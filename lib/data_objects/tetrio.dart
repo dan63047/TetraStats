@@ -1,217 +1,607 @@
+import 'dart:math';
+
 class TetrioPlayer{
-  final String userId;
-  final String username;
-  final String role;
-  final DateTime registrationTime;
-  final List badges;
-  final String bio;
-  final String country;
-  final int friendCount;
-  final int gamesPlayed;
-  final int gamesWon;
-  final double gameTime;
-  final double xp;
-  final int supporterTier;
-  final bool verified;
-  final List<String> connection;
-  final TetraLeagueAlpha tlSeason1;
-  final List<TetrioSprint> sprint;
-  final List<TetrioBlitz> blitz;
-  final TetrioZen zen;
+  String? userId;
+  String? username;
+  String? role;
+  int? avatarRevision;
+  int? bannerRevision;
+  DateTime? registrationTime;
+  List<Badge>? badges;
+  String? bio;
+  String? country;
+  int? friendCount;
+  int? gamesPlayed;
+  int? gamesWon;
+  double? gameTime;
+  double? xp;
+  int? supporterTier;
+  bool? verified;
+  Connections? connections;
+  TetraLeagueAlpha? tlSeason1;
+  List<RecordSingle>? sprint;
+  List<RecordSingle>? blitz;
+  TetrioZen? zen;
 
-  const TetrioPlayer({
-    required this.userId,
-    required this.username,
-    required this.role,
-    required this.registrationTime,
-    required this.badges,
-    required this.bio,
-    required this.country,
-    required this.friendCount,
-    required this.gamesPlayed,
-    required this.gamesWon,
-    required this.gameTime,
-    required this.xp,
-    required this.supporterTier,
-    required this.verified,
-    required this.connection,
-    required this.tlSeason1,
-    required this.sprint,
-    required this.blitz,
-    required this.zen,
+  TetrioPlayer({
+    this.userId,
+    this.username,
+    this.role,
+    this.registrationTime,
+    this.badges,
+    this.bio,
+    this.country,
+    this.friendCount,
+    this.gamesPlayed,
+    this.gamesWon,
+    this.gameTime,
+    this.xp,
+    this.supporterTier,
+    this.verified,
+    this.connections,
+    this.tlSeason1,
+    this.sprint,
+    this.blitz,
+    this.zen,
   });
+
+  double getLevel(){
+    return pow((xp!/500), 0.6)+(xp!/(5000+(max(0, xp!-4*pow(10, 6))/5000)))+1;
+  }
+
+  TetrioPlayer.fromJson(Map<String, dynamic> json) {
+    userId = json['data']['user']['_id'];
+    username = json['data']['user']['username'];
+    role = json['data']['user']['role'];
+    registrationTime = DateTime.parse(json['data']['user']['ts']);
+    if (json['data']['user']['badges'] != null) {
+      badges = <Badge>[];
+      json['data']['user']['badges'].forEach((v) {
+        badges!.add(Badge.fromJson(v));
+      });
+    }
+    xp = json['data']['user']['xp'].toDouble();
+    gamesPlayed = json['data']['user']['gamesplayed'];
+    gamesWon = json['data']['user']['gameswon'];
+    gameTime = json['data']['user']['gametime'].toDouble();
+    country = json['data']['user']['country'];
+    supporterTier = json['data']['user']['supporter_tier'];
+    verified = json['data']['user']['verified'];
+    tlSeason1 =
+    json['data']['user']['league'] != null ? TetraLeagueAlpha.fromJson(json['data']['user']['league']) : null;
+    avatarRevision = json['data']['user']['avatar_revision'];
+    bannerRevision = json['data']['user']['banner_revision'];
+    bio = json['data']['user']['bio'];
+    connections = json['data']['user']['connections'] != null
+        ? Connections.fromJson(json['data']['user']['connections'])
+        : null;
+    friendCount = json['data']['user']['friend_count'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['_id'] = userId;
+    data['username'] = username;
+    data['role'] = role;
+    data['ts'] = registrationTime;
+    if (badges != null) {
+      data['badges'] = badges!.map((v) => v.toJson()).toList();
+    }
+    data['xp'] = xp;
+    data['gamesplayed'] = gamesPlayed;
+    data['gameswon'] = gamesWon;
+    data['gametime'] = gameTime;
+    data['country'] = country;
+    data['supporter_tier'] = supporterTier;
+    data['verified'] = verified;
+    if (tlSeason1 != null) {
+      data['league'] = tlSeason1!.toJson();
+    }
+    data['avatar_revision'] = avatarRevision;
+    data['banner_revision'] = bannerRevision;
+    data['bio'] = bio;
+    if (connections != null) {
+      data['connections'] = connections!.toJson();
+    }
+    data['friend_count'] = friendCount;
+    return data;
+  }
+
 }
 
-class EndContextClears{
-  final int singles;
-  final int doubles;
-  final int triples;
-  final int quads;
-  final int allClears;
-  final int tSpinZeros;
-  final int tSpinSingles;
-  final int tSpinDoubles;
-  final int tSpinTriples;
-  final int tSpinQuads;
-  final int tSpinMiniZeros;
-  final int tSpinMiniSingles;
-  final int tSpinMiniDoubles;
+class Badge{
+  String? badgeId;
+  String? label;
+  DateTime? ts;
 
-  const EndContextClears({
-    required this.singles,
-    required this.doubles,
-    required this.triples,
-    required this.quads,
-    required this.allClears,
-    required this.tSpinZeros,
-    required this.tSpinSingles,
-    required this.tSpinDoubles,
-    required this.tSpinTriples,
-    required this.tSpinQuads,
-    required this.tSpinMiniZeros,
-    required this.tSpinMiniSingles,
-    required this.tSpinMiniDoubles
-});
+  Badge({
+    required this.badgeId,
+    required this.label,
+    required this.ts
+  });
+
+  Badge.fromJson(Map<String, dynamic> json) {
+    badgeId = json['id'];
+    label = json['label'];
+    ts = DateTime.parse(json['ts']);
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = badgeId;
+    data['label'] = label;
+    data['ts'] = ts;
+    return data;
+  }
 }
 
-class EndContextFinesse{
-  final int combo;
-  final int faults;
-  final int perfectPieces;
+class Connections {
+  Discord? discord;
 
-  const EndContextFinesse({
-    required this.combo,
-    required this.faults,
-    required this.perfectPieces
-});
+  Connections({this.discord});
+
+  Connections.fromJson(Map<String, dynamic> json) {
+    discord =
+    json['discord'] != null ? Discord.fromJson(json['discord']) : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (discord != null) {
+      data['discord'] = discord!.toJson();
+    }
+    return data;
+  }
 }
 
-class ReplayEndContextSingle{
-  final String gameType;
-  final int topBtB;
-  final int topCombo;
-  final int holds;
-  final int inputs;
-  final int level;
-  final int piecesPlaced;
-  final int lines;
-  final int score;
-  final int seed;
-  final double finalTime;
-  final int tSpins;
-  final EndContextClears clears;
-  final EndContextFinesse finesse;
+class Clears{
+  int? singles;
+  int? doubles;
+  int? triples;
+  int? quads;
+  int? allClears;
+  int? tSpinZeros;
+  int? tSpinSingles;
+  int? tSpinDoubles;
+  int? tSpinTriples;
+  int? tSpinQuads;
+  int? tSpinMiniZeros;
+  int? tSpinMiniSingles;
+  int? tSpinMiniDoubles;
 
-  const ReplayEndContextSingle({
-    required this.gameType,
-    required this.topBtB,
-    required this.topCombo,
-    required this.holds,
-    required this.inputs,
-    required this.level,
-    required this.piecesPlaced,
-    required this.lines,
-    required this.score,
-    required this.seed,
-    required this.finalTime,
-    required this.tSpins,
-    required this.clears,
-    required this.finesse
+  Clears({
+    this.singles,
+    this.doubles,
+    this.triples,
+    this.quads,
+    this.allClears,
+    this.tSpinZeros,
+    this.tSpinSingles,
+    this.tSpinDoubles,
+    this.tSpinTriples,
+    this.tSpinQuads,
+    this.tSpinMiniZeros,
+    this.tSpinMiniSingles,
+    this.tSpinMiniDoubles
 });
+
+  Clears.fromJson(Map<String, dynamic> json) {
+    singles = json['singles'];
+    doubles = json['doubles'];
+    triples = json['triples'];
+    quads = json['quads'];
+    tSpinZeros = json['realtspins'];
+    tSpinMiniZeros = json['minitspins'];
+    tSpinMiniSingles = json['minitspinsingles'];
+    tSpinSingles = json['tspinsingles'];
+    tSpinMiniDoubles = json['minitspindoubles'];
+    tSpinDoubles = json['tspindoubles'];
+    tSpinTriples = json['tspintriples'];
+    tSpinQuads = json['tspinquads'];
+    allClears = json['allclear'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['singles'] = singles;
+    data['doubles'] = doubles;
+    data['triples'] = triples;
+    data['quads'] = quads;
+    data['realtspins'] = tSpinZeros;
+    data['minitspins'] = tSpinMiniZeros;
+    data['minitspinsingles'] = tSpinMiniSingles;
+    data['tspinsingles'] = tSpinSingles;
+    data['minitspindoubles'] = tSpinMiniDoubles;
+    data['tspindoubles'] = tSpinDoubles;
+    data['tspintriples'] = tSpinTriples;
+    data['tspinquads'] = tSpinQuads;
+    data['allclear'] = allClears;
+    return data;
+  }
+}
+
+class Discord {
+  String? id;
+  String? username;
+
+  Discord({this.id, this.username});
+
+  Discord.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    username = json['username'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['username'] = username;
+    return data;
+  }
+}
+
+class Finesse{
+  int? combo;
+  int? faults;
+  int? perfectPieces;
+
+  Finesse({
+    this.combo,
+    this.faults,
+    this.perfectPieces
+});
+
+  Finesse.fromJson(Map<String, dynamic> json) {
+    combo = json['combo'];
+    faults = json['faults'];
+    perfectPieces = json['perfectpieces'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['combo'] = combo;
+    data['faults'] = faults;
+    data['perfectpieces'] = perfectPieces;
+    return data;
+  }
+}
+
+class EndContextSingle{
+  String? gameType;
+  int? topBtB;
+  int? topCombo;
+  int? holds;
+  int? inputs;
+  int? level;
+  int? piecesPlaced;
+  int? lines;
+  int? score;
+  int? seed;
+  double? finalTime;
+  int? tSpins;
+  Clears? clears;
+  Finesse? finesse;
+
+  EndContextSingle({
+    this.gameType,
+    this.topBtB,
+    this.topCombo,
+    this.holds,
+    this.inputs,
+    this.level,
+    this.piecesPlaced,
+    this.lines,
+    this.score,
+    this.seed,
+    this.finalTime,
+    this.tSpins,
+    this.clears,
+    this.finesse
+});
+
+  EndContextSingle.fromJson(Map<String, dynamic> json) {
+    seed = json['seed'];
+    lines = json['lines'];
+    inputs = json['inputs'];
+    holds = json['holds'];
+    finalTime = json['finalTime'];
+    score = json['score'];
+    level = json['level'];
+    topCombo = json['topcombo'];
+    topBtB = json['topbtb'];
+    tSpins = json['tspins'];
+    piecesPlaced = json['piecesplaced'];
+    clears = json['clears'] != null ? Clears.fromJson(json['clears']) : null;
+    finesse = json['finesse'] != null ? Finesse.fromJson(json['finesse']) : null;
+    gameType = json['gametype'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['seed'] = seed;
+    data['lines'] = lines;
+    data['inputs'] = inputs;
+    data['holds'] = holds;
+    data['score'] = score;
+    data['level'] = level;
+    data['topcombo'] = topCombo;
+    data['topbtb'] = topBtB;
+    data['tspins'] = tSpins;
+    data['piecesplaced'] = piecesPlaced;
+    if (clears != null) {
+      data['clears'] = clears!.toJson();
+    }
+    if (finesse != null) {
+      data['finesse'] = finesse!.toJson();
+    }
+    data['finalTime'] = finalTime;
+    data['gametype'] = gameType;
+    return data;
+  }
+}
+
+class Handling{
+  double? arr;
+  double? das;
+  int? sdf;
+  int? dcd;
+  bool? cancel;
+  bool? safeLock;
+
+  Handling({
+    this.arr,
+    this.das,
+    this.sdf,
+    this.dcd,
+    this.cancel,
+    this.safeLock
+  });
+
+  Handling.fromJson(Map<String, dynamic> json) {
+    arr = json['arr'];
+    das = json['das'];
+    dcd = json['dcd'];
+    sdf = json['sdf'];
+    safeLock = json['safelock'];
+    cancel = json['cancel'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['arr'] = arr;
+    data['das'] = das;
+    data['dcd'] = dcd;
+    data['sdf'] = sdf;
+    data['safelock'] = safeLock;
+    data['cancel'] = cancel;
+    return data;
+  }
+}
+
+class EndContextMulti{
+  String? userId;
+  int? naturalOrder;
+  int? inputs;
+  int? piecesPlaced;
+  Handling? handling;
+  int? points;
+  int? wins;
+  double? secondary;
+  List<double>? secondaryTracking;
+  double? tertiary;
+  List<double>? tertiaryTracking;
+  double? extra;
+  List<double>? extraTracking;
+  bool? success;
+
+  EndContextMulti({
+    this.userId,
+    this.naturalOrder,
+    this.inputs,
+    this.piecesPlaced,
+    this.handling,
+    this.points,
+    this.wins,
+    this.secondary,
+    this.secondaryTracking,
+    this.tertiary,
+    this.tertiaryTracking,
+    this.extra,
+    this.extraTracking,
+    this.success
+});
+
+  EndContextMulti.fromJson(Map<String, dynamic> json) {
+    userId = json['user']['_id'];
+    handling = json['handling'] != null
+        ? Handling.fromJson(json['handling'])
+        : null;
+    success = json['success'];
+    inputs = json['inputs'];
+    piecesPlaced = json['piecesplaced'];
+    naturalOrder = json['naturalorder'];
+    wins = json['wins'];
+    points = json['points']['primary'];
+    secondary = json['points']['secondary'];
+    tertiary = json['points']['tertiary'];
+    secondaryTracking = json['points']['secondaryAvgTracking'].cast<double>();
+    tertiaryTracking = json['points']['tertiaryAvgTracking'].cast<double>();
+    extra = json['points']['extra']['vs'];
+    extraTracking = json['points']['extraAvgTracking']['aggregatestats___vsscore'].cast<double>();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['user'] = userId;
+    if (handling != null) {
+      data['handling'] = handling!.toJson();
+    }
+    data['success'] = success;
+    data['inputs'] = inputs;
+    data['piecesplaced'] = piecesPlaced;
+    data['naturalorder'] = naturalOrder;
+    data['wins'] = wins;
+    data['points']['primary'] = points;
+    data['points']['secondary'] = secondary;
+    data['points']['tertiary'] = tertiary;
+    data['points']['extra']['vs'] = extra;
+    data['points']['extraAvgTracking']['aggregatestats___vsscore'] = extraTracking;
+    return data;
+  }
 }
 
 class TetraLeagueAlpha{
-  final String userId;
-  final int gamesPlayed;
-  final int gamesWon;
-  final String bestRank;
-  final bool decaying;
-  final double rating;
-  final String rank;
-  final double gliko;
-  final double rd;
-  final String percentileRank;
-  final String percentile;
-  final int standing;
-  final int standingLocal;
-  final String nextRank;
-  final int nextAt;
-  final String prevRank;
-  final int prevAt;
-  final double apm;
-  final double pps;
-  final double vs;
-  final List records;
+  String? userId;
+  int? gamesPlayed;
+  int? gamesWon;
+  String? bestRank;
+  bool? decaying;
+  double? rating;
+  String? rank;
+  double? glicko;
+  double? rd;
+  String? percentileRank;
+  double? percentile;
+  int? standing;
+  int? standingLocal;
+  String? nextRank;
+  int? nextAt;
+  String? prevRank;
+  int? prevAt;
+  double? apm;
+  double? pps;
+  double? vs;
+  List? records;
 
-  const TetraLeagueAlpha({
-    required this.userId,
-    required this.gamesPlayed,
-    required this.gamesWon,
-    required this.bestRank,
-    required this.decaying,
-    required this.rating,
-    required this.rank,
-    required this.gliko,
-    required this.rd,
-    required this.percentileRank,
-    required this.percentile,
-    required this.standing,
-    required this.standingLocal,
-    required this.nextRank,
-    required this.nextAt,
-    required this.prevRank,
-    required this.prevAt,
-    required this.apm,
-    required this.pps,
-    required this.vs,
-    required this.records
+  TetraLeagueAlpha({
+    this.userId,
+    this.gamesPlayed,
+    this.gamesWon,
+    this.bestRank,
+    this.decaying,
+    this.rating,
+    this.rank,
+    this.glicko,
+    this.rd,
+    this.percentileRank,
+    this.percentile,
+    this.standing,
+    this.standingLocal,
+    this.nextRank,
+    this.nextAt,
+    this.prevRank,
+    this.prevAt,
+    this.apm,
+    this.pps,
+    this.vs,
+    this.records
 });
+
+  TetraLeagueAlpha.fromJson(Map<String, dynamic> json) {
+    gamesPlayed = json['gamesplayed'];
+    gamesWon = json['gameswon'];
+    rating = json['rating'].toDouble();
+    glicko = json['glicko'].toDouble();
+    rd = json['rd'].toDouble();
+    rank = json['rank'];
+    bestRank = json['bestrank'];
+    apm = json['apm'].toDouble();
+    pps = json['pps'].toDouble();
+    vs = json['vs'].toDouble();
+    decaying = json['decaying'];
+    standing = json['standing'];
+    percentile = json['percentile'].toDouble();
+    standingLocal = json['standing_local'];
+    prevRank = json['prev_rank'];
+    prevAt = json['prev_at'];
+    nextRank = json['next_rank'];
+    nextAt = json['next_at'];
+    percentileRank = json['percentile_rank'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['gamesplayed'] = gamesPlayed;
+    data['gameswon'] = gamesWon;
+    data['rating'] = rating;
+    data['glicko'] = glicko;
+    data['rd'] = rd;
+    data['rank'] = rank;
+    data['bestrank'] = bestRank;
+    data['apm'] = apm;
+    data['pps'] = pps;
+    data['vs'] = vs;
+    data['decaying'] = decaying;
+    data['standing'] = standing;
+    data['percentile'] = percentile;
+    data['standing_local'] = standingLocal;
+    data['prev_rank'] = prevRank;
+    data['prev_at'] = prevAt;
+    data['next_rank'] = nextRank;
+    data['next_at'] = nextAt;
+    data['percentile_rank'] = percentileRank;
+    return data;
+  }
 }
 
-class TetrioSprint{
-  final String userId;
-  final String replayId;
-  final String ownId;
-  final DateTime timestamp;
-  final ReplayEndContextSingle endContext;
-  final int rank;
+class RecordSingle{
+  String? userId;
+  String? replayId;
+  String? ownId;
+  DateTime? timestamp;
+  EndContextSingle? endContext;
+  int? rank;
 
-  const TetrioSprint({
-    required this.userId,
-    required this.replayId,
-    required this.ownId,
-    required this.timestamp,
-    required this.endContext,
-    required this.rank
-});
-}
-
-class TetrioBlitz{
-  final String userId;
-  final String replayId;
-  final String ownId;
-  final DateTime timestamp;
-  final ReplayEndContextSingle endContext;
-  final int rank;
-
-  const TetrioBlitz({
-    required this.userId,
-    required this.replayId,
-    required this.ownId,
-    required this.timestamp,
-    required this.endContext,
-    required this.rank
+  RecordSingle({
+    this.userId,
+    this.replayId,
+    this.ownId,
+    this.timestamp,
+    this.endContext,
+    this.rank
   });
+
+  RecordSingle.fromJson(Map<String, dynamic> json) {
+    ownId = json['_id'];
+    endContext = json['endcontext'] != null ? EndContextSingle.fromJson(json['endcontext']) : null;
+    replayId = json['replayid'];
+    timestamp = json['ts'];
+    userId = json['user']['_id'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['_id'] = ownId;
+    if (endContext != null) {
+      data['endcontext'] = endContext!.toJson();
+    }
+    data['ismulti'] = false;
+    data['replayid'] = replayId;
+    data['ts'] = timestamp;
+    data['user_id'] = userId;
+    return data;
+  }
 }
 
 class TetrioZen{
-  final String userId;
-  final int level;
-  final int score;
+  String? userId;
+  int? level;
+  int? score;
 
-  const TetrioZen({
-    required this.userId,
-    required this.level,
-    required this.score
+  TetrioZen({
+    this.userId,
+    this.level,
+    this.score
 });
+
+  TetrioZen.fromJson(Map<String, dynamic> json) {
+    level = json['level'];
+    score = json['score'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['level'] = level;
+    data['score'] = score;
+    return data;
+  }
 }
