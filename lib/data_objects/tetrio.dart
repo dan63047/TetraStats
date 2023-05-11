@@ -1,4 +1,27 @@
 import 'dart:math';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+Future<TetrioPlayer> fetchTetrioRecords(String user) async {
+  var url = Uri.https('ch.tetr.io', 'api/users/$user/records');
+  final response = await http.get(url);
+  // final response = await http.get(Uri.parse('https://ch.tetr.io/'));
+
+  if (response.statusCode == 200) {
+    // If the server did return a 200 OK response,
+    // then parse the JSON.
+    return TetrioPlayer.fromJson(jsonDecode(response.body));
+  } else {
+    // If the server did not return a 200 OK response,
+    // then throw an exception.
+    throw Exception('Failed to fetch player');
+  }
+}
+
+Duration doubleSecondsToDuration(double value) {
+  value = value * 1000000;
+  return Duration(microseconds: value.floor());
+}
 
 class TetrioPlayer {
   String? userId;
@@ -13,7 +36,7 @@ class TetrioPlayer {
   int? friendCount;
   int? gamesPlayed;
   int? gamesWon;
-  double? gameTime;
+  Duration? gameTime;
   double? xp;
   int? supporterTier;
   bool? verified;
@@ -52,35 +75,56 @@ class TetrioPlayer {
   }
 
   TetrioPlayer.fromJson(Map<String, dynamic> json) {
-    userId = json['data']['user']['_id'];
-    username = json['data']['user']['username'];
-    role = json['data']['user']['role'];
-    registrationTime = json['data']['user']['ts'] != null
-        ? DateTime.parse(json['data']['user']['ts'])
-        : null;
-    if (json['data']['user']['badges'] != null) {
+    userId = json['_id'];
+    username = json['username'];
+    role = json['role'];
+    registrationTime = json['ts'] != null ? DateTime.parse(json['ts']) : null;
+    if (json['badges'] != null) {
       badges = <Badge>[];
-      json['data']['user']['badges'].forEach((v) {
+      json['badges'].forEach((v) {
         badges!.add(Badge.fromJson(v));
       });
     }
-    xp = json['data']['user']['xp'].toDouble();
-    gamesPlayed = json['data']['user']['gamesplayed'];
-    gamesWon = json['data']['user']['gameswon'];
-    gameTime = json['data']['user']['gametime'].toDouble();
-    country = json['data']['user']['country'];
-    supporterTier = json['data']['user']['supporter_tier'];
-    verified = json['data']['user']['verified'];
-    tlSeason1 = json['data']['user']['league'] != null
-        ? TetraLeagueAlpha.fromJson(json['data']['user']['league'])
+    xp = json['xp'].toDouble();
+    gamesPlayed = json['gamesplayed'];
+    gamesWon = json['gameswon'];
+    gameTime = doubleSecondsToDuration(json['gametime'].toDouble());
+    country = json['country'];
+    supporterTier = json['supporter_tier'];
+    verified = json['verified'];
+    tlSeason1 = json['league'] != null
+        ? TetraLeagueAlpha.fromJson(json['league'])
         : null;
-    avatarRevision = json['data']['user']['avatar_revision'];
-    bannerRevision = json['data']['user']['banner_revision'];
-    bio = json['data']['user']['bio'];
-    connections = json['data']['user']['connections'] != null
-        ? Connections.fromJson(json['data']['user']['connections'])
+    avatarRevision = json['avatar_revision'];
+    bannerRevision = json['banner_revision'];
+    bio = json['bio'];
+    connections = json['connections'] != null
+        ? Connections.fromJson(json['connections'])
         : null;
-    friendCount = json['data']['user']['friend_count'];
+    var url = Uri.https('ch.tetr.io', 'api/users/$userId/records');
+    Future response = http.get(url);
+    response.then((value) {
+      if (value.statusCode == 200) {
+        sprint = jsonDecode(value.body)['data']['records']['40l']['record'] !=
+                null
+            ? [
+                RecordSingle.fromJson(
+                    jsonDecode(value.body)['data']['records']['40l']['record'])
+              ]
+            : null;
+        blitz =
+            jsonDecode(value.body)['data']['records']['blitz']['record'] != null
+                ? [
+                    RecordSingle.fromJson(jsonDecode(value.body)['data']
+                        ['records']['blitz']['record'])
+                  ]
+                : null;
+        zen = TetrioZen.fromJson(jsonDecode(value.body)['data']['zen']);
+      } else {
+        throw Exception('Failed to fetch player');
+      }
+    });
+    friendCount = json['friend_count'];
   }
 
   Map<String, dynamic> toJson() {
@@ -271,7 +315,7 @@ class EndContextSingle {
   int? lines;
   int? score;
   int? seed;
-  double? finalTime;
+  Duration? finalTime;
   int? tSpins;
   Clears? clears;
   Finesse? finesse;
@@ -297,7 +341,7 @@ class EndContextSingle {
     lines = json['lines'];
     inputs = json['inputs'];
     holds = json['holds'];
-    finalTime = json['finalTime'];
+    finalTime = doubleSecondsToDuration(json['finalTime'].toDouble());
     score = json['score'];
     level = json['level'];
     topCombo = json['topcombo'];
@@ -554,7 +598,7 @@ class RecordSingle {
         ? EndContextSingle.fromJson(json['endcontext'])
         : null;
     replayId = json['replayid'];
-    timestamp = json['ts'];
+    timestamp = DateTime.parse(json['ts']);
     userId = json['user']['_id'];
   }
 
