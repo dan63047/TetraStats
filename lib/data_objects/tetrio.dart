@@ -1,6 +1,6 @@
 import 'dart:math';
 
-class TetrioPlayer{
+class TetrioPlayer {
   String? userId;
   String? username;
   String? role;
@@ -45,15 +45,19 @@ class TetrioPlayer{
     this.zen,
   });
 
-  double getLevel(){
-    return pow((xp!/500), 0.6)+(xp!/(5000+(max(0, xp!-4*pow(10, 6))/5000)))+1;
+  double getLevel() {
+    return pow((xp! / 500), 0.6) +
+        (xp! / (5000 + (max(0, xp! - 4 * pow(10, 6)) / 5000))) +
+        1;
   }
 
   TetrioPlayer.fromJson(Map<String, dynamic> json) {
     userId = json['data']['user']['_id'];
     username = json['data']['user']['username'];
     role = json['data']['user']['role'];
-    registrationTime = DateTime.parse(json['data']['user']['ts']);
+    registrationTime = json['data']['user']['ts'] != null
+        ? DateTime.parse(json['data']['user']['ts'])
+        : null;
     if (json['data']['user']['badges'] != null) {
       badges = <Badge>[];
       json['data']['user']['badges'].forEach((v) {
@@ -67,8 +71,9 @@ class TetrioPlayer{
     country = json['data']['user']['country'];
     supporterTier = json['data']['user']['supporter_tier'];
     verified = json['data']['user']['verified'];
-    tlSeason1 =
-    json['data']['user']['league'] != null ? TetraLeagueAlpha.fromJson(json['data']['user']['league']) : null;
+    tlSeason1 = json['data']['user']['league'] != null
+        ? TetraLeagueAlpha.fromJson(json['data']['user']['league'])
+        : null;
     avatarRevision = json['data']['user']['avatar_revision'];
     bannerRevision = json['data']['user']['banner_revision'];
     bio = json['data']['user']['bio'];
@@ -106,24 +111,19 @@ class TetrioPlayer{
     data['friend_count'] = friendCount;
     return data;
   }
-
 }
 
-class Badge{
+class Badge {
   String? badgeId;
   String? label;
   DateTime? ts;
 
-  Badge({
-    required this.badgeId,
-    required this.label,
-    required this.ts
-  });
+  Badge({required this.badgeId, required this.label, required this.ts});
 
   Badge.fromJson(Map<String, dynamic> json) {
     badgeId = json['id'];
     label = json['label'];
-    ts = DateTime.parse(json['ts']);
+    ts = json['ts'] != null ? DateTime.parse(json['ts']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -142,7 +142,7 @@ class Connections {
 
   Connections.fromJson(Map<String, dynamic> json) {
     discord =
-    json['discord'] != null ? Discord.fromJson(json['discord']) : null;
+        json['discord'] != null ? Discord.fromJson(json['discord']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -154,7 +154,7 @@ class Connections {
   }
 }
 
-class Clears{
+class Clears {
   int? singles;
   int? doubles;
   int? triples;
@@ -169,21 +169,20 @@ class Clears{
   int? tSpinMiniSingles;
   int? tSpinMiniDoubles;
 
-  Clears({
-    this.singles,
-    this.doubles,
-    this.triples,
-    this.quads,
-    this.allClears,
-    this.tSpinZeros,
-    this.tSpinSingles,
-    this.tSpinDoubles,
-    this.tSpinTriples,
-    this.tSpinQuads,
-    this.tSpinMiniZeros,
-    this.tSpinMiniSingles,
-    this.tSpinMiniDoubles
-});
+  Clears(
+      {this.singles,
+      this.doubles,
+      this.triples,
+      this.quads,
+      this.allClears,
+      this.tSpinZeros,
+      this.tSpinSingles,
+      this.tSpinDoubles,
+      this.tSpinTriples,
+      this.tSpinQuads,
+      this.tSpinMiniZeros,
+      this.tSpinMiniSingles,
+      this.tSpinMiniDoubles});
 
   Clears.fromJson(Map<String, dynamic> json) {
     singles = json['singles'];
@@ -239,16 +238,12 @@ class Discord {
   }
 }
 
-class Finesse{
+class Finesse {
   int? combo;
   int? faults;
   int? perfectPieces;
 
-  Finesse({
-    this.combo,
-    this.faults,
-    this.perfectPieces
-});
+  Finesse({this.combo, this.faults, this.perfectPieces});
 
   Finesse.fromJson(Map<String, dynamic> json) {
     combo = json['combo'];
@@ -265,7 +260,7 @@ class Finesse{
   }
 }
 
-class EndContextSingle{
+class EndContextSingle {
   String? gameType;
   int? topBtB;
   int? topCombo;
@@ -281,22 +276,21 @@ class EndContextSingle{
   Clears? clears;
   Finesse? finesse;
 
-  EndContextSingle({
-    this.gameType,
-    this.topBtB,
-    this.topCombo,
-    this.holds,
-    this.inputs,
-    this.level,
-    this.piecesPlaced,
-    this.lines,
-    this.score,
-    this.seed,
-    this.finalTime,
-    this.tSpins,
-    this.clears,
-    this.finesse
-});
+  EndContextSingle(
+      {this.gameType,
+      this.topBtB,
+      this.topCombo,
+      this.holds,
+      this.inputs,
+      this.level,
+      this.piecesPlaced,
+      this.lines,
+      this.score,
+      this.seed,
+      this.finalTime,
+      this.tSpins,
+      this.clears,
+      this.finesse});
 
   EndContextSingle.fromJson(Map<String, dynamic> json) {
     seed = json['seed'];
@@ -311,7 +305,8 @@ class EndContextSingle{
     tSpins = json['tspins'];
     piecesPlaced = json['piecesplaced'];
     clears = json['clears'] != null ? Clears.fromJson(json['clears']) : null;
-    finesse = json['finesse'] != null ? Finesse.fromJson(json['finesse']) : null;
+    finesse =
+        json['finesse'] != null ? Finesse.fromJson(json['finesse']) : null;
     gameType = json['gametype'];
   }
 
@@ -339,7 +334,7 @@ class EndContextSingle{
   }
 }
 
-class Handling{
+class Handling {
   double? arr;
   double? das;
   int? sdf;
@@ -347,14 +342,8 @@ class Handling{
   bool? cancel;
   bool? safeLock;
 
-  Handling({
-    this.arr,
-    this.das,
-    this.sdf,
-    this.dcd,
-    this.cancel,
-    this.safeLock
-  });
+  Handling(
+      {this.arr, this.das, this.sdf, this.dcd, this.cancel, this.safeLock});
 
   Handling.fromJson(Map<String, dynamic> json) {
     arr = json['arr'];
@@ -377,7 +366,7 @@ class Handling{
   }
 }
 
-class EndContextMulti{
+class EndContextMulti {
   String? userId;
   int? naturalOrder;
   int? inputs;
@@ -393,28 +382,26 @@ class EndContextMulti{
   List<double>? extraTracking;
   bool? success;
 
-  EndContextMulti({
-    this.userId,
-    this.naturalOrder,
-    this.inputs,
-    this.piecesPlaced,
-    this.handling,
-    this.points,
-    this.wins,
-    this.secondary,
-    this.secondaryTracking,
-    this.tertiary,
-    this.tertiaryTracking,
-    this.extra,
-    this.extraTracking,
-    this.success
-});
+  EndContextMulti(
+      {this.userId,
+      this.naturalOrder,
+      this.inputs,
+      this.piecesPlaced,
+      this.handling,
+      this.points,
+      this.wins,
+      this.secondary,
+      this.secondaryTracking,
+      this.tertiary,
+      this.tertiaryTracking,
+      this.extra,
+      this.extraTracking,
+      this.success});
 
   EndContextMulti.fromJson(Map<String, dynamic> json) {
     userId = json['user']['_id'];
-    handling = json['handling'] != null
-        ? Handling.fromJson(json['handling'])
-        : null;
+    handling =
+        json['handling'] != null ? Handling.fromJson(json['handling']) : null;
     success = json['success'];
     inputs = json['inputs'];
     piecesPlaced = json['piecesplaced'];
@@ -426,7 +413,9 @@ class EndContextMulti{
     secondaryTracking = json['points']['secondaryAvgTracking'].cast<double>();
     tertiaryTracking = json['points']['tertiaryAvgTracking'].cast<double>();
     extra = json['points']['extra']['vs'];
-    extraTracking = json['points']['extraAvgTracking']['aggregatestats___vsscore'].cast<double>();
+    extraTracking = json['points']['extraAvgTracking']
+            ['aggregatestats___vsscore']
+        .cast<double>();
   }
 
   Map<String, dynamic> toJson() {
@@ -444,12 +433,13 @@ class EndContextMulti{
     data['points']['secondary'] = secondary;
     data['points']['tertiary'] = tertiary;
     data['points']['extra']['vs'] = extra;
-    data['points']['extraAvgTracking']['aggregatestats___vsscore'] = extraTracking;
+    data['points']['extraAvgTracking']['aggregatestats___vsscore'] =
+        extraTracking;
     return data;
   }
 }
 
-class TetraLeagueAlpha{
+class TetraLeagueAlpha {
   String? userId;
   int? gamesPlayed;
   int? gamesWon;
@@ -472,41 +462,40 @@ class TetraLeagueAlpha{
   double? vs;
   List? records;
 
-  TetraLeagueAlpha({
-    this.userId,
-    this.gamesPlayed,
-    this.gamesWon,
-    this.bestRank,
-    this.decaying,
-    this.rating,
-    this.rank,
-    this.glicko,
-    this.rd,
-    this.percentileRank,
-    this.percentile,
-    this.standing,
-    this.standingLocal,
-    this.nextRank,
-    this.nextAt,
-    this.prevRank,
-    this.prevAt,
-    this.apm,
-    this.pps,
-    this.vs,
-    this.records
-});
+  TetraLeagueAlpha(
+      {this.userId,
+      this.gamesPlayed,
+      this.gamesWon,
+      this.bestRank,
+      this.decaying,
+      this.rating,
+      this.rank,
+      this.glicko,
+      this.rd,
+      this.percentileRank,
+      this.percentile,
+      this.standing,
+      this.standingLocal,
+      this.nextRank,
+      this.nextAt,
+      this.prevRank,
+      this.prevAt,
+      this.apm,
+      this.pps,
+      this.vs,
+      this.records});
 
   TetraLeagueAlpha.fromJson(Map<String, dynamic> json) {
     gamesPlayed = json['gamesplayed'];
     gamesWon = json['gameswon'];
     rating = json['rating'].toDouble();
-    glicko = json['glicko'].toDouble();
-    rd = json['rd'].toDouble();
+    glicko = json['glicko']?.toDouble();
+    rd = json['rd']?.toDouble();
     rank = json['rank'];
     bestRank = json['bestrank'];
-    apm = json['apm'].toDouble();
-    pps = json['pps'].toDouble();
-    vs = json['vs'].toDouble();
+    apm = json['apm']?.toDouble();
+    pps = json['pps']?.toDouble();
+    vs = json['vs']?.toDouble();
     decaying = json['decaying'];
     standing = json['standing'];
     percentile = json['percentile'].toDouble();
@@ -543,7 +532,7 @@ class TetraLeagueAlpha{
   }
 }
 
-class RecordSingle{
+class RecordSingle {
   String? userId;
   String? replayId;
   String? ownId;
@@ -551,18 +540,19 @@ class RecordSingle{
   EndContextSingle? endContext;
   int? rank;
 
-  RecordSingle({
-    this.userId,
-    this.replayId,
-    this.ownId,
-    this.timestamp,
-    this.endContext,
-    this.rank
-  });
+  RecordSingle(
+      {this.userId,
+      this.replayId,
+      this.ownId,
+      this.timestamp,
+      this.endContext,
+      this.rank});
 
   RecordSingle.fromJson(Map<String, dynamic> json) {
     ownId = json['_id'];
-    endContext = json['endcontext'] != null ? EndContextSingle.fromJson(json['endcontext']) : null;
+    endContext = json['endcontext'] != null
+        ? EndContextSingle.fromJson(json['endcontext'])
+        : null;
     replayId = json['replayid'];
     timestamp = json['ts'];
     userId = json['user']['_id'];
@@ -582,16 +572,12 @@ class RecordSingle{
   }
 }
 
-class TetrioZen{
+class TetrioZen {
   String? userId;
   int? level;
   int? score;
 
-  TetrioZen({
-    this.userId,
-    this.level,
-    this.score
-});
+  TetrioZen({this.userId, this.level, this.score});
 
   TetrioZen.fromJson(Map<String, dynamic> json) {
     level = json['level'];
