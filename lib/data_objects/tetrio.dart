@@ -2,75 +2,67 @@ import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-Future<TetrioPlayer> fetchTetrioRecords(String user) async {
-  var url = Uri.https('ch.tetr.io', 'api/users/$user/records');
-  final response = await http.get(url);
-  // final response = await http.get(Uri.parse('https://ch.tetr.io/'));
-
-  if (response.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
-    return TetrioPlayer.fromJson(jsonDecode(response.body));
-  } else {
-    // If the server did not return a 200 OK response,
-    // then throw an exception.
-    throw Exception('Failed to fetch player');
-  }
-}
-
 Duration doubleSecondsToDuration(double value) {
   value = value * 1000000;
   return Duration(microseconds: value.floor());
 }
 
+Duration doubleMillisecondsToDuration(double value) {
+  value = value * 1000;
+  return Duration(microseconds: value.floor());
+}
+
 class TetrioPlayer {
-  String? userId;
-  String? username;
-  String? role;
+  late String userId;
+  late String username;
+  late String role;
   int? avatarRevision;
   int? bannerRevision;
   DateTime? registrationTime;
-  List<Badge>? badges;
+  List<Badge> badges = [];
   String? bio;
   String? country;
-  int? friendCount;
-  int? gamesPlayed;
-  int? gamesWon;
-  Duration? gameTime;
-  double? xp;
-  int? supporterTier;
-  bool? verified;
-  Connections? connections;
-  TetraLeagueAlpha? tlSeason1;
-  List<RecordSingle>? sprint;
-  List<RecordSingle>? blitz;
+  late int friendCount;
+  late int gamesPlayed;
+  late int gamesWon;
+  late Duration gameTime;
+  late double xp;
+  late int supporterTier;
+  late bool verified;
+  bool? badstanding;
+  bool? bot;
+  late Connections connections;
+  late TetraLeagueAlpha tlSeason1;
+  List<RecordSingle?> sprint = [];
+  List<RecordSingle?> blitz = [];
   TetrioZen? zen;
+  Distinguishment? distinguishment;
 
   TetrioPlayer({
-    this.userId,
-    this.username,
-    this.role,
+    required this.userId,
+    required this.username,
+    required this.role,
     this.registrationTime,
-    this.badges,
+    required this.badges,
     this.bio,
     this.country,
-    this.friendCount,
-    this.gamesPlayed,
-    this.gamesWon,
-    this.gameTime,
-    this.xp,
-    this.supporterTier,
-    this.verified,
-    this.connections,
-    this.tlSeason1,
-    this.sprint,
-    this.blitz,
+    required this.friendCount,
+    required this.gamesPlayed,
+    required this.gamesWon,
+    required this.gameTime,
+    required this.xp,
+    required this.supporterTier,
+    required this.verified,
+    required this.connections,
+    required this.tlSeason1,
+    required this.sprint,
+    required this.blitz,
     this.zen,
   });
 
   double getLevel() {
-    return pow((xp! / 500), 0.6) +
-        (xp! / (5000 + (max(0, xp! - 4 * pow(10, 6)) / 5000))) +
+    return pow((xp / 500), 0.6) +
+        (xp / (5000 + (max(0, xp - 4 * pow(10, 6)) / 5000))) +
         1;
   }
 
@@ -80,9 +72,8 @@ class TetrioPlayer {
     role = json['role'];
     registrationTime = json['ts'] != null ? DateTime.parse(json['ts']) : null;
     if (json['badges'] != null) {
-      badges = <Badge>[];
       json['badges'].forEach((v) {
-        badges!.add(Badge.fromJson(v));
+        badges.add(Badge.fromJson(v));
       });
     }
     xp = json['xp'].toDouble();
@@ -92,33 +83,24 @@ class TetrioPlayer {
     country = json['country'];
     supporterTier = json['supporter_tier'];
     verified = json['verified'];
-    tlSeason1 = json['league'] != null
-        ? TetraLeagueAlpha.fromJson(json['league'])
-        : null;
+    tlSeason1 = TetraLeagueAlpha.fromJson(json['league']);
     avatarRevision = json['avatar_revision'];
     bannerRevision = json['banner_revision'];
     bio = json['bio'];
-    connections = json['connections'] != null
-        ? Connections.fromJson(json['connections'])
+    connections = Connections.fromJson(json['connections']);
+    distinguishment = json['distinguishment'] != null
+        ? Distinguishment.fromJson(json['distinguishment'])
         : null;
     var url = Uri.https('ch.tetr.io', 'api/users/$userId/records');
     Future response = http.get(url);
     response.then((value) {
       if (value.statusCode == 200) {
-        sprint = jsonDecode(value.body)['data']['records']['40l']['record'] !=
-                null
-            ? [
-                RecordSingle.fromJson(
-                    jsonDecode(value.body)['data']['records']['40l']['record'])
-              ]
-            : null;
-        blitz =
-            jsonDecode(value.body)['data']['records']['blitz']['record'] != null
-                ? [
-                    RecordSingle.fromJson(jsonDecode(value.body)['data']
-                        ['records']['blitz']['record'])
-                  ]
-                : null;
+        if(jsonDecode(value.body)['data']['records']['40l']['record'] != null){
+          sprint.add(RecordSingle.fromJson(jsonDecode(value.body)['data']['records']['40l']['record']));
+        }
+        if(jsonDecode(value.body)['data']['records']['blitz']['record'] != null){
+          blitz.add(RecordSingle.fromJson(jsonDecode(value.body)['data']['records']['blitz']['record']));
+      }
         zen = TetrioZen.fromJson(jsonDecode(value.body)['data']['zen']);
       } else {
         throw Exception('Failed to fetch player');
@@ -133,9 +115,7 @@ class TetrioPlayer {
     data['username'] = username;
     data['role'] = role;
     data['ts'] = registrationTime;
-    if (badges != null) {
-      data['badges'] = badges!.map((v) => v.toJson()).toList();
-    }
+    data['badges'] = badges.map((v) => v.toJson()).toList();
     data['xp'] = xp;
     data['gamesplayed'] = gamesPlayed;
     data['gameswon'] = gamesWon;
@@ -143,26 +123,22 @@ class TetrioPlayer {
     data['country'] = country;
     data['supporter_tier'] = supporterTier;
     data['verified'] = verified;
-    if (tlSeason1 != null) {
-      data['league'] = tlSeason1!.toJson();
-    }
+    data['league'] = tlSeason1.toJson();
     data['avatar_revision'] = avatarRevision;
     data['banner_revision'] = bannerRevision;
     data['bio'] = bio;
-    if (connections != null) {
-      data['connections'] = connections!.toJson();
-    }
+    data['connections'] = connections.toJson();
     data['friend_count'] = friendCount;
     return data;
   }
 }
 
 class Badge {
-  String? badgeId;
-  String? label;
+  late String badgeId;
+  late String label;
   DateTime? ts;
 
-  Badge({required this.badgeId, required this.label, required this.ts});
+  Badge({required this.badgeId, required this.label, this.ts});
 
   Badge.fromJson(Map<String, dynamic> json) {
     badgeId = json['id'];
@@ -199,34 +175,34 @@ class Connections {
 }
 
 class Clears {
-  int? singles;
-  int? doubles;
-  int? triples;
-  int? quads;
-  int? allClears;
-  int? tSpinZeros;
-  int? tSpinSingles;
-  int? tSpinDoubles;
-  int? tSpinTriples;
-  int? tSpinQuads;
-  int? tSpinMiniZeros;
-  int? tSpinMiniSingles;
-  int? tSpinMiniDoubles;
+  late int singles;
+  late int doubles;
+  late int triples;
+  late int quads;
+  late int allClears;
+  late int tSpinZeros;
+  late int tSpinSingles;
+  late int tSpinDoubles;
+  late int tSpinTriples;
+  late int tSpinQuads;
+  late int tSpinMiniZeros;
+  late int tSpinMiniSingles;
+  late int tSpinMiniDoubles;
 
   Clears(
-      {this.singles,
-      this.doubles,
-      this.triples,
-      this.quads,
-      this.allClears,
-      this.tSpinZeros,
-      this.tSpinSingles,
-      this.tSpinDoubles,
-      this.tSpinTriples,
-      this.tSpinQuads,
-      this.tSpinMiniZeros,
-      this.tSpinMiniSingles,
-      this.tSpinMiniDoubles});
+      {required this.singles,
+      required this.doubles,
+      required this.triples,
+      required this.quads,
+      required this.allClears,
+      required this.tSpinZeros,
+      required this.tSpinSingles,
+      required this.tSpinDoubles,
+      required this.tSpinTriples,
+      required this.tSpinQuads,
+      required this.tSpinMiniZeros,
+      required this.tSpinMiniSingles,
+      required this.tSpinMiniDoubles});
 
   Clears.fromJson(Map<String, dynamic> json) {
     singles = json['singles'];
@@ -264,10 +240,10 @@ class Clears {
 }
 
 class Discord {
-  String? id;
-  String? username;
+  late String id;
+  late String username;
 
-  Discord({this.id, this.username});
+  Discord({required this.id, required this.username});
 
   Discord.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -283,11 +259,12 @@ class Discord {
 }
 
 class Finesse {
-  int? combo;
-  int? faults;
-  int? perfectPieces;
+  late int combo;
+  late int faults;
+  late int perfectPieces;
 
-  Finesse({this.combo, this.faults, this.perfectPieces});
+  Finesse(
+      {required this.combo, required this.faults, required this.perfectPieces});
 
   Finesse.fromJson(Map<String, dynamic> json) {
     combo = json['combo'];
@@ -341,7 +318,7 @@ class EndContextSingle {
     lines = json['lines'];
     inputs = json['inputs'];
     holds = json['holds'];
-    finalTime = doubleSecondsToDuration(json['finalTime'].toDouble());
+    finalTime = doubleMillisecondsToDuration(json['finalTime'].toDouble());
     score = json['score'];
     level = json['level'];
     topCombo = json['topcombo'];
@@ -379,15 +356,20 @@ class EndContextSingle {
 }
 
 class Handling {
-  double? arr;
-  double? das;
-  int? sdf;
-  int? dcd;
-  bool? cancel;
-  bool? safeLock;
+  late double arr;
+  late double das;
+  late int sdf;
+  late int dcd;
+  late bool cancel;
+  late bool safeLock;
 
   Handling(
-      {this.arr, this.das, this.sdf, this.dcd, this.cancel, this.safeLock});
+      {required this.arr,
+      required this.das,
+      required this.sdf,
+      required this.dcd,
+      required this.cancel,
+      required this.safeLock});
 
   Handling.fromJson(Map<String, dynamic> json) {
     arr = json['arr'];
@@ -484,46 +466,44 @@ class EndContextMulti {
 }
 
 class TetraLeagueAlpha {
-  String? userId;
-  int? gamesPlayed;
-  int? gamesWon;
-  String? bestRank;
-  bool? decaying;
-  double? rating;
-  String? rank;
+  late int gamesPlayed;
+  late int gamesWon;
+  late String bestRank;
+  late bool decaying;
+  late double rating;
+  late String rank;
   double? glicko;
   double? rd;
-  String? percentileRank;
-  double? percentile;
-  int? standing;
-  int? standingLocal;
+  late String percentileRank;
+  late double percentile;
+  late int standing;
+  late int standingLocal;
   String? nextRank;
-  int? nextAt;
+  late int nextAt;
   String? prevRank;
-  int? prevAt;
+  late int prevAt;
   double? apm;
   double? pps;
   double? vs;
   List? records;
 
   TetraLeagueAlpha(
-      {this.userId,
-      this.gamesPlayed,
-      this.gamesWon,
-      this.bestRank,
-      this.decaying,
-      this.rating,
-      this.rank,
+      {required this.gamesPlayed,
+      required this.gamesWon,
+      required this.bestRank,
+      required this.decaying,
+      required this.rating,
+      required this.rank,
       this.glicko,
       this.rd,
-      this.percentileRank,
-      this.percentile,
-      this.standing,
-      this.standingLocal,
+      required this.percentileRank,
+      required this.percentile,
+      required this.standing,
+      required this.standingLocal,
       this.nextRank,
-      this.nextAt,
+      required this.nextAt,
       this.prevRank,
-      this.prevAt,
+      required this.prevAt,
       this.apm,
       this.pps,
       this.vs,
@@ -577,17 +557,17 @@ class TetraLeagueAlpha {
 }
 
 class RecordSingle {
-  String? userId;
-  String? replayId;
-  String? ownId;
+  late String userId;
+  late String replayId;
+  late String ownId;
   DateTime? timestamp;
   EndContextSingle? endContext;
   int? rank;
 
   RecordSingle(
-      {this.userId,
-      this.replayId,
-      this.ownId,
+      {required this.userId,
+      required this.replayId,
+      required this.ownId,
       this.timestamp,
       this.endContext,
       this.rank});
@@ -617,11 +597,10 @@ class RecordSingle {
 }
 
 class TetrioZen {
-  String? userId;
-  int? level;
-  int? score;
+  late int level;
+  late int score;
 
-  TetrioZen({this.userId, this.level, this.score});
+  TetrioZen({required this.level, required this.score});
 
   TetrioZen.fromJson(Map<String, dynamic> json) {
     level = json['level'];
@@ -632,6 +611,31 @@ class TetrioZen {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['level'] = level;
     data['score'] = score;
+    return data;
+  }
+}
+
+class Distinguishment {
+  late String type;
+  String? detail;
+  String? header;
+  String? footer;
+
+  Distinguishment({required this.type, this.detail, this.header, this.footer});
+
+  Distinguishment.fromJson(Map<String, dynamic> json) {
+    type = json['type'];
+    detail = json['detail'];
+    header = json['header'];
+    footer = json['footer'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['type'] = type;
+    data['detail'] = detail;
+    data['header'] = header;
+    data['footer'] = footer;
     return data;
   }
 }

@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 
 String _searchFor = "";
-TetrioPlayer me = TetrioPlayer();
+late TetrioPlayer me;
 
 class MainView extends StatefulWidget {
   const MainView({Key? key}) : super(key: key);
@@ -51,6 +51,9 @@ class _MainViewState extends State<MainView> {
               child: TextField(
             onChanged: (String value) {
               _searchFor = value;
+              setState(() {
+
+              });
             },
             onSubmitted: (String value) {
               setState(() {
@@ -87,19 +90,19 @@ class _MainViewState extends State<MainView> {
                   Text("Supporter tier ${snapshot.data!.supporterTier}"),
                   const Text("\nTetra League", softWrap: true),
                   Text(
-                      "${snapshot.data!.tlSeason1!.rating?.toStringAsFixed(2)} TR"),
+                      "${snapshot.data!.tlSeason1.rating.toStringAsFixed(2)} TR"),
                   Text(
-                      "${snapshot.data!.tlSeason1!.glicko?.toStringAsFixed(2)}±${snapshot.data!.tlSeason1!.rd?.toStringAsFixed(2)} GLICKO"),
+                      "${snapshot.data!.tlSeason1.glicko?.toStringAsFixed(2)}±${snapshot.data!.tlSeason1.rd?.toStringAsFixed(2)} GLICKO"),
                   Text(
-                      "Rank: ${snapshot.data!.tlSeason1!.rank?.toUpperCase()} (top ${(snapshot.data!.tlSeason1!.percentile! * 100).toStringAsFixed(2)}%)"),
+                      "Rank: ${snapshot.data!.tlSeason1.rank.toUpperCase()} (top ${(snapshot.data!.tlSeason1.percentile * 100).toStringAsFixed(2)}%)"),
                   Text(
-                      "Won/Games: ${snapshot.data!.tlSeason1!.gamesPlayed}/${snapshot.data!.tlSeason1!.gamesWon}"),
+                      "Won/Games: ${snapshot.data!.tlSeason1.gamesPlayed}/${snapshot.data!.tlSeason1.gamesWon}"),
                   Text(
-                      "№${snapshot.data!.tlSeason1!.standing} (№${snapshot.data!.tlSeason1!.standingLocal} in country)"),
+                      "№${snapshot.data!.tlSeason1.standing} (№${snapshot.data!.tlSeason1.standingLocal} in country)"),
                   Text(
-                      "${snapshot.data!.tlSeason1!.apm} APM, ${snapshot.data!.tlSeason1!.pps} PPS, ${snapshot.data!.tlSeason1!.vs} VS"),
+                      "${snapshot.data!.tlSeason1.apm} APM, ${snapshot.data!.tlSeason1.pps} PPS, ${snapshot.data!.tlSeason1.vs} VS"),
                   const Text("\n40 Lines", softWrap: true),
-                  Text(snapshot.data!.sprint.toString()),
+                  Text(snapshot.data!.sprint.isNotEmpty ? snapshot.data!.sprint[0].toString() : "No record"),
                 ]));
               } else if (snapshot.hasError) {
                 return Text('${snapshot.error}');
