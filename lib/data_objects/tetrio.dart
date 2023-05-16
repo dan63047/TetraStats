@@ -15,6 +15,7 @@ Duration doubleMillisecondsToDuration(double value) {
 class TetrioPlayer {
   late String userId;
   late String username;
+  late DateTime state;
   late String role;
   int? avatarRevision;
   int? bannerRevision;
@@ -42,6 +43,7 @@ class TetrioPlayer {
     required this.userId,
     required this.username,
     required this.role,
+    required this.state,
     this.registrationTime,
     required this.badges,
     this.bio,
@@ -60,15 +62,16 @@ class TetrioPlayer {
     this.zen,
   });
 
-  double getLevel() {
+  double get level{
     return pow((xp / 500), 0.6) +
         (xp / (5000 + (max(0, xp - 4 * pow(10, 6)) / 5000))) +
         1;
   }
 
-  TetrioPlayer.fromJson(Map<String, dynamic> json) {
+  TetrioPlayer.fromJson(Map<String, dynamic> json, DateTime stateTime) {
     userId = json['_id'];
     username = json['username'];
+    state = stateTime;
     role = json['role'];
     registrationTime = json['ts'] != null ? DateTime.parse(json['ts']) : null;
     if (json['badges'] != null) {
@@ -91,22 +94,25 @@ class TetrioPlayer {
     distinguishment = json['distinguishment'] != null
         ? Distinguishment.fromJson(json['distinguishment'])
         : null;
-    var url = Uri.https('ch.tetr.io', 'api/users/$userId/records');
-    Future response = http.get(url);
-    response.then((value) {
-      if (value.statusCode == 200) {
-        if(jsonDecode(value.body)['data']['records']['40l']['record'] != null){
-          sprint.add(RecordSingle.fromJson(jsonDecode(value.body)['data']['records']['40l']['record']));
-        }
-        if(jsonDecode(value.body)['data']['records']['blitz']['record'] != null){
-          blitz.add(RecordSingle.fromJson(jsonDecode(value.body)['data']['records']['blitz']['record']));
-      }
-        zen = TetrioZen.fromJson(jsonDecode(value.body)['data']['zen']);
-      } else {
-        throw Exception('Failed to fetch player');
-      }
-    });
     friendCount = json['friend_count'];
+  }
+
+  Future<void> getRecords() async {
+    var url = Uri.https('ch.tetr.io', 'api/users/$userId/records');
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      if(jsonDecode(response.body)['data']['records']['40l']['record'] != null){
+        sprint.add(RecordSingle.fromJson(jsonDecode(response.body)['data']['records']['40l']['record']));
+      }
+      if(jsonDecode(response.body)['data']['records']['blitz']['record'] != null){
+        blitz.add(RecordSingle.fromJson(jsonDecode(response.body)['data']['records']['blitz']['record']));
+      }
+      zen = TetrioZen.fromJson(jsonDecode(response.body)['data']['zen']);
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to fetch player');
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -124,6 +130,7 @@ class TetrioPlayer {
     data['supporter_tier'] = supporterTier;
     data['verified'] = verified;
     data['league'] = tlSeason1.toJson();
+    data['distinguishment'] = distinguishment?.toJson();
     data['avatar_revision'] = avatarRevision;
     data['banner_revision'] = bannerRevision;
     data['bio'] = bio;
@@ -131,6 +138,39 @@ class TetrioPlayer {
     data['friend_count'] = friendCount;
     return data;
   }
+
+  bool isSameState(TetrioPlayer other){
+    if (userId != other.userId) return false;
+    if (username != other.username) return false;
+    if (role != other.role) return false;
+    if (badges != other.badges) return false;
+    if (bio != other.bio) return false;
+    if (country != other.country) return false;
+    if (friendCount != other.friendCount) return false;
+    if (gamesPlayed != other.gamesPlayed) return false;
+    if (gamesWon != other.gamesWon) return false;
+    if (gameTime != other.gameTime) return false;
+    if (xp != other.xp) return false;
+    if (supporterTier != other.supporterTier) return false;
+    if (verified != other.verified) return false;
+    if (badstanding != other.badstanding) return false;
+    if (bot != other.bot) return false;
+    if (connections != other.connections) return false;
+    if (tlSeason1 != other.tlSeason1) return false;
+    if (distinguishment != other.distinguishment) return false;
+    return true;
+  }
+
+  @override
+  String toString(){
+    return "$username ($userId)";
+  }
+
+  @override
+  int get hashCode => state.hashCode;
+
+  @override
+  bool operator ==(covariant TetrioPlayer other) => (userId == other.userId);
 }
 
 class Badge {
@@ -153,6 +193,17 @@ class Badge {
     data['ts'] = ts;
     return data;
   }
+
+  @override
+  String toString(){
+    return "Badge $label ($badgeId)";
+  }
+
+  @override
+  int get hashCode => badgeId.hashCode;
+
+  @override
+  bool operator ==(covariant Badge other) => badgeId == other.badgeId;
 }
 
 class Connections {

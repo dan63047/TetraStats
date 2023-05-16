@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:tetra_stats/data_objects/tetrio.dart';
+import 'package:tetra_stats/services/tetrio_crud.dart';
 
 String _searchFor = "";
 late TetrioPlayer me;
+TetrioService teto = TetrioService();
 
 class MainView extends StatefulWidget {
   const MainView({Key? key}) : super(key: key);
@@ -16,13 +18,14 @@ class MainView extends StatefulWidget {
 class _MainViewState extends State<MainView> {
   Future<TetrioPlayer> fetchTetrioPlayer(String user) async {
     var url = Uri.https('ch.tetr.io', 'api/users/$user');
+    teto.open();
     final response = await http.get(url);
     // final response = await http.get(Uri.parse('https://ch.tetr.io/'));
 
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
-      return TetrioPlayer.fromJson(jsonDecode(response.body)['data']['user']);
+      return TetrioPlayer.fromJson(jsonDecode(response.body)['data']['user'], DateTime.fromMillisecondsSinceEpoch(jsonDecode(response.body)['cache']['cached_at'], isUtc: true));
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.
@@ -73,13 +76,15 @@ class _MainViewState extends State<MainView> {
             future: me,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
+                snapshot.data!.getRecords();
+                teto.getUser(id: snapshot.data!.userId);
                 return Flexible(
                     child: Column(children: [
                   Text(snapshot.data!.username.toString()),
                   Text(snapshot.data!.userId.toString()),
                   Text(snapshot.data!.role.toString()),
                   Text(
-                      "Level ${snapshot.data!.getLevel().toStringAsFixed(2)} (${snapshot.data!.xp} XP)"),
+                      "Level ${snapshot.data!.level.toStringAsFixed(2)} (${snapshot.data!.xp} XP)"),
                   Text("Registered ${snapshot.data!.registrationTime}"),
                   Text("Bio: ${snapshot.data!.bio}", softWrap: true),
                   Text("Country: ${snapshot.data!.country}"),
