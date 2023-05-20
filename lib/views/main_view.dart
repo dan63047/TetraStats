@@ -3,9 +3,11 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
+import 'package:tetra_stats/services/sqlite_db_controller.dart';
 
 String _searchFor = "";
 late TetrioPlayer me;
+DB db = DB();
 TetrioService teto = TetrioService();
 
 class MainView extends StatefulWidget {
@@ -18,14 +20,18 @@ class MainView extends StatefulWidget {
 class _MainViewState extends State<MainView> {
   Future<TetrioPlayer> fetchTetrioPlayer(String user) async {
     var url = Uri.https('ch.tetr.io', 'api/users/$user');
-    teto.open();
+    db.open();
     final response = await http.get(url);
     // final response = await http.get(Uri.parse('https://ch.tetr.io/'));
 
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
-      return TetrioPlayer.fromJson(jsonDecode(response.body)['data']['user'], DateTime.fromMillisecondsSinceEpoch(jsonDecode(response.body)['cache']['cached_at'], isUtc: true));
+      return TetrioPlayer.fromJson(
+          jsonDecode(response.body)['data']['user'],
+          DateTime.fromMillisecondsSinceEpoch(
+              jsonDecode(response.body)['cache']['cached_at'],
+              isUtc: true));
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.
@@ -54,9 +60,6 @@ class _MainViewState extends State<MainView> {
               child: TextField(
             onChanged: (String value) {
               _searchFor = value;
-              setState(() {
-
-              });
             },
             onSubmitted: (String value) {
               setState(() {
@@ -77,7 +80,7 @@ class _MainViewState extends State<MainView> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 snapshot.data!.getRecords();
-                teto.getUser(id: snapshot.data!.userId);
+                teto.storeState(snapshot.data!, db);
                 return Flexible(
                     child: Column(children: [
                   Text(snapshot.data!.username.toString()),
@@ -105,9 +108,11 @@ class _MainViewState extends State<MainView> {
                   Text(
                       "№${snapshot.data!.tlSeason1.standing} (№${snapshot.data!.tlSeason1.standingLocal} in country)"),
                   Text(
-                      "${snapshot.data!.tlSeason1.apm} APM, ${snapshot.data!.tlSeason1.pps} PPS, ${snapshot.data!.tlSeason1.vs} VS"),
+                      "${snapshot.data!.tlSeason1.apm} APM, ${snapshot.data!.tlSeason1.pps} PPS, ${snapshot.data!.tlSeason1.vs} VS, ${snapshot.data!.tlSeason1.app?.toStringAsFixed(3)} APP"),
                   const Text("\n40 Lines", softWrap: true),
-                  Text(snapshot.data!.sprint.isNotEmpty ? snapshot.data!.sprint[0].toString() : "No record"),
+                  Text(snapshot.data!.sprint.isNotEmpty
+                      ? snapshot.data!.sprint[0].toString()
+                      : "No record"),
                 ]));
               } else if (snapshot.hasError) {
                 return Text('${snapshot.error}');

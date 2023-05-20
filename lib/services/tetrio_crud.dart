@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:sqflite/sqflite.dart';
-import 'package:path_provider/path_provider.dart' show MissingPlatformDirectoryException, getApplicationDocumentsDirectory;
+import 'package:path_provider/path_provider.dart'
+    show MissingPlatformDirectoryException, getApplicationDocumentsDirectory;
 import 'package:path/path.dart' show join;
+import 'package:tetra_stats/services/crud_exceptions.dart';
+import 'package:tetra_stats/services/sqlite_db_controller.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 
 const String dbName = "TetraStats.db";
@@ -19,89 +21,120 @@ const String createTetrioUsersTable = '''
           PRIMARY KEY("id")
         );''';
 
-class DatabaseAlreadyOpen implements Exception {}
-class DatabaseIsNotOpen implements Exception {}
-class UnableToGetDocuments implements Exception {}
-class CouldNotDeletePlayer implements Exception{}
-class TetrioPlayerAlreadyExist implements Exception{}
-class TetrioPlayerNotExist implements Exception{}
-
-class TetrioService{
-  Database? _db;
+class TetrioService {
   Map<String, List<TetrioPlayer>> _players = {};
-  final _tetrioStreamController = StreamController<Map<String, List<TetrioPlayer>>>.broadcast();
+  final _tetrioStreamController =
+      StreamController<Map<String, List<TetrioPlayer>>>.broadcast();
 
-  Database _getDatabaseOrThrow(){
-    final db = _db;
-    if(db == null){
-      throw DatabaseIsNotOpen();
-    }else{
-      return db;
-    }
+  Future<void> _cachePlayers(DB udb) async {
+    final allPlayers = await getAllPlayers(udb: udb);
+    _players = allPlayers.first;
+    _tetrioStreamController.add(_players);
   }
 
-  Future<void> open() async{
-    if (_db != null){
-      throw DatabaseAlreadyOpen();
-    }
-    try{
-      final docsPath = await getApplicationDocumentsDirectory();
-      final dbPath = join(docsPath.path, dbName);
-      final db = await openDatabase(dbPath);
-      _db = db;
-      await db.execute(createTetrioUsersTable);
-    } on MissingPlatformDirectoryException {
-      throw UnableToGetDocuments();
-    }
-  }
-
-  Future<void> close() async{
-    final db = _db;
-    if(db == null){
-      throw DatabaseIsNotOpen();
-    }else{
-      await db.close();
-      _db = null;
-    }
-  }
-
-  Future<void> _cachePlayers() async{
-    //final allPlayers = await getAllPlayers();
-  }
-
-  Future<void> deleteTetrioPlayer({required String id}) async{
-    final db = _getDatabaseOrThrow();
-    final deletedPlayer = await db.delete(tetrioUsersTable, where: '$idCol = ?', whereArgs: [id.toLowerCase()]);
-    if (deletedPlayer != 1){
+  Future<void> deletePlayer({required String id, required DB udb}) async {
+    final db = udb.getDatabaseOrThrow();
+    final deletedPlayer = await db.delete(tetrioUsersTable,
+        where: '$idCol = ?', whereArgs: [id.toLowerCase()]);
+    if (deletedPlayer != 1) {
       throw CouldNotDeletePlayer();
+    } else {
+      _players.removeWhere((key, value) => key == id);
+      _tetrioStreamController.add(_players);
     }
   }
 
-  Future<void> storeUser({required TetrioPlayer tetrioPlayer}) async{
-    final db = _getDatabaseOrThrow();
-    final results = await db.query(tetrioUsersTable, limit: 1, where: '$idCol = ?', whereArgs: [tetrioPlayer.userId.toLowerCase()]);
-    if(results.isNotEmpty){
+  // Future <List<TetrioPlayer>> getOrCreatePlayer({required String id}) async {
+  //   try{
+  //     final player = await getPlayer(id: id);
+  //     return player;
+  //   } on TetrioPlayerNotExist{
+
+  //     final player = await createPlayer(tetrioPlayer: tetrioPlayer)
+  //   }
+  // }
+
+  Future<void> createPlayer(
+      {required TetrioPlayer tetrioPlayer, required DB udb}) async {
+    final db = udb.getDatabaseOrThrow();
+    final results = await db.query(tetrioUsersTable,
+        limit: 1,
+        where: '$idCol = ?',
+        whereArgs: [tetrioPlayer.userId.toLowerCase()]);
+    if (results.isNotEmpty) {
       throw TetrioPlayerAlreadyExist();
     }
-    final Map<String, String> statesJson = {tetrioPlayer.state.toString(): tetrioPlayer.toJson().toString()};
+    final Map<String, dynamic> statesJson = {
+      tetrioPlayer.state.millisecondsSinceEpoch.toString():
+          tetrioPlayer.toJson()
+    };
     db.insert(tetrioUsersTable, {
       idCol: tetrioPlayer.userId,
       nickCol: tetrioPlayer.username,
-      statesCol: statesJson
+      statesCol: jsonEncode(statesJson)
     });
+    _players.addEntries({
+      tetrioPlayer.userId: [tetrioPlayer]
+    }.entries);
+    _tetrioStreamController.add(_players);
   }
 
-  Future<List<TetrioPlayer>> getUser({required String id}) async{
-    final db = _getDatabaseOrThrow();
+  Future<void> storeState(TetrioPlayer tetrioPlayer, DB udb) async {
+    final db = udb.getDatabaseOrThrow();
+    List<TetrioPlayer> states =
+        await getPlayer(id: tetrioPlayer.userId, udb: udb);
+    states.add(tetrioPlayer);
+    final Map<String, dynamic> statesJson = {};
+    for (var e in states) {
+      statesJson.addEntries(
+          {e.state.millisecondsSinceEpoch.toString(): e.toJson()}.entries);
+    }
+    db.update(
+        tetrioUsersTable,
+        {
+          idCol: tetrioPlayer.userId,
+          nickCol: tetrioPlayer.username,
+          statesCol: jsonEncode(statesJson)
+        },
+        where: '$idCol = ?',
+        whereArgs: [tetrioPlayer.userId]);
+    _players[tetrioPlayer.userId]!.add(tetrioPlayer);
+    _tetrioStreamController.add(_players);
+  }
+
+  Future<List<TetrioPlayer>> getPlayer(
+      {required String id, required DB udb}) async {
+    final db = udb.getDatabaseOrThrow();
     List<TetrioPlayer> states = [];
-    final results = await db.query(tetrioUsersTable, limit: 1, where: '$idCol = ?', whereArgs: [id.toLowerCase()]);
-    if(results.isEmpty){
+    final results = await db.query(tetrioUsersTable,
+        limit: 1, where: '$idCol = ?', whereArgs: [id.toLowerCase()]);
+    if (results.isEmpty) {
       throw TetrioPlayerNotExist();
-    }else{
+    } else {
       dynamic rawStates = results.first['jsonStates'] as String;
       rawStates = json.decode(rawStates);
-      rawStates.forEach((k,v) => states.add(TetrioPlayer.fromJson(v, DateTime.now())));
+      rawStates.forEach((k, v) => states.add(TetrioPlayer.fromJson(
+          v, DateTime.fromMillisecondsSinceEpoch(int.parse(k)))));
+      _players.removeWhere((key, value) => key == id);
+      _players.addEntries({states.last.userId: states}.entries);
+      _tetrioStreamController.add(_players);
       return states;
     }
+  }
+
+  Future<Iterable<Map<String, List<TetrioPlayer>>>> getAllPlayers(
+      {required DB udb}) async {
+    //await _ensureDbIsOpen();
+    final db = udb.getDatabaseOrThrow();
+    final players = await db.query(tetrioUsersTable);
+    Map<String, List<TetrioPlayer>> data = {};
+    return players.map((row) {
+      var test = json.decode(row['jsonStates'] as String);
+      List<TetrioPlayer> states = [];
+      test.forEach(
+          (k, v) => states.add(TetrioPlayer.fromJson(v, DateTime.now())));
+      data.addEntries({states.last.userId: states}.entries);
+      return data;
+    });
   }
 }

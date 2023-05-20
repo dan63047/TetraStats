@@ -62,11 +62,10 @@ class TetrioPlayer {
     this.zen,
   });
 
-  double get level{
-    return pow((xp / 500), 0.6) +
-        (xp / (5000 + (max(0, xp - 4 * pow(10, 6)) / 5000))) +
-        1;
-  }
+  double get level =>
+      pow((xp / 500), 0.6) +
+      (xp / (5000 + (max(0, xp - 4 * pow(10, 6)) / 5000))) +
+      1;
 
   TetrioPlayer.fromJson(Map<String, dynamic> json, DateTime stateTime) {
     userId = json['_id'];
@@ -101,11 +100,15 @@ class TetrioPlayer {
     var url = Uri.https('ch.tetr.io', 'api/users/$userId/records');
     final response = await http.get(url);
     if (response.statusCode == 200) {
-      if(jsonDecode(response.body)['data']['records']['40l']['record'] != null){
-        sprint.add(RecordSingle.fromJson(jsonDecode(response.body)['data']['records']['40l']['record']));
+      if (jsonDecode(response.body)['data']['records']['40l']['record'] !=
+          null) {
+        sprint.add(RecordSingle.fromJson(
+            jsonDecode(response.body)['data']['records']['40l']['record']));
       }
-      if(jsonDecode(response.body)['data']['records']['blitz']['record'] != null){
-        blitz.add(RecordSingle.fromJson(jsonDecode(response.body)['data']['records']['blitz']['record']));
+      if (jsonDecode(response.body)['data']['records']['blitz']['record'] !=
+          null) {
+        blitz.add(RecordSingle.fromJson(
+            jsonDecode(response.body)['data']['records']['blitz']['record']));
       }
       zen = TetrioZen.fromJson(jsonDecode(response.body)['data']['zen']);
     } else {
@@ -120,12 +123,12 @@ class TetrioPlayer {
     data['_id'] = userId;
     data['username'] = username;
     data['role'] = role;
-    data['ts'] = registrationTime;
+    data['ts'] = registrationTime?.toString();
     data['badges'] = badges.map((v) => v.toJson()).toList();
     data['xp'] = xp;
     data['gamesplayed'] = gamesPlayed;
     data['gameswon'] = gamesWon;
-    data['gametime'] = gameTime;
+    data['gametime'] = gameTime.inMicroseconds / 1000000;
     data['country'] = country;
     data['supporter_tier'] = supporterTier;
     data['verified'] = verified;
@@ -139,7 +142,7 @@ class TetrioPlayer {
     return data;
   }
 
-  bool isSameState(TetrioPlayer other){
+  bool isSameState(TetrioPlayer other) {
     if (userId != other.userId) return false;
     if (username != other.username) return false;
     if (role != other.role) return false;
@@ -162,7 +165,7 @@ class TetrioPlayer {
   }
 
   @override
-  String toString(){
+  String toString() {
     return "$username ($userId)";
   }
 
@@ -190,12 +193,12 @@ class Badge {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = badgeId;
     data['label'] = label;
-    data['ts'] = ts;
+    data['ts'] = ts?.toString();
     return data;
   }
 
   @override
-  String toString(){
+  String toString() {
     return "Badge $label ($badgeId)";
   }
 
@@ -581,6 +584,8 @@ class TetraLeagueAlpha {
     nextAt = json['next_at'];
     percentileRank = json['percentile_rank'];
   }
+
+  double? get app => apm! / (pps! * 60);
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
