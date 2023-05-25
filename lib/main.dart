@@ -5,5 +5,8 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 void main() {
   sqfliteFfiInit();
   databaseFactory = databaseFactoryFfi;
-  runApp(MaterialApp(home: MainView()));
+  runApp(MaterialApp(
+    home: MainView(),
+    theme: ThemeData(fontFamily: 'Eurostile Round'),
+  ));
 }
