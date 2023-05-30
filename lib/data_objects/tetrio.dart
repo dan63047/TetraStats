@@ -93,7 +93,7 @@ class TetrioPlayer {
     distinguishment = json['distinguishment'] != null
         ? Distinguishment.fromJson(json['distinguishment'])
         : null;
-    friendCount = json['friend_count'];
+    friendCount = json['friend_count'] != null ? json['friend_count'] : 0;
   }
 
   Future<void> getRecords() async {
@@ -570,7 +570,7 @@ class TetraLeagueAlpha {
     glicko = json['glicko']?.toDouble();
     rd = json['rd']?.toDouble();
     rank = json['rank'];
-    bestRank = json['bestrank'];
+    bestRank = json['bestrank'].toString();
     apm = json['apm']?.toDouble();
     pps = json['pps']?.toDouble();
     vs = json['vs']?.toDouble();

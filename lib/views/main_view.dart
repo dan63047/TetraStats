@@ -6,6 +6,12 @@ import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:tetra_stats/services/sqlite_db_controller.dart';
 
+extension StringExtension on String {
+  String capitalize() {
+    return "${this[0].toUpperCase()}${this.substring(1).toLowerCase()}";
+  }
+}
+
 String _searchFor = "";
 late Future<TetrioPlayer> me;
 DB db = DB();
@@ -33,11 +39,13 @@ Future<TetrioPlayer> fetchTetrioPlayer(String user) async {
   if (response.statusCode == 200) {
     // If the server did return a 200 OK response,
     // then parse the JSON.
-    return TetrioPlayer.fromJson(
-        jsonDecode(response.body)['data']['user'],
-        DateTime.fromMillisecondsSinceEpoch(
-            jsonDecode(response.body)['cache']['cached_at'],
-            isUtc: true));
+    return jsonDecode(response.body)['success']
+        ? TetrioPlayer.fromJson(
+            jsonDecode(response.body)['data']['user'],
+            DateTime.fromMillisecondsSinceEpoch(
+                jsonDecode(response.body)['cache']['cached_at'],
+                isUtc: true))
+        : throw Exception("User doesn't exist");
   } else {
     // If the server did not return a 200 OK response,
     // then throw an exception.
@@ -47,7 +55,6 @@ Future<TetrioPlayer> fetchTetrioPlayer(String user) async {
 
 class _MainViewState extends State<MainView> {
   bool _searchBoolean = false;
-  String _coverLink = "";
   @override
   void initState() {
     super.initState();
@@ -106,10 +113,6 @@ class _MainViewState extends State<MainView> {
                 ),
               )
             : _searchTextField(),
-        flexibleSpace: Image.network(
-          _coverLink,
-          fit: BoxFit.cover,
-        ),
         backgroundColor: Colors.black,
         actions: [
           !_searchBoolean
@@ -156,8 +159,6 @@ class _MainViewState extends State<MainView> {
           future: me,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              _coverLink =
-                  "https://tetr.io/user-content/banners/${snapshot.data!.userId}.jpg?rv=${snapshot.data!.bannerRevision}";
               return ListView(
                 padding: const EdgeInsets.all(8),
                 children: [
@@ -276,14 +277,11 @@ class NavDrawer extends StatelessWidget {
 
 class _UserThingy extends StatelessWidget {
   final TetrioPlayer player;
-  const _UserThingy({Key? key, required this.player}) : super(key: key);
+  _UserThingy({Key? key, required this.player}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-      final settings = context
-          .dependOnInheritedWidgetOfExactType<FlexibleSpaceBarSettings>();
-
       return Column(
         children: [
           Flex(
@@ -291,13 +289,34 @@ class _UserThingy extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(1000),
-                child: Image.network(
-                  "https://tetr.io/user-content/avatars/${player.userId}.jpg?rv=${player.avatarRevision}",
-                  fit: BoxFit.fitHeight,
-                  height: 128,
-                ),
+              Stack(
+                alignment: Alignment.topCenter,
+                children: [
+                  if (player.bannerRevision != null)
+                    Image.network(
+                      "https://tetr.io/user-content/banners/${player.userId}.jpg?rv=${player.bannerRevision}",
+                      fit: BoxFit.cover,
+                      height: 240,
+                    ),
+                  Container(
+                    padding: EdgeInsets.fromLTRB(
+                        0, player.bannerRevision != null ? 170 : 64, 0, 0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(1000),
+                      child: Image.network(
+                        "https://tetr.io/user-content/avatars/${player.userId}.jpg?rv=${player.avatarRevision}",
+                        fit: BoxFit.fitHeight,
+                        height: 128,
+                        errorBuilder: (context, error, stackTrace) =>
+                            Image.network(
+                          "https://tetr.io/res/avatar.png",
+                          fit: BoxFit.fitHeight,
+                          height: 128,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               Flexible(
                 child: Column(
@@ -319,25 +338,66 @@ class _UserThingy extends StatelessWidget {
               ),
             ],
           ),
+          (player.role != "banned")
+              ? Wrap(
+                  direction: Axis.horizontal,
+                  alignment: WrapAlignment.center,
+                  spacing: 25,
+                  crossAxisAlignment: WrapCrossAlignment.start,
+                  clipBehavior: Clip.hardEdge, // hard WHAT???
+                  children: [
+                    _StatCellNum(
+                      playerStat: player.level,
+                      playerStatLabel: "Level",
+                      snackBar:
+                          "${player.xp.floor().toString()} XP, ${((player.level - player.level.floor()) * 100).toStringAsFixed(2)} % until next level",
+                    ),
+                    if (player.gameTime >= Duration.zero)
+                      _StatCellNum(
+                        playerStat: (player.gameTime.inSeconds / 3600),
+                        playerStatLabel: "Hours\nPlayed",
+                        snackBar: player.gameTime.toString(),
+                      ),
+                    if (player.gamesPlayed >= 0)
+                      _StatCellNum(
+                          playerStat: player.gamesPlayed,
+                          playerStatLabel: "Games\nPlayed"),
+                    if (player.gamesWon >= 0)
+                      _StatCellNum(
+                          playerStat: player.gamesWon,
+                          playerStatLabel: "Games\nWon"),
+                    if (player.friendCount > 0)
+                      _StatCellNum(
+                          playerStat: player.friendCount,
+                          playerStatLabel: "Friends"),
+                  ],
+                )
+              : Text(
+                  "BANNED",
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontFamily: "Eurostile Round Extended",
+                    fontWeight: FontWeight.w900,
+                    color: Colors.red,
+                    fontSize: 60,
+                  ),
+                ),
           Wrap(
             direction: Axis.horizontal,
             alignment: WrapAlignment.center,
             spacing: 25,
             crossAxisAlignment: WrapCrossAlignment.start,
-            clipBehavior: Clip.hardEdge, // hard WHAT???
+            clipBehavior: Clip.hardEdge,
             children: [
-              _StatCellNum(
-                  playerStat: player.level,
-                  playerStatLabel: "Level\n${player.xp.floor().toString()} XP"),
-              _StatCellDuration(
-                  playerStat: player.gameTime, playerStatLabel: "Gametime"),
-              _StatCellNum(
-                  playerStat: player.gamesPlayed,
-                  playerStatLabel: "Games\nPlayed"),
-              _StatCellNum(
-                  playerStat: player.gamesWon, playerStatLabel: "Games\nWon"),
+              Text(
+                  "${player.role.capitalize()} account ${player.registrationTime == null ? "that was from very beginning" : 'created ${player.registrationTime}'}",
+                  style: const TextStyle(
+                    fontFamily: "Eurostile Round",
+                    color: Colors.white,
+                    fontSize: 16,
+                  ))
             ],
-          )
+          ),
         ],
       );
     });
@@ -345,72 +405,52 @@ class _UserThingy extends StatelessWidget {
 }
 
 class _StatCellNum extends StatelessWidget {
-  const _StatCellNum({
-    super.key,
-    required this.playerStat,
-    required this.playerStatLabel,
-  });
+  const _StatCellNum(
+      {super.key,
+      required this.playerStat,
+      required this.playerStatLabel,
+      this.snackBar});
 
   final num playerStat;
   final String playerStatLabel;
+  final String? snackBar;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Text(
-          playerStat.toStringAsFixed(0),
+          playerStat.floor().toString(),
           style: const TextStyle(
             fontFamily: "Eurostile Round Extended",
             color: Colors.white,
             fontSize: 32,
           ),
         ),
-        Text(
-          playerStatLabel,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontFamily: "Eurostile Round",
-            color: Colors.white,
-            fontSize: 16,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _StatCellDuration extends StatelessWidget {
-  const _StatCellDuration({
-    super.key,
-    required this.playerStat,
-    required this.playerStatLabel,
-  });
-
-  final Duration playerStat;
-  final String playerStatLabel;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          playerStat.toString().toString().split('.').first.padLeft(8, "0"),
-          style: const TextStyle(
-            fontFamily: "Eurostile Round Extended",
-            color: Colors.white,
-            fontSize: 32,
-          ),
-        ),
-        Text(
-          playerStatLabel,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontFamily: "Eurostile Round",
-            color: Colors.white,
-            fontSize: 16,
-          ),
-        ),
+        snackBar == null
+            ? Text(
+                playerStatLabel,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontFamily: "Eurostile Round",
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              )
+            : TextButton(
+                onPressed: () {
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(snackBar!)));
+                },
+                child: Text(
+                  playerStatLabel,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontFamily: "Eurostile Round",
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                )),
       ],
     );
   }
