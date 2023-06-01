@@ -44,6 +44,8 @@ class TetrioPlayer {
     required this.username,
     required this.role,
     required this.state,
+    this.avatarRevision,
+    this.bannerRevision,
     this.registrationTime,
     required this.badges,
     this.bio,
@@ -55,11 +57,14 @@ class TetrioPlayer {
     required this.xp,
     required this.supporterTier,
     required this.verified,
+    this.badstanding,
+    this.bot,
     required this.connections,
     required this.tlSeason1,
     required this.sprint,
     required this.blitz,
     this.zen,
+    this.distinguishment,
   });
 
   double get level =>
@@ -94,6 +99,7 @@ class TetrioPlayer {
         ? Distinguishment.fromJson(json['distinguishment'])
         : null;
     friendCount = json['friend_count'] != null ? json['friend_count'] : 0;
+    badstanding = json['badstanding'] != null ? json['badstanding'] : null;
   }
 
   Future<void> getRecords() async {
@@ -139,6 +145,8 @@ class TetrioPlayer {
     data['bio'] = bio;
     data['connections'] = connections.toJson();
     data['friend_count'] = friendCount;
+    data['badstanding'] = badstanding;
+    data['bot'] = bot;
     return data;
   }
 
@@ -563,6 +571,8 @@ class TetraLeagueAlpha {
       this.vs,
       this.records});
 
+  double get winrate => gamesWon / gamesPlayed;
+
   TetraLeagueAlpha.fromJson(Map<String, dynamic> json) {
     gamesPlayed = json['gamesplayed'];
     gamesWon = json['gameswon'];
@@ -586,6 +596,9 @@ class TetraLeagueAlpha {
   }
 
   double? get app => apm! / (pps! * 60);
+  double? get vsapm => vs! / apm!;
+  double? get dss => (vs! / 100) - (apm! / 60);
+  double? get dsp => ((vs! / 100) - (apm! / 60)) / pps!;
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};

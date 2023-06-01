@@ -7,6 +7,9 @@ void main() {
   databaseFactory = databaseFactoryFfi;
   runApp(MaterialApp(
     home: MainView(),
-    theme: ThemeData(fontFamily: 'Eurostile Round'),
+    theme: ThemeData(
+        fontFamily: 'Eurostile Round',
+        colorScheme: ColorScheme.dark(),
+        scaffoldBackgroundColor: Colors.black),
   ));
 }

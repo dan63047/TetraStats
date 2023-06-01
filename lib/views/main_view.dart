@@ -32,7 +32,7 @@ class MainView extends StatefulWidget {
 }
 
 Future<TetrioPlayer> fetchTetrioPlayer(String user) async {
-  var url = Uri.https('ch.tetr.io', 'api/users/$user');
+  var url = Uri.https('ch.tetr.io', 'api/users/${user.toLowerCase()}');
   final response = await http.get(url);
   // final response = await http.get(Uri.parse('https://ch.tetr.io/'));
 
@@ -63,11 +63,7 @@ class _MainViewState extends State<MainView> {
 
   Widget _searchTextField() {
     return TextField(
-      decoration: const InputDecoration(
-          enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white))),
       style: const TextStyle(
-        color: Colors.white,
         shadows: <Shadow>[
           Shadow(
             offset: Offset(0.0, 0.0),
@@ -92,7 +88,6 @@ class _MainViewState extends State<MainView> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: NavDrawer(),
-      backgroundColor: Colors.black,
       appBar: AppBar(
         title: !_searchBoolean
             ? Text(
@@ -163,18 +158,20 @@ class _MainViewState extends State<MainView> {
                 padding: const EdgeInsets.all(8),
                 children: [
                   _UserThingy(player: snapshot.data!),
+                  _PlayerTabSection(context, snapshot.data!)
                 ],
               );
             } else if (snapshot.hasError) {
-              return Text('${snapshot.error}',
-                  style: const TextStyle(
-                      fontFamily: "Eurostile Round Extended",
-                      color: Colors.white,
-                      fontSize: 42));
+              return Center(
+                  child: Text('${snapshot.error}',
+                      style: const TextStyle(
+                          fontFamily: "Eurostile Round Extended",
+                          fontSize: 42)));
             }
-
-            // By default, show a loading spinner.
-            return const CircularProgressIndicator();
+            return const Center(
+                child: CircularProgressIndicator(
+              color: Colors.white,
+            ));
           },
         ),
       ),
@@ -282,6 +279,9 @@ class _UserThingy extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
+      bool bigScreen = constraints.maxWidth > 768;
+      double bannerHeight = bigScreen ? 240 : 120;
+      double pfpHeight = bigScreen ? 64 : 32;
       return Column(
         children: [
           Flex(
@@ -296,24 +296,35 @@ class _UserThingy extends StatelessWidget {
                     Image.network(
                       "https://tetr.io/user-content/banners/${player.userId}.jpg?rv=${player.bannerRevision}",
                       fit: BoxFit.cover,
-                      height: 240,
+                      height: bannerHeight,
                     ),
                   Container(
                     padding: EdgeInsets.fromLTRB(
-                        0, player.bannerRevision != null ? 170 : 64, 0, 0),
+                        0,
+                        player.bannerRevision != null
+                            ? bannerHeight / 1.4
+                            : pfpHeight,
+                        0,
+                        0),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(1000),
-                      child: Image.network(
-                        "https://tetr.io/user-content/avatars/${player.userId}.jpg?rv=${player.avatarRevision}",
-                        fit: BoxFit.fitHeight,
-                        height: 128,
-                        errorBuilder: (context, error, stackTrace) =>
-                            Image.network(
-                          "https://tetr.io/res/avatar.png",
-                          fit: BoxFit.fitHeight,
-                          height: 128,
-                        ),
-                      ),
+                      child: player.role == "banned"
+                          ? Image.asset(
+                              "res/avatars/tetrio_banned.png",
+                              fit: BoxFit.fitHeight,
+                              height: 128,
+                            )
+                          : Image.network(
+                              "https://tetr.io/user-content/avatars/${player.userId}.jpg?rv=${player.avatarRevision}",
+                              fit: BoxFit.fitHeight,
+                              height: 128,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Image.asset(
+                                "res/avatars/tetrio_anon.png",
+                                fit: BoxFit.fitHeight,
+                                height: 128,
+                              ),
+                            ),
                     ),
                   ),
                 ],
@@ -322,15 +333,13 @@ class _UserThingy extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(player.username,
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontFamily: "Eurostile Round Extended",
-                            color: Colors.white,
-                            fontSize: 42)),
+                            fontSize: bigScreen ? 42 : 28)),
                     Text(
                       player.userId,
                       style: const TextStyle(
                           fontFamily: "Eurostile Round Condensed",
-                          color: Colors.white,
                           fontSize: 14),
                     ),
                   ],
@@ -348,7 +357,8 @@ class _UserThingy extends StatelessWidget {
                   children: [
                     _StatCellNum(
                       playerStat: player.level,
-                      playerStatLabel: "Level",
+                      playerStatLabel: "XP Level",
+                      isScreenBig: bigScreen,
                       snackBar:
                           "${player.xp.floor().toString()} XP, ${((player.level - player.level.floor()) * 100).toStringAsFixed(2)} % until next level",
                     ),
@@ -356,32 +366,85 @@ class _UserThingy extends StatelessWidget {
                       _StatCellNum(
                         playerStat: (player.gameTime.inSeconds / 3600),
                         playerStatLabel: "Hours\nPlayed",
+                        isScreenBig: bigScreen,
                         snackBar: player.gameTime.toString(),
                       ),
                     if (player.gamesPlayed >= 0)
                       _StatCellNum(
                           playerStat: player.gamesPlayed,
-                          playerStatLabel: "Games\nPlayed"),
+                          isScreenBig: bigScreen,
+                          playerStatLabel: "Online\nGames"),
                     if (player.gamesWon >= 0)
                       _StatCellNum(
                           playerStat: player.gamesWon,
+                          isScreenBig: bigScreen,
                           playerStatLabel: "Games\nWon"),
                     if (player.friendCount > 0)
                       _StatCellNum(
                           playerStat: player.friendCount,
+                          isScreenBig: bigScreen,
                           playerStatLabel: "Friends"),
                   ],
                 )
               : Text(
                   "BANNED",
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: "Eurostile Round Extended",
                     fontWeight: FontWeight.w900,
                     color: Colors.red,
-                    fontSize: 60,
+                    fontSize: bigScreen ? 60 : 45,
                   ),
                 ),
+          if (player.badstanding != null)
+            player.badstanding!
+                ? Text(
+                    "BAD STANDING",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: "Eurostile Round Extended",
+                      fontWeight: FontWeight.w900,
+                      color: Colors.red,
+                      fontSize: bigScreen ? 60 : 45,
+                    ),
+                  )
+                : const Text(
+                    "Was in bad standing long time ago",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.red,
+                    ),
+                  ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (player.country != null)
+                Text("${player.country?.toUpperCase()} • ",
+                    style: const TextStyle(
+                      fontFamily: "Eurostile Round",
+                      fontSize: 16,
+                    )),
+              Text(
+                  "${player.role.capitalize()} account ${player.registrationTime == null ? "that was from very beginning" : 'created ${player.registrationTime}'}",
+                  style: const TextStyle(
+                    fontFamily: "Eurostile Round",
+                    fontSize: 16,
+                  )),
+              const Text(" • ",
+                  style: TextStyle(
+                    fontFamily: "Eurostile Round",
+                    fontSize: 16,
+                  )),
+              Text(
+                  player.supporterTier == 0
+                      ? "Not a supporter"
+                      : "Supporter tier ${player.supporterTier}",
+                  style: const TextStyle(
+                    fontFamily: "Eurostile Round",
+                    fontSize: 16,
+                  )),
+            ],
+          ),
           Wrap(
             direction: Axis.horizontal,
             alignment: WrapAlignment.center,
@@ -389,13 +452,55 @@ class _UserThingy extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.start,
             clipBehavior: Clip.hardEdge,
             children: [
-              Text(
-                  "${player.role.capitalize()} account ${player.registrationTime == null ? "that was from very beginning" : 'created ${player.registrationTime}'}",
-                  style: const TextStyle(
-                    fontFamily: "Eurostile Round",
-                    color: Colors.white,
-                    fontSize: 16,
-                  ))
+              for (var badge in player.badges)
+                IconButton(
+                    onPressed: () => showDialog<void>(
+                          context: context,
+                          barrierDismissible: false, // user must tap button!
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text(
+                                badge.label,
+                                style: const TextStyle(
+                                    fontFamily: "Eurostile Round Extended"),
+                              ),
+                              content: SingleChildScrollView(
+                                child: ListBody(
+                                  children: [
+                                    Wrap(
+                                      direction: Axis.horizontal,
+                                      alignment: WrapAlignment.center,
+                                      crossAxisAlignment:
+                                          WrapCrossAlignment.center,
+                                      spacing: 25,
+                                      children: [
+                                        Image.asset(
+                                            "res/tetrio_badges/${badge.badgeId}.png"),
+                                        Text(badge.ts != null
+                                            ? "Obtained ${badge.ts}"
+                                            : "That badge was assigned manualy by TETR.IO admins"),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: const Text('OK'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                    tooltip: badge.label,
+                    icon: Image.asset(
+                      "res/tetrio_badges/${badge.badgeId}.png",
+                      height: 64,
+                      width: 64,
+                    ))
             ],
           ),
         ],
@@ -406,25 +511,29 @@ class _UserThingy extends StatelessWidget {
 
 class _StatCellNum extends StatelessWidget {
   const _StatCellNum(
-      {super.key,
-      required this.playerStat,
+      {required this.playerStat,
       required this.playerStatLabel,
-      this.snackBar});
+      required this.isScreenBig,
+      this.snackBar,
+      this.fractionDigits});
 
   final num playerStat;
   final String playerStatLabel;
+  final bool isScreenBig;
   final String? snackBar;
+  final int? fractionDigits;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Text(
-          playerStat.floor().toString(),
-          style: const TextStyle(
+          fractionDigits != null
+              ? playerStat.toStringAsFixed(fractionDigits!)
+              : playerStat.floor().toString(),
+          style: TextStyle(
             fontFamily: "Eurostile Round Extended",
-            color: Colors.white,
-            fontSize: 32,
+            fontSize: isScreenBig ? 32 : 24,
           ),
         ),
         snackBar == null
@@ -433,7 +542,6 @@ class _StatCellNum extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontFamily: "Eurostile Round",
-                  color: Colors.white,
                   fontSize: 16,
                 ),
               )
@@ -447,11 +555,211 @@ class _StatCellNum extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontFamily: "Eurostile Round",
-                    color: Colors.white,
                     fontSize: 16,
                   ),
                 )),
       ],
     );
   }
+}
+
+Widget _PlayerTabSection(BuildContext context, TetrioPlayer player) {
+  bool bigScreen = MediaQuery.of(context).size.width > 768;
+  return DefaultTabController(
+    length: 4,
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Container(
+          child: TabBar(tabs: [
+            Tab(text: "Tetra League"),
+            Tab(text: "40 Lines"),
+            Tab(text: "Blitz"),
+            Tab(text: "Other"),
+          ]),
+        ),
+        Container(
+          //Add this to give height
+          height: MediaQuery.of(context).size.height,
+          child: TabBarView(children: [
+            Container(
+              child: Column(
+                children: (player.tlSeason1.gamesPlayed > 0)
+                    ? [
+                        Text("Tetra League",
+                            style: TextStyle(
+                                fontFamily: "Eurostile Round Extended",
+                                fontSize: bigScreen ? 42 : 28)),
+                        if (player.tlSeason1.gamesPlayed >= 10)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                "res/tetrio_tl_alpha_ranks/${player.tlSeason1.rank}.png",
+                                height: bigScreen ? 128 : 64,
+                              ),
+                              Column(
+                                children: [
+                                  Text(
+                                      "${player.tlSeason1.rating.toStringAsFixed(2)} TR",
+                                      style: TextStyle(
+                                          fontFamily:
+                                              "Eurostile Round Extended",
+                                          fontSize: bigScreen ? 42 : 28)),
+                                  Text(
+                                      "Top ${(player.tlSeason1.percentile * 100).toStringAsFixed(2)}% • Top Rank: ${player.tlSeason1.bestRank.toUpperCase()} • Glicko: ${player.tlSeason1.glicko?.toStringAsFixed(2)}±${player.tlSeason1.rd?.toStringAsFixed(2)}${player.tlSeason1.decaying ? ' • Decaying' : ''}")
+                                ],
+                              )
+                            ],
+                          )
+                        else
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Column(
+                                children: [
+                                  Text(
+                                      "${10 - player.tlSeason1.gamesPlayed} games until being ranked",
+                                      softWrap: true,
+                                      style: TextStyle(
+                                        fontFamily: "Eurostile Round Extended",
+                                        fontSize: bigScreen ? 42 : 28,
+                                        overflow: TextOverflow.visible,
+                                      )),
+                                  //Text("Top ${(player.tlSeason1.percentile * 100).toStringAsFixed(2)}% • Glicko: ${player.tlSeason1.glicko?.toStringAsFixed(2)}±${player.tlSeason1.rd?.toStringAsFixed(2)}${player.tlSeason1.decaying ? ' • Decaying' : ''}")
+                                ],
+                              )
+                            ],
+                          ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 16, 0, 48),
+                          child: Wrap(
+                            direction: Axis.horizontal,
+                            alignment: WrapAlignment.center,
+                            spacing: 25,
+                            crossAxisAlignment: WrapCrossAlignment.start,
+                            clipBehavior: Clip.hardEdge,
+                            children: [
+                              if (player.tlSeason1.apm != null)
+                                _StatCellNum(
+                                    playerStat: player.tlSeason1.apm!,
+                                    isScreenBig: bigScreen,
+                                    fractionDigits: 2,
+                                    playerStatLabel: "Attack\nPer Minute"),
+                              if (player.tlSeason1.pps != null)
+                                _StatCellNum(
+                                    playerStat: player.tlSeason1.pps!,
+                                    isScreenBig: bigScreen,
+                                    fractionDigits: 2,
+                                    playerStatLabel: "Pieces\nPer Second"),
+                              if (player.tlSeason1.apm != null)
+                                _StatCellNum(
+                                    playerStat: player.tlSeason1.vs!,
+                                    isScreenBig: bigScreen,
+                                    fractionDigits: 2,
+                                    playerStatLabel: "Versus\nScore"),
+                              if (player.tlSeason1.standing > 0)
+                                _StatCellNum(
+                                    playerStat: player.tlSeason1.standing,
+                                    isScreenBig: bigScreen,
+                                    playerStatLabel: "Leaderboard\nplacement"),
+                              if (player.tlSeason1.standingLocal > 0)
+                                _StatCellNum(
+                                    playerStat: player.tlSeason1.standingLocal,
+                                    isScreenBig: bigScreen,
+                                    playerStatLabel: "Country LB\nplacement"),
+                              _StatCellNum(
+                                  playerStat: player.tlSeason1.gamesPlayed,
+                                  isScreenBig: bigScreen,
+                                  playerStatLabel: "Games\nplayed"),
+                              _StatCellNum(
+                                  playerStat: player.tlSeason1.gamesWon,
+                                  isScreenBig: bigScreen,
+                                  playerStatLabel: "Games\nwon"),
+                              _StatCellNum(
+                                  playerStat: player.tlSeason1.winrate * 100,
+                                  isScreenBig: bigScreen,
+                                  fractionDigits: 2,
+                                  playerStatLabel: "Winrate\nprecentage"),
+                            ],
+                          ),
+                        ),
+                        if (player.tlSeason1.apm != null &&
+                            player.tlSeason1.pps != null &&
+                            player.tlSeason1.apm != null)
+                          Column(
+                            children: [
+                              Text("Nerd Stats",
+                                  style: TextStyle(
+                                      fontFamily: "Eurostile Round Extended",
+                                      fontSize: bigScreen ? 42 : 28)),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(0, 16, 0, 48),
+                                child: Wrap(
+                                    direction: Axis.horizontal,
+                                    alignment: WrapAlignment.center,
+                                    spacing: 25,
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.start,
+                                    clipBehavior: Clip.hardEdge,
+                                    children: [
+                                      _StatCellNum(
+                                          playerStat: player.tlSeason1.app!,
+                                          isScreenBig: bigScreen,
+                                          fractionDigits: 3,
+                                          playerStatLabel: "Attack\nPer Piece"),
+                                      _StatCellNum(
+                                          playerStat: player.tlSeason1.vsapm!,
+                                          isScreenBig: bigScreen,
+                                          fractionDigits: 3,
+                                          playerStatLabel: "VS/APM"),
+                                      _StatCellNum(
+                                          playerStat: player.tlSeason1.dss!,
+                                          isScreenBig: bigScreen,
+                                          fractionDigits: 3,
+                                          playerStatLabel:
+                                              "Downstack\nPer Second"),
+                                      _StatCellNum(
+                                          playerStat: player.tlSeason1.dsp!,
+                                          isScreenBig: bigScreen,
+                                          fractionDigits: 3,
+                                          playerStatLabel:
+                                              "Downstack\nPer Piece"),
+                                    ]),
+                              )
+                            ],
+                          )
+                      ]
+                    : [
+                        Text("That user never played Tetra League",
+                            style: TextStyle(
+                                fontFamily: "Eurostile Round Extended",
+                                fontSize: bigScreen ? 42 : 28)),
+                      ],
+              ),
+            ),
+            Container(
+              child: Text("40 Lines",
+                  style: TextStyle(
+                      fontFamily: "Eurostile Round Extended",
+                      fontSize: bigScreen ? 42 : 28)),
+            ),
+            Container(
+              child: Text("Blitz",
+                  style: TextStyle(
+                      fontFamily: "Eurostile Round Extended",
+                      fontSize: bigScreen ? 42 : 28)),
+            ),
+            Container(
+              child: Text("Other info",
+                  style: TextStyle(
+                      fontFamily: "Eurostile Round Extended",
+                      fontSize: bigScreen ? 42 : 28)),
+            ),
+          ]),
+        ),
+      ],
+    ),
+  );
 }
