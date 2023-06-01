@@ -418,31 +418,15 @@ class _UserThingy extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (player.country != null)
-                Text("${player.country?.toUpperCase()} • ",
+              Expanded(
+                child: Text(
+                    "${player.country?.toUpperCase()} • ${player.role.capitalize()} account ${player.registrationTime == null ? "that was from very beginning" : 'created ${player.registrationTime}'} • ${player.supporterTier == 0 ? "Not a supporter" : "Supporter tier ${player.supporterTier}"}",
+                    textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontFamily: "Eurostile Round",
                       fontSize: 16,
                     )),
-              Text(
-                  "${player.role.capitalize()} account ${player.registrationTime == null ? "that was from very beginning" : 'created ${player.registrationTime}'}",
-                  style: const TextStyle(
-                    fontFamily: "Eurostile Round",
-                    fontSize: 16,
-                  )),
-              const Text(" • ",
-                  style: TextStyle(
-                    fontFamily: "Eurostile Round",
-                    fontSize: 16,
-                  )),
-              Text(
-                  player.supporterTier == 0
-                      ? "Not a supporter"
-                      : "Supporter tier ${player.supporterTier}",
-                  style: const TextStyle(
-                    fontFamily: "Eurostile Round",
-                    fontSize: 16,
-                  )),
+              )
             ],
           ),
           Wrap(
@@ -598,18 +582,17 @@ Widget _PlayerTabSection(BuildContext context, TetrioPlayer player) {
                                 "res/tetrio_tl_alpha_ranks/${player.tlSeason1.rank}.png",
                                 height: bigScreen ? 128 : 64,
                               ),
-                              Column(
-                                children: [
-                                  Text(
-                                      "${player.tlSeason1.rating.toStringAsFixed(2)} TR",
-                                      style: TextStyle(
-                                          fontFamily:
-                                              "Eurostile Round Extended",
-                                          fontSize: bigScreen ? 42 : 28)),
-                                  Text(
-                                      "Top ${(player.tlSeason1.percentile * 100).toStringAsFixed(2)}% • Top Rank: ${player.tlSeason1.bestRank.toUpperCase()} • Glicko: ${player.tlSeason1.glicko?.toStringAsFixed(2)}±${player.tlSeason1.rd?.toStringAsFixed(2)}${player.tlSeason1.decaying ? ' • Decaying' : ''}")
-                                ],
-                              )
+                              Column(children: [
+                                Text(
+                                    "${player.tlSeason1.rating.toStringAsFixed(2)} TR",
+                                    style: TextStyle(
+                                        fontFamily: "Eurostile Round Extended",
+                                        fontSize: bigScreen ? 42 : 28)),
+                                Text(
+                                  "Top ${(player.tlSeason1.percentile * 100).toStringAsFixed(2)}% • Top Rank: ${player.tlSeason1.bestRank.toUpperCase()} • Glicko: ${player.tlSeason1.glicko?.toStringAsFixed(2)}±${player.tlSeason1.rd?.toStringAsFixed(2)}${player.tlSeason1.decaying ? ' • Decaying' : ''}",
+                                  textAlign: TextAlign.center,
+                                ),
+                              ])
                             ],
                           )
                         else
