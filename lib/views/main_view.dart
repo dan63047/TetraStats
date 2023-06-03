@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart';
 import 'dart:convert';
-import 'dart:math';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:tetra_stats/services/sqlite_db_controller.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 extension StringExtension on String {
   String capitalize() {
@@ -32,13 +33,10 @@ class MainView extends StatefulWidget {
 }
 
 Future<TetrioPlayer> fetchTetrioPlayer(String user) async {
-  var url = Uri.https('ch.tetr.io', 'api/users/${user.toLowerCase()}');
+  var url = Uri.https('ch.tetr.io', 'api/users/${user.toLowerCase().trim()}');
   final response = await http.get(url);
-  // final response = await http.get(Uri.parse('https://ch.tetr.io/'));
 
   if (response.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
     return jsonDecode(response.body)['success']
         ? TetrioPlayer.fromJson(
             jsonDecode(response.body)['data']['user'],
@@ -47,8 +45,6 @@ Future<TetrioPlayer> fetchTetrioPlayer(String user) async {
                 isUtc: true))
         : throw Exception("User doesn't exist");
   } else {
-    // If the server did not return a 200 OK response,
-    // then throw an exception.
     throw Exception('Failed to fetch player');
   }
 }
@@ -57,10 +53,10 @@ class _MyHomePageState extends State<MainView>
     with SingleTickerProviderStateMixin {
   final bodyGlobalKey = GlobalKey();
   final List<Widget> myTabs = [
-    Tab(text: "Tetra League"),
-    Tab(text: "40 Lines"),
-    Tab(text: "Blitz"),
-    Tab(text: "Other"),
+    const Tab(text: "Tetra League"),
+    const Tab(text: "40 Lines"),
+    const Tab(text: "Blitz"),
+    const Tab(text: "Other"),
   ];
   bool _searchBoolean = false;
   late TabController _tabController;
@@ -69,6 +65,8 @@ class _MyHomePageState extends State<MainView>
 
   Widget _searchTextField() {
     return TextField(
+      maxLength: 25,
+      decoration: InputDecoration(counter: Offstage()),
       style: const TextStyle(
         shadows: <Shadow>[
           Shadow(
@@ -116,7 +114,7 @@ class _MyHomePageState extends State<MainView>
   _smoothScrollToTop() {
     _scrollController.animateTo(
       0,
-      duration: Duration(microseconds: 300),
+      duration: const Duration(microseconds: 300),
       curve: Curves.ease,
     );
 
@@ -124,16 +122,6 @@ class _MyHomePageState extends State<MainView>
       fixedScroll = _tabController.index == 2;
     });
   }
-
-  _buildTabContext(int lineCount) => Container(
-        child: ListView.builder(
-          physics: const ClampingScrollPhysics(),
-          itemCount: lineCount,
-          itemBuilder: (BuildContext context, int index) {
-            return Text('some content');
-          },
-        ),
-      );
 
   @override
   Widget build(BuildContext context) {
@@ -239,31 +227,33 @@ class _MyHomePageState extends State<MainView>
                                           fontSize: bigScreen ? 42 : 28)),
                                   if (snapshot.data!.tlSeason1.gamesPlayed >=
                                       10)
-                                    Center(
-                                      child: Wrap(
-                                        direction: Axis.horizontal,
-                                        alignment: WrapAlignment.center,
-                                        crossAxisAlignment:
-                                            WrapCrossAlignment.center,
-                                        clipBehavior: Clip.hardEdge,
-                                        children: [
-                                          Image.asset(
-                                            "res/tetrio_tl_alpha_ranks/${snapshot.data!.tlSeason1.rank}.png",
-                                            height: bigScreen ? 256 : 128,
-                                          ),
-                                          Text(
-                                              "${snapshot.data!.tlSeason1.rating.toStringAsFixed(2)} TR",
-                                              style: TextStyle(
-                                                  fontFamily:
-                                                      "Eurostile Round Extended",
-                                                  fontSize:
-                                                      bigScreen ? 42 : 28)),
-                                          Text(
-                                            "Top ${(snapshot.data!.tlSeason1.percentile * 100).toStringAsFixed(2)}% (${snapshot.data!.tlSeason1.percentileRank.toUpperCase()}) • Top Rank: ${snapshot.data!.tlSeason1.bestRank.toUpperCase()} • Glicko: ${snapshot.data!.tlSeason1.glicko?.toStringAsFixed(2)}±${snapshot.data!.tlSeason1.rd?.toStringAsFixed(2)}${snapshot.data!.tlSeason1.decaying ? ' • Decaying' : ''}",
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ],
-                                      ),
+                                    Wrap(
+                                      direction: Axis.horizontal,
+                                      alignment: WrapAlignment.spaceAround,
+                                      crossAxisAlignment:
+                                          WrapCrossAlignment.center,
+                                      clipBehavior: Clip.hardEdge,
+                                      children: [
+                                        Image.asset(
+                                          "res/tetrio_tl_alpha_ranks/${snapshot.data!.tlSeason1.rank}.png",
+                                          height: 128,
+                                        ),
+                                        Column(
+                                          children: [
+                                            Text(
+                                                "${snapshot.data!.tlSeason1.rating.toStringAsFixed(2)} TR",
+                                                style: TextStyle(
+                                                    fontFamily:
+                                                        "Eurostile Round Extended",
+                                                    fontSize:
+                                                        bigScreen ? 42 : 28)),
+                                            Text(
+                                              "Top ${(snapshot.data!.tlSeason1.percentile * 100).toStringAsFixed(2)}% (${snapshot.data!.tlSeason1.percentileRank.toUpperCase()}) • Top Rank: ${snapshot.data!.tlSeason1.bestRank.toUpperCase()} • Glicko: ${snapshot.data!.tlSeason1.glicko?.toStringAsFixed(2)}±${snapshot.data!.tlSeason1.rd?.toStringAsFixed(2)}${snapshot.data!.tlSeason1.decaying ? ' • Decaying' : ''}",
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ],
+                                        ),
+                                      ],
                                     )
                                   else
                                     Row(
@@ -411,6 +401,13 @@ class _MyHomePageState extends State<MainView>
                                                         "Downstack\nPer Piece"),
                                                 _StatCellNum(
                                                     playerStat: snapshot.data!
+                                                        .tlSeason1.appdsp!,
+                                                    isScreenBig: bigScreen,
+                                                    fractionDigits: 3,
+                                                    playerStatLabel:
+                                                        "APP + DS/P"),
+                                                _StatCellNum(
+                                                    playerStat: snapshot.data!
                                                         .tlSeason1.cheese!,
                                                     isScreenBig: bigScreen,
                                                     fractionDigits: 2,
@@ -439,7 +436,169 @@ class _MyHomePageState extends State<MainView>
                                               ]),
                                         )
                                       ],
-                                    )
+                                    ),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(0, 16, 0, 48),
+                                    child: SizedBox(
+                                      width: bigScreen
+                                          ? MediaQuery.of(context).size.width *
+                                              0.4
+                                          : MediaQuery.of(context).size.width *
+                                              0.85,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              const Text(
+                                                "Est. of TR:",
+                                                style: TextStyle(fontSize: 24),
+                                              ),
+                                              Text(
+                                                snapshot.data!.tlSeason1.esttr!
+                                                    .toStringAsFixed(2),
+                                                style: const TextStyle(
+                                                    fontSize: 24),
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              const Text(
+                                                "Accuracy of TR Est.:",
+                                                style: TextStyle(fontSize: 24),
+                                              ),
+                                              Text(
+                                                (snapshot.data!.tlSeason1
+                                                        .esttracc!)
+                                                    .toStringAsFixed(2),
+                                                style: const TextStyle(
+                                                    fontSize: 24),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(0, 0, 0, 48),
+                                    child: SizedBox(
+                                      height: 300,
+                                      child: RadarChart(
+                                        RadarChartData(
+                                          getTitle: (index, angle) {
+                                            bool relativeAngleMode = true;
+                                            double angleValue = 0;
+                                            final usedAngle = relativeAngleMode
+                                                ? angle + angleValue
+                                                : angleValue;
+                                            switch (index) {
+                                              case 0:
+                                                return RadarChartTitle(
+                                                  text: 'APM',
+                                                  angle: usedAngle,
+                                                );
+                                              case 1:
+                                                return RadarChartTitle(
+                                                  text: 'PPS',
+                                                  angle: usedAngle,
+                                                );
+                                              case 2:
+                                                return RadarChartTitle(
+                                                    text: 'VS',
+                                                    angle: usedAngle);
+                                              case 3:
+                                                return RadarChartTitle(
+                                                    text: 'APP',
+                                                    angle: usedAngle);
+                                              case 4:
+                                                return RadarChartTitle(
+                                                    text: 'DS/S',
+                                                    angle: usedAngle);
+                                              case 5:
+                                                return RadarChartTitle(
+                                                    text: 'DS/P',
+                                                    angle: usedAngle);
+                                              case 6:
+                                                return RadarChartTitle(
+                                                    text: 'APP+DS/P',
+                                                    angle: usedAngle);
+                                              case 7:
+                                                return RadarChartTitle(
+                                                    text: 'VS/APM',
+                                                    angle: usedAngle);
+                                              case 8:
+                                                return RadarChartTitle(
+                                                    text: 'Cheese',
+                                                    angle: usedAngle);
+                                              case 9:
+                                                return RadarChartTitle(
+                                                    text: 'Gb Eff.',
+                                                    angle: usedAngle);
+                                              default:
+                                                return const RadarChartTitle(
+                                                    text: '');
+                                            }
+                                          },
+                                          dataSets: [
+                                            RadarDataSet(
+                                              dataEntries: [
+                                                RadarEntry(
+                                                    value: snapshot.data!
+                                                            .tlSeason1.apm! *
+                                                        1),
+                                                RadarEntry(
+                                                    value: snapshot.data!
+                                                            .tlSeason1.pps! *
+                                                        45),
+                                                RadarEntry(
+                                                    value: snapshot.data!
+                                                            .tlSeason1.vs! *
+                                                        0.444),
+                                                RadarEntry(
+                                                    value: snapshot.data!
+                                                            .tlSeason1.app! *
+                                                        185),
+                                                RadarEntry(
+                                                    value: snapshot.data!
+                                                            .tlSeason1.dss! *
+                                                        175),
+                                                RadarEntry(
+                                                    value: snapshot.data!
+                                                            .tlSeason1.dsp! *
+                                                        450),
+                                                RadarEntry(
+                                                    value: snapshot.data!
+                                                        .tlSeason1.appdsp!),
+                                                RadarEntry(
+                                                    value: snapshot.data!
+                                                        .tlSeason1.vsapm!),
+                                                RadarEntry(
+                                                    value: snapshot.data!
+                                                        .tlSeason1.cheese!),
+                                                RadarEntry(
+                                                    value: snapshot.data!
+                                                            .tlSeason1.gbe! *
+                                                        315),
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                        swapAnimationDuration: const Duration(
+                                            milliseconds: 150), // Optional
+                                        swapAnimationCurve:
+                                            Curves.linear, // Optional
+                                      ),
+                                    ),
+                                  )
                                 ]
                               : [
                                   Text("That user never played Tetra League",
@@ -451,11 +610,15 @@ class _MyHomePageState extends State<MainView>
                         );
                       },
                     ),
-                    Container(
-                      child: Text("40 Lines",
-                          style: TextStyle(
-                              fontFamily: "Eurostile Round Extended",
-                              fontSize: bigScreen ? 42 : 28)),
+                    Column(
+                      children: (snapshot.data!.sprint.isNotEmpty)
+                          ? []
+                          : [
+                              Text("That user never played 40 Lines",
+                                  style: TextStyle(
+                                      fontFamily: "Eurostile Round Extended",
+                                      fontSize: bigScreen ? 42 : 28))
+                            ],
                     ),
                     Container(
                       child: Text("Blitz",

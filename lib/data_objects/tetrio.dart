@@ -600,6 +600,7 @@ class TetraLeagueAlpha {
   double? get vsapm => vs! / apm!;
   double? get dss => (vs! / 100) - (apm! / 60);
   double? get dsp => ((vs! / 100) - (apm! / 60)) / pps!;
+  double? get appdsp => app! + dsp!;
   double? get cheese =>
       (dsp! * 150) + (((vs! / apm!) - 2) * 50) + (0.6 - app!) * 125;
   double? get gbe => ((app! * dss!) / pps!) * 2;
@@ -630,6 +631,8 @@ class TetraLeagueAlpha {
     double temp3 = 1 + pow(10, (temp / temp2)) as double;
     return 25000 / temp3;
   }
+
+  double? get esttracc => esttr! - rating;
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
