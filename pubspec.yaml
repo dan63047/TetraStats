@@ -46,6 +46,7 @@ flutter:
   assets:
      - res/avatars/tetrio_anon.png
      - res/avatars/tetrio_banned.png
+     - res/icons/kagari.png
      - res/tetrio_tl_alpha_ranks/x.png
      - res/tetrio_tl_alpha_ranks/u.png
      - res/tetrio_tl_alpha_ranks/ss.png

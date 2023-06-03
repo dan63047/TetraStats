@@ -234,10 +234,16 @@ class _MyHomePageState extends State<MainView>
                                           WrapCrossAlignment.center,
                                       clipBehavior: Clip.hardEdge,
                                       children: [
-                                        Image.asset(
-                                          "res/tetrio_tl_alpha_ranks/${snapshot.data!.tlSeason1.rank}.png",
-                                          height: 128,
-                                        ),
+                                        snapshot.data!.userId ==
+                                                "5e32fc85ab319c2ab1beb07c"
+                                            ? Image.asset(
+                                                "res/icons/kagari.png",
+                                                height: 128,
+                                              )
+                                            : Image.asset(
+                                                "res/tetrio_tl_alpha_ranks/${snapshot.data!.tlSeason1.rank}.png",
+                                                height: 128,
+                                              ),
                                         Column(
                                           children: [
                                             Text(
@@ -494,55 +500,59 @@ class _MyHomePageState extends State<MainView>
                                       height: 300,
                                       child: RadarChart(
                                         RadarChartData(
+                                          radarShape: RadarShape.polygon,
+                                          tickCount: 4,
+                                          ticksTextStyle: const TextStyle(
+                                              color: Colors.transparent,
+                                              fontSize: 10),
+                                          radarBorderData: BorderSide(
+                                              color: Colors.transparent,
+                                              width: 1),
+                                          gridBorderData: BorderSide(
+                                              color: Colors.white24, width: 1),
+                                          tickBorderData: BorderSide(
+                                              color: Colors.transparent,
+                                              width: 1),
                                           getTitle: (index, angle) {
-                                            bool relativeAngleMode = true;
-                                            double angleValue = 0;
-                                            final usedAngle = relativeAngleMode
-                                                ? angle + angleValue
-                                                : angleValue;
                                             switch (index) {
                                               case 0:
                                                 return RadarChartTitle(
                                                   text: 'APM',
-                                                  angle: usedAngle,
+                                                  angle: angle,
                                                 );
                                               case 1:
                                                 return RadarChartTitle(
                                                   text: 'PPS',
-                                                  angle: usedAngle,
+                                                  angle: angle,
                                                 );
                                               case 2:
                                                 return RadarChartTitle(
-                                                    text: 'VS',
-                                                    angle: usedAngle);
+                                                    text: 'VS', angle: angle);
                                               case 3:
                                                 return RadarChartTitle(
-                                                    text: 'APP',
-                                                    angle: usedAngle);
+                                                    text: 'APP', angle: angle);
                                               case 4:
                                                 return RadarChartTitle(
-                                                    text: 'DS/S',
-                                                    angle: usedAngle);
+                                                    text: 'DS/S', angle: angle);
                                               case 5:
                                                 return RadarChartTitle(
-                                                    text: 'DS/P',
-                                                    angle: usedAngle);
+                                                    text: 'DS/P', angle: angle);
                                               case 6:
                                                 return RadarChartTitle(
                                                     text: 'APP+DS/P',
-                                                    angle: usedAngle);
+                                                    angle: angle);
                                               case 7:
                                                 return RadarChartTitle(
                                                     text: 'VS/APM',
-                                                    angle: usedAngle);
+                                                    angle: angle);
                                               case 8:
                                                 return RadarChartTitle(
                                                     text: 'Cheese',
-                                                    angle: usedAngle);
+                                                    angle: angle);
                                               case 9:
                                                 return RadarChartTitle(
                                                     text: 'Gb Eff.',
-                                                    angle: usedAngle);
+                                                    angle: angle);
                                               default:
                                                 return const RadarChartTitle(
                                                     text: '');
@@ -577,17 +587,36 @@ class _MyHomePageState extends State<MainView>
                                                         450),
                                                 RadarEntry(
                                                     value: snapshot.data!
-                                                        .tlSeason1.appdsp!),
+                                                            .tlSeason1.appdsp! *
+                                                        140),
                                                 RadarEntry(
                                                     value: snapshot.data!
-                                                        .tlSeason1.vsapm!),
+                                                            .tlSeason1.vsapm! *
+                                                        60),
                                                 RadarEntry(
                                                     value: snapshot.data!
-                                                        .tlSeason1.cheese!),
+                                                            .tlSeason1.cheese! *
+                                                        1.25),
                                                 RadarEntry(
                                                     value: snapshot.data!
                                                             .tlSeason1.gbe! *
                                                         315),
+                                              ],
+                                            ),
+                                            RadarDataSet(
+                                              fillColor: Colors.transparent,
+                                              borderColor: Colors.transparent,
+                                              dataEntries: [
+                                                RadarEntry(value: 0),
+                                                RadarEntry(value: 0),
+                                                RadarEntry(value: 0),
+                                                RadarEntry(value: 0),
+                                                RadarEntry(value: 0),
+                                                RadarEntry(value: 0),
+                                                RadarEntry(value: 0),
+                                                RadarEntry(value: 0),
+                                                RadarEntry(value: 0),
+                                                RadarEntry(value: 0),
                                               ],
                                             )
                                           ],
