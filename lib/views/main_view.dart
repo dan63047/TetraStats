@@ -8,11 +8,11 @@ import 'package:tetra_stats/services/sqlite_db_controller.dart';
 
 extension StringExtension on String {
   String capitalize() {
-    return "${this[0].toUpperCase()}${this.substring(1).toLowerCase()}";
+    return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
   }
 }
 
-String _searchFor = "";
+String _searchFor = "dan63047";
 late Future<TetrioPlayer> me;
 DB db = DB();
 TetrioService teto = TetrioService();
@@ -20,7 +20,7 @@ const allowedHeightForPlayerIdInPixels = 40.0;
 const allowedHeightForPlayerBioInPixels = 30.0;
 const givenTextHeightByScreenPercentage = 0.3;
 
-enum SampleItem { itemOne, itemTwo, itemThree }
+enum ThreeDotsItems { compare, states, settings }
 
 class MainView extends StatefulWidget {
   const MainView({Key? key}) : super(key: key);
@@ -28,7 +28,7 @@ class MainView extends StatefulWidget {
   String get title => "Tetra Stats: $_searchFor";
 
   @override
-  State<MainView> createState() => _MainViewState();
+  State<MainView> createState() => _MyHomePageState();
 }
 
 Future<TetrioPlayer> fetchTetrioPlayer(String user) async {
@@ -53,13 +53,19 @@ Future<TetrioPlayer> fetchTetrioPlayer(String user) async {
   }
 }
 
-class _MainViewState extends State<MainView> {
+class _MyHomePageState extends State<MainView>
+    with SingleTickerProviderStateMixin {
+  final bodyGlobalKey = GlobalKey();
+  final List<Widget> myTabs = [
+    Tab(text: "Tetra League"),
+    Tab(text: "40 Lines"),
+    Tab(text: "Blitz"),
+    Tab(text: "Other"),
+  ];
   bool _searchBoolean = false;
-  @override
-  void initState() {
-    super.initState();
-    me = fetchTetrioPlayer("dan63047");
-  }
+  late TabController _tabController;
+  late ScrollController _scrollController;
+  late bool fixedScroll;
 
   Widget _searchTextField() {
     return TextField(
@@ -83,6 +89,51 @@ class _MainViewState extends State<MainView> {
       }),
     );
   }
+
+  @override
+  void initState() {
+    _scrollController = ScrollController();
+    //_scrollController.addListener(_scrollListener);
+    _tabController = TabController(length: 4, vsync: this);
+    //_tabController.addListener(_smoothScrollToTop);
+    me = fetchTetrioPlayer("dan63047");
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  _scrollListener() {
+    if (fixedScroll) {
+      _scrollController.jumpTo(0);
+    }
+  }
+
+  _smoothScrollToTop() {
+    _scrollController.animateTo(
+      0,
+      duration: Duration(microseconds: 300),
+      curve: Curves.ease,
+    );
+
+    setState(() {
+      fixedScroll = _tabController.index == 2;
+    });
+  }
+
+  _buildTabContext(int lineCount) => Container(
+        child: ListView.builder(
+          physics: const ClampingScrollPhysics(),
+          itemCount: lineCount,
+          itemBuilder: (BuildContext context, int index) {
+            return Text('some content');
+          },
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -132,17 +183,18 @@ class _MainViewState extends State<MainView> {
                   tooltip: "Close search",
                 ),
           PopupMenuButton(
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<SampleItem>>[
-              const PopupMenuItem<SampleItem>(
-                value: SampleItem.itemOne,
+            itemBuilder: (BuildContext context) =>
+                <PopupMenuEntry<ThreeDotsItems>>[
+              const PopupMenuItem<ThreeDotsItems>(
+                value: ThreeDotsItems.compare,
                 child: Text('Compare'),
               ),
-              const PopupMenuItem<SampleItem>(
-                value: SampleItem.itemTwo,
+              const PopupMenuItem<ThreeDotsItems>(
+                value: ThreeDotsItems.states,
                 child: Text('States'),
               ),
-              const PopupMenuItem<SampleItem>(
-                value: SampleItem.itemThree,
+              const PopupMenuItem<ThreeDotsItems>(
+                value: ThreeDotsItems.settings,
                 child: Text('Settings'),
               ),
             ],
@@ -154,12 +206,271 @@ class _MainViewState extends State<MainView> {
           future: me,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return ListView(
-                padding: const EdgeInsets.all(8),
-                children: [
-                  _UserThingy(player: snapshot.data!),
-                  _PlayerTabSection(context, snapshot.data!)
-                ],
+              bool bigScreen = MediaQuery.of(context).size.width > 768;
+              return NestedScrollView(
+                controller: _scrollController,
+                headerSliverBuilder: (context, value) {
+                  return [
+                    SliverToBoxAdapter(
+                        child: _UserThingy(player: snapshot.data!)),
+                    SliverToBoxAdapter(
+                      child: TabBar(
+                        controller: _tabController,
+                        isScrollable: true,
+                        tabs: myTabs,
+                      ),
+                    ),
+                  ];
+                },
+                body: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    ListView.builder(
+                      physics: const ClampingScrollPhysics(),
+                      itemCount: 1,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Column(
+                          children: (snapshot.data!.tlSeason1.gamesPlayed > 0)
+                              ? [
+                                  Text("Tetra League",
+                                      style: TextStyle(
+                                          fontFamily:
+                                              "Eurostile Round Extended",
+                                          fontSize: bigScreen ? 42 : 28)),
+                                  if (snapshot.data!.tlSeason1.gamesPlayed >=
+                                      10)
+                                    Center(
+                                      child: Wrap(
+                                        direction: Axis.horizontal,
+                                        alignment: WrapAlignment.center,
+                                        crossAxisAlignment:
+                                            WrapCrossAlignment.center,
+                                        clipBehavior: Clip.hardEdge,
+                                        children: [
+                                          Image.asset(
+                                            "res/tetrio_tl_alpha_ranks/${snapshot.data!.tlSeason1.rank}.png",
+                                            height: bigScreen ? 256 : 128,
+                                          ),
+                                          Text(
+                                              "${snapshot.data!.tlSeason1.rating.toStringAsFixed(2)} TR",
+                                              style: TextStyle(
+                                                  fontFamily:
+                                                      "Eurostile Round Extended",
+                                                  fontSize:
+                                                      bigScreen ? 42 : 28)),
+                                          Text(
+                                            "Top ${(snapshot.data!.tlSeason1.percentile * 100).toStringAsFixed(2)}% (${snapshot.data!.tlSeason1.percentileRank.toUpperCase()}) • Top Rank: ${snapshot.data!.tlSeason1.bestRank.toUpperCase()} • Glicko: ${snapshot.data!.tlSeason1.glicko?.toStringAsFixed(2)}±${snapshot.data!.tlSeason1.rd?.toStringAsFixed(2)}${snapshot.data!.tlSeason1.decaying ? ' • Decaying' : ''}",
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  else
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Column(
+                                          children: [
+                                            Text(
+                                                "${10 - snapshot.data!.tlSeason1.gamesPlayed} games until being ranked",
+                                                softWrap: true,
+                                                style: TextStyle(
+                                                  fontFamily:
+                                                      "Eurostile Round Extended",
+                                                  fontSize: bigScreen ? 42 : 28,
+                                                  overflow:
+                                                      TextOverflow.visible,
+                                                )),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(0, 16, 0, 48),
+                                    child: Wrap(
+                                      direction: Axis.horizontal,
+                                      alignment: WrapAlignment.center,
+                                      spacing: 25,
+                                      crossAxisAlignment:
+                                          WrapCrossAlignment.start,
+                                      clipBehavior: Clip.hardEdge,
+                                      children: [
+                                        if (snapshot.data!.tlSeason1.apm !=
+                                            null)
+                                          _StatCellNum(
+                                              playerStat:
+                                                  snapshot.data!.tlSeason1.apm!,
+                                              isScreenBig: bigScreen,
+                                              fractionDigits: 2,
+                                              playerStatLabel:
+                                                  "Attack\nPer Minute"),
+                                        if (snapshot.data!.tlSeason1.pps !=
+                                            null)
+                                          _StatCellNum(
+                                              playerStat:
+                                                  snapshot.data!.tlSeason1.pps!,
+                                              isScreenBig: bigScreen,
+                                              fractionDigits: 2,
+                                              playerStatLabel:
+                                                  "Pieces\nPer Second"),
+                                        if (snapshot.data!.tlSeason1.apm !=
+                                            null)
+                                          _StatCellNum(
+                                              playerStat:
+                                                  snapshot.data!.tlSeason1.vs!,
+                                              isScreenBig: bigScreen,
+                                              fractionDigits: 2,
+                                              playerStatLabel: "Versus\nScore"),
+                                        if (snapshot.data!.tlSeason1.standing >
+                                            0)
+                                          _StatCellNum(
+                                              playerStat: snapshot
+                                                  .data!.tlSeason1.standing,
+                                              isScreenBig: bigScreen,
+                                              playerStatLabel:
+                                                  "Leaderboard\nplacement"),
+                                        if (snapshot
+                                                .data!.tlSeason1.standingLocal >
+                                            0)
+                                          _StatCellNum(
+                                              playerStat: snapshot.data!
+                                                  .tlSeason1.standingLocal,
+                                              isScreenBig: bigScreen,
+                                              playerStatLabel:
+                                                  "Country LB\nplacement"),
+                                        _StatCellNum(
+                                            playerStat: snapshot
+                                                .data!.tlSeason1.gamesPlayed,
+                                            isScreenBig: bigScreen,
+                                            playerStatLabel: "Games\nplayed"),
+                                        _StatCellNum(
+                                            playerStat: snapshot
+                                                .data!.tlSeason1.gamesWon,
+                                            isScreenBig: bigScreen,
+                                            playerStatLabel: "Games\nwon"),
+                                        _StatCellNum(
+                                            playerStat: snapshot
+                                                    .data!.tlSeason1.winrate *
+                                                100,
+                                            isScreenBig: bigScreen,
+                                            fractionDigits: 2,
+                                            playerStatLabel:
+                                                "Winrate\nprecentage"),
+                                      ],
+                                    ),
+                                  ),
+                                  if (snapshot.data!.tlSeason1.apm != null &&
+                                      snapshot.data!.tlSeason1.pps != null &&
+                                      snapshot.data!.tlSeason1.apm != null)
+                                    Column(
+                                      children: [
+                                        Text("Nerd Stats",
+                                            style: TextStyle(
+                                                fontFamily:
+                                                    "Eurostile Round Extended",
+                                                fontSize: bigScreen ? 42 : 28)),
+                                        Padding(
+                                          padding: const EdgeInsets.fromLTRB(
+                                              0, 16, 0, 48),
+                                          child: Wrap(
+                                              direction: Axis.horizontal,
+                                              alignment: WrapAlignment.center,
+                                              spacing: 25,
+                                              crossAxisAlignment:
+                                                  WrapCrossAlignment.start,
+                                              clipBehavior: Clip.hardEdge,
+                                              children: [
+                                                _StatCellNum(
+                                                    playerStat: snapshot
+                                                        .data!.tlSeason1.app!,
+                                                    isScreenBig: bigScreen,
+                                                    fractionDigits: 3,
+                                                    playerStatLabel:
+                                                        "Attack\nPer Piece"),
+                                                _StatCellNum(
+                                                    playerStat: snapshot
+                                                        .data!.tlSeason1.vsapm!,
+                                                    isScreenBig: bigScreen,
+                                                    fractionDigits: 3,
+                                                    playerStatLabel: "VS/APM"),
+                                                _StatCellNum(
+                                                    playerStat: snapshot
+                                                        .data!.tlSeason1.dss!,
+                                                    isScreenBig: bigScreen,
+                                                    fractionDigits: 3,
+                                                    playerStatLabel:
+                                                        "Downstack\nPer Second"),
+                                                _StatCellNum(
+                                                    playerStat: snapshot
+                                                        .data!.tlSeason1.dsp!,
+                                                    isScreenBig: bigScreen,
+                                                    fractionDigits: 3,
+                                                    playerStatLabel:
+                                                        "Downstack\nPer Piece"),
+                                                _StatCellNum(
+                                                    playerStat: snapshot.data!
+                                                        .tlSeason1.cheese!,
+                                                    isScreenBig: bigScreen,
+                                                    fractionDigits: 2,
+                                                    playerStatLabel:
+                                                        "Cheese\nIndex"),
+                                                _StatCellNum(
+                                                    playerStat: snapshot
+                                                        .data!.tlSeason1.gbe!,
+                                                    isScreenBig: bigScreen,
+                                                    fractionDigits: 3,
+                                                    playerStatLabel:
+                                                        "Garbage\nEfficiency"),
+                                                _StatCellNum(
+                                                    playerStat: snapshot.data!
+                                                        .tlSeason1.nyaapp!,
+                                                    isScreenBig: bigScreen,
+                                                    fractionDigits: 3,
+                                                    playerStatLabel:
+                                                        "Weighted\nAPP"),
+                                                _StatCellNum(
+                                                    playerStat: snapshot
+                                                        .data!.tlSeason1.area!,
+                                                    isScreenBig: bigScreen,
+                                                    fractionDigits: 1,
+                                                    playerStatLabel: "Area")
+                                              ]),
+                                        )
+                                      ],
+                                    )
+                                ]
+                              : [
+                                  Text("That user never played Tetra League",
+                                      style: TextStyle(
+                                          fontFamily:
+                                              "Eurostile Round Extended",
+                                          fontSize: bigScreen ? 42 : 28)),
+                                ],
+                        );
+                      },
+                    ),
+                    Container(
+                      child: Text("40 Lines",
+                          style: TextStyle(
+                              fontFamily: "Eurostile Round Extended",
+                              fontSize: bigScreen ? 42 : 28)),
+                    ),
+                    Container(
+                      child: Text("Blitz",
+                          style: TextStyle(
+                              fontFamily: "Eurostile Round Extended",
+                              fontSize: bigScreen ? 42 : 28)),
+                    ),
+                    Container(
+                      child: Text("Other info",
+                          style: TextStyle(
+                              fontFamily: "Eurostile Round Extended",
+                              fontSize: bigScreen ? 42 : 28)),
+                    ),
+                  ],
+                ),
               );
             } else if (snapshot.hasError) {
               return Center(
@@ -272,6 +583,62 @@ class NavDrawer extends StatelessWidget {
   }
 }
 
+class _StatCellNum extends StatelessWidget {
+  const _StatCellNum(
+      {required this.playerStat,
+      required this.playerStatLabel,
+      required this.isScreenBig,
+      this.snackBar,
+      this.fractionDigits});
+
+  final num playerStat;
+  final String playerStatLabel;
+  final bool isScreenBig;
+  final String? snackBar;
+  final int? fractionDigits;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          fractionDigits != null
+              ? playerStat.toStringAsFixed(fractionDigits!)
+              : playerStat.floor().toString(),
+          style: TextStyle(
+            fontFamily: "Eurostile Round Extended",
+            fontSize: isScreenBig ? 32 : 24,
+          ),
+        ),
+        snackBar == null
+            ? Text(
+                playerStatLabel,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontFamily: "Eurostile Round",
+                  fontSize: 16,
+                ),
+              )
+            : TextButton(
+                onPressed: () {
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(snackBar!)));
+                },
+                style: ButtonStyle(
+                    padding: MaterialStateProperty.all(EdgeInsets.zero)),
+                child: Text(
+                  playerStatLabel,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontFamily: "Eurostile Round",
+                    fontSize: 16,
+                  ),
+                )),
+      ],
+    );
+  }
+}
+
 class _UserThingy extends StatelessWidget {
   final TetrioPlayer player;
   _UserThingy({Key? key, required this.player}) : super(key: key);
@@ -364,7 +731,7 @@ class _UserThingy extends StatelessWidget {
                     ),
                     if (player.gameTime >= Duration.zero)
                       _StatCellNum(
-                        playerStat: (player.gameTime.inSeconds / 3600),
+                        playerStat: player.gameTime.inHours,
                         playerStatLabel: "Hours\nPlayed",
                         isScreenBig: bigScreen,
                         snackBar: player.gameTime.toString(),
@@ -396,31 +763,23 @@ class _UserThingy extends StatelessWidget {
                     fontSize: bigScreen ? 60 : 45,
                   ),
                 ),
-          if (player.badstanding != null)
-            player.badstanding!
-                ? Text(
-                    "BAD STANDING",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: "Eurostile Round Extended",
-                      fontWeight: FontWeight.w900,
-                      color: Colors.red,
-                      fontSize: bigScreen ? 60 : 45,
-                    ),
-                  )
-                : const Text(
-                    "Was in bad standing long time ago",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.red,
-                    ),
-                  ),
+          if (player.badstanding != null && player.badstanding!)
+            Text(
+              "BAD STANDING",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: "Eurostile Round Extended",
+                fontWeight: FontWeight.w900,
+                color: Colors.red,
+                fontSize: bigScreen ? 60 : 45,
+              ),
+            ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(
                 child: Text(
-                    "${player.country?.toUpperCase()} • ${player.role.capitalize()} account ${player.registrationTime == null ? "that was from very beginning" : 'created ${player.registrationTime}'} • ${player.supporterTier == 0 ? "Not a supporter" : "Supporter tier ${player.supporterTier}"}",
+                    "${player.country != null ? "${player.country?.toUpperCase()} • " : ""}${player.role.capitalize()} account ${player.registrationTime == null ? "that was from very beginning" : 'created ${player.registrationTime}'} • ${player.supporterTier == 0 ? "Not a supporter" : "Supporter tier ${player.supporterTier}"}",
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontFamily: "Eurostile Round",
@@ -491,258 +850,4 @@ class _UserThingy extends StatelessWidget {
       );
     });
   }
-}
-
-class _StatCellNum extends StatelessWidget {
-  const _StatCellNum(
-      {required this.playerStat,
-      required this.playerStatLabel,
-      required this.isScreenBig,
-      this.snackBar,
-      this.fractionDigits});
-
-  final num playerStat;
-  final String playerStatLabel;
-  final bool isScreenBig;
-  final String? snackBar;
-  final int? fractionDigits;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          fractionDigits != null
-              ? playerStat.toStringAsFixed(fractionDigits!)
-              : playerStat.floor().toString(),
-          style: TextStyle(
-            fontFamily: "Eurostile Round Extended",
-            fontSize: isScreenBig ? 32 : 24,
-          ),
-        ),
-        snackBar == null
-            ? Text(
-                playerStatLabel,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontFamily: "Eurostile Round",
-                  fontSize: 16,
-                ),
-              )
-            : TextButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text(snackBar!)));
-                },
-                child: Text(
-                  playerStatLabel,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontFamily: "Eurostile Round",
-                    fontSize: 16,
-                  ),
-                )),
-      ],
-    );
-  }
-}
-
-Widget _PlayerTabSection(BuildContext context, TetrioPlayer player) {
-  bool bigScreen = MediaQuery.of(context).size.width > 768;
-  return DefaultTabController(
-    length: 4,
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Container(
-          child: TabBar(tabs: [
-            Tab(text: "Tetra League"),
-            Tab(text: "40 Lines"),
-            Tab(text: "Blitz"),
-            Tab(text: "Other"),
-          ]),
-        ),
-        Container(
-          //Add this to give height
-          height: MediaQuery.of(context).size.height,
-          child: TabBarView(children: [
-            Container(
-              child: Column(
-                children: (player.tlSeason1.gamesPlayed > 0)
-                    ? [
-                        Text("Tetra League",
-                            style: TextStyle(
-                                fontFamily: "Eurostile Round Extended",
-                                fontSize: bigScreen ? 42 : 28)),
-                        if (player.tlSeason1.gamesPlayed >= 10)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                "res/tetrio_tl_alpha_ranks/${player.tlSeason1.rank}.png",
-                                height: bigScreen ? 128 : 64,
-                              ),
-                              Column(children: [
-                                Text(
-                                    "${player.tlSeason1.rating.toStringAsFixed(2)} TR",
-                                    style: TextStyle(
-                                        fontFamily: "Eurostile Round Extended",
-                                        fontSize: bigScreen ? 42 : 28)),
-                                Text(
-                                  "Top ${(player.tlSeason1.percentile * 100).toStringAsFixed(2)}% • Top Rank: ${player.tlSeason1.bestRank.toUpperCase()} • Glicko: ${player.tlSeason1.glicko?.toStringAsFixed(2)}±${player.tlSeason1.rd?.toStringAsFixed(2)}${player.tlSeason1.decaying ? ' • Decaying' : ''}",
-                                  textAlign: TextAlign.center,
-                                ),
-                              ])
-                            ],
-                          )
-                        else
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Column(
-                                children: [
-                                  Text(
-                                      "${10 - player.tlSeason1.gamesPlayed} games until being ranked",
-                                      softWrap: true,
-                                      style: TextStyle(
-                                        fontFamily: "Eurostile Round Extended",
-                                        fontSize: bigScreen ? 42 : 28,
-                                        overflow: TextOverflow.visible,
-                                      )),
-                                  //Text("Top ${(player.tlSeason1.percentile * 100).toStringAsFixed(2)}% • Glicko: ${player.tlSeason1.glicko?.toStringAsFixed(2)}±${player.tlSeason1.rd?.toStringAsFixed(2)}${player.tlSeason1.decaying ? ' • Decaying' : ''}")
-                                ],
-                              )
-                            ],
-                          ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 16, 0, 48),
-                          child: Wrap(
-                            direction: Axis.horizontal,
-                            alignment: WrapAlignment.center,
-                            spacing: 25,
-                            crossAxisAlignment: WrapCrossAlignment.start,
-                            clipBehavior: Clip.hardEdge,
-                            children: [
-                              if (player.tlSeason1.apm != null)
-                                _StatCellNum(
-                                    playerStat: player.tlSeason1.apm!,
-                                    isScreenBig: bigScreen,
-                                    fractionDigits: 2,
-                                    playerStatLabel: "Attack\nPer Minute"),
-                              if (player.tlSeason1.pps != null)
-                                _StatCellNum(
-                                    playerStat: player.tlSeason1.pps!,
-                                    isScreenBig: bigScreen,
-                                    fractionDigits: 2,
-                                    playerStatLabel: "Pieces\nPer Second"),
-                              if (player.tlSeason1.apm != null)
-                                _StatCellNum(
-                                    playerStat: player.tlSeason1.vs!,
-                                    isScreenBig: bigScreen,
-                                    fractionDigits: 2,
-                                    playerStatLabel: "Versus\nScore"),
-                              if (player.tlSeason1.standing > 0)
-                                _StatCellNum(
-                                    playerStat: player.tlSeason1.standing,
-                                    isScreenBig: bigScreen,
-                                    playerStatLabel: "Leaderboard\nplacement"),
-                              if (player.tlSeason1.standingLocal > 0)
-                                _StatCellNum(
-                                    playerStat: player.tlSeason1.standingLocal,
-                                    isScreenBig: bigScreen,
-                                    playerStatLabel: "Country LB\nplacement"),
-                              _StatCellNum(
-                                  playerStat: player.tlSeason1.gamesPlayed,
-                                  isScreenBig: bigScreen,
-                                  playerStatLabel: "Games\nplayed"),
-                              _StatCellNum(
-                                  playerStat: player.tlSeason1.gamesWon,
-                                  isScreenBig: bigScreen,
-                                  playerStatLabel: "Games\nwon"),
-                              _StatCellNum(
-                                  playerStat: player.tlSeason1.winrate * 100,
-                                  isScreenBig: bigScreen,
-                                  fractionDigits: 2,
-                                  playerStatLabel: "Winrate\nprecentage"),
-                            ],
-                          ),
-                        ),
-                        if (player.tlSeason1.apm != null &&
-                            player.tlSeason1.pps != null &&
-                            player.tlSeason1.apm != null)
-                          Column(
-                            children: [
-                              Text("Nerd Stats",
-                                  style: TextStyle(
-                                      fontFamily: "Eurostile Round Extended",
-                                      fontSize: bigScreen ? 42 : 28)),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(0, 16, 0, 48),
-                                child: Wrap(
-                                    direction: Axis.horizontal,
-                                    alignment: WrapAlignment.center,
-                                    spacing: 25,
-                                    crossAxisAlignment:
-                                        WrapCrossAlignment.start,
-                                    clipBehavior: Clip.hardEdge,
-                                    children: [
-                                      _StatCellNum(
-                                          playerStat: player.tlSeason1.app!,
-                                          isScreenBig: bigScreen,
-                                          fractionDigits: 3,
-                                          playerStatLabel: "Attack\nPer Piece"),
-                                      _StatCellNum(
-                                          playerStat: player.tlSeason1.vsapm!,
-                                          isScreenBig: bigScreen,
-                                          fractionDigits: 3,
-                                          playerStatLabel: "VS/APM"),
-                                      _StatCellNum(
-                                          playerStat: player.tlSeason1.dss!,
-                                          isScreenBig: bigScreen,
-                                          fractionDigits: 3,
-                                          playerStatLabel:
-                                              "Downstack\nPer Second"),
-                                      _StatCellNum(
-                                          playerStat: player.tlSeason1.dsp!,
-                                          isScreenBig: bigScreen,
-                                          fractionDigits: 3,
-                                          playerStatLabel:
-                                              "Downstack\nPer Piece"),
-                                    ]),
-                              )
-                            ],
-                          )
-                      ]
-                    : [
-                        Text("That user never played Tetra League",
-                            style: TextStyle(
-                                fontFamily: "Eurostile Round Extended",
-                                fontSize: bigScreen ? 42 : 28)),
-                      ],
-              ),
-            ),
-            Container(
-              child: Text("40 Lines",
-                  style: TextStyle(
-                      fontFamily: "Eurostile Round Extended",
-                      fontSize: bigScreen ? 42 : 28)),
-            ),
-            Container(
-              child: Text("Blitz",
-                  style: TextStyle(
-                      fontFamily: "Eurostile Round Extended",
-                      fontSize: bigScreen ? 42 : 28)),
-            ),
-            Container(
-              child: Text("Other info",
-                  style: TextStyle(
-                      fontFamily: "Eurostile Round Extended",
-                      fontSize: bigScreen ? 42 : 28)),
-            ),
-          ]),
-        ),
-      ],
-    ),
-  );
 }

@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:vector_math/vector_math.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -599,6 +600,36 @@ class TetraLeagueAlpha {
   double? get vsapm => vs! / apm!;
   double? get dss => (vs! / 100) - (apm! / 60);
   double? get dsp => ((vs! / 100) - (apm! / 60)) / pps!;
+  double? get cheese =>
+      (dsp! * 150) + (((vs! / apm!) - 2) * 50) + (0.6 - app!) * 125;
+  double? get gbe => ((app! * dss!) / pps!) * 2;
+  double? get nyaapp => app! - 5 * tan(radians((cheese! / -30) + 1));
+  double? get area =>
+      apm! * 1 +
+      pps! * 45 +
+      vs! * 0.444 +
+      app! * 185 +
+      dss! * 175 +
+      dsp! * 450 +
+      gbe! * 315;
+
+  double? get esttr {
+    double srarea = (apm! * 0) +
+        (pps! * 135) +
+        (vs! * 0) +
+        (app! * 290) +
+        (dss! * 0) +
+        (dsp! * 700) +
+        (gbe! * 0);
+    double statrank = 11.2 * atan((srarea - 93) / 130) + 1;
+    if (statrank <= 0) statrank = 0.001;
+    double estglicko = (4.0867 * srarea + 186.68);
+    double temp = (1500 - estglicko) * pi;
+    double temp2 =
+        pow((15.9056943314 * (pow(rd!, 2)) + 3527584.25978), 0.5) as double;
+    double temp3 = 1 + pow(10, (temp / temp2)) as double;
+    return 25000 / temp3;
+  }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
