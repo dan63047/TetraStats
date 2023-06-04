@@ -68,10 +68,7 @@ class TetrioPlayer {
     this.distinguishment,
   });
 
-  double get level =>
-      pow((xp / 500), 0.6) +
-      (xp / (5000 + (max(0, xp - 4 * pow(10, 6)) / 5000))) +
-      1;
+  double get level => pow((xp / 500), 0.6) + (xp / (5000 + (max(0, xp - 4 * pow(10, 6)) / 5000))) + 1;
 
   TetrioPlayer.fromJson(Map<String, dynamic> json, DateTime stateTime) {
     userId = json['_id'];
@@ -96,33 +93,25 @@ class TetrioPlayer {
     bannerRevision = json['banner_revision'];
     bio = json['bio'];
     connections = Connections.fromJson(json['connections']);
-    distinguishment = json['distinguishment'] != null
-        ? Distinguishment.fromJson(json['distinguishment'])
-        : null;
-    friendCount = json['friend_count'] != null ? json['friend_count'] : 0;
-    badstanding = json['badstanding'] != null ? json['badstanding'] : null;
-  }
-
-  Future<void> getRecords() async {
+    distinguishment = json['distinguishment'] != null ? Distinguishment.fromJson(json['distinguishment']) : null;
+    friendCount = json['friend_count'] ?? 0;
     var url = Uri.https('ch.tetr.io', 'api/users/$userId/records');
-    final response = await http.get(url);
-    if (response.statusCode == 200) {
-      if (jsonDecode(response.body)['data']['records']['40l']['record'] !=
-          null) {
-        sprint.add(RecordSingle.fromJson(
-            jsonDecode(response.body)['data']['records']['40l']['record']));
+    Future response = http.get(url);
+    response.then((value) {
+      if (value.statusCode == 200) {
+        Map jsonRecords = jsonDecode(value.body);
+        sprint = jsonRecords['data']['records']['40l']['record'] != null
+            ? [RecordSingle.fromJson(jsonRecords['data']['records']['40l']['record'], jsonRecords['data']['records']['40l']['rank'])]
+            : [];
+        blitz = jsonRecords['data']['records']['blitz']['record'] != null
+            ? [RecordSingle.fromJson(jsonRecords['data']['records']['blitz']['record'], jsonRecords['data']['records']['blitz']['rank'])]
+            : [];
+        zen = TetrioZen.fromJson(jsonRecords['data']['zen']);
+      } else {
+        throw Exception('Failed to fetch player');
       }
-      if (jsonDecode(response.body)['data']['records']['blitz']['record'] !=
-          null) {
-        blitz.add(RecordSingle.fromJson(
-            jsonDecode(response.body)['data']['records']['blitz']['record']));
-      }
-      zen = TetrioZen.fromJson(jsonDecode(response.body)['data']['zen']);
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to fetch player');
-    }
+    });
+    badstanding = json['badstanding'];
   }
 
   Map<String, dynamic> toJson() {
@@ -195,7 +184,7 @@ class Badge {
   Badge.fromJson(Map<String, dynamic> json) {
     badgeId = json['id'];
     label = json['label'];
-    ts = json['ts'] != null ? DateTime.parse(json['ts']) : null;
+    ts = (json['ts'] != null && json['ts'] is String) ? DateTime.parse(json['ts']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -224,8 +213,7 @@ class Connections {
   Connections({this.discord});
 
   Connections.fromJson(Map<String, dynamic> json) {
-    discord =
-        json['discord'] != null ? Discord.fromJson(json['discord']) : null;
+    discord = json['discord'] != null ? Discord.fromJson(json['discord']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -326,8 +314,7 @@ class Finesse {
   late int faults;
   late int perfectPieces;
 
-  Finesse(
-      {required this.combo, required this.faults, required this.perfectPieces});
+  Finesse({required this.combo, required this.faults, required this.perfectPieces});
 
   Finesse.fromJson(Map<String, dynamic> json) {
     combo = json['combo'];
@@ -345,42 +332,48 @@ class Finesse {
 }
 
 class EndContextSingle {
-  String? gameType;
-  int? topBtB;
-  int? topCombo;
-  int? holds;
-  int? inputs;
-  int? level;
-  int? piecesPlaced;
-  int? lines;
-  int? score;
-  int? seed;
-  Duration? finalTime;
-  int? tSpins;
-  Clears? clears;
-  Finesse? finesse;
+  late String gameType;
+  late int topBtB;
+  late int topCombo;
+  late int holds;
+  late int inputs;
+  late int level;
+  late int piecesPlaced;
+  late int lines;
+  late int score;
+  late int seed;
+  late Duration finalTime;
+  late int tSpins;
+  late Clears clears;
+  late Finesse finesse;
+
+  double get pps => piecesPlaced / (finalTime.inMicroseconds / 1000000);
+  double get kpp => inputs / piecesPlaced;
+  double get spp => score / piecesPlaced;
+  double get kps => inputs / (finalTime.inMicroseconds / 1000000);
+  double get finessePercentage => finesse.perfectPieces / piecesPlaced;
 
   EndContextSingle(
-      {this.gameType,
-      this.topBtB,
-      this.topCombo,
-      this.holds,
-      this.inputs,
-      this.level,
-      this.piecesPlaced,
-      this.lines,
-      this.score,
-      this.seed,
-      this.finalTime,
-      this.tSpins,
-      this.clears,
-      this.finesse});
+      {required this.gameType,
+      required this.topBtB,
+      required this.topCombo,
+      required this.holds,
+      required this.inputs,
+      required this.level,
+      required this.piecesPlaced,
+      required this.lines,
+      required this.score,
+      required this.seed,
+      required this.finalTime,
+      required this.tSpins,
+      required this.clears,
+      required this.finesse});
 
   EndContextSingle.fromJson(Map<String, dynamic> json) {
     seed = json['seed'];
     lines = json['lines'];
     inputs = json['inputs'];
-    holds = json['holds'];
+    holds = json['holds'] ?? 0;
     finalTime = doubleMillisecondsToDuration(json['finalTime'].toDouble());
     score = json['score'];
     level = json['level'];
@@ -388,9 +381,8 @@ class EndContextSingle {
     topBtB = json['topbtb'];
     tSpins = json['tspins'];
     piecesPlaced = json['piecesplaced'];
-    clears = json['clears'] != null ? Clears.fromJson(json['clears']) : null;
-    finesse =
-        json['finesse'] != null ? Finesse.fromJson(json['finesse']) : null;
+    clears = Clears.fromJson(json['clears']);
+    finesse = Finesse.fromJson(json['finesse']);
     gameType = json['gametype'];
   }
 
@@ -406,12 +398,8 @@ class EndContextSingle {
     data['topbtb'] = topBtB;
     data['tspins'] = tSpins;
     data['piecesplaced'] = piecesPlaced;
-    if (clears != null) {
-      data['clears'] = clears!.toJson();
-    }
-    if (finesse != null) {
-      data['finesse'] = finesse!.toJson();
-    }
+    data['clears'] = clears.toJson();
+    data['finesse'] = finesse.toJson();
     data['finalTime'] = finalTime;
     data['gametype'] = gameType;
     return data;
@@ -426,13 +414,7 @@ class Handling {
   late bool cancel;
   late bool safeLock;
 
-  Handling(
-      {required this.arr,
-      required this.das,
-      required this.sdf,
-      required this.dcd,
-      required this.cancel,
-      required this.safeLock});
+  Handling({required this.arr, required this.das, required this.sdf, required this.dcd, required this.cancel, required this.safeLock});
 
   Handling.fromJson(Map<String, dynamic> json) {
     arr = json['arr'];
@@ -452,6 +434,92 @@ class Handling {
     data['safelock'] = safeLock;
     data['cancel'] = cancel;
     return data;
+  }
+}
+
+class NerdStats {
+  final double _apm;
+  final double _pps;
+  final double _vs;
+  late double app;
+  late double vsapm;
+  late double dss;
+  late double dsp;
+  late double appdsp;
+  late double cheese;
+  late double gbe;
+  late double nyaapp;
+  late double area;
+
+  NerdStats(this._apm, this._pps, this._vs) {
+    app = _apm / (_pps * 60);
+    vsapm = _vs / _apm;
+    dss = (_vs / 100) - (_apm / 60);
+    dsp = ((_vs / 100) - (_apm / 60)) / _pps;
+    appdsp = app + dsp;
+    cheese = (dsp * 150) + (((_vs / _apm) - 2) * 50) + (0.6 - app) * 125;
+    gbe = ((app * dss) / _pps) * 2;
+    nyaapp = app - 5 * tan(radians((cheese / -30) + 1));
+    area = _apm * 1 + _pps * 45 + _vs * 0.444 + app * 185 + dss * 175 + dsp * 450 + gbe * 315;
+  }
+}
+
+class EstTr {
+  final double _apm;
+  final double _pps;
+  final double _vs;
+  final double _rating;
+  final double _rd;
+  final double _app;
+  final double _dss;
+  final double _dsp;
+  final double _gbe;
+  late double esttr;
+  late double srarea;
+  late double statrank;
+
+  EstTr(this._apm, this._pps, this._vs, this._rating, this._rd, this._app, this._dss, this._dsp, this._gbe) {
+    srarea = (_apm * 0) + (_pps * 135) + (_vs * 0) + (_app * 290) + (_dss * 0) + (_dsp * 700) + (_gbe * 0);
+    statrank = 11.2 * atan((srarea - 93) / 130) + 1;
+    if (statrank <= 0) statrank = 0.001;
+    double estglicko = (4.0867 * srarea + 186.68);
+    double temp = (1500 - estglicko) * pi;
+    double temp2 = pow((15.9056943314 * (pow(_rd, 2)) + 3527584.25978), 0.5) as double;
+    double temp3 = 1 + pow(10, (temp / temp2)) as double;
+    esttr = 25000 / temp3;
+  }
+}
+
+class Playstyle {
+  final double _apm;
+  final double _pps;
+  final double _vs;
+  final double _rd;
+  final double _app;
+  final double _vsapm;
+  final double _dss;
+  final double _dsp;
+  final double _gbe;
+  final double _srarea;
+  final double _statrank;
+  late double opener;
+  late double plonk;
+  late double stride;
+  late double infds;
+
+  Playstyle(this._apm, this._pps, this._vs, this._rd, this._app, this._vsapm, this._dss, this._dsp, this._gbe, this._srarea, this._statrank) {
+    double nmapm = ((_apm / _srarea) / ((0.069 * pow(1.0017, (pow(_statrank, 5) / 4700))) + _statrank / 360)) - 1;
+    double nmpps = ((_pps / _srarea) / (0.0084264 * pow(2.14, (-2 * (_statrank / 2.7 + 1.03))) - _statrank / 5750 + 0.0067)) - 1;
+    double nmvs = ((_vs / _srarea) / (0.1333 * pow(1.0021, ((pow(_statrank, 7) * (_statrank / 16.5)) / 1400000)) + _statrank / 133)) - 1;
+    double nmapp = (_app / (0.1368803292 * pow(1.0024, (pow(_statrank, 5) / 2800)) + _statrank / 54)) - 1;
+    double nmdss = (_dss / (0.01436466667 * pow(4.1, ((_statrank - 9.6) / 2.9)) + _statrank / 140 + 0.01)) - 1;
+    double nmdsp = (_dsp / (0.02136327583 * pow(14, ((_statrank - 14.75) / 3.9)) + _statrank / 152 + 0.022)) - 1;
+    double nmgbe = (_gbe / (_statrank / 350 + 0.005948424455 * pow(3.8, ((_statrank - 6.1) / 4)) + 0.006)) - 1;
+    double nmvsapm = (_vsapm / (-pow(((_statrank - 16) / 36), 2) + 2.133)) - 1;
+    opener = ((nmapm + nmpps * 0.75 + nmvsapm * -10 + nmapp * 0.75 + nmdsp * -0.25) / 3.5) + 0.5;
+    plonk = ((nmgbe + nmapp + nmdsp * 0.75 + nmpps * -1) / 2.73) + 0.5;
+    stride = ((nmapm * -0.25 + nmpps + nmapp * -2 + nmdsp * -0.5) * 0.79) + 0.5;
+    infds = ((nmdsp + nmapp * -0.75 + nmapm * 0.5 + nmvsapm * 1.5 + nmpps * 0.5) * 0.9) + 0.5;
   }
 }
 
@@ -489,8 +557,7 @@ class EndContextMulti {
 
   EndContextMulti.fromJson(Map<String, dynamic> json) {
     userId = json['user']['_id'];
-    handling =
-        json['handling'] != null ? Handling.fromJson(json['handling']) : null;
+    handling = json['handling'] != null ? Handling.fromJson(json['handling']) : null;
     success = json['success'];
     inputs = json['inputs'];
     piecesPlaced = json['piecesplaced'];
@@ -502,9 +569,7 @@ class EndContextMulti {
     secondaryTracking = json['points']['secondaryAvgTracking'].cast<double>();
     tertiaryTracking = json['points']['tertiaryAvgTracking'].cast<double>();
     extra = json['points']['extra']['vs'];
-    extraTracking = json['points']['extraAvgTracking']
-            ['aggregatestats___vsscore']
-        .cast<double>();
+    extraTracking = json['points']['extraAvgTracking']['aggregatestats___vsscore'].cast<double>();
   }
 
   Map<String, dynamic> toJson() {
@@ -522,8 +587,7 @@ class EndContextMulti {
     data['points']['secondary'] = secondary;
     data['points']['tertiary'] = tertiary;
     data['points']['extra']['vs'] = extra;
-    data['points']['extraAvgTracking']['aggregatestats___vsscore'] =
-        extraTracking;
+    data['points']['extraAvgTracking']['aggregatestats___vsscore'] = extraTracking;
     return data;
   }
 }
@@ -548,6 +612,9 @@ class TetraLeagueAlpha {
   double? apm;
   double? pps;
   double? vs;
+  NerdStats? nerdStats;
+  EstTr? estTr;
+  Playstyle? playstyle;
   List? records;
 
   TetraLeagueAlpha(
@@ -594,45 +661,16 @@ class TetraLeagueAlpha {
     nextRank = json['next_rank'];
     nextAt = json['next_at'];
     percentileRank = json['percentile_rank'];
+    nerdStats = (apm != null && pps != null && apm != null) ? NerdStats(apm!, pps!, vs!) : null;
+    estTr =
+        (nerdStats != null) ? EstTr(apm!, pps!, vs!, rating, (rd != null) ? rd! : 69, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp, nerdStats!.gbe) : null;
+    playstyle = (nerdStats != null)
+        ? Playstyle(apm!, pps!, vs!, (rd != null) ? rd! : 69, nerdStats!.app, nerdStats!.vsapm, nerdStats!.dss, nerdStats!.dsp, nerdStats!.gbe, estTr!.srarea,
+            estTr!.statrank)
+        : null;
   }
 
-  double? get app => apm! / (pps! * 60);
-  double? get vsapm => vs! / apm!;
-  double? get dss => (vs! / 100) - (apm! / 60);
-  double? get dsp => ((vs! / 100) - (apm! / 60)) / pps!;
-  double? get appdsp => app! + dsp!;
-  double? get cheese =>
-      (dsp! * 150) + (((vs! / apm!) - 2) * 50) + (0.6 - app!) * 125;
-  double? get gbe => ((app! * dss!) / pps!) * 2;
-  double? get nyaapp => app! - 5 * tan(radians((cheese! / -30) + 1));
-  double? get area =>
-      apm! * 1 +
-      pps! * 45 +
-      vs! * 0.444 +
-      app! * 185 +
-      dss! * 175 +
-      dsp! * 450 +
-      gbe! * 315;
-
-  double? get esttr {
-    double srarea = (apm! * 0) +
-        (pps! * 135) +
-        (vs! * 0) +
-        (app! * 290) +
-        (dss! * 0) +
-        (dsp! * 700) +
-        (gbe! * 0);
-    double statrank = 11.2 * atan((srarea - 93) / 130) + 1;
-    if (statrank <= 0) statrank = 0.001;
-    double estglicko = (4.0867 * srarea + 186.68);
-    double temp = (1500 - estglicko) * pi;
-    double temp2 =
-        pow((15.9056943314 * (pow(rd!, 2)) + 3527584.25978), 0.5) as double;
-    double temp3 = 1 + pow(10, (temp / temp2)) as double;
-    return 25000 / temp3;
-  }
-
-  double? get esttracc => esttr! - rating;
+  double? get esttracc => (estTr != null) ? estTr!.esttr - rating : null;
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
@@ -667,22 +705,15 @@ class RecordSingle {
   EndContextSingle? endContext;
   int? rank;
 
-  RecordSingle(
-      {required this.userId,
-      required this.replayId,
-      required this.ownId,
-      this.timestamp,
-      this.endContext,
-      this.rank});
+  RecordSingle({required this.userId, required this.replayId, required this.ownId, this.timestamp, this.endContext, this.rank});
 
-  RecordSingle.fromJson(Map<String, dynamic> json) {
+  RecordSingle.fromJson(Map<String, dynamic> json, int? ran) {
     ownId = json['_id'];
-    endContext = json['endcontext'] != null
-        ? EndContextSingle.fromJson(json['endcontext'])
-        : null;
+    endContext = json['endcontext'] != null ? EndContextSingle.fromJson(json['endcontext']) : null;
     replayId = json['replayid'];
     timestamp = DateTime.parse(json['ts']);
     userId = json['user']['_id'];
+    rank = ran;
   }
 
   Map<String, dynamic> toJson() {
