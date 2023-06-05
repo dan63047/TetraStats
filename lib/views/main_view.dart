@@ -21,15 +21,13 @@ const allowedHeightForPlayerIdInPixels = 40.0;
 const allowedHeightForPlayerBioInPixels = 30.0;
 const givenTextHeightByScreenPercentage = 0.3;
 
-enum ThreeDotsItems { compare, states, settings }
-
 class MainView extends StatefulWidget {
   const MainView({Key? key}) : super(key: key);
 
   String get title => "Tetra Stats: $_searchFor";
 
   @override
-  State<MainView> createState() => _MyHomePageState();
+  State<MainView> createState() => _MainState();
 }
 
 Future<TetrioPlayer> fetchTetrioPlayer(String user) async {
@@ -48,7 +46,7 @@ Future<TetrioPlayer> fetchTetrioPlayer(String user) async {
   }
 }
 
-class _MyHomePageState extends State<MainView> with SingleTickerProviderStateMixin {
+class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
   final bodyGlobalKey = GlobalKey();
   final List<Widget> myTabs = [
     const Tab(text: "Tetra League"),
@@ -80,12 +78,8 @@ class _MyHomePageState extends State<MainView> with SingleTickerProviderStateMix
         ],
       ),
       onSubmitted: (String value) {
-        _searchFor = value;
-        me = null;
         _tabController.animateTo(0, duration: Duration(milliseconds: 300));
-        setState(() {
-          me = fetchTetrioPlayer(value);
-        });
+        changePlayer(value);
       },
     );
   }
@@ -94,7 +88,7 @@ class _MyHomePageState extends State<MainView> with SingleTickerProviderStateMix
   void initState() {
     _scrollController = ScrollController();
     _tabController = TabController(length: 4, vsync: this);
-    me = fetchTetrioPlayer("dan63047");
+    changePlayer("dan63047");
     super.initState();
   }
 
@@ -103,6 +97,13 @@ class _MyHomePageState extends State<MainView> with SingleTickerProviderStateMix
     _tabController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void changePlayer(String player) {
+    setState(() {
+      _searchFor = player;
+      me = fetchTetrioPlayer(player);
+    });
   }
 
   _scrollListener() {
@@ -122,7 +123,7 @@ class _MyHomePageState extends State<MainView> with SingleTickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: NavDrawer(),
+      drawer: NavDrawer(changePlayer),
       appBar: AppBar(
         title: !_searchBoolean
             ? Text(
@@ -167,20 +168,23 @@ class _MyHomePageState extends State<MainView> with SingleTickerProviderStateMix
                   tooltip: "Close search",
                 ),
           PopupMenuButton(
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<ThreeDotsItems>>[
-              const PopupMenuItem<ThreeDotsItems>(
-                value: ThreeDotsItems.compare,
+            itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+              const PopupMenuItem(
+                value: "/compare",
                 child: Text('Compare'),
               ),
-              const PopupMenuItem<ThreeDotsItems>(
-                value: ThreeDotsItems.states,
+              const PopupMenuItem(
+                value: "/states",
                 child: Text('States'),
               ),
-              const PopupMenuItem<ThreeDotsItems>(
-                value: ThreeDotsItems.settings,
+              const PopupMenuItem(
+                value: "/settings",
                 child: Text('Settings'),
               ),
             ],
+            onSelected: (value) {
+              Navigator.pushNamed(context, value);
+            },
           ),
         ],
       ),
@@ -1097,6 +1101,9 @@ class _MyHomePageState extends State<MainView> with SingleTickerProviderStateMix
 }
 
 class NavDrawer extends StatelessWidget {
+  Function changePlayer;
+  NavDrawer(this.changePlayer, {super.key});
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -1112,9 +1119,8 @@ class NavDrawer extends StatelessWidget {
             leading: const Icon(Icons.verified_user),
             title: const Text('dan63047'),
             onTap: () {
-              me = fetchTetrioPlayer("dan63047");
+              changePlayer('dan63047');
               Navigator.of(context).pop();
-              Navigator.of(context).initState();
             },
           ),
         ],

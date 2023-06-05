@@ -184,7 +184,7 @@ class Badge {
   Badge.fromJson(Map<String, dynamic> json) {
     badgeId = json['id'];
     label = json['label'];
-    ts = (json['ts'] != null && json['ts'] is String) ? DateTime.parse(json['ts']) : null;
+    ts = (json['ts'] != null && json['ts'] is String) ? DateTime.parse(json['ts']) : null; // man i love osk
   }
 
   Map<String, dynamic> toJson() {

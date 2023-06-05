@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.dan63.tetrastats.tetra_stats">
    <application
-        android:label="tetra_stats"
+        android:label="Tetra Stats"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
