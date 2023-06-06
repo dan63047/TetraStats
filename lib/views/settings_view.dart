@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsView extends StatefulWidget {
   const SettingsView({Key? key}) : super(key: key);
@@ -10,11 +11,14 @@ class SettingsView extends StatefulWidget {
 
 class SettingsState extends State<SettingsView> {
   PackageInfo _packageInfo = PackageInfo(appName: "TetraStats", packageName: "idk man", version: "some numbers", buildNumber: "anotherNumber");
+  late SharedPreferences prefs;
+  final TextEditingController _playertext = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _initPackageInfo();
+    _getPreferences();
   }
 
   Future<void> _initPackageInfo() async {
@@ -22,6 +26,14 @@ class SettingsState extends State<SettingsView> {
     setState(() {
       _packageInfo = info;
     });
+  }
+
+  Future<void> _getPreferences() async {
+    prefs = await SharedPreferences.getInstance();
+  }
+
+  Future<void> _setPlayer(String player) async {
+    await prefs.setString('player', player);
   }
 
   @override
@@ -37,22 +49,23 @@ class SettingsState extends State<SettingsView> {
           ListTile(
             title: const Text("So there you gonna be able to change some settings"),
             subtitle: const Text(
-                "They are not implemented yet. But its gonna be possible to change player for main view init, save logs, as well as import and export app sqlite database."),
+                "Only \"Your TETR.IO account nickname or ID\" implemented yet. But its gonna be possible to change player for main view init, save logs, as well as import and export app sqlite database."),
             trailing: Switch(
               value: true,
               onChanged: (bool value) {},
             ),
           ),
           ListTile(
-            title: const Text("Very egg"),
-            subtitle: const Text("very ass"),
-            trailing: const Text("dan63047"),
+            title: const Text("Your TETR.IO account nickname or ID"),
+            subtitle:
+                const Text("Every time when app loads, stats of that player will be fetched. Please prefer ID over nickname because nickname can be changed."),
+            trailing: Text(prefs.getString("player") ?? "dan63047"),
             onTap: () => showDialog(
                 context: context,
                 builder: (BuildContext context) => AlertDialog(
-                      title: const Text("Your username in TETR.IO", style: TextStyle(fontFamily: "Eurostile Round Extended")),
+                      title: const Text("Your TETR.IO account nickname or ID", style: TextStyle(fontFamily: "Eurostile Round Extended")),
                       content: SingleChildScrollView(
-                        child: ListBody(children: [const TextField()]),
+                        child: ListBody(children: [TextField(controller: _playertext)]),
                       ),
                       actions: <Widget>[
                         TextButton(
@@ -64,13 +77,15 @@ class SettingsState extends State<SettingsView> {
                         TextButton(
                           child: const Text('Submit'),
                           onPressed: () {
+                            _setPlayer(_playertext.text.toLowerCase().trim());
                             Navigator.of(context).pop();
+                            setState(() {});
                           },
                         )
                       ],
                     )),
           ),
-          Divider(),
+          const Divider(),
           ListTile(
             title: const Text("About app"),
             subtitle: Text("${_packageInfo.appName} (${_packageInfo.packageName}) Version ${_packageInfo.version} Build ${_packageInfo.buildNumber}"),

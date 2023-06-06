@@ -12,12 +12,12 @@ class CompareState extends State<CompareView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("you vs someone"),
+        title: const Text("you vs someone"),
       ),
       backgroundColor: Colors.black,
       body: SafeArea(
           child: ListView(
-        children: [
+        children: const [
           ListTile(
             title: Center(child: Text("So thats gonna be the main purpose of the app")),
             subtitle: Center(child: Text("We gonna look who is the best")),

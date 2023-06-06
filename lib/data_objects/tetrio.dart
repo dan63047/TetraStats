@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:vector_math/vector_math.dart';
+import 'dart:developer' as developer;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -70,7 +71,8 @@ class TetrioPlayer {
 
   double get level => pow((xp / 500), 0.6) + (xp / (5000 + (max(0, xp - 4 * pow(10, 6)) / 5000))) + 1;
 
-  TetrioPlayer.fromJson(Map<String, dynamic> json, DateTime stateTime) {
+  TetrioPlayer.fromJson(Map<String, dynamic> json, DateTime stateTime, bool fetchRecords) {
+    developer.log("TetrioPlayer.fromJson $stateTime: $json", name: "data_objects/tetrio");
     userId = json['_id'];
     username = json['username'];
     state = stateTime;
@@ -95,23 +97,26 @@ class TetrioPlayer {
     connections = Connections.fromJson(json['connections']);
     distinguishment = json['distinguishment'] != null ? Distinguishment.fromJson(json['distinguishment']) : null;
     friendCount = json['friend_count'] ?? 0;
-    var url = Uri.https('ch.tetr.io', 'api/users/$userId/records');
-    Future response = http.get(url);
-    response.then((value) {
-      if (value.statusCode == 200) {
-        Map jsonRecords = jsonDecode(value.body);
-        sprint = jsonRecords['data']['records']['40l']['record'] != null
-            ? [RecordSingle.fromJson(jsonRecords['data']['records']['40l']['record'], jsonRecords['data']['records']['40l']['rank'])]
-            : [];
-        blitz = jsonRecords['data']['records']['blitz']['record'] != null
-            ? [RecordSingle.fromJson(jsonRecords['data']['records']['blitz']['record'], jsonRecords['data']['records']['blitz']['rank'])]
-            : [];
-        zen = TetrioZen.fromJson(jsonRecords['data']['zen']);
-      } else {
-        throw Exception('Failed to fetch player');
-      }
-    });
     badstanding = json['badstanding'];
+    if (fetchRecords) {
+      var url = Uri.https('ch.tetr.io', 'api/users/$userId/records');
+      Future response = http.get(url);
+      response.then((value) {
+        if (value.statusCode == 200) {
+          Map jsonRecords = jsonDecode(value.body);
+          sprint = jsonRecords['data']['records']['40l']['record'] != null
+              ? [RecordSingle.fromJson(jsonRecords['data']['records']['40l']['record'], jsonRecords['data']['records']['40l']['rank'])]
+              : [];
+          blitz = jsonRecords['data']['records']['blitz']['record'] != null
+              ? [RecordSingle.fromJson(jsonRecords['data']['records']['blitz']['record'], jsonRecords['data']['records']['blitz']['rank'])]
+              : [];
+          zen = TetrioZen.fromJson(jsonRecords['data']['zen']);
+        } else {
+          developer.log("TetrioPlayer.fromJson exception", name: "data_objects/tetrio", error: value.statusCode);
+          throw Exception('Failed to fetch player');
+        }
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -137,6 +142,7 @@ class TetrioPlayer {
     data['friend_count'] = friendCount;
     data['badstanding'] = badstanding;
     data['bot'] = bot;
+    developer.log("TetrioPlayer.toJson: $bot", name: "data_objects/tetrio");
     return data;
   }
 
@@ -468,7 +474,6 @@ class EstTr {
   final double _apm;
   final double _pps;
   final double _vs;
-  final double _rating;
   final double _rd;
   final double _app;
   final double _dss;
@@ -478,7 +483,7 @@ class EstTr {
   late double srarea;
   late double statrank;
 
-  EstTr(this._apm, this._pps, this._vs, this._rating, this._rd, this._app, this._dss, this._dsp, this._gbe) {
+  EstTr(this._apm, this._pps, this._vs, this._rd, this._app, this._dss, this._dsp, this._gbe) {
     srarea = (_apm * 0) + (_pps * 135) + (_vs * 0) + (_app * 290) + (_dss * 0) + (_dsp * 700) + (_gbe * 0);
     statrank = 11.2 * atan((srarea - 93) / 130) + 1;
     if (statrank <= 0) statrank = 0.001;
@@ -493,11 +498,10 @@ class EstTr {
 class Playstyle {
   final double _apm;
   final double _pps;
-  final double _vs;
-  final double _rd;
+  //final double _vs;
   final double _app;
   final double _vsapm;
-  final double _dss;
+  //final double _dss;
   final double _dsp;
   final double _gbe;
   final double _srarea;
@@ -507,12 +511,12 @@ class Playstyle {
   late double stride;
   late double infds;
 
-  Playstyle(this._apm, this._pps, this._vs, this._rd, this._app, this._vsapm, this._dss, this._dsp, this._gbe, this._srarea, this._statrank) {
+  Playstyle(this._apm, this._pps, this._app, this._vsapm, this._dsp, this._gbe, this._srarea, this._statrank) {
     double nmapm = ((_apm / _srarea) / ((0.069 * pow(1.0017, (pow(_statrank, 5) / 4700))) + _statrank / 360)) - 1;
     double nmpps = ((_pps / _srarea) / (0.0084264 * pow(2.14, (-2 * (_statrank / 2.7 + 1.03))) - _statrank / 5750 + 0.0067)) - 1;
-    double nmvs = ((_vs / _srarea) / (0.1333 * pow(1.0021, ((pow(_statrank, 7) * (_statrank / 16.5)) / 1400000)) + _statrank / 133)) - 1;
+    //double nmvs = ((_vs / _srarea) / (0.1333 * pow(1.0021, ((pow(_statrank, 7) * (_statrank / 16.5)) / 1400000)) + _statrank / 133)) - 1;
     double nmapp = (_app / (0.1368803292 * pow(1.0024, (pow(_statrank, 5) / 2800)) + _statrank / 54)) - 1;
-    double nmdss = (_dss / (0.01436466667 * pow(4.1, ((_statrank - 9.6) / 2.9)) + _statrank / 140 + 0.01)) - 1;
+    //double nmdss = (_dss / (0.01436466667 * pow(4.1, ((_statrank - 9.6) / 2.9)) + _statrank / 140 + 0.01)) - 1;
     double nmdsp = (_dsp / (0.02136327583 * pow(14, ((_statrank - 14.75) / 3.9)) + _statrank / 152 + 0.022)) - 1;
     double nmgbe = (_gbe / (_statrank / 350 + 0.005948424455 * pow(3.8, ((_statrank - 6.1) / 4)) + 0.006)) - 1;
     double nmvsapm = (_vsapm / (-pow(((_statrank - 16) / 36), 2) + 2.133)) - 1;
@@ -662,12 +666,9 @@ class TetraLeagueAlpha {
     nextAt = json['next_at'];
     percentileRank = json['percentile_rank'];
     nerdStats = (apm != null && pps != null && apm != null) ? NerdStats(apm!, pps!, vs!) : null;
-    estTr =
-        (nerdStats != null) ? EstTr(apm!, pps!, vs!, rating, (rd != null) ? rd! : 69, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp, nerdStats!.gbe) : null;
-    playstyle = (nerdStats != null)
-        ? Playstyle(apm!, pps!, vs!, (rd != null) ? rd! : 69, nerdStats!.app, nerdStats!.vsapm, nerdStats!.dss, nerdStats!.dsp, nerdStats!.gbe, estTr!.srarea,
-            estTr!.statrank)
-        : null;
+    estTr = (nerdStats != null) ? EstTr(apm!, pps!, vs!, (rd != null) ? rd! : 69, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp, nerdStats!.gbe) : null;
+    playstyle =
+        (nerdStats != null) ? Playstyle(apm!, pps!, nerdStats!.app, nerdStats!.vsapm, nerdStats!.dsp, nerdStats!.gbe, estTr!.srarea, estTr!.statrank) : null;
   }
 
   double? get esttracc => (estTr != null) ? estTr!.esttr - rating : null;
@@ -701,6 +702,7 @@ class RecordSingle {
   late String userId;
   late String replayId;
   late String ownId;
+  late String stream;
   DateTime? timestamp;
   EndContextSingle? endContext;
   int? rank;
@@ -708,9 +710,11 @@ class RecordSingle {
   RecordSingle({required this.userId, required this.replayId, required this.ownId, this.timestamp, this.endContext, this.rank});
 
   RecordSingle.fromJson(Map<String, dynamic> json, int? ran) {
+    developer.log("RecordSingle.fromJson: $json", name: "data_objects/tetrio");
     ownId = json['_id'];
     endContext = json['endcontext'] != null ? EndContextSingle.fromJson(json['endcontext']) : null;
     replayId = json['replayid'];
+    stream = json['stream'];
     timestamp = DateTime.parse(json['ts']);
     userId = json['user']['_id'];
     rank = ran;

@@ -1,11 +1,8 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:sqflite/sqflite.dart';
-import 'package:path_provider/path_provider.dart'
-    show MissingPlatformDirectoryException, getApplicationDocumentsDirectory;
+import 'package:path_provider/path_provider.dart' show MissingPlatformDirectoryException, getApplicationDocumentsDirectory;
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
-import 'package:tetra_stats/services/settings_crud.dart';
 import 'package:path/path.dart' show join;
 
 const String dbName = "TetraStats.db";
@@ -22,7 +19,6 @@ class DB {
       final db = await openDatabase(dbPath);
       _db = db;
       await db.execute(createTetrioUsersTable);
-      await db.execute(createSettingsTable);
     } on MissingPlatformDirectoryException {
       throw UnableToGetDocuments();
     }

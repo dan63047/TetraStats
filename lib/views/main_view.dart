@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:path/path.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:developer' as developer;
 import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:tetra_stats/services/sqlite_db_controller.dart';
@@ -16,7 +18,8 @@ extension StringExtension on String {
 String _searchFor = "dan63047";
 Future<TetrioPlayer>? me;
 DB db = DB();
-TetrioService teto = TetrioService();
+late TetrioService teto;
+late SharedPreferences prefs;
 const allowedHeightForPlayerIdInPixels = 40.0;
 const allowedHeightForPlayerBioInPixels = 30.0;
 const givenTextHeightByScreenPercentage = 0.3;
@@ -30,6 +33,10 @@ class MainView extends StatefulWidget {
   State<MainView> createState() => _MainState();
 }
 
+Future<void> copyToClipboard(String text) async {
+  await Clipboard.setData(ClipboardData(text: text));
+}
+
 Future<TetrioPlayer> fetchTetrioPlayer(String user) async {
   var url = Uri.https('ch.tetr.io', 'api/users/${user.toLowerCase().trim()}');
   final response = await http.get(url);
@@ -37,11 +44,13 @@ Future<TetrioPlayer> fetchTetrioPlayer(String user) async {
   if (response.statusCode == 200) {
     if (jsonDecode(response.body)['success']) {
       return TetrioPlayer.fromJson(
-          jsonDecode(response.body)['data']['user'], DateTime.fromMillisecondsSinceEpoch(jsonDecode(response.body)['cache']['cached_at'], isUtc: true));
+          jsonDecode(response.body)['data']['user'], DateTime.fromMillisecondsSinceEpoch(jsonDecode(response.body)['cache']['cached_at'], isUtc: true), true);
     } else {
+      developer.log("fetchTetrioPlayer User dosen't exist", name: "main_view", error: response.body);
       throw Exception("User doesn't exist");
     }
   } else {
+    developer.log("fetchTetrioPlayer Failed to fetch player", name: "main_view", error: response.statusCode);
     throw Exception('Failed to fetch player');
   }
 }
@@ -62,7 +71,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
   Widget _searchTextField() {
     return TextField(
       maxLength: 25,
-      decoration: InputDecoration(counter: Offstage()),
+      decoration: const InputDecoration(counter: Offstage()),
       style: const TextStyle(
         shadows: <Shadow>[
           Shadow(
@@ -78,7 +87,6 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
         ],
       ),
       onSubmitted: (String value) {
-        _tabController.animateTo(0, duration: Duration(milliseconds: 300));
         changePlayer(value);
       },
     );
@@ -86,10 +94,13 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
 
   @override
   void initState() {
+    db.open();
+    teto = TetrioService(db);
     _scrollController = ScrollController();
     _tabController = TabController(length: 4, vsync: this);
-    changePlayer("dan63047");
+    _getPreferences().then((value) => changePlayer(prefs.getString("player") ?? "dan63047"));
     super.initState();
+    developer.log("Main view initialized", name: "main_view");
   }
 
   @override
@@ -97,28 +108,34 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
     _tabController.dispose();
     _scrollController.dispose();
     super.dispose();
+    developer.log("Main view disposed", name: "main_view");
+  }
+
+  Future<void> _getPreferences() async {
+    prefs = await SharedPreferences.getInstance();
   }
 
   void changePlayer(String player) {
     setState(() {
+      _tabController.animateTo(0, duration: const Duration(milliseconds: 300));
       _searchFor = player;
       me = fetchTetrioPlayer(player);
     });
   }
 
-  _scrollListener() {
-    if (fixedScroll) {
-      _scrollController.jumpTo(0);
-    }
-  }
+  // _scrollListener() {
+  //   if (fixedScroll) {
+  //     _scrollController.jumpTo(0);
+  //   }
+  // }
 
-  _smoothScrollToTop() {
-    _scrollController.animateTo(
-      0,
-      duration: const Duration(microseconds: 300),
-      curve: Curves.ease,
-    );
-  }
+  // _smoothScrollToTop() {
+  //   _scrollController.animateTo(
+  //     0,
+  //     duration: const Duration(microseconds: 300),
+  //     curve: Curves.ease,
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -150,7 +167,6 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
               ? IconButton(
                   onPressed: () {
                     setState(() {
-                      //add
                       _searchBoolean = true;
                     });
                   },
@@ -160,7 +176,6 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
               : IconButton(
                   onPressed: () {
                     setState(() {
-                      //add
                       _searchBoolean = false;
                     });
                   },
@@ -192,6 +207,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
         child: FutureBuilder<TetrioPlayer>(
           future: me,
           builder: (context, snapshot) {
+            developer.log("builder ($context): $snapshot", name: "main_view");
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(
                   child: CircularProgressIndicator(
@@ -210,8 +226,10 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                         controller: _tabController,
                         isScrollable: true,
                         tabs: myTabs,
-                        onTap: (int sus) {
-                          setState(() {});
+                        onTap: (int tabId) {
+                          setState(() {
+                            developer.log("Tab changed to $tabId", name: "main_view");
+                          });
                         },
                       ),
                     ),
@@ -438,9 +456,9 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                                                 radarShape: RadarShape.polygon,
                                                 tickCount: 4,
                                                 ticksTextStyle: const TextStyle(color: Colors.transparent, fontSize: 10),
-                                                radarBorderData: BorderSide(color: Colors.transparent, width: 1),
-                                                gridBorderData: BorderSide(color: Colors.white24, width: 1),
-                                                tickBorderData: BorderSide(color: Colors.transparent, width: 1),
+                                                radarBorderData: const BorderSide(color: Colors.transparent, width: 1),
+                                                gridBorderData: const BorderSide(color: Colors.white24, width: 1),
+                                                tickBorderData: const BorderSide(color: Colors.transparent, width: 1),
                                                 getTitle: (index, angle) {
                                                   switch (index) {
                                                     case 0:
@@ -492,16 +510,16 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                                                     fillColor: Colors.transparent,
                                                     borderColor: Colors.transparent,
                                                     dataEntries: [
-                                                      RadarEntry(value: 0),
-                                                      RadarEntry(value: 0),
-                                                      RadarEntry(value: 0),
-                                                      RadarEntry(value: 0),
-                                                      RadarEntry(value: 0),
-                                                      RadarEntry(value: 0),
-                                                      RadarEntry(value: 0),
-                                                      RadarEntry(value: 0),
-                                                      RadarEntry(value: 0),
-                                                      RadarEntry(value: 0),
+                                                      const RadarEntry(value: 0),
+                                                      const RadarEntry(value: 0),
+                                                      const RadarEntry(value: 0),
+                                                      const RadarEntry(value: 0),
+                                                      const RadarEntry(value: 0),
+                                                      const RadarEntry(value: 0),
+                                                      const RadarEntry(value: 0),
+                                                      const RadarEntry(value: 0),
+                                                      const RadarEntry(value: 0),
+                                                      const RadarEntry(value: 0),
                                                     ],
                                                   )
                                                 ],
@@ -521,9 +539,9 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                                                 radarShape: RadarShape.polygon,
                                                 tickCount: 4,
                                                 ticksTextStyle: const TextStyle(color: Colors.transparent, fontSize: 10),
-                                                radarBorderData: BorderSide(color: Colors.transparent, width: 1),
-                                                gridBorderData: BorderSide(color: Colors.white24, width: 1),
-                                                tickBorderData: BorderSide(color: Colors.transparent, width: 1),
+                                                radarBorderData: const BorderSide(color: Colors.transparent, width: 1),
+                                                gridBorderData: const BorderSide(color: Colors.white24, width: 1),
+                                                tickBorderData: const BorderSide(color: Colors.transparent, width: 1),
                                                 getTitle: (index, angle) {
                                                   switch (index) {
                                                     case 0:
@@ -557,20 +575,20 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                                                     fillColor: Colors.transparent,
                                                     borderColor: Colors.transparent,
                                                     dataEntries: [
-                                                      RadarEntry(value: 0),
-                                                      RadarEntry(value: 0),
-                                                      RadarEntry(value: 0),
-                                                      RadarEntry(value: 0),
+                                                      const RadarEntry(value: 0),
+                                                      const RadarEntry(value: 0),
+                                                      const RadarEntry(value: 0),
+                                                      const RadarEntry(value: 0),
                                                     ],
                                                   ),
                                                   RadarDataSet(
                                                     fillColor: Colors.transparent,
                                                     borderColor: Colors.transparent,
                                                     dataEntries: [
-                                                      RadarEntry(value: 1),
-                                                      RadarEntry(value: 1),
-                                                      RadarEntry(value: 1),
-                                                      RadarEntry(value: 1),
+                                                      const RadarEntry(value: 1),
+                                                      const RadarEntry(value: 1),
+                                                      const RadarEntry(value: 1),
+                                                      const RadarEntry(value: 1),
                                                     ],
                                                   )
                                                 ],
@@ -1087,7 +1105,8 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                 ),
               );
             } else if (snapshot.hasError) {
-              return Center(child: Text('${snapshot.error}', style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)));
+              return Center(
+                  child: Text('${snapshot.error}', style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42), textAlign: TextAlign.center));
             }
             return const Center(
                 child: CircularProgressIndicator(
@@ -1101,8 +1120,8 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
 }
 
 class NavDrawer extends StatelessWidget {
-  Function changePlayer;
-  NavDrawer(this.changePlayer, {super.key});
+  final Function changePlayer;
+  const NavDrawer(this.changePlayer, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -1116,10 +1135,11 @@ class NavDrawer extends StatelessWidget {
             style: TextStyle(color: Colors.white, fontSize: 25),
           )),
           ListTile(
-            leading: const Icon(Icons.verified_user),
-            title: const Text('dan63047'),
+            leading: const Icon(Icons.home),
+            title: Text(prefs.getString("player") ?? "dan63047"),
             onTap: () {
-              changePlayer('dan63047');
+              developer.log("Navigator changed player", name: "main_view");
+              changePlayer(prefs.getString("player") ?? "dan63047");
               Navigator.of(context).pop();
             },
           ),
@@ -1178,7 +1198,7 @@ class _StatCellNum extends StatelessWidget {
 
 class _UserThingy extends StatelessWidget {
   final TetrioPlayer player;
-  _UserThingy({Key? key, required this.player}) : super(key: key);
+  const _UserThingy({Key? key, required this.player}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -1201,6 +1221,12 @@ class _UserThingy extends StatelessWidget {
                       "https://tetr.io/user-content/banners/${player.userId}.jpg?rv=${player.bannerRevision}",
                       fit: BoxFit.cover,
                       height: bannerHeight,
+                      errorBuilder: (context, error, stackTrace) {
+                        developer.log("Error with building banner image", name: "main_view", error: error, stackTrace: stackTrace);
+                        return const Placeholder(
+                          color: Colors.black,
+                        );
+                      },
                     ),
                   Container(
                     padding: EdgeInsets.fromLTRB(0, player.bannerRevision != null ? bannerHeight / 1.4 : pfpHeight, 0, 0),
@@ -1212,16 +1238,21 @@ class _UserThingy extends StatelessWidget {
                               fit: BoxFit.fitHeight,
                               height: 128,
                             )
-                          : Image.network(
-                              "https://tetr.io/user-content/avatars/${player.userId}.jpg?rv=${player.avatarRevision}",
-                              fit: BoxFit.fitHeight,
-                              height: 128,
-                              errorBuilder: (context, error, stackTrace) => Image.asset(
-                                "res/avatars/tetrio_anon.png",
-                                fit: BoxFit.fitHeight,
-                                height: 128,
-                              ),
-                            ),
+                          : player.avatarRevision != null
+                              ? Image.network("https://tetr.io/user-content/avatars/${player.userId}.jpg?rv=${player.avatarRevision}",
+                                  fit: BoxFit.fitHeight, height: 128, errorBuilder: (context, error, stackTrace) {
+                                  developer.log("Error with building profile picture", name: "main_view", error: error, stackTrace: stackTrace);
+                                  return Image.asset(
+                                    "res/avatars/tetrio_anon.png",
+                                    fit: BoxFit.fitHeight,
+                                    height: 128,
+                                  );
+                                })
+                              : Image.asset(
+                                  "res/avatars/tetrio_anon.png",
+                                  fit: BoxFit.fitHeight,
+                                  height: 128,
+                                ),
                     ),
                   ),
                 ],
@@ -1230,10 +1261,12 @@ class _UserThingy extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(player.username, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                    Text(
-                      player.userId,
-                      style: const TextStyle(fontFamily: "Eurostile Round Condensed", fontSize: 14),
-                    ),
+                    TextButton(
+                        child: Text(player.userId, style: const TextStyle(fontFamily: "Eurostile Round Condensed", fontSize: 14)),
+                        onPressed: () {
+                          copyToClipboard(player.userId);
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Copied to clipboard!")));
+                        }),
                   ],
                 ),
               ),
@@ -1311,7 +1344,6 @@ class _UserThingy extends StatelessWidget {
                 IconButton(
                     onPressed: () => showDialog<void>(
                           context: context,
-                          barrierDismissible: false, // user must tap button!
                           builder: (BuildContext context) {
                             return AlertDialog(
                               title: Text(
@@ -1350,6 +1382,10 @@ class _UserThingy extends StatelessWidget {
                       "res/tetrio_badges/${badge.badgeId}.png",
                       height: 64,
                       width: 64,
+                      errorBuilder: (context, error, stackTrace) {
+                        developer.log("Error with building $badge", name: "main_view", error: error, stackTrace: stackTrace);
+                        return Image.asset("res/icons/kagari.png", height: 64, width: 64);
+                      },
                     ))
             ],
           ),
