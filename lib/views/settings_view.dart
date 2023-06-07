@@ -65,7 +65,7 @@ class SettingsState extends State<SettingsView> {
                 builder: (BuildContext context) => AlertDialog(
                       title: const Text("Your TETR.IO account nickname or ID", style: TextStyle(fontFamily: "Eurostile Round Extended")),
                       content: SingleChildScrollView(
-                        child: ListBody(children: [TextField(controller: _playertext)]),
+                        child: ListBody(children: [TextField(controller: _playertext, maxLength: 25)]),
                       ),
                       actions: <Widget>[
                         TextButton(

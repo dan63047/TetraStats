@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer' as developer;
+import 'package:http/http.dart' as http;
 // import 'package:sqflite/sqflite.dart';
 // import 'package:path_provider/path_provider.dart' show MissingPlatformDirectoryException, getApplicationDocumentsDirectory;
 // import 'package:path/path.dart' show join;
@@ -31,7 +32,7 @@ class TetrioService {
 
   Future<void> _cachePlayers(DB udb) async {
     final allPlayers = await getAllPlayers(udb: udb);
-    _players = allPlayers.first;
+    _players = allPlayers.toList().first; // ???
     _tetrioStreamController.add(_players);
     developer.log("_cachePlayers: $_players", name: "services/tetrio_crud");
   }
@@ -58,6 +59,7 @@ class TetrioService {
   // }
 
   Future<void> createPlayer({required TetrioPlayer tetrioPlayer, required DB udb}) async {
+    _ensureDbIsOpen(udb);
     final db = udb.getDatabaseOrThrow();
     final results = await db.query(tetrioUsersTable, limit: 1, where: '$idCol = ?', whereArgs: [tetrioPlayer.userId.toLowerCase()]);
     if (results.isNotEmpty) {
@@ -72,9 +74,16 @@ class TetrioService {
   }
 
   Future<void> storeState(TetrioPlayer tetrioPlayer, DB udb) async {
+    _ensureDbIsOpen(udb);
     final db = udb.getDatabaseOrThrow();
-    List<TetrioPlayer> states = await getPlayer(id: tetrioPlayer.userId, udb: udb);
-    states.add(tetrioPlayer);
+    late List<TetrioPlayer> states;
+    try {
+      states = await getPlayer(id: tetrioPlayer.userId, udb: udb);
+    } on TetrioPlayerNotExist {
+      await createPlayer(tetrioPlayer: tetrioPlayer, udb: udb);
+      states = await getPlayer(id: tetrioPlayer.userId, udb: udb);
+    }
+    if (!_players[tetrioPlayer.userId]!.last.isSameState(tetrioPlayer)) states.add(tetrioPlayer);
     final Map<String, dynamic> statesJson = {};
     for (var e in states) {
       statesJson.addEntries({e.state.millisecondsSinceEpoch.toString(): e.toJson()}.entries);
@@ -86,6 +95,7 @@ class TetrioService {
   }
 
   Future<List<TetrioPlayer>> getPlayer({required String id, required DB udb}) async {
+    _ensureDbIsOpen(udb);
     final db = udb.getDatabaseOrThrow();
     List<TetrioPlayer> states = [];
     final results = await db.query(tetrioUsersTable, limit: 1, where: '$idCol = ?', whereArgs: [id.toLowerCase()]);
@@ -99,6 +109,29 @@ class TetrioService {
       _players.addEntries({states.last.userId: states}.entries);
       _tetrioStreamController.add(_players);
       return states;
+    }
+  }
+
+  Future<TetrioPlayer> fetchPlayer(String user, DB udb, bool addToDB) async {
+    var url = Uri.https('ch.tetr.io', 'api/users/${user.toLowerCase().trim()}');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      if (jsonDecode(response.body)['success']) {
+        TetrioPlayer player = TetrioPlayer.fromJson(
+            jsonDecode(response.body)['data']['user'], DateTime.fromMillisecondsSinceEpoch(jsonDecode(response.body)['cache']['cached_at'], isUtc: true), true);
+        if (addToDB) {
+          _ensureDbIsOpen(udb);
+          storeState(player, udb);
+        }
+        return player;
+      } else {
+        developer.log("fetchTetrioPlayer User dosen't exist", name: "services/tetrio_crud", error: response.body);
+        throw Exception("User doesn't exist");
+      }
+    } else {
+      developer.log("fetchTetrioPlayer Failed to fetch player", name: "services/tetrio_crud", error: response.statusCode);
+      throw Exception('Failed to fetch player');
     }
   }
 
@@ -117,6 +150,7 @@ class TetrioService {
     Map<String, List<TetrioPlayer>> data = {};
     //developer.log("getAllPlayers: $players", name: "services/tetrio_crud");
     return players.map((row) {
+      // what the fuck am i doing here?
       var test = json.decode(row['jsonStates'] as String);
       List<TetrioPlayer> states = [];
       test.forEach((k, v) => states.add(TetrioPlayer.fromJson(v, DateTime.fromMillisecondsSinceEpoch(int.parse(k)), false)));

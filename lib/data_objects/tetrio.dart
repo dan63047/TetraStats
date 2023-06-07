@@ -33,7 +33,7 @@ class TetrioPlayer {
   late int supporterTier;
   late bool verified;
   bool? badstanding;
-  bool? bot;
+  String? botmaster;
   late Connections connections;
   late TetraLeagueAlpha tlSeason1;
   List<RecordSingle?> sprint = [];
@@ -60,7 +60,7 @@ class TetrioPlayer {
     required this.supporterTier,
     required this.verified,
     this.badstanding,
-    this.bot,
+    this.botmaster,
     required this.connections,
     required this.tlSeason1,
     required this.sprint,
@@ -98,6 +98,7 @@ class TetrioPlayer {
     distinguishment = json['distinguishment'] != null ? Distinguishment.fromJson(json['distinguishment']) : null;
     friendCount = json['friend_count'] ?? 0;
     badstanding = json['badstanding'];
+    botmaster = json['botmaster'];
     if (fetchRecords) {
       var url = Uri.https('ch.tetr.io', 'api/users/$userId/records');
       Future response = http.get(url);
@@ -124,25 +125,25 @@ class TetrioPlayer {
     data['_id'] = userId;
     data['username'] = username;
     data['role'] = role;
-    data['ts'] = registrationTime?.toString();
+    if (registrationTime != null) data['ts'] = registrationTime?.toString();
     data['badges'] = badges.map((v) => v.toJson()).toList();
     data['xp'] = xp;
     data['gamesplayed'] = gamesPlayed;
     data['gameswon'] = gamesWon;
     data['gametime'] = gameTime.inMicroseconds / 1000000;
-    data['country'] = country;
+    if (country != null) data['country'] = country;
     data['supporter_tier'] = supporterTier;
     data['verified'] = verified;
     data['league'] = tlSeason1.toJson();
-    data['distinguishment'] = distinguishment?.toJson();
-    data['avatar_revision'] = avatarRevision;
-    data['banner_revision'] = bannerRevision;
-    data['bio'] = bio;
+    if (distinguishment != null) data['distinguishment'] = distinguishment?.toJson();
+    if (avatarRevision != null) data['avatar_revision'] = avatarRevision;
+    if (bannerRevision != null) data['banner_revision'] = bannerRevision;
+    if (data['bio'] != null) data['bio'] = bio;
     data['connections'] = connections.toJson();
     data['friend_count'] = friendCount;
-    data['badstanding'] = badstanding;
-    data['bot'] = bot;
-    developer.log("TetrioPlayer.toJson: $bot", name: "data_objects/tetrio");
+    if (badstanding != null) data['badstanding'] = badstanding;
+    if (botmaster != null) data['botmaster'] = botmaster;
+    developer.log("TetrioPlayer.toJson: $data", name: "data_objects/tetrio");
     return data;
   }
 
@@ -161,7 +162,7 @@ class TetrioPlayer {
     if (supporterTier != other.supporterTier) return false;
     if (verified != other.verified) return false;
     if (badstanding != other.badstanding) return false;
-    if (bot != other.bot) return false;
+    if (botmaster != other.botmaster) return false;
     if (connections != other.connections) return false;
     if (tlSeason1 != other.tlSeason1) return false;
     if (distinguishment != other.distinguishment) return false;
@@ -170,7 +171,7 @@ class TetrioPlayer {
 
   @override
   String toString() {
-    return "$username ($userId)";
+    return "$username ($state)";
   }
 
   @override
@@ -678,20 +679,20 @@ class TetraLeagueAlpha {
     data['gamesplayed'] = gamesPlayed;
     data['gameswon'] = gamesWon;
     data['rating'] = rating;
-    data['glicko'] = glicko;
-    data['rd'] = rd;
+    if (glicko != null) data['glicko'] = glicko;
+    if (rd != null) data['rd'] = rd;
     data['rank'] = rank;
     data['bestrank'] = bestRank;
-    data['apm'] = apm;
-    data['pps'] = pps;
-    data['vs'] = vs;
+    if (apm != null) data['apm'] = apm;
+    if (pps != null) data['pps'] = pps;
+    if (vs != null) data['vs'] = vs;
     data['decaying'] = decaying;
     data['standing'] = standing;
     data['percentile'] = percentile;
     data['standing_local'] = standingLocal;
-    data['prev_rank'] = prevRank;
+    if (prevRank != null) data['prev_rank'] = prevRank;
     data['prev_at'] = prevAt;
-    data['next_rank'] = nextRank;
+    if (nextRank != null) data['next_rank'] = nextRank;
     data['next_at'] = nextAt;
     data['percentile_rank'] = percentileRank;
     return data;
@@ -710,7 +711,7 @@ class RecordSingle {
   RecordSingle({required this.userId, required this.replayId, required this.ownId, this.timestamp, this.endContext, this.rank});
 
   RecordSingle.fromJson(Map<String, dynamic> json, int? ran) {
-    developer.log("RecordSingle.fromJson: $json", name: "data_objects/tetrio");
+    //developer.log("RecordSingle.fromJson: $json", name: "data_objects/tetrio");
     ownId = json['_id'];
     endContext = json['endcontext'] != null ? EndContextSingle.fromJson(json['endcontext']) : null;
     replayId = json['replayid'];
@@ -775,5 +776,43 @@ class Distinguishment {
     data['header'] = header;
     data['footer'] = footer;
     return data;
+  }
+}
+
+class TetrioPlayersLeaderboard {
+  late String type;
+  late List<TetrioPlayerFromLeaderboard> leaderboard;
+
+  TetrioPlayersLeaderboard(this.type, this.leaderboard);
+
+  TetrioPlayersLeaderboard.fromJson(Map<String, dynamic> json, String type) {
+    type = type;
+    for (Map<String, dynamic> entry in json['users']) {
+      leaderboard.add(TetrioPlayerFromLeaderboard.fromJson(entry));
+    }
+  }
+}
+
+class TetrioPlayerFromLeaderboard {
+  late String userId;
+  late String username;
+  late String role;
+  late double xp;
+  String? country;
+  late bool supporter;
+  late bool verified;
+  late TetraLeagueAlpha league;
+
+  TetrioPlayerFromLeaderboard(this.userId, this.username, this.role, this.xp, this.country, this.supporter, this.verified, this.league);
+
+  TetrioPlayerFromLeaderboard.fromJson(Map<String, dynamic> json) {
+    userId = json['_id'];
+    username = json['username'];
+    role = json['role'];
+    xp = json['xp'].toDouble();
+    country = json['country '];
+    supporter = json['supporter'];
+    verified = json['verified'];
+    league = TetraLeagueAlpha.fromJson(json['league']);
   }
 }
