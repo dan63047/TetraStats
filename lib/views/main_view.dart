@@ -17,8 +17,7 @@ extension StringExtension on String {
 
 String _searchFor = "dan63047";
 Future<TetrioPlayer>? me;
-DB db = DB();
-late final TetrioService teto;
+final TetrioService teto = TetrioService();
 late SharedPreferences prefs;
 const allowedHeightForPlayerIdInPixels = 40.0;
 const allowedHeightForPlayerBioInPixels = 30.0;
@@ -76,8 +75,8 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
 
   @override
   void initState() {
-    db.open();
-    teto = TetrioService(db);
+    //teto = TetrioService();
+    teto.open();
     _scrollController = ScrollController();
     _tabController = TabController(length: 4, vsync: this);
     _getPreferences().then((value) => changePlayer(prefs.getString("player") ?? "dan63047"));
@@ -89,7 +88,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
   void dispose() {
     _tabController.dispose();
     _scrollController.dispose();
-    db.close();
+    //db.close();
     super.dispose();
     developer.log("Main view disposed", name: "main_view");
   }
@@ -102,7 +101,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
     setState(() {
       _tabController.animateTo(0, duration: const Duration(milliseconds: 300));
       _searchFor = player;
-      me = teto.fetchPlayer(player, db, false);
+      me = teto.fetchPlayer(player, false);
     });
   }
 
@@ -195,51 +194,62 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
           future: me,
           builder: (context, snapshot) {
             developer.log("builder ($context): $snapshot", name: "main_view");
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                  child: CircularProgressIndicator(
-                color: Colors.white,
-              ));
-            }
-            if (snapshot.hasData) {
-              bool bigScreen = MediaQuery.of(context).size.width > 1024;
-              return NestedScrollView(
-                controller: _scrollController,
-                headerSliverBuilder: (context, value) {
-                  return [
-                    SliverToBoxAdapter(child: _UserThingy(player: snapshot.data!)),
-                    SliverToBoxAdapter(
-                      child: TabBar(
-                        controller: _tabController,
-                        isScrollable: true,
-                        tabs: myTabs,
-                        onTap: (int tabId) {
-                          setState(() {
-                            developer.log("Tab changed to $tabId", name: "main_view");
-                          });
-                        },
-                      ),
+            switch (snapshot.connectionState) {
+              case ConnectionState.none:
+                return Center(
+                    child: Text('none case of FutureBuilder',
+                        style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42), textAlign: TextAlign.center));
+              case ConnectionState.waiting:
+                return const Center(child: CircularProgressIndicator(color: Colors.white));
+              case ConnectionState.active:
+                return Center(
+                    child: Text('active case of FutureBuilder',
+                        style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42), textAlign: TextAlign.center));
+              case ConnectionState.done:
+                bool bigScreen = MediaQuery.of(context).size.width > 1024;
+                if (snapshot.hasData) {
+                  return NestedScrollView(
+                    controller: _scrollController,
+                    headerSliverBuilder: (context, value) {
+                      return [
+                        SliverToBoxAdapter(child: _UserThingy(player: snapshot.data!)),
+                        SliverToBoxAdapter(
+                          child: TabBar(
+                            controller: _tabController,
+                            isScrollable: true,
+                            tabs: myTabs,
+                            onTap: (int tabId) {
+                              setState(() {
+                                developer.log("Tab changed to $tabId", name: "main_view");
+                              });
+                            },
+                          ),
+                        ),
+                      ];
+                    },
+                    body: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _TLThingy(tl: snapshot.data!.tlSeason1, userID: snapshot.data!.userId),
+                        _RecordThingy(record: (snapshot.data!.sprint.isNotEmpty) ? snapshot.data!.sprint[0] : null),
+                        _RecordThingy(record: (snapshot.data!.blitz.isNotEmpty) ? snapshot.data!.blitz[0] : null),
+                        _OtherThingy(zen: snapshot.data!.zen, bio: snapshot.data!.bio)
+                      ],
                     ),
-                  ];
-                },
-                body: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    _TLThingy(tl: snapshot.data!.tlSeason1, userID: snapshot.data!.userId),
-                    _RecordThingy(record: (snapshot.data!.sprint.isNotEmpty) ? snapshot.data!.sprint[0] : null),
-                    _RecordThingy(record: (snapshot.data!.blitz.isNotEmpty) ? snapshot.data!.blitz[0] : null),
-                    _OtherThingy(zen: snapshot.data!.zen, bio: snapshot.data!.bio)
-                  ],
-                ),
-              );
-            } else if (snapshot.hasError) {
-              return Center(
-                  child: Text('${snapshot.error}', style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42), textAlign: TextAlign.center));
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(
+                      child:
+                          Text('${snapshot.error}', style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42), textAlign: TextAlign.center));
+                }
+                break;
+              default:
+                return Center(
+                    child: Text('default case of FutureBuilder',
+                        style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42), textAlign: TextAlign.center));
             }
-            return const Center(
-                child: CircularProgressIndicator(
-              color: Colors.white,
-            ));
+            return Center(
+                child: Text('end of FutureBuilder', style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42), textAlign: TextAlign.center));
           },
         ),
       ),
@@ -271,6 +281,20 @@ class NavDrawer extends StatelessWidget {
               Navigator.of(context).pop();
             },
           ),
+          StreamBuilder(
+            stream: teto.allPlayers,
+            builder: (context, snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.none:
+                  return Center(child: Text('none case of StreamBuilder'));
+                case ConnectionState.waiting:
+                case ConnectionState.active:
+                  return Center(child: Text('${snapshot.data}'));
+                case ConnectionState.done:
+                  return Center(child: Text('done case of StreamBuilder'));
+              }
+            },
+          )
         ],
       ),
     );
@@ -452,7 +476,7 @@ class _UserThingy extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                    "${player.country != null ? "${player.country?.toUpperCase()} • " : ""}${player.role.capitalize()} account ${player.registrationTime == null ? "that was from very beginning" : 'created ${player.registrationTime}'} • ${player.supporterTier == 0 ? "Not a supporter" : "Supporter tier ${player.supporterTier}"}",
+                    "${player.country != null ? "${player.country?.toUpperCase()} • " : ""}${player.role.capitalize()} account ${player.registrationTime == null ? "that was from very beginning" : 'created ${player.registrationTime}'}${player.botmaster != null ? " by ${player.botmaster}" : ""} • ${player.supporterTier == 0 ? "Not a supporter" : "Supporter tier ${player.supporterTier}"}",
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontFamily: "Eurostile Round",

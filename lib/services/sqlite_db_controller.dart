@@ -43,9 +43,9 @@ class DB {
     }
   }
 
-  Future<void> _ensureDbIsOpen(DB udb) async {
+  Future<void> ensureDbIsOpen() async {
     try {
-      await udb.open();
+      await open();
     } on DatabaseAlreadyOpen {
       // empty
     }
