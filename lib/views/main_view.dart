@@ -75,7 +75,6 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
 
   @override
   void initState() {
-    //teto = TetrioService();
     teto.open();
     _scrollController = ScrollController();
     _tabController = TabController(length: 4, vsync: this);
@@ -88,7 +87,6 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
   void dispose() {
     _tabController.dispose();
     _scrollController.dispose();
-    //db.close();
     super.dispose();
     developer.log("Main view disposed", name: "main_view");
   }
@@ -104,20 +102,6 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
       me = teto.fetchPlayer(player, false);
     });
   }
-
-  // _scrollListener() {
-  //   if (fixedScroll) {
-  //     _scrollController.jumpTo(0);
-  //   }
-  // }
-
-  // _smoothScrollToTop() {
-  //   _scrollController.animateTo(
-  //     0,
-  //     duration: const Duration(microseconds: 300),
-  //     curve: Curves.ease,
-  //   );
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -257,45 +241,80 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
   }
 }
 
-class NavDrawer extends StatelessWidget {
+class NavDrawer extends StatefulWidget {
   final Function changePlayer;
+
   const NavDrawer(this.changePlayer, {super.key});
+
+  @override
+  State<NavDrawer> createState() => _NavDrawerState();
+}
+
+class _NavDrawerState extends State<NavDrawer> {
+  late ScrollController _scrollController;
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: <Widget>[
-          const DrawerHeader(
-              child: Text(
-            'Players you track',
-            style: TextStyle(color: Colors.white, fontSize: 25),
-          )),
-          ListTile(
-            leading: const Icon(Icons.home),
-            title: Text(prefs.getString("player") ?? "dan63047"),
-            onTap: () {
-              developer.log("Navigator changed player", name: "main_view");
-              changePlayer(prefs.getString("player") ?? "dan63047");
-              Navigator.of(context).pop();
-            },
-          ),
-          StreamBuilder(
-            stream: teto.allPlayers,
-            builder: (context, snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.none:
-                  return Center(child: Text('none case of StreamBuilder'));
-                case ConnectionState.waiting:
-                case ConnectionState.active:
-                  return Center(child: Text('${snapshot.data}'));
-                case ConnectionState.done:
-                  return Center(child: Text('done case of StreamBuilder'));
-              }
-            },
-          )
-        ],
+      child: StreamBuilder(
+        stream: teto.allPlayers,
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+              return Center(child: Text('none case of StreamBuilder'));
+            case ConnectionState.waiting:
+            case ConnectionState.active:
+              final allPlayers = (snapshot.data != null) ? snapshot.data as Map<String, List<TetrioPlayer>> : <String, List<TetrioPlayer>>{};
+              List<String> keys = allPlayers.keys.toList();
+              return NestedScrollView(
+                  headerSliverBuilder: (context, value) {
+                    return [
+                      const SliverToBoxAdapter(
+                          child: DrawerHeader(
+                              child: Text(
+                        'Players you track',
+                        style: TextStyle(color: Colors.white, fontSize: 25),
+                      ))),
+                      SliverToBoxAdapter(
+                        child: ListTile(
+                          leading: const Icon(Icons.home),
+                          title: Text(prefs.getString("player") ?? "dan63047"),
+                          onTap: () {
+                            developer.log("Navigator changed player", name: "main_view");
+                            widget.changePlayer(prefs.getString("player") ?? "dan63047");
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      )
+                    ];
+                  },
+                  body: ListView.builder(
+                      itemCount: allPlayers.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          title: Text(allPlayers[keys[index]]?.last.username as String),
+                          onTap: () {
+                            developer.log("Navigator changed player", name: "main_view");
+                            widget.changePlayer(keys[index]);
+                            Navigator.of(context).pop();
+                          },
+                        );
+                      }));
+            case ConnectionState.done:
+              return Center(child: Text('done case of StreamBuilder'));
+          }
+        },
       ),
     );
   }
