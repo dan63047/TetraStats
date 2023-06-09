@@ -2,17 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:http/http.dart' as http;
-import 'dart:async';
-import 'package:sqflite/sqflite.dart';
-// import 'package:sqflite/sqflite.dart';
-// import 'package:path_provider/path_provider.dart' show MissingPlatformDirectoryException, getApplicationDocumentsDirectory;
-// import 'package:path/path.dart' show join;
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/services/sqlite_db_controller.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 
 const String dbName = "TetraStats.db";
 const String tetrioUsersTable = "tetrioUsers";
+const String tetrioUsersToTrackTable = "tetrioUsersToTrack";
 const String idCol = "id";
 const String nickCol = "nickname";
 const String statesCol = "jsonStates";
@@ -23,6 +19,12 @@ const String createTetrioUsersTable = '''
           "jsonStates"	TEXT,
           PRIMARY KEY("id")
         );''';
+const String createTetrioUsersToTrack = '''
+        CREATE TABLE IF NOT EXISTS "tetrioUsersToTrack" (
+          "id"	TEXT NOT NULL UNIQUE,
+          PRIMARY KEY("ID")
+        )
+''';
 
 class TetrioService extends DB {
   Map<String, List<TetrioPlayer>> _players = {};
@@ -50,9 +52,9 @@ class TetrioService extends DB {
     developer.log("_cachePlayers: $_players", name: "services/tetrio_crud");
   }
 
-  Future<void> deletePlayer({required String id, required DB udb}) async {
+  Future<void> deletePlayer(String id) async {
     await ensureDbIsOpen();
-    final db = udb.getDatabaseOrThrow();
+    final db = getDatabaseOrThrow();
     final deletedPlayer = await db.delete(tetrioUsersTable, where: '$idCol = ?', whereArgs: [id.toLowerCase()]);
     if (deletedPlayer != 1) {
       throw CouldNotDeletePlayer();
@@ -61,16 +63,6 @@ class TetrioService extends DB {
       _tetrioStreamController.add(_players);
     }
   }
-
-  // Future <List<TetrioPlayer>> getOrCreatePlayer({required String id}) async {
-  //   try{
-  //     final player = await getPlayer(id: id);
-  //     return player;
-  //   } on TetrioPlayerNotExist{
-
-  //     final player = await createPlayer(tetrioPlayer: tetrioPlayer)
-  //   }
-  // }
 
   Future<void> createPlayer(TetrioPlayer tetrioPlayer) async {
     ensureDbIsOpen();
@@ -85,6 +77,36 @@ class TetrioService extends DB {
       tetrioPlayer.userId: [tetrioPlayer]
     }.entries);
     _tetrioStreamController.add(_players);
+  }
+
+  Future<void> addPlayerToTrack(TetrioPlayer tetrioPlayer) async {
+    ensureDbIsOpen();
+    final db = getDatabaseOrThrow();
+    final results = await db.query(tetrioUsersToTrackTable, where: '$idCol = ?', whereArgs: [tetrioPlayer.userId.toLowerCase()]);
+    if (results.isNotEmpty) {
+      throw TetrioPlayerAlreadyExist();
+    }
+    db.insert(tetrioUsersToTrackTable, {idCol: tetrioPlayer.userId});
+  }
+
+  Future<Iterable<String>> getAllPlayerToTrack() async {
+    await ensureDbIsOpen();
+    final db = getDatabaseOrThrow();
+    final players = await db.query(tetrioUsersToTrackTable);
+    developer.log("getAllPlayerToTrack: $players", name: "services/tetrio_crud");
+    return players.map((noteRow) => noteRow["id"].toString());
+  }
+
+  Future<void> deletePlayerToTrack(String id) async {
+    await ensureDbIsOpen();
+    final db = getDatabaseOrThrow();
+    final deletedPlayer = await db.delete(tetrioUsersToTrackTable, where: '$idCol = ?', whereArgs: [id.toLowerCase()]);
+    if (deletedPlayer != 1) {
+      throw CouldNotDeletePlayer();
+    } else {
+      // _players.removeWhere((key, value) => key == id);
+      // _tetrioStreamController.add(_players);
+    }
   }
 
   Future<void> storeState(TetrioPlayer tetrioPlayer) async {

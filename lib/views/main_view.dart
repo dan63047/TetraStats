@@ -156,7 +156,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
               ),
               const PopupMenuItem(
                 value: "/states",
-                child: Text('States'),
+                child: Text('Players you track'),
               ),
               const PopupMenuItem(
                 value: "/calc",
@@ -376,7 +376,7 @@ class _UserThingy extends StatelessWidget {
     return LayoutBuilder(builder: (context, constraints) {
       bool bigScreen = constraints.maxWidth > 768;
       double bannerHeight = bigScreen ? 240 : 120;
-      double pfpHeight = bigScreen ? 64 : 32;
+      double pfpHeight = 128;
       return Column(
         children: [
           Flex(
@@ -407,7 +407,7 @@ class _UserThingy extends StatelessWidget {
                           ? Image.asset(
                               "res/avatars/tetrio_banned.png",
                               fit: BoxFit.fitHeight,
-                              height: 128,
+                              height: pfpHeight,
                             )
                           : player.avatarRevision != null
                               ? Image.network("https://tetr.io/user-content/avatars/${player.userId}.jpg?rv=${player.avatarRevision}",
@@ -416,31 +416,47 @@ class _UserThingy extends StatelessWidget {
                                   return Image.asset(
                                     "res/avatars/tetrio_anon.png",
                                     fit: BoxFit.fitHeight,
-                                    height: 128,
+                                    height: pfpHeight,
                                   );
                                 })
                               : Image.asset(
                                   "res/avatars/tetrio_anon.png",
                                   fit: BoxFit.fitHeight,
-                                  height: 128,
+                                  height: pfpHeight,
                                 ),
                     ),
                   ),
+                  if (player.verified)
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                          pfpHeight - 22,
+                          bigScreen //                                                                                          verified icon top padding:
+                              ? (player.bannerRevision != null ? bannerHeight + pfpHeight - 96 : pfpHeight + pfpHeight - 32) // for big screen
+                              : (player.bannerRevision != null ? bannerHeight + pfpHeight - 58 : pfpHeight + pfpHeight - 32), // for small screen
+                          0,
+                          0),
+                      child: const Icon(Icons.verified),
+                    )
                 ],
               ),
               Flexible(
-                child: Column(
-                  children: [
-                    Text(player.username, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                    TextButton(
-                        child: Text(player.userId, style: const TextStyle(fontFamily: "Eurostile Round Condensed", fontSize: 14)),
-                        onPressed: () {
-                          copyToClipboard(player.userId);
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Copied to clipboard!")));
-                        }),
-                  ],
-                ),
-              ),
+                  child: Column(
+                children: [
+                  Text(player.username, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                  TextButton(
+                      child: Text(player.userId, style: const TextStyle(fontFamily: "Eurostile Round Condensed", fontSize: 14)),
+                      onPressed: () {
+                        copyToClipboard(player.userId);
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Copied to clipboard!")));
+                      }),
+                  IconButton(
+                    icon: Icon(Icons.addchart),
+                    style: ButtonStyle(),
+                    onPressed: () {},
+                  ),
+                  Text("Track")
+                ],
+              )),
             ],
           ),
           (player.role != "banned")
@@ -459,11 +475,7 @@ class _UserThingy extends StatelessWidget {
                     ),
                     if (player.gameTime >= Duration.zero)
                       _StatCellNum(
-                        playerStat: player.gameTime.inHours,
-                        playerStatLabel: "Hours\nPlayed",
-                        isScreenBig: bigScreen,
-                        snackBar: player.gameTime.toString(),
-                      ),
+                          playerStat: player.gameTime.inHours, playerStatLabel: "Hours\nPlayed", isScreenBig: bigScreen, snackBar: player.gameTime.toString()),
                     if (player.gamesPlayed >= 0) _StatCellNum(playerStat: player.gamesPlayed, isScreenBig: bigScreen, playerStatLabel: "Online\nGames"),
                     if (player.gamesWon >= 0) _StatCellNum(playerStat: player.gamesWon, isScreenBig: bigScreen, playerStatLabel: "Games\nWon"),
                     if (player.friendCount > 0) _StatCellNum(playerStat: player.friendCount, isScreenBig: bigScreen, playerStatLabel: "Friends"),

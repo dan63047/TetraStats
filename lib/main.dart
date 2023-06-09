@@ -3,7 +3,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:tetra_stats/views/main_view.dart';
 import 'package:tetra_stats/views/compare_view.dart';
 import 'package:tetra_stats/views/settings_view.dart';
-import 'package:tetra_stats/views/states_view.dart';
+import 'package:tetra_stats/views/tracked_players_view.dart';
 import 'package:tetra_stats/views/calc_view.dart';
 
 void main() {
