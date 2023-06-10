@@ -87,6 +87,7 @@ flutter:
      - res/tetrio_badges/heart.png
      - res/tetrio_badges/hnprism_1.png
      - res/tetrio_badges/hnprism_2.png
+     - res/tetrio_badges/hnprism_3.png
      - res/tetrio_badges/ift_1.png
      - res/tetrio_badges/ift_2.png
      - res/tetrio_badges/ift_3.png
@@ -100,20 +101,28 @@ flutter:
      - res/tetrio_badges/mmc_tabi_superlobby.png
      - res/tetrio_badges/mmc_tabi_superlobby2.png
      - res/tetrio_badges/mmc_tabi_superlobby3.png
+     - res/tetrio_badges/redgevo_1.png
      - res/tetrio_badges/redgevo_2.png
      - res/tetrio_badges/redgevo_3.png
      - res/tetrio_badges/rengervl_1.png
      - res/tetrio_badges/rengervl_2.png
      - res/tetrio_badges/rengervl_3.png
      - res/tetrio_badges/sakurablend_1.png
+     - res/tetrio_badges/sakurablend_2.png
+     - res/tetrio_badges/sakurablend_3.png
      - res/tetrio_badges/scuncapped_1.png
      - res/tetrio_badges/scuncapped_2.png
+     - res/tetrio_badges/scuncapped_3.png
      - res/tetrio_badges/secretgrade.png
      - res/tetrio_badges/sfu_raccoon_1.png
+     - res/tetrio_badges/sfu_raccoon_2.png
+     - res/tetrio_badges/sfu_raccoon_3.png
      - res/tetrio_badges/superlobby.png
      - res/tetrio_badges/superlobby2.png
      - res/tetrio_badges/taws_u50_1.png
+     - res/tetrio_badges/taws_u50_2.png
      - res/tetrio_badges/taws_u50_3.png
+     - res/tetrio_badges/tawshdsl_capped.png
      - res/tetrio_badges/tawshdsl_uncapped.png
      - res/tetrio_badges/tawsignite_expert.png
      - res/tetrio_badges/tawslg.png
@@ -121,8 +130,16 @@ flutter:
      - res/tetrio_badges/ttsdtc_1.png
      - res/tetrio_badges/ttsdtc_2.png
      - res/tetrio_badges/ttsdtc_3.png
+     - res/tetrio_badges/ubcea_1.png
+     - res/tetrio_badges/ubcea_2.png
+     - res/tetrio_badges/ubcea_3.png
+     - res/tetrio_badges/underdog_1.png
+     - res/tetrio_badges/underdog_2.png
+     - res/tetrio_badges/underdog_3.png
      - res/tetrio_badges/underdog_predict.png
      - res/tetrio_badges/wpl_1.png
+     - res/tetrio_badges/wpl_2.png
+     - res/tetrio_badges/wpl_3.png
      - res/tetrio_badges/wplc_1.png
      - res/tetrio_badges/wplc_2.png
      - res/tetrio_badges/wplc_3.png

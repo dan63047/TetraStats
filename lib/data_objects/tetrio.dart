@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:vector_math/vector_math.dart';
 import 'dart:developer' as developer;
 import 'package:http/http.dart' as http;
@@ -151,8 +152,8 @@ class TetrioPlayer {
     if (userId != other.userId) return false;
     if (username != other.username) return false;
     if (role != other.role) return false;
-    if (badges != other.badges) return false;
-    if (bio != other.bio) return false;
+    if (listEquals(badges, other.badges) == false) return false;
+    //if (bio != other.bio) return false;
     if (country != other.country) return false;
     if (friendCount != other.friendCount) return false;
     if (gamesPlayed != other.gamesPlayed) return false;
@@ -222,6 +223,8 @@ class Connections {
   Connections.fromJson(Map<String, dynamic> json) {
     discord = json['discord'] != null ? Discord.fromJson(json['discord']) : null;
   }
+  @override
+  bool operator ==(covariant Connections other) => discord == other.discord;
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
@@ -307,6 +310,9 @@ class Discord {
     id = json['id'];
     username = json['username'];
   }
+
+  @override
+  bool operator ==(covariant Discord other) => id == other.id;
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
@@ -672,6 +678,9 @@ class TetraLeagueAlpha {
         (nerdStats != null) ? Playstyle(apm!, pps!, nerdStats!.app, nerdStats!.vsapm, nerdStats!.dsp, nerdStats!.gbe, estTr!.srarea, estTr!.statrank) : null;
   }
 
+  @override
+  bool operator ==(covariant TetraLeagueAlpha other) => gamesPlayed == other.gamesPlayed && rd == other.rd;
+
   double? get esttracc => (estTr != null) ? estTr!.esttr - rating : null;
 
   Map<String, dynamic> toJson() {
@@ -768,6 +777,9 @@ class Distinguishment {
     header = json['header'];
     footer = json['footer'];
   }
+
+  @override
+  bool operator ==(covariant Distinguishment other) => type == other.type && detail == other.detail && header == other.header && footer == other.footer;
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};

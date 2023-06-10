@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
+import 'package:tetra_stats/views/states_view.dart';
 
 final TetrioService teto = TetrioService();
 
-class StatesView extends StatefulWidget {
-  const StatesView({Key? key}) : super(key: key);
+class TrackedPlayersView extends StatefulWidget {
+  const TrackedPlayersView({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => StatesState();
+  State<StatefulWidget> createState() => TrackedPlayersState();
 }
 
-class StatesState extends State<StatesView> {
+class TrackedPlayersState extends State<TrackedPlayersView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Players you track"),
+        title: const Text("Stored data"),
       ),
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -38,7 +39,7 @@ class StatesState extends State<StatesView> {
                                 child: Padding(
                               padding: const EdgeInsets.only(left: 16),
                               child: Text(
-                                'There is ${allPlayers.length} players',
+                                'There are ${allPlayers.length} players',
                                 style: TextStyle(color: Colors.white, fontSize: 25),
                               ),
                             )),
@@ -51,7 +52,18 @@ class StatesState extends State<StatesView> {
                               return ListTile(
                                 title: Text("${allPlayers[keys[index]]?.last.username}: ${allPlayers[keys[index]]?.length} states"),
                                 subtitle: Text("From ${allPlayers[keys[index]]?.first.state} until ${allPlayers[keys[index]]?.last.state}"),
-                                onTap: () {},
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.delete_forever),
+                                  onPressed: () {},
+                                ),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => StatesView(states: allPlayers[keys[index]]!),
+                                    ),
+                                  );
+                                },
                               );
                             }));
                   case ConnectionState.done:

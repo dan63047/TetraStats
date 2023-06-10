@@ -64,6 +64,12 @@ class TetrioService extends DB {
     }
   }
 
+  Future<String> getNicknameByID(String id) async {
+    if (id.length <= 16) return id;
+    TetrioPlayer player = await getPlayer(id).then((value) => value.last);
+    return player.username;
+  }
+
   Future<void> createPlayer(TetrioPlayer tetrioPlayer) async {
     ensureDbIsOpen();
     final db = getDatabaseOrThrow();
@@ -87,6 +93,17 @@ class TetrioService extends DB {
       throw TetrioPlayerAlreadyExist();
     }
     db.insert(tetrioUsersToTrackTable, {idCol: tetrioPlayer.userId});
+  }
+
+  Future<bool> isPlayerTracking(String id) async {
+    ensureDbIsOpen();
+    final db = getDatabaseOrThrow();
+    final results = await db.query(tetrioUsersToTrackTable, where: '$idCol = ?', whereArgs: [id.toLowerCase()]);
+    if (results.isEmpty) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   Future<Iterable<String>> getAllPlayerToTrack() async {
@@ -119,7 +136,8 @@ class TetrioService extends DB {
       await createPlayer(tetrioPlayer);
       states = await getPlayer(tetrioPlayer.userId);
     }
-    if (!_players[tetrioPlayer.userId]!.last.isSameState(tetrioPlayer)) states.add(tetrioPlayer);
+    bool test = _players[tetrioPlayer.userId]!.last.isSameState(tetrioPlayer);
+    if (test == false) states.add(tetrioPlayer);
     final Map<String, dynamic> statesJson = {};
     for (var e in states) {
       statesJson.addEntries({e.state.millisecondsSinceEpoch.toString(): e.toJson()}.entries);

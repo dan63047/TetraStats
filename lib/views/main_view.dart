@@ -1,19 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' as developer;
-import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
-import 'package:tetra_stats/services/sqlite_db_controller.dart';
-import 'package:fl_chart/fl_chart.dart';
-
-extension StringExtension on String {
-  String capitalize() {
-    return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
-  }
-}
+import 'package:tetra_stats/services/crud_exceptions.dart';
+import 'package:tetra_stats/widgets/stat_sell_num.dart';
+import 'package:tetra_stats/widgets/tl_thingy.dart';
+import 'package:tetra_stats/widgets/user_thingy.dart';
 
 String _searchFor = "dan63047";
 Future<TetrioPlayer>? me;
@@ -103,6 +97,10 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
     });
   }
 
+  void _justUpdate() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -150,13 +148,13 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                 ),
           PopupMenuButton(
             itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-              const PopupMenuItem(
-                value: "/compare",
-                child: Text('Compare'),
-              ),
+              // const PopupMenuItem(
+              //   value: "/compare",
+              //   child: Text('Compare'),
+              // ),
               const PopupMenuItem(
                 value: "/states",
-                child: Text('Players you track'),
+                child: Text('Show stored data'),
               ),
               const PopupMenuItem(
                 value: "/calc",
@@ -192,11 +190,20 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
               case ConnectionState.done:
                 bool bigScreen = MediaQuery.of(context).size.width > 1024;
                 if (snapshot.hasData) {
+                  if (_searchFor.length > 16) _searchFor = snapshot.data!.username;
+                  teto.isPlayerTracking(snapshot.data!.userId).then((value) {
+                    if (value) teto.storeState(snapshot.data!);
+                  });
                   return NestedScrollView(
                     controller: _scrollController,
                     headerSliverBuilder: (context, value) {
                       return [
-                        SliverToBoxAdapter(child: _UserThingy(player: snapshot.data!)),
+                        SliverToBoxAdapter(
+                            child: UserThingy(
+                          player: snapshot.data!,
+                          showStateTimestamp: false,
+                          setState: _justUpdate,
+                        )),
                         SliverToBoxAdapter(
                           child: TabBar(
                             controller: _tabController,
@@ -214,7 +221,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                     body: TabBarView(
                       controller: _tabController,
                       children: [
-                        _TLThingy(tl: snapshot.data!.tlSeason1, userID: snapshot.data!.userId),
+                        TLThingy(tl: snapshot.data!.tlSeason1, userID: snapshot.data!.userId),
                         _RecordThingy(record: (snapshot.data!.sprint.isNotEmpty) ? snapshot.data!.sprint[0] : null),
                         _RecordThingy(record: (snapshot.data!.blitz.isNotEmpty) ? snapshot.data!.blitz[0] : null),
                         _OtherThingy(zen: snapshot.data!.zen, bio: snapshot.data!.bio)
@@ -252,9 +259,11 @@ class NavDrawer extends StatefulWidget {
 
 class _NavDrawerState extends State<NavDrawer> {
   late ScrollController _scrollController;
+  String homePlayerNickname = "Checking...";
   @override
   void initState() {
     super.initState();
+    _setHomePlayerNickname(prefs.getString("player"));
     _scrollController = ScrollController();
   }
 
@@ -262,6 +271,19 @@ class _NavDrawerState extends State<NavDrawer> {
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  Future<void> _setHomePlayerNickname(String? n) async {
+    if (n != null) {
+      try {
+        homePlayerNickname = await teto.getNicknameByID(n);
+      } on TetrioPlayerNotExist {
+        homePlayerNickname = n;
+      }
+    } else {
+      homePlayerNickname = "dan63047";
+    }
+    setState(() {});
   }
 
   @override
@@ -289,7 +311,7 @@ class _NavDrawerState extends State<NavDrawer> {
                       SliverToBoxAdapter(
                         child: ListTile(
                           leading: const Icon(Icons.home),
-                          title: Text(prefs.getString("player") ?? "dan63047"),
+                          title: Text(homePlayerNickname),
                           onTap: () {
                             developer.log("Navigator changed player", name: "main_view");
                             widget.changePlayer(prefs.getString("player") ?? "dan63047");
@@ -320,575 +342,6 @@ class _NavDrawerState extends State<NavDrawer> {
   }
 }
 
-class _StatCellNum extends StatelessWidget {
-  const _StatCellNum({required this.playerStat, required this.playerStatLabel, required this.isScreenBig, this.snackBar, this.fractionDigits});
-
-  final num playerStat;
-  final String playerStatLabel;
-  final bool isScreenBig;
-  final String? snackBar;
-  final int? fractionDigits;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          fractionDigits != null ? playerStat.toStringAsFixed(fractionDigits!) : playerStat.floor().toString(),
-          style: TextStyle(
-            fontFamily: "Eurostile Round Extended",
-            fontSize: isScreenBig ? 32 : 24,
-          ),
-        ),
-        snackBar == null
-            ? Text(
-                playerStatLabel,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontFamily: "Eurostile Round",
-                  fontSize: 16,
-                ),
-              )
-            : TextButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(snackBar!)));
-                },
-                style: ButtonStyle(padding: MaterialStateProperty.all(EdgeInsets.zero)),
-                child: Text(
-                  playerStatLabel,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontFamily: "Eurostile Round",
-                    fontSize: 16,
-                  ),
-                )),
-      ],
-    );
-  }
-}
-
-class _UserThingy extends StatelessWidget {
-  final TetrioPlayer player;
-  const _UserThingy({Key? key, required this.player}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      bool bigScreen = constraints.maxWidth > 768;
-      double bannerHeight = bigScreen ? 240 : 120;
-      double pfpHeight = 128;
-      return Column(
-        children: [
-          Flex(
-            direction: Axis.vertical,
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Stack(
-                alignment: Alignment.topCenter,
-                children: [
-                  if (player.bannerRevision != null)
-                    Image.network(
-                      "https://tetr.io/user-content/banners/${player.userId}.jpg?rv=${player.bannerRevision}",
-                      fit: BoxFit.cover,
-                      height: bannerHeight,
-                      errorBuilder: (context, error, stackTrace) {
-                        developer.log("Error with building banner image", name: "main_view", error: error, stackTrace: stackTrace);
-                        return const Placeholder(
-                          color: Colors.black,
-                        );
-                      },
-                    ),
-                  Container(
-                    padding: EdgeInsets.fromLTRB(0, player.bannerRevision != null ? bannerHeight / 1.4 : pfpHeight, 0, 0),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(1000),
-                      child: player.role == "banned"
-                          ? Image.asset(
-                              "res/avatars/tetrio_banned.png",
-                              fit: BoxFit.fitHeight,
-                              height: pfpHeight,
-                            )
-                          : player.avatarRevision != null
-                              ? Image.network("https://tetr.io/user-content/avatars/${player.userId}.jpg?rv=${player.avatarRevision}",
-                                  fit: BoxFit.fitHeight, height: 128, errorBuilder: (context, error, stackTrace) {
-                                  developer.log("Error with building profile picture", name: "main_view", error: error, stackTrace: stackTrace);
-                                  return Image.asset(
-                                    "res/avatars/tetrio_anon.png",
-                                    fit: BoxFit.fitHeight,
-                                    height: pfpHeight,
-                                  );
-                                })
-                              : Image.asset(
-                                  "res/avatars/tetrio_anon.png",
-                                  fit: BoxFit.fitHeight,
-                                  height: pfpHeight,
-                                ),
-                    ),
-                  ),
-                  if (player.verified)
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(
-                          pfpHeight - 22,
-                          bigScreen //                                                                                          verified icon top padding:
-                              ? (player.bannerRevision != null ? bannerHeight + pfpHeight - 96 : pfpHeight + pfpHeight - 32) // for big screen
-                              : (player.bannerRevision != null ? bannerHeight + pfpHeight - 58 : pfpHeight + pfpHeight - 32), // for small screen
-                          0,
-                          0),
-                      child: const Icon(Icons.verified),
-                    )
-                ],
-              ),
-              Flexible(
-                  child: Column(
-                children: [
-                  Text(player.username, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                  TextButton(
-                      child: Text(player.userId, style: const TextStyle(fontFamily: "Eurostile Round Condensed", fontSize: 14)),
-                      onPressed: () {
-                        copyToClipboard(player.userId);
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Copied to clipboard!")));
-                      }),
-                  IconButton(
-                    icon: Icon(Icons.addchart),
-                    style: ButtonStyle(),
-                    onPressed: () {},
-                  ),
-                  Text("Track")
-                ],
-              )),
-            ],
-          ),
-          (player.role != "banned")
-              ? Wrap(
-                  direction: Axis.horizontal,
-                  alignment: WrapAlignment.center,
-                  spacing: 25,
-                  crossAxisAlignment: WrapCrossAlignment.start,
-                  clipBehavior: Clip.hardEdge, // hard WHAT???
-                  children: [
-                    _StatCellNum(
-                      playerStat: player.level,
-                      playerStatLabel: "XP Level",
-                      isScreenBig: bigScreen,
-                      snackBar: "${player.xp.floor().toString()} XP, ${((player.level - player.level.floor()) * 100).toStringAsFixed(2)} % until next level",
-                    ),
-                    if (player.gameTime >= Duration.zero)
-                      _StatCellNum(
-                          playerStat: player.gameTime.inHours, playerStatLabel: "Hours\nPlayed", isScreenBig: bigScreen, snackBar: player.gameTime.toString()),
-                    if (player.gamesPlayed >= 0) _StatCellNum(playerStat: player.gamesPlayed, isScreenBig: bigScreen, playerStatLabel: "Online\nGames"),
-                    if (player.gamesWon >= 0) _StatCellNum(playerStat: player.gamesWon, isScreenBig: bigScreen, playerStatLabel: "Games\nWon"),
-                    if (player.friendCount > 0) _StatCellNum(playerStat: player.friendCount, isScreenBig: bigScreen, playerStatLabel: "Friends"),
-                  ],
-                )
-              : Text(
-                  "BANNED",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: "Eurostile Round Extended",
-                    fontWeight: FontWeight.w900,
-                    color: Colors.red,
-                    fontSize: bigScreen ? 60 : 45,
-                  ),
-                ),
-          if (player.badstanding != null && player.badstanding!)
-            Text(
-              "BAD STANDING",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: "Eurostile Round Extended",
-                fontWeight: FontWeight.w900,
-                color: Colors.red,
-                fontSize: bigScreen ? 60 : 45,
-              ),
-            ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Text(
-                    "${player.country != null ? "${player.country?.toUpperCase()} • " : ""}${player.role.capitalize()} account ${player.registrationTime == null ? "that was from very beginning" : 'created ${player.registrationTime}'}${player.botmaster != null ? " by ${player.botmaster}" : ""} • ${player.supporterTier == 0 ? "Not a supporter" : "Supporter tier ${player.supporterTier}"}",
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontFamily: "Eurostile Round",
-                      fontSize: 16,
-                    )),
-              )
-            ],
-          ),
-          Wrap(
-            direction: Axis.horizontal,
-            alignment: WrapAlignment.center,
-            spacing: 25,
-            crossAxisAlignment: WrapCrossAlignment.start,
-            clipBehavior: Clip.hardEdge,
-            children: [
-              for (var badge in player.badges)
-                IconButton(
-                    onPressed: () => showDialog<void>(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text(
-                                badge.label,
-                                style: const TextStyle(fontFamily: "Eurostile Round Extended"),
-                              ),
-                              content: SingleChildScrollView(
-                                child: ListBody(
-                                  children: [
-                                    Wrap(
-                                      direction: Axis.horizontal,
-                                      alignment: WrapAlignment.center,
-                                      crossAxisAlignment: WrapCrossAlignment.center,
-                                      spacing: 25,
-                                      children: [
-                                        Image.asset("res/tetrio_badges/${badge.badgeId}.png"),
-                                        Text(badge.ts != null ? "Obtained ${badge.ts}" : "That badge was assigned manualy by TETR.IO admins"),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: const Text('OK'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                    tooltip: badge.label,
-                    icon: Image.asset(
-                      "res/tetrio_badges/${badge.badgeId}.png",
-                      height: 64,
-                      width: 64,
-                      errorBuilder: (context, error, stackTrace) {
-                        developer.log("Error with building $badge", name: "main_view", error: error, stackTrace: stackTrace);
-                        return Image.asset("res/icons/kagari.png", height: 64, width: 64);
-                      },
-                    ))
-            ],
-          ),
-        ],
-      );
-    });
-  }
-}
-
-class _TLThingy extends StatelessWidget {
-  final TetraLeagueAlpha tl;
-  final String userID;
-  const _TLThingy({Key? key, required this.tl, required this.userID}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      bool bigScreen = constraints.maxWidth > 768;
-      return ListView.builder(
-        physics: const ClampingScrollPhysics(),
-        itemCount: 1,
-        itemBuilder: (BuildContext context, int index) {
-          return Column(
-            children: (tl.gamesPlayed > 0)
-                ? [
-                    Text("Tetra League", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                    if (tl.gamesPlayed >= 10)
-                      Wrap(
-                        direction: Axis.horizontal,
-                        alignment: WrapAlignment.spaceAround,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        clipBehavior: Clip.hardEdge,
-                        children: [
-                          userID == "5e32fc85ab319c2ab1beb07c" // he love her so much, you can't even imagine
-                              ? Image.asset("res/icons/kagari.png", height: 128) // Btw why she wearing Kazamatsuri high school uniform?
-                              : Image.asset("res/tetrio_tl_alpha_ranks/${tl.rank}.png", height: 128),
-                          Column(
-                            children: [
-                              Text("${tl.rating.toStringAsFixed(2)} TR",
-                                  style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                              Text(
-                                "Top ${(tl.percentile * 100).toStringAsFixed(2)}% (${tl.percentileRank.toUpperCase()}) • Top Rank: ${tl.bestRank.toUpperCase()} • Glicko: ${tl.glicko?.toStringAsFixed(2)}±${tl.rd?.toStringAsFixed(2)}${tl.decaying ? ' • Decaying' : ''}",
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                        ],
-                      )
-                    else
-                      Text("${10 - tl.gamesPlayed} games until being ranked",
-                          softWrap: true,
-                          style: TextStyle(
-                            fontFamily: "Eurostile Round Extended",
-                            fontSize: bigScreen ? 42 : 28,
-                            overflow: TextOverflow.visible,
-                          )),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 16, 0, 48),
-                      child: Wrap(
-                        direction: Axis.horizontal,
-                        alignment: WrapAlignment.center,
-                        spacing: 25,
-                        crossAxisAlignment: WrapCrossAlignment.start,
-                        clipBehavior: Clip.hardEdge,
-                        children: [
-                          if (tl.apm != null)
-                            _StatCellNum(playerStat: tl.apm!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: "Attack\nPer Minute"),
-                          if (tl.pps != null)
-                            _StatCellNum(playerStat: tl.pps!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: "Pieces\nPer Second"),
-                          if (tl.apm != null) _StatCellNum(playerStat: tl.vs!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: "Versus\nScore"),
-                          if (tl.standing > 0) _StatCellNum(playerStat: tl.standing, isScreenBig: bigScreen, playerStatLabel: "Leaderboard\nplacement"),
-                          if (tl.standingLocal > 0)
-                            _StatCellNum(playerStat: tl.standingLocal, isScreenBig: bigScreen, playerStatLabel: "Country LB\nplacement"),
-                          _StatCellNum(playerStat: tl.gamesPlayed, isScreenBig: bigScreen, playerStatLabel: "Games\nplayed"),
-                          _StatCellNum(playerStat: tl.gamesWon, isScreenBig: bigScreen, playerStatLabel: "Games\nwon"),
-                          _StatCellNum(playerStat: tl.winrate * 100, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: "Winrate\nprecentage"),
-                        ],
-                      ),
-                    ),
-                    if (tl.nerdStats != null)
-                      Column(
-                        children: [
-                          Text("Nerd Stats", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 16, 0, 48),
-                            child: Wrap(
-                                direction: Axis.horizontal,
-                                alignment: WrapAlignment.center,
-                                spacing: 25,
-                                crossAxisAlignment: WrapCrossAlignment.start,
-                                clipBehavior: Clip.hardEdge,
-                                children: [
-                                  _StatCellNum(playerStat: tl.nerdStats!.app, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "Attack\nPer Piece"),
-                                  _StatCellNum(playerStat: tl.nerdStats!.vsapm, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "VS/APM"),
-                                  _StatCellNum(
-                                      playerStat: tl.nerdStats!.dss, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "Downstack\nPer Second"),
-                                  _StatCellNum(
-                                      playerStat: tl.nerdStats!.dsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "Downstack\nPer Piece"),
-                                  _StatCellNum(playerStat: tl.nerdStats!.appdsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "APP + DS/P"),
-                                  _StatCellNum(playerStat: tl.nerdStats!.cheese, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: "Cheese\nIndex"),
-                                  _StatCellNum(
-                                      playerStat: tl.nerdStats!.gbe, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "Garbage\nEfficiency"),
-                                  _StatCellNum(playerStat: tl.nerdStats!.nyaapp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "Weighted\nAPP"),
-                                  _StatCellNum(playerStat: tl.nerdStats!.area, isScreenBig: bigScreen, fractionDigits: 1, playerStatLabel: "Area")
-                                ]),
-                          )
-                        ],
-                      ),
-                    if (tl.estTr != null)
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 16, 0, 48),
-                        child: SizedBox(
-                          width: bigScreen ? MediaQuery.of(context).size.width * 0.4 : MediaQuery.of(context).size.width * 0.85,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(
-                                    "Est. of TR:",
-                                    style: TextStyle(fontSize: 24),
-                                  ),
-                                  Text(
-                                    tl.estTr!.esttr.toStringAsFixed(2),
-                                    style: const TextStyle(fontSize: 24),
-                                  ),
-                                ],
-                              ),
-                              if (tl.rating >= 0)
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text(
-                                      "Accuracy:",
-                                      style: TextStyle(fontSize: 24),
-                                    ),
-                                    Text(
-                                      tl.esttracc!.toStringAsFixed(2),
-                                      style: const TextStyle(fontSize: 24),
-                                    ),
-                                  ],
-                                ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    if (tl.nerdStats != null)
-                      Wrap(
-                        direction: Axis.horizontal,
-                        alignment: WrapAlignment.spaceAround,
-                        spacing: 25,
-                        crossAxisAlignment: WrapCrossAlignment.start,
-                        clipBehavior: Clip.hardEdge,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(20, 0, 20, 48),
-                            child: SizedBox(
-                              height: 300,
-                              width: 300,
-                              child: RadarChart(
-                                RadarChartData(
-                                  radarShape: RadarShape.polygon,
-                                  tickCount: 4,
-                                  ticksTextStyle: const TextStyle(color: Colors.transparent, fontSize: 10),
-                                  radarBorderData: const BorderSide(color: Colors.transparent, width: 1),
-                                  gridBorderData: const BorderSide(color: Colors.white24, width: 1),
-                                  tickBorderData: const BorderSide(color: Colors.transparent, width: 1),
-                                  getTitle: (index, angle) {
-                                    switch (index) {
-                                      case 0:
-                                        return RadarChartTitle(
-                                          text: 'APM',
-                                          angle: angle,
-                                        );
-                                      case 1:
-                                        return RadarChartTitle(
-                                          text: 'PPS',
-                                          angle: angle,
-                                        );
-                                      case 2:
-                                        return RadarChartTitle(text: 'VS', angle: angle);
-                                      case 3:
-                                        return RadarChartTitle(text: 'APP', angle: angle + 180);
-                                      case 4:
-                                        return RadarChartTitle(text: 'DS/S', angle: angle + 180);
-                                      case 5:
-                                        return RadarChartTitle(text: 'DS/P', angle: angle + 180);
-                                      case 6:
-                                        return RadarChartTitle(text: 'APP+DS/P', angle: angle + 180);
-                                      case 7:
-                                        return RadarChartTitle(text: 'VS/APM', angle: angle + 180);
-                                      case 8:
-                                        return RadarChartTitle(text: 'Cheese', angle: angle);
-                                      case 9:
-                                        return RadarChartTitle(text: 'Gb Eff.', angle: angle);
-                                      default:
-                                        return const RadarChartTitle(text: '');
-                                    }
-                                  },
-                                  dataSets: [
-                                    RadarDataSet(
-                                      dataEntries: [
-                                        RadarEntry(value: tl.apm! * 1),
-                                        RadarEntry(value: tl.pps! * 45),
-                                        RadarEntry(value: tl.vs! * 0.444),
-                                        RadarEntry(value: tl.nerdStats!.app * 185),
-                                        RadarEntry(value: tl.nerdStats!.dss * 175),
-                                        RadarEntry(value: tl.nerdStats!.dsp * 450),
-                                        RadarEntry(value: tl.nerdStats!.appdsp * 140),
-                                        RadarEntry(value: tl.nerdStats!.vsapm * 60),
-                                        RadarEntry(value: tl.nerdStats!.cheese * 1.25),
-                                        RadarEntry(value: tl.nerdStats!.gbe * 315),
-                                      ],
-                                    ),
-                                    RadarDataSet(
-                                      fillColor: Colors.transparent,
-                                      borderColor: Colors.transparent,
-                                      dataEntries: [
-                                        const RadarEntry(value: 0),
-                                        const RadarEntry(value: 0),
-                                        const RadarEntry(value: 0),
-                                        const RadarEntry(value: 0),
-                                        const RadarEntry(value: 0),
-                                        const RadarEntry(value: 0),
-                                        const RadarEntry(value: 0),
-                                        const RadarEntry(value: 0),
-                                        const RadarEntry(value: 0),
-                                        const RadarEntry(value: 0),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                                swapAnimationDuration: const Duration(milliseconds: 150), // Optional
-                                swapAnimationCurve: Curves.linear, // Optional
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(20, 0, 20, 48),
-                            child: SizedBox(
-                              height: 300,
-                              width: 300,
-                              child: RadarChart(
-                                RadarChartData(
-                                  radarShape: RadarShape.polygon,
-                                  tickCount: 4,
-                                  ticksTextStyle: const TextStyle(color: Colors.transparent, fontSize: 10),
-                                  radarBorderData: const BorderSide(color: Colors.transparent, width: 1),
-                                  gridBorderData: const BorderSide(color: Colors.white24, width: 1),
-                                  tickBorderData: const BorderSide(color: Colors.transparent, width: 1),
-                                  getTitle: (index, angle) {
-                                    switch (index) {
-                                      case 0:
-                                        return RadarChartTitle(
-                                          text: 'Opener',
-                                          angle: angle,
-                                        );
-                                      case 1:
-                                        return RadarChartTitle(
-                                          text: 'Stride',
-                                          angle: angle,
-                                        );
-                                      case 2:
-                                        return RadarChartTitle(text: 'Inf Ds', angle: angle + 180);
-                                      case 3:
-                                        return RadarChartTitle(text: 'Plonk', angle: angle);
-                                      default:
-                                        return const RadarChartTitle(text: '');
-                                    }
-                                  },
-                                  dataSets: [
-                                    RadarDataSet(
-                                      dataEntries: [
-                                        RadarEntry(value: tl.playstyle!.opener),
-                                        RadarEntry(value: tl.playstyle!.stride),
-                                        RadarEntry(value: tl.playstyle!.infds),
-                                        RadarEntry(value: tl.playstyle!.plonk),
-                                      ],
-                                    ),
-                                    RadarDataSet(
-                                      fillColor: Colors.transparent,
-                                      borderColor: Colors.transparent,
-                                      dataEntries: [
-                                        const RadarEntry(value: 0),
-                                        const RadarEntry(value: 0),
-                                        const RadarEntry(value: 0),
-                                        const RadarEntry(value: 0),
-                                      ],
-                                    ),
-                                    RadarDataSet(
-                                      fillColor: Colors.transparent,
-                                      borderColor: Colors.transparent,
-                                      dataEntries: [
-                                        const RadarEntry(value: 1),
-                                        const RadarEntry(value: 1),
-                                        const RadarEntry(value: 1),
-                                        const RadarEntry(value: 1),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                                swapAnimationDuration: const Duration(milliseconds: 150), // Optional
-                                swapAnimationCurve: Curves.linear, // Optional
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                  ]
-                : [
-                    Text("That user never played Tetra League", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                  ],
-          );
-        },
-      );
-    });
-  }
-}
-
 class _RecordThingy extends StatelessWidget {
   final RecordSingle? record;
   const _RecordThingy({Key? key, required this.record}) : super(key: key);
@@ -912,7 +365,7 @@ class _RecordThingy extends StatelessWidget {
                         Text(record!.endContext!.finalTime.toString(), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
                       else if (record!.stream.contains("blitz"))
                         Text(record!.endContext!.score.toString(), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                      if (record!.rank != null) _StatCellNum(playerStat: record!.rank!, playerStatLabel: "Leaderboard Placement", isScreenBig: bigScreen),
+                      if (record!.rank != null) StatCellNum(playerStat: record!.rank!, playerStatLabel: "Leaderboard Placement", isScreenBig: bigScreen),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(0, 48, 0, 48),
                         child: Wrap(
@@ -923,20 +376,20 @@ class _RecordThingy extends StatelessWidget {
                           spacing: 25,
                           children: [
                             if (record!.stream.contains("blitz"))
-                              _StatCellNum(playerStat: record!.endContext!.level, playerStatLabel: "Level", isScreenBig: bigScreen),
+                              StatCellNum(playerStat: record!.endContext!.level, playerStatLabel: "Level", isScreenBig: bigScreen),
                             if (record!.stream.contains("blitz"))
-                              _StatCellNum(playerStat: record!.endContext!.spp, playerStatLabel: "Score\nPer Piece", fractionDigits: 2, isScreenBig: bigScreen),
-                            _StatCellNum(playerStat: record!.endContext!.piecesPlaced, playerStatLabel: "Pieces\nPlaced", isScreenBig: bigScreen),
-                            _StatCellNum(playerStat: record!.endContext!.pps, playerStatLabel: "Pieces\nPer Second", fractionDigits: 2, isScreenBig: bigScreen),
-                            _StatCellNum(playerStat: record!.endContext!.finesse.faults, playerStatLabel: "Finesse\nFaults", isScreenBig: bigScreen),
-                            _StatCellNum(
+                              StatCellNum(playerStat: record!.endContext!.spp, playerStatLabel: "Score\nPer Piece", fractionDigits: 2, isScreenBig: bigScreen),
+                            StatCellNum(playerStat: record!.endContext!.piecesPlaced, playerStatLabel: "Pieces\nPlaced", isScreenBig: bigScreen),
+                            StatCellNum(playerStat: record!.endContext!.pps, playerStatLabel: "Pieces\nPer Second", fractionDigits: 2, isScreenBig: bigScreen),
+                            StatCellNum(playerStat: record!.endContext!.finesse.faults, playerStatLabel: "Finesse\nFaults", isScreenBig: bigScreen),
+                            StatCellNum(
                                 playerStat: record!.endContext!.finessePercentage * 100,
                                 playerStatLabel: "Finesse\nPercentage",
                                 fractionDigits: 2,
                                 isScreenBig: bigScreen),
-                            _StatCellNum(playerStat: record!.endContext!.inputs, playerStatLabel: "Key\nPresses", isScreenBig: bigScreen),
-                            _StatCellNum(playerStat: record!.endContext!.kpp, playerStatLabel: "KP Per\nPiece", fractionDigits: 2, isScreenBig: bigScreen),
-                            _StatCellNum(playerStat: record!.endContext!.kps, playerStatLabel: "KP Per\nSecond", fractionDigits: 2, isScreenBig: bigScreen),
+                            StatCellNum(playerStat: record!.endContext!.inputs, playerStatLabel: "Key\nPresses", isScreenBig: bigScreen),
+                            StatCellNum(playerStat: record!.endContext!.kpp, playerStatLabel: "KP Per\nPiece", fractionDigits: 2, isScreenBig: bigScreen),
+                            StatCellNum(playerStat: record!.endContext!.kps, playerStatLabel: "KP Per\nSecond", fractionDigits: 2, isScreenBig: bigScreen),
                           ],
                         ),
                       ),

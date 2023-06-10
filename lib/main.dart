@@ -14,7 +14,7 @@ void main() {
       routes: {
         "/settings": (context) => const SettingsView(),
         "/compare": (context) => const CompareView(),
-        "/states": (context) => const StatesView(),
+        "/states": (context) => const TrackedPlayersView(),
         "/calc": (context) => const CalcView()
       },
       theme: ThemeData(
