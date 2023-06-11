@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
-import 'dart:developer' as developer;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
 

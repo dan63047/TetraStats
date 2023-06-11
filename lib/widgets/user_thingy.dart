@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
-import 'package:tetra_stats/views/tracked_players_view.dart';
+import 'package:tetra_stats/views/compare_view.dart';
 import 'dart:developer' as developer;
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
 
@@ -116,27 +116,27 @@ class UserThingy extends StatelessWidget {
                                   return Column(
                                     children: [
                                       IconButton(
-                                        icon: Icon(Icons.person_remove),
+                                        icon: const Icon(Icons.person_remove),
                                         onPressed: () {
                                           teto.deletePlayerToTrack(player.userId).then((value) => setState());
                                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Removed from tracking list!")));
                                         },
                                       ),
-                                      Text("Stop tracking")
+                                      const Text("Stop tracking")
                                     ],
                                   );
                                 } else {
                                   return Column(
                                     children: [
                                       IconButton(
-                                        icon: Icon(Icons.person_add),
+                                        icon: const Icon(Icons.person_add),
                                         onPressed: () {
                                           teto.addPlayerToTrack(player).then((value) => setState());
                                           teto.storeState(player);
                                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Added to tracking list!")));
                                         },
                                       ),
-                                      Text("Track")
+                                      const Text("Track")
                                     ],
                                   );
                                 }
@@ -145,10 +145,17 @@ class UserThingy extends StatelessWidget {
                       Column(
                         children: [
                           IconButton(
-                            icon: Icon(Icons.balance),
-                            onPressed: () {},
+                            icon: const Icon(Icons.balance),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CompareView(greenSide: player, redSide: null),
+                                ),
+                              );
+                            },
                           ),
-                          Text("Compare")
+                          const Text("Compare")
                         ],
                       )
                     ]),

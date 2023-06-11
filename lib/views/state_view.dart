@@ -35,14 +35,7 @@ class StateState extends State<StateView> {
             child: NestedScrollView(
                 controller: _scrollController,
                 headerSliverBuilder: (context, value) {
-                  return [
-                    SliverToBoxAdapter(
-                        child: UserThingy(
-                      player: widget.state,
-                      showStateTimestamp: true,
-                      setState: _justUpdate,
-                    ))
-                  ];
+                  return [SliverToBoxAdapter(child: UserThingy(player: widget.state, showStateTimestamp: true, setState: _justUpdate))];
                 },
                 body: TLThingy(tl: widget.state.tlSeason1, userID: widget.state.userId))));
   }

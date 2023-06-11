@@ -26,12 +26,11 @@ class TrackedPlayersState extends State<TrackedPlayersView> {
               builder: (context, snapshot) {
                 switch (snapshot.connectionState) {
                   case ConnectionState.none:
-                    return Center(child: Text('none case of StreamBuilder'));
+                    return const Center(child: Text('none case of StreamBuilder'));
                   case ConnectionState.waiting:
                   case ConnectionState.active:
                     final allPlayers = (snapshot.data != null) ? snapshot.data as Map<String, List<TetrioPlayer>> : <String, List<TetrioPlayer>>{};
                     List<String> keys = allPlayers.keys.toList();
-                    print(allPlayers.toString());
                     return NestedScrollView(
                         headerSliverBuilder: (context, value) {
                           return [
@@ -40,7 +39,7 @@ class TrackedPlayersState extends State<TrackedPlayersView> {
                               padding: const EdgeInsets.only(left: 16),
                               child: Text(
                                 'There are ${allPlayers.length} players',
-                                style: TextStyle(color: Colors.white, fontSize: 25),
+                                style: const TextStyle(color: Colors.white, fontSize: 25),
                               ),
                             )),
                             const SliverToBoxAdapter(child: Divider())
@@ -67,9 +66,9 @@ class TrackedPlayersState extends State<TrackedPlayersView> {
                               );
                             }));
                   case ConnectionState.done:
-                    return Center(
+                    return const Center(
                         child: Text('done case of StreamBuilder',
-                            style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42), textAlign: TextAlign.center));
+                            style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42), textAlign: TextAlign.center));
                 }
               })),
     );

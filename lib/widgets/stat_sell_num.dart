@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class StatCellNum extends StatelessWidget {
-  const StatCellNum({required this.playerStat, required this.playerStatLabel, required this.isScreenBig, this.snackBar, this.fractionDigits});
+  const StatCellNum({super.key, required this.playerStat, required this.playerStatLabel, required this.isScreenBig, this.snackBar, this.fractionDigits});
 
   final num playerStat;
   final String playerStatLabel;

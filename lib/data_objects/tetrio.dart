@@ -73,7 +73,7 @@ class TetrioPlayer {
   double get level => pow((xp / 500), 0.6) + (xp / (5000 + (max(0, xp - 4 * pow(10, 6)) / 5000))) + 1;
 
   TetrioPlayer.fromJson(Map<String, dynamic> json, DateTime stateTime, bool fetchRecords) {
-    developer.log("TetrioPlayer.fromJson $stateTime: $json", name: "data_objects/tetrio");
+    //developer.log("TetrioPlayer.fromJson $stateTime: $json", name: "data_objects/tetrio");
     userId = json['_id'];
     username = json['username'];
     state = stateTime;
@@ -144,7 +144,7 @@ class TetrioPlayer {
     data['friend_count'] = friendCount;
     if (badstanding != null) data['badstanding'] = badstanding;
     if (botmaster != null) data['botmaster'] = botmaster;
-    developer.log("TetrioPlayer.toJson: $data", name: "data_objects/tetrio");
+    //developer.log("TetrioPlayer.toJson: $data", name: "data_objects/tetrio");
     return data;
   }
 

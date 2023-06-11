@@ -46,6 +46,8 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
   Widget _searchTextField() {
     return TextField(
       maxLength: 25,
+      autocorrect: false,
+      enableSuggestions: false,
       decoration: const InputDecoration(counter: Offstage()),
       style: const TextStyle(
         shadows: <Shadow>[
@@ -178,17 +180,17 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
             developer.log("builder ($context): $snapshot", name: "main_view");
             switch (snapshot.connectionState) {
               case ConnectionState.none:
-                return Center(
+                return const Center(
                     child: Text('none case of FutureBuilder',
-                        style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42), textAlign: TextAlign.center));
+                        style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42), textAlign: TextAlign.center));
               case ConnectionState.waiting:
                 return const Center(child: CircularProgressIndicator(color: Colors.white));
               case ConnectionState.active:
-                return Center(
+                return const Center(
                     child: Text('active case of FutureBuilder',
-                        style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42), textAlign: TextAlign.center));
+                        style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42), textAlign: TextAlign.center));
               case ConnectionState.done:
-                bool bigScreen = MediaQuery.of(context).size.width > 1024;
+                //bool bigScreen = MediaQuery.of(context).size.width > 1024;
                 if (snapshot.hasData) {
                   if (_searchFor.length > 16) _searchFor = snapshot.data!.username;
                   teto.isPlayerTracking(snapshot.data!.userId).then((value) {
@@ -235,12 +237,12 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                 }
                 break;
               default:
-                return Center(
+                return const Center(
                     child: Text('default case of FutureBuilder',
-                        style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42), textAlign: TextAlign.center));
+                        style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42), textAlign: TextAlign.center));
             }
-            return Center(
-                child: Text('end of FutureBuilder', style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42), textAlign: TextAlign.center));
+            return const Center(
+                child: Text('end of FutureBuilder', style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42), textAlign: TextAlign.center));
           },
         ),
       ),
@@ -294,7 +296,7 @@ class _NavDrawerState extends State<NavDrawer> {
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
-              return Center(child: Text('none case of StreamBuilder'));
+              return const Center(child: Text('none case of StreamBuilder'));
             case ConnectionState.waiting:
             case ConnectionState.active:
               final allPlayers = (snapshot.data != null) ? snapshot.data as Map<String, List<TetrioPlayer>> : <String, List<TetrioPlayer>>{};
@@ -334,7 +336,7 @@ class _NavDrawerState extends State<NavDrawer> {
                         );
                       }));
             case ConnectionState.done:
-              return Center(child: Text('done case of StreamBuilder'));
+              return const Center(child: Text('done case of StreamBuilder'));
           }
         },
       ),

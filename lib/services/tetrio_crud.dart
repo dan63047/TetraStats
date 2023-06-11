@@ -189,14 +189,6 @@ class TetrioService extends DB {
     }
   }
 
-  // Future<void> _ensureDbIsOpen() async {
-  //   try {
-  //     await open();
-  //   } on DatabaseAlreadyOpen {
-  //     // empty
-  //   }
-  // }
-
   Future<Iterable<Map<String, List<TetrioPlayer>>>> getAllPlayers() async {
     await ensureDbIsOpen();
     final db = getDatabaseOrThrow();

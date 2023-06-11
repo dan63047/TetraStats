@@ -38,6 +38,7 @@ dependencies:
   fl_chart: ^0.62.0
   package_info_plus: ^4.0.2
   shared_preferences: ^2.1.1
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:
