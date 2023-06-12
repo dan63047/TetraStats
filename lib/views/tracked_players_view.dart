@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:tetra_stats/views/states_view.dart';
@@ -11,6 +12,8 @@ class TrackedPlayersView extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => TrackedPlayersState();
 }
+
+final DateFormat dateFormat = DateFormat.yMMMd().add_Hms();
 
 class TrackedPlayersState extends State<TrackedPlayersView> {
   @override
@@ -33,12 +36,22 @@ class TrackedPlayersState extends State<TrackedPlayersView> {
                     List<String> keys = allPlayers.keys.toList();
                     return NestedScrollView(
                         headerSliverBuilder: (context, value) {
+                          String howManyPlayers(int numberOfPlayers) => Intl.plural(
+                                numberOfPlayers,
+                                zero: 'Empty list. Press "Track" button in previous view to add current player here',
+                                one: 'There is only one player',
+                                other: 'There are $numberOfPlayers players',
+                                name: 'howManyPeople',
+                                args: [numberOfPlayers],
+                                desc: 'Description of how many people are seen in a place.',
+                                examples: const {'numberOfPeople': 3},
+                              );
                           return [
                             SliverToBoxAdapter(
                                 child: Padding(
                               padding: const EdgeInsets.only(left: 16),
                               child: Text(
-                                'There are ${allPlayers.length} players',
+                                howManyPlayers(allPlayers.length),
                                 style: const TextStyle(color: Colors.white, fontSize: 25),
                               ),
                             )),
@@ -50,10 +63,15 @@ class TrackedPlayersState extends State<TrackedPlayersView> {
                             itemBuilder: (context, index) {
                               return ListTile(
                                 title: Text("${allPlayers[keys[index]]?.last.username}: ${allPlayers[keys[index]]?.length} states"),
-                                subtitle: Text("From ${allPlayers[keys[index]]?.first.state} until ${allPlayers[keys[index]]?.last.state}"),
+                                subtitle: Text(
+                                    "From ${dateFormat.format(allPlayers[keys[index]]!.first.state)} until ${dateFormat.format(allPlayers[keys[index]]!.last.state)}"),
                                 trailing: IconButton(
                                   icon: const Icon(Icons.delete_forever),
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    String nn = allPlayers[keys[index]]!.last.username;
+                                    teto.deletePlayer(keys[index]);
+                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("$nn states was removed from database!")));
+                                  },
                                 ),
                                 onTap: () {
                                   Navigator.push(

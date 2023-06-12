@@ -148,6 +148,23 @@ class TetrioService extends DB {
     _tetrioStreamController.add(_players);
   }
 
+  Future<void> deleteState(TetrioPlayer tetrioPlayer) async {
+    ensureDbIsOpen();
+    final db = getDatabaseOrThrow();
+    late List<TetrioPlayer> states;
+    states = await getPlayer(tetrioPlayer.userId);
+    _players[tetrioPlayer.userId]!.removeWhere((element) => element.state == tetrioPlayer.state);
+    states = _players[tetrioPlayer.userId]!;
+    final Map<String, dynamic> statesJson = {};
+    for (var e in states) {
+      statesJson.addEntries({e.state.millisecondsSinceEpoch.toString(): e.toJson()}.entries);
+    }
+    db.update(tetrioUsersTable, {idCol: tetrioPlayer.userId, nickCol: tetrioPlayer.username, statesCol: jsonEncode(statesJson)},
+        where: '$idCol = ?', whereArgs: [tetrioPlayer.userId]);
+    _players[tetrioPlayer.userId]!.add(tetrioPlayer);
+    _tetrioStreamController.add(_players);
+  }
+
   Future<List<TetrioPlayer>> getPlayer(String id) async {
     ensureDbIsOpen();
     final db = getDatabaseOrThrow();

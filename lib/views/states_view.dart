@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
+import 'package:tetra_stats/views/compare_view.dart';
 import 'package:tetra_stats/views/state_view.dart';
 
 class StatesView extends StatefulWidget {
@@ -9,6 +11,8 @@ class StatesView extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => StatesState();
 }
+
+final DateFormat dateFormat = DateFormat.yMMMd().add_Hms();
 
 class StatesState extends State<StatesView> {
   @override
@@ -23,11 +27,16 @@ class StatesState extends State<StatesView> {
                 itemCount: widget.states.length,
                 itemBuilder: (context, index) {
                   return ListTile(
-                    title: Text("On ${widget.states[index].state}"),
+                    title: Text("On ${dateFormat.format(widget.states[index].state)}"),
                     subtitle: Text("Level ${widget.states[index].level.toStringAsFixed(2)} level, ${widget.states[index].gameTime} of gametime"),
                     trailing: IconButton(
                       icon: const Icon(Icons.delete_forever),
-                      onPressed: () {},
+                      onPressed: () {
+                        DateTime nn = widget.states[index].state;
+                        teto.deleteState(widget.states[index]).then((value) => setState(() {
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("${dateFormat.format(nn)} state was removed from database!")));
+                            }));
+                      },
                     ),
                     onTap: () {
                       Navigator.push(

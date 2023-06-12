@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
+
+var fDiff = NumberFormat("+#,###.###;-#,###.###");
+final NumberFormat f2 = NumberFormat.decimalPatternDigits(decimalDigits: 2);
 
 class TLThingy extends StatelessWidget {
   final TetraLeagueAlpha tl;
@@ -32,10 +36,9 @@ class TLThingy extends StatelessWidget {
                               : Image.asset("res/tetrio_tl_alpha_ranks/${tl.rank}.png", height: 128),
                           Column(
                             children: [
-                              Text("${tl.rating.toStringAsFixed(2)} TR",
-                                  style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                              Text("${f2.format(tl.rating)} TR", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
                               Text(
-                                "Top ${(tl.percentile * 100).toStringAsFixed(2)}% (${tl.percentileRank.toUpperCase()}) • Top Rank: ${tl.bestRank.toUpperCase()} • Glicko: ${tl.glicko?.toStringAsFixed(2)}±${tl.rd?.toStringAsFixed(2)}${tl.decaying ? ' • Decaying' : ''}",
+                                "Top ${f2.format(tl.percentile * 100)}% (${tl.percentileRank.toUpperCase()}) • Top Rank: ${tl.bestRank.toUpperCase()} • Glicko: ${f2.format(tl.glicko!)}±${f2.format(tl.rd!)}${tl.decaying ? ' • Decaying' : ''}",
                                 textAlign: TextAlign.center,
                               ),
                             ],
@@ -45,6 +48,7 @@ class TLThingy extends StatelessWidget {
                     else
                       Text("${10 - tl.gamesPlayed} games until being ranked",
                           softWrap: true,
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             fontFamily: "Eurostile Round Extended",
                             fontSize: bigScreen ? 42 : 28,
@@ -116,7 +120,7 @@ class TLThingy extends StatelessWidget {
                                     style: TextStyle(fontSize: 24),
                                   ),
                                   Text(
-                                    tl.estTr!.esttr.toStringAsFixed(2),
+                                    f2.format(tl.estTr!.esttr),
                                     style: const TextStyle(fontSize: 24),
                                   ),
                                 ],
@@ -130,7 +134,7 @@ class TLThingy extends StatelessWidget {
                                       style: TextStyle(fontSize: 24),
                                     ),
                                     Text(
-                                      tl.esttracc!.toStringAsFixed(2),
+                                      fDiff.format(tl.esttracc!),
                                       style: const TextStyle(fontSize: 24),
                                     ),
                                   ],

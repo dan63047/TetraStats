@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -7,6 +8,9 @@ import 'package:tetra_stats/services/tetrio_crud.dart';
 TetrioPlayer? theGreenSide;
 TetrioPlayer? theRedSide;
 final TetrioService teto = TetrioService();
+
+FocusNode greenFocusNode = FocusNode();
+FocusNode redFocusNode = FocusNode();
 
 class CompareView extends StatefulWidget {
   final TetrioPlayer greenSide;
@@ -46,6 +50,16 @@ class CompareState extends State<CompareView> {
     setState(() {});
   }
 
+  double getWinrateByTR(double yourGlicko, double yourRD, double notyourGlicko, double notyourRD) {
+    double q = 400 * sqrt(1 + 3 * pow(log(10) / (400 * pi), 2));
+    double k = (notyourGlicko - yourGlicko) / (q * sqrt(pow(yourRD, 2) + pow(notyourRD, 2)));
+    //return 1 / (1 + pow(10, (notyourGlicko - yourGlicko)) / (400 * sqrt(1 + (3 * pow(0.00575646273, 2) * (pow(yourRD, 2) + pow(notyourRD, 2))) / pow(pi, 2))));
+    return ((1 /
+        (1 + pow(10, (notyourGlicko - yourGlicko) / (400 * sqrt(1 + (3 * pow(0.0057564273, 2) * (pow(yourRD, 2) + pow(notyourRD, 2)) / pow(pi, 2))))))));
+    //return 1 / (1 + pow(10, k));
+  }
+
+  // 1/(1+10^(rating[1]-rating[0])/(400*sqrt(1+(3*Q^2*(RD[0]^2+RD[1]^2))/PI^2)))) wtf where is
   void _justUpdate() {
     setState(() {});
   }
@@ -72,9 +86,22 @@ class CompareState extends State<CompareView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                          child: PlayerSelector(player: theGreenSide, change: fetchGreenSide, updateState: _justUpdate),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                            colors: [Colors.green, Colors.transparent],
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
+                            stops: [0.0, 0.4],
+                          )),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                            child: PlayerSelector(
+                              player: theGreenSide,
+                              change: fetchGreenSide,
+                              updateState: _justUpdate,
+                            ),
+                          ),
                         ),
                       ),
                       const Padding(
@@ -82,9 +109,22 @@ class CompareState extends State<CompareView> {
                         child: Text("VS"),
                       ),
                       Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                          child: PlayerSelector(player: theRedSide, change: fetchRedSide, updateState: _justUpdate),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                            colors: [Colors.red, Colors.transparent],
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
+                            stops: [0.0, 0.4],
+                          )),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                            child: PlayerSelector(
+                              player: theRedSide,
+                              change: fetchRedSide,
+                              updateState: _justUpdate,
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -99,33 +139,49 @@ class CompareState extends State<CompareView> {
           body: theGreenSide != null && theRedSide != null
               ? ListView(
                   children: [
-                    CompareThingy(
-                      label: "Level",
-                      greenSide: theGreenSide!.level,
-                      redSide: theRedSide!.level,
-                      higherIsBetter: true,
-                      fractionDigits: 2,
-                    ),
-                    if (theGreenSide!.gamesPlayed >= 0 && theRedSide!.gamesPlayed >= 0)
-                      CompareThingy(
-                        label: "Online Games",
-                        greenSide: theGreenSide!.gamesPlayed,
-                        redSide: theRedSide!.gamesPlayed,
-                        higherIsBetter: true,
-                      ),
-                    if (theGreenSide!.gamesWon >= 0 && theRedSide!.gamesWon >= 0)
-                      CompareThingy(
-                        label: "Games Won",
-                        greenSide: theGreenSide!.gamesWon,
-                        redSide: theRedSide!.gamesWon,
-                        higherIsBetter: true,
-                      ),
-                    CompareThingy(
-                      label: "Friends",
-                      greenSide: theGreenSide!.friendCount,
-                      redSide: theRedSide!.friendCount,
-                      higherIsBetter: true,
-                    ),
+                    if (theGreenSide!.role != "banned" && theRedSide!.role != "banned")
+                      Column(
+                        children: [
+                          CompareRegTimeThingy(greenSide: theGreenSide!.registrationTime, redSide: theRedSide!.registrationTime, label: "Registred"),
+                          CompareThingy(
+                            label: "Level",
+                            greenSide: theGreenSide!.level,
+                            redSide: theRedSide!.level,
+                            higherIsBetter: true,
+                            fractionDigits: 2,
+                          ),
+                          if (!theGreenSide!.gameTime.isNegative && !theRedSide!.gameTime.isNegative)
+                            CompareThingy(
+                              greenSide: theGreenSide!.gameTime.inMicroseconds / 1000000 / 60 / 60,
+                              redSide: theRedSide!.gameTime.inMicroseconds / 1000000 / 60 / 60,
+                              label: "Hours Played",
+                              higherIsBetter: true,
+                              fractionDigits: 2,
+                            ),
+                          if (theGreenSide!.gamesPlayed >= 0 && theRedSide!.gamesPlayed >= 0)
+                            CompareThingy(
+                              label: "Online Games",
+                              greenSide: theGreenSide!.gamesPlayed,
+                              redSide: theRedSide!.gamesPlayed,
+                              higherIsBetter: true,
+                            ),
+                          if (theGreenSide!.gamesWon >= 0 && theRedSide!.gamesWon >= 0)
+                            CompareThingy(
+                              label: "Games Won",
+                              greenSide: theGreenSide!.gamesWon,
+                              redSide: theRedSide!.gamesWon,
+                              higherIsBetter: true,
+                            ),
+                          CompareThingy(
+                            label: "Friends",
+                            greenSide: theGreenSide!.friendCount,
+                            redSide: theRedSide!.friendCount,
+                            higherIsBetter: true,
+                          ),
+                        ],
+                      )
+                    else
+                      CompareBoolThingy(greenSide: theGreenSide!.role == "banned", redSide: theRedSide!.role == "banned", label: "Banned", trueIsBetter: false),
                     const Divider(),
                     theGreenSide!.tlSeason1.gamesPlayed > 0 && theRedSide!.tlSeason1.gamesPlayed > 0
                         ? Column(
@@ -217,37 +273,11 @@ class CompareState extends State<CompareView> {
                                 ),
                             ],
                           )
-                        : Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
-                            child: Row(children: [
-                              Expanded(
-                                  child: Text(
-                                theGreenSide!.tlSeason1.gamesPlayed > 0 ? "Yes" : "No",
-                                style: const TextStyle(fontSize: 22),
-                                textAlign: TextAlign.start,
-                              )),
-                              Column(
-                                children: const [
-                                  Text(
-                                    "Played Tetra League",
-                                    style: TextStyle(fontSize: 22),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  Text(
-                                    "---",
-                                    style: TextStyle(fontSize: 16),
-                                    textAlign: TextAlign.center,
-                                  )
-                                ],
-                              ),
-                              Expanded(
-                                  child: Text(
-                                theRedSide!.tlSeason1.gamesPlayed > 0 ? "Yes" : "No",
-                                style: const TextStyle(fontSize: 22),
-                                textAlign: TextAlign.end,
-                              )),
-                            ]),
-                          ),
+                        : CompareBoolThingy(
+                            greenSide: theGreenSide!.tlSeason1.gamesPlayed > 0,
+                            redSide: theRedSide!.tlSeason1.gamesPlayed > 0,
+                            label: "Played Tetra League",
+                            trueIsBetter: false),
                     const Divider(),
                     if (theGreenSide!.tlSeason1.apm != null &&
                         theRedSide!.tlSeason1.apm != null &&
@@ -393,8 +423,8 @@ class CompareState extends State<CompareView> {
                                       },
                                       dataSets: [
                                         RadarDataSet(
-                                          fillColor: const Color.fromARGB(117, 105, 240, 175),
-                                          borderColor: Colors.greenAccent,
+                                          fillColor: const Color.fromARGB(115, 76, 175, 79),
+                                          borderColor: Colors.green,
                                           dataEntries: [
                                             RadarEntry(value: theGreenSide!.tlSeason1.apm! * 1),
                                             RadarEntry(value: theGreenSide!.tlSeason1.pps! * 45),
@@ -409,8 +439,8 @@ class CompareState extends State<CompareView> {
                                           ],
                                         ),
                                         RadarDataSet(
-                                          fillColor: const Color.fromARGB(117, 255, 82, 82),
-                                          borderColor: Colors.redAccent,
+                                          fillColor: const Color.fromARGB(115, 244, 67, 54),
+                                          borderColor: Colors.red,
                                           dataEntries: [
                                             RadarEntry(value: theRedSide!.tlSeason1.apm! * 1),
                                             RadarEntry(value: theRedSide!.tlSeason1.pps! * 45),
@@ -482,8 +512,8 @@ class CompareState extends State<CompareView> {
                                       },
                                       dataSets: [
                                         RadarDataSet(
-                                          fillColor: const Color.fromARGB(117, 105, 240, 175),
-                                          borderColor: Colors.greenAccent,
+                                          fillColor: Color.fromARGB(115, 76, 175, 79),
+                                          borderColor: Colors.green,
                                           dataEntries: [
                                             RadarEntry(value: theGreenSide!.tlSeason1.playstyle!.opener),
                                             RadarEntry(value: theGreenSide!.tlSeason1.playstyle!.stride),
@@ -492,8 +522,8 @@ class CompareState extends State<CompareView> {
                                           ],
                                         ),
                                         RadarDataSet(
-                                          fillColor: const Color.fromARGB(117, 255, 82, 82),
-                                          borderColor: Colors.redAccent,
+                                          fillColor: Color.fromARGB(115, 244, 67, 54),
+                                          borderColor: Colors.red,
                                           dataEntries: [
                                             RadarEntry(value: theRedSide!.tlSeason1.playstyle!.opener),
                                             RadarEntry(value: theRedSide!.tlSeason1.playstyle!.stride),
@@ -533,6 +563,17 @@ class CompareState extends State<CompareView> {
                                 padding: const EdgeInsets.only(bottom: 16),
                                 child: Text("Win Chance", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
                               ),
+                              CompareThingy(
+                                label: "By Glicko",
+                                greenSide: getWinrateByTR(theGreenSide!.tlSeason1.glicko!, theGreenSide!.tlSeason1.rd!, theRedSide!.tlSeason1.glicko!,
+                                        theRedSide!.tlSeason1.rd!) *
+                                    100,
+                                redSide: getWinrateByTR(theRedSide!.tlSeason1.glicko!, theRedSide!.tlSeason1.rd!, theGreenSide!.tlSeason1.glicko!,
+                                        theGreenSide!.tlSeason1.rd!) *
+                                    100,
+                                fractionDigits: 2,
+                                higherIsBetter: true,
+                              ),
                             ],
                           )
                         ],
@@ -559,16 +600,32 @@ class PlayerSelector extends StatelessWidget {
     return Column(
       children: [
         TextField(
-          autocorrect: false,
-          enableSuggestions: false,
-          maxLength: 25,
-          controller: playerController,
-          decoration: const InputDecoration(counter: Offstage()),
-          onSubmitted: (String value) {
-            change(value);
-          },
-        ),
-        if (player != null) Text(player!.toString())
+            autocorrect: false,
+            enableSuggestions: false,
+            maxLength: 25,
+            controller: playerController,
+            decoration: const InputDecoration(counter: Offstage()),
+            onSubmitted: (String value) {
+              change(value);
+            }),
+        if (player != null)
+          Text(
+            player!.toString(),
+            style: TextStyle(
+              shadows: <Shadow>[
+                Shadow(
+                  offset: Offset(0.0, 0.0),
+                  blurRadius: 3.0,
+                  color: Colors.black,
+                ),
+                Shadow(
+                  offset: Offset(0.0, 0.0),
+                  blurRadius: 8.0,
+                  color: Colors.black,
+                ),
+              ],
+            ),
+          )
       ],
     );
   }
@@ -598,12 +655,43 @@ class CompareThingy extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Expanded(
-              child: Text(
-            f.format(greenSide),
-            style: const TextStyle(
-              fontSize: 22,
+              child: Container(
+            padding: EdgeInsets.all(4),
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+              colors: [Colors.green, Colors.transparent],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              stops: [
+                0.0,
+                higherIsBetter
+                    ? greenSide > redSide
+                        ? 0.6
+                        : 0
+                    : greenSide < redSide
+                        ? 0.6
+                        : 0
+              ],
+            )),
+            child: Text(
+              f.format(greenSide),
+              style: const TextStyle(
+                fontSize: 22,
+                shadows: <Shadow>[
+                  Shadow(
+                    offset: Offset(0.0, 0.0),
+                    blurRadius: 3.0,
+                    color: Colors.black,
+                  ),
+                  Shadow(
+                    offset: Offset(0.0, 0.0),
+                    blurRadius: 8.0,
+                    color: Colors.black,
+                  ),
+                ],
+              ),
+              textAlign: TextAlign.start,
             ),
-            textAlign: TextAlign.start,
           )),
           Column(
             children: [
@@ -620,10 +708,334 @@ class CompareThingy extends StatelessWidget {
             ],
           ),
           Expanded(
+              child: Container(
+            padding: EdgeInsets.all(4),
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+              colors: [Colors.red, Colors.transparent],
+              begin: Alignment.centerRight,
+              end: Alignment.centerLeft,
+              stops: [
+                0.0,
+                higherIsBetter
+                    ? redSide > greenSide
+                        ? 0.6
+                        : 0
+                    : redSide < greenSide
+                        ? 0.6
+                        : 0
+              ],
+            )),
+            child: Text(
+              f.format(redSide),
+              style: const TextStyle(
+                fontSize: 22,
+                shadows: <Shadow>[
+                  Shadow(
+                    offset: Offset(0.0, 0.0),
+                    blurRadius: 3.0,
+                    color: Colors.black,
+                  ),
+                  Shadow(
+                    offset: Offset(0.0, 0.0),
+                    blurRadius: 8.0,
+                    color: Colors.black,
+                  ),
+                ],
+              ),
+              textAlign: TextAlign.end,
+            ),
+          )),
+        ],
+      ),
+    );
+  }
+}
+
+class CompareBoolThingy extends StatelessWidget {
+  final bool greenSide;
+  final bool redSide;
+  final String label;
+  final bool trueIsBetter;
+  const CompareBoolThingy({super.key, required this.greenSide, required this.redSide, required this.label, required this.trueIsBetter});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
+      child: Row(children: [
+        Expanded(
+            child: Container(
+          padding: EdgeInsets.all(4),
+          decoration: BoxDecoration(
+              gradient: LinearGradient(
+            colors: [Colors.green, Colors.transparent],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            stops: [
+              0.0,
+              trueIsBetter
+                  ? greenSide
+                      ? 0.6
+                      : 0
+                  : !greenSide
+                      ? 0.6
+                      : 0
+            ],
+          )),
+          child: Text(
+            greenSide ? "Yes" : "No",
+            style: const TextStyle(
+              fontSize: 22,
+              shadows: <Shadow>[
+                Shadow(
+                  offset: Offset(0.0, 0.0),
+                  blurRadius: 3.0,
+                  color: Colors.black,
+                ),
+                Shadow(
+                  offset: Offset(0.0, 0.0),
+                  blurRadius: 8.0,
+                  color: Colors.black,
+                ),
+              ],
+            ),
+            textAlign: TextAlign.start,
+          ),
+        )),
+        Column(
+          children: [
+            Text(
+              label,
+              style: const TextStyle(fontSize: 22),
+              textAlign: TextAlign.center,
+            ),
+            const Text(
+              "---",
+              style: TextStyle(fontSize: 16),
+              textAlign: TextAlign.center,
+            )
+          ],
+        ),
+        Expanded(
+            child: Container(
+          padding: EdgeInsets.all(4),
+          decoration: BoxDecoration(
+              gradient: LinearGradient(
+            colors: [Colors.red, Colors.transparent],
+            begin: Alignment.centerRight,
+            end: Alignment.centerLeft,
+            stops: [
+              0.0,
+              trueIsBetter
+                  ? redSide
+                      ? 0.6
+                      : 0
+                  : !redSide
+                      ? 0.6
+                      : 0
+            ],
+          )),
+          child: Text(
+            redSide ? "Yes" : "No",
+            style: const TextStyle(
+              fontSize: 22,
+              shadows: <Shadow>[
+                Shadow(
+                  offset: Offset(0.0, 0.0),
+                  blurRadius: 3.0,
+                  color: Colors.black,
+                ),
+                Shadow(
+                  offset: Offset(0.0, 0.0),
+                  blurRadius: 8.0,
+                  color: Colors.black,
+                ),
+              ],
+            ),
+            textAlign: TextAlign.end,
+          ),
+        )),
+      ]),
+    );
+  }
+}
+
+class CompareDurationThingy extends StatelessWidget {
+  final Duration greenSide;
+  final Duration redSide;
+  final String label;
+  final bool higherIsBetter;
+  const CompareDurationThingy({super.key, required this.greenSide, required this.redSide, required this.label, required this.higherIsBetter});
+
+  Duration verdict(Duration greenSide, Duration redSide) {
+    return greenSide - redSide;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
               child: Text(
-            f.format(redSide),
+            greenSide.toString(),
+            style: const TextStyle(
+              fontSize: 22,
+            ),
+            textAlign: TextAlign.start,
+          )),
+          Column(
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 22,
+                  shadows: <Shadow>[
+                    Shadow(
+                      offset: Offset(0.0, 0.0),
+                      blurRadius: 3.0,
+                      color: Colors.black,
+                    ),
+                    Shadow(
+                      offset: Offset(0.0, 0.0),
+                      blurRadius: 8.0,
+                      color: Colors.black,
+                    ),
+                  ],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                verdict(greenSide, redSide).toString(),
+                style: const TextStyle(fontSize: 16),
+                textAlign: TextAlign.center,
+              )
+            ],
+          ),
+          Expanded(
+              child: Text(
+            redSide.toString(),
             style: const TextStyle(fontSize: 22),
             textAlign: TextAlign.end,
+          )),
+        ],
+      ),
+    );
+  }
+}
+
+class CompareRegTimeThingy extends StatelessWidget {
+  final DateTime? greenSide;
+  final DateTime? redSide;
+  final String label;
+  final int? fractionDigits;
+  const CompareRegTimeThingy({super.key, required this.greenSide, required this.redSide, required this.label, this.fractionDigits});
+
+  String verdict(DateTime? greenSide, DateTime? redSide) {
+    var f = NumberFormat("#,### days later;#,### days before");
+    String result = "---";
+    if (greenSide != null && redSide != null) result = f.format(greenSide.difference(redSide).inDays);
+    return result;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    DateFormat f = DateFormat.yMMMd();
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+              child: Container(
+            padding: EdgeInsets.all(4),
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+              colors: [Colors.green, Colors.transparent],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              stops: [
+                0.0,
+                greenSide == null
+                    ? 0.6
+                    : redSide != null && greenSide!.isBefore(redSide!)
+                        ? 0.6
+                        : 0
+              ],
+            )),
+            child: Text(
+              greenSide != null ? f.format(greenSide!) : "From beginning",
+              style: const TextStyle(
+                fontSize: 22,
+                shadows: <Shadow>[
+                  Shadow(
+                    offset: Offset(0.0, 0.0),
+                    blurRadius: 3.0,
+                    color: Colors.black,
+                  ),
+                  Shadow(
+                    offset: Offset(0.0, 0.0),
+                    blurRadius: 8.0,
+                    color: Colors.black,
+                  ),
+                ],
+              ),
+              textAlign: TextAlign.start,
+            ),
+          )),
+          Column(
+            children: [
+              Text(
+                label,
+                style: const TextStyle(fontSize: 22),
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                verdict(greenSide, redSide),
+                style: const TextStyle(fontSize: 16),
+                textAlign: TextAlign.center,
+              )
+            ],
+          ),
+          Expanded(
+              child: Container(
+            padding: EdgeInsets.all(4),
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+              colors: [Colors.red, Colors.transparent],
+              begin: Alignment.centerRight,
+              end: Alignment.centerLeft,
+              stops: [
+                0.0,
+                redSide == null
+                    ? 0.6
+                    : greenSide != null && redSide!.isBefore(greenSide!)
+                        ? 0.6
+                        : 0
+              ],
+            )),
+            child: Text(
+              redSide != null ? f.format(redSide!) : "From beginning",
+              style: const TextStyle(
+                fontSize: 22,
+                shadows: <Shadow>[
+                  Shadow(
+                    offset: Offset(0.0, 0.0),
+                    blurRadius: 3.0,
+                    color: Colors.black,
+                  ),
+                  Shadow(
+                    offset: Offset(0.0, 0.0),
+                    blurRadius: 8.0,
+                    color: Colors.black,
+                  ),
+                ],
+              ),
+              textAlign: TextAlign.end,
+            ),
           )),
         ],
       ),

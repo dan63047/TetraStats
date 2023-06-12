@@ -108,7 +108,12 @@ class SettingsState extends State<SettingsView> {
           const Divider(),
           ListTile(
             title: const Text("About app"),
-            subtitle: Text("${_packageInfo.appName} (${_packageInfo.packageName}) Version ${_packageInfo.version} Build ${_packageInfo.buildNumber}"),
+            subtitle: Text("""
+${_packageInfo.appName} (${_packageInfo.packageName}) Version ${_packageInfo.version} Build ${_packageInfo.buildNumber}
+
+Developed by dan63047
+Formulas provided by kerrmunism
+"""),
           ),
         ],
       )),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/views/compare_view.dart';
+import 'package:intl/intl.dart';
 import 'dart:developer' as developer;
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
 
@@ -14,6 +15,8 @@ extension StringExtension on String {
 Future<void> copyToClipboard(String text) async {
   await Clipboard.setData(ClipboardData(text: text));
 }
+
+final DateFormat dateFormat = DateFormat.yMMMd().add_Hms();
 
 class UserThingy extends StatelessWidget {
   final TetrioPlayer player;
@@ -102,7 +105,7 @@ class UserThingy extends StatelessWidget {
                 ],
               )),
               showStateTimestamp
-                  ? Text("Fetched ${player.state}")
+                  ? Text("Fetched ${dateFormat.format(player.state)}")
                   : Wrap(direction: Axis.horizontal, alignment: WrapAlignment.center, spacing: 25, crossAxisAlignment: WrapCrossAlignment.start, children: [
                       FutureBuilder(
                           future: teto.isPlayerTracking(player.userId),
@@ -209,7 +212,7 @@ class UserThingy extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                    "${player.country != null ? "${player.country?.toUpperCase()} • " : ""}${player.role.capitalize()} account ${player.registrationTime == null ? "that was from very beginning" : 'created ${player.registrationTime}'}${player.botmaster != null ? " by ${player.botmaster}" : ""} • ${player.supporterTier == 0 ? "Not a supporter" : "Supporter tier ${player.supporterTier}"}",
+                    "${player.country != null ? "${player.country?.toUpperCase()} • " : ""}${player.role.capitalize()} account ${player.registrationTime == null ? "that was from very beginning" : 'created ${dateFormat.format(player.registrationTime!)}'}${player.botmaster != null ? " by ${player.botmaster}" : ""} • ${player.supporterTier == 0 ? "Not a supporter" : "Supporter tier ${player.supporterTier}"}",
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontFamily: "Eurostile Round",
@@ -245,7 +248,9 @@ class UserThingy extends StatelessWidget {
                                       spacing: 25,
                                       children: [
                                         Image.asset("res/tetrio_badges/${badge.badgeId}.png"),
-                                        Text(badge.ts != null ? "Obtained ${badge.ts}" : "That badge was assigned manualy by TETR.IO admins"),
+                                        Text(badge.ts != null
+                                            ? "Obtained ${dateFormat.format(badge.ts!)}"
+                                            : "That badge was assigned manualy by TETR.IO admins"),
                                       ],
                                     )
                                   ],

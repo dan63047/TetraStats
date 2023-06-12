@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' as developer;
 import 'package:flutter/services.dart';
@@ -16,6 +17,8 @@ late SharedPreferences prefs;
 const allowedHeightForPlayerIdInPixels = 40.0;
 const allowedHeightForPlayerBioInPixels = 30.0;
 const givenTextHeightByScreenPercentage = 0.3;
+final NumberFormat timeInSec = NumberFormat("#,###.###s.");
+final DateFormat dateFormat = DateFormat.yMMMd().add_Hms();
 
 class MainView extends StatefulWidget {
   const MainView({Key? key}) : super(key: key);
@@ -364,10 +367,18 @@ class _RecordThingy extends StatelessWidget {
                       else if (record!.stream.contains("blitz"))
                         Text("Blitz", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
                       if (record!.stream.contains("40l"))
-                        Text(record!.endContext!.finalTime.toString(), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
+                        Text(timeInSec.format(record!.endContext!.finalTime.inMicroseconds / 1000000),
+                            style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
                       else if (record!.stream.contains("blitz"))
-                        Text(record!.endContext!.score.toString(), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                        Text(NumberFormat.decimalPattern().format(record!.endContext!.score),
+                            style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
                       if (record!.rank != null) StatCellNum(playerStat: record!.rank!, playerStatLabel: "Leaderboard Placement", isScreenBig: bigScreen),
+                      Text("Obtained ${dateFormat.format(record!.timestamp!)}",
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontFamily: "Eurostile Round",
+                            fontSize: 16,
+                          )),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(0, 48, 0, 48),
                         child: Wrap(
@@ -586,11 +597,9 @@ class _OtherThingy extends StatelessWidget {
                   child: Column(
                     children: [
                       Text("Zen", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                      Text("Level ${zen!.level}", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                      Text(
-                        "Score ${zen!.score}",
-                        style: const TextStyle(fontSize: 18),
-                      ),
+                      Text("Level ${NumberFormat.decimalPattern().format(zen!.level)}",
+                          style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                      Text("Score ${NumberFormat.decimalPattern().format(zen!.score)}", style: const TextStyle(fontSize: 18)),
                     ],
                   ),
                 ),

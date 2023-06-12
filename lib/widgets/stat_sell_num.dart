@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class StatCellNum extends StatelessWidget {
   const StatCellNum({super.key, required this.playerStat, required this.playerStatLabel, required this.isScreenBig, this.snackBar, this.fractionDigits});
@@ -11,10 +12,11 @@ class StatCellNum extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    NumberFormat f = NumberFormat.decimalPatternDigits(decimalDigits: fractionDigits ?? 0);
     return Column(
       children: [
         Text(
-          fractionDigits != null ? playerStat.toStringAsFixed(fractionDigits!) : playerStat.floor().toString(),
+          f.format(playerStat),
           style: TextStyle(
             fontFamily: "Eurostile Round Extended",
             fontSize: isScreenBig ? 32 : 24,
