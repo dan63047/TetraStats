@@ -51,15 +51,10 @@ class CompareState extends State<CompareView> {
   }
 
   double getWinrateByTR(double yourGlicko, double yourRD, double notyourGlicko, double notyourRD) {
-    double q = 400 * sqrt(1 + 3 * pow(log(10) / (400 * pi), 2));
-    double k = (notyourGlicko - yourGlicko) / (q * sqrt(pow(yourRD, 2) + pow(notyourRD, 2)));
-    //return 1 / (1 + pow(10, (notyourGlicko - yourGlicko)) / (400 * sqrt(1 + (3 * pow(0.00575646273, 2) * (pow(yourRD, 2) + pow(notyourRD, 2))) / pow(pi, 2))));
     return ((1 /
         (1 + pow(10, (notyourGlicko - yourGlicko) / (400 * sqrt(1 + (3 * pow(0.0057564273, 2) * (pow(yourRD, 2) + pow(notyourRD, 2)) / pow(pi, 2))))))));
-    //return 1 / (1 + pow(10, k));
   }
 
-  // 1/(1+10^(rating[1]-rating[0])/(400*sqrt(1+(3*Q^2*(RD[0]^2+RD[1]^2))/PI^2)))) wtf where is
   void _justUpdate() {
     setState(() {});
   }
@@ -87,7 +82,7 @@ class CompareState extends State<CompareView> {
                     children: [
                       Expanded(
                         child: Container(
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                               gradient: LinearGradient(
                             colors: [Colors.green, Colors.transparent],
                             begin: Alignment.bottomCenter,
@@ -110,7 +105,7 @@ class CompareState extends State<CompareView> {
                       ),
                       Expanded(
                         child: Container(
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                               gradient: LinearGradient(
                             colors: [Colors.red, Colors.transparent],
                             begin: Alignment.bottomCenter,
@@ -512,7 +507,7 @@ class CompareState extends State<CompareView> {
                                       },
                                       dataSets: [
                                         RadarDataSet(
-                                          fillColor: Color.fromARGB(115, 76, 175, 79),
+                                          fillColor: const Color.fromARGB(115, 76, 175, 79),
                                           borderColor: Colors.green,
                                           dataEntries: [
                                             RadarEntry(value: theGreenSide!.tlSeason1.playstyle!.opener),
@@ -522,7 +517,7 @@ class CompareState extends State<CompareView> {
                                           ],
                                         ),
                                         RadarDataSet(
-                                          fillColor: Color.fromARGB(115, 244, 67, 54),
+                                          fillColor: const Color.fromARGB(115, 244, 67, 54),
                                           borderColor: Colors.red,
                                           dataEntries: [
                                             RadarEntry(value: theRedSide!.tlSeason1.playstyle!.opener),
@@ -611,7 +606,7 @@ class PlayerSelector extends StatelessWidget {
         if (player != null)
           Text(
             player!.toString(),
-            style: TextStyle(
+            style: const TextStyle(
               shadows: <Shadow>[
                 Shadow(
                   offset: Offset(0.0, 0.0),
@@ -656,10 +651,10 @@ class CompareThingy extends StatelessWidget {
         children: [
           Expanded(
               child: Container(
-            padding: EdgeInsets.all(4),
+            padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
                 gradient: LinearGradient(
-              colors: [Colors.green, Colors.transparent],
+              colors: const [Colors.green, Colors.transparent],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
               stops: [
@@ -709,10 +704,10 @@ class CompareThingy extends StatelessWidget {
           ),
           Expanded(
               child: Container(
-            padding: EdgeInsets.all(4),
+            padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
                 gradient: LinearGradient(
-              colors: [Colors.red, Colors.transparent],
+              colors: const [Colors.red, Colors.transparent],
               begin: Alignment.centerRight,
               end: Alignment.centerLeft,
               stops: [
@@ -766,10 +761,10 @@ class CompareBoolThingy extends StatelessWidget {
       child: Row(children: [
         Expanded(
             child: Container(
-          padding: EdgeInsets.all(4),
+          padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
               gradient: LinearGradient(
-            colors: [Colors.green, Colors.transparent],
+            colors: const [Colors.green, Colors.transparent],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
             stops: [
@@ -819,10 +814,10 @@ class CompareBoolThingy extends StatelessWidget {
         ),
         Expanded(
             child: Container(
-          padding: EdgeInsets.all(4),
+          padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
               gradient: LinearGradient(
-            colors: [Colors.red, Colors.transparent],
+            colors: const [Colors.red, Colors.transparent],
             begin: Alignment.centerRight,
             end: Alignment.centerLeft,
             stops: [
@@ -951,10 +946,10 @@ class CompareRegTimeThingy extends StatelessWidget {
         children: [
           Expanded(
               child: Container(
-            padding: EdgeInsets.all(4),
+            padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
                 gradient: LinearGradient(
-              colors: [Colors.green, Colors.transparent],
+              colors: const [Colors.green, Colors.transparent],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
               stops: [
@@ -1002,10 +997,10 @@ class CompareRegTimeThingy extends StatelessWidget {
           ),
           Expanded(
               child: Container(
-            padding: EdgeInsets.all(4),
+            padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
                 gradient: LinearGradient(
-              colors: [Colors.red, Colors.transparent],
+              colors: const [Colors.red, Colors.transparent],
               begin: Alignment.centerRight,
               end: Alignment.centerLeft,
               stops: [
