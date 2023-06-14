@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 
+double? apm;
+double? pps;
+double? vs;
 NerdStats? nerdStats;
 EstTr? estTr;
 Playstyle? playstyle;
@@ -26,14 +29,19 @@ class CalcState extends State<CalcView> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   void calc() {
-    double? apm = double.tryParse(apmController.text);
-    double? pps = double.tryParse(ppsController.text);
-    double? vs = double.tryParse(vsController.text);
+    apm = double.tryParse(apmController.text);
+    pps = double.tryParse(ppsController.text);
+    vs = double.tryParse(vsController.text);
     if (apm != null && pps != null && vs != null) {
-      nerdStats = NerdStats(apm, pps, vs);
-      estTr = EstTr(apm, pps, vs, 60.9, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp, nerdStats!.gbe);
-      playstyle = Playstyle(apm, pps, nerdStats!.app, nerdStats!.vsapm, nerdStats!.dsp, nerdStats!.gbe, estTr!.srarea, estTr!.statrank);
+      nerdStats = NerdStats(apm!, pps!, vs!);
+      estTr = EstTr(apm!, pps!, vs!, 60.9, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp, nerdStats!.gbe);
+      playstyle = Playstyle(apm!, pps!, nerdStats!.app, nerdStats!.vsapm, nerdStats!.dsp, nerdStats!.gbe, estTr!.srarea, estTr!.statrank);
       setState(() {});
     } else {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please, enter valid values")));
@@ -166,9 +174,9 @@ class CalcState extends State<CalcView> {
                                   dataSets: [
                                     RadarDataSet(
                                       dataEntries: [
-                                        RadarEntry(value: double.parse(apmController.text) * 1),
-                                        RadarEntry(value: double.parse(ppsController.text) * 45),
-                                        RadarEntry(value: double.parse(vsController.text) * 0.444),
+                                        RadarEntry(value: apm! * 1),
+                                        RadarEntry(value: pps! * 45),
+                                        RadarEntry(value: vs! * 0.444),
                                         RadarEntry(value: nerdStats!.app * 185),
                                         RadarEntry(value: nerdStats!.dss * 175),
                                         RadarEntry(value: nerdStats!.dsp * 450),
