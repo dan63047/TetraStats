@@ -33,6 +33,7 @@ dependencies:
   vector_math: any
   sqflite: ^2.2.8+2
   sqflite_common_ffi: any
+  sqlite3_flutter_libs: ^0.5.15
   path_provider: ^2.0.15
   path: ^1.8.2
   fl_chart: ^0.62.0
