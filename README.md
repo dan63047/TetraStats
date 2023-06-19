@@ -10,8 +10,8 @@
 - ~~Sqlite Database and service, that can work with it~~ *v0.0.2*
 - ~~Ability to track player~~
 - ~~Ability to compare 2 players~~ *v0.1.0, we are here*
-- ~~Stats Calculator~~ *dev build are here*
-- Ability to compare player with himself in past
+- ~~Stats Calculator~~
+- ~~Ability to compare player with himself in past~~ *dev build are here*
 - Tetra League matches history
 - Tetra League historic charts for tracked players (maybe even same sh*t for 40l and blitz well see)
 - Better UI with delta and hints for stats *that will be v0.2.0*

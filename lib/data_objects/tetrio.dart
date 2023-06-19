@@ -179,7 +179,7 @@ class TetrioPlayer {
   int get hashCode => state.hashCode;
 
   @override
-  bool operator ==(covariant TetrioPlayer other) => (userId == other.userId);
+  bool operator ==(covariant TetrioPlayer other) => isSameState(other) && state.isAtSameMomentAs(other.state);
 }
 
 class Badge {

@@ -18,7 +18,6 @@ const allowedHeightForPlayerIdInPixels = 40.0;
 const allowedHeightForPlayerBioInPixels = 30.0;
 const givenTextHeightByScreenPercentage = 0.3;
 final NumberFormat timeInSec = NumberFormat("#,###.###s.");
-final DateFormat dateFormat = DateFormat.yMMMd().add_Hms();
 
 class MainView extends StatefulWidget {
   const MainView({Key? key}) : super(key: key);

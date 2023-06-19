@@ -30,6 +30,7 @@ class UserThingy extends StatelessWidget {
       bool bigScreen = constraints.maxWidth > 768;
       double bannerHeight = bigScreen ? 240 : 120;
       double pfpHeight = 128;
+
       return Column(
         children: [
           Flex(
