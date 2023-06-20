@@ -420,10 +420,10 @@ class EndContextSingle {
 }
 
 class Handling {
-  late double arr;
-  late double das;
-  late int sdf;
-  late int dcd;
+  late num arr;
+  late num das;
+  late num sdf;
+  late num dcd;
   late bool cancel;
   late bool safeLock;
 
@@ -534,8 +534,52 @@ class Playstyle {
   }
 }
 
+class TetraLeagueAlphaStream{
+  late String userId;
+  List<TetraLeagueAlphaRecord>? records;
+
+  TetraLeagueAlphaStream({required this.userId, this.records});
+
+  TetraLeagueAlphaStream.fromJson(List<dynamic> json, String userID) {
+    userId = userID;
+    records = [];
+    for (var value in json) {records!.add(TetraLeagueAlphaRecord.fromJson(value));}
+  }
+}
+
+class TetraLeagueAlphaRecord{
+  late String replayId;
+  late String ownId;
+  DateTime? timestamp;
+  late List<EndContextMulti> endContext;
+
+  TetraLeagueAlphaRecord({required this.replayId, required this.ownId, this.timestamp, required this.endContext});
+
+  TetraLeagueAlphaRecord.fromJson(Map<String, dynamic> json) {
+    ownId = json['_id'];
+    endContext = [EndContextMulti.fromJson(json['endcontext'][0]), EndContextMulti.fromJson(json['endcontext'][1])];
+    replayId = json['replayid'];
+    timestamp = DateTime.parse(json['ts']);
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['_id'] = ownId;
+    data['endcontext'][0] = endContext[0].toJson();
+    data['endcontext'][1] = endContext[1].toJson();
+    data['replayid'] = replayId;
+    data['ts'] = timestamp;
+    return data;
+  }
+  @override
+  String toString() {
+    return "TetraLeagueAlphaRecord: ${endContext.first.userId} vs ${endContext.last.userId}";
+  }
+}
+
 class EndContextMulti {
   String? userId;
+  String? username;
   int? naturalOrder;
   int? inputs;
   int? piecesPlaced;
@@ -568,6 +612,7 @@ class EndContextMulti {
 
   EndContextMulti.fromJson(Map<String, dynamic> json) {
     userId = json['user']['_id'];
+    username = json['user']['username'];
     handling = json['handling'] != null ? Handling.fromJson(json['handling']) : null;
     success = json['success'];
     inputs = json['inputs'];
@@ -585,7 +630,8 @@ class EndContextMulti {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['user'] = userId;
+    data['user']['_id'] = userId;
+    data['user']['username'] = username;
     if (handling != null) {
       data['handling'] = handling!.toJson();
     }

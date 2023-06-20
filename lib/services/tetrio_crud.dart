@@ -9,6 +9,7 @@ import 'package:tetra_stats/data_objects/tetrio.dart';
 const String dbName = "TetraStats.db";
 const String tetrioUsersTable = "tetrioUsers";
 const String tetrioUsersToTrackTable = "tetrioUsersToTrack";
+const String tetraLeagueMatchesTable = "tetraLeagueMatches";
 const String idCol = "id";
 const String nickCol = "nickname";
 const String statesCol = "jsonStates";
@@ -68,6 +69,29 @@ class TetrioService extends DB {
     if (id.length <= 16) return id;
     TetrioPlayer player = await getPlayer(id).then((value) => value.last);
     return player.username;
+  }
+
+  Future<TetraLeagueAlphaStream> getTLStream(String userID) async {
+    var url = Uri.https('ch.tetr.io', 'api/streams/league_userrecent_${userID.toLowerCase().trim()}');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      if (jsonDecode(response.body)['success']) {
+        TetraLeagueAlphaStream stream = TetraLeagueAlphaStream.fromJson(
+            jsonDecode(response.body)['data']['records'], userID);
+        // if (addToDB) {
+        //   await ensureDbIsOpen();
+        //   storeState(player);
+        // }
+        return stream;
+      } else {
+        developer.log("getTLStream User dosen't exist", name: "services/tetrio_crud", error: response.body);
+        throw Exception("User doesn't exist");
+      }
+    } else {
+      developer.log("getTLStream Failed to fetch player", name: "services/tetrio_crud", error: response.statusCode);
+      throw Exception('Failed to fetch player');
+    }
   }
 
   Future<void> createPlayer(TetrioPlayer tetrioPlayer) async {

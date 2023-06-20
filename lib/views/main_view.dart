@@ -18,6 +18,7 @@ const allowedHeightForPlayerIdInPixels = 40.0;
 const allowedHeightForPlayerBioInPixels = 30.0;
 const givenTextHeightByScreenPercentage = 0.3;
 final NumberFormat timeInSec = NumberFormat("#,###.###s.");
+final NumberFormat f2 = NumberFormat.decimalPatternDigits(decimalDigits: 2);
 
 class MainView extends StatefulWidget {
   const MainView({Key? key}) : super(key: key);
@@ -36,6 +37,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
   final bodyGlobalKey = GlobalKey();
   final List<Widget> myTabs = [
     const Tab(text: "Tetra League"),
+    const Tab(text: "TL Records"),
     const Tab(text: "40 Lines"),
     const Tab(text: "Blitz"),
     const Tab(text: "Other"),
@@ -75,8 +77,9 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
   void initState() {
     teto.open();
     _scrollController = ScrollController();
-    _tabController = TabController(length: 4, vsync: this);
-    _getPreferences().then((value) => changePlayer(prefs.getString("player") ?? "dan63047"));
+    _tabController = TabController(length: 5, vsync: this);
+    _getPreferences()
+        .then((value) => changePlayer(prefs.getString("player") ?? "dan63047"));
     super.initState();
     developer.log("Main view initialized", name: "main_view");
   }
@@ -184,17 +187,25 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
               case ConnectionState.none:
                 return const Center(
                     child: Text('none case of FutureBuilder',
-                        style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42), textAlign: TextAlign.center));
+                        style: TextStyle(
+                            fontFamily: "Eurostile Round Extended",
+                            fontSize: 42),
+                        textAlign: TextAlign.center));
               case ConnectionState.waiting:
-                return const Center(child: CircularProgressIndicator(color: Colors.white));
+                return const Center(
+                    child: CircularProgressIndicator(color: Colors.white));
               case ConnectionState.active:
                 return const Center(
                     child: Text('active case of FutureBuilder',
-                        style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42), textAlign: TextAlign.center));
+                        style: TextStyle(
+                            fontFamily: "Eurostile Round Extended",
+                            fontSize: 42),
+                        textAlign: TextAlign.center));
               case ConnectionState.done:
                 //bool bigScreen = MediaQuery.of(context).size.width > 1024;
                 if (snapshot.hasData) {
-                  if (_searchFor.length > 16) _searchFor = snapshot.data!.username;
+                  if (_searchFor.length > 16)
+                    _searchFor = snapshot.data!.username;
                   teto.isPlayerTracking(snapshot.data!.userId).then((value) {
                     if (value) teto.storeState(snapshot.data!);
                   });
@@ -215,7 +226,8 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                             tabs: myTabs,
                             onTap: (int tabId) {
                               setState(() {
-                                developer.log("Tab changed to $tabId", name: "main_view");
+                                developer.log("Tab changed to $tabId",
+                                    name: "main_view");
                               });
                             },
                           ),
@@ -225,26 +237,45 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                     body: TabBarView(
                       controller: _tabController,
                       children: [
-                        TLThingy(tl: snapshot.data!.tlSeason1, userID: snapshot.data!.userId),
-                        _RecordThingy(record: (snapshot.data!.sprint.isNotEmpty) ? snapshot.data!.sprint[0] : null),
-                        _RecordThingy(record: (snapshot.data!.blitz.isNotEmpty) ? snapshot.data!.blitz[0] : null),
-                        _OtherThingy(zen: snapshot.data!.zen, bio: snapshot.data!.bio)
+                        TLThingy(
+                            tl: snapshot.data!.tlSeason1,
+                            userID: snapshot.data!.userId),
+                        _TLRecords(userID: snapshot.data!.userId),
+                        _RecordThingy(
+                            record: (snapshot.data!.sprint.isNotEmpty)
+                                ? snapshot.data!.sprint[0]
+                                : null),
+                        _RecordThingy(
+                            record: (snapshot.data!.blitz.isNotEmpty)
+                                ? snapshot.data!.blitz[0]
+                                : null),
+                        _OtherThingy(
+                            zen: snapshot.data!.zen, bio: snapshot.data!.bio)
                       ],
                     ),
                   );
                 } else if (snapshot.hasError) {
                   return Center(
-                      child:
-                          Text('${snapshot.error}', style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42), textAlign: TextAlign.center));
+                      child: Text('${snapshot.error}',
+                          style: const TextStyle(
+                              fontFamily: "Eurostile Round Extended",
+                              fontSize: 42),
+                          textAlign: TextAlign.center));
                 }
                 break;
               default:
                 return const Center(
                     child: Text('default case of FutureBuilder',
-                        style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42), textAlign: TextAlign.center));
+                        style: TextStyle(
+                            fontFamily: "Eurostile Round Extended",
+                            fontSize: 42),
+                        textAlign: TextAlign.center));
             }
             return const Center(
-                child: Text('end of FutureBuilder', style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42), textAlign: TextAlign.center));
+                child: Text('end of FutureBuilder',
+                    style: TextStyle(
+                        fontFamily: "Eurostile Round Extended", fontSize: 42),
+                    textAlign: TextAlign.center));
           },
         ),
       ),
@@ -301,7 +332,9 @@ class _NavDrawerState extends State<NavDrawer> {
               return const Center(child: Text('none case of StreamBuilder'));
             case ConnectionState.waiting:
             case ConnectionState.active:
-              final allPlayers = (snapshot.data != null) ? snapshot.data as Map<String, List<TetrioPlayer>> : <String, List<TetrioPlayer>>{};
+              final allPlayers = (snapshot.data != null)
+                  ? snapshot.data as Map<String, List<TetrioPlayer>>
+                  : <String, List<TetrioPlayer>>{};
               List<String> keys = allPlayers.keys.toList();
               return NestedScrollView(
                   headerSliverBuilder: (context, value) {
@@ -317,8 +350,10 @@ class _NavDrawerState extends State<NavDrawer> {
                           leading: const Icon(Icons.home),
                           title: Text(homePlayerNickname),
                           onTap: () {
-                            developer.log("Navigator changed player", name: "main_view");
-                            widget.changePlayer(prefs.getString("player") ?? "dan63047");
+                            developer.log("Navigator changed player",
+                                name: "main_view");
+                            widget.changePlayer(
+                                prefs.getString("player") ?? "dan63047");
                             Navigator.of(context).pop();
                           },
                         ),
@@ -329,9 +364,11 @@ class _NavDrawerState extends State<NavDrawer> {
                       itemCount: allPlayers.length,
                       itemBuilder: (context, index) {
                         return ListTile(
-                          title: Text(allPlayers[keys[index]]?.last.username as String),
+                          title: Text(
+                              allPlayers[keys[index]]?.last.username as String),
                           onTap: () {
-                            developer.log("Navigator changed player", name: "main_view");
+                            developer.log("Navigator changed player",
+                                name: "main_view");
                             widget.changePlayer(keys[index]);
                             Navigator.of(context).pop();
                           },
@@ -343,6 +380,60 @@ class _NavDrawerState extends State<NavDrawer> {
         },
       ),
     );
+  }
+}
+
+class _TLRecords extends StatelessWidget {
+  final String userID;
+
+  const _TLRecords({required this.userID});
+
+  @override
+  Widget build(BuildContext context) {
+      return FutureBuilder(
+          future: teto.getTLStream(userID),
+          builder: (context, snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.none:
+              case ConnectionState.waiting:
+              case ConnectionState.active:
+                return const Center(
+                    child: CircularProgressIndicator(color: Colors.white));
+              case ConnectionState.done:
+                if (snapshot.hasError) {
+                  return Text(snapshot.error.toString(),
+                      style: TextStyle(
+                          fontFamily: "Eurostile Round Extended",
+                          fontSize: 28));
+                } else {
+                  return ListView(
+                    physics: const ClampingScrollPhysics(),
+                    children: (snapshot.data!.records!.isNotEmpty)
+                        ? [for (var value in snapshot.data!.records!) ListTile(
+                          leading: Text("${value.endContext.firstWhere((element) => element.userId == userID).points} : ${value.endContext.firstWhere((element) => element.userId != userID).points}",
+                          style: const TextStyle(
+                            fontFamily: "Eurostile Round Extended",
+                            fontSize: 28,)),
+                          title: Text("vs. ${value.endContext.firstWhere((element) => element.userId != userID).username!}"),
+                          subtitle: Text(dateFormat.format(value.timestamp!)),
+                          trailing: Column(mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                            Text("${f2.format(value.endContext.firstWhere((element) => element.userId == userID).secondary)} : ${f2.format(value.endContext.firstWhere((element) => element.userId != userID).secondary)} APM", style: TextStyle(height: 1.1)),
+                            Text("${f2.format(value.endContext.firstWhere((element) => element.userId == userID).tertiary)} : ${f2.format(value.endContext.firstWhere((element) => element.userId != userID).tertiary)} PPS", style: TextStyle(height: 1.1)),
+                            Text("${f2.format(value.endContext.firstWhere((element) => element.userId == userID).extra)} : ${f2.format(value.endContext.firstWhere((element) => element.userId != userID).extra)} VS", style: TextStyle(height: 1.1)),
+                          ]),
+                          onTap: (){},
+                        )]
+                        : [
+                            Text("No records",
+                                style: TextStyle(
+                                    fontFamily: "Eurostile Round Extended",
+                                    fontSize: 28))
+                          ],
+                  );
+                }
+            }
+          });
   }
 }
 
@@ -362,16 +453,35 @@ class _RecordThingy extends StatelessWidget {
               children: (record != null)
                   ? [
                       if (record!.stream.contains("40l"))
-                        Text("40 Lines", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
+                        Text("40 Lines",
+                            style: TextStyle(
+                                fontFamily: "Eurostile Round Extended",
+                                fontSize: bigScreen ? 42 : 28))
                       else if (record!.stream.contains("blitz"))
-                        Text("Blitz", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                        Text("Blitz",
+                            style: TextStyle(
+                                fontFamily: "Eurostile Round Extended",
+                                fontSize: bigScreen ? 42 : 28)),
                       if (record!.stream.contains("40l"))
-                        Text(timeInSec.format(record!.endContext!.finalTime.inMicroseconds / 1000000),
-                            style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
+                        Text(
+                            timeInSec.format(
+                                record!.endContext!.finalTime.inMicroseconds /
+                                    1000000),
+                            style: TextStyle(
+                                fontFamily: "Eurostile Round Extended",
+                                fontSize: bigScreen ? 42 : 28))
                       else if (record!.stream.contains("blitz"))
-                        Text(NumberFormat.decimalPattern().format(record!.endContext!.score),
-                            style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                      if (record!.rank != null) StatCellNum(playerStat: record!.rank!, playerStatLabel: "Leaderboard Placement", isScreenBig: bigScreen),
+                        Text(
+                            NumberFormat.decimalPattern()
+                                .format(record!.endContext!.score),
+                            style: TextStyle(
+                                fontFamily: "Eurostile Round Extended",
+                                fontSize: bigScreen ? 42 : 28)),
+                      if (record!.rank != null)
+                        StatCellNum(
+                            playerStat: record!.rank!,
+                            playerStatLabel: "Leaderboard Placement",
+                            isScreenBig: bigScreen),
                       Text("Obtained ${dateFormat.format(record!.timestamp!)}",
                           textAlign: TextAlign.center,
                           style: const TextStyle(
@@ -388,44 +498,80 @@ class _RecordThingy extends StatelessWidget {
                           spacing: 25,
                           children: [
                             if (record!.stream.contains("blitz"))
-                              StatCellNum(playerStat: record!.endContext!.level, playerStatLabel: "Level", isScreenBig: bigScreen),
+                              StatCellNum(
+                                  playerStat: record!.endContext!.level,
+                                  playerStatLabel: "Level",
+                                  isScreenBig: bigScreen),
                             if (record!.stream.contains("blitz"))
-                              StatCellNum(playerStat: record!.endContext!.spp, playerStatLabel: "Score\nPer Piece", fractionDigits: 2, isScreenBig: bigScreen),
-                            StatCellNum(playerStat: record!.endContext!.piecesPlaced, playerStatLabel: "Pieces\nPlaced", isScreenBig: bigScreen),
-                            StatCellNum(playerStat: record!.endContext!.pps, playerStatLabel: "Pieces\nPer Second", fractionDigits: 2, isScreenBig: bigScreen),
-                            StatCellNum(playerStat: record!.endContext!.finesse.faults, playerStatLabel: "Finesse\nFaults", isScreenBig: bigScreen),
+                              StatCellNum(
+                                  playerStat: record!.endContext!.spp,
+                                  playerStatLabel: "Score\nPer Piece",
+                                  fractionDigits: 2,
+                                  isScreenBig: bigScreen),
                             StatCellNum(
-                                playerStat: record!.endContext!.finessePercentage * 100,
+                                playerStat: record!.endContext!.piecesPlaced,
+                                playerStatLabel: "Pieces\nPlaced",
+                                isScreenBig: bigScreen),
+                            StatCellNum(
+                                playerStat: record!.endContext!.pps,
+                                playerStatLabel: "Pieces\nPer Second",
+                                fractionDigits: 2,
+                                isScreenBig: bigScreen),
+                            StatCellNum(
+                                playerStat: record!.endContext!.finesse.faults,
+                                playerStatLabel: "Finesse\nFaults",
+                                isScreenBig: bigScreen),
+                            StatCellNum(
+                                playerStat:
+                                    record!.endContext!.finessePercentage * 100,
                                 playerStatLabel: "Finesse\nPercentage",
                                 fractionDigits: 2,
                                 isScreenBig: bigScreen),
-                            StatCellNum(playerStat: record!.endContext!.inputs, playerStatLabel: "Key\nPresses", isScreenBig: bigScreen),
-                            StatCellNum(playerStat: record!.endContext!.kpp, playerStatLabel: "KP Per\nPiece", fractionDigits: 2, isScreenBig: bigScreen),
-                            StatCellNum(playerStat: record!.endContext!.kps, playerStatLabel: "KP Per\nSecond", fractionDigits: 2, isScreenBig: bigScreen),
+                            StatCellNum(
+                                playerStat: record!.endContext!.inputs,
+                                playerStatLabel: "Key\nPresses",
+                                isScreenBig: bigScreen),
+                            StatCellNum(
+                                playerStat: record!.endContext!.kpp,
+                                playerStatLabel: "KP Per\nPiece",
+                                fractionDigits: 2,
+                                isScreenBig: bigScreen),
+                            StatCellNum(
+                                playerStat: record!.endContext!.kps,
+                                playerStatLabel: "KP Per\nSecond",
+                                fractionDigits: 2,
+                                isScreenBig: bigScreen),
                           ],
                         ),
                       ),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(0, 16, 0, 48),
                         child: SizedBox(
-                          width: bigScreen ? MediaQuery.of(context).size.width * 0.4 : MediaQuery.of(context).size.width * 0.85,
+                          width: bigScreen
+                              ? MediaQuery.of(context).size.width * 0.4
+                              : MediaQuery.of(context).size.width * 0.85,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text("All Clears:", style: TextStyle(fontSize: 24)),
+                                  const Text("All Clears:",
+                                      style: TextStyle(fontSize: 24)),
                                   Text(
-                                    record!.endContext!.clears.allClears.toString(),
+                                    record!.endContext!.clears.allClears
+                                        .toString(),
                                     style: const TextStyle(fontSize: 24),
                                   ),
                                 ],
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text("Holds:", style: TextStyle(fontSize: 24)),
+                                  const Text("Holds:",
+                                      style: TextStyle(fontSize: 24)),
                                   Text(
                                     record!.endContext!.holds.toString(),
                                     style: const TextStyle(fontSize: 24),
@@ -433,9 +579,11 @@ class _RecordThingy extends StatelessWidget {
                                 ],
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text("T-spins total:", style: TextStyle(fontSize: 24)),
+                                  const Text("T-spins total:",
+                                      style: TextStyle(fontSize: 24)),
                                   Text(
                                     record!.endContext!.tSpins.toString(),
                                     style: const TextStyle(fontSize: 24),
@@ -443,79 +591,102 @@ class _RecordThingy extends StatelessWidget {
                                 ],
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(" - T-spin zero:", style: TextStyle(fontSize: 18)),
+                                  const Text(" - T-spin zero:",
+                                      style: TextStyle(fontSize: 18)),
                                   Text(
-                                    record!.endContext!.clears.tSpinZeros.toString(),
+                                    record!.endContext!.clears.tSpinZeros
+                                        .toString(),
                                     style: const TextStyle(fontSize: 18),
                                   ),
                                 ],
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(" - T-spin singles:", style: TextStyle(fontSize: 18)),
+                                  const Text(" - T-spin singles:",
+                                      style: TextStyle(fontSize: 18)),
                                   Text(
-                                    record!.endContext!.clears.tSpinSingles.toString(),
+                                    record!.endContext!.clears.tSpinSingles
+                                        .toString(),
                                     style: const TextStyle(fontSize: 18),
                                   ),
                                 ],
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(" - T-spin doubles:", style: TextStyle(fontSize: 18)),
+                                  const Text(" - T-spin doubles:",
+                                      style: TextStyle(fontSize: 18)),
                                   Text(
-                                    record!.endContext!.clears.tSpinDoubles.toString(),
+                                    record!.endContext!.clears.tSpinDoubles
+                                        .toString(),
                                     style: const TextStyle(fontSize: 18),
                                   ),
                                 ],
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(" - T-spin triples:", style: TextStyle(fontSize: 18)),
+                                  const Text(" - T-spin triples:",
+                                      style: TextStyle(fontSize: 18)),
                                   Text(
-                                    record!.endContext!.clears.tSpinTriples.toString(),
+                                    record!.endContext!.clears.tSpinTriples
+                                        .toString(),
                                     style: const TextStyle(fontSize: 18),
                                   ),
                                 ],
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(" - T-spin mini zero:", style: TextStyle(fontSize: 18)),
+                                  const Text(" - T-spin mini zero:",
+                                      style: TextStyle(fontSize: 18)),
                                   Text(
-                                    record!.endContext!.clears.tSpinMiniZeros.toString(),
+                                    record!.endContext!.clears.tSpinMiniZeros
+                                        .toString(),
                                     style: const TextStyle(fontSize: 18),
                                   ),
                                 ],
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(" - T-spin mini singles:", style: TextStyle(fontSize: 18)),
+                                  const Text(" - T-spin mini singles:",
+                                      style: TextStyle(fontSize: 18)),
                                   Text(
-                                    record!.endContext!.clears.tSpinMiniSingles.toString(),
+                                    record!.endContext!.clears.tSpinMiniSingles
+                                        .toString(),
                                     style: const TextStyle(fontSize: 18),
                                   ),
                                 ],
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(" - T-spin mini doubles:", style: TextStyle(fontSize: 18)),
+                                  const Text(" - T-spin mini doubles:",
+                                      style: TextStyle(fontSize: 18)),
                                   Text(
-                                    record!.endContext!.clears.tSpinMiniDoubles.toString(),
+                                    record!.endContext!.clears.tSpinMiniDoubles
+                                        .toString(),
                                     style: const TextStyle(fontSize: 18),
                                   ),
                                 ],
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text("Line clears:", style: TextStyle(fontSize: 24)),
+                                  const Text("Line clears:",
+                                      style: TextStyle(fontSize: 24)),
                                   Text(
                                     record!.endContext!.lines.toString(),
                                     style: const TextStyle(fontSize: 24),
@@ -523,39 +694,50 @@ class _RecordThingy extends StatelessWidget {
                                 ],
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(" - Singles:", style: TextStyle(fontSize: 18)),
+                                  const Text(" - Singles:",
+                                      style: TextStyle(fontSize: 18)),
                                   Text(
-                                    record!.endContext!.clears.singles.toString(),
+                                    record!.endContext!.clears.singles
+                                        .toString(),
                                     style: const TextStyle(fontSize: 18),
                                   ),
                                 ],
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(" - Doubles:", style: TextStyle(fontSize: 18)),
+                                  const Text(" - Doubles:",
+                                      style: TextStyle(fontSize: 18)),
                                   Text(
-                                    record!.endContext!.clears.doubles.toString(),
+                                    record!.endContext!.clears.doubles
+                                        .toString(),
                                     style: const TextStyle(fontSize: 18),
                                   ),
                                 ],
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(" - Triples:", style: TextStyle(fontSize: 18)),
+                                  const Text(" - Triples:",
+                                      style: TextStyle(fontSize: 18)),
                                   Text(
-                                    record!.endContext!.clears.triples.toString(),
+                                    record!.endContext!.clears.triples
+                                        .toString(),
                                     style: const TextStyle(fontSize: 18),
                                   ),
                                 ],
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(" - Quads:", style: TextStyle(fontSize: 18)),
+                                  const Text(" - Quads:",
+                                      style: TextStyle(fontSize: 18)),
                                   Text(
                                     record!.endContext!.clears.quads.toString(),
                                     style: const TextStyle(fontSize: 18),
@@ -567,7 +749,12 @@ class _RecordThingy extends StatelessWidget {
                         ),
                       ),
                     ]
-                  : [Text("No record", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))],
+                  : [
+                      Text("No record",
+                          style: TextStyle(
+                              fontFamily: "Eurostile Round Extended",
+                              fontSize: bigScreen ? 42 : 28))
+                    ],
             );
           });
     });
@@ -577,7 +764,8 @@ class _RecordThingy extends StatelessWidget {
 class _OtherThingy extends StatelessWidget {
   final TetrioZen? zen;
   final String? bio;
-  const _OtherThingy({Key? key, required this.zen, required this.bio}) : super(key: key);
+  const _OtherThingy({Key? key, required this.zen, required this.bio})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -589,16 +777,27 @@ class _OtherThingy extends StatelessWidget {
         itemBuilder: (BuildContext context, int index) {
           return Column(
             children: [
-              Text("Other info", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+              Text("Other info",
+                  style: TextStyle(
+                      fontFamily: "Eurostile Round Extended",
+                      fontSize: bigScreen ? 42 : 28)),
               if (zen != null)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 48, 0, 48),
                   child: Column(
                     children: [
-                      Text("Zen", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                      Text("Level ${NumberFormat.decimalPattern().format(zen!.level)}",
-                          style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                      Text("Score ${NumberFormat.decimalPattern().format(zen!.score)}", style: const TextStyle(fontSize: 18)),
+                      Text("Zen",
+                          style: TextStyle(
+                              fontFamily: "Eurostile Round Extended",
+                              fontSize: bigScreen ? 42 : 28)),
+                      Text(
+                          "Level ${NumberFormat.decimalPattern().format(zen!.level)}",
+                          style: TextStyle(
+                              fontFamily: "Eurostile Round Extended",
+                              fontSize: bigScreen ? 42 : 28)),
+                      Text(
+                          "Score ${NumberFormat.decimalPattern().format(zen!.score)}",
+                          style: const TextStyle(fontSize: 18)),
                     ],
                   ),
                 ),
@@ -607,7 +806,10 @@ class _OtherThingy extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(0, 0, 0, 48),
                   child: Column(
                     children: [
-                      Text("Bio", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                      Text("Bio",
+                          style: TextStyle(
+                              fontFamily: "Eurostile Round Extended",
+                              fontSize: bigScreen ? 42 : 28)),
                       Text(bio!, style: const TextStyle(fontSize: 18)),
                     ],
                   ),
