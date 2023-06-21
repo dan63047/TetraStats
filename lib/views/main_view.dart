@@ -10,8 +10,9 @@ import 'package:tetra_stats/widgets/stat_sell_num.dart';
 import 'package:tetra_stats/widgets/tl_thingy.dart';
 import 'package:tetra_stats/widgets/user_thingy.dart';
 
+late Future<List> me;
 String _searchFor = "dan63047";
-Future<TetrioPlayer>? me;
+String _titleNickname = "dan63047";
 final TetrioService teto = TetrioService();
 late SharedPreferences prefs;
 const allowedHeightForPlayerIdInPixels = 40.0;
@@ -23,7 +24,7 @@ final NumberFormat f2 = NumberFormat.decimalPatternDigits(decimalDigits: 2);
 class MainView extends StatefulWidget {
   const MainView({Key? key}) : super(key: key);
 
-  String get title => "Tetra Stats: $_searchFor";
+  String get title => "Tetra Stats: $_titleNickname";
 
   @override
   State<MainView> createState() => _MainState();
@@ -38,6 +39,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
   final List<Widget> myTabs = [
     const Tab(text: "Tetra League"),
     const Tab(text: "TL Records"),
+    const Tab(text: "TL History"),
     const Tab(text: "40 Lines"),
     const Tab(text: "Blitz"),
     const Tab(text: "Other"),
@@ -77,7 +79,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
   void initState() {
     teto.open();
     _scrollController = ScrollController();
-    _tabController = TabController(length: 5, vsync: this);
+    _tabController = TabController(length: 6, vsync: this);
     _getPreferences()
         .then((value) => changePlayer(prefs.getString("player") ?? "dan63047"));
     super.initState();
@@ -96,10 +98,18 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
 
   void changePlayer(String player) {
     setState(() {
-      _tabController.animateTo(0, duration: const Duration(milliseconds: 300));
       _searchFor = player;
-      me = teto.fetchPlayer(player, false);
+      me = fetch(_searchFor);
     });
+  }
+
+  Future<List> fetch(String nickOrID) async {
+    TetrioPlayer me = await teto.fetchPlayer(nickOrID);
+    setState((){_titleNickname = me.username;});
+    bool isTracking = await teto.isPlayerTracking(nickOrID);
+    if (isTracking) teto.storeState(me);
+    Map<String, dynamic> records = await teto.fetchRecords(me.userId);
+    return [me, records, isTracking];
   }
 
   void _justUpdate() {
@@ -173,7 +183,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
         ],
       ),
       body: SafeArea(
-        child: FutureBuilder<TetrioPlayer>(
+        child: FutureBuilder<List<dynamic>>(
           future: me,
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
@@ -197,18 +207,13 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
               case ConnectionState.done:
                 //bool bigScreen = MediaQuery.of(context).size.width > 1024;
                 if (snapshot.hasData) {
-                  if (_searchFor.length > 16)
-                    _searchFor = snapshot.data!.username;
-                  teto.isPlayerTracking(snapshot.data!.userId).then((value) {
-                    if (value) teto.storeState(snapshot.data!);
-                  });
                   return NestedScrollView(
                     controller: _scrollController,
                     headerSliverBuilder: (context, value) {
                       return [
                         SliverToBoxAdapter(
                             child: UserThingy(
-                          player: snapshot.data!,
+                          player: snapshot.data![0],
                           showStateTimestamp: false,
                           setState: _justUpdate,
                         )),
@@ -217,9 +222,6 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                             controller: _tabController,
                             isScrollable: true,
                             tabs: myTabs,
-                            onTap: (int tabId) {
-                              setState(() {});
-                            },
                           ),
                         ),
                       ];
@@ -228,19 +230,20 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                       controller: _tabController,
                       children: [
                         TLThingy(
-                            tl: snapshot.data!.tlSeason1,
-                            userID: snapshot.data!.userId),
-                        _TLRecords(userID: snapshot.data!.userId),
+                            tl: snapshot.data![0].tlSeason1,
+                            userID: snapshot.data![0].userId),
+                        _TLRecords(userID: snapshot.data![0].userId),
+                        Text("kekwa"),
                         _RecordThingy(
-                            record: (snapshot.data!.sprint.isNotEmpty)
-                                ? snapshot.data!.sprint[0]
+                            record: (snapshot.data![1]['sprint'].isNotEmpty)
+                                ? snapshot.data![1]['sprint'][0]
                                 : null),
                         _RecordThingy(
-                            record: (snapshot.data!.blitz.isNotEmpty)
-                                ? snapshot.data!.blitz[0]
+                            record: (snapshot.data![1]['blitz'].isNotEmpty)
+                                ? snapshot.data![1]['blitz'][0]
                                 : null),
                         _OtherThingy(
-                            zen: snapshot.data!.zen, bio: snapshot.data!.bio)
+                            zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio)
                       ],
                     ),
                   );

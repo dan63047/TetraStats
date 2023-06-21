@@ -45,7 +45,7 @@ class CompareState extends State<CompareView> {
 
   void fetchRedSide(String user) async {
     try {
-      theRedSide = await teto.fetchPlayer(user, false);
+      theRedSide = await teto.fetchPlayer(user);
       late List<TetrioPlayer> states;
       try{
         states = await teto.getPlayer(theRedSide!.userId);
@@ -73,7 +73,7 @@ class CompareState extends State<CompareView> {
 
   void fetchGreenSide(String user) async {
     try {
-      theGreenSide = await teto.fetchPlayer(user, false);
+      theGreenSide = await teto.fetchPlayer(user);
       late List<TetrioPlayer> states;
       greenSideStates = null;
       try{

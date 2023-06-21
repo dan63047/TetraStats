@@ -30,6 +30,7 @@ const String createTetrioUsersToTrack = '''
 class TetrioService extends DB {
   Map<String, List<TetrioPlayer>> _players = {};
   final Map<String, TetrioPlayer> _playersCache = {};
+  final Map<String, Map<String, dynamic>> _recordsCache = {};
   final Map<String, TetraLeagueAlphaStream> _tlStreamsCache = {}; // i'm trying to respect oskware api It should look something like {"cached_until": TetrioPlayer}
   static final TetrioService _shared = TetrioService._sharedInstance();
   factory TetrioService() => _shared;
@@ -94,10 +95,6 @@ class TetrioService extends DB {
       if (jsonDecode(response.body)['success']) {
         TetraLeagueAlphaStream stream = TetraLeagueAlphaStream.fromJson(
             jsonDecode(response.body)['data']['records'], userID);
-        // if (addToDB) {
-        //   await ensureDbIsOpen();
-        //   storeState(player);
-        // }
         developer.log("getTLStream: $userID stream retrieved and cached", name: "services/tetrio_crud");
         _tlStreamsCache[jsonDecode(response.body)['cache']['cached_until'].toString()] = stream;
         return stream;
@@ -107,6 +104,47 @@ class TetrioService extends DB {
       }
     } else {
       developer.log("getTLStream Failed to fetch stream", name: "services/tetrio_crud", error: response.statusCode);
+      throw Exception('Failed to fetch player');
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchRecords(String userID) async {
+    try{
+      var cached = _recordsCache.entries.firstWhere((element) => element.value['user'] == userID);
+    if (DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true).isAfter(DateTime.now())){
+      developer.log("fetchRecords: $userID records retrieved from cache, that expires ${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)}", name: "services/tetrio_crud");
+      return cached.value;
+    }else{
+      _recordsCache.remove(cached.key);
+      developer.log("fetchRecords: $userID records expired (${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)})", name: "services/tetrio_crud");
+    }
+    }catch(e){
+      developer.log("fetchRecords: Trying to retrieve $userID records", name: "services/tetrio_crud");
+    }
+    
+    var url = Uri.https('ch.tetr.io', 'api/users/${userID.toLowerCase().trim()}/records');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      if (jsonDecode(response.body)['success']) {
+         Map jsonRecords = jsonDecode(response.body);
+          var sprint = jsonRecords['data']['records']['40l']['record'] != null
+              ? [RecordSingle.fromJson(jsonRecords['data']['records']['40l']['record'], jsonRecords['data']['records']['40l']['rank'])]
+              : [];
+          var blitz = jsonRecords['data']['records']['blitz']['record'] != null
+              ? [RecordSingle.fromJson(jsonRecords['data']['records']['blitz']['record'], jsonRecords['data']['records']['blitz']['rank'])]
+              : [];
+          var zen = TetrioZen.fromJson(jsonRecords['data']['zen']);
+        Map<String, dynamic> map = {"user": userID.toLowerCase().trim(), "sprint": sprint, "blitz": blitz, "zen": zen};
+        developer.log("fetchRecords: $userID stream retrieved and cached", name: "services/tetrio_crud");
+        _recordsCache[jsonDecode(response.body)['cache']['cached_until'].toString()] = map;
+        return map;
+      } else {
+        developer.log("fetchRecords User dosen't exist", name: "services/tetrio_crud", error: response.body);
+        throw Exception("User doesn't exist");
+      }
+    } else {
+      developer.log("fetchRecords Failed to fetch records", name: "services/tetrio_crud", error: response.statusCode);
       throw Exception('Failed to fetch player');
     }
   }
@@ -216,7 +254,7 @@ class TetrioService extends DB {
     } else {
       dynamic rawStates = results.first['jsonStates'] as String;
       rawStates = json.decode(rawStates);
-      rawStates.forEach((k, v) => states.add(TetrioPlayer.fromJson(v, DateTime.fromMillisecondsSinceEpoch(int.parse(k)), false)));
+      rawStates.forEach((k, v) => states.add(TetrioPlayer.fromJson(v, DateTime.fromMillisecondsSinceEpoch(int.parse(k)))));
       _players.removeWhere((key, value) => key == id);
       _players.addEntries({states.last.userId: states}.entries);
       _tetrioStreamController.add(_players);
@@ -224,7 +262,7 @@ class TetrioService extends DB {
     }
   }
 
-  Future<TetrioPlayer> fetchPlayer(String user, bool addToDB) async {
+  Future<TetrioPlayer> fetchPlayer(String user) async {
     try{
       var cached = _playersCache.entries.firstWhere((element) => element.value.userId == user || element.value.username == user);
     if (DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true).isAfter(DateTime.now())){
@@ -244,11 +282,7 @@ class TetrioService extends DB {
     if (response.statusCode == 200) {
       if (jsonDecode(response.body)['success']) {
         TetrioPlayer player = TetrioPlayer.fromJson(
-            jsonDecode(response.body)['data']['user'], DateTime.fromMillisecondsSinceEpoch(jsonDecode(response.body)['cache']['cached_at'], isUtc: true), true);
-        if (addToDB) {
-          await ensureDbIsOpen();
-          storeState(player);
-        }
+            jsonDecode(response.body)['data']['user'], DateTime.fromMillisecondsSinceEpoch(jsonDecode(response.body)['cache']['cached_at'], isUtc: true));
         developer.log("fetchPlayer: $user retrieved and cached", name: "services/tetrio_crud");
         _playersCache[jsonDecode(response.body)['cache']['cached_until'].toString()] = player;
         return player;
@@ -272,7 +306,7 @@ class TetrioService extends DB {
       // what the fuck am i doing here?
       var test = json.decode(row['jsonStates'] as String);
       List<TetrioPlayer> states = [];
-      test.forEach((k, v) => states.add(TetrioPlayer.fromJson(v, DateTime.fromMillisecondsSinceEpoch(int.parse(k)), false)));
+      test.forEach((k, v) => states.add(TetrioPlayer.fromJson(v, DateTime.fromMillisecondsSinceEpoch(int.parse(k)))));
       data.addEntries({states.last.userId: states}.entries);
       return data;
     });

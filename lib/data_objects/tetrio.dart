@@ -1,9 +1,6 @@
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:vector_math/vector_math.dart';
-import 'dart:developer' as developer;
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 const double noTrRd = 60.9;
 const double apmWeight = 1;
@@ -84,7 +81,7 @@ class TetrioPlayer {
 
   double get level => pow((xp / 500), 0.6) + (xp / (5000 + (max(0, xp - 4 * pow(10, 6)) / 5000))) + 1;
 
-  TetrioPlayer.fromJson(Map<String, dynamic> json, DateTime stateTime, bool fetchRecords) {
+  TetrioPlayer.fromJson(Map<String, dynamic> json, DateTime stateTime) {
     //developer.log("TetrioPlayer.fromJson $stateTime: $json", name: "data_objects/tetrio");
     userId = json['_id'];
     username = json['username'];
@@ -112,25 +109,6 @@ class TetrioPlayer {
     friendCount = json['friend_count'] ?? 0;
     badstanding = json['badstanding'];
     botmaster = json['botmaster'];
-    if (fetchRecords) {
-      var url = Uri.https('ch.tetr.io', 'api/users/$userId/records');
-      Future response = http.get(url);
-      response.then((value) {
-        if (value.statusCode == 200) {
-          Map jsonRecords = jsonDecode(value.body);
-          sprint = jsonRecords['data']['records']['40l']['record'] != null
-              ? [RecordSingle.fromJson(jsonRecords['data']['records']['40l']['record'], jsonRecords['data']['records']['40l']['rank'])]
-              : [];
-          blitz = jsonRecords['data']['records']['blitz']['record'] != null
-              ? [RecordSingle.fromJson(jsonRecords['data']['records']['blitz']['record'], jsonRecords['data']['records']['blitz']['rank'])]
-              : [];
-          zen = TetrioZen.fromJson(jsonRecords['data']['zen']);
-        } else {
-          developer.log("TetrioPlayer.fromJson exception", name: "data_objects/tetrio", error: value.statusCode);
-          throw Exception('Failed to fetch player');
-        }
-      });
-    }
   }
 
   Map<String, dynamic> toJson() {
