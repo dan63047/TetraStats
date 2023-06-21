@@ -29,6 +29,8 @@ const String createTetrioUsersToTrack = '''
 
 class TetrioService extends DB {
   Map<String, List<TetrioPlayer>> _players = {};
+  final Map<String, TetrioPlayer> _playersCache = {};
+  final Map<String, TetraLeagueAlphaStream> _tlStreamsCache = {}; // i'm trying to respect oskware api It should look something like {"cached_until": TetrioPlayer}
   static final TetrioService _shared = TetrioService._sharedInstance();
   factory TetrioService() => _shared;
   late final StreamController<Map<String, List<TetrioPlayer>>> _tetrioStreamController;
@@ -41,16 +43,16 @@ class TetrioService extends DB {
   @override
   Future<void> open() async {
     await super.open();
-    await _cachePlayers();
+    await _loadPlayers();
   }
 
   Stream<Map<String, List<TetrioPlayer>>> get allPlayers => _tetrioStreamController.stream;
 
-  Future<void> _cachePlayers() async {
+  Future<void> _loadPlayers() async {
     final allPlayers = await getAllPlayers();
     _players = allPlayers.toList().first; // ???
     _tetrioStreamController.add(_players);
-    developer.log("_cachePlayers: $_players", name: "services/tetrio_crud");
+    developer.log("_loadPlayers: $_players", name: "services/tetrio_crud");
   }
 
   Future<void> deletePlayer(String id) async {
@@ -72,6 +74,19 @@ class TetrioService extends DB {
   }
 
   Future<TetraLeagueAlphaStream> getTLStream(String userID) async {
+    try{
+      var cached = _tlStreamsCache.entries.firstWhere((element) => element.value.userId == userID);
+    if (DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true).isAfter(DateTime.now())){
+      developer.log("getTLStream: Stream $userID retrieved from cache, that expires ${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)}", name: "services/tetrio_crud");
+      return cached.value;
+    }else{
+      _tlStreamsCache.remove(cached.key);
+      developer.log("getTLStream: Cached stream $userID expired (${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)})", name: "services/tetrio_crud");
+    }
+    }catch(e){
+      developer.log("getTLStream: Trying to retrieve stream $userID", name: "services/tetrio_crud");
+    }
+    
     var url = Uri.https('ch.tetr.io', 'api/streams/league_userrecent_${userID.toLowerCase().trim()}');
     final response = await http.get(url);
 
@@ -83,13 +98,15 @@ class TetrioService extends DB {
         //   await ensureDbIsOpen();
         //   storeState(player);
         // }
+        developer.log("getTLStream: $userID stream retrieved and cached", name: "services/tetrio_crud");
+        _tlStreamsCache[jsonDecode(response.body)['cache']['cached_until'].toString()] = stream;
         return stream;
       } else {
         developer.log("getTLStream User dosen't exist", name: "services/tetrio_crud", error: response.body);
         throw Exception("User doesn't exist");
       }
     } else {
-      developer.log("getTLStream Failed to fetch player", name: "services/tetrio_crud", error: response.statusCode);
+      developer.log("getTLStream Failed to fetch stream", name: "services/tetrio_crud", error: response.statusCode);
       throw Exception('Failed to fetch player');
     }
   }
@@ -208,6 +225,19 @@ class TetrioService extends DB {
   }
 
   Future<TetrioPlayer> fetchPlayer(String user, bool addToDB) async {
+    try{
+      var cached = _playersCache.entries.firstWhere((element) => element.value.userId == user || element.value.username == user);
+    if (DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true).isAfter(DateTime.now())){
+      developer.log("fetchPlayer: User $user retrieved from cache, that expires ${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)}", name: "services/tetrio_crud");
+      return cached.value;
+    }else{
+      _playersCache.remove(cached.key);
+      developer.log("fetchPlayer: Cached user $user expired (${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)})", name: "services/tetrio_crud");
+    }
+    }catch(e){
+      developer.log("fetchPlayer: Trying to retrieve $user", name: "services/tetrio_crud");
+    }
+    
     var url = Uri.https('ch.tetr.io', 'api/users/${user.toLowerCase().trim()}');
     final response = await http.get(url);
 
@@ -219,13 +249,15 @@ class TetrioService extends DB {
           await ensureDbIsOpen();
           storeState(player);
         }
+        developer.log("fetchPlayer: $user retrieved and cached", name: "services/tetrio_crud");
+        _playersCache[jsonDecode(response.body)['cache']['cached_until'].toString()] = player;
         return player;
       } else {
-        developer.log("fetchTetrioPlayer User dosen't exist", name: "services/tetrio_crud", error: response.body);
+        developer.log("fetchPlayer User dosen't exist", name: "services/tetrio_crud", error: response.body);
         throw Exception("User doesn't exist");
       }
     } else {
-      developer.log("fetchTetrioPlayer Failed to fetch player", name: "services/tetrio_crud", error: response.statusCode);
+      developer.log("fetchPlayer Failed to fetch player", name: "services/tetrio_crud", error: response.statusCode);
       throw Exception('Failed to fetch player');
     }
   }

@@ -547,43 +547,43 @@ class CompareState extends State<CompareView> {
                                             RadarEntry(
                                                 value: theGreenSide!
                                                         .tlSeason1.apm! *
-                                                    1),
+                                                    apmWeight),
                                             RadarEntry(
                                                 value: theGreenSide!
                                                         .tlSeason1.pps! *
-                                                    45),
+                                                    ppsWeight),
                                             RadarEntry(
                                                 value: theGreenSide!
                                                         .tlSeason1.vs! *
-                                                    0.444),
+                                                    vsWeight),
                                             RadarEntry(
                                                 value: theGreenSide!.tlSeason1
                                                         .nerdStats!.app *
-                                                    185),
+                                                    appWeight),
                                             RadarEntry(
                                                 value: theGreenSide!.tlSeason1
                                                         .nerdStats!.dss *
-                                                    175),
+                                                    dssWeight),
                                             RadarEntry(
                                                 value: theGreenSide!.tlSeason1
                                                         .nerdStats!.dsp *
-                                                    450),
+                                                    dspWeight),
                                             RadarEntry(
                                                 value: theGreenSide!.tlSeason1
                                                         .nerdStats!.appdsp *
-                                                    140),
+                                                    appdspWeight),
                                             RadarEntry(
                                                 value: theGreenSide!.tlSeason1
                                                         .nerdStats!.vsapm *
-                                                    60),
+                                                    vsapmWeight),
                                             RadarEntry(
                                                 value: theGreenSide!.tlSeason1
                                                         .nerdStats!.cheese *
-                                                    1.25),
+                                                    cheeseWeight),
                                             RadarEntry(
                                                 value: theGreenSide!.tlSeason1
                                                         .nerdStats!.gbe *
-                                                    315),
+                                                    gbeWeight),
                                           ],
                                         ),
                                         RadarDataSet(

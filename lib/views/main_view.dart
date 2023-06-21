@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:developer' as developer;
 import 'package:flutter/services.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
+import 'package:tetra_stats/views/tl_match_view.dart' show TlMatchResultView;
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
 import 'package:tetra_stats/widgets/tl_thingy.dart';
 import 'package:tetra_stats/widgets/user_thingy.dart';
@@ -81,7 +81,6 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
     _getPreferences()
         .then((value) => changePlayer(prefs.getString("player") ?? "dan63047"));
     super.initState();
-    developer.log("Main view initialized", name: "main_view");
   }
 
   @override
@@ -89,7 +88,6 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
     _tabController.dispose();
     _scrollController.dispose();
     super.dispose();
-    developer.log("Main view disposed", name: "main_view");
   }
 
   Future<void> _getPreferences() async {
@@ -155,10 +153,6 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                 ),
           PopupMenuButton(
             itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-              // const PopupMenuItem(
-              //   value: "/compare",
-              //   child: Text('Compare'),
-              // ),
               const PopupMenuItem(
                 value: "/states",
                 child: Text('Show stored data'),
@@ -182,7 +176,6 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
         child: FutureBuilder<TetrioPlayer>(
           future: me,
           builder: (context, snapshot) {
-            developer.log("builder ($context): $snapshot", name: "main_view");
             switch (snapshot.connectionState) {
               case ConnectionState.none:
                 return const Center(
@@ -225,10 +218,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                             isScrollable: true,
                             tabs: myTabs,
                             onTap: (int tabId) {
-                              setState(() {
-                                developer.log("Tab changed to $tabId",
-                                    name: "main_view");
-                              });
+                              setState(() {});
                             },
                           ),
                         ),
@@ -350,8 +340,6 @@ class _NavDrawerState extends State<NavDrawer> {
                           leading: const Icon(Icons.home),
                           title: Text(homePlayerNickname),
                           onTap: () {
-                            developer.log("Navigator changed player",
-                                name: "main_view");
                             widget.changePlayer(
                                 prefs.getString("player") ?? "dan63047");
                             Navigator.of(context).pop();
@@ -367,8 +355,6 @@ class _NavDrawerState extends State<NavDrawer> {
                           title: Text(
                               allPlayers[keys[index]]?.last.username as String),
                           onTap: () {
-                            developer.log("Navigator changed player",
-                                name: "main_view");
                             widget.changePlayer(keys[index]);
                             Navigator.of(context).pop();
                           },
@@ -401,10 +387,7 @@ class _TLRecords extends StatelessWidget {
                     child: CircularProgressIndicator(color: Colors.white));
               case ConnectionState.done:
                 if (snapshot.hasError) {
-                  return Text(snapshot.error.toString(),
-                      style: TextStyle(
-                          fontFamily: "Eurostile Round Extended",
-                          fontSize: 28));
+                  return Text(snapshot.error.toString(), style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28));
                 } else {
                   return ListView(
                     physics: const ClampingScrollPhysics(),
@@ -414,7 +397,7 @@ class _TLRecords extends StatelessWidget {
                           style: const TextStyle(
                             fontFamily: "Eurostile Round Extended",
                             fontSize: 28,)),
-                          title: Text("vs. ${value.endContext.firstWhere((element) => element.userId != userID).username!}"),
+                          title: Text("vs. ${value.endContext.firstWhere((element) => element.userId != userID).username}"),
                           subtitle: Text(dateFormat.format(value.timestamp!)),
                           trailing: Column(mainAxisAlignment: MainAxisAlignment.end,
                             children: [
@@ -422,14 +405,14 @@ class _TLRecords extends StatelessWidget {
                             Text("${f2.format(value.endContext.firstWhere((element) => element.userId == userID).tertiary)} : ${f2.format(value.endContext.firstWhere((element) => element.userId != userID).tertiary)} PPS", style: TextStyle(height: 1.1)),
                             Text("${f2.format(value.endContext.firstWhere((element) => element.userId == userID).extra)} : ${f2.format(value.endContext.firstWhere((element) => element.userId != userID).extra)} VS", style: TextStyle(height: 1.1)),
                           ]),
-                          onTap: (){},
+                          onTap: (){Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => TlMatchResultView(record: value, initPlayerId: userID),
+                                ),
+                              );},
                         )]
-                        : [
-                            Text("No records",
-                                style: TextStyle(
-                                    fontFamily: "Eurostile Round Extended",
-                                    fontSize: 28))
-                          ],
+                        : [const Text("No records",style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28))],
                   );
                 }
             }

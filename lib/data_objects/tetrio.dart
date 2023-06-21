@@ -5,6 +5,18 @@ import 'dart:developer' as developer;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+const double noTrRd = 60.9;
+const double apmWeight = 1;
+const double ppsWeight = 45;
+const double vsWeight = 0.444;
+const double appWeight = 185;
+const double dssWeight = 175;
+const double dspWeight = 450;
+const double appdspWeight = 140;
+const double vsapmWeight = 60;
+const double cheeseWeight = 1.25;
+const double gbeWeight = 315;
+
 Duration doubleSecondsToDuration(double value) {
   value = value * 1000000;
   return Duration(microseconds: value.floor());
@@ -578,42 +590,46 @@ class TetraLeagueAlphaRecord{
 }
 
 class EndContextMulti {
-  String? userId;
-  String? username;
-  int? naturalOrder;
-  int? inputs;
-  int? piecesPlaced;
-  Handling? handling;
-  int? points;
-  int? wins;
-  double? secondary;
-  List<double>? secondaryTracking;
-  double? tertiary;
-  List<double>? tertiaryTracking;
-  double? extra;
-  List<double>? extraTracking;
-  bool? success;
+  late String userId;
+  late String username;
+  late int naturalOrder;
+  late int inputs;
+  late int piecesPlaced;
+  late Handling handling;
+  late int points;
+  late int wins;
+  late double secondary;
+  late List<double> secondaryTracking;
+  late double tertiary;
+  late List<double> tertiaryTracking;
+  late double extra;
+  late List<double> extraTracking;
+  late bool success;
+  late NerdStats nerdStats;
+  late EstTr estTr;
+  late Playstyle playstyle;
 
   EndContextMulti(
-      {this.userId,
-      this.naturalOrder,
-      this.inputs,
-      this.piecesPlaced,
-      this.handling,
-      this.points,
-      this.wins,
-      this.secondary,
-      this.secondaryTracking,
-      this.tertiary,
-      this.tertiaryTracking,
-      this.extra,
-      this.extraTracking,
-      this.success});
+      {required this.userId,
+      required this.username,
+      required this.naturalOrder,
+      required this.inputs,
+      required this.piecesPlaced,
+      required this.handling,
+      required this.points,
+      required this.wins,
+      required this.secondary,
+      required this.secondaryTracking,
+      required this.tertiary,
+      required this.tertiaryTracking,
+      required this.extra,
+      required this.extraTracking,
+      required this.success});
 
   EndContextMulti.fromJson(Map<String, dynamic> json) {
     userId = json['user']['_id'];
     username = json['user']['username'];
-    handling = json['handling'] != null ? Handling.fromJson(json['handling']) : null;
+    handling = Handling.fromJson(json['handling']);
     success = json['success'];
     inputs = json['inputs'];
     piecesPlaced = json['piecesplaced'];
@@ -626,15 +642,16 @@ class EndContextMulti {
     tertiaryTracking = json['points']['tertiaryAvgTracking'].cast<double>();
     extra = json['points']['extra']['vs'];
     extraTracking = json['points']['extraAvgTracking']['aggregatestats___vsscore'].cast<double>();
+    nerdStats = NerdStats(secondary, tertiary, extra);
+    estTr = EstTr(secondary, tertiary, extra, noTrRd, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
+    playstyle = Playstyle(secondary, tertiary, nerdStats.app, nerdStats.vsapm, nerdStats.dsp, nerdStats.gbe, estTr.srarea, estTr.statrank);
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['user']['_id'] = userId;
     data['user']['username'] = username;
-    if (handling != null) {
-      data['handling'] = handling!.toJson();
-    }
+    data['handling'] = handling.toJson();
     data['success'] = success;
     data['inputs'] = inputs;
     data['piecesplaced'] = piecesPlaced;

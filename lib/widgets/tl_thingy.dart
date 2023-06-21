@@ -199,16 +199,16 @@ class TLThingy extends StatelessWidget {
                                   dataSets: [
                                     RadarDataSet(
                                       dataEntries: [
-                                        RadarEntry(value: tl.apm! * 1),
-                                        RadarEntry(value: tl.pps! * 45),
-                                        RadarEntry(value: tl.vs! * 0.444),
-                                        RadarEntry(value: tl.nerdStats!.app * 185),
-                                        RadarEntry(value: tl.nerdStats!.dss * 175),
-                                        RadarEntry(value: tl.nerdStats!.dsp * 450),
-                                        RadarEntry(value: tl.nerdStats!.appdsp * 140),
-                                        RadarEntry(value: tl.nerdStats!.vsapm * 60),
-                                        RadarEntry(value: tl.nerdStats!.cheese * 1.25),
-                                        RadarEntry(value: tl.nerdStats!.gbe * 315),
+                                        RadarEntry(value: tl.apm! * apmWeight),
+                                        RadarEntry(value: tl.pps! * ppsWeight),
+                                        RadarEntry(value: tl.vs! * vsWeight),
+                                        RadarEntry(value: tl.nerdStats!.app * appWeight),
+                                        RadarEntry(value: tl.nerdStats!.dss * dssWeight),
+                                        RadarEntry(value: tl.nerdStats!.dsp * dspWeight),
+                                        RadarEntry(value: tl.nerdStats!.appdsp * appdspWeight),
+                                        RadarEntry(value: tl.nerdStats!.vsapm * vsWeight),
+                                        RadarEntry(value: tl.nerdStats!.cheese * cheeseWeight),
+                                        RadarEntry(value: tl.nerdStats!.gbe * gbeWeight),
                                       ],
                                     ),
                                     RadarDataSet(
