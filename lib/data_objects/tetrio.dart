@@ -614,11 +614,11 @@ class EndContextMulti {
     naturalOrder = json['naturalorder'];
     wins = json['wins'];
     points = json['points']['primary'];
-    secondary = json['points']['secondary'];
-    tertiary = json['points']['tertiary'];
+    secondary = json['points']['secondary'].toDouble();
+    tertiary = json['points']['tertiary'].toDouble();
     secondaryTracking = json['points']['secondaryAvgTracking'].cast<double>();
     tertiaryTracking = json['points']['tertiaryAvgTracking'].cast<double>();
-    extra = json['points']['extra']['vs'];
+    extra = json['points']['extra']['vs'].toDouble();
     extraTracking = json['points']['extraAvgTracking']['aggregatestats___vsscore'].cast<double>();
     nerdStats = NerdStats(secondary, tertiary, extra);
     estTr = EstTr(secondary, tertiary, extra, noTrRd, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
@@ -20,6 +21,7 @@ const allowedHeightForPlayerBioInPixels = 30.0;
 const givenTextHeightByScreenPercentage = 0.3;
 final NumberFormat timeInSec = NumberFormat("#,###.###s.");
 final NumberFormat f2 = NumberFormat.decimalPatternDigits(decimalDigits: 2);
+final DateFormat dateFormat = DateFormat.yMMMd().add_Hms();
 
 class MainView extends StatefulWidget {
   const MainView({Key? key}) : super(key: key);
@@ -106,10 +108,14 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
   Future<List> fetch(String nickOrID) async {
     TetrioPlayer me = await teto.fetchPlayer(nickOrID);
     setState((){_titleNickname = me.username;});
-    bool isTracking = await teto.isPlayerTracking(nickOrID);
-    if (isTracking) teto.storeState(me);
+    bool isTracking = await teto.isPlayerTracking(me.userId);
+    List<TetrioPlayer> states = [];
+    if (isTracking){
+      teto.storeState(me);
+      states.addAll(await teto.getPlayer(me.userId));
+    } 
     Map<String, dynamic> records = await teto.fetchRecords(me.userId);
-    return [me, records, isTracking];
+    return [me, records, states, isTracking];
   }
 
   void _justUpdate() {
@@ -233,7 +239,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                             tl: snapshot.data![0].tlSeason1,
                             userID: snapshot.data![0].userId),
                         _TLRecords(userID: snapshot.data![0].userId),
-                        Text("kekwa"),
+                        _TLHistory(states: snapshot.data![2]),
                         _RecordThingy(
                             record: (snapshot.data![1]['sprint'].isNotEmpty)
                                 ? snapshot.data![1]['sprint'][0]
@@ -415,11 +421,82 @@ class _TLRecords extends StatelessWidget {
                                 ),
                               );},
                         )]
-                        : [const Text("No records",style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28))],
+                        : [const Center(child: Text("No records", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))],
                   );
                 }
             }
           });
+  }
+}
+
+class _TLHistory extends StatelessWidget{
+  final List<TetrioPlayer> states;
+  const _TLHistory({super.key, required this.states});
+  
+  @override
+  Widget build(BuildContext context) {
+    bool bigScreen = MediaQuery.of(context).size.width > 768;
+    List<FlSpot> trData = [for (var state in states) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.rating)];
+    List<FlSpot> apmData = [for (var state in states) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.apm!)];
+    List<FlSpot> ppsData = [for (var state in states) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.pps!)];
+    List<FlSpot> vsData = [for (var state in states) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.vs!)];
+    return ListView(physics: const ClampingScrollPhysics(),
+    children: states.isNotEmpty ? [
+      Column(
+        children: [
+          _HistoryChartThigy(data: trData, title: "Tetra Rating", yAxisTitle: "TR", bigScreen: bigScreen),
+          _HistoryChartThigy(data: apmData, title: "Attack Per Minute", yAxisTitle: "APM", bigScreen: bigScreen),
+          _HistoryChartThigy(data: ppsData, title: "Pieces Per Second", yAxisTitle: "PPS", bigScreen: bigScreen),
+          _HistoryChartThigy(data: vsData, title: "Versus Score", yAxisTitle: "VS", bigScreen: bigScreen),
+        ],
+      ),
+    ] : [const Center(child: Text("No history saved", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))]);
+  }
+}
+
+class _HistoryChartThigy extends StatelessWidget{
+  final List<FlSpot> data;
+  final String title;
+  final String yAxisTitle;
+  final bool bigScreen;
+  const _HistoryChartThigy({super.key, required this.data, required this.title, required this.yAxisTitle, required this.bigScreen});
+  
+  @override
+  Widget build(BuildContext context) {
+    return AspectRatio(
+      aspectRatio: bigScreen ? 1.9 : 1.1,
+      child: Stack(
+        children: [
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text(title, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28))]),
+          Padding( padding: bigScreen ? const EdgeInsets.fromLTRB(40, 80, 40, 48) : const EdgeInsets.fromLTRB(0, 80, 0, 48) ,
+          child: LineChart(
+            LineChartData(
+              lineBarsData: [LineChartBarData(spots: data)],
+              borderData: FlBorderData(show: false),
+              titlesData: FlTitlesData(topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 30, getTitlesWidget: (double value, TitleMeta meta){
+                return SideTitleWidget(
+                  axisSide: meta.axisSide,
+                  angle: 0.3,
+                  child: Text(DateFormat(DateFormat.YEAR_ABBR_MONTH_DAY).format(DateTime.fromMillisecondsSinceEpoch(value.floor()))),
+                );
+              })),
+              leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 80, getTitlesWidget: (double value, TitleMeta meta){
+                return SideTitleWidget(
+                  axisSide: meta.axisSide,
+                  child: Text(f2.format(value)),
+                );
+              }))),
+              lineTouchData: LineTouchData(touchTooltipData: LineTouchTooltipData(getTooltipItems: (touchedSpots) {
+                return [for (var v in touchedSpots) LineTooltipItem("${f2.format(v.y)} $yAxisTitle \n", TextStyle(), children: [TextSpan(text: "${dateFormat.format(DateTime.fromMillisecondsSinceEpoch(v.x.floor()))}")])];
+              },))
+              )
+            ),
+          ),
+        ],
+      )
+    );
   }
 }
 
@@ -736,10 +813,7 @@ class _RecordThingy extends StatelessWidget {
                       ),
                     ]
                   : [
-                      Text("No record",
-                          style: TextStyle(
-                              fontFamily: "Eurostile Round Extended",
-                              fontSize: bigScreen ? 42 : 28))
+                      const Text("No record", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28))
                     ],
             );
           });

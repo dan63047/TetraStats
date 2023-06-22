@@ -13,7 +13,7 @@
 - ~~Stats Calculator~~
 - ~~Ability to compare player with himself in past~~
 - ~~Tetra League matches history~~ *dev build are here*
-- Tetra League historic charts for tracked players (maybe even same sh*t for 40l and blitz well see)
+- ~~Tetra League historic charts for tracked players~~ (bit mess idk)
 - Better UI with delta and hints for stats *that will be v0.2.0*
 - Ability to compare player with APM-PPS-VS stats
 - Ability to fetch Tetra League leaderboard

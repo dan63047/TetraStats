@@ -136,7 +136,7 @@ class TetrioService extends DB {
               : [];
           var zen = TetrioZen.fromJson(jsonRecords['data']['zen']);
         Map<String, dynamic> map = {"user": userID.toLowerCase().trim(), "sprint": sprint, "blitz": blitz, "zen": zen};
-        developer.log("fetchRecords: $userID stream retrieved and cached", name: "services/tetrio_crud");
+        developer.log("fetchRecords: $userID records retrieved and cached", name: "services/tetrio_crud");
         _recordsCache[jsonDecode(response.body)['cache']['cached_until'].toString()] = map;
         return map;
       } else {

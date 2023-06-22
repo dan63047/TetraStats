@@ -307,7 +307,7 @@ class TLThingy extends StatelessWidget {
                       )
                   ]
                 : [
-                    Text("That user never played Tetra League", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                    const Text("That user never played Tetra League", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)),
                   ],
           );
         },
