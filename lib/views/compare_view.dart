@@ -1194,8 +1194,9 @@ class CompareRegTimeThingy extends StatelessWidget {
   String verdict(DateTime? greenSide, DateTime? redSide) {
     var f = NumberFormat("#,### days later;#,### days before");
     String result = "---";
-    if (greenSide != null && redSide != null)
+    if (greenSide != null && redSide != null) {
       result = f.format(greenSide.difference(redSide).inDays);
+    }
     return result;
   }
 

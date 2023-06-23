@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
@@ -21,6 +22,7 @@ const allowedHeightForPlayerBioInPixels = 30.0;
 const givenTextHeightByScreenPercentage = 0.3;
 final NumberFormat timeInSec = NumberFormat("#,###.###s.");
 final NumberFormat f2 = NumberFormat.decimalPatternDigits(decimalDigits: 2);
+final NumberFormat f4 = NumberFormat.decimalPatternDigits(decimalDigits: 4);
 final DateFormat dateFormat = DateFormat.yMMMd().add_Hms();
 
 class MainView extends StatefulWidget {
@@ -112,10 +114,29 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
     List<TetrioPlayer> states = [];
     if (isTracking){
       teto.storeState(me);
+      teto.saveTLMatchesFromStream(await teto.getTLStream(me.userId));
       states.addAll(await teto.getPlayer(me.userId));
     } 
     Map<String, dynamic> records = await teto.fetchRecords(me.userId);
     return [me, records, states, isTracking];
+  }
+
+  Future<List<TetraLeagueAlphaRecord>> getTLMatches(String userID) async {
+    var fetched = await teto.getTLStream(userID);
+    bool isTracked = await teto.isPlayerTracking(userID);
+    if (!isTracked) return fetched.records;
+    teto.saveTLMatchesFromStream(fetched);
+    var fromdb = await teto.getTLMatchesbyPlayerID(userID);
+    for (var match in fetched.records) {
+      if (!fromdb.contains(match)) fromdb.add(match);
+    }
+    fromdb.sort((a, b) {
+      if(a.timestamp.isBefore(b.timestamp)) return 1;
+      if(a.timestamp.isAtSameMomentAs(b.timestamp)) return 0;
+      if(a.timestamp.isAfter(b.timestamp)) return -1;
+      return 0;
+      });
+    return fromdb;
   }
 
   void _justUpdate() {
@@ -238,7 +259,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                         TLThingy(
                             tl: snapshot.data![0].tlSeason1,
                             userID: snapshot.data![0].userId),
-                        _TLRecords(userID: snapshot.data![0].userId),
+                        _TLRecords(userID: snapshot.data![0].userId, get: getTLMatches,),
                         _TLHistory(states: snapshot.data![2]),
                         _RecordThingy(
                             record: (snapshot.data![1]['sprint'].isNotEmpty)
@@ -380,13 +401,14 @@ class _NavDrawerState extends State<NavDrawer> {
 
 class _TLRecords extends StatelessWidget {
   final String userID;
+  final Future<List<TetraLeagueAlphaRecord>> Function(String user) get;
 
-  const _TLRecords({required this.userID});
+  const _TLRecords({required this.userID, required this.get});
 
   @override
   Widget build(BuildContext context) {
       return FutureBuilder(
-          future: teto.getTLStream(userID),
+          future: get(userID),
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.none:
@@ -400,19 +422,19 @@ class _TLRecords extends StatelessWidget {
                 } else {
                   return ListView(
                     physics: const ClampingScrollPhysics(),
-                    children: (snapshot.data!.records!.isNotEmpty)
-                        ? [for (var value in snapshot.data!.records!) ListTile(
+                    children: (snapshot.data!.isNotEmpty)
+                        ? [for (var value in snapshot.data!) ListTile(
                           leading: Text("${value.endContext.firstWhere((element) => element.userId == userID).points} : ${value.endContext.firstWhere((element) => element.userId != userID).points}",
                           style: const TextStyle(
                             fontFamily: "Eurostile Round Extended",
                             fontSize: 28,)),
                           title: Text("vs. ${value.endContext.firstWhere((element) => element.userId != userID).username}"),
-                          subtitle: Text(dateFormat.format(value.timestamp!)),
-                          trailing: Column(mainAxisAlignment: MainAxisAlignment.end,
+                          subtitle: Text(dateFormat.format(value.timestamp)),
+                          trailing: Column(mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                            Text("${f2.format(value.endContext.firstWhere((element) => element.userId == userID).secondary)} : ${f2.format(value.endContext.firstWhere((element) => element.userId != userID).secondary)} APM", style: TextStyle(height: 1.1)),
-                            Text("${f2.format(value.endContext.firstWhere((element) => element.userId == userID).tertiary)} : ${f2.format(value.endContext.firstWhere((element) => element.userId != userID).tertiary)} PPS", style: TextStyle(height: 1.1)),
-                            Text("${f2.format(value.endContext.firstWhere((element) => element.userId == userID).extra)} : ${f2.format(value.endContext.firstWhere((element) => element.userId != userID).extra)} VS", style: TextStyle(height: 1.1)),
+                            Text("${f2.format(value.endContext.firstWhere((element) => element.userId == userID).secondary)} : ${f2.format(value.endContext.firstWhere((element) => element.userId != userID).secondary)} APM", style: const TextStyle(height: 1.1)),
+                            Text("${f2.format(value.endContext.firstWhere((element) => element.userId == userID).tertiary)} : ${f2.format(value.endContext.firstWhere((element) => element.userId != userID).tertiary)} PPS", style: const TextStyle(height: 1.1)),
+                            Text("${f2.format(value.endContext.firstWhere((element) => element.userId == userID).extra)} : ${f2.format(value.endContext.firstWhere((element) => element.userId != userID).extra)} VS", style: const TextStyle(height: 1.1)),
                           ]),
                           onTap: (){Navigator.push(
                                 context,
@@ -431,23 +453,47 @@ class _TLRecords extends StatelessWidget {
 
 class _TLHistory extends StatelessWidget{
   final List<TetrioPlayer> states;
-  const _TLHistory({super.key, required this.states});
+  const _TLHistory({required this.states});
   
   @override
   Widget build(BuildContext context) {
     bool bigScreen = MediaQuery.of(context).size.width > 768;
-    List<FlSpot> trData = [for (var state in states) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.rating)];
-    List<FlSpot> apmData = [for (var state in states) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.apm!)];
-    List<FlSpot> ppsData = [for (var state in states) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.pps!)];
-    List<FlSpot> vsData = [for (var state in states) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.vs!)];
+    List<FlSpot> trData = [for (var state in states) if (state.tlSeason1.gamesPlayed > 9) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.rating)];
+    List<FlSpot> apmData = [for (var state in states) if (state.tlSeason1.apm != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.apm!)];
+    List<FlSpot> ppsData = [for (var state in states) if (state.tlSeason1.pps != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.pps!)];
+    List<FlSpot> vsData = [for (var state in states) if (state.tlSeason1.vs != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.vs!)];
+    List<FlSpot> appData = [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.app)];
+    List<FlSpot> dssData = [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.dss)];
+    List<FlSpot> dspData = [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.dsp)];
+    List<FlSpot> appdspData = [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.appdsp)];
+    List<FlSpot> vsapmData = [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.vsapm)];
+    List<FlSpot> cheeseData = [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.cheese)];
+    List<FlSpot> gbeData = [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.gbe)];
+    List<FlSpot> nyaappData = [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.nyaapp)];
+    List<FlSpot> areaData = [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.area)];
+    List<FlSpot> estTrData = [for (var state in states) if (state.tlSeason1.estTr != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.estTr!.esttr)];
+    List<FlSpot> estaccData = [for (var state in states) if (state.tlSeason1.esttracc != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.esttracc!)];
     return ListView(physics: const ClampingScrollPhysics(),
     children: states.isNotEmpty ? [
       Column(
         children: [
-          _HistoryChartThigy(data: trData, title: "Tetra Rating", yAxisTitle: "TR", bigScreen: bigScreen),
-          _HistoryChartThigy(data: apmData, title: "Attack Per Minute", yAxisTitle: "APM", bigScreen: bigScreen),
-          _HistoryChartThigy(data: ppsData, title: "Pieces Per Second", yAxisTitle: "PPS", bigScreen: bigScreen),
-          _HistoryChartThigy(data: vsData, title: "Versus Score", yAxisTitle: "VS", bigScreen: bigScreen),
+          if(trData.length > 1) _HistoryChartThigy(data: trData, title: "Tetra Rating", yAxisTitle: "TR", bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? f2 : NumberFormat.compact(),),
+          if(apmData.length > 1) _HistoryChartThigy(data: apmData, title: "Attack Per Minute", yAxisTitle: "APM", bigScreen: bigScreen, leftSpace: 40, yFormat: NumberFormat.compact(),),
+          if(ppsData.length > 1) _HistoryChartThigy(data: ppsData, title: "Pieces Per Second", yAxisTitle: "PPS", bigScreen: bigScreen, leftSpace: 40, yFormat: NumberFormat.compact(),),
+          if(vsData.length > 1) _HistoryChartThigy(data: vsData, title: "Versus Score", yAxisTitle: "VS", bigScreen: bigScreen, leftSpace: 40, yFormat: NumberFormat.compact(),),
+          if(appData.length > 1) _HistoryChartThigy(data: appData, title: "Attack Per Piece", yAxisTitle: "APP", bigScreen: bigScreen, leftSpace: 48, yFormat: NumberFormat.compact(),),
+          if(dssData.length > 1) _HistoryChartThigy(data: dssData, title: bigScreen ? "Downstack Per Second" : "Downstack\nPer Second", yAxisTitle: "DS/S", bigScreen: bigScreen, leftSpace: 48, yFormat: NumberFormat.compact(),),
+          if(dspData.length > 1) _HistoryChartThigy(data: dspData, title: bigScreen ? "Downstack Per Piece" : "Downstack\nPer Piece", yAxisTitle: "DS/P", bigScreen: bigScreen, leftSpace: 48, yFormat: NumberFormat.compact(),),
+          if(appdspData.length > 1) _HistoryChartThigy(data: appdspData, title: "APP + DS/P", yAxisTitle: "APP + DS/P", bigScreen: bigScreen, leftSpace: 48, yFormat: NumberFormat.compact(),),
+          if(vsapmData.length > 1) _HistoryChartThigy(data: vsapmData, title: "VS/APM", yAxisTitle: "VS/APM", bigScreen: bigScreen, leftSpace: 48, yFormat: NumberFormat.compact(),),
+          if(cheeseData.length > 1) _HistoryChartThigy(data: cheeseData, title: "Cheese Index", yAxisTitle: "Cheese", bigScreen: bigScreen, leftSpace: 40, yFormat: NumberFormat.compact(),),
+          if(gbeData.length > 1) _HistoryChartThigy(data: gbeData, title: "Garbage Efficiency", yAxisTitle: "GbE", bigScreen: bigScreen, leftSpace: 48, yFormat: NumberFormat.compact(),),
+          if(nyaappData.length > 1) _HistoryChartThigy(data: nyaappData, title: "Weighted APP", yAxisTitle: "wAPP", bigScreen: bigScreen, leftSpace: 48, yFormat: NumberFormat.compact(),),
+          if(areaData.length > 1) _HistoryChartThigy(data: areaData, title: "Area", yAxisTitle: "Area", bigScreen: bigScreen, leftSpace: 40, yFormat: NumberFormat.compact(),),
+          if(estTrData.length > 1) _HistoryChartThigy(data: estTrData, title: "Est. of TR", yAxisTitle: "eTR", bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat:  bigScreen? f2 : NumberFormat.compact(),),
+          if(estaccData.length > 1) _HistoryChartThigy(data: estaccData, title: "Accuracy of Est.", yAxisTitle: "±eTR", bigScreen: bigScreen, leftSpace: 60, yFormat: NumberFormat.compact(explicitSign: true),),
+          if(trData.length <= 1 || apmData.length <= 1 || ppsData.length <= 1 || vsData.length <= 1  || appData.length <= 1  || dssData.length <= 1  || dspData.length <= 1  || appdspData.length <= 1 || vsapmData.length <= 1 || cheeseData.length <= 1 || gbeData.length <= 1 || nyaappData.length <= 1  || areaData.length <= 1 || estTrData.length <= 1 || estaccData.length <= 1) const Center(child: Text("Some charts aren't shown due to lack of data...", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))
+          // Why it's look like a garbage solution???
         ],
       ),
     ] : [const Center(child: Text("No history saved", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))]);
@@ -459,37 +505,40 @@ class _HistoryChartThigy extends StatelessWidget{
   final String title;
   final String yAxisTitle;
   final bool bigScreen;
-  const _HistoryChartThigy({super.key, required this.data, required this.title, required this.yAxisTitle, required this.bigScreen});
+  final double leftSpace;
+  final NumberFormat yFormat;
+  const _HistoryChartThigy({required this.data, required this.title, required this.yAxisTitle, required this.bigScreen, required this.leftSpace, required this.yFormat});
   
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {    
+    double xInterval = bigScreen ? max(1, (data.last.x - data.first.x) / 6) : max(1, (data.last.x - data.first.x) / 3);
     return AspectRatio(
       aspectRatio: bigScreen ? 1.9 : 1.1,
       child: Stack(
         children: [
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text(title, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28))]),
-          Padding( padding: bigScreen ? const EdgeInsets.fromLTRB(40, 80, 40, 48) : const EdgeInsets.fromLTRB(0, 80, 0, 48) ,
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text(title, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28))]),
+          Padding( padding: bigScreen ? const EdgeInsets.fromLTRB(40, 75, 40, 48) : const EdgeInsets.fromLTRB(0, 80, 0, 48) ,
           child: LineChart(
             LineChartData(
               lineBarsData: [LineChartBarData(spots: data)],
               borderData: FlBorderData(show: false),
+              gridData: FlGridData(verticalInterval: xInterval),
               titlesData: FlTitlesData(topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
               rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 30, getTitlesWidget: (double value, TitleMeta meta){
-                return SideTitleWidget(
+              bottomTitles: AxisTitles(sideTitles: SideTitles(interval: xInterval, showTitles: true, reservedSize: 30, getTitlesWidget: (double value, TitleMeta meta){
+                return value != meta.min && value != meta.max ? SideTitleWidget(
                   axisSide: meta.axisSide,
-                  angle: 0.3,
                   child: Text(DateFormat(DateFormat.YEAR_ABBR_MONTH_DAY).format(DateTime.fromMillisecondsSinceEpoch(value.floor()))),
-                );
+                ) : Container();
               })),
-              leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 80, getTitlesWidget: (double value, TitleMeta meta){
-                return SideTitleWidget(
+              leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: leftSpace, getTitlesWidget: (double value, TitleMeta meta){
+                return value != meta.min && value != meta.max ? SideTitleWidget(
                   axisSide: meta.axisSide,
-                  child: Text(f2.format(value)),
-                );
+                  child: Text(yFormat.format(value)),
+                ) : Container();
               }))),
-              lineTouchData: LineTouchData(touchTooltipData: LineTouchTooltipData(getTooltipItems: (touchedSpots) {
-                return [for (var v in touchedSpots) LineTooltipItem("${f2.format(v.y)} $yAxisTitle \n", TextStyle(), children: [TextSpan(text: "${dateFormat.format(DateTime.fromMillisecondsSinceEpoch(v.x.floor()))}")])];
+              lineTouchData: LineTouchData(touchTooltipData: LineTouchTooltipData( fitInsideHorizontally: true, fitInsideVertically: true, getTooltipItems: (touchedSpots) {
+                return [for (var v in touchedSpots) LineTooltipItem("${f4.format(v.y)} $yAxisTitle \n", const TextStyle(), children: [TextSpan(text: dateFormat.format(DateTime.fromMillisecondsSinceEpoch(v.x.floor())))])];
               },))
               )
             ),

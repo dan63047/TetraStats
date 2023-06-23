@@ -9,10 +9,16 @@ import 'package:tetra_stats/data_objects/tetrio.dart';
 const String dbName = "TetraStats.db";
 const String tetrioUsersTable = "tetrioUsers";
 const String tetrioUsersToTrackTable = "tetrioUsersToTrack";
-const String tetraLeagueMatchesTable = "tetraLeagueMatches";
+const String tetraLeagueMatchesTable = "tetrioAlphaLeagueMathces";
 const String idCol = "id";
+const String replayID = "replayId";
 const String nickCol = "nickname";
+const String timestamp = "timestamp";
+const String endContext1 = "endContext1";
+const String endContext2 = "endContext2";
 const String statesCol = "jsonStates";
+const String player1id = "player1id";
+const String player2id = "player2id";
 const String createTetrioUsersTable = '''
         CREATE TABLE IF NOT EXISTS "tetrioUsers" (
           "id"	TEXT UNIQUE,
@@ -24,6 +30,17 @@ const String createTetrioUsersToTrack = '''
         CREATE TABLE IF NOT EXISTS "tetrioUsersToTrack" (
           "id"	TEXT NOT NULL UNIQUE,
           PRIMARY KEY("ID")
+        )
+''';
+const String createTetrioTLRecordsTable = '''
+        CREATE TABLE IF NOT EXISTS "tetrioAlphaLeagueMathces" (
+          "id"	TEXT,
+          "replayId"	TEXT,
+          "player1id"	TEXT,
+          "player2id"	TEXT,
+          "timestamp"	TEXT,
+          "endContext1"	TEXT,
+          "endContext2"	TEXT
         )
 ''';
 
@@ -106,6 +123,27 @@ class TetrioService extends DB {
       developer.log("getTLStream Failed to fetch stream", name: "services/tetrio_crud", error: response.statusCode);
       throw Exception('Failed to fetch player');
     }
+  }
+
+  Future<void> saveTLMatchesFromStream(TetraLeagueAlphaStream stream) async {
+    ensureDbIsOpen();
+    final db = getDatabaseOrThrow();
+    for (TetraLeagueAlphaRecord match in stream.records) {
+       final results = await db.query(tetraLeagueMatchesTable, where: '$idCol = ?', whereArgs: [match.ownId]);
+    if (results.isNotEmpty) continue;
+    db.insert(tetraLeagueMatchesTable, {idCol: match.ownId, replayID: match.replayId, timestamp: match.timestamp.toString(), player1id: match.endContext.first.userId, player2id: match.endContext.last.userId, endContext1: jsonEncode(match.endContext.first.toJson()), endContext2: jsonEncode(match.endContext.last.toJson())});
+    }
+  }
+
+  Future<List<TetraLeagueAlphaRecord>> getTLMatchesbyPlayerID(String playerID) async {
+    ensureDbIsOpen();
+    final db = getDatabaseOrThrow();
+    List<TetraLeagueAlphaRecord> matches = [];
+    final results = await db.query(tetraLeagueMatchesTable, where: '($player1id = ?) OR ($player2id = ?)', whereArgs: [playerID, playerID]);
+    for (var match in results){
+      matches.add(TetraLeagueAlphaRecord(ownId: match[idCol].toString(), replayId: match[replayID].toString(), timestamp: DateTime.parse(match[timestamp].toString()), endContext:[EndContextMulti.fromJson(jsonDecode(match[endContext1].toString())), EndContextMulti.fromJson(jsonDecode(match[endContext2].toString()))]));
+    }
+    return matches;
   }
 
   Future<Map<String, dynamic>> fetchRecords(String userID) async {

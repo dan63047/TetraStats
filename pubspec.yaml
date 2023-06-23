@@ -85,7 +85,12 @@ flutter:
      - res/tetrio_badges/early-supporter.png
      - res/tetrio_badges/founder.png
      - res/tetrio_badges/galactic2x2_1.png
+     - res/tetrio_badges/ggc_1.png
      - res/tetrio_badges/ggc_2.png
+     - res/tetrio_badges/ggc_3.png
+     - res/tetrio_badges/hdoxii_1.png
+     - res/tetrio_badges/hdoxii_2.png
+     - res/tetrio_badges/hdoxii_3.png
      - res/tetrio_badges/heart.png
      - res/tetrio_badges/hnprism_1.png
      - res/tetrio_badges/hnprism_2.png

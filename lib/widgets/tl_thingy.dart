@@ -206,7 +206,7 @@ class TLThingy extends StatelessWidget {
                                         RadarEntry(value: tl.nerdStats!.dss * dssWeight),
                                         RadarEntry(value: tl.nerdStats!.dsp * dspWeight),
                                         RadarEntry(value: tl.nerdStats!.appdsp * appdspWeight),
-                                        RadarEntry(value: tl.nerdStats!.vsapm * vsWeight),
+                                        RadarEntry(value: tl.nerdStats!.vsapm * vsapmWeight),
                                         RadarEntry(value: tl.nerdStats!.cheese * cheeseWeight),
                                         RadarEntry(value: tl.nerdStats!.gbe * gbeWeight),
                                       ],

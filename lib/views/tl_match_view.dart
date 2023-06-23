@@ -31,7 +31,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-            "${widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).username.toUpperCase()} vs. ${widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).username.toUpperCase()} in TL match ${dateFormat.format(widget.record.timestamp!)}"),
+            "${widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).username.toUpperCase()} vs. ${widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).username.toUpperCase()} in TL match ${dateFormat.format(widget.record.timestamp)}"),
       ),
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -48,19 +48,19 @@ class TlMatchResultState extends State<TlMatchResultView> {
                     children: [
                       Expanded(
                         child: Container(
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                               gradient: LinearGradient(
-                            colors: [Colors.green, Colors.transparent],
+                            colors: const [Colors.green, Colors.transparent],
                             begin: Alignment.bottomCenter,
                             end: Alignment.topCenter,
-                            stops: [0.0, 0.4],
+                            stops: [0.0, widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).success ? 0.4 : 0.0],
                           )),
                           child: Padding(
                             padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
                             child: Column(children: [
-                              Text(widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).username, style: const TextStyle(
+                              Text(widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).username, style: bigScreen ? const TextStyle(
                             fontFamily: "Eurostile Round Extended",
-                            fontSize: 28)),
+                            fontSize: 28) : const TextStyle()),
                               Text(widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).points.toString(), style: const TextStyle(
                             fontFamily: "Eurostile Round Extended",
                             fontSize: 42))
@@ -74,19 +74,19 @@ class TlMatchResultState extends State<TlMatchResultView> {
                       ),
                       Expanded(
                         child: Container(
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                               gradient: LinearGradient(
-                            colors: [Colors.red, Colors.transparent],
+                            colors: const [Colors.red, Colors.transparent],
                             begin: Alignment.bottomCenter,
                             end: Alignment.topCenter,
-                            stops: [0.0, 0.4],
+                            stops: [0.0, widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).success ? 0.4 : 0.0],
                           )),
                           child: Padding(
                             padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
                             child: Column(children: [
-                              Text(widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).username, style: const TextStyle(
+                              Text(widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).username, style:  bigScreen ? const TextStyle(
                             fontFamily: "Eurostile Round Extended",
-                            fontSize: 28)),
+                            fontSize: 28) : const TextStyle()),
                               Text(widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).points.toString(), style: const TextStyle(
                             fontFamily: "Eurostile Round Extended",
                             fontSize: 42))
@@ -779,8 +779,9 @@ class CompareRegTimeThingy extends StatelessWidget {
   String verdict(DateTime? greenSide, DateTime? redSide) {
     var f = NumberFormat("#,### days later;#,### days before");
     String result = "---";
-    if (greenSide != null && redSide != null)
+    if (greenSide != null && redSide != null) {
       result = f.format(greenSide.difference(redSide).inDays);
+    }
     return result;
   }
 

@@ -430,10 +430,10 @@ class Handling {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['arr'] = arr;
-    data['das'] = das;
-    data['dcd'] = dcd;
-    data['sdf'] = sdf;
+    data['arr'] = arr.toDouble();
+    data['das'] = das.toDouble();
+    data['dcd'] = dcd.toDouble();
+    data['sdf'] = sdf.toDouble();
     data['safelock'] = safeLock;
     data['cancel'] = cancel;
     return data;
@@ -526,24 +526,24 @@ class Playstyle {
 
 class TetraLeagueAlphaStream{
   late String userId;
-  List<TetraLeagueAlphaRecord>? records;
+  late List<TetraLeagueAlphaRecord> records;
 
-  TetraLeagueAlphaStream({required this.userId, this.records});
+  TetraLeagueAlphaStream({required this.userId, required this.records});
 
   TetraLeagueAlphaStream.fromJson(List<dynamic> json, String userID) {
     userId = userID;
     records = [];
-    for (var value in json) {records!.add(TetraLeagueAlphaRecord.fromJson(value));}
+    for (var value in json) {records.add(TetraLeagueAlphaRecord.fromJson(value));}
   }
 }
 
 class TetraLeagueAlphaRecord{
   late String replayId;
   late String ownId;
-  DateTime? timestamp;
+  late DateTime timestamp;
   late List<EndContextMulti> endContext;
 
-  TetraLeagueAlphaRecord({required this.replayId, required this.ownId, this.timestamp, required this.endContext});
+  TetraLeagueAlphaRecord({required this.replayId, required this.ownId, required this.timestamp, required this.endContext});
 
   TetraLeagueAlphaRecord.fromJson(Map<String, dynamic> json) {
     ownId = json['_id'];
@@ -561,6 +561,10 @@ class TetraLeagueAlphaRecord{
     data['ts'] = timestamp;
     return data;
   }
+
+  @override
+  bool operator ==(covariant TetraLeagueAlphaRecord other) => ownId == other.ownId;
+
   @override
   String toString() {
     return "TetraLeagueAlphaRecord: ${endContext.first.userId} vs ${endContext.last.userId}";
@@ -577,11 +581,11 @@ class EndContextMulti {
   late int points;
   late int wins;
   late double secondary;
-  late List<double> secondaryTracking;
+  late List secondaryTracking;
   late double tertiary;
-  late List<double> tertiaryTracking;
+  late List tertiaryTracking;
   late double extra;
-  late List<double> extraTracking;
+  late List extraTracking;
   late bool success;
   late NerdStats nerdStats;
   late EstTr estTr;
@@ -616,10 +620,10 @@ class EndContextMulti {
     points = json['points']['primary'];
     secondary = json['points']['secondary'].toDouble();
     tertiary = json['points']['tertiary'].toDouble();
-    secondaryTracking = json['points']['secondaryAvgTracking'].cast<double>();
-    tertiaryTracking = json['points']['tertiaryAvgTracking'].cast<double>();
+    secondaryTracking = json['points']['secondaryAvgTracking'].map((e) => e.toDouble()).toList();
+    tertiaryTracking = json['points']['tertiaryAvgTracking'].map((e) => e.toDouble()).toList();
     extra = json['points']['extra']['vs'].toDouble();
-    extraTracking = json['points']['extraAvgTracking']['aggregatestats___vsscore'].cast<double>();
+    extraTracking = json['points']['extraAvgTracking']['aggregatestats___vsscore'].map((e) => e.toDouble()).toList();
     nerdStats = NerdStats(secondary, tertiary, extra);
     estTr = EstTr(secondary, tertiary, extra, noTrRd, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
     playstyle = Playstyle(secondary, tertiary, nerdStats.app, nerdStats.vsapm, nerdStats.dsp, nerdStats.gbe, estTr.srarea, estTr.statrank);
@@ -627,19 +631,14 @@ class EndContextMulti {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['user']['_id'] = userId;
-    data['user']['username'] = username;
+    data['user'] = {'_id': userId, 'username': username};
     data['handling'] = handling.toJson();
     data['success'] = success;
     data['inputs'] = inputs;
     data['piecesplaced'] = piecesPlaced;
     data['naturalorder'] = naturalOrder;
     data['wins'] = wins;
-    data['points']['primary'] = points;
-    data['points']['secondary'] = secondary;
-    data['points']['tertiary'] = tertiary;
-    data['points']['extra']['vs'] = extra;
-    data['points']['extraAvgTracking']['aggregatestats___vsscore'] = extraTracking;
+    data['points'] = {'primary': points, 'secondary': secondary, 'tertiary':tertiary, 'extra': {'vs': extra}, 'secondaryAvgTracking': secondaryTracking, 'tertiaryAvgTracking': tertiaryTracking, 'extraAvgTracking': {'aggregatestats___vsscore': extraTracking}};
     return data;
   }
 }

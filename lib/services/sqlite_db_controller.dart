@@ -20,6 +20,7 @@ class DB {
       _db = db;
       await db.execute(createTetrioUsersTable);
       await db.execute(createTetrioUsersToTrack);
+      await db.execute(createTetrioTLRecordsTable);
     } on MissingPlatformDirectoryException {
       throw UnableToGetDocuments();
     }

@@ -48,9 +48,7 @@ class UserThingy extends StatelessWidget {
                       height: bannerHeight,
                       errorBuilder: (context, error, stackTrace) {
                         developer.log("Error with building banner image", name: "main_view", error: error, stackTrace: stackTrace);
-                        return const Placeholder(
-                          color: Colors.black,
-                        );
+                        return Container();
                       },
                     ),
                   Container(

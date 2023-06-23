@@ -28,7 +28,7 @@ class StatesState extends State<StatesView> {
                 itemBuilder: (context, index) {
                   return ListTile(
                     title: Text("On ${dateFormat.format(widget.states[index].state)}"),
-                    subtitle: Text("Level ${widget.states[index].level.toStringAsFixed(2)} level, ${widget.states[index].gameTime} of gametime"),
+                    subtitle: Text("Level ${widget.states[index].level.toStringAsFixed(2)}, ${widget.states[index].gameTime} of gametime, ${widget.states[index].friendCount} friends, ${NumberFormat.compact().format(widget.states[index].tlSeason1.rd)} RD"),
                     trailing: IconButton(
                       icon: const Icon(Icons.delete_forever),
                       onPressed: () {
