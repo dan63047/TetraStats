@@ -34,13 +34,14 @@ const String createTetrioUsersToTrack = '''
 ''';
 const String createTetrioTLRecordsTable = '''
         CREATE TABLE IF NOT EXISTS "tetrioAlphaLeagueMathces" (
-          "id"	TEXT,
+          "id"	TEXT NOT NULL UNIQUE,
           "replayId"	TEXT,
           "player1id"	TEXT,
           "player2id"	TEXT,
           "timestamp"	TEXT,
           "endContext1"	TEXT,
-          "endContext2"	TEXT
+          "endContext2"	TEXT,
+          PRIMARY KEY("id")
         )
 ''';
 
@@ -70,7 +71,6 @@ class TetrioService extends DB {
     final allPlayers = await getAllPlayers();
     _players = allPlayers.toList().first; // ???
     _tetrioStreamController.add(_players);
-    developer.log("_loadPlayers: $_players", name: "services/tetrio_crud");
   }
 
   Future<void> deletePlayer(String id) async {

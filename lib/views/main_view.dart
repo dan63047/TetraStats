@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:math';
@@ -17,6 +19,9 @@ String _searchFor = "dan63047";
 String _titleNickname = "dan63047";
 final TetrioService teto = TetrioService();
 late SharedPreferences prefs;
+var chartsData = <DropdownMenuItem<List<FlSpot>>>[];
+List chartsShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR"];
+int chartsIndex = 0; 
 const allowedHeightForPlayerIdInPixels = 40.0;
 const allowedHeightForPlayerBioInPixels = 30.0;
 const givenTextHeightByScreenPercentage = 0.3;
@@ -43,7 +48,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
   final List<Widget> myTabs = [
     const Tab(text: "Tetra League"),
     const Tab(text: "TL Records"),
-    const Tab(text: "TL History"),
+    const Tab(text: "History"),
     const Tab(text: "40 Lines"),
     const Tab(text: "Blitz"),
     const Tab(text: "Other"),
@@ -110,33 +115,48 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
   Future<List> fetch(String nickOrID) async {
     TetrioPlayer me = await teto.fetchPlayer(nickOrID);
     setState((){_titleNickname = me.username;});
+    var tlStream = await teto.getTLStream(me.userId);
+    List<TetraLeagueAlphaRecord> tlMatches = [];
     bool isTracking = await teto.isPlayerTracking(me.userId);
     List<TetrioPlayer> states = [];
     if (isTracking){
       teto.storeState(me);
       teto.saveTLMatchesFromStream(await teto.getTLStream(me.userId));
       states.addAll(await teto.getPlayer(me.userId));
-    } 
-    Map<String, dynamic> records = await teto.fetchRecords(me.userId);
-    return [me, records, states, isTracking];
-  }
-
-  Future<List<TetraLeagueAlphaRecord>> getTLMatches(String userID) async {
-    var fetched = await teto.getTLStream(userID);
-    bool isTracked = await teto.isPlayerTracking(userID);
-    if (!isTracked) return fetched.records;
-    teto.saveTLMatchesFromStream(fetched);
-    var fromdb = await teto.getTLMatchesbyPlayerID(userID);
-    for (var match in fetched.records) {
-      if (!fromdb.contains(match)) fromdb.add(match);
+      chartsData = <DropdownMenuItem<List<FlSpot>>>[
+      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.gamesPlayed > 9) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.rating)], child: const Text("Tetra Rating")),
+      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.gamesPlayed > 9) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.glicko!)], child: const Text("Glicko")),
+      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.gamesPlayed > 9) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.rd!)], child: const Text("Rating Deviation")),
+      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.apm != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.apm!)], child: const Text("Attack Per Minute")),
+      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.pps != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.pps!)], child: const Text("Pieces Per Second")),
+      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.vs != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.vs!)], child: const Text("Versus Score")),
+      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.app)], child: const Text("Attack Per Piece")),
+      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.dss)], child: const Text("Downstack Per Second")),
+      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.dsp)], child: const Text("Downstack Per Piece")),
+      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.appdsp)], child: const Text("APP + DS/P")),
+      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.vsapm)], child: const Text("VS/APM")),
+      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.cheese)], child: const Text("Cheese Index")),
+      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.gbe)], child: const Text("Garbage Efficiency")),
+      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.nyaapp)], child: const Text("Weighted APP")),
+      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.area)], child: const Text("Area")),
+      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.estTr != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.estTr!.esttr)], child: const Text("Est. of TR")),
+      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.esttracc != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.esttracc!)], child: const Text("Accuracy of Est.")),
+    ];
+    tlMatches.addAll(await teto.getTLMatchesbyPlayerID(me.userId));
+    for (var match in tlStream.records) {
+      if (!tlMatches.contains(match)) tlMatches.add(match);
     }
-    fromdb.sort((a, b) {
+    tlMatches.sort((a, b) {
       if(a.timestamp.isBefore(b.timestamp)) return 1;
       if(a.timestamp.isAtSameMomentAs(b.timestamp)) return 0;
       if(a.timestamp.isAfter(b.timestamp)) return -1;
       return 0;
       });
-    return fromdb;
+    } else{
+      tlMatches = tlStream.records;
+    }
+    Map<String, dynamic> records = await teto.fetchRecords(me.userId);
+    return [me, records, states, tlMatches, isTracking];
   }
 
   void _justUpdate() {
@@ -234,44 +254,57 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
               case ConnectionState.done:
                 //bool bigScreen = MediaQuery.of(context).size.width > 1024;
                 if (snapshot.hasData) {
-                  return NestedScrollView(
-                    controller: _scrollController,
-                    headerSliverBuilder: (context, value) {
-                      return [
-                        SliverToBoxAdapter(
-                            child: UserThingy(
-                          player: snapshot.data![0],
-                          showStateTimestamp: false,
-                          setState: _justUpdate,
-                        )),
-                        SliverToBoxAdapter(
-                          child: TabBar(
-                            controller: _tabController,
-                            isScrollable: true,
-                            tabs: myTabs,
-                          ),
-                        ),
-                      ];
+                  return RefreshIndicator(
+                    onRefresh: () {
+                      return Future(() => changePlayer(snapshot.data![0].userId));
                     },
-                    body: TabBarView(
-                      controller: _tabController,
-                      children: [
-                        TLThingy(
-                            tl: snapshot.data![0].tlSeason1,
-                            userID: snapshot.data![0].userId),
-                        _TLRecords(userID: snapshot.data![0].userId, get: getTLMatches,),
-                        _TLHistory(states: snapshot.data![2]),
-                        _RecordThingy(
-                            record: (snapshot.data![1]['sprint'].isNotEmpty)
-                                ? snapshot.data![1]['sprint'][0]
-                                : null),
-                        _RecordThingy(
-                            record: (snapshot.data![1]['blitz'].isNotEmpty)
-                                ? snapshot.data![1]['blitz'][0]
-                                : null),
-                        _OtherThingy(
-                            zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio)
-                      ],
+                    notificationPredicate: (notification) {
+                      // with NestedScrollView local(depth == 2) OverscrollNotification are not sent
+                      if (notification is OverscrollNotification || Platform.isIOS) {
+                        return notification.depth == 2;
+                      }
+                      return notification.depth == 0;
+                    },
+                    child: NestedScrollView(
+                      controller: _scrollController,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      headerSliverBuilder: (context, value) {
+                        return [
+                          SliverToBoxAdapter(
+                              child: UserThingy(
+                            player: snapshot.data![0],
+                            showStateTimestamp: false,
+                            setState: _justUpdate,
+                          )),
+                          SliverToBoxAdapter(
+                            child: TabBar(
+                              controller: _tabController,
+                              isScrollable: true,
+                              tabs: myTabs,
+                            ),
+                          ),
+                        ];
+                      },
+                      body: TabBarView(
+                        controller: _tabController,
+                        children: [
+                          TLThingy(
+                              tl: snapshot.data![0].tlSeason1,
+                              userID: snapshot.data![0].userId),
+                          _TLRecords(userID: snapshot.data![0].userId, data: snapshot.data![3]),
+                          _History(states: snapshot.data![2], update: _justUpdate),
+                          _RecordThingy(
+                              record: (snapshot.data![1]['sprint'].isNotEmpty)
+                                  ? snapshot.data![1]['sprint'][0]
+                                  : null),
+                          _RecordThingy(
+                              record: (snapshot.data![1]['blitz'].isNotEmpty)
+                                  ? snapshot.data![1]['blitz'][0]
+                                  : null),
+                          _OtherThingy(
+                              zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio)
+                        ],
+                      ),
                     ),
                   );
                 } else if (snapshot.hasError) {
@@ -401,99 +434,62 @@ class _NavDrawerState extends State<NavDrawer> {
 
 class _TLRecords extends StatelessWidget {
   final String userID;
-  final Future<List<TetraLeagueAlphaRecord>> Function(String user) get;
+  final List<TetraLeagueAlphaRecord> data;
 
-  const _TLRecords({required this.userID, required this.get});
+  const _TLRecords({required this.userID, required this.data});
 
   @override
   Widget build(BuildContext context) {
-      return FutureBuilder(
-          future: get(userID),
-          builder: (context, snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.none:
-              case ConnectionState.waiting:
-              case ConnectionState.active:
-                return const Center(
-                    child: CircularProgressIndicator(color: Colors.white));
-              case ConnectionState.done:
-                if (snapshot.hasError) {
-                  return Text(snapshot.error.toString(), style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28));
-                } else {
-                  return ListView(
-                    physics: const ClampingScrollPhysics(),
-                    children: (snapshot.data!.isNotEmpty)
-                        ? [for (var value in snapshot.data!) ListTile(
-                          leading: Text("${value.endContext.firstWhere((element) => element.userId == userID).points} : ${value.endContext.firstWhere((element) => element.userId != userID).points}",
-                          style: const TextStyle(
-                            fontFamily: "Eurostile Round Extended",
-                            fontSize: 28,)),
-                          title: Text("vs. ${value.endContext.firstWhere((element) => element.userId != userID).username}"),
-                          subtitle: Text(dateFormat.format(value.timestamp)),
-                          trailing: Column(mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                            Text("${f2.format(value.endContext.firstWhere((element) => element.userId == userID).secondary)} : ${f2.format(value.endContext.firstWhere((element) => element.userId != userID).secondary)} APM", style: const TextStyle(height: 1.1)),
-                            Text("${f2.format(value.endContext.firstWhere((element) => element.userId == userID).tertiary)} : ${f2.format(value.endContext.firstWhere((element) => element.userId != userID).tertiary)} PPS", style: const TextStyle(height: 1.1)),
-                            Text("${f2.format(value.endContext.firstWhere((element) => element.userId == userID).extra)} : ${f2.format(value.endContext.firstWhere((element) => element.userId != userID).extra)} VS", style: const TextStyle(height: 1.1)),
-                          ]),
-                          onTap: (){Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => TlMatchResultView(record: value, initPlayerId: userID),
-                                ),
-                              );},
-                        )]
-                        : [const Center(child: Text("No records", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))],
-                  );
-                }
-            }
-          });
+      return ListView( // TODO: Redo using ListView.builder()
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: (data.isNotEmpty)
+            ? [for (var value in data) ListTile(
+              leading: Text("${value.endContext.firstWhere((element) => element.userId == userID).points} : ${value.endContext.firstWhere((element) => element.userId != userID).points}",
+              style: const TextStyle(
+                fontFamily: "Eurostile Round Extended",
+                fontSize: 28,)),
+              title: Text("vs. ${value.endContext.firstWhere((element) => element.userId != userID).username}"),
+              subtitle: Text(dateFormat.format(value.timestamp)),
+              trailing: Column(mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                Text("${f2.format(value.endContext.firstWhere((element) => element.userId == userID).secondary)} : ${f2.format(value.endContext.firstWhere((element) => element.userId != userID).secondary)} APM", style: const TextStyle(height: 1.1)),
+                Text("${f2.format(value.endContext.firstWhere((element) => element.userId == userID).tertiary)} : ${f2.format(value.endContext.firstWhere((element) => element.userId != userID).tertiary)} PPS", style: const TextStyle(height: 1.1)),
+                Text("${f2.format(value.endContext.firstWhere((element) => element.userId == userID).extra)} : ${f2.format(value.endContext.firstWhere((element) => element.userId != userID).extra)} VS", style: const TextStyle(height: 1.1)),
+              ]),
+              onTap: (){Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TlMatchResultView(record: value, initPlayerId: userID),
+                    ),
+                  );},
+            )]
+            : [const Center(child: Text("No records", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))],
+      );
   }
 }
 
-class _TLHistory extends StatelessWidget{
+class _History extends StatelessWidget{
   final List<TetrioPlayer> states;
-  const _TLHistory({required this.states});
+  final Function update;
+  const _History({required this.states, required this.update});
   
   @override
   Widget build(BuildContext context) {
     bool bigScreen = MediaQuery.of(context).size.width > 768;
-    List<FlSpot> trData = [for (var state in states) if (state.tlSeason1.gamesPlayed > 9) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.rating)];
-    List<FlSpot> apmData = [for (var state in states) if (state.tlSeason1.apm != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.apm!)];
-    List<FlSpot> ppsData = [for (var state in states) if (state.tlSeason1.pps != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.pps!)];
-    List<FlSpot> vsData = [for (var state in states) if (state.tlSeason1.vs != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.vs!)];
-    List<FlSpot> appData = [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.app)];
-    List<FlSpot> dssData = [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.dss)];
-    List<FlSpot> dspData = [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.dsp)];
-    List<FlSpot> appdspData = [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.appdsp)];
-    List<FlSpot> vsapmData = [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.vsapm)];
-    List<FlSpot> cheeseData = [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.cheese)];
-    List<FlSpot> gbeData = [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.gbe)];
-    List<FlSpot> nyaappData = [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.nyaapp)];
-    List<FlSpot> areaData = [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.area)];
-    List<FlSpot> estTrData = [for (var state in states) if (state.tlSeason1.estTr != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.estTr!.esttr)];
-    List<FlSpot> estaccData = [for (var state in states) if (state.tlSeason1.esttracc != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.esttracc!)];
     return ListView(physics: const ClampingScrollPhysics(),
     children: states.isNotEmpty ? [
       Column(
         children: [
-          if(trData.length > 1) _HistoryChartThigy(data: trData, title: "Tetra Rating", yAxisTitle: "TR", bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? f2 : NumberFormat.compact(),),
-          if(apmData.length > 1) _HistoryChartThigy(data: apmData, title: "Attack Per Minute", yAxisTitle: "APM", bigScreen: bigScreen, leftSpace: 40, yFormat: NumberFormat.compact(),),
-          if(ppsData.length > 1) _HistoryChartThigy(data: ppsData, title: "Pieces Per Second", yAxisTitle: "PPS", bigScreen: bigScreen, leftSpace: 40, yFormat: NumberFormat.compact(),),
-          if(vsData.length > 1) _HistoryChartThigy(data: vsData, title: "Versus Score", yAxisTitle: "VS", bigScreen: bigScreen, leftSpace: 40, yFormat: NumberFormat.compact(),),
-          if(appData.length > 1) _HistoryChartThigy(data: appData, title: "Attack Per Piece", yAxisTitle: "APP", bigScreen: bigScreen, leftSpace: 48, yFormat: NumberFormat.compact(),),
-          if(dssData.length > 1) _HistoryChartThigy(data: dssData, title: bigScreen ? "Downstack Per Second" : "Downstack\nPer Second", yAxisTitle: "DS/S", bigScreen: bigScreen, leftSpace: 48, yFormat: NumberFormat.compact(),),
-          if(dspData.length > 1) _HistoryChartThigy(data: dspData, title: bigScreen ? "Downstack Per Piece" : "Downstack\nPer Piece", yAxisTitle: "DS/P", bigScreen: bigScreen, leftSpace: 48, yFormat: NumberFormat.compact(),),
-          if(appdspData.length > 1) _HistoryChartThigy(data: appdspData, title: "APP + DS/P", yAxisTitle: "APP + DS/P", bigScreen: bigScreen, leftSpace: 48, yFormat: NumberFormat.compact(),),
-          if(vsapmData.length > 1) _HistoryChartThigy(data: vsapmData, title: "VS/APM", yAxisTitle: "VS/APM", bigScreen: bigScreen, leftSpace: 48, yFormat: NumberFormat.compact(),),
-          if(cheeseData.length > 1) _HistoryChartThigy(data: cheeseData, title: "Cheese Index", yAxisTitle: "Cheese", bigScreen: bigScreen, leftSpace: 40, yFormat: NumberFormat.compact(),),
-          if(gbeData.length > 1) _HistoryChartThigy(data: gbeData, title: "Garbage Efficiency", yAxisTitle: "GbE", bigScreen: bigScreen, leftSpace: 48, yFormat: NumberFormat.compact(),),
-          if(nyaappData.length > 1) _HistoryChartThigy(data: nyaappData, title: "Weighted APP", yAxisTitle: "wAPP", bigScreen: bigScreen, leftSpace: 48, yFormat: NumberFormat.compact(),),
-          if(areaData.length > 1) _HistoryChartThigy(data: areaData, title: "Area", yAxisTitle: "Area", bigScreen: bigScreen, leftSpace: 40, yFormat: NumberFormat.compact(),),
-          if(estTrData.length > 1) _HistoryChartThigy(data: estTrData, title: "Est. of TR", yAxisTitle: "eTR", bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat:  bigScreen? f2 : NumberFormat.compact(),),
-          if(estaccData.length > 1) _HistoryChartThigy(data: estaccData, title: "Accuracy of Est.", yAxisTitle: "±eTR", bigScreen: bigScreen, leftSpace: 60, yFormat: NumberFormat.compact(explicitSign: true),),
-          if(trData.length <= 1 || apmData.length <= 1 || ppsData.length <= 1 || vsData.length <= 1  || appData.length <= 1  || dssData.length <= 1  || dspData.length <= 1  || appdspData.length <= 1 || vsapmData.length <= 1 || cheeseData.length <= 1 || gbeData.length <= 1 || nyaappData.length <= 1  || areaData.length <= 1 || estTrData.length <= 1 || estaccData.length <= 1) const Center(child: Text("Some charts aren't shown due to lack of data...", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))
-          // Why it's look like a garbage solution???
+          DropdownButton(
+                items: chartsData,
+                value: chartsData[chartsIndex].value,
+                onChanged: (value) {
+                  chartsIndex = chartsData.indexWhere((element) => element.value == value);
+                  update();
+                }
+              ),
+          if(chartsData[chartsIndex].value!.length > 1) _HistoryChartThigy(data: chartsData[chartsIndex].value!, title: "ss", yAxisTitle: chartsShortTitles[chartsIndex], bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? f2 : NumberFormat.compact(),)
+          else const Center(child: Text("Not enough data", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))
         ],
       ),
     ] : [const Center(child: Text("No history saved", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))]);
@@ -512,12 +508,12 @@ class _HistoryChartThigy extends StatelessWidget{
   @override
   Widget build(BuildContext context) {    
     double xInterval = bigScreen ? max(1, (data.last.x - data.first.x) / 6) : max(1, (data.last.x - data.first.x) / 3);
-    return AspectRatio(
-      aspectRatio: bigScreen ? 1.9 : 1.1,
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height - 100,
       child: Stack(
         children: [
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text(title, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28))]),
-          Padding( padding: bigScreen ? const EdgeInsets.fromLTRB(40, 75, 40, 48) : const EdgeInsets.fromLTRB(0, 80, 0, 48) ,
+          Padding( padding: bigScreen ? const EdgeInsets.fromLTRB(40, 40, 40, 48) : const EdgeInsets.fromLTRB(0, 40, 0, 48) ,
           child: LineChart(
             LineChartData(
               lineBarsData: [LineChartBarData(spots: data)],
@@ -558,7 +554,7 @@ class _RecordThingy extends StatelessWidget {
     return LayoutBuilder(builder: (context, constraints) {
       bool bigScreen = constraints.maxWidth > 768;
       return ListView.builder(
-          physics: const ClampingScrollPhysics(),
+          physics: const AlwaysScrollableScrollPhysics(),
           itemCount: 1,
           itemBuilder: (BuildContext context, int index) {
             return Column(
@@ -881,7 +877,7 @@ class _OtherThingy extends StatelessWidget {
     return LayoutBuilder(builder: (context, constraints) {
       bool bigScreen = constraints.maxWidth > 768;
       return ListView.builder(
-        physics: const ClampingScrollPhysics(),
+        physics: const AlwaysScrollableScrollPhysics(),
         itemCount: 1,
         itemBuilder: (BuildContext context, int index) {
           return Column(

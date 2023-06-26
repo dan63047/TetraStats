@@ -344,7 +344,7 @@ class EndContextSingle {
   late int piecesPlaced;
   late int lines;
   late int score;
-  late int seed;
+  late double seed;
   late Duration finalTime;
   late int tSpins;
   late Clears clears;
@@ -373,7 +373,7 @@ class EndContextSingle {
       required this.finesse});
 
   EndContextSingle.fromJson(Map<String, dynamic> json) {
-    seed = json['seed'];
+    seed = json['seed'].toDouble();
     lines = json['lines'];
     inputs = json['inputs'];
     holds = json['holds'] ?? 0;
