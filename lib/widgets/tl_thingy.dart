@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
 
 var fDiff = NumberFormat("+#,###.###;-#,###.###");
 final NumberFormat f2 = NumberFormat.decimalPatternDigits(decimalDigits: 2);
+final NumberFormat f3 = NumberFormat.decimalPatternDigits(decimalDigits: 3);
 
 class TLThingy extends StatelessWidget {
   final TetraLeagueAlpha tl;
@@ -44,8 +46,22 @@ class TLThingy extends StatelessWidget {
                             ],
                           ),
                         ],
-                      )
-                    else
+                      ),
+                    if (tl.gamesPlayed >= 10 && tl.rd! < 100) Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SfLinearGauge(
+                        minimum: tl.nextAt.toDouble(),
+                        maximum: tl.prevAt.toDouble(),
+                        interval: tl.prevAt.toDouble() - tl.nextAt.toDouble(), 
+                        ranges: [LinearGaugeRange(startValue: tl.standing.toDouble(), endValue: tl.prevAt.toDouble(), color: Colors.cyanAccent,)],
+                        //barPointers: [LinearBarPointer(value: 80)],
+                        isAxisInversed: true,
+                        isMirrored: true,
+                        showTicks: true,
+                        showLabels: true
+                        ),
+                    ),
+                    if (tl.gamesPlayed < 10)
                       Text("${10 - tl.gamesPlayed} games until being ranked",
                           softWrap: true,
                           textAlign: TextAlign.center,
@@ -81,27 +97,120 @@ class TLThingy extends StatelessWidget {
                         children: [
                           Text("Nerd Stats", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 16, 0, 48),
+                            padding: const EdgeInsets.fromLTRB(0, 40, 0, 0),
                             child: Wrap(
                                 direction: Axis.horizontal,
                                 alignment: WrapAlignment.center,
-                                spacing: 25,
+                                spacing: 35,
                                 crossAxisAlignment: WrapCrossAlignment.start,
                                 clipBehavior: Clip.hardEdge,
                                 children: [
-                                  StatCellNum(playerStat: tl.nerdStats!.app, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "Attack\nPer Piece"),
-                                  StatCellNum(playerStat: tl.nerdStats!.vsapm, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "VS/APM"),
-                                  StatCellNum(
-                                      playerStat: tl.nerdStats!.dss, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "Downstack\nPer Second"),
-                                  StatCellNum(
-                                      playerStat: tl.nerdStats!.dsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "Downstack\nPer Piece"),
-                                  StatCellNum(playerStat: tl.nerdStats!.appdsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "APP + DS/P"),
-                                  StatCellNum(playerStat: tl.nerdStats!.cheese, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: "Cheese\nIndex"),
-                                  StatCellNum(playerStat: tl.nerdStats!.gbe, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "Garbage\nEfficiency"),
-                                  StatCellNum(playerStat: tl.nerdStats!.nyaapp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "Weighted\nAPP"),
-                                  StatCellNum(playerStat: tl.nerdStats!.area, isScreenBig: bigScreen, fractionDigits: 1, playerStatLabel: "Area")
-                                ]),
-                          )
+                                  SizedBox(
+                                    width: 200,
+                                    height: 120,
+                                    child: SfRadialGauge(
+                                      title: const GaugeTitle(text: "Attack Per Piece"),
+                                      axes: [RadialAxis(
+                                      startAngle: 180,
+                                      endAngle: 360,
+                                      showLabels: false,
+                                      showTicks: false,
+                                      radiusFactor: 2.1,
+                                      centerY: 0.3,
+                                      minimum: 0,
+                                      maximum: 1,
+                                      ranges: [
+                                        GaugeRange(startValue: 0, endValue: 0.2, color: Colors.red),
+                                        GaugeRange(startValue: 0.2, endValue: 0.4, color: Colors.yellow),
+                                        GaugeRange(startValue: 0.4, endValue: 0.6, color: Colors.green),
+                                        GaugeRange(startValue: 0.6, endValue: 0.8, color: Colors.blue),
+                                        GaugeRange(startValue: 0.8, endValue: 1, color: Colors.purple),
+                                      ],
+                                      pointers: [
+                                        NeedlePointer(
+                                          value: tl.nerdStats!.app,
+                                          enableAnimation: true,
+                                          needleLength: 0.9,
+                                          needleStartWidth: 2,
+                                          needleEndWidth: 15,
+                                          knobStyle: const KnobStyle(color: Colors.transparent),
+                                          gradient: const LinearGradient(colors: [Colors.transparent, Colors.white], begin: Alignment.bottomCenter, end: Alignment.topCenter, stops: [0.5, 1]),)
+                                        ],
+                                      annotations: [GaugeAnnotation(widget: Text(f3.format(tl.nerdStats!.app), style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36)))],
+                                      )],),
+                                  ),
+                                  SizedBox(
+                                    width: 200,
+                                    height: 120,
+                                    child: SfRadialGauge(
+                                      title: const GaugeTitle(text: "VS / APM"),
+                                      axes: [RadialAxis(
+                                      startAngle: 180,
+                                      endAngle: 360,
+                                      showTicks: false,
+                                      showLabels: false,
+                                      radiusFactor: 2.1,
+                                      centerY: 0.3,
+                                      minimum: 1.8,
+                                      maximum: 2.4,
+                                      ranges: [
+                                        GaugeRange(startValue: 1.8, endValue: 2.0, color: Colors.green),
+                                        GaugeRange(startValue: 2.0, endValue: 2.2, color: Colors.blue),
+                                        GaugeRange(startValue: 2.2, endValue: 2.4, color: Colors.purple),
+                                      ],
+                                      pointers: [
+                                        NeedlePointer(
+                                          value: tl.nerdStats!.vsapm,
+                                          enableAnimation: true,
+                                          needleLength: 0.9,
+                                          needleStartWidth: 2,
+                                          needleEndWidth: 15,
+                                          knobStyle: const KnobStyle(color: Colors.transparent),
+                                          gradient: const LinearGradient(colors: [Colors.transparent, Colors.white], begin: Alignment.bottomCenter, end: Alignment.topCenter, stops: [0.5, 1]),)
+                                        ],
+                                      annotations: [GaugeAnnotation(widget: Text(f3.format(tl.nerdStats!.vsapm), style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36)))],
+                                      )],),
+                                  ),]),
+                          ),
+                          Wrap(
+                              direction: Axis.horizontal,
+                              alignment: WrapAlignment.center,
+                              spacing: 25,
+                              crossAxisAlignment: WrapCrossAlignment.start,
+                              clipBehavior: Clip.hardEdge,
+                              children: [
+                                //StatCellNum(playerStat: tl.nerdStats!.app, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "Attack\nPer Piece"),
+                                //StatCellNum(playerStat: tl.nerdStats!.vsapm, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "VS/APM"),
+                                StatCellNum(playerStat: tl.nerdStats!.dss, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "Downstack\nPer Second",
+                                alertWidgets: [const Text("Downstack per Second measures how many garbage lines you clear in a second."),
+                                    const Text("Formula: (VS / 100) - (APM / 60)"),
+                                    Text("(${tl.vs} / 100) - (${tl.apm} / 60) = ${tl.nerdStats!.dss}"),],
+                                    ),
+                                StatCellNum(playerStat: tl.nerdStats!.dsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "Downstack\nPer Piece",
+                                alertWidgets: [const Text("Downstack per Piece measures how many garbage lines you clear per piece."),
+                                    const Text("Formula: DS/S / PPS"),
+                                    Text("${tl.nerdStats!.dss} / ${tl.pps} = ${tl.nerdStats!.dsp}"),],),
+                                StatCellNum(playerStat: tl.nerdStats!.appdsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "APP + DS/P",
+                                alertWidgets: [const Text("Just a sum of Attack per Piece and Downstack per Piece."),
+                                    const Text("Formula: APP + DS/P"),
+                                    Text("${tl.nerdStats!.app} + ${tl.nerdStats!.dsp} = ${tl.nerdStats!.appdsp}"),]),
+                                StatCellNum(playerStat: tl.nerdStats!.cheese, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: "Cheese\nIndex",
+                                alertWidgets: [const Text("Cheese Index is an approximation how much clean / cheese garbage player sends. Lower = more clean. Higher = more cheese.\nInvented by kerrmunism"),
+                                    const Text("Formula: (DS/P * 150) + ((VS/APM - 2) * 50) + (0.6 - APP) * 125"),
+                                    Text("(${tl.nerdStats!.dsp} * 150) + ((${tl.nerdStats!.vsapm} - 2) * 50) + (0.6 - ${tl.nerdStats!.app}) * 125 = ${tl.nerdStats!.cheese}"),]),
+                                StatCellNum(playerStat: tl.nerdStats!.gbe, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "Garbage\nEfficiency",
+                                alertWidgets: [const Text("Garbage Efficiency measures how well player uses their garbage. Higher = better or they use their garbage more. Lower = they mostly send their garbage back at cheese or rarely clear garbage.\nInvented by Zepheniah and Dragonboy."),
+                                    const Text("Formula: ((APP * DS/S) / PPS) * 2"),
+                                    Text("((${tl.nerdStats!.app} * ${tl.nerdStats!.dss}) / ${tl.pps}) * 2 = ${tl.nerdStats!.gbe}"),]),
+                                StatCellNum(playerStat: tl.nerdStats!.nyaapp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "Weighted\nAPP",
+                                alertWidgets: [const Text("Essentially, a measure of your ability to send cheese while still maintaining a high APP.\nInvented by Wertj."),
+                                    const Text("Formula: APP - 5 * tan(radians((Cheese Index / -30) + 1))"),
+                                    Text("${tl.nerdStats!.app} - 5 * tan(radians((${tl.nerdStats!.cheese} / -30) + 1)) = ${tl.nerdStats!.nyaapp}"),]),
+                                StatCellNum(playerStat: tl.nerdStats!.area, isScreenBig: bigScreen, fractionDigits: 1, playerStatLabel: "Area",
+                                alertWidgets: [const Text("How much space your shape takes up on the graph, if you exclude the cheese and vs/apm sections"),
+                                    const Text("Formula: APM * 1 + PPS * 45 + VS * 0.444 + APP * 185 + DS/S * 175 + DS/P * 450 + Garbage Effi * 315"),
+                                    Text("${tl.apm} * 1 + ${tl.pps} * 45 + ${tl.vs} * 0.444 + ${tl.nerdStats!.app} * 185 + ${tl.nerdStats!.dss} * 175 + ${tl.nerdStats!.dsp} * 450 + ${tl.nerdStats!.gbe} * 315 = ${tl.nerdStats!.area}"),])
+                              ])
                         ],
                       ),
                     if (tl.estTr != null)

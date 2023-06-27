@@ -2,17 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class StatCellNum extends StatelessWidget {
-  const StatCellNum({super.key, required this.playerStat, required this.playerStatLabel, required this.isScreenBig, this.snackBar, this.fractionDigits});
+  const StatCellNum(
+      {super.key,
+      required this.playerStat,
+      required this.playerStatLabel,
+      required this.isScreenBig,
+      this.alertWidgets,
+      this.fractionDigits});
 
   final num playerStat;
   final String playerStatLabel;
   final bool isScreenBig;
-  final String? snackBar;
+  final List<Widget>? alertWidgets;
   final int? fractionDigits;
 
   @override
   Widget build(BuildContext context) {
-    NumberFormat f = NumberFormat.decimalPatternDigits(decimalDigits: fractionDigits ?? 0);
+    NumberFormat f =
+        NumberFormat.decimalPatternDigits(decimalDigits: fractionDigits ?? 0);
     return Column(
       children: [
         Text(
@@ -22,7 +29,7 @@ class StatCellNum extends StatelessWidget {
             fontSize: isScreenBig ? 32 : 24,
           ),
         ),
-        snackBar == null
+        alertWidgets == null
             ? Text(
                 playerStatLabel,
                 textAlign: TextAlign.center,
@@ -33,9 +40,27 @@ class StatCellNum extends StatelessWidget {
               )
             : TextButton(
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(snackBar!)));
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) => AlertDialog(
+                            title: Text(playerStatLabel,
+                                style: const TextStyle(
+                                    fontFamily: "Eurostile Round Extended")),
+                            content: SingleChildScrollView(
+                              child: ListBody(children: alertWidgets!),
+                            ),
+                            actions: <Widget>[
+                              TextButton(
+                                child: const Text('OK'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              )
+                            ],
+                          ));
                 },
-                style: ButtonStyle(padding: MaterialStateProperty.all(EdgeInsets.zero)),
+                style: ButtonStyle(
+                    padding: MaterialStateProperty.all(EdgeInsets.zero)),
                 child: Text(
                   playerStatLabel,
                   textAlign: TextAlign.center,
