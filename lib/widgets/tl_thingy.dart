@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
-import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
 
 var fDiff = NumberFormat("+#,###.###;-#,###.###");
@@ -91,10 +90,8 @@ class TLThingy extends StatelessWidget {
                         crossAxisAlignment: WrapCrossAlignment.start,
                         clipBehavior: Clip.hardEdge,
                         children: [
-                          if (tl.apm != null)
-                            StatCellNum(playerStat: tl.apm!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: "Attack\nPer Minute", higherIsBetter: true, oldPlayerStat: oldTl?.apm),
-                          if (tl.pps != null)
-                            StatCellNum(playerStat: tl.pps!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: "Pieces\nPer Second", higherIsBetter: true, oldPlayerStat: oldTl?.pps),
+                          if (tl.apm != null) StatCellNum(playerStat: tl.apm!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: "Attack\nPer Minute", higherIsBetter: true, oldPlayerStat: oldTl?.apm),
+                          if (tl.pps != null) StatCellNum(playerStat: tl.pps!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: "Pieces\nPer Second", higherIsBetter: true, oldPlayerStat: oldTl?.pps),
                           if (tl.vs != null) StatCellNum(playerStat: tl.vs!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: "Versus\nScore", higherIsBetter: true, oldPlayerStat: oldTl?.vs),
                           if (tl.standing > 0) StatCellNum(playerStat: tl.standing, isScreenBig: bigScreen, playerStatLabel: "Leaderboard\nplacement", higherIsBetter: false, oldPlayerStat: oldTl?.standing),
                           if (tl.standingLocal > 0) StatCellNum(playerStat: tl.standingLocal, isScreenBig: bigScreen, playerStatLabel: "Country LB\nplacement", higherIsBetter: false, oldPlayerStat: oldTl?.standingLocal),
@@ -220,9 +217,10 @@ class TLThingy extends StatelessWidget {
                                               title: const Text("VS / APM",
                                                   style: TextStyle(
                                                       fontFamily: "Eurostile Round Extended")),
-                                              content: const SingleChildScrollView(
+                                              content: SingleChildScrollView(
                                                 child: ListBody(children: [
-                                                  Text("Basically, tells how much and how efficient you using garbage in your attacks")
+                                                  const Text("Basically, tells how much and how efficient you using garbage in your attacks"),
+                                                  Text("Raw value: ${tl.nerdStats!.vsapm}")
                                                 ]),
                                               ),
                                               actions: <Widget>[

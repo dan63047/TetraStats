@@ -66,12 +66,9 @@ class SettingsState extends State<SettingsView> {
           child: ListView(
         children: [
           ListTile(
-            title: const Text("So there you gonna be able to change some settings"),
-            subtitle: const Text("Only \"Your TETR.IO account\" implemented yet. In the future you will able to import and export app sqlite database."),
-            trailing: Switch(
-              value: true,
-              onChanged: (bool value) {},
-            ),
+            title: const Text("Export local database"),
+            subtitle: const Text("It contains states and Tetra League records of the tracked players and list of tracked players."),
+            onTap: (){},
           ),
           ListTile(
             title: const Text("Your TETR.IO account"),
