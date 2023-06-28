@@ -176,13 +176,33 @@ class UserThingy extends StatelessWidget {
                       playerStatLabel: "XP Level",
                       isScreenBig: bigScreen,
                       alertWidgets: [Text("${NumberFormat.decimalPatternDigits(decimalDigits: 2).format(player.xp)} XP", style: const TextStyle(fontFamily: "Eurostile Round Extended"),), Text("Progress to next level: ${((player.level - player.level.floor()) * 100).toStringAsFixed(2)} %"), Text("Progress from 0 XP to level 5000: ${((player.xp / 67009017.7589378) * 100).toStringAsFixed(2)} %")],
+                      higherIsBetter: true,
                     ),
                     if (player.gameTime >= Duration.zero)
                       StatCellNum(
-                          playerStat: player.gameTime.inHours, playerStatLabel: "Hours\nPlayed", isScreenBig: bigScreen, alertWidgets: [Text("Exact gametime: ${player.gameTime.toString()}")]),
-                    if (player.gamesPlayed >= 0) StatCellNum(playerStat: player.gamesPlayed, isScreenBig: bigScreen, playerStatLabel: "Online\nGames"),
-                    if (player.gamesWon >= 0) StatCellNum(playerStat: player.gamesWon, isScreenBig: bigScreen, playerStatLabel: "Games\nWon"),
-                    if (player.friendCount > 0) StatCellNum(playerStat: player.friendCount, isScreenBig: bigScreen, playerStatLabel: "Friends"),
+                        playerStat: player.gameTime.inHours,
+                        playerStatLabel: "Hours\nPlayed",
+                        isScreenBig: bigScreen,
+                        alertWidgets: [Text("Exact gametime: ${player.gameTime.toString()}")],
+                        higherIsBetter: true,),
+                    if (player.gamesPlayed >= 0) 
+                      StatCellNum(
+                        playerStat: player.gamesPlayed,
+                        isScreenBig: bigScreen,
+                        playerStatLabel: "Online\nGames",
+                        higherIsBetter: true,),
+                    if (player.gamesWon >= 0) 
+                      StatCellNum(
+                        playerStat: player.gamesWon,
+                        isScreenBig: bigScreen,
+                        playerStatLabel: "Games\nWon",
+                        higherIsBetter: true,),
+                    if (player.friendCount > 0) 
+                    StatCellNum(
+                      playerStat: player.friendCount,
+                      isScreenBig: bigScreen,
+                      playerStatLabel: "Friends",
+                      higherIsBetter: true,),
                   ],
                 )
               : Text(

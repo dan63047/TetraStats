@@ -118,28 +118,35 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
     List<TetraLeagueAlphaRecord> tlMatches = [];
     bool isTracking = await teto.isPlayerTracking(me.userId);
     List<TetrioPlayer> states = [];
+    TetraLeagueAlpha? compareWith = null;
+    var uniqueTL = Set();
     if (isTracking){
       teto.storeState(me);
       teto.saveTLMatchesFromStream(await teto.getTLStream(me.userId));
       states.addAll(await teto.getPlayer(me.userId));
+      states.forEach((element) {
+        if (uniqueTL.isNotEmpty && uniqueTL.last != element.tlSeason1) uniqueTL.add(element.tlSeason1);
+        if (uniqueTL.isEmpty) uniqueTL.add(element.tlSeason1);
+        });
+      compareWith = uniqueTL.toList()[uniqueTL.length - 2];
       chartsData = <DropdownMenuItem<List<FlSpot>>>[
-      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.gamesPlayed > 9) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.rating)], child: const Text("Tetra Rating")),
-      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.gamesPlayed > 9) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.glicko!)], child: const Text("Glicko")),
-      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.gamesPlayed > 9) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.rd!)], child: const Text("Rating Deviation")),
-      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.apm != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.apm!)], child: const Text("Attack Per Minute")),
-      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.pps != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.pps!)], child: const Text("Pieces Per Second")),
-      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.vs != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.vs!)], child: const Text("Versus Score")),
-      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.app)], child: const Text("Attack Per Piece")),
-      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.dss)], child: const Text("Downstack Per Second")),
-      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.dsp)], child: const Text("Downstack Per Piece")),
-      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.appdsp)], child: const Text("APP + DS/P")),
-      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.vsapm)], child: const Text("VS/APM")),
-      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.cheese)], child: const Text("Cheese Index")),
-      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.gbe)], child: const Text("Garbage Efficiency")),
-      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.nyaapp)], child: const Text("Weighted APP")),
-      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.nerdStats != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.nerdStats!.area)], child: const Text("Area")),
-      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.estTr != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.estTr!.esttr)], child: const Text("Est. of TR")),
-      DropdownMenuItem(value: [for (var state in states) if (state.tlSeason1.esttracc != null) FlSpot(state.state.millisecondsSinceEpoch.toDouble(), state.tlSeason1.esttracc!)], child: const Text("Accuracy of Est.")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.rating)], child: const Text("Tetra Rating")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.glicko!)], child: const Text("Glicko")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.rd!)], child: const Text("Rating Deviation")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.apm != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.apm!)], child: const Text("Attack Per Minute")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.pps != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.pps!)], child: const Text("Pieces Per Second")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.vs != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.vs!)], child: const Text("Versus Score")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.app)], child: const Text("Attack Per Piece")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.dss)], child: const Text("Downstack Per Second")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.dsp)], child: const Text("Downstack Per Piece")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.appdsp)], child: const Text("APP + DS/P")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.vsapm)], child: const Text("VS/APM")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.cheese)], child: const Text("Cheese Index")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.gbe)], child: const Text("Garbage Efficiency")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.nyaapp)], child: const Text("Weighted APP")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.area)], child: const Text("Area")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.estTr != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.estTr!.esttr)], child: const Text("Est. of TR")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.esttracc != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.esttracc!)], child: const Text("Accuracy of Est.")),
     ];
     tlMatches.addAll(await teto.getTLMatchesbyPlayerID(me.userId));
     for (var match in tlStream.records) {
@@ -155,7 +162,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
       tlMatches = tlStream.records;
     }
     Map<String, dynamic> records = await teto.fetchRecords(me.userId);
-    return [me, records, states, tlMatches, isTracking];
+    return [me, records, states, tlMatches, compareWith, isTracking];
   }
 
   void _justUpdate() {
@@ -289,7 +296,8 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                         children: [
                           TLThingy(
                               tl: snapshot.data![0].tlSeason1,
-                              userID: snapshot.data![0].userId),
+                              userID: snapshot.data![0].userId,
+                              oldTl: snapshot.data![4],),
                           _TLRecords(userID: snapshot.data![0].userId, data: snapshot.data![3]),
                           _History(states: snapshot.data![2], update: _justUpdate),
                           _RecordThingy(
@@ -588,7 +596,8 @@ class _RecordThingy extends StatelessWidget {
                         StatCellNum(
                             playerStat: record!.rank!,
                             playerStatLabel: "Leaderboard Placement",
-                            isScreenBig: bigScreen),
+                            isScreenBig: bigScreen,
+                            higherIsBetter: false),
                       Text("Obtained ${dateFormat.format(record!.timestamp!)}",
                           textAlign: TextAlign.center,
                           style: const TextStyle(
@@ -608,46 +617,55 @@ class _RecordThingy extends StatelessWidget {
                               StatCellNum(
                                   playerStat: record!.endContext!.level,
                                   playerStatLabel: "Level",
-                                  isScreenBig: bigScreen),
+                                  isScreenBig: bigScreen,
+                                  higherIsBetter: true,),
                             if (record!.stream.contains("blitz"))
                               StatCellNum(
                                   playerStat: record!.endContext!.spp,
                                   playerStatLabel: "Score\nPer Piece",
                                   fractionDigits: 2,
-                                  isScreenBig: bigScreen),
+                                  isScreenBig: bigScreen,
+                                  higherIsBetter: true,),
                             StatCellNum(
                                 playerStat: record!.endContext!.piecesPlaced,
                                 playerStatLabel: "Pieces\nPlaced",
-                                isScreenBig: bigScreen),
+                                isScreenBig: bigScreen,
+                                  higherIsBetter: true,),
                             StatCellNum(
                                 playerStat: record!.endContext!.pps,
                                 playerStatLabel: "Pieces\nPer Second",
                                 fractionDigits: 2,
-                                isScreenBig: bigScreen),
+                                isScreenBig: bigScreen,
+                                  higherIsBetter: true,),
                             StatCellNum(
                                 playerStat: record!.endContext!.finesse.faults,
                                 playerStatLabel: "Finesse\nFaults",
-                                isScreenBig: bigScreen),
+                                isScreenBig: bigScreen,
+                                  higherIsBetter: false,),
                             StatCellNum(
                                 playerStat:
                                     record!.endContext!.finessePercentage * 100,
                                 playerStatLabel: "Finesse\nPercentage",
                                 fractionDigits: 2,
-                                isScreenBig: bigScreen),
+                                isScreenBig: bigScreen,
+                                  higherIsBetter: true,),
                             StatCellNum(
                                 playerStat: record!.endContext!.inputs,
                                 playerStatLabel: "Key\nPresses",
-                                isScreenBig: bigScreen),
+                                isScreenBig: bigScreen,
+                                  higherIsBetter: false,),
                             StatCellNum(
                                 playerStat: record!.endContext!.kpp,
                                 playerStatLabel: "KP Per\nPiece",
                                 fractionDigits: 2,
-                                isScreenBig: bigScreen),
+                                isScreenBig: bigScreen,
+                                  higherIsBetter: false,),
                             StatCellNum(
                                 playerStat: record!.endContext!.kps,
                                 playerStatLabel: "KP Per\nSecond",
                                 fractionDigits: 2,
-                                isScreenBig: bigScreen),
+                                isScreenBig: bigScreen,
+                                  higherIsBetter: true,),
                           ],
                         ),
                       ),

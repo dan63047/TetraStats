@@ -10,7 +10,7 @@ List<DropdownMenuItem<TetrioPlayer>>? greenSideStates;
 TetrioPlayer? theRedSide;
 List<DropdownMenuItem<TetrioPlayer>>? redSideStates;
 final TetrioService teto = TetrioService();
-final DateFormat dateFormat = DateFormat.yMMMd().add_Hms();
+final DateFormat dateFormat = DateFormat.yMd().add_Hm();
 
 class CompareView extends StatefulWidget {
   final TetrioPlayer greenSide;
@@ -794,6 +794,23 @@ class CompareState extends State<CompareView> {
                                 fractionDigits: 2,
                                 higherIsBetter: true,
                               ),
+                              CompareThingy(
+                                label: "By Est. TR",
+                                greenSide: getWinrateByTR(
+                                        theGreenSide!.tlSeason1.estTr!.estglicko,
+                                        theGreenSide!.tlSeason1.rd!,
+                                        theRedSide!.tlSeason1.estTr!.estglicko,
+                                        theRedSide!.tlSeason1.rd!) *
+                                    100,
+                                redSide: getWinrateByTR(
+                                        theRedSide!.tlSeason1.estTr!.estglicko,
+                                        theRedSide!.tlSeason1.rd!,
+                                        theGreenSide!.tlSeason1.estTr!.estglicko,
+                                        theGreenSide!.tlSeason1.rd!) *
+                                    100,
+                                fractionDigits: 2,
+                                higherIsBetter: true,
+                              ),
                             ],
                           )
                         ],
@@ -858,6 +875,7 @@ class PlayerSelector extends StatelessWidget {
               child: DropdownButton(
                 items: states,
                 value: player,
+                //style: TextStyle(overflow: TextOverflow.clip),
                 onChanged: (value) => change(value!),
               ),
             )

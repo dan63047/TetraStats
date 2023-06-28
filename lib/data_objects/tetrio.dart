@@ -100,7 +100,7 @@ class TetrioPlayer {
     country = json['country'];
     supporterTier = json['supporter_tier'];
     verified = json['verified'];
-    tlSeason1 = TetraLeagueAlpha.fromJson(json['league']);
+    tlSeason1 = TetraLeagueAlpha.fromJson(json['league'], stateTime);
     avatarRevision = json['avatar_revision'];
     bannerRevision = json['banner_revision'];
     bio = json['bio'];
@@ -479,12 +479,13 @@ class EstTr {
   late double esttr;
   late double srarea;
   late double statrank;
+  late double estglicko;
 
   EstTr(this._apm, this._pps, this._vs, this._rd, this._app, this._dss, this._dsp, this._gbe) {
     srarea = (_apm * 0) + (_pps * 135) + (_vs * 0) + (_app * 290) + (_dss * 0) + (_dsp * 700) + (_gbe * 0);
     statrank = 11.2 * atan((srarea - 93) / 130) + 1;
     if (statrank <= 0) statrank = 0.001;
-    double estglicko = (4.0867 * srarea + 186.68);
+    estglicko = (4.0867 * srarea + 186.68);
     double temp = (1500 - estglicko) * pi;
     double temp2 = pow((15.9056943314 * (pow(_rd, 2)) + 3527584.25978), 0.5) as double;
     double temp3 = 1 + pow(10, (temp / temp2)) as double;
@@ -644,6 +645,7 @@ class EndContextMulti {
 }
 
 class TetraLeagueAlpha {
+  late DateTime timestamp;
   late int gamesPlayed;
   late int gamesWon;
   late String bestRank;
@@ -692,7 +694,8 @@ class TetraLeagueAlpha {
 
   double get winrate => gamesWon / gamesPlayed;
 
-  TetraLeagueAlpha.fromJson(Map<String, dynamic> json) {
+  TetraLeagueAlpha.fromJson(Map<String, dynamic> json, ts) {
+    timestamp = ts;
     gamesPlayed = json['gamesplayed'];
     gamesWon = json['gameswon'];
     rating = json['rating'].toDouble();
@@ -833,14 +836,16 @@ class Distinguishment {
 
 class TetrioPlayersLeaderboard {
   late String type;
+  late DateTime timestamp;
   late List<TetrioPlayerFromLeaderboard> leaderboard;
 
   TetrioPlayersLeaderboard(this.type, this.leaderboard);
 
-  TetrioPlayersLeaderboard.fromJson(Map<String, dynamic> json, String type) {
+  TetrioPlayersLeaderboard.fromJson(Map<String, dynamic> json, String type, DateTime ts) {
     type = type;
+    timestamp = ts;
     for (Map<String, dynamic> entry in json['users']) {
-      leaderboard.add(TetrioPlayerFromLeaderboard.fromJson(entry));
+      leaderboard.add(TetrioPlayerFromLeaderboard.fromJson(entry, ts));
     }
   }
 }
@@ -857,7 +862,7 @@ class TetrioPlayerFromLeaderboard {
 
   TetrioPlayerFromLeaderboard(this.userId, this.username, this.role, this.xp, this.country, this.supporter, this.verified, this.league);
 
-  TetrioPlayerFromLeaderboard.fromJson(Map<String, dynamic> json) {
+  TetrioPlayerFromLeaderboard.fromJson(Map<String, dynamic> json, DateTime ts) {
     userId = json['_id'];
     username = json['username'];
     role = json['role'];
@@ -865,6 +870,6 @@ class TetrioPlayerFromLeaderboard {
     country = json['country '];
     supporter = json['supporter'];
     verified = json['verified'];
-    league = TetraLeagueAlpha.fromJson(json['league']);
+    league = TetraLeagueAlpha.fromJson(json['league'], ts);
   }
 }

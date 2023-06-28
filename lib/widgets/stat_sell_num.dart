@@ -8,9 +8,11 @@ class StatCellNum extends StatelessWidget {
       required this.playerStatLabel,
       required this.isScreenBig,
       this.alertWidgets,
-      this.fractionDigits});
+      this.fractionDigits, this.oldPlayerStat, required this.higherIsBetter});
 
   final num playerStat;
+  final num? oldPlayerStat;
+  final bool higherIsBetter;
   final String playerStatLabel;
   final bool isScreenBig;
   final List<Widget>? alertWidgets;
@@ -29,6 +31,11 @@ class StatCellNum extends StatelessWidget {
             fontSize: isScreenBig ? 32 : 24,
           ),
         ),
+        if (oldPlayerStat != null) Text(NumberFormat("+#,###.###;-#,###.###").format(playerStat - oldPlayerStat!), style: TextStyle(
+          color: higherIsBetter ?
+          oldPlayerStat! > playerStat ? Colors.red : Colors.green :
+          oldPlayerStat! < playerStat ? Colors.red : Colors.green
+        ),),
         alertWidgets == null
             ? Text(
                 playerStatLabel,
