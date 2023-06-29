@@ -1,0 +1,14 @@
+flutter_app: 
+  command: tetra_stats
+  arch: x64
+  parent: /usr/local/lib
+
+control:
+  Package: tetra-stats
+  Version: 0.2.0
+  Architecture: amd64
+  Essential: no
+  Priority: optional
+  Depends:
+  Maintainer: dan63047
+  Description: Track your and other player stats in TETR.IO

@@ -54,8 +54,12 @@ class CompareState extends State<CompareView> {
         redSideStates!.add(DropdownMenuItem<TetrioPlayer>(
         value: state, child: Text(dateFormat.format(state.state))));
       }
-      redSideStates!.add(DropdownMenuItem<TetrioPlayer>(
+      redSideStates!.firstWhere((element) => element.value == theRedSide, orElse: () {
+        redSideStates!.add(DropdownMenuItem<TetrioPlayer>(
         value: theRedSide!, child: const Text("Most recent one")));
+        return DropdownMenuItem<TetrioPlayer>(
+        value: theRedSide!, child: const Text("Most recent one"));
+      },);
       }on Exception {
         states = [];
         redSideStates = null;
@@ -78,13 +82,17 @@ class CompareState extends State<CompareView> {
       greenSideStates = null;
       try{
         states = await teto.getPlayer(theGreenSide!.userId);
-         greenSideStates = <DropdownMenuItem<TetrioPlayer>>[];
+        greenSideStates = <DropdownMenuItem<TetrioPlayer>>[];
       for (final TetrioPlayer state in states) {
         greenSideStates!.add(DropdownMenuItem<TetrioPlayer>(
         value: state, child: Text(dateFormat.format(state.state))));
       }
-      greenSideStates!.add(DropdownMenuItem<TetrioPlayer>(
+      greenSideStates!.firstWhere((element) => element.value == theGreenSide, orElse: () {
+        greenSideStates!.add(DropdownMenuItem<TetrioPlayer>(
         value: theGreenSide!, child: const Text("Most recent one")));
+        return DropdownMenuItem<TetrioPlayer>(
+        value: theGreenSide!, child: const Text("Most recent one"));
+      },);
       }on Exception {
         states = [];
         greenSideStates = null;

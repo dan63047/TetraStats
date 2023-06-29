@@ -118,17 +118,22 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
     List<TetraLeagueAlphaRecord> tlMatches = [];
     bool isTracking = await teto.isPlayerTracking(me.userId);
     List<TetrioPlayer> states = [];
-    TetraLeagueAlpha? compareWith = null;
-    var uniqueTL = Set();
+    TetraLeagueAlpha? compareWith;
+    var uniqueTL = <dynamic>{};
     if (isTracking){
       teto.storeState(me);
       teto.saveTLMatchesFromStream(await teto.getTLStream(me.userId));
       states.addAll(await teto.getPlayer(me.userId));
-      states.forEach((element) {
+      for (var element in states) {
         if (uniqueTL.isNotEmpty && uniqueTL.last != element.tlSeason1) uniqueTL.add(element.tlSeason1);
         if (uniqueTL.isEmpty) uniqueTL.add(element.tlSeason1);
-        });
-      compareWith = uniqueTL.toList()[uniqueTL.length - 2];
+        }
+        try{
+          compareWith = uniqueTL.toList()[uniqueTL.length - 2];
+        }on RangeError {
+          compareWith = null;
+        }
+      
       chartsData = <DropdownMenuItem<List<FlSpot>>>[
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.rating)], child: const Text("Tetra Rating")),
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.glicko!)], child: const Text("Glicko")),

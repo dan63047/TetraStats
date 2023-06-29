@@ -16,6 +16,6 @@ void main() {
       routes: {"/settings": (context) => const SettingsView(), "/states": (context) => const TrackedPlayersView(), "/calc": (context) => const CalcView()},
       theme: ThemeData(
           fontFamily: 'Eurostile Round',
-          colorScheme: const ColorScheme.dark(primary: Colors.cyanAccent, secondary: Colors.purpleAccent),
+          colorScheme: const ColorScheme.dark(primary: Colors.cyanAccent, secondary: Colors.white),
           scaffoldBackgroundColor: Colors.black)));
 }

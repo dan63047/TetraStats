@@ -1,5 +1,9 @@
+import 'dart:io';
+import 'package:file_selector/file_selector.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
@@ -12,7 +16,11 @@ class SettingsView extends StatefulWidget {
 }
 
 class SettingsState extends State<SettingsView> {
-  PackageInfo _packageInfo = PackageInfo(appName: "TetraStats", packageName: "idk man", version: "some numbers", buildNumber: "anotherNumber");
+  PackageInfo _packageInfo = PackageInfo(
+      appName: "TetraStats",
+      packageName: "idk man",
+      version: "some numbers",
+      buildNumber: "anotherNumber");
   late SharedPreferences prefs;
   final TetrioService teto = TetrioService();
   String defaultNickname = "Checking...";
@@ -67,8 +75,108 @@ class SettingsState extends State<SettingsView> {
         children: [
           ListTile(
             title: const Text("Export local database"),
-            subtitle: const Text("It contains states and Tetra League records of the tracked players and list of tracked players."),
-            onTap: (){},
+            subtitle: const Text(
+                "It contains states and Tetra League records of the tracked players and list of tracked players."),
+            onTap: () {
+              if (Platform.isLinux || Platform.isWindows) {
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                          title: const Text("Desktop export",
+                              style: TextStyle(
+                                  fontFamily: "Eurostile Round Extended")),
+                          content: const SingleChildScrollView(
+                            child: ListBody(children: [
+                              Text(
+                                  "It seems like you using this app on desktop. Check your documents folder, you should find \"TetraStats.db\". Copy it somewhere")
+                            ]),
+                          ),
+                          actions: <Widget>[
+                            TextButton(
+                              child: const Text('OK'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        ));
+              }
+              if (Platform.isAndroid){
+                var downloadFolder = Directory("/storage/emulated/0/Download");
+                File exportedDB = File("${downloadFolder.path}/TetraStats.db");
+                getApplicationDocumentsDirectory().then((value) {
+                  exportedDB.writeAsBytes(File("${value.path}/TetraStats.db").readAsBytesSync());
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                          title: const Text("Android export",
+                              style: TextStyle(
+                                  fontFamily: "Eurostile Round Extended")),
+                          content: SingleChildScrollView(
+                            child: ListBody(children: [Text("Exported.\n$exportedDB")]),
+                          ),
+                          actions: <Widget>[
+                            TextButton(
+                              child: const Text('OK'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        ));
+                });
+              }
+            },
+          ),
+          ListTile(
+            title: const Text("Import local database"),
+            subtitle: const Text("Restore your backup. Notice that already stored database will be overwritten."),
+            onTap: () {
+              if(Platform.isAndroid){
+                FilePicker.platform.pickFiles(
+                  type: FileType.any,
+                ).then((value){
+                if (value != null){
+                  var newDB = value.paths[0]!;
+                    teto.close().then((value){
+                      if(!newDB.endsWith("db")){
+                        return ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Wrong file type")));
+                      }
+                    getApplicationDocumentsDirectory().then((value){
+                      var oldDB = File("${value.path}/TetraStats.db");
+                      oldDB.writeAsBytes(File(newDB).readAsBytesSync(), flush: true).then((value){
+                        teto.open();
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Import successful")));
+                      });
+                    });
+                  });
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Operation was cancelled")));
+                }
+              }); 
+              }else{
+               const XTypeGroup typeGroup = XTypeGroup(
+                label: 'Tetra Stats Database',
+                extensions: <String>['db'],
+              );
+              openFile(acceptedTypeGroups: <XTypeGroup>[typeGroup]).then((value){
+                if (value != null){
+                  var newDB = value.path;
+                    teto.close().then((value){
+                    getApplicationDocumentsDirectory().then((value){
+                      var oldDB = File("${value.path}/TetraStats.db");
+                      oldDB.writeAsBytes(File(newDB).readAsBytesSync()).then((value){
+                        teto.open();
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Import successful")));
+                      });
+                    });
+                  });
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Operation was cancelled")));
+                }
+              }); 
+              }
+            },
           ),
           ListTile(
             title: const Text("Your TETR.IO account"),
@@ -76,7 +184,9 @@ class SettingsState extends State<SettingsView> {
             onTap: () => showDialog(
                 context: context,
                 builder: (BuildContext context) => AlertDialog(
-                      title: const Text("Your TETR.IO account nickname or ID", style: TextStyle(fontFamily: "Eurostile Round Extended")),
+                      title: const Text("Your TETR.IO account nickname or ID",
+                          style: TextStyle(
+                              fontFamily: "Eurostile Round Extended")),
                       content: SingleChildScrollView(
                         child: ListBody(children: [
                           const Text(
