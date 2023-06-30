@@ -9,12 +9,12 @@
 - ~~Serialization/Deserialization~~
 - ~~Sqlite Database and service, that can work with it~~ *v0.0.2*
 - ~~Ability to track player~~
-- ~~Ability to compare 2 players~~ *v0.1.0, we are here*
+- ~~Ability to compare 2 players~~ *v0.1.0*
 - ~~Stats Calculator~~
 - ~~Ability to compare player with himself in past~~
 - ~~Tetra League matches history~~
-- ~~Tetra League historic charts for tracked players~~ *dev build are here*
-- Better UI with delta and hints for stats *that will be v0.2.0*
+- ~~Tetra League historic charts for tracked players~~ 
+- ~~Better UI with delta and hints for stats~~ *v0.2.0, we are here* *dev build are here*
 - Ability to compare player with APM-PPS-VS stats
 - Ability to fetch Tetra League leaderboard
 - Average stats for ranks
