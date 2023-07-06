@@ -13,12 +13,8 @@ enum Mode{
 }
 Mode greenSideMode = Mode.player;
 List<dynamic> theGreenSide = [null, null, null]; // TetrioPlayer?, List<DropdownMenuItem<TetrioPlayer>>?, TetraLeagueAlpha?
-//TetrioPlayer? theGreenSide;
-//List<DropdownMenuItem<TetrioPlayer>>? greenSideStates;
 Mode redSideMode = Mode.player;
 List<dynamic> theRedSide = [null, null, null];
-//TetrioPlayer? theRedSide;
-//List<DropdownMenuItem<TetrioPlayer>>? redSideStates;
 final TetrioService teto = TetrioService();
 final DateFormat dateFormat = DateFormat.yMd().add_Hm();
 // ignore: unnecessary_string_escapes
@@ -51,7 +47,9 @@ class CompareState extends State<CompareView> {
   @override
   void dispose(){
     theGreenSide = [null, null, null];
+    greenSideMode = Mode.player;
     theRedSide = [null, null, null];
+    redSideMode = Mode.player;
     super.dispose();
   }
 
@@ -87,7 +85,6 @@ class CompareState extends State<CompareView> {
         return setState(() {});
       }
       var player = await teto.fetchPlayer(user);
-      //theRedSide
       redSideMode = Mode.player;
       late List<TetrioPlayer> states;
       List<DropdownMenuItem<TetrioPlayer>>? dStates = <DropdownMenuItem<TetrioPlayer>>[];
@@ -128,7 +125,7 @@ class CompareState extends State<CompareView> {
         double apm = double.parse(threeNumbers[0][0]!);
         double pps = double.parse(threeNumbers[1][0]!);
         double vs = double.parse(threeNumbers[2][0]!);
-        theGreenSide = theRedSide = [null,
+        theGreenSide = [null,
         null,
         TetraLeagueAlpha(
           apm: apm,
