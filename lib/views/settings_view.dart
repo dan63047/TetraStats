@@ -140,18 +140,18 @@ class SettingsState extends State<SettingsView> {
                   var newDB = value.paths[0]!;
                     teto.close().then((value){
                       if(!newDB.endsWith("db")){
-                        return ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Wrong file type")));
+                        return ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Wrong file type")));
                       }
                     getApplicationDocumentsDirectory().then((value){
                       var oldDB = File("${value.path}/TetraStats.db");
                       oldDB.writeAsBytes(File(newDB).readAsBytesSync(), flush: true).then((value){
                         teto.open();
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Import successful")));
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Import successful")));
                       });
                     });
                   });
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Operation was cancelled")));
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Operation was cancelled")));
                 }
               }); 
               }else{
@@ -167,12 +167,12 @@ class SettingsState extends State<SettingsView> {
                       var oldDB = File("${value.path}/TetraStats.db");
                       oldDB.writeAsBytes(File(newDB).readAsBytesSync()).then((value){
                         teto.open();
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Import successful")));
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Import successful")));
                       });
                     });
                   });
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Operation was cancelled")));
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Operation was cancelled")));
                 }
               }); 
               }

@@ -690,7 +690,11 @@ class TetraLeagueAlpha {
       this.apm,
       this.pps,
       this.vs,
-      this.records});
+      this.records}){
+        nerdStats = (apm != null && pps != null && apm != null) ? NerdStats(apm!, pps!, vs!) : null;
+        estTr = (nerdStats != null) ? EstTr(apm!, pps!, vs!, (rd != null) ? rd! : 69, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp, nerdStats!.gbe) : null;
+        playstyle =(nerdStats != null) ? Playstyle(apm!, pps!, nerdStats!.app, nerdStats!.vsapm, nerdStats!.dsp, nerdStats!.gbe, estTr!.srarea, estTr!.statrank) : null;
+      }
 
   double get winrate => gamesWon / gamesPlayed;
 
