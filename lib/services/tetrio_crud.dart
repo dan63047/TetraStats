@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer' as developer;
+import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/services/sqlite_db_controller.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
@@ -49,6 +52,7 @@ class TetrioService extends DB {
   Map<String, List<TetrioPlayer>> _players = {};
   final Map<String, TetrioPlayer> _playersCache = {};
   final Map<String, Map<String, dynamic>> _recordsCache = {};
+  final Map<String, TetrioPlayersLeaderboard> _leaderboardsCache = {};
   final Map<String, TetraLeagueAlphaStream> _tlStreamsCache = {}; // i'm trying to respect oskware api It should look something like {"cached_until": TetrioPlayer}
   static final TetrioService _shared = TetrioService._sharedInstance();
   factory TetrioService() => _shared;
@@ -89,6 +93,39 @@ class TetrioService extends DB {
     if (id.length <= 16) return id;
     TetrioPlayer player = await getPlayer(id).then((value) => value.last);
     return player.username;
+  }
+
+  Future<TetrioPlayersLeaderboard> fetchTLLeaderboard() async {
+    try{
+      var cached = _leaderboardsCache.entries.firstWhere((element) => element.value.type == "league");
+    if (DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true).isAfter(DateTime.now())){
+      developer.log("fetchTLLeaderboard: Leaderboard retrieved from cache, that expires ${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)}", name: "services/tetrio_crud");
+      return cached.value;
+    }else{
+      _leaderboardsCache.remove(cached.key);
+      developer.log("fetchTLLeaderboard: Leaderboard expired (${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)})", name: "services/tetrio_crud");
+    }
+    }catch(e){
+      developer.log("fetchTLLeaderboard: Trying to retrieve leaderboard", name: "services/tetrio_crud");
+    }
+    
+    var url = Uri.https('ch.tetr.io', 'api/users/lists/league/all');
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      var rawJson = jsonDecode(response.body);
+      if (rawJson['success']) {
+        TetrioPlayersLeaderboard leaderboard = TetrioPlayersLeaderboard.fromJson(rawJson['data']['users'], "league", DateTime.fromMillisecondsSinceEpoch(rawJson['cache']['cached_at']));
+        developer.log("fetchTLLeaderboard: Leaderboard retrieved and cached", name: "services/tetrio_crud");
+        _leaderboardsCache[rawJson['cache']['cached_until'].toString()] = leaderboard;
+        return leaderboard;
+      } else {
+        developer.log("fetchTLLeaderboard: Bruh", name: "services/tetrio_crud", error: rawJson);
+        throw Exception("User doesn't exist");
+      }
+    } else {
+      developer.log("fetchTLLeaderboard: Failed to fetch leaderboard", name: "services/tetrio_crud", error: response.statusCode);
+      throw Exception('Failed to fetch player');
+    }
   }
 
   Future<TetraLeagueAlphaStream> getTLStream(String userID) async {

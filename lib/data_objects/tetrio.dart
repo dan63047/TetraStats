@@ -845,10 +845,11 @@ class TetrioPlayersLeaderboard {
 
   TetrioPlayersLeaderboard(this.type, this.leaderboard);
 
-  TetrioPlayersLeaderboard.fromJson(Map<String, dynamic> json, String type, DateTime ts) {
-    type = type;
+  TetrioPlayersLeaderboard.fromJson(List<dynamic> json, String t, DateTime ts) {
+    type = t;
     timestamp = ts;
-    for (Map<String, dynamic> entry in json['users']) {
+    leaderboard = [];
+    for (Map<String, dynamic> entry in json) {
       leaderboard.add(TetrioPlayerFromLeaderboard.fromJson(entry, ts));
     }
   }
@@ -862,9 +863,42 @@ class TetrioPlayerFromLeaderboard {
   String? country;
   late bool supporter;
   late bool verified;
-  late TetraLeagueAlpha league;
+  late DateTime timestamp;
+  late int gamesPlayed;
+  late int gamesWon;
+  late double rating;
+  late double glicko;
+  late double rd;
+  late String rank;
+  late String bestRank;
+  late double apm;
+  late double pps;
+  late double vs;
+  late bool decaying;
 
-  TetrioPlayerFromLeaderboard(this.userId, this.username, this.role, this.xp, this.country, this.supporter, this.verified, this.league);
+  TetrioPlayerFromLeaderboard(
+    this.userId,
+    this.username,
+    this.role,
+    this.xp,
+    this.country,
+    this.supporter,
+    this.verified,
+    this.timestamp,
+    this.gamesPlayed,
+    this.gamesWon,
+    this.rating,
+    this.glicko,
+    this.rd,
+    this.rank,
+    this.bestRank,
+    this.apm,
+    this.pps,
+    this.vs,
+    this.decaying);
+
+  get app => apm / (pps * 60);
+  get vsapm => vs / apm;
 
   TetrioPlayerFromLeaderboard.fromJson(Map<String, dynamic> json, DateTime ts) {
     userId = json['_id'];
@@ -874,6 +908,17 @@ class TetrioPlayerFromLeaderboard {
     country = json['country '];
     supporter = json['supporter'];
     verified = json['verified'];
-    league = TetraLeagueAlpha.fromJson(json['league'], ts);
+    timestamp = ts;
+    gamesPlayed = json['league']['gamesplayed'];
+    gamesWon = json['league']['gameswon'];
+    rating = json['league']['rating'].toDouble();
+    glicko = json['league']['glicko'].toDouble();
+    rd = json['league']['rd'].toDouble();
+    rank = json['league']['rank'];
+    bestRank = json['league']['bestrank'];
+    apm = json['league']['apm'].toDouble();
+    pps = json['league']['pps'].toDouble();
+    vs = json['league']['vs'].toDouble();
+    decaying = json['league']['decaying'];
   }
 }

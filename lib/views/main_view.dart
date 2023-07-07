@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
+import 'package:tetra_stats/views/tl_leaderboard_view.dart' show TLLeaderboardView;
 import 'package:tetra_stats/views/tl_match_view.dart' show TlMatchResultView;
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
 import 'package:tetra_stats/widgets/tl_thingy.dart';
@@ -235,6 +236,8 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
               ),
             ],
             onSelected: (value) {
+              if (value == "tll") {teto.fetchTLLeaderboard();
+              return;}
               Navigator.pushNamed(context, value);
             },
           ),
@@ -418,6 +421,20 @@ class _NavDrawerState extends State<NavDrawer> {
                             widget.changePlayer(
                                 prefs.getString("player") ?? "dan63047");
                             Navigator.of(context).pop();
+                          },
+                        ),
+                      ),
+                      SliverToBoxAdapter(
+                        child: ListTile(
+                          leading: const Icon(Icons.leaderboard),
+                          title: const Text("Tetra League leaderboard"),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const TLLeaderboardView(),
+                              ),
+                            );
                           },
                         ),
                       )
