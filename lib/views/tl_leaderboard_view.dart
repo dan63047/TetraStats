@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
-import 'package:tetra_stats/views/states_view.dart';
+import 'package:tetra_stats/views/main_view.dart';
+import 'package:tetra_stats/views/ranks_averages_view.dart';
 
 final TetrioService teto = TetrioService();
 
@@ -22,6 +22,21 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Tetra League Leaderboard"),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const RankAveragesView(),
+                  maintainState: false,
+                ),
+              );
+            },
+            icon: const Icon(Icons.compress),
+            tooltip: "Averages",
+          ),
+        ],
       ),
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -39,9 +54,9 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
                         headerSliverBuilder: (context, value) {
                           String howManyPlayers(int numberOfPlayers) => Intl.plural(
                                 numberOfPlayers,
-                                zero: 'Empty list. Press "Track" button in previous view to add current player here',
-                                one: 'There is only one player',
-                                other: 'There are $numberOfPlayers players',
+                                zero: 'Empty list. Looks like something is wrong...',
+                                one: 'There is only one player... What?',
+                                other: 'There are $numberOfPlayers ranked players.',
                                 name: 'howManyPeople',
                                 args: [numberOfPlayers],
                                 desc: 'Description of how many people are seen in a place.',
@@ -62,25 +77,27 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
                         body: ListView.builder(
                             itemCount: allPlayers!.length,
                             itemBuilder: (context, index) {
+                              bool bigScreen = MediaQuery.of(context).size.width > 768;
                               return ListTile(
-                                leading: Text((index+1).toString(), style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)),
-                                title: Text("${allPlayers[index].username}", style: const TextStyle(fontFamily: "Eurostile Round Extended")),
+                                leading: Text((index+1).toString(), style: bigScreen ? const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28) : null),
+                                title: Text(allPlayers[index].username, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
                                 subtitle: Text(
                                     "${f2.format(allPlayers[index].apm)} APM, ${f2.format(allPlayers[index].pps)} PPS, ${f2.format(allPlayers[index].vs)} VS, ${f2.format(allPlayers[index].app)} APP, ${f2.format(allPlayers[index].vsapm)} VS/APM"),
                                 trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text("${f2.format(allPlayers[index].rating)} TR", style: const TextStyle(fontSize: 28)),
-                                    Image.asset("res/tetrio_tl_alpha_ranks/${allPlayers[index].rank}.png", height: 48),
+                                    Text("${f2.format(allPlayers[index].rating)} TR", style: bigScreen ? const TextStyle(fontSize: 28) : null),
+                                    Image.asset("res/tetrio_tl_alpha_ranks/${allPlayers[index].rank}.png", height: bigScreen ? 48 : 16),
                                   ],
                                 ),
                                 onTap: () {
-                                  // Navigator.push(
-                                  //   context,
-                                  //   MaterialPageRoute(
-                                  //     builder: (context) => StatesView(states: allPlayers!),
-                                  //   ),
-                                  // );
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => MainView(player: allPlayers[index].userId),
+                                      maintainState: false,
+                                    ),
+                                  );
                                 },
                               );
                             }));

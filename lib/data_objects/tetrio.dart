@@ -13,6 +13,25 @@ const double appdspWeight = 140;
 const double vsapmWeight = 60;
 const double cheeseWeight = 1.25;
 const double gbeWeight = 315;
+const Map<String, double> ranksCutoffs = {
+  "x": 0.01,
+  "u": 0.05,
+  "ss": 0.11,
+  "s+": 0.17,
+  "s": 0.23,
+  "s-": 0.3,
+  "a+": 0.38,
+  "a": 0.46,
+  "a-": 0.54,
+  "b+": 0.62,
+  "b": 0.7,
+  "b-": 0.78,
+  "c+": 0.84,
+  "c": 0.9,
+  "c-": 0.95,
+  "d+": 0.975,
+  "d": 1
+};
 
 Duration doubleSecondsToDuration(double value) {
   value = value * 1000000;
@@ -719,7 +738,7 @@ class TetraLeagueAlpha {
     nextRank = json['next_rank'];
     nextAt = json['next_at'];
     percentileRank = json['percentile_rank'];
-    nerdStats = (apm != null && pps != null && apm != null) ? NerdStats(apm!, pps!, vs!) : null;
+    nerdStats = (apm != null && pps != null && vs != null) ? NerdStats(apm!, pps!, vs!) : null;
     estTr = (nerdStats != null) ? EstTr(apm!, pps!, vs!, (rd != null) ? rd! : 69, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp, nerdStats!.gbe) : null;
     playstyle =
         (nerdStats != null) ? Playstyle(apm!, pps!, nerdStats!.app, nerdStats!.vsapm, nerdStats!.dsp, nerdStats!.gbe, estTr!.srarea, estTr!.statrank) : null;
@@ -844,6 +863,55 @@ class TetrioPlayersLeaderboard {
   late List<TetrioPlayerFromLeaderboard> leaderboard;
 
   TetrioPlayersLeaderboard(this.type, this.leaderboard);
+
+  List<dynamic> getAverageOfRank(String rank){
+    List<TetrioPlayerFromLeaderboard> filtredLeaderboard = List.from(leaderboard); 
+    filtredLeaderboard.removeWhere((element) => element.rank != rank);
+    if (filtredLeaderboard.isEmpty) throw Exception("Invalid rank");
+    double avgAPM = 0, avgPPS = 0, avgVS = 0, avgTR = 0, avgGlicko = 0, avgRD = 0, lowestTR = 25000;
+    int avgGamesPlayed = 0, avgGamesWon = 0, totalGamesPlayed = 0, totalGamesWon = 0;
+    for (var entry in filtredLeaderboard){
+      avgAPM += entry.apm;
+      avgPPS += entry.pps;
+      avgVS += entry.vs;
+      avgTR += entry.rating;
+      avgGlicko += entry.glicko;
+      avgRD += entry.rd;
+      totalGamesPlayed += entry.gamesPlayed;
+      totalGamesWon += entry.gamesWon;
+      if (entry.rating < lowestTR) lowestTR = entry.rating;
+    }
+    avgAPM /= filtredLeaderboard.length;
+    avgPPS /= filtredLeaderboard.length;
+    avgVS /= filtredLeaderboard.length;
+    avgTR /= filtredLeaderboard.length;
+    avgGlicko /= filtredLeaderboard.length;
+    avgRD /= filtredLeaderboard.length;
+    avgGamesPlayed = (totalGamesPlayed / filtredLeaderboard.length).floor();
+    avgGamesWon = (totalGamesWon / filtredLeaderboard.length).floor();
+    return [TetraLeagueAlpha(apm: avgAPM, pps: avgPPS, vs: avgVS, glicko: avgGlicko, rd: avgRD, gamesPlayed: avgGamesPlayed, gamesWon: avgGamesWon, bestRank: rank, decaying: false, rating: avgTR, rank: rank, percentileRank: rank, percentile: 0, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1),
+    {"totalGamesPlayed": totalGamesPlayed, "totalGamesWon": totalGamesWon, "players": filtredLeaderboard.length, "lowestTR": lowestTR, "toEnterTR": leaderboard[(leaderboard.length * ranksCutoffs[rank]!).floor()-1].rating}];
+  }
+
+  Map<String, List<dynamic>> get averages => {
+    'x': getAverageOfRank("x"),
+    'u': getAverageOfRank("u"),
+    'ss': getAverageOfRank("ss"),
+    's+': getAverageOfRank("s+"),
+    's': getAverageOfRank("s"),
+    's-': getAverageOfRank("s-"),
+    'a+': getAverageOfRank("a+"),
+    'a': getAverageOfRank("a"),
+    'a-': getAverageOfRank("a-"),
+    'b+': getAverageOfRank("b+"),
+    'b': getAverageOfRank("b"),
+    'b-': getAverageOfRank("b-"),
+    'c+': getAverageOfRank("c+"),
+    'c': getAverageOfRank("c"),
+    'c-': getAverageOfRank("c-"),
+    'd+': getAverageOfRank("d+"),
+    'd': getAverageOfRank("d")
+    };
 
   TetrioPlayersLeaderboard.fromJson(List<dynamic> json, String t, DateTime ts) {
     type = t;

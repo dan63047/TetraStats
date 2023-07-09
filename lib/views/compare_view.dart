@@ -820,7 +820,7 @@ class CompareState extends State<CompareView> {
                           )
                         ],
                       )
-                  ] : [Text("Please, enter username, user ID, or APM-PPS-VS values (divider doesn't matter) to both of fields")],
+                  ] : [const Text("Please, enter username, user ID, or APM-PPS-VS values (divider doesn't matter) to both of fields")],
                 )
         ),
       ),

@@ -31,7 +31,8 @@ final NumberFormat f4 = NumberFormat.decimalPatternDigits(decimalDigits: 4);
 final DateFormat dateFormat = DateFormat.yMMMd().add_Hms();
 
 class MainView extends StatefulWidget {
-  const MainView({Key? key}) : super(key: key);
+  final String? player;
+  const MainView({Key? key, this.player}) : super(key: key);
 
   String get title => "Tetra Stats: $_titleNickname";
 
@@ -89,8 +90,12 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
     teto.open();
     _scrollController = ScrollController();
     _tabController = TabController(length: 6, vsync: this);
-    _getPreferences()
+    if (widget.player != null){
+      changePlayer(widget.player!);
+    }else{
+      _getPreferences()
         .then((value) => changePlayer(prefs.getString("player") ?? "dan63047"));
+    }
     super.initState();
   }
 
@@ -178,7 +183,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: NavDrawer(changePlayer),
+      drawer: widget.player == null ? NavDrawer(changePlayer) : null,
       appBar: AppBar(
         title: !_searchBoolean
             ? Text(
@@ -223,6 +228,10 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
           PopupMenuButton(
             itemBuilder: (BuildContext context) => <PopupMenuEntry>[
               const PopupMenuItem(
+                value: "refresh",
+                child: Text('Refresh'),
+              ),
+              const PopupMenuItem(
                 value: "/states",
                 child: Text('Show stored data'),
               ),
@@ -236,7 +245,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
               ),
             ],
             onSelected: (value) {
-              if (value == "tll") {teto.fetchTLLeaderboard();
+              if (value == "refresh") {changePlayer(_searchFor);
               return;}
               Navigator.pushNamed(context, value);
             },
@@ -542,7 +551,7 @@ class _HistoryChartThigy extends StatelessWidget{
       height: MediaQuery.of(context).size.height - 100,
       child: Stack(
         children: [
-          Padding( padding: bigScreen ? const EdgeInsets.fromLTRB(40, 40, 40, 48) : const EdgeInsets.fromLTRB(0, 40, 0, 48) ,
+          Padding( padding: bigScreen ? const EdgeInsets.fromLTRB(40, 40, 40, 48) : const EdgeInsets.fromLTRB(0, 40, 16, 48) ,
           child: LineChart(
             LineChartData(
               lineBarsData: [LineChartBarData(spots: data)],

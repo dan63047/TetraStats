@@ -15,9 +15,9 @@
 - ~~Tetra League matches history~~
 - ~~Tetra League historic charts for tracked players~~ 
 - ~~Better UI with delta and hints for stats~~ *v0.2.0, we are here*
-- ~~Ability to compare player with APM-PPS-VS stats~~ *dev build are here*
-- Ability to fetch Tetra League leaderboard
-- Average stats for ranks
+- ~~Ability to compare player with APM-PPS-VS stats~~
+- ~~Ability to fetch Tetra League leaderboard~~
+- ~~Average stats for ranks~~ *dev build are here*
 - Ability to compare player with avgRank
 - UI Animations
 - i18n, EN and RU locales
