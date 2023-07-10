@@ -29,7 +29,7 @@ const givenTextHeightByScreenPercentage = 0.3;
 final NumberFormat timeInSec = NumberFormat("#,###.###s.");
 final NumberFormat f2 = NumberFormat.decimalPatternDigits(decimalDigits: 2);
 final NumberFormat f4 = NumberFormat.decimalPatternDigits(decimalDigits: 4);
-final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale).add_Hms();
+final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
 
 class MainView extends StatefulWidget {
   final String? player;
