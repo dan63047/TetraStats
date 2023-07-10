@@ -1,22 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/views/compare_view.dart';
 import 'package:intl/intl.dart';
 import 'dart:developer' as developer;
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
 
-extension StringExtension on String {
-  String capitalize() {
-    return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
-  }
-}
-
 Future<void> copyToClipboard(String text) async {
   await Clipboard.setData(ClipboardData(text: text));
 }
-
-final DateFormat dateFormat = DateFormat.yMMMd().add_Hms();
 
 class UserThingy extends StatelessWidget {
   final TetrioPlayer player;
@@ -26,6 +19,8 @@ class UserThingy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
+    final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
     return LayoutBuilder(builder: (context, constraints) {
       bool bigScreen = constraints.maxWidth > 768;
       double bannerHeight = bigScreen ? 240 : 120;
@@ -99,12 +94,12 @@ class UserThingy extends StatelessWidget {
                       child: Text(player.userId, style: const TextStyle(fontFamily: "Eurostile Round Condensed", fontSize: 14)),
                       onPressed: () {
                         copyToClipboard(player.userId);
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Copied to clipboard!")));
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.copiedToClipboard)));
                       }),
                 ],
               )),
               showStateTimestamp
-                  ? Text("Fetched ${dateFormat.format(player.state)}")
+                  ? Text(t.fetchDate(date: dateFormat.format(player.state)))
                   : Wrap(direction: Axis.horizontal, alignment: WrapAlignment.center, spacing: 25, crossAxisAlignment: WrapCrossAlignment.start, children: [
                       FutureBuilder(
                           future: teto.isPlayerTracking(player.userId),
@@ -121,10 +116,10 @@ class UserThingy extends StatelessWidget {
                                         icon: const Icon(Icons.person_remove),
                                         onPressed: () {
                                           teto.deletePlayerToTrack(player.userId).then((value) => setState());
-                                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Removed from tracking list!")));
+                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.stoppedBeingTracked)));
                                         },
                                       ),
-                                      const Text("Stop tracking")
+                                      Text(t.stopTracking, textAlign: TextAlign.center)
                                     ],
                                   );
                                 } else {
@@ -135,10 +130,10 @@ class UserThingy extends StatelessWidget {
                                         onPressed: () {
                                           teto.addPlayerToTrack(player).then((value) => setState());
                                           teto.storeState(player);
-                                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Added to tracking list!")));
+                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.becameTracked)));
                                         },
                                       ),
-                                      const Text("Track")
+                                      Text(t.track, textAlign: TextAlign.center)
                                     ],
                                   );
                                 }
@@ -157,7 +152,7 @@ class UserThingy extends StatelessWidget {
                               );
                             },
                           ),
-                          const Text("Compare")
+                          Text(t.compare, textAlign: TextAlign.center)
                         ],
                       )
                     ]),
@@ -173,7 +168,7 @@ class UserThingy extends StatelessWidget {
                   children: [
                     StatCellNum(
                       playerStat: player.level,
-                      playerStatLabel: "XP Level",
+                      playerStatLabel: t.statCellNum.xpLevel,
                       isScreenBig: bigScreen,
                       alertWidgets: [Text("${NumberFormat.decimalPatternDigits(decimalDigits: 2).format(player.xp)} XP", style: const TextStyle(fontFamily: "Eurostile Round Extended"),), Text("Progress to next level: ${((player.level - player.level.floor()) * 100).toStringAsFixed(2)} %"), Text("Progress from 0 XP to level 5000: ${((player.xp / 67009017.7589378) * 100).toStringAsFixed(2)} %")],
                       higherIsBetter: true,
@@ -181,32 +176,32 @@ class UserThingy extends StatelessWidget {
                     if (player.gameTime >= Duration.zero)
                       StatCellNum(
                         playerStat: player.gameTime.inHours,
-                        playerStatLabel: "Hours\nPlayed",
+                        playerStatLabel: t.statCellNum.hoursPlayed,
                         isScreenBig: bigScreen,
-                        alertWidgets: [Text("Exact gametime: ${player.gameTime.toString()}")],
+                        alertWidgets: [Text("${t.exactGametime}: ${player.gameTime.toString()}")],
                         higherIsBetter: true,),
                     if (player.gamesPlayed >= 0) 
                       StatCellNum(
                         playerStat: player.gamesPlayed,
                         isScreenBig: bigScreen,
-                        playerStatLabel: "Online\nGames",
+                        playerStatLabel: t.statCellNum.onlineGames,
                         higherIsBetter: true,),
                     if (player.gamesWon >= 0) 
                       StatCellNum(
                         playerStat: player.gamesWon,
                         isScreenBig: bigScreen,
-                        playerStatLabel: "Games\nWon",
+                        playerStatLabel: t.statCellNum.gamesWon,
                         higherIsBetter: true,),
                     if (player.friendCount > 0) 
                     StatCellNum(
                       playerStat: player.friendCount,
                       isScreenBig: bigScreen,
-                      playerStatLabel: "Friends",
+                      playerStatLabel: t.statCellNum.friends,
                       higherIsBetter: true,),
                   ],
                 )
               : Text(
-                  "BANNED",
+                  t.bigRedBanned,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: "Eurostile Round Extended",
@@ -217,7 +212,7 @@ class UserThingy extends StatelessWidget {
                 ),
           if (player.badstanding != null && player.badstanding!)
             Text(
-              "BAD STANDING",
+              t.bigRedBadStanding,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: "Eurostile Round Extended",
@@ -231,7 +226,7 @@ class UserThingy extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                    "${player.country != null ? "${player.country?.toUpperCase()} • " : ""}${player.role.capitalize()} account ${player.registrationTime == null ? "that was from very beginning" : 'created ${dateFormat.format(player.registrationTime!)}'}${player.botmaster != null ? " by ${player.botmaster}" : ""} • ${player.supporterTier == 0 ? "Not a supporter" : "Supporter tier ${player.supporterTier}"}",
+                    "${player.country != null ? "${player.country?.toUpperCase()} • " : ""}${t.playerRole[player.role]}${t.playerRoleAccount}${player.registrationTime == null ? t.wasFromBeginning : '${t.created} ${dateFormat.format(player.registrationTime!)}'}${player.botmaster != null ? " ${t.botCreatedBy} ${player.botmaster}" : ""} • ${player.supporterTier == 0 ? t.notSupporter : t.supporter(tier: player.supporterTier)}",
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontFamily: "Eurostile Round",
@@ -268,8 +263,8 @@ class UserThingy extends StatelessWidget {
                                       children: [
                                         Image.asset("res/tetrio_badges/${badge.badgeId}.png"),
                                         Text(badge.ts != null
-                                            ? "Obtained ${dateFormat.format(badge.ts!)}"
-                                            : "That badge was assigned manualy by TETR.IO admins"),
+                                            ? t.obtainDate(date: dateFormat.format(badge.ts!))
+                                            : t.assignedManualy),
                                       ],
                                     )
                                   ],
@@ -277,7 +272,7 @@ class UserThingy extends StatelessWidget {
                               ),
                               actions: <Widget>[
                                 TextButton(
-                                  child: const Text('OK'),
+                                  child: Text(t.popupActions.ok),
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                   },

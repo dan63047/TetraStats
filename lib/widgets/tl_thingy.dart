@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:tetra_stats/views/calc_view.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
 
 var fDiff = NumberFormat("+#,###.###;-#,###.###");
@@ -17,6 +19,8 @@ class TLThingy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
+    final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
     return LayoutBuilder(builder: (context, constraints) {
       bool bigScreen = constraints.maxWidth > 768;
       return ListView.builder(
@@ -26,8 +30,8 @@ class TLThingy extends StatelessWidget {
           return Column(
             children: (tl.gamesPlayed > 0)
                 ? [
-                    Text("Tetra League", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                    if (oldTl != null) Text("Comparing with data from ${DateFormat.yMMMd().add_Hms().format(oldTl!.timestamp)}"),
+                    Text(t.tetraLeague, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                    if (oldTl != null) Text(t.comparingWith(date: dateFormat.format(oldTl!.timestamp))),
                     if (tl.gamesPlayed >= 10)
                       Wrap(
                         direction: Axis.horizontal,
@@ -51,7 +55,7 @@ class TLThingy extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                "Top ${f2.format(tl.percentile * 100)}% (${tl.percentileRank.toUpperCase()}) • Top Rank: ${tl.bestRank.toUpperCase()} • Glicko: ${f2.format(tl.glicko!)}±${f2.format(tl.rd!)}${tl.decaying ? ' • Decaying' : ''}",
+                                "${t.top} ${f2.format(tl.percentile * 100)}% (${tl.percentileRank.toUpperCase()}) • ${t.topRank}: ${tl.bestRank.toUpperCase()} • Glicko: ${f2.format(tl.glicko!)}±${f2.format(tl.rd!)}${tl.decaying ? ' • ${t.decaying}' : ''}",
                                 textAlign: TextAlign.center,
                               ),
                             ],
@@ -73,7 +77,7 @@ class TLThingy extends StatelessWidget {
                         ),
                     ),
                     if (tl.gamesPlayed < 10)
-                      Text("${10 - tl.gamesPlayed} games until being ranked",
+                      Text(t.gamesUntilRanked(left: 10 - tl.gamesPlayed),
                           softWrap: true,
                           textAlign: TextAlign.center,
                           style: TextStyle(
@@ -90,21 +94,21 @@ class TLThingy extends StatelessWidget {
                         crossAxisAlignment: WrapCrossAlignment.start,
                         clipBehavior: Clip.hardEdge,
                         children: [
-                          if (tl.apm != null) StatCellNum(playerStat: tl.apm!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: "Attack\nPer Minute", higherIsBetter: true, oldPlayerStat: oldTl?.apm),
-                          if (tl.pps != null) StatCellNum(playerStat: tl.pps!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: "Pieces\nPer Second", higherIsBetter: true, oldPlayerStat: oldTl?.pps),
-                          if (tl.vs != null) StatCellNum(playerStat: tl.vs!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: "Versus\nScore", higherIsBetter: true, oldPlayerStat: oldTl?.vs),
-                          if (tl.standing > 0) StatCellNum(playerStat: tl.standing, isScreenBig: bigScreen, playerStatLabel: "Leaderboard\nplacement", higherIsBetter: false, oldPlayerStat: oldTl?.standing),
-                          if (tl.standingLocal > 0) StatCellNum(playerStat: tl.standingLocal, isScreenBig: bigScreen, playerStatLabel: "Country LB\nplacement", higherIsBetter: false, oldPlayerStat: oldTl?.standingLocal),
-                          StatCellNum(playerStat: tl.gamesPlayed, isScreenBig: bigScreen, playerStatLabel: "Games\nplayed", higherIsBetter: true, oldPlayerStat: oldTl?.gamesPlayed),
-                          StatCellNum(playerStat: tl.gamesWon, isScreenBig: bigScreen, playerStatLabel: "Games\nwon", higherIsBetter: true, oldPlayerStat: oldTl?.gamesWon),
-                          StatCellNum(playerStat: tl.winrate * 100, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: "Winrate\nprecentage", higherIsBetter: true, oldPlayerStat: oldTl != null ? oldTl!.winrate*100 : null),
+                          if (tl.apm != null) StatCellNum(playerStat: tl.apm!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.apm, higherIsBetter: true, oldPlayerStat: oldTl?.apm),
+                          if (tl.pps != null) StatCellNum(playerStat: tl.pps!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.pps, higherIsBetter: true, oldPlayerStat: oldTl?.pps),
+                          if (tl.vs != null) StatCellNum(playerStat: tl.vs!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.vs, higherIsBetter: true, oldPlayerStat: oldTl?.vs),
+                          if (tl.standing > 0) StatCellNum(playerStat: tl.standing, isScreenBig: bigScreen, playerStatLabel: t.statCellNum.lbp, higherIsBetter: false, oldPlayerStat: oldTl?.standing),
+                          if (tl.standingLocal > 0) StatCellNum(playerStat: tl.standingLocal, isScreenBig: bigScreen, playerStatLabel: t.statCellNum.lbpc, higherIsBetter: false, oldPlayerStat: oldTl?.standingLocal),
+                          StatCellNum(playerStat: tl.gamesPlayed, isScreenBig: bigScreen, playerStatLabel: t.statCellNum.gamesPlayed, higherIsBetter: true, oldPlayerStat: oldTl?.gamesPlayed),
+                          StatCellNum(playerStat: tl.gamesWon, isScreenBig: bigScreen, playerStatLabel: t.statCellNum.gamesWonTL, higherIsBetter: true, oldPlayerStat: oldTl?.gamesWon),
+                          StatCellNum(playerStat: tl.winrate * 100, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.winrate, higherIsBetter: true, oldPlayerStat: oldTl != null ? oldTl!.winrate*100 : null),
                         ],
                       ),
                     ),
                     if (tl.nerdStats != null)
                       Column(
                         children: [
-                          Text("Nerd Stats", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                          Text(t.nerdStats, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
                           Padding(
                             padding: const EdgeInsets.fromLTRB(0, 40, 0, 0),
                             child: Wrap(

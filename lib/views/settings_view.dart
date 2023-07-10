@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
 
@@ -65,6 +66,12 @@ class SettingsState extends State<SettingsView> {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
+    List<DropdownMenuItem<AppLocale>>? locales = <DropdownMenuItem<AppLocale>>[];
+    for (var v in AppLocale.values){
+      locales.add(DropdownMenuItem<AppLocale>(
+        value: v, child: Text(t.locales[v.languageTag]!)));
+    }
     return Scaffold(
       appBar: AppBar(
         title: const Text("Settings"),
@@ -211,6 +218,14 @@ class SettingsState extends State<SettingsView> {
                         )
                       ],
                     )),
+          ),
+          ListTile(
+            title: const Text("Language"),
+            trailing: DropdownButton(
+                items: locales,
+                value: LocaleSettings.currentLocale,
+                onChanged: (value) => LocaleSettings.setLocale(value!),
+              ),
           ),
           const Divider(),
           ListTile(

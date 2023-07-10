@@ -55,6 +55,18 @@ class CompareState extends State<CompareView> {
 
   void fetchRedSide(String user) async {
     try {
+      if (user.startsWith("\$avg")){
+        try{
+          var average = (await teto.fetchTLLeaderboard()).getAverageOfRank(user.substring(4).toLowerCase())[0];
+          redSideMode = Mode.averages;
+          theRedSide = [null, null, average];
+          return setState(() {});
+        }on Exception {
+          ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Falied to assign $user")));
+          return;
+        }
+      }
       var tearDownToNumbers = numbersReg.allMatches(user);
       if (tearDownToNumbers.length == 3) {
         redSideMode = Mode.stats;
@@ -118,6 +130,18 @@ class CompareState extends State<CompareView> {
 
   void fetchGreenSide(String user) async {
     try {
+      if (user.startsWith("\$avg")){
+        try{
+          var average = (await teto.fetchTLLeaderboard()).getAverageOfRank(user.substring(4).toLowerCase())[0];
+          greenSideMode = Mode.averages;
+          theGreenSide = [null, null, average];
+          return setState(() {});
+        }on Exception {
+          ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Falied to assign $user")));
+          return;
+        }
+      }
       var tearDownToNumbers = numbersReg.allMatches(user);
       if (tearDownToNumbers.length == 3) {
         greenSideMode = Mode.stats;
@@ -211,7 +235,7 @@ class CompareState extends State<CompareView> {
         titleGreenSide = "${theGreenSide[2].apm} APM, ${theGreenSide[2].pps} PPS, ${theGreenSide[2].vs} VS";
         break;
       case Mode.averages:
-        titleGreenSide = "average";
+        titleGreenSide = "Average ${theGreenSide[2].rank.toUpperCase()} rank";
         break;
     }
     switch (redSideMode){
@@ -222,7 +246,7 @@ class CompareState extends State<CompareView> {
         titleRedSide = "${theRedSide[2].apm} APM, ${theRedSide[2].pps} PPS, ${theRedSide[2].vs} VS";
         break;
       case Mode.averages:
-        titleRedSide = "average";
+        titleRedSide = "Average ${theRedSide[2].rank.toUpperCase()} rank";
         break;
     }
     return Scaffold(
@@ -376,8 +400,8 @@ class CompareState extends State<CompareView> {
                               ),
                               if (theGreenSide[2].gamesPlayed > 9 &&
                                   theRedSide[2].gamesPlayed > 9 &&
-                                  greenSideMode == Mode.player &&
-                                  redSideMode == Mode.player)
+                                  greenSideMode != Mode.stats &&
+                                  redSideMode != Mode.stats)
                                 CompareThingy(
                                   label: "TR",
                                   greenSide: theGreenSide[2].rating,
@@ -385,24 +409,24 @@ class CompareState extends State<CompareView> {
                                   fractionDigits: 2,
                                   higherIsBetter: true,
                                 ),
-                              if (greenSideMode == Mode.player &&
-                                  redSideMode == Mode.player)
+                              if (greenSideMode != Mode.stats &&
+                                  redSideMode != Mode.stats)
                               CompareThingy(
                                 label: "Games Played",
                                 greenSide: theGreenSide[2].gamesPlayed,
                                 redSide: theRedSide[2].gamesPlayed,
                                 higherIsBetter: true,
                               ),
-                              if (greenSideMode == Mode.player &&
-                                  redSideMode == Mode.player)
+                              if (greenSideMode != Mode.stats &&
+                                  redSideMode != Mode.stats)
                               CompareThingy(
                                 label: "Games Won",
                                 greenSide: theGreenSide[2].gamesWon,
                                 redSide: theRedSide[2].gamesWon,
                                 higherIsBetter: true,
                               ),
-                              if (greenSideMode == Mode.player &&
-                                  redSideMode == Mode.player)
+                              if (greenSideMode != Mode.stats &&
+                                  redSideMode != Mode.stats)
                               CompareThingy(
                                 label: "WR %",
                                 greenSide:
@@ -413,8 +437,8 @@ class CompareState extends State<CompareView> {
                               ),
                               if (theGreenSide[2].gamesPlayed > 9 &&
                                   theRedSide[2].gamesPlayed > 9 &&
-                                  greenSideMode == Mode.player &&
-                                  redSideMode == Mode.player)
+                                  greenSideMode != Mode.stats &&
+                                  redSideMode != Mode.stats)
                                 CompareThingy(
                                   label: "Glicko",
                                   greenSide: theGreenSide[2].glicko!,
@@ -424,8 +448,8 @@ class CompareState extends State<CompareView> {
                                 ),
                               if (theGreenSide[2].gamesPlayed > 9 &&
                                   theRedSide[2].gamesPlayed > 9 &&
-                                  greenSideMode == Mode.player &&
-                                  redSideMode == Mode.player)
+                                  greenSideMode != Mode.stats &&
+                                  redSideMode != Mode.stats)
                                 CompareThingy(
                                   label: "RD",
                                   greenSide: theGreenSide[2].rd!,
@@ -575,8 +599,8 @@ class CompareState extends State<CompareView> {
                           ),
                           if (theGreenSide[2].gamesPlayed > 9 &&
                               theGreenSide[2].gamesPlayed > 9 &&
-                              greenSideMode == Mode.player &&
-                              redSideMode == Mode.player)
+                              greenSideMode != Mode.stats &&
+                              redSideMode != Mode.stats)
                             CompareThingy(
                               label: "Acc. of Est.",
                               greenSide: theGreenSide[2].esttracc!,
@@ -781,7 +805,8 @@ class CompareState extends State<CompareView> {
                                         fontFamily: "Eurostile Round Extended",
                                         fontSize: bigScreen ? 42 : 28)),
                               ),
-                              if (greenSideMode == Mode.player && redSideMode == Mode.player)
+                              if (greenSideMode != Mode.stats && redSideMode != Mode.stats &&
+                              theGreenSide[2].gamesPlayed > 9 && theRedSide[2].gamesPlayed > 9)
                               CompareThingy(
                                 label: "By Glicko",
                                 greenSide: getWinrateByTR(
@@ -803,15 +828,15 @@ class CompareState extends State<CompareView> {
                                 label: "By Est. TR",
                                 greenSide: getWinrateByTR(
                                         theGreenSide[2].estTr!.estglicko,
-                                        theGreenSide[2].rd!,
+                                        theGreenSide[2].rd ?? noTrRd,
                                         theRedSide[2].estTr!.estglicko,
-                                        theRedSide[2].rd!) *
+                                        theRedSide[2].rd ?? noTrRd) *
                                     100,
                                 redSide: getWinrateByTR(
                                         theRedSide[2].estTr!.estglicko,
-                                        theRedSide[2].rd!,
+                                        theRedSide[2].rd ?? noTrRd,
                                         theGreenSide[2].estTr!.estglicko,
-                                        theGreenSide[2].rd!) *
+                                        theGreenSide[2].rd ?? noTrRd) *
                                     100,
                                 fractionDigits: 2,
                                 higherIsBetter: true,
@@ -834,7 +859,7 @@ class PlayerSelector extends StatelessWidget {
   final Function fetch;
   final Function change;
   final Function updateState;
-  const PlayerSelector(
+  PlayerSelector(
       {super.key,
       required this.data,
       required this.mode,
@@ -845,16 +870,30 @@ class PlayerSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextEditingController playerController = TextEditingController();
+    String underFieldString = "";
     if (!listEquals(data, [null, null, null])){
       switch (mode){
         case Mode.player:
-          playerController.text = data[0] != null ? data[0].username : "???";
+          playerController.text = data[0] != null ? data[0].username : "";
           break;
         case Mode.stats:
           playerController.text = "${data[2].apm} ${data[2].pps} ${data[2].vs}";
           break;
         case Mode.averages:
-          playerController.text = "average";
+          playerController.text = "\$avg${data[2].rank.toUpperCase()}";
+          break;
+      }
+    }
+    if (!listEquals(data, [null, null, null])){
+      switch (mode){
+        case Mode.player:
+          underFieldString = data[0] != null ? data[0].toString() : "???";
+          break;
+        case Mode.stats:
+          underFieldString = "${data[2].apm} APM, ${data[2].pps} PPS, ${data[2].vs} VS";
+          break;
+        case Mode.averages:
+          underFieldString = "Average ${data[2].rank.toUpperCase()} rank";
           break;
       }
     }
@@ -867,11 +906,20 @@ class PlayerSelector extends StatelessWidget {
             controller: playerController,
             decoration: const InputDecoration(counter: Offstage()),
             onSubmitted: (String value) {
+              underFieldString = "Fetching...";
               fetch(value);
             }),
-        if (data[0] != null && data[1] == null)
-          Text(
-            data[0].toString(),
+          if (data[0] != null && data[1] != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: DropdownButton(
+                items: data[1],
+                value: data[0],
+                onChanged: (value) => change(value!),
+              ),
+            )
+          else Text(
+            underFieldString,
             style: const TextStyle(
               shadows: <Shadow>[
                 Shadow(
@@ -887,15 +935,6 @@ class PlayerSelector extends StatelessWidget {
               ],
             ),
           ),
-          if (data[0] != null && data[1] != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: DropdownButton(
-                items: data[1],
-                value: data[0],
-                onChanged: (value) => change(value!),
-              ),
-            )
       ],
     );
   }

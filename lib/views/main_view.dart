@@ -6,6 +6,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/views/tl_leaderboard_view.dart' show TLLeaderboardView;
@@ -28,7 +29,7 @@ const givenTextHeightByScreenPercentage = 0.3;
 final NumberFormat timeInSec = NumberFormat("#,###.###s.");
 final NumberFormat f2 = NumberFormat.decimalPatternDigits(decimalDigits: 2);
 final NumberFormat f4 = NumberFormat.decimalPatternDigits(decimalDigits: 4);
-final DateFormat dateFormat = DateFormat.yMMMd().add_Hms();
+final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale).add_Hms();
 
 class MainView extends StatefulWidget {
   final String? player;
@@ -46,14 +47,6 @@ Future<void> copyToClipboard(String text) async {
 
 class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
   final bodyGlobalKey = GlobalKey();
-  final List<Widget> myTabs = [
-    const Tab(text: "Tetra League"),
-    const Tab(text: "TL Records"),
-    const Tab(text: "History"),
-    const Tab(text: "40 Lines"),
-    const Tab(text: "Blitz"),
-    const Tab(text: "Other"),
-  ];
   bool _searchBoolean = false;
   late TabController _tabController;
   late ScrollController _scrollController;
@@ -182,6 +175,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     return Scaffold(
       drawer: widget.player == null ? NavDrawer(changePlayer) : null,
       appBar: AppBar(
@@ -227,21 +221,21 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                 ),
           PopupMenuButton(
             itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: "refresh",
-                child: Text('Refresh'),
+                child: Text(t.refresh),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: "/states",
-                child: Text('Show stored data'),
+                child: Text(t.showStoredData),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: "/calc",
-                child: Text('Stats Calculator'),
+                child: Text(t.statsCalc),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: "/settings",
-                child: Text('Settings'),
+                child: Text(t.settings),
               ),
             ],
             onSelected: (value) {
@@ -258,22 +252,9 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.none:
-                return const Center(
-                    child: Text('none case of FutureBuilder',
-                        style: TextStyle(
-                            fontFamily: "Eurostile Round Extended",
-                            fontSize: 42),
-                        textAlign: TextAlign.center));
               case ConnectionState.waiting:
-                return const Center(
-                    child: CircularProgressIndicator(color: Colors.white));
               case ConnectionState.active:
-                return const Center(
-                    child: Text('active case of FutureBuilder',
-                        style: TextStyle(
-                            fontFamily: "Eurostile Round Extended",
-                            fontSize: 42),
-                        textAlign: TextAlign.center));
+                return const Center(child: CircularProgressIndicator(color: Colors.white));
               case ConnectionState.done:
                 //bool bigScreen = MediaQuery.of(context).size.width > 1024;
                 if (snapshot.hasData) {
@@ -303,7 +284,14 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                             child: TabBar(
                               controller: _tabController,
                               isScrollable: true,
-                              tabs: myTabs,
+                              tabs: [
+                                Tab(text: t.tetraLeague),
+                                Tab(text: t.tlRecords),
+                                Tab(text: t.history),
+                                Tab(text: t.sprint),
+                                Tab(text: t.blitz),
+                                Tab(text: t.other),
+                              ],
                             ),
                           ),
                         ];
@@ -314,7 +302,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                           TLThingy(
                               tl: snapshot.data![0].tlSeason1,
                               userID: snapshot.data![0].userId,
-                              oldTl: snapshot.data![4],),
+                              oldTl: snapshot.data![4]),
                           _TLRecords(userID: snapshot.data![0].userId, data: snapshot.data![3]),
                           _History(states: snapshot.data![2], update: _justUpdate),
                           _RecordThingy(
@@ -406,7 +394,6 @@ class _NavDrawerState extends State<NavDrawer> {
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
-              return const Center(child: Text('none case of StreamBuilder'));
             case ConnectionState.waiting:
             case ConnectionState.active:
               final allPlayers = (snapshot.data != null)
@@ -436,7 +423,7 @@ class _NavDrawerState extends State<NavDrawer> {
                       SliverToBoxAdapter(
                         child: ListTile(
                           leading: const Icon(Icons.leaderboard),
-                          title: const Text("Tetra League leaderboard"),
+                          title: Text(t.tlLeaderboard),
                           onTap: () {
                             Navigator.push(
                               context,
@@ -501,7 +488,7 @@ class _TLRecords extends StatelessWidget {
                     ),
                   );},
             )]
-            : [const Center(child: Text("No records", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))],
+            : [Center(child: Text(t.noRecords, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))],
       );
   }
 }
@@ -527,10 +514,10 @@ class _History extends StatelessWidget{
                 }
               ),
           if(chartsData[chartsIndex].value!.length > 1) _HistoryChartThigy(data: chartsData[chartsIndex].value!, title: "ss", yAxisTitle: chartsShortTitles[chartsIndex], bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? f2 : NumberFormat.compact(),)
-          else const Center(child: Text("Not enough data", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))
+          else Center(child: Text(t.notEnoughData, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))
         ],
       ),
-    ] : [const Center(child: Text("No history saved", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))]);
+    ] : [Center(child: Text(t.noHistorySaved, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))]);
   }
 }
 
@@ -599,12 +586,12 @@ class _RecordThingy extends StatelessWidget {
               children: (record != null)
                   ? [
                       if (record!.stream.contains("40l"))
-                        Text("40 Lines",
+                        Text(t.sprint,
                             style: TextStyle(
                                 fontFamily: "Eurostile Round Extended",
                                 fontSize: bigScreen ? 42 : 28))
                       else if (record!.stream.contains("blitz"))
-                        Text("Blitz",
+                        Text(t.blitz,
                             style: TextStyle(
                                 fontFamily: "Eurostile Round Extended",
                                 fontSize: bigScreen ? 42 : 28)),
@@ -629,7 +616,7 @@ class _RecordThingy extends StatelessWidget {
                             playerStatLabel: "Leaderboard Placement",
                             isScreenBig: bigScreen,
                             higherIsBetter: false),
-                      Text("Obtained ${dateFormat.format(record!.timestamp!)}",
+                      Text(t.obtainDate(date: dateFormat.format(record!.timestamp!)),
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontFamily: "Eurostile Round",
@@ -647,53 +634,53 @@ class _RecordThingy extends StatelessWidget {
                             if (record!.stream.contains("blitz"))
                               StatCellNum(
                                   playerStat: record!.endContext!.level,
-                                  playerStatLabel: "Level",
+                                  playerStatLabel: t.statCellNum.level,
                                   isScreenBig: bigScreen,
                                   higherIsBetter: true,),
                             if (record!.stream.contains("blitz"))
                               StatCellNum(
                                   playerStat: record!.endContext!.spp,
-                                  playerStatLabel: "Score\nPer Piece",
+                                  playerStatLabel: t.statCellNum.spp,
                                   fractionDigits: 2,
                                   isScreenBig: bigScreen,
                                   higherIsBetter: true,),
                             StatCellNum(
                                 playerStat: record!.endContext!.piecesPlaced,
-                                playerStatLabel: "Pieces\nPlaced",
+                                playerStatLabel: t.statCellNum.pieces,
                                 isScreenBig: bigScreen,
                                   higherIsBetter: true,),
                             StatCellNum(
                                 playerStat: record!.endContext!.pps,
-                                playerStatLabel: "Pieces\nPer Second",
+                                playerStatLabel: t.statCellNum.pps,
                                 fractionDigits: 2,
                                 isScreenBig: bigScreen,
                                   higherIsBetter: true,),
                             StatCellNum(
                                 playerStat: record!.endContext!.finesse.faults,
-                                playerStatLabel: "Finesse\nFaults",
+                                playerStatLabel: t.statCellNum.finesseFaults,
                                 isScreenBig: bigScreen,
                                   higherIsBetter: false,),
                             StatCellNum(
                                 playerStat:
                                     record!.endContext!.finessePercentage * 100,
-                                playerStatLabel: "Finesse\nPercentage",
+                                playerStatLabel: t.statCellNum.finessePercentage,
                                 fractionDigits: 2,
                                 isScreenBig: bigScreen,
                                   higherIsBetter: true,),
                             StatCellNum(
                                 playerStat: record!.endContext!.inputs,
-                                playerStatLabel: "Key\nPresses",
+                                playerStatLabel: t.statCellNum.keys,
                                 isScreenBig: bigScreen,
                                   higherIsBetter: false,),
                             StatCellNum(
                                 playerStat: record!.endContext!.kpp,
-                                playerStatLabel: "KP Per\nPiece",
+                                playerStatLabel: t.statCellNum.kpp,
                                 fractionDigits: 2,
                                 isScreenBig: bigScreen,
                                   higherIsBetter: false,),
                             StatCellNum(
                                 playerStat: record!.endContext!.kps,
-                                playerStatLabel: "KP Per\nSecond",
+                                playerStatLabel: t.statCellNum.kps,
                                 fractionDigits: 2,
                                 isScreenBig: bigScreen,
                                   higherIsBetter: true,),
@@ -713,8 +700,8 @@ class _RecordThingy extends StatelessWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text("All Clears:",
-                                      style: TextStyle(fontSize: 24)),
+                                  Text("${t.numOfGameActions.pc}:",
+                                      style: const TextStyle(fontSize: 24)),
                                   Text(
                                     record!.endContext!.clears.allClears
                                         .toString(),
@@ -726,8 +713,8 @@ class _RecordThingy extends StatelessWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text("Holds:",
-                                      style: TextStyle(fontSize: 24)),
+                                  Text("${t.numOfGameActions.hold}:",
+                                      style: const TextStyle(fontSize: 24)),
                                   Text(
                                     record!.endContext!.holds.toString(),
                                     style: const TextStyle(fontSize: 24),
@@ -738,8 +725,8 @@ class _RecordThingy extends StatelessWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text("T-spins total:",
-                                      style: TextStyle(fontSize: 24)),
+                                  Text("${t.numOfGameActions.tspinsTotal}:",
+                                      style: const TextStyle(fontSize: 24)),
                                   Text(
                                     record!.endContext!.tSpins.toString(),
                                     style: const TextStyle(fontSize: 24),
@@ -841,8 +828,8 @@ class _RecordThingy extends StatelessWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text("Line clears:",
-                                      style: TextStyle(fontSize: 24)),
+                                  Text("${t.numOfGameActions.lineClears}:",
+                                      style: const TextStyle(fontSize: 24)),
                                   Text(
                                     record!.endContext!.lines.toString(),
                                     style: const TextStyle(fontSize: 24),
@@ -906,7 +893,7 @@ class _RecordThingy extends StatelessWidget {
                       ),
                     ]
                   : [
-                      const Text("No record", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28))
+                      Text(t.noRecord, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28))
                     ],
             );
           });
@@ -930,7 +917,7 @@ class _OtherThingy extends StatelessWidget {
         itemBuilder: (BuildContext context, int index) {
           return Column(
             children: [
-              Text("Other info",
+              Text(t.other,
                   style: TextStyle(
                       fontFamily: "Eurostile Round Extended",
                       fontSize: bigScreen ? 42 : 28)),
@@ -939,17 +926,17 @@ class _OtherThingy extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(0, 48, 0, 48),
                   child: Column(
                     children: [
-                      Text("Zen",
+                      Text(t.zen,
                           style: TextStyle(
                               fontFamily: "Eurostile Round Extended",
                               fontSize: bigScreen ? 42 : 28)),
                       Text(
-                          "Level ${NumberFormat.decimalPattern().format(zen!.level)}",
+                          "${t.statCellNum.level} ${NumberFormat.decimalPattern().format(zen!.level)}",
                           style: TextStyle(
                               fontFamily: "Eurostile Round Extended",
                               fontSize: bigScreen ? 42 : 28)),
                       Text(
-                          "Score ${NumberFormat.decimalPattern().format(zen!.score)}",
+                          "${t.statCellNum.score} ${NumberFormat.decimalPattern().format(zen!.score)}",
                           style: const TextStyle(fontSize: 18)),
                     ],
                   ),
@@ -959,7 +946,7 @@ class _OtherThingy extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(0, 0, 0, 48),
                   child: Column(
                     children: [
-                      Text("Bio",
+                      Text(t.bio,
                           style: TextStyle(
                               fontFamily: "Eurostile Round Extended",
                               fontSize: bigScreen ? 42 : 28)),
