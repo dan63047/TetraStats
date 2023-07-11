@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math.dart';
 
 const double noTrRd = 60.9;
@@ -13,7 +14,7 @@ const double appdspWeight = 140;
 const double vsapmWeight = 60;
 const double cheeseWeight = 1.25;
 const double gbeWeight = 315;
-const Map<String, double> ranksCutoffs = {
+const Map<String, double> rankCutoffs = {
   "x": 0.01,
   "u": 0.05,
   "ss": 0.11,
@@ -32,6 +33,27 @@ const Map<String, double> ranksCutoffs = {
   "d+": 0.975,
   "d": 1
 };
+const Map<String, Color> rankColors = { // thanks osk for const rankColors at https://ch.tetr.io/res/js/base.js:418
+	'x': Color(0xFFFF45FF),
+	'u': Color(0xFFFF3813),
+	'ss': Color(0xFFDB8B1F),
+	's+': Color(0xFFD8AF0E),
+	's': Color(0xFFE0A71B),
+	's-': Color(0xFFB2972B),
+	'a+': Color(0xFF1FA834),
+	'a': Color(0xFF46AD51),
+	'a-': Color(0xFF3BB687),
+	'b+': Color(0xFF4F99C0),
+	'b': Color(0xFF4F64C9),
+	'b-': Color(0xFF5650C7),
+	'c+': Color(0xFF552883),
+	'c': Color(0xFF733E8F),
+	'c-': Color(0xFF79558C),
+	'd+': Color(0xFF8E6091),
+	'd': Color(0xFF907591),
+	'z': Color(0xFF375433)
+};
+
 
 Duration doubleSecondsToDuration(double value) {
   value = value * 1000000;
@@ -890,7 +912,7 @@ class TetrioPlayersLeaderboard {
     avgGamesPlayed = (totalGamesPlayed / filtredLeaderboard.length).floor();
     avgGamesWon = (totalGamesWon / filtredLeaderboard.length).floor();
     return [TetraLeagueAlpha(apm: avgAPM, pps: avgPPS, vs: avgVS, glicko: avgGlicko, rd: avgRD, gamesPlayed: avgGamesPlayed, gamesWon: avgGamesWon, bestRank: rank, decaying: false, rating: avgTR, rank: rank, percentileRank: rank, percentile: 0, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1),
-    {"totalGamesPlayed": totalGamesPlayed, "totalGamesWon": totalGamesWon, "players": filtredLeaderboard.length, "lowestTR": lowestTR, "toEnterTR": leaderboard[(leaderboard.length * ranksCutoffs[rank]!).floor()-1].rating}];
+    {"totalGamesPlayed": totalGamesPlayed, "totalGamesWon": totalGamesWon, "players": filtredLeaderboard.length, "lowestTR": lowestTR, "toEnterTR": leaderboard[(leaderboard.length * rankCutoffs[rank]!).floor()-1].rating}];
   }
 
   Map<String, List<dynamic>> get averages => {

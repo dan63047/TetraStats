@@ -199,7 +199,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
               )
             : _searchTextField(),
         backgroundColor: Colors.black,
-        actions: [
+        actions: widget.player == null ? [ 
           !_searchBoolean
               ? IconButton(
                   onPressed: () {
@@ -244,7 +244,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
               Navigator.pushNamed(context, value);
             },
           ),
-        ],
+        ] : null,
       ),
       body: SafeArea(
         child: FutureBuilder<List<dynamic>>(
@@ -320,8 +320,24 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                     ),
                   );
                 } else if (snapshot.hasError) {
+                  String errText = "";
+                  switch (snapshot.error.runtimeType){
+                    case TetrioPlayerNotExist:
+                    errText = t.errors.noSuchUser;
+                    break;
+                    case ConnectionIssue:
+                    var err = snapshot.error as ConnectionIssue;
+                    errText = t.errors.connection(code: err.code, message: err.message);
+                    break;
+                    case SocketException: // cant catch
+                    var err = snapshot.error as SocketException;
+                    errText = t.errors.socketException(host: err.address!.host, message: err.osError!.message);
+                    break;
+                    default:
+                    errText = snapshot.error.toString();
+                  }
                   return Center(
-                      child: Text('${snapshot.error}',
+                      child: Text(errText,
                           style: const TextStyle(
                               fontFamily: "Eurostile Round Extended",
                               fontSize: 42),
@@ -403,11 +419,9 @@ class _NavDrawerState extends State<NavDrawer> {
               return NestedScrollView(
                   headerSliverBuilder: (context, value) {
                     return [
-                      const SliverToBoxAdapter(
+                      SliverToBoxAdapter(
                           child: DrawerHeader(
-                              child: Text(
-                        'Players you track',
-                        style: TextStyle(color: Colors.white, fontSize: 25),
+                              child: Text(t.playersYouTrack, style: const TextStyle(color: Colors.white, fontSize: 25),
                       ))),
                       SliverToBoxAdapter(
                         child: ListTile(
@@ -433,7 +447,8 @@ class _NavDrawerState extends State<NavDrawer> {
                             );
                           },
                         ),
-                      )
+                      ),
+                      const SliverToBoxAdapter(child: Divider())
                     ];
                   },
                   body: ListView.builder(

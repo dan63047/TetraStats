@@ -360,11 +360,11 @@ class TetrioService extends DB {
         return player;
       } else {
         developer.log("fetchPlayer User dosen't exist", name: "services/tetrio_crud", error: response.body);
-        throw Exception("User doesn't exist");
+        throw TetrioPlayerNotExist();
       }
     } else {
       developer.log("fetchPlayer Failed to fetch player", name: "services/tetrio_crud", error: response.statusCode);
-      throw Exception('Failed to fetch player');
+      throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
     }
   }
 
