@@ -35,7 +35,7 @@ jobs:
           prerelease: true
           discussionCategory: autobuilded-releases
           artifacts: "build/windows/runner/Release/TetraStats-${{github.ref_name}}-windows.zip"
-          tag: Auto ${{ github.run_number }}
+          tag: Auto-${{ github.run_number }}
           body: This build was builded with GitHub Action workflow
           token: ${{ secrets.TOKEN }}
   build-and-release-android:
@@ -58,6 +58,6 @@ jobs:
           prerelease: true
          # discussionCategory: autobuilded-releases
           artifacts: "build/app/outputs/apk/debug/*"
-          tag: Auto ${{ github.run_number }}
+          tag: Auto-${{ github.run_number }}
           body: This build was builded with GitHub Action workflow
           token: ${{ secrets.TOKEN }}
