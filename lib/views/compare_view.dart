@@ -120,7 +120,7 @@ class CompareState extends State<CompareView> {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text("Falied to assign $user")));
     }
-    setState(() {});
+    _justUpdate();
   }
 
   void changeRedSide(TetrioPlayer user) {
@@ -195,7 +195,7 @@ class CompareState extends State<CompareView> {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text("Falied to assign $user")));
     }
-    setState(() {});
+    _justUpdate();
   }
 
   void changeGreenSide(TetrioPlayer user) {
