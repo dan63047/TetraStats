@@ -8,12 +8,16 @@ class StatCellNum extends StatelessWidget {
       required this.playerStatLabel,
       required this.isScreenBig,
       this.alertWidgets,
-      this.fractionDigits, this.oldPlayerStat, required this.higherIsBetter});
+      this.fractionDigits,
+      this.oldPlayerStat,
+      required this.higherIsBetter,
+      this.okText});
 
   final num playerStat;
   final num? oldPlayerStat;
   final bool higherIsBetter;
   final String playerStatLabel;
+  final String? okText;
   final bool isScreenBig;
   final List<Widget>? alertWidgets;
   final int? fractionDigits;
@@ -58,10 +62,8 @@ class StatCellNum extends StatelessWidget {
                             ),
                             actions: <Widget>[
                               TextButton(
-                                child: const Text('OK'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
+                                child: Text(okText??"OK"),
+                                onPressed: () {Navigator.of(context).pop();}
                               )
                             ],
                           ));

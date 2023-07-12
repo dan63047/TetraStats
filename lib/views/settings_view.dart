@@ -74,33 +74,31 @@ class SettingsState extends State<SettingsView> {
     }
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Settings"),
+        title: Text(t.settings),
       ),
       backgroundColor: Colors.black,
       body: SafeArea(
           child: ListView(
         children: [
           ListTile(
-            title: const Text("Export local database"),
-            subtitle: const Text(
-                "It contains states and Tetra League records of the tracked players and list of tracked players."),
+            title: Text(t.exportDB),
+            subtitle: Text(t.exportDBDescription),
             onTap: () {
               if (Platform.isLinux || Platform.isWindows) {
                 showDialog(
                     context: context,
                     builder: (BuildContext context) => AlertDialog(
-                          title: const Text("Desktop export",
-                              style: TextStyle(
+                          title: Text(t.desktopExportAlertTitle,
+                              style: const TextStyle(
                                   fontFamily: "Eurostile Round Extended")),
-                          content: const SingleChildScrollView(
+                          content: SingleChildScrollView(
                             child: ListBody(children: [
-                              Text(
-                                  "It seems like you using this app on desktop. Check your documents folder, you should find \"TetraStats.db\". Copy it somewhere")
+                              Text(t.desktopExportText)
                             ]),
                           ),
                           actions: <Widget>[
                             TextButton(
-                              child: const Text('OK'),
+                              child: Text(t.popupActions.ok),
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
@@ -116,15 +114,15 @@ class SettingsState extends State<SettingsView> {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) => AlertDialog(
-                          title: const Text("Android export",
-                              style: TextStyle(
+                          title: Text(t.androidExportAlertTitle,
+                              style: const TextStyle(
                                   fontFamily: "Eurostile Round Extended")),
                           content: SingleChildScrollView(
-                            child: ListBody(children: [Text("Exported.\n$exportedDB")]),
+                            child: ListBody(children: [Text(t.androidExportText(exportedDB: exportedDB))]),
                           ),
                           actions: <Widget>[
                             TextButton(
-                              child: const Text('OK'),
+                              child: Text(t.popupActions.ok),
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
@@ -136,8 +134,8 @@ class SettingsState extends State<SettingsView> {
             },
           ),
           ListTile(
-            title: const Text("Import local database"),
-            subtitle: const Text("Restore your backup. Notice that already stored database will be overwritten."),
+            title: Text(t.importDB),
+            subtitle: Text(t.importDBDescription),
             onTap: () {
               if(Platform.isAndroid){
                 FilePicker.platform.pickFiles(
@@ -147,18 +145,18 @@ class SettingsState extends State<SettingsView> {
                   var newDB = value.paths[0]!;
                     teto.close().then((value){
                       if(!newDB.endsWith("db")){
-                        return ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Wrong file type")));
+                        return ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.importWrongFileType)));
                       }
                     getApplicationDocumentsDirectory().then((value){
                       var oldDB = File("${value.path}/TetraStats.db");
                       oldDB.writeAsBytes(File(newDB).readAsBytesSync(), flush: true).then((value){
                         teto.open();
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Import successful")));
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.importSuccess)));
                       });
                     });
                   });
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Operation was cancelled")));
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.importCancelled)));
                 }
               }); 
               }else{
@@ -174,42 +172,41 @@ class SettingsState extends State<SettingsView> {
                       var oldDB = File("${value.path}/TetraStats.db");
                       oldDB.writeAsBytes(File(newDB).readAsBytesSync()).then((value){
                         teto.open();
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Import successful")));
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.importSuccess)));
                       });
                     });
                   });
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Operation was cancelled")));
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.importCancelled)));
                 }
               }); 
               }
             },
           ),
           ListTile(
-            title: const Text("Your TETR.IO account"),
+            title: Text(t.yourID),
             trailing: Text(defaultNickname),
             onTap: () => showDialog(
                 context: context,
                 builder: (BuildContext context) => AlertDialog(
-                      title: const Text("Your TETR.IO account nickname or ID",
-                          style: TextStyle(
+                      title: Text(t.yourIDAlertTitle,
+                          style: const TextStyle(
                               fontFamily: "Eurostile Round Extended")),
                       content: SingleChildScrollView(
                         child: ListBody(children: [
-                          const Text(
-                              "Every time when app loads, stats of that player will be fetched. Please prefer ID over nickname because nickname can be changed."),
+                          Text(t.yourIDText),
                           TextField(controller: _playertext, maxLength: 25)
                         ]),
                       ),
                       actions: <Widget>[
                         TextButton(
-                          child: const Text('Cancel'),
+                          child: Text(t.popupActions.cancel),
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
                         ),
                         TextButton(
-                          child: const Text('Submit'),
+                          child: Text(t.popupActions.submit),
                           onPressed: () {
                             _setPlayer(_playertext.text.toLowerCase().trim());
                             Navigator.of(context).pop();
@@ -220,7 +217,7 @@ class SettingsState extends State<SettingsView> {
                     )),
           ),
           ListTile(
-            title: const Text("Language"),
+            title: Text(t.language),
             trailing: DropdownButton(
                 items: locales,
                 value: LocaleSettings.currentLocale,
@@ -229,13 +226,8 @@ class SettingsState extends State<SettingsView> {
           ),
           const Divider(),
           ListTile(
-            title: const Text("About app"),
-            subtitle: Text("""
-${_packageInfo.appName} (${_packageInfo.packageName}) Version ${_packageInfo.version} Build ${_packageInfo.buildNumber}
-
-Developed by dan63047
-Formulas provided by kerrmunism
-"""),
+            title: Text(t.aboutApp),
+            subtitle: Text(t.aboutAppText(appName: _packageInfo.appName, packageName: _packageInfo.packageName, version: _packageInfo.version, buildNumber: _packageInfo.buildNumber)),
           ),
         ],
       )),

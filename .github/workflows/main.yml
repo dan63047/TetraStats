@@ -59,7 +59,7 @@ jobs:
           prerelease: true
           allowUpdates: true
           discussionCategory: autobuilded-releases
-          artifacts: "build/app/outputs/apk/debug/*"
+          artifacts: "build/app/outputs/apk/flutter-apk/*"
           tag: Auto-${{ github.run_number }}
           body: This build was builded with GitHub Action workflow
           token: ${{ secrets.TOKEN }}

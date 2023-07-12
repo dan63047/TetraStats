@@ -170,7 +170,8 @@ class UserThingy extends StatelessWidget {
                       playerStat: player.level,
                       playerStatLabel: t.statCellNum.xpLevel,
                       isScreenBig: bigScreen,
-                      alertWidgets: [Text("${NumberFormat.decimalPatternDigits(decimalDigits: 2).format(player.xp)} XP", style: const TextStyle(fontFamily: "Eurostile Round Extended"),), Text("Progress to next level: ${((player.level - player.level.floor()) * 100).toStringAsFixed(2)} %"), Text("Progress from 0 XP to level 5000: ${((player.xp / 67009017.7589378) * 100).toStringAsFixed(2)} %")],
+                      alertWidgets: [Text("${NumberFormat.decimalPatternDigits(decimalDigits: 2).format(player.xp)} XP", style: const TextStyle(fontFamily: "Eurostile Round Extended"),), Text("${t.statCellNum.xpProgress}: ${((player.level - player.level.floor()) * 100).toStringAsFixed(2)} %"), Text("${t.statCellNum.xpFrom0To5000}: ${((player.xp / 67009017.7589378) * 100).toStringAsFixed(2)} %")],
+                      okText: t.popupActions.ok,
                       higherIsBetter: true,
                     ),
                     if (player.gameTime >= Duration.zero)

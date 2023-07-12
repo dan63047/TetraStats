@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/widgets/tl_thingy.dart';
 import 'package:tetra_stats/widgets/user_thingy.dart';
+
+final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
 
 class StateView extends StatefulWidget {
   final TetrioPlayer state;
@@ -26,9 +30,10 @@ class StateState extends State<StateView> {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     return Scaffold(
         appBar: AppBar(
-          title: Text("${widget.state.username.toUpperCase()} account on ${widget.state.state}"),
+          title: Text(t.stateViewTitle(nickname: widget.state.username.toUpperCase(), date: dateFormat.format(widget.state.state))),
         ),
         backgroundColor: Colors.black,
         body: SafeArea(

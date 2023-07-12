@@ -121,7 +121,7 @@ class TLThingy extends StatelessWidget {
                                     width: 200,
                                     height: 120,
                                     child: SfRadialGauge(
-                                      title: const GaugeTitle(text: "Attack Per Piece"),
+                                      title: GaugeTitle(text: t.statCellNum.app),
                                       axes: [RadialAxis(
                                       startAngle: 180,
                                       endAngle: 360,
@@ -155,18 +155,18 @@ class TLThingy extends StatelessWidget {
                                           showDialog(
                                             context: context,
                                             builder: (BuildContext context) => AlertDialog(
-                                              title: const Text("Attack Per Piece",
-                                                  style: TextStyle(
+                                              title: Text(t.statCellNum.app,
+                                                  style: const TextStyle(
                                                       fontFamily: "Eurostile Round Extended")),
                                               content:  SingleChildScrollView(
                                                 child: ListBody(children: [
-                                                  const Text("Main efficiency metric. Tells how many attack you producing per piece"),
-                                                  Text("Raw value: ${tl.nerdStats!.app}")
+                                                  Text(t.statCellNum.appDescription),
+                                                  Text("${t.exactValue}: ${tl.nerdStats!.app}")
                                                 ]),
                                               ),
                                               actions: <Widget>[
                                                 TextButton(
-                                                  child: const Text('OK'),
+                                                  child: Text(t.popupActions.ok),
                                                   onPressed: () {
                                                     Navigator.of(context).pop();
                                                   },
@@ -222,13 +222,13 @@ class TLThingy extends StatelessWidget {
                                                       fontFamily: "Eurostile Round Extended")),
                                               content: SingleChildScrollView(
                                                 child: ListBody(children: [
-                                                  const Text("Basically, tells how much and how efficient you using garbage in your attacks"),
-                                                  Text("Raw value: ${tl.nerdStats!.vsapm}")
+                                                  Text(t.statCellNum.vsapmDescription),
+                                                  Text("${t.exactValue}: ${tl.nerdStats!.vsapm}")
                                                 ]),
                                               ),
                                               actions: <Widget>[
                                                 TextButton(
-                                                  child: const Text('OK'),
+                                                  child: Text(t.popupActions.ok),
                                                   onPressed: () {
                                                     Navigator.of(context).pop();
                                                   },
@@ -251,46 +251,53 @@ class TLThingy extends StatelessWidget {
                               crossAxisAlignment: WrapCrossAlignment.start,
                               clipBehavior: Clip.hardEdge,
                               children: [
-                                StatCellNum(playerStat: tl.nerdStats!.dss, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "Downstack\nPer Second",
-                                alertWidgets: [const Text("Downstack per Second measures how many garbage lines you clear in a second."),
-                                    const Text("Formula: (VS / 100) - (APM / 60)"),
-                                    Text("Raw value: ${tl.nerdStats!.dss}"),],
+                                StatCellNum(playerStat: tl.nerdStats!.dss, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.dss,
+                                alertWidgets: [Text(t.statCellNum.dssDescription),
+                                    Text("${t.formula}: (VS / 100) - (APM / 60)"),
+                                    Text("${t.exactValue}: ${tl.nerdStats!.dss}"),],
+                                    okText: t.popupActions.ok,
                                     higherIsBetter: true,
                                     oldPlayerStat: oldTl?.nerdStats?.dss,),
-                                StatCellNum(playerStat: tl.nerdStats!.dsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "Downstack\nPer Piece",
-                                alertWidgets: [const Text("Downstack per Piece measures how many garbage lines you clear per piece."),
-                                    const Text("Formula: DS/S / PPS"),
-                                    Text("Raw value: ${tl.nerdStats!.dsp}"),],
+                                StatCellNum(playerStat: tl.nerdStats!.dsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.dsp,
+                                alertWidgets: [Text(t.statCellNum.dspDescription),
+                                    Text("${t.formula}: DS/S / PPS"),
+                                    Text("${t.exactValue}: ${tl.nerdStats!.dsp}"),],
+                                    okText: t.popupActions.ok,
                                     higherIsBetter: true,
                                     oldPlayerStat: oldTl?.nerdStats?.dsp,),
-                                StatCellNum(playerStat: tl.nerdStats!.appdsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "APP + DS/P",
-                                alertWidgets: [const Text("Just a sum of Attack per Piece and Downstack per Piece."),
-                                    const Text("Formula: APP + DS/P"),
-                                    Text("Raw value: ${tl.nerdStats!.appdsp}"),],
+                                StatCellNum(playerStat: tl.nerdStats!.appdsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.appdsp,
+                                alertWidgets: [Text(t.statCellNum.appdspDescription),
+                                    Text("${t.formula}: APP + DS/P"),
+                                    Text("${t.exactValue}: ${tl.nerdStats!.appdsp}"),],
+                                    okText: t.popupActions.ok,
                                     higherIsBetter: true,
                                     oldPlayerStat: oldTl?.nerdStats?.appdsp,),
-                                StatCellNum(playerStat: tl.nerdStats!.cheese, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: "Cheese\nIndex",
-                                alertWidgets: [const Text("Cheese Index is an approximation how much clean / cheese garbage player sends. Lower = more clean. Higher = more cheese.\nInvented by kerrmunism"),
-                                    const Text("Formula: (DS/P * 150) + ((VS/APM - 2) * 50) + (0.6 - APP) * 125"),
-                                    Text("Raw value: ${tl.nerdStats!.cheese}"),],
+                                StatCellNum(playerStat: tl.nerdStats!.cheese, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.cheese,
+                                alertWidgets: [Text(t.statCellNum.cheeseDescription),
+                                    Text("${t.formula}: (DS/P * 150) + ((VS/APM - 2) * 50) + (0.6 - APP) * 125"),
+                                    Text("${t.exactValue}: ${tl.nerdStats!.cheese}"),],
+                                    okText: t.popupActions.ok,
                                     higherIsBetter: true,
                                     oldPlayerStat: oldTl?.nerdStats?.cheese,),
-                                StatCellNum(playerStat: tl.nerdStats!.gbe, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "Garbage\nEfficiency",
-                                alertWidgets: [const Text("Garbage Efficiency measures how well player uses their garbage. Higher = better or they use their garbage more. Lower = they mostly send their garbage back at cheese or rarely clear garbage.\nInvented by Zepheniah and Dragonboy."),
-                                    const Text("Formula: ((APP * DS/S) / PPS) * 2"),
-                                    Text("Raw value: ${tl.nerdStats!.gbe}"),],
+                                StatCellNum(playerStat: tl.nerdStats!.gbe, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.gbe,
+                                alertWidgets: [Text(t.statCellNum.gbeDescription),
+                                    Text("${t.formula}: ((APP * DS/S) / PPS) * 2"),
+                                    Text("${t.exactValue}: ${tl.nerdStats!.gbe}"),],
+                                    okText: t.popupActions.ok,
                                     higherIsBetter: true,
                                     oldPlayerStat: oldTl?.nerdStats?.gbe,),
-                                StatCellNum(playerStat: tl.nerdStats!.nyaapp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: "Weighted\nAPP",
-                                alertWidgets: [const Text("Essentially, a measure of your ability to send cheese while still maintaining a high APP.\nInvented by Wertj."),
-                                    const Text("Formula: APP - 5 * tan(radians((Cheese Index / -30) + 1))"),
-                                    Text("Raw value:  ${tl.nerdStats!.nyaapp}"),],
+                                StatCellNum(playerStat: tl.nerdStats!.nyaapp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.nyaapp,
+                                alertWidgets: [Text(t.statCellNum.nyaappDescription),
+                                    Text("${t.formula}: APP - 5 * tan(radians((Cheese Index / -30) + 1))"),
+                                    Text("${t.exactValue}:  ${tl.nerdStats!.nyaapp}"),],
+                                    okText: t.popupActions.ok,
                                     higherIsBetter: true,
                                     oldPlayerStat: oldTl?.nerdStats?.nyaapp,),
-                                StatCellNum(playerStat: tl.nerdStats!.area, isScreenBig: bigScreen, fractionDigits: 1, playerStatLabel: "Area",
-                                alertWidgets: [const Text("How much space your shape takes up on the graph, if you exclude the cheese and vs/apm sections"),
-                                    const Text("Formula: APM * 1 + PPS * 45 + VS * 0.444 + APP * 185 + DS/S * 175 + DS/P * 450 + Garbage Effi * 315"),
-                                    Text("Raw value:  ${tl.nerdStats!.area}"),],
+                                StatCellNum(playerStat: tl.nerdStats!.area, isScreenBig: bigScreen, fractionDigits: 1, playerStatLabel: t.statCellNum.area,
+                                alertWidgets: [Text(t.statCellNum.areaDescription),
+                                    Text("${t.formula}: APM * 1 + PPS * 45 + VS * 0.444 + APP * 185 + DS/S * 175 + DS/P * 450 + Garbage Effi * 315"),
+                                    Text("${t.exactValue}:  ${tl.nerdStats!.area}"),],
+                                    okText: t.popupActions.ok,
                                     higherIsBetter: true,
                                     oldPlayerStat: oldTl?.nerdStats?.area,)
                               ])
@@ -307,9 +314,9 @@ class TLThingy extends StatelessWidget {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(
-                                    "Est. of TR:",
-                                    style: TextStyle(fontSize: 24),
+                                  Text(
+                                    "${t.statCellNum.estOfTR}:",
+                                    style: const TextStyle(fontSize: 24),
                                   ),
                                   Text(
                                     f2.format(tl.estTr!.esttr),
@@ -321,9 +328,9 @@ class TLThingy extends StatelessWidget {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    const Text(
-                                      "Accuracy:",
-                                      style: TextStyle(fontSize: 24),
+                                    Text(
+                                      "${t.statCellNum.accOfEst}:",
+                                      style: const TextStyle(fontSize: 24),
                                     ),
                                     Text(
                                       fDiff.format(tl.esttracc!),
@@ -499,7 +506,7 @@ class TLThingy extends StatelessWidget {
                       )
                   ]
                 : [
-                    const Text("That user never played Tetra League", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)),
+                    Text(t.neverPlayedTL, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)),
                   ],
           );
         },

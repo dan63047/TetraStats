@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:tetra_stats/views/states_view.dart';
 
@@ -13,14 +14,14 @@ class TrackedPlayersView extends StatefulWidget {
   State<StatefulWidget> createState() => TrackedPlayersState();
 }
 
-final DateFormat dateFormat = DateFormat.yMMMd().add_Hms();
-
 class TrackedPlayersState extends State<TrackedPlayersView> {
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
+    final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Stored data"),
+        title: Text(t.trackedPlayersViewTitle),
       ),
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -38,9 +39,9 @@ class TrackedPlayersState extends State<TrackedPlayersView> {
                         headerSliverBuilder: (context, value) {
                           String howManyPlayers(int numberOfPlayers) => Intl.plural(
                                 numberOfPlayers,
-                                zero: 'Empty list. Press "Track" button in previous view to add current player here',
-                                one: 'There is only one player',
-                                other: 'There are $numberOfPlayers players',
+                                zero: t.trackedPlayersZeroEntrys,
+                                one: t.trackedPlayersOneEntry,
+                                other: t.trackedPlayersManyEntrys(numberOfPlayers: numberOfPlayers),
                                 name: 'howManyPeople',
                                 args: [numberOfPlayers],
                                 desc: 'Description of how many people are seen in a place.',
@@ -62,15 +63,14 @@ class TrackedPlayersState extends State<TrackedPlayersView> {
                             itemCount: allPlayers.length,
                             itemBuilder: (context, index) {
                               return ListTile(
-                                title: Text("${allPlayers[keys[index]]?.last.username}: ${allPlayers[keys[index]]?.length} states"),
-                                subtitle: Text(
-                                    "From ${dateFormat.format(allPlayers[keys[index]]!.first.state)} until ${dateFormat.format(allPlayers[keys[index]]!.last.state)}"),
+                                title: Text(t.trackedPlayersEntry(nickname: allPlayers[keys[index]]!.last.username, numberOfStates: allPlayers[keys[index]]!.length)),
+                                subtitle: Text(t.trackedPlayersDescription(firstStateDate: dateFormat.format(allPlayers[keys[index]]!.first.state), lastStateDate: dateFormat.format(allPlayers[keys[index]]!.last.state))),
                                 trailing: IconButton(
                                   icon: const Icon(Icons.delete_forever),
                                   onPressed: () {
                                     String nn = allPlayers[keys[index]]!.last.username;
                                     teto.deletePlayer(keys[index]);
-                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("$nn states was removed from database!")));
+                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.trackedPlayersStatesDeleted(nickname: nn))));
                                   },
                                 ),
                                 onTap: () {

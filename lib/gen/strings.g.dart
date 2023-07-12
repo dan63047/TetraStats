@@ -1,9 +1,9 @@
 /// Generated file. Do not edit.
 ///
 /// Locales: 2
-/// Strings: 680 (340 per locale)
+/// Strings: 788 (394 per locale)
 ///
-/// Built on 2023-07-11 at 16:43 UTC
+/// Built on 2023-07-12 at 15:02 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -193,6 +193,37 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String gamesUntilRanked({required Object left}) => '${left} games until being ranked';
 	String get nerdStats => 'Nerd Stats';
 	String get playersYouTrack => 'Players you track';
+	String get formula => 'Formula';
+	String get exactValue => 'Exact value';
+	String get neverPlayedTL => 'That user never played Tetra League';
+	String get exportDB => 'Export local database';
+	String get exportDBDescription => 'It contains states and Tetra League records of the tracked players and list of tracked players.';
+	String get desktopExportAlertTitle => 'Desktop export';
+	String get desktopExportText => 'It seems like you using this app on desktop. Check your documents folder, you should find "TetraStats.db". Copy it somewhere';
+	String get androidExportAlertTitle => 'Android export';
+	String androidExportText({required Object exportedDB}) => 'Exported.\n${exportedDB}';
+	String get importDB => 'Import local database';
+	String get importDBDescription => 'Restore your backup. Notice that already stored database will be overwritten.';
+	String get importWrongFileType => 'Wrong file type';
+	String get importCancelled => 'Operation was cancelled';
+	String get importSuccess => 'Import successful';
+	String get yourID => 'Your TETR.IO account';
+	String get yourIDAlertTitle => 'Your TETR.IO account nickname or ID';
+	String get yourIDText => 'Every time when app loads, stats of that player will be fetched. Please prefer ID over nickname because nickname can be changed.';
+	String get language => 'Language';
+	String get aboutApp => 'About app';
+	String aboutAppText({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Version ${version} Build ${buildNumber}\n\nDeveloped by dan63047\nFormulas provided by kerrmunism';
+	String stateViewTitle({required Object nickname, required Object date}) => '${nickname} account on ${date}';
+	String statesViewTitle({required Object number, required Object nickname}) => '${number} states of ${nickname} account';
+	String statesViewEntry({required Object level, required Object gameTime, required Object friends, required Object rd}) => 'Level ${level}, ${gameTime} of gametime, ${friends} friends, ${rd} RD';
+	String stateRemoved({required Object date}) => '${date} state was removed from database!';
+	String get trackedPlayersViewTitle => 'Stored data';
+	String get trackedPlayersZeroEntrys => 'Empty list. Press "Track" button in previous view to add current player here';
+	String get trackedPlayersOneEntry => 'There is only one player';
+	String trackedPlayersManyEntrys({required Object numberOfPlayers}) => 'There are ${numberOfPlayers} players';
+	String trackedPlayersEntry({required Object nickname, required Object numberOfStates}) => '${nickname}: ${numberOfStates} states';
+	String trackedPlayersDescription({required Object firstStateDate, required Object lastStateDate}) => 'From ${firstStateDate} until ${lastStateDate}';
+	String trackedPlayersStatesDeleted({required Object nickname}) => '${nickname} states was removed from database!';
 	late final _StringsStatCellNumEn statCellNum = _StringsStatCellNumEn._(_root);
 	Map<String, String> get playerRole => {
 		'user': 'User',
@@ -477,6 +508,8 @@ class _StringsStatCellNumEn {
 
 	// Translations
 	String get xpLevel => 'XP Level';
+	String get xpProgress => 'Progress to next level';
+	String get xpFrom0To5000 => 'Progress from 0 XP to level 5000';
 	String get hoursPlayed => 'Hours\nPlayed';
 	String get onlineGames => 'Online\nGames';
 	String get gamesWon => 'Games\nWon';
@@ -498,6 +531,25 @@ class _StringsStatCellNumEn {
 	String get keys => 'Key\nPresses';
 	String get kpp => 'KP Per\nPiece';
 	String get kps => 'KP Per\nSecond';
+	String get app => 'Attack Per Piece';
+	String get appDescription => '(Abbreviated as APP) Main efficiency metric. Tells how many attack you producing per piece';
+	String get vsapmDescription => 'Basically, tells how much and how efficient you using garbage in your attacks';
+	String get dss => 'Downstack\nPer Second';
+	String get dssDescription => 'Downstack per Second measures how many garbage lines you clear in a second.';
+	String get dsp => 'Downstack\nPer Piece';
+	String get dspDescription => 'Downstack per Piece measures how many garbage lines you clear per piece.';
+	String get appdsp => 'APP + DS/P';
+	String get appdspDescription => 'Just a sum of Attack per Piece and Downstack per Piece.';
+	String get cheese => 'Cheese\nIndex';
+	String get cheeseDescription => 'Cheese Index is an approximation how much clean / cheese garbage player sends. Lower = more clean. Higher = more cheese.\nInvented by kerrmunism';
+	String get gbe => 'Garbage\nEfficiency';
+	String get gbeDescription => 'Garbage Efficiency measures how well player uses their garbage. Higher = better or they use their garbage more. Lower = they mostly send their garbage back at cheese or rarely clear garbage.\nInvented by Zepheniah and Dragonboy.';
+	String get nyaapp => 'Weighted\nAPP';
+	String get nyaappDescription => 'Essentially, a measure of your ability to send cheese while still maintaining a high APP.\nInvented by Wertj.';
+	String get area => 'Area';
+	String get areaDescription => 'How much space your shape takes up on the graph, if you exclude the cheese and vs/apm sections';
+	String get estOfTR => 'Est. of TR';
+	String get accOfEst => 'Accuracy';
 }
 
 // Path: numOfGameActions
@@ -520,6 +572,8 @@ class _StringsPopupActionsEn {
 	final _StringsEn _root; // ignore: unused_field
 
 	// Translations
+	String get cancel => 'Cancel';
+	String get submit => 'Submit';
 	String get ok => 'OK';
 }
 
@@ -606,6 +660,37 @@ class _StringsRu implements _StringsEn {
 	@override String gamesUntilRanked({required Object left}) => '${left} матчей до получения рейтинга';
 	@override String get nerdStats => 'Для задротов';
 	@override String get playersYouTrack => 'Отслеживаемые игроки';
+	@override String get formula => 'Формула';
+	@override String get exactValue => 'Точное значение';
+	@override String get neverPlayedTL => 'Этот игрок никогда не играл в Тетра Лигу';
+	@override String get exportDB => 'Экспортировать локальную базу данных';
+	@override String get exportDBDescription => 'Она содержит состояния аккаунтов и их матчей в Тетра Лиге для отслеживаемых игроков и список таких игроков.';
+	@override String get desktopExportAlertTitle => 'Экспорт на десктопе';
+	@override String get desktopExportText => 'Похоже, вы используете десктопную версию. Проверьте папку "Документы", там вы должны найти файл "TetraStats.db". Скопируйте его куда-нибудь';
+	@override String get androidExportAlertTitle => 'Экспорт на Android';
+	@override String androidExportText({required Object exportedDB}) => 'Экспортировано.\n${exportedDB}';
+	@override String get importDB => 'Импортировать локальную базу данных';
+	@override String get importDBDescription => 'Восстановите свою резеврную копию. Обратите внимание, что текущая база данных будет перезаписана.';
+	@override String get importWrongFileType => 'Неверный тип файла';
+	@override String get importCancelled => 'Операция была отменена';
+	@override String get importSuccess => 'Успешно импортировано';
+	@override String get yourID => 'Ваш аккаунт в TETR.IO';
+	@override String get yourIDAlertTitle => 'Никнейм или ID вашего аккаунта в TETR.IO';
+	@override String get yourIDText => 'Каждый раз, когда приложение запускается, приложение будет получать статистику этого игрока. Пожалуйста, отдайте предпочтение ID, так как никнейм можно изменить.';
+	@override String get language => 'Язык (Language)';
+	@override String get aboutApp => 'О приложении';
+	@override String aboutAppText({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Версия ${version} Сборка ${buildNumber}\n\nРазработал dan63047\nФормулы предоставил kerrmunism';
+	@override String stateViewTitle({required Object nickname, required Object date}) => 'Аккаунт ${nickname} ${date}';
+	@override String statesViewTitle({required Object number, required Object nickname}) => '${number} состояний аккаунта ${nickname}';
+	@override String statesViewEntry({required Object level, required Object gameTime, required Object friends, required Object rd}) => '${level} уровень, ${gameTime} сыграно, ${friends} друзей, ${rd} RD';
+	@override String stateRemoved({required Object }) => '${}Состояние от {date} было удалено из локальной базы данных!';
+	@override String get trackedPlayersViewTitle => 'Сохранённые данные';
+	@override String get trackedPlayersZeroEntrys => 'Пустой список. Вернитесь на предыдущий экран и нажмите кнопку "Отслеживать", чтобы текущий игрок появился здесь';
+	@override String get trackedPlayersOneEntry => 'В списке только один игрок';
+	@override String trackedPlayersManyEntrys({required Object numberOfPlayers}) => 'В списке ${numberOfPlayers} игроков';
+	@override String trackedPlayersEntry({required Object nickname, required Object numberOfStates}) => '${nickname}: ${numberOfStates} состояний';
+	@override String trackedPlayersDescription({required Object firstStateDate, required Object lastStateDate}) => 'Начиная с ${firstStateDate} и заканчивая ${lastStateDate}';
+	@override String trackedPlayersStatesDeleted({required Object nickname}) => 'Состояния аккаунта ${nickname} были удалены из локальной базы данных!';
 	@override late final _StringsStatCellNumRu statCellNum = _StringsStatCellNumRu._(_root);
 	@override Map<String, String> get playerRole => {
 		'user': 'Пользователь',
@@ -890,6 +975,8 @@ class _StringsStatCellNumRu implements _StringsStatCellNumEn {
 
 	// Translations
 	@override String get xpLevel => 'Уровень\nопыта';
+	@override String get xpProgress => 'Прогресс до следующего уровня';
+	@override String get xpFrom0To5000 => 'Прогресс от 0 XP до 5000 уровня';
 	@override String get hoursPlayed => 'Часов\nСыграно';
 	@override String get onlineGames => 'Онлайн\nИгр';
 	@override String get gamesWon => 'Онлайн\nПобед';
@@ -911,6 +998,25 @@ class _StringsStatCellNumRu implements _StringsStatCellNumEn {
 	@override String get keys => 'Нажатий\nКлавиш';
 	@override String get kpp => 'Нажатий\nна Фигуру';
 	@override String get kps => 'Нажатий\nв Секунду';
+	@override String get app => 'Атака на Фигуру';
+	@override String get appDescription => '(Сокращенно APP) Главный показатель эффективности. Показывает, сколько атаки приходится на одну фигуру';
+	@override String get vsapmDescription => 'В основном, показывает как много мусора игрок использует в своих атаках и насколько эффективно.';
+	@override String get dss => 'Downstack\nв Секунду';
+	@override String get dssDescription => '(Сокращенно DS/S) Downstack (спуск вниз) в Секунду показывает как много мусорных линий в среднем игрок убирает за одну секунду.';
+	@override String get dsp => 'Downstack\nна Фигуру';
+	@override String get dspDescription => '(Сокращенно DS/P) Downstack (спуск вниз) на Фигуру показывает как много мусорных линий в среднем игрок убирает одну фигуру.';
+	@override String get appdsp => 'APP + DS/P';
+	@override String get appdspDescription => 'Просто сумма Атаки на Фигуру и Downstack на Фигуру.';
+	@override String get cheese => 'Индекс сыра';
+	@override String get cheeseDescription => '(Сокращенно Cheese) Индекс сыра является аппроксимацией того, насколько чистый / дырявый мусор игрок отправляет. Меньше = более чистый. Больше = более дырявый.\nПридумал kerrmunism';
+	@override String get gbe => 'Garbage\nEfficiency';
+	@override String get gbeDescription => '(Сокращенно Gb Eff.) Garbage Efficiency показывает насколько хорошо игрок использует свой мусор. Больше = лучше (или он использует больше мусора). Меньше = в основном отправляют сыр (или он редко чистит мусор).\nПридумали Zepheniah и Dragonboy.';
+	@override String get nyaapp => 'Взвешенный\nAPP';
+	@override String get nyaappDescription => '(Сокращенно wAPP) По сути, показывает способность отправлять сыр, сохраняя при этом высокую эффективность.\nПридумал Wertj.';
+	@override String get area => 'Area';
+	@override String get areaDescription => 'Какую площадь занимает диаграмма, если не брать в расчёт индекс сыра и VS/APM';
+	@override String get estOfTR => 'Расчётный TR';
+	@override String get accOfEst => 'Точность расчёта';
 }
 
 // Path: numOfGameActions
@@ -933,6 +1039,8 @@ class _StringsPopupActionsRu implements _StringsPopupActionsEn {
 	@override final _StringsRu _root; // ignore: unused_field
 
 	// Translations
+	@override String get cancel => 'Отменить';
+	@override String get submit => 'Подтвердить';
 	@override String get ok => 'OK';
 }
 
@@ -998,7 +1106,40 @@ extension on _StringsEn {
 			case 'gamesUntilRanked': return ({required Object left}) => '${left} games until being ranked';
 			case 'nerdStats': return 'Nerd Stats';
 			case 'playersYouTrack': return 'Players you track';
+			case 'formula': return 'Formula';
+			case 'exactValue': return 'Exact value';
+			case 'neverPlayedTL': return 'That user never played Tetra League';
+			case 'exportDB': return 'Export local database';
+			case 'exportDBDescription': return 'It contains states and Tetra League records of the tracked players and list of tracked players.';
+			case 'desktopExportAlertTitle': return 'Desktop export';
+			case 'desktopExportText': return 'It seems like you using this app on desktop. Check your documents folder, you should find "TetraStats.db". Copy it somewhere';
+			case 'androidExportAlertTitle': return 'Android export';
+			case 'androidExportText': return ({required Object exportedDB}) => 'Exported.\n${exportedDB}';
+			case 'importDB': return 'Import local database';
+			case 'importDBDescription': return 'Restore your backup. Notice that already stored database will be overwritten.';
+			case 'importWrongFileType': return 'Wrong file type';
+			case 'importCancelled': return 'Operation was cancelled';
+			case 'importSuccess': return 'Import successful';
+			case 'yourID': return 'Your TETR.IO account';
+			case 'yourIDAlertTitle': return 'Your TETR.IO account nickname or ID';
+			case 'yourIDText': return 'Every time when app loads, stats of that player will be fetched. Please prefer ID over nickname because nickname can be changed.';
+			case 'language': return 'Language';
+			case 'aboutApp': return 'About app';
+			case 'aboutAppText': return ({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Version ${version} Build ${buildNumber}\n\nDeveloped by dan63047\nFormulas provided by kerrmunism';
+			case 'stateViewTitle': return ({required Object nickname, required Object date}) => '${nickname} account on ${date}';
+			case 'statesViewTitle': return ({required Object number, required Object nickname}) => '${number} states of ${nickname} account';
+			case 'statesViewEntry': return ({required Object level, required Object gameTime, required Object friends, required Object rd}) => 'Level ${level}, ${gameTime} of gametime, ${friends} friends, ${rd} RD';
+			case 'stateRemoved': return ({required Object date}) => '${date} state was removed from database!';
+			case 'trackedPlayersViewTitle': return 'Stored data';
+			case 'trackedPlayersZeroEntrys': return 'Empty list. Press "Track" button in previous view to add current player here';
+			case 'trackedPlayersOneEntry': return 'There is only one player';
+			case 'trackedPlayersManyEntrys': return ({required Object numberOfPlayers}) => 'There are ${numberOfPlayers} players';
+			case 'trackedPlayersEntry': return ({required Object nickname, required Object numberOfStates}) => '${nickname}: ${numberOfStates} states';
+			case 'trackedPlayersDescription': return ({required Object firstStateDate, required Object lastStateDate}) => 'From ${firstStateDate} until ${lastStateDate}';
+			case 'trackedPlayersStatesDeleted': return ({required Object nickname}) => '${nickname} states was removed from database!';
 			case 'statCellNum.xpLevel': return 'XP Level';
+			case 'statCellNum.xpProgress': return 'Progress to next level';
+			case 'statCellNum.xpFrom0To5000': return 'Progress from 0 XP to level 5000';
 			case 'statCellNum.hoursPlayed': return 'Hours\nPlayed';
 			case 'statCellNum.onlineGames': return 'Online\nGames';
 			case 'statCellNum.gamesWon': return 'Games\nWon';
@@ -1020,6 +1161,25 @@ extension on _StringsEn {
 			case 'statCellNum.keys': return 'Key\nPresses';
 			case 'statCellNum.kpp': return 'KP Per\nPiece';
 			case 'statCellNum.kps': return 'KP Per\nSecond';
+			case 'statCellNum.app': return 'Attack Per Piece';
+			case 'statCellNum.appDescription': return '(Abbreviated as APP) Main efficiency metric. Tells how many attack you producing per piece';
+			case 'statCellNum.vsapmDescription': return 'Basically, tells how much and how efficient you using garbage in your attacks';
+			case 'statCellNum.dss': return 'Downstack\nPer Second';
+			case 'statCellNum.dssDescription': return 'Downstack per Second measures how many garbage lines you clear in a second.';
+			case 'statCellNum.dsp': return 'Downstack\nPer Piece';
+			case 'statCellNum.dspDescription': return 'Downstack per Piece measures how many garbage lines you clear per piece.';
+			case 'statCellNum.appdsp': return 'APP + DS/P';
+			case 'statCellNum.appdspDescription': return 'Just a sum of Attack per Piece and Downstack per Piece.';
+			case 'statCellNum.cheese': return 'Cheese\nIndex';
+			case 'statCellNum.cheeseDescription': return 'Cheese Index is an approximation how much clean / cheese garbage player sends. Lower = more clean. Higher = more cheese.\nInvented by kerrmunism';
+			case 'statCellNum.gbe': return 'Garbage\nEfficiency';
+			case 'statCellNum.gbeDescription': return 'Garbage Efficiency measures how well player uses their garbage. Higher = better or they use their garbage more. Lower = they mostly send their garbage back at cheese or rarely clear garbage.\nInvented by Zepheniah and Dragonboy.';
+			case 'statCellNum.nyaapp': return 'Weighted\nAPP';
+			case 'statCellNum.nyaappDescription': return 'Essentially, a measure of your ability to send cheese while still maintaining a high APP.\nInvented by Wertj.';
+			case 'statCellNum.area': return 'Area';
+			case 'statCellNum.areaDescription': return 'How much space your shape takes up on the graph, if you exclude the cheese and vs/apm sections';
+			case 'statCellNum.estOfTR': return 'Est. of TR';
+			case 'statCellNum.accOfEst': return 'Accuracy';
 			case 'playerRole.user': return 'User';
 			case 'playerRole.banned': return 'Banned';
 			case 'playerRole.bot': return 'Bot';
@@ -1032,6 +1192,8 @@ extension on _StringsEn {
 			case 'numOfGameActions.hold': return 'Holds';
 			case 'numOfGameActions.tspinsTotal': return 'T-spins total';
 			case 'numOfGameActions.lineClears': return 'Line clears';
+			case 'popupActions.cancel': return 'Cancel';
+			case 'popupActions.submit': return 'Submit';
 			case 'popupActions.ok': return 'OK';
 			case 'errors.connection': return ({required Object code, required Object message}) => 'Some issue with connection: ${code} ${message}';
 			case 'errors.noSuchUser': return 'No such user';
@@ -1346,7 +1508,40 @@ extension on _StringsRu {
 			case 'gamesUntilRanked': return ({required Object left}) => '${left} матчей до получения рейтинга';
 			case 'nerdStats': return 'Для задротов';
 			case 'playersYouTrack': return 'Отслеживаемые игроки';
+			case 'formula': return 'Формула';
+			case 'exactValue': return 'Точное значение';
+			case 'neverPlayedTL': return 'Этот игрок никогда не играл в Тетра Лигу';
+			case 'exportDB': return 'Экспортировать локальную базу данных';
+			case 'exportDBDescription': return 'Она содержит состояния аккаунтов и их матчей в Тетра Лиге для отслеживаемых игроков и список таких игроков.';
+			case 'desktopExportAlertTitle': return 'Экспорт на десктопе';
+			case 'desktopExportText': return 'Похоже, вы используете десктопную версию. Проверьте папку "Документы", там вы должны найти файл "TetraStats.db". Скопируйте его куда-нибудь';
+			case 'androidExportAlertTitle': return 'Экспорт на Android';
+			case 'androidExportText': return ({required Object exportedDB}) => 'Экспортировано.\n${exportedDB}';
+			case 'importDB': return 'Импортировать локальную базу данных';
+			case 'importDBDescription': return 'Восстановите свою резеврную копию. Обратите внимание, что текущая база данных будет перезаписана.';
+			case 'importWrongFileType': return 'Неверный тип файла';
+			case 'importCancelled': return 'Операция была отменена';
+			case 'importSuccess': return 'Успешно импортировано';
+			case 'yourID': return 'Ваш аккаунт в TETR.IO';
+			case 'yourIDAlertTitle': return 'Никнейм или ID вашего аккаунта в TETR.IO';
+			case 'yourIDText': return 'Каждый раз, когда приложение запускается, приложение будет получать статистику этого игрока. Пожалуйста, отдайте предпочтение ID, так как никнейм можно изменить.';
+			case 'language': return 'Язык (Language)';
+			case 'aboutApp': return 'О приложении';
+			case 'aboutAppText': return ({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Версия ${version} Сборка ${buildNumber}\n\nРазработал dan63047\nФормулы предоставил kerrmunism';
+			case 'stateViewTitle': return ({required Object nickname, required Object date}) => 'Аккаунт ${nickname} ${date}';
+			case 'statesViewTitle': return ({required Object number, required Object nickname}) => '${number} состояний аккаунта ${nickname}';
+			case 'statesViewEntry': return ({required Object level, required Object gameTime, required Object friends, required Object rd}) => '${level} уровень, ${gameTime} сыграно, ${friends} друзей, ${rd} RD';
+			case 'stateRemoved': return ({required Object }) => '${}Состояние от {date} было удалено из локальной базы данных!';
+			case 'trackedPlayersViewTitle': return 'Сохранённые данные';
+			case 'trackedPlayersZeroEntrys': return 'Пустой список. Вернитесь на предыдущий экран и нажмите кнопку "Отслеживать", чтобы текущий игрок появился здесь';
+			case 'trackedPlayersOneEntry': return 'В списке только один игрок';
+			case 'trackedPlayersManyEntrys': return ({required Object numberOfPlayers}) => 'В списке ${numberOfPlayers} игроков';
+			case 'trackedPlayersEntry': return ({required Object nickname, required Object numberOfStates}) => '${nickname}: ${numberOfStates} состояний';
+			case 'trackedPlayersDescription': return ({required Object firstStateDate, required Object lastStateDate}) => 'Начиная с ${firstStateDate} и заканчивая ${lastStateDate}';
+			case 'trackedPlayersStatesDeleted': return ({required Object nickname}) => 'Состояния аккаунта ${nickname} были удалены из локальной базы данных!';
 			case 'statCellNum.xpLevel': return 'Уровень\nопыта';
+			case 'statCellNum.xpProgress': return 'Прогресс до следующего уровня';
+			case 'statCellNum.xpFrom0To5000': return 'Прогресс от 0 XP до 5000 уровня';
 			case 'statCellNum.hoursPlayed': return 'Часов\nСыграно';
 			case 'statCellNum.onlineGames': return 'Онлайн\nИгр';
 			case 'statCellNum.gamesWon': return 'Онлайн\nПобед';
@@ -1368,6 +1563,25 @@ extension on _StringsRu {
 			case 'statCellNum.keys': return 'Нажатий\nКлавиш';
 			case 'statCellNum.kpp': return 'Нажатий\nна Фигуру';
 			case 'statCellNum.kps': return 'Нажатий\nв Секунду';
+			case 'statCellNum.app': return 'Атака на Фигуру';
+			case 'statCellNum.appDescription': return '(Сокращенно APP) Главный показатель эффективности. Показывает, сколько атаки приходится на одну фигуру';
+			case 'statCellNum.vsapmDescription': return 'В основном, показывает как много мусора игрок использует в своих атаках и насколько эффективно.';
+			case 'statCellNum.dss': return 'Downstack\nв Секунду';
+			case 'statCellNum.dssDescription': return '(Сокращенно DS/S) Downstack (спуск вниз) в Секунду показывает как много мусорных линий в среднем игрок убирает за одну секунду.';
+			case 'statCellNum.dsp': return 'Downstack\nна Фигуру';
+			case 'statCellNum.dspDescription': return '(Сокращенно DS/P) Downstack (спуск вниз) на Фигуру показывает как много мусорных линий в среднем игрок убирает одну фигуру.';
+			case 'statCellNum.appdsp': return 'APP + DS/P';
+			case 'statCellNum.appdspDescription': return 'Просто сумма Атаки на Фигуру и Downstack на Фигуру.';
+			case 'statCellNum.cheese': return 'Индекс сыра';
+			case 'statCellNum.cheeseDescription': return '(Сокращенно Cheese) Индекс сыра является аппроксимацией того, насколько чистый / дырявый мусор игрок отправляет. Меньше = более чистый. Больше = более дырявый.\nПридумал kerrmunism';
+			case 'statCellNum.gbe': return 'Garbage\nEfficiency';
+			case 'statCellNum.gbeDescription': return '(Сокращенно Gb Eff.) Garbage Efficiency показывает насколько хорошо игрок использует свой мусор. Больше = лучше (или он использует больше мусора). Меньше = в основном отправляют сыр (или он редко чистит мусор).\nПридумали Zepheniah и Dragonboy.';
+			case 'statCellNum.nyaapp': return 'Взвешенный\nAPP';
+			case 'statCellNum.nyaappDescription': return '(Сокращенно wAPP) По сути, показывает способность отправлять сыр, сохраняя при этом высокую эффективность.\nПридумал Wertj.';
+			case 'statCellNum.area': return 'Area';
+			case 'statCellNum.areaDescription': return 'Какую площадь занимает диаграмма, если не брать в расчёт индекс сыра и VS/APM';
+			case 'statCellNum.estOfTR': return 'Расчётный TR';
+			case 'statCellNum.accOfEst': return 'Точность расчёта';
 			case 'playerRole.user': return 'Пользователь';
 			case 'playerRole.banned': return 'Заблокированный пользователь';
 			case 'playerRole.bot': return 'Бот';
@@ -1380,6 +1594,8 @@ extension on _StringsRu {
 			case 'numOfGameActions.hold': return 'В запас';
 			case 'numOfGameActions.tspinsTotal': return 'T-spins всего';
 			case 'numOfGameActions.lineClears': return 'Линий очищено';
+			case 'popupActions.cancel': return 'Отменить';
+			case 'popupActions.submit': return 'Подтвердить';
 			case 'popupActions.ok': return 'OK';
 			case 'errors.connection': return ({required Object code, required Object message}) => 'Проблема с подключением: ${code} ${message}';
 			case 'errors.noSuchUser': return 'Нет такого пользователя';
