@@ -68,7 +68,7 @@
     "stateViewTitle": "Аккаунт ${nickname} ${date}",
     "statesViewTitle": "${number} состояний аккаунта ${nickname}",
     "statesViewEntry": "${level} уровень, ${gameTime} сыграно, ${friends} друзей, ${rd} RD",
-    "stateRemoved": "$Состояние от {date} было удалено из локальной базы данных!",
+    "stateRemoved": "Состояние от ${date} было удалено из локальной базы данных!",
     "trackedPlayersViewTitle": "Сохранённые данные",
     "trackedPlayersZeroEntrys": "Пустой список. Вернитесь на предыдущий экран и нажмите кнопку \"Отслеживать\", чтобы текущий игрок появился здесь",
     "trackedPlayersOneEntry": "В списке только один игрок",

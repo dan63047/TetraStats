@@ -3,7 +3,7 @@
 /// Locales: 2
 /// Strings: 788 (394 per locale)
 ///
-/// Built on 2023-07-12 at 15:02 UTC
+/// Built on 2023-07-12 at 15:22 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -683,7 +683,7 @@ class _StringsRu implements _StringsEn {
 	@override String stateViewTitle({required Object nickname, required Object date}) => 'Аккаунт ${nickname} ${date}';
 	@override String statesViewTitle({required Object number, required Object nickname}) => '${number} состояний аккаунта ${nickname}';
 	@override String statesViewEntry({required Object level, required Object gameTime, required Object friends, required Object rd}) => '${level} уровень, ${gameTime} сыграно, ${friends} друзей, ${rd} RD';
-	@override String stateRemoved({required Object }) => '${}Состояние от {date} было удалено из локальной базы данных!';
+	@override String stateRemoved({required Object date}) => 'Состояние от ${date} было удалено из локальной базы данных!';
 	@override String get trackedPlayersViewTitle => 'Сохранённые данные';
 	@override String get trackedPlayersZeroEntrys => 'Пустой список. Вернитесь на предыдущий экран и нажмите кнопку "Отслеживать", чтобы текущий игрок появился здесь';
 	@override String get trackedPlayersOneEntry => 'В списке только один игрок';
@@ -1531,7 +1531,7 @@ extension on _StringsRu {
 			case 'stateViewTitle': return ({required Object nickname, required Object date}) => 'Аккаунт ${nickname} ${date}';
 			case 'statesViewTitle': return ({required Object number, required Object nickname}) => '${number} состояний аккаунта ${nickname}';
 			case 'statesViewEntry': return ({required Object level, required Object gameTime, required Object friends, required Object rd}) => '${level} уровень, ${gameTime} сыграно, ${friends} друзей, ${rd} RD';
-			case 'stateRemoved': return ({required Object }) => '${}Состояние от {date} было удалено из локальной базы данных!';
+			case 'stateRemoved': return ({required Object date}) => 'Состояние от ${date} было удалено из локальной базы данных!';
 			case 'trackedPlayersViewTitle': return 'Сохранённые данные';
 			case 'trackedPlayersZeroEntrys': return 'Пустой список. Вернитесь на предыдущий экран и нажмите кнопку "Отслеживать", чтобы текущий игрок появился здесь';
 			case 'trackedPlayersOneEntry': return 'В списке только один игрок';
