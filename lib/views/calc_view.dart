@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 
 double? apm;
 double? pps;
@@ -50,9 +51,10 @@ class CalcState extends State<CalcView> {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Stats Calculator"),
+        title: Text(t.statsCalc),
       ),
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -94,7 +96,7 @@ class CalcState extends State<CalcView> {
                         )),
                         TextButton(
                           onPressed: () => calc(),
-                          child: const Text("Calc"),
+                          child: Text(t.calc),
                         ),
                       ],
                     ),
@@ -106,19 +108,19 @@ class CalcState extends State<CalcView> {
               ];
             },
             body: nerdStats == null
-                ? const Text("Enter values to calculate the stats")
+                ? Text(t.calcViewNoValues)
                 : ListView(
                     children: [
-                      _ListEntry(value: nerdStats!.app, label: "Attack Per Piece", fractionDigits: 3),
+                      _ListEntry(value: nerdStats!.app, label: t.statCellNum.app.replaceAll(RegExp(r'\n'), " "), fractionDigits: 3),
                       _ListEntry(value: nerdStats!.vsapm, label: "VS/APM", fractionDigits: 3),
-                      _ListEntry(value: nerdStats!.dss, label: "Downstack Per Second", fractionDigits: 3),
-                      _ListEntry(value: nerdStats!.dsp, label: "Downstack Per Piece", fractionDigits: 3),
+                      _ListEntry(value: nerdStats!.dss, label: t.statCellNum.dss.replaceAll(RegExp(r'\n'), " "), fractionDigits: 3),
+                      _ListEntry(value: nerdStats!.dsp, label: t.statCellNum.dsp.replaceAll(RegExp(r'\n'), " "), fractionDigits: 3),
                       _ListEntry(value: nerdStats!.appdsp, label: "APP + DS/P", fractionDigits: 3),
-                      _ListEntry(value: nerdStats!.cheese, label: "Cheese Index", fractionDigits: 3),
-                      _ListEntry(value: nerdStats!.gbe, label: "Garbage Efficiency", fractionDigits: 3),
-                      _ListEntry(value: nerdStats!.nyaapp, label: "Weighted APP", fractionDigits: 3),
-                      _ListEntry(value: nerdStats!.area, label: "Area", fractionDigits: 3),
-                      _ListEntry(value: estTr!.esttr, label: "Est. of TR", fractionDigits: 3),
+                      _ListEntry(value: nerdStats!.cheese, label: t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "), fractionDigits: 3),
+                      _ListEntry(value: nerdStats!.gbe, label: t.statCellNum.gbe.replaceAll(RegExp(r'\n'), " "), fractionDigits: 3),
+                      _ListEntry(value: nerdStats!.nyaapp, label: t.statCellNum.nyaapp.replaceAll(RegExp(r'\n'), " "), fractionDigits: 3),
+                      _ListEntry(value: nerdStats!.area, label: t.statCellNum.area.replaceAll(RegExp(r'\n'), " "), fractionDigits: 3),
+                      _ListEntry(value: estTr!.esttr, label: t.statCellNum.estOfTR, fractionDigits: 3),
                       Wrap(
                         direction: Axis.horizontal,
                         alignment: WrapAlignment.spaceAround,

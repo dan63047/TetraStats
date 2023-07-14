@@ -1,9 +1,9 @@
 /// Generated file. Do not edit.
 ///
 /// Locales: 2
-/// Strings: 788 (394 per locale)
+/// Strings: 828 (414 per locale)
 ///
-/// Built on 2023-07-12 at 15:22 UTC
+/// Built on 2023-07-14 at 20:17 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -177,6 +177,7 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String fetchDate({required Object date}) => 'Fetched ${date}';
 	String get exactGametime => 'Exact gametime';
 	String get bigRedBanned => 'BANNED';
+	String get normalBanned => 'Banned';
 	String get bigRedBadStanding => 'BAD STANDING';
 	String get copiedToClipboard => 'Copied to clipboard!';
 	String get playerRoleAccount => ' account ';
@@ -224,6 +225,23 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String trackedPlayersEntry({required Object nickname, required Object numberOfStates}) => '${nickname}: ${numberOfStates} states';
 	String trackedPlayersDescription({required Object firstStateDate, required Object lastStateDate}) => 'From ${firstStateDate} until ${lastStateDate}';
 	String trackedPlayersStatesDeleted({required Object nickname}) => '${nickname} states was removed from database!';
+	String averageXrank({required Object rankLetter}) => 'Average ${rankLetter} rank';
+	String get vs => 'vs';
+	String get registred => 'Registred';
+	String get playedTL => 'Played Tetra League';
+	String get winChance => 'Win Chance';
+	String get byGlicko => 'By Glicko';
+	String get byEstTR => 'By Est. TR';
+	String get compareViewNoValues => 'Please, enter username, user ID, or APM-PPS-VS values (divider doesn\'t matter, only order matter) to both of fields';
+	String compareViewWrongValue({required Object value}) => 'Falied to assign ${value}';
+	String get mostRecentOne => 'Most recent one';
+	String get yes => 'Yes';
+	String get no => 'No';
+	String get daysLater => 'days later';
+	String get dayseBefore => 'days before';
+	String get fromBeginning => 'From beginning';
+	String get calc => 'Calc';
+	String get calcViewNoValues => 'Enter values to calculate the stats';
 	late final _StringsStatCellNumEn statCellNum = _StringsStatCellNumEn._(_root);
 	Map<String, String> get playerRole => {
 		'user': 'User',
@@ -517,7 +535,9 @@ class _StringsStatCellNumEn {
 	String get apm => 'Attack\nPer Minute';
 	String get vs => 'Versus\nScore';
 	String get lbp => 'Leaderboard\nplacement';
+	String get lbpShort => '№ in LB';
 	String get lbpc => 'Country LB\nplacement';
+	String get lbpcShort => '№ in local LB';
 	String get gamesPlayed => 'Games\nplayed';
 	String get gamesWonTL => 'Games\nWon';
 	String get winrate => 'Winrate\nprecentage';
@@ -535,17 +555,17 @@ class _StringsStatCellNumEn {
 	String get appDescription => '(Abbreviated as APP) Main efficiency metric. Tells how many attack you producing per piece';
 	String get vsapmDescription => 'Basically, tells how much and how efficient you using garbage in your attacks';
 	String get dss => 'Downstack\nPer Second';
-	String get dssDescription => 'Downstack per Second measures how many garbage lines you clear in a second.';
+	String get dssDescription => '(Abbreviated as DS/S) Downstack per Second measures how many garbage lines you clear in a second.';
 	String get dsp => 'Downstack\nPer Piece';
-	String get dspDescription => 'Downstack per Piece measures how many garbage lines you clear per piece.';
+	String get dspDescription => '(Abbreviated as DS/P) Downstack per Piece measures how many garbage lines you clear per piece.';
 	String get appdsp => 'APP + DS/P';
 	String get appdspDescription => 'Just a sum of Attack per Piece and Downstack per Piece.';
 	String get cheese => 'Cheese\nIndex';
-	String get cheeseDescription => 'Cheese Index is an approximation how much clean / cheese garbage player sends. Lower = more clean. Higher = more cheese.\nInvented by kerrmunism';
+	String get cheeseDescription => '(Abbreviated as Cheese) Cheese Index is an approximation how much clean / cheese garbage player sends. Lower = more clean. Higher = more cheese.\nInvented by kerrmunism';
 	String get gbe => 'Garbage\nEfficiency';
-	String get gbeDescription => 'Garbage Efficiency measures how well player uses their garbage. Higher = better or they use their garbage more. Lower = they mostly send their garbage back at cheese or rarely clear garbage.\nInvented by Zepheniah and Dragonboy.';
+	String get gbeDescription => '(Abbreviated as Gb Eff.) Garbage Efficiency measures how well player uses their garbage. Higher = better or they use their garbage more. Lower = they mostly send their garbage back at cheese or rarely clear garbage.\nInvented by Zepheniah and Dragonboy.';
 	String get nyaapp => 'Weighted\nAPP';
-	String get nyaappDescription => 'Essentially, a measure of your ability to send cheese while still maintaining a high APP.\nInvented by Wertj.';
+	String get nyaappDescription => '(Abbreviated as wAPP) Essentially, a measure of your ability to send cheese while still maintaining a high APP.\nInvented by Wertj.';
 	String get area => 'Area';
 	String get areaDescription => 'How much space your shape takes up on the graph, if you exclude the cheese and vs/apm sections';
 	String get estOfTR => 'Est. of TR';
@@ -644,6 +664,7 @@ class _StringsRu implements _StringsEn {
 	@override String fetchDate({required Object date}) => 'На момент ${date}';
 	@override String get exactGametime => 'Время, проведённое в игре';
 	@override String get bigRedBanned => 'ЗАБАНЕН';
+	@override String get normalBanned => 'Забанен';
 	@override String get bigRedBadStanding => 'ПЛОХАЯ РЕПУТАЦИЯ';
 	@override String get copiedToClipboard => 'Скопировано в буфер обмена!';
 	@override String get playerRoleAccount => ', аккаунт которого ';
@@ -691,6 +712,23 @@ class _StringsRu implements _StringsEn {
 	@override String trackedPlayersEntry({required Object nickname, required Object numberOfStates}) => '${nickname}: ${numberOfStates} состояний';
 	@override String trackedPlayersDescription({required Object firstStateDate, required Object lastStateDate}) => 'Начиная с ${firstStateDate} и заканчивая ${lastStateDate}';
 	@override String trackedPlayersStatesDeleted({required Object nickname}) => 'Состояния аккаунта ${nickname} были удалены из локальной базы данных!';
+	@override String averageXrank({required Object rankLetter}) => 'Средний ${rankLetter} ранг';
+	@override String get vs => 'против';
+	@override String get registred => 'Зарегистрирован';
+	@override String get playedTL => 'Играл в Тетра Лигу';
+	@override String get winChance => 'Шансы на победу';
+	@override String get byGlicko => 'По Glicko';
+	@override String get byEstTR => 'По расч. TR';
+	@override String get compareViewNoValues => 'Пожалуйста, введите никнейм, ID или значения APM-PPS-VS (неважно, какой разделитель, важен порядок) в оба поля';
+	@override String compareViewWrongValue({required Object value}) => 'Не удалось получить ${value}';
+	@override String get mostRecentOne => 'Самый последний';
+	@override String get yes => 'Да';
+	@override String get no => 'Нет';
+	@override String get daysLater => 'дней позже';
+	@override String get dayseBefore => 'дней до';
+	@override String get fromBeginning => 'С начала';
+	@override String get calc => 'Считать';
+	@override String get calcViewNoValues => 'Введите значения, чтобы посчитать статистику';
 	@override late final _StringsStatCellNumRu statCellNum = _StringsStatCellNumRu._(_root);
 	@override Map<String, String> get playerRole => {
 		'user': 'Пользователь',
@@ -984,7 +1022,9 @@ class _StringsStatCellNumRu implements _StringsStatCellNumEn {
 	@override String get apm => 'Атака в\nМинуту';
 	@override String get vs => 'Показатель\nVersus';
 	@override String get lbp => 'Положение\nв рейтинге';
+	@override String get lbpShort => '№ в рейтинге';
 	@override String get lbpc => 'Положение\nв рейтинге страны';
+	@override String get lbpcShort => '№ по стране';
 	@override String get gamesPlayed => 'Игр\nСыграно';
 	@override String get gamesWonTL => 'Побед';
 	@override String get winrate => 'Процент\nпобед';
@@ -1090,6 +1130,7 @@ extension on _StringsEn {
 			case 'fetchDate': return ({required Object date}) => 'Fetched ${date}';
 			case 'exactGametime': return 'Exact gametime';
 			case 'bigRedBanned': return 'BANNED';
+			case 'normalBanned': return 'Banned';
 			case 'bigRedBadStanding': return 'BAD STANDING';
 			case 'copiedToClipboard': return 'Copied to clipboard!';
 			case 'playerRoleAccount': return ' account ';
@@ -1137,6 +1178,23 @@ extension on _StringsEn {
 			case 'trackedPlayersEntry': return ({required Object nickname, required Object numberOfStates}) => '${nickname}: ${numberOfStates} states';
 			case 'trackedPlayersDescription': return ({required Object firstStateDate, required Object lastStateDate}) => 'From ${firstStateDate} until ${lastStateDate}';
 			case 'trackedPlayersStatesDeleted': return ({required Object nickname}) => '${nickname} states was removed from database!';
+			case 'averageXrank': return ({required Object rankLetter}) => 'Average ${rankLetter} rank';
+			case 'vs': return 'vs';
+			case 'registred': return 'Registred';
+			case 'playedTL': return 'Played Tetra League';
+			case 'winChance': return 'Win Chance';
+			case 'byGlicko': return 'By Glicko';
+			case 'byEstTR': return 'By Est. TR';
+			case 'compareViewNoValues': return 'Please, enter username, user ID, or APM-PPS-VS values (divider doesn\'t matter, only order matter) to both of fields';
+			case 'compareViewWrongValue': return ({required Object value}) => 'Falied to assign ${value}';
+			case 'mostRecentOne': return 'Most recent one';
+			case 'yes': return 'Yes';
+			case 'no': return 'No';
+			case 'daysLater': return 'days later';
+			case 'dayseBefore': return 'days before';
+			case 'fromBeginning': return 'From beginning';
+			case 'calc': return 'Calc';
+			case 'calcViewNoValues': return 'Enter values to calculate the stats';
 			case 'statCellNum.xpLevel': return 'XP Level';
 			case 'statCellNum.xpProgress': return 'Progress to next level';
 			case 'statCellNum.xpFrom0To5000': return 'Progress from 0 XP to level 5000';
@@ -1147,7 +1205,9 @@ extension on _StringsEn {
 			case 'statCellNum.apm': return 'Attack\nPer Minute';
 			case 'statCellNum.vs': return 'Versus\nScore';
 			case 'statCellNum.lbp': return 'Leaderboard\nplacement';
+			case 'statCellNum.lbpShort': return '№ in LB';
 			case 'statCellNum.lbpc': return 'Country LB\nplacement';
+			case 'statCellNum.lbpcShort': return '№ in local LB';
 			case 'statCellNum.gamesPlayed': return 'Games\nplayed';
 			case 'statCellNum.gamesWonTL': return 'Games\nWon';
 			case 'statCellNum.winrate': return 'Winrate\nprecentage';
@@ -1165,17 +1225,17 @@ extension on _StringsEn {
 			case 'statCellNum.appDescription': return '(Abbreviated as APP) Main efficiency metric. Tells how many attack you producing per piece';
 			case 'statCellNum.vsapmDescription': return 'Basically, tells how much and how efficient you using garbage in your attacks';
 			case 'statCellNum.dss': return 'Downstack\nPer Second';
-			case 'statCellNum.dssDescription': return 'Downstack per Second measures how many garbage lines you clear in a second.';
+			case 'statCellNum.dssDescription': return '(Abbreviated as DS/S) Downstack per Second measures how many garbage lines you clear in a second.';
 			case 'statCellNum.dsp': return 'Downstack\nPer Piece';
-			case 'statCellNum.dspDescription': return 'Downstack per Piece measures how many garbage lines you clear per piece.';
+			case 'statCellNum.dspDescription': return '(Abbreviated as DS/P) Downstack per Piece measures how many garbage lines you clear per piece.';
 			case 'statCellNum.appdsp': return 'APP + DS/P';
 			case 'statCellNum.appdspDescription': return 'Just a sum of Attack per Piece and Downstack per Piece.';
 			case 'statCellNum.cheese': return 'Cheese\nIndex';
-			case 'statCellNum.cheeseDescription': return 'Cheese Index is an approximation how much clean / cheese garbage player sends. Lower = more clean. Higher = more cheese.\nInvented by kerrmunism';
+			case 'statCellNum.cheeseDescription': return '(Abbreviated as Cheese) Cheese Index is an approximation how much clean / cheese garbage player sends. Lower = more clean. Higher = more cheese.\nInvented by kerrmunism';
 			case 'statCellNum.gbe': return 'Garbage\nEfficiency';
-			case 'statCellNum.gbeDescription': return 'Garbage Efficiency measures how well player uses their garbage. Higher = better or they use their garbage more. Lower = they mostly send their garbage back at cheese or rarely clear garbage.\nInvented by Zepheniah and Dragonboy.';
+			case 'statCellNum.gbeDescription': return '(Abbreviated as Gb Eff.) Garbage Efficiency measures how well player uses their garbage. Higher = better or they use their garbage more. Lower = they mostly send their garbage back at cheese or rarely clear garbage.\nInvented by Zepheniah and Dragonboy.';
 			case 'statCellNum.nyaapp': return 'Weighted\nAPP';
-			case 'statCellNum.nyaappDescription': return 'Essentially, a measure of your ability to send cheese while still maintaining a high APP.\nInvented by Wertj.';
+			case 'statCellNum.nyaappDescription': return '(Abbreviated as wAPP) Essentially, a measure of your ability to send cheese while still maintaining a high APP.\nInvented by Wertj.';
 			case 'statCellNum.area': return 'Area';
 			case 'statCellNum.areaDescription': return 'How much space your shape takes up on the graph, if you exclude the cheese and vs/apm sections';
 			case 'statCellNum.estOfTR': return 'Est. of TR';
@@ -1492,6 +1552,7 @@ extension on _StringsRu {
 			case 'fetchDate': return ({required Object date}) => 'На момент ${date}';
 			case 'exactGametime': return 'Время, проведённое в игре';
 			case 'bigRedBanned': return 'ЗАБАНЕН';
+			case 'normalBanned': return 'Забанен';
 			case 'bigRedBadStanding': return 'ПЛОХАЯ РЕПУТАЦИЯ';
 			case 'copiedToClipboard': return 'Скопировано в буфер обмена!';
 			case 'playerRoleAccount': return ', аккаунт которого ';
@@ -1539,6 +1600,23 @@ extension on _StringsRu {
 			case 'trackedPlayersEntry': return ({required Object nickname, required Object numberOfStates}) => '${nickname}: ${numberOfStates} состояний';
 			case 'trackedPlayersDescription': return ({required Object firstStateDate, required Object lastStateDate}) => 'Начиная с ${firstStateDate} и заканчивая ${lastStateDate}';
 			case 'trackedPlayersStatesDeleted': return ({required Object nickname}) => 'Состояния аккаунта ${nickname} были удалены из локальной базы данных!';
+			case 'averageXrank': return ({required Object rankLetter}) => 'Средний ${rankLetter} ранг';
+			case 'vs': return 'против';
+			case 'registred': return 'Зарегистрирован';
+			case 'playedTL': return 'Играл в Тетра Лигу';
+			case 'winChance': return 'Шансы на победу';
+			case 'byGlicko': return 'По Glicko';
+			case 'byEstTR': return 'По расч. TR';
+			case 'compareViewNoValues': return 'Пожалуйста, введите никнейм, ID или значения APM-PPS-VS (неважно, какой разделитель, важен порядок) в оба поля';
+			case 'compareViewWrongValue': return ({required Object value}) => 'Не удалось получить ${value}';
+			case 'mostRecentOne': return 'Самый последний';
+			case 'yes': return 'Да';
+			case 'no': return 'Нет';
+			case 'daysLater': return 'дней позже';
+			case 'dayseBefore': return 'дней до';
+			case 'fromBeginning': return 'С начала';
+			case 'calc': return 'Считать';
+			case 'calcViewNoValues': return 'Введите значения, чтобы посчитать статистику';
 			case 'statCellNum.xpLevel': return 'Уровень\nопыта';
 			case 'statCellNum.xpProgress': return 'Прогресс до следующего уровня';
 			case 'statCellNum.xpFrom0To5000': return 'Прогресс от 0 XP до 5000 уровня';
@@ -1549,7 +1627,9 @@ extension on _StringsRu {
 			case 'statCellNum.apm': return 'Атака в\nМинуту';
 			case 'statCellNum.vs': return 'Показатель\nVersus';
 			case 'statCellNum.lbp': return 'Положение\nв рейтинге';
+			case 'statCellNum.lbpShort': return '№ в рейтинге';
 			case 'statCellNum.lbpc': return 'Положение\nв рейтинге страны';
+			case 'statCellNum.lbpcShort': return '№ по стране';
 			case 'statCellNum.gamesPlayed': return 'Игр\nСыграно';
 			case 'statCellNum.gamesWonTL': return 'Побед';
 			case 'statCellNum.winrate': return 'Процент\nпобед';

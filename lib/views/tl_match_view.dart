@@ -2,9 +2,10 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 
 
-final DateFormat dateFormat = DateFormat.yMMMd().add_Hms();
+final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
 
 class TlMatchResultView extends StatefulWidget {
   final TetraLeagueAlphaRecord record;
@@ -27,11 +28,12 @@ class TlMatchResultState extends State<TlMatchResultView> {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     bool bigScreen = MediaQuery.of(context).size.width > 768;
     return Scaffold(
       appBar: AppBar(
         title: Text(
-            "${widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).username.toUpperCase()} vs. ${widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).username.toUpperCase()} in TL match ${dateFormat.format(widget.record.timestamp)}"),
+            "${widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).username.toUpperCase()} ${t.vs} ${widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).username.toUpperCase()} in TL match ${dateFormat.format(widget.record.timestamp)}"),
       ),
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -135,7 +137,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.only(bottom: 16),
-                            child: Text("Nerd Stats",
+                            child: Text(t.nerdStats,
                                 style: TextStyle(
                                     fontFamily: "Eurostile Round Extended",
                                     fontSize: bigScreen ? 42 : 28)),
@@ -177,21 +179,21 @@ class TlMatchResultState extends State<TlMatchResultView> {
                             higherIsBetter: true,
                           ),
                           CompareThingy(
-                            label: "Cheese",
+                            label: t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "),
                             greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.cheese,
                             redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.cheese,
                             fractionDigits: 2,
                             higherIsBetter: true,
                           ),
                           CompareThingy(
-                            label: "Garbage Eff.",
+                            label: "Gb Eff.",
                             greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.gbe,
                             redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.gbe,
                             fractionDigits: 3,
                             higherIsBetter: true,
                           ),
                           CompareThingy(
-                            label: "Weighted APP",
+                            label: "wAPP",
                             greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.nyaapp,
                             redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.nyaapp,
                             fractionDigits: 3,
@@ -205,7 +207,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
                             higherIsBetter: true,
                           ),
                           CompareThingy(
-                            label: "Est. of TR",
+                            label: t.statCellNum.estOfTR,
                             greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).estTr.esttr,
                             redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).estTr.esttr,
                             fractionDigits: 2,
@@ -555,314 +557,6 @@ class CompareThingy extends StatelessWidget {
             )),
             child: Text(
               f.format(redSide),
-              style: const TextStyle(
-                fontSize: 22,
-                shadows: <Shadow>[
-                  Shadow(
-                    offset: Offset(0.0, 0.0),
-                    blurRadius: 3.0,
-                    color: Colors.black,
-                  ),
-                  Shadow(
-                    offset: Offset(0.0, 0.0),
-                    blurRadius: 8.0,
-                    color: Colors.black,
-                  ),
-                ],
-              ),
-              textAlign: TextAlign.end,
-            ),
-          )),
-        ],
-      ),
-    );
-  }
-}
-
-class CompareBoolThingy extends StatelessWidget {
-  final bool greenSide;
-  final bool redSide;
-  final String label;
-  final bool trueIsBetter;
-  const CompareBoolThingy(
-      {super.key,
-      required this.greenSide,
-      required this.redSide,
-      required this.label,
-      required this.trueIsBetter});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
-      child: Row(children: [
-        Expanded(
-            child: Container(
-          padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-              gradient: LinearGradient(
-            colors: const [Colors.green, Colors.transparent],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-            stops: [
-              0.0,
-              trueIsBetter
-                  ? greenSide
-                      ? 0.6
-                      : 0
-                  : !greenSide
-                      ? 0.6
-                      : 0
-            ],
-          )),
-          child: Text(
-            greenSide ? "Yes" : "No",
-            style: const TextStyle(
-              fontSize: 22,
-              shadows: <Shadow>[
-                Shadow(
-                  offset: Offset(0.0, 0.0),
-                  blurRadius: 3.0,
-                  color: Colors.black,
-                ),
-                Shadow(
-                  offset: Offset(0.0, 0.0),
-                  blurRadius: 8.0,
-                  color: Colors.black,
-                ),
-              ],
-            ),
-            textAlign: TextAlign.start,
-          ),
-        )),
-        Column(
-          children: [
-            Text(
-              label,
-              style: const TextStyle(fontSize: 22),
-              textAlign: TextAlign.center,
-            ),
-            const Text(
-              "---",
-              style: TextStyle(fontSize: 16),
-              textAlign: TextAlign.center,
-            )
-          ],
-        ),
-        Expanded(
-            child: Container(
-          padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-              gradient: LinearGradient(
-            colors: const [Colors.red, Colors.transparent],
-            begin: Alignment.centerRight,
-            end: Alignment.centerLeft,
-            stops: [
-              0.0,
-              trueIsBetter
-                  ? redSide
-                      ? 0.6
-                      : 0
-                  : !redSide
-                      ? 0.6
-                      : 0
-            ],
-          )),
-          child: Text(
-            redSide ? "Yes" : "No",
-            style: const TextStyle(
-              fontSize: 22,
-              shadows: <Shadow>[
-                Shadow(
-                  offset: Offset(0.0, 0.0),
-                  blurRadius: 3.0,
-                  color: Colors.black,
-                ),
-                Shadow(
-                  offset: Offset(0.0, 0.0),
-                  blurRadius: 8.0,
-                  color: Colors.black,
-                ),
-              ],
-            ),
-            textAlign: TextAlign.end,
-          ),
-        )),
-      ]),
-    );
-  }
-}
-
-class CompareDurationThingy extends StatelessWidget {
-  final Duration greenSide;
-  final Duration redSide;
-  final String label;
-  final bool higherIsBetter;
-  const CompareDurationThingy(
-      {super.key,
-      required this.greenSide,
-      required this.redSide,
-      required this.label,
-      required this.higherIsBetter});
-
-  Duration verdict(Duration greenSide, Duration redSide) {
-    return greenSide - redSide;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Expanded(
-              child: Text(
-            greenSide.toString(),
-            style: const TextStyle(
-              fontSize: 22,
-            ),
-            textAlign: TextAlign.start,
-          )),
-          Column(
-            children: [
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 22,
-                  shadows: <Shadow>[
-                    Shadow(
-                      offset: Offset(0.0, 0.0),
-                      blurRadius: 3.0,
-                      color: Colors.black,
-                    ),
-                    Shadow(
-                      offset: Offset(0.0, 0.0),
-                      blurRadius: 8.0,
-                      color: Colors.black,
-                    ),
-                  ],
-                ),
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                verdict(greenSide, redSide).toString(),
-                style: const TextStyle(fontSize: 16),
-                textAlign: TextAlign.center,
-              )
-            ],
-          ),
-          Expanded(
-              child: Text(
-            redSide.toString(),
-            style: const TextStyle(fontSize: 22),
-            textAlign: TextAlign.end,
-          )),
-        ],
-      ),
-    );
-  }
-}
-
-class CompareRegTimeThingy extends StatelessWidget {
-  final DateTime? greenSide;
-  final DateTime? redSide;
-  final String label;
-  final int? fractionDigits;
-  const CompareRegTimeThingy(
-      {super.key,
-      required this.greenSide,
-      required this.redSide,
-      required this.label,
-      this.fractionDigits});
-
-  String verdict(DateTime? greenSide, DateTime? redSide) {
-    var f = NumberFormat("#,### days later;#,### days before");
-    String result = "---";
-    if (greenSide != null && redSide != null) {
-      result = f.format(greenSide.difference(redSide).inDays);
-    }
-    return result;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    DateFormat f = DateFormat.yMMMd();
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Expanded(
-              child: Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-              colors: const [Colors.green, Colors.transparent],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              stops: [
-                0.0,
-                greenSide == null
-                    ? 0.6
-                    : redSide != null && greenSide!.isBefore(redSide!)
-                        ? 0.6
-                        : 0
-              ],
-            )),
-            child: Text(
-              greenSide != null ? f.format(greenSide!) : "From beginning",
-              style: const TextStyle(
-                fontSize: 22,
-                shadows: <Shadow>[
-                  Shadow(
-                    offset: Offset(0.0, 0.0),
-                    blurRadius: 3.0,
-                    color: Colors.black,
-                  ),
-                  Shadow(
-                    offset: Offset(0.0, 0.0),
-                    blurRadius: 8.0,
-                    color: Colors.black,
-                  ),
-                ],
-              ),
-              textAlign: TextAlign.start,
-            ),
-          )),
-          Column(
-            children: [
-              Text(
-                label,
-                style: const TextStyle(fontSize: 22),
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                verdict(greenSide, redSide),
-                style: const TextStyle(fontSize: 16),
-                textAlign: TextAlign.center,
-              )
-            ],
-          ),
-          Expanded(
-              child: Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-              colors: const [Colors.red, Colors.transparent],
-              begin: Alignment.centerRight,
-              end: Alignment.centerLeft,
-              stops: [
-                0.0,
-                redSide == null
-                    ? 0.6
-                    : greenSide != null && redSide!.isBefore(greenSide!)
-                        ? 0.6
-                        : 0
-              ],
-            )),
-            child: Text(
-              redSide != null ? f.format(redSide!) : "From beginning",
               style: const TextStyle(
                 fontSize: 22,
                 shadows: <Shadow>[

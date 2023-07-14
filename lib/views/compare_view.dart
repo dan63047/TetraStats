@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
 
 enum Mode{
@@ -16,7 +17,7 @@ List<dynamic> theGreenSide = [null, null, null]; // TetrioPlayer?, List<Dropdown
 Mode redSideMode = Mode.player;
 List<dynamic> theRedSide = [null, null, null];
 final TetrioService teto = TetrioService();
-final DateFormat dateFormat = DateFormat.yMd().add_Hm();
+final DateFormat dateFormat = DateFormat.yMd(LocaleSettings.currentLocale.languageCode).add_Hm();
 // ignore: unnecessary_string_escapes
 var numbersReg = RegExp(r'\d+(\.\d*)*');
 
@@ -63,7 +64,7 @@ class CompareState extends State<CompareView> {
           return setState(() {});
         }on Exception {
           ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Falied to assign $user")));
+          .showSnackBar(SnackBar(content: Text(t.compareViewWrongValue(value: user))));
           return;
         }
       }
@@ -108,9 +109,9 @@ class CompareState extends State<CompareView> {
       }
       dStates.firstWhere((element) => element.value == player, orElse: () {
         dStates?.add(DropdownMenuItem<TetrioPlayer>(
-        value: player, child: const Text("Most recent one")));
+        value: player, child: Text(t.mostRecentOne)));
         return DropdownMenuItem<TetrioPlayer>(
-        value: player, child: const Text("Most recent one"));
+        value: player, child: Text(t.mostRecentOne));
       },);
       }on Exception {
         dStates = null;
@@ -118,7 +119,7 @@ class CompareState extends State<CompareView> {
       theRedSide = [player, dStates, player.tlSeason1];
     } on Exception {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Falied to assign $user")));
+          .showSnackBar(SnackBar(content: Text(t.compareViewWrongValue(value: user))));
     }
     _justUpdate();
   }
@@ -183,9 +184,9 @@ class CompareState extends State<CompareView> {
       }
       dStates.firstWhere((element) => element.value == player, orElse: () {
         dStates?.add(DropdownMenuItem<TetrioPlayer>(
-        value: player, child: const Text("Most recent one")));
+        value: player, child: Text(t.mostRecentOne)));
         return DropdownMenuItem<TetrioPlayer>(
-        value: player, child: const Text("Most recent one"));
+        value: player, child: Text(t.mostRecentOne));
       },);
       }on Exception {
         dStates = null;
@@ -224,6 +225,7 @@ class CompareState extends State<CompareView> {
 
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
     bool bigScreen = MediaQuery.of(context).size.width > 768;
     String titleGreenSide;
     String titleRedSide;
@@ -235,7 +237,7 @@ class CompareState extends State<CompareView> {
         titleGreenSide = "${theGreenSide[2].apm} APM, ${theGreenSide[2].pps} PPS, ${theGreenSide[2].vs} VS";
         break;
       case Mode.averages:
-        titleGreenSide = "Average ${theGreenSide[2].rank.toUpperCase()} rank";
+        titleGreenSide = t.averageXrank(rankLetter: theGreenSide[2].rank.toUpperCase());
         break;
     }
     switch (redSideMode){
@@ -246,11 +248,11 @@ class CompareState extends State<CompareView> {
         titleRedSide = "${theRedSide[2].apm} APM, ${theRedSide[2].pps} PPS, ${theRedSide[2].vs} VS";
         break;
       case Mode.averages:
-        titleRedSide = "Average ${theRedSide[2].rank.toUpperCase()} rank";
+        titleRedSide = t.averageXrank(rankLetter: theRedSide[2].rank.toUpperCase());;
         break;
     }
     return Scaffold(
-      appBar: AppBar(title: Text("$titleGreenSide vs $titleRedSide")),
+      appBar: AppBar(title: Text("$titleGreenSide ${t.vs} $titleRedSide")),
       backgroundColor: Colors.black,
       body: SafeArea(
         child: NestedScrollView(
@@ -330,9 +332,9 @@ class CompareState extends State<CompareView> {
                           CompareRegTimeThingy(
                               greenSide: theGreenSide[0].registrationTime,
                               redSide: theRedSide[0].registrationTime,
-                              label: "Registred"),
+                              label: t.registred),
                           CompareThingy(
-                            label: "Level",
+                            label: t.statCellNum.level,
                             greenSide: theGreenSide[0].level,
                             redSide: theRedSide[0].level,
                             higherIsBetter: true,
@@ -349,14 +351,14 @@ class CompareState extends State<CompareView> {
                                   1000000 /
                                   60 /
                                   60,
-                              label: "Hours Played",
+                              label: t.statCellNum.hoursPlayed.replaceAll(RegExp(r'\n'), " "),
                               higherIsBetter: true,
                               fractionDigits: 2,
                             ),
                           if (theGreenSide[0].gamesPlayed >= 0 &&
                               theRedSide[0].gamesPlayed >= 0)
                             CompareThingy(
-                              label: "Online Games",
+                              label: t.statCellNum.onlineGames.replaceAll(RegExp(r'\n'), " "),
                               greenSide: theGreenSide[0].gamesPlayed,
                               redSide: theRedSide[0].gamesPlayed,
                               higherIsBetter: true,
@@ -364,13 +366,13 @@ class CompareState extends State<CompareView> {
                           if (theGreenSide[0].gamesWon >= 0 &&
                               theRedSide[0].gamesWon >= 0)
                             CompareThingy(
-                              label: "Games Won",
+                              label: t.statCellNum.gamesWon.replaceAll(RegExp(r'\n'), " "),
                               greenSide: theGreenSide[0].gamesWon,
                               redSide: theRedSide[0].gamesWon,
                               higherIsBetter: true,
                             ),
                           CompareThingy(
-                            label: "Friends",
+                            label: t.statCellNum.friends,
                             greenSide: theGreenSide[0].friendCount,
                             redSide: theRedSide[0].friendCount,
                             higherIsBetter: true,
@@ -385,7 +387,7 @@ class CompareState extends State<CompareView> {
                       CompareBoolThingy(
                           greenSide: theGreenSide[0].role == "banned",
                           redSide: theRedSide[0].role == "banned",
-                          label: "Banned",
+                          label: t.normalBanned,
                           trueIsBetter: false),
                     (theGreenSide[2].gamesPlayed > 0 || greenSideMode == Mode.stats) &&
                     (theRedSide[2].gamesPlayed > 0 || redSideMode == Mode.stats)
@@ -393,7 +395,7 @@ class CompareState extends State<CompareView> {
                             children: [
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 16),
-                                child: Text("Tetra League",
+                                child: Text(t.tetraLeague,
                                     style: TextStyle(
                                         fontFamily: "Eurostile Round Extended",
                                         fontSize: bigScreen ? 42 : 28)),
@@ -412,7 +414,7 @@ class CompareState extends State<CompareView> {
                               if (greenSideMode != Mode.stats &&
                                   redSideMode != Mode.stats)
                               CompareThingy(
-                                label: "Games Played",
+                                label: t.statCellNum.gamesPlayed.replaceAll(RegExp(r'\n'), " "),
                                 greenSide: theGreenSide[2].gamesPlayed,
                                 redSide: theRedSide[2].gamesPlayed,
                                 higherIsBetter: true,
@@ -420,7 +422,7 @@ class CompareState extends State<CompareView> {
                               if (greenSideMode != Mode.stats &&
                                   redSideMode != Mode.stats)
                               CompareThingy(
-                                label: "Games Won",
+                                label: t.statCellNum.gamesWonTL.replaceAll(RegExp(r'\n'), " "),
                                 greenSide: theGreenSide[2].gamesWon,
                                 redSide: theRedSide[2].gamesWon,
                                 higherIsBetter: true,
@@ -462,7 +464,7 @@ class CompareState extends State<CompareView> {
                                   greenSideMode == Mode.player &&
                                   redSideMode == Mode.player)
                                 CompareThingy(
-                                  label: "№ in LB",
+                                  label: t.statCellNum.lbpShort,
                                   greenSide: theGreenSide[2].standing,
                                   redSide: theRedSide[2].standing,
                                   higherIsBetter: false,
@@ -472,7 +474,7 @@ class CompareState extends State<CompareView> {
                                   greenSideMode == Mode.player &&
                                   redSideMode == Mode.player)
                                 CompareThingy(
-                                  label: "№ in local LB",
+                                  label: t.statCellNum.lbpcShort,
                                   greenSide:
                                       theGreenSide[2].standingLocal,
                                   redSide: theRedSide[2].standingLocal,
@@ -510,7 +512,7 @@ class CompareState extends State<CompareView> {
                         : CompareBoolThingy(
                             greenSide: theGreenSide[2].gamesPlayed > 0,
                             redSide: theRedSide[2].gamesPlayed > 0,
-                            label: "Played Tetra League",
+                            label: t.playedTL,
                             trueIsBetter: false),
                     const Divider(),
                     if (theGreenSide[2].nerdStats != null &&
@@ -519,7 +521,7 @@ class CompareState extends State<CompareView> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.only(bottom: 16),
-                            child: Text("Nerd Stats",
+                            child: Text(t.nerdStats,
                                 style: TextStyle(
                                     fontFamily: "Eurostile Round Extended",
                                     fontSize: bigScreen ? 42 : 28)),
@@ -561,7 +563,7 @@ class CompareState extends State<CompareView> {
                             higherIsBetter: true,
                           ),
                           CompareThingy(
-                            label: "Cheese",
+                            label: t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "),
                             greenSide:
                                 theGreenSide[2].nerdStats!.cheese,
                             redSide: theRedSide[2].nerdStats!.cheese,
@@ -569,14 +571,14 @@ class CompareState extends State<CompareView> {
                             higherIsBetter: true,
                           ),
                           CompareThingy(
-                            label: "Garbage Eff.",
+                            label: "Gb Eff.",
                             greenSide: theGreenSide[2].nerdStats!.gbe,
                             redSide: theRedSide[2].nerdStats!.gbe,
                             fractionDigits: 3,
                             higherIsBetter: true,
                           ),
                           CompareThingy(
-                            label: "Weighted APP",
+                            label: "wAPP",
                             greenSide:
                                 theGreenSide[2].nerdStats!.nyaapp,
                             redSide: theRedSide[2].nerdStats!.nyaapp,
@@ -591,7 +593,7 @@ class CompareState extends State<CompareView> {
                             higherIsBetter: true,
                           ),
                           CompareThingy(
-                            label: "Est. of TR",
+                            label: t.statCellNum.estOfTR,
                             greenSide: theGreenSide[2].estTr!.esttr,
                             redSide: theRedSide[2].estTr!.esttr,
                             fractionDigits: 2,
@@ -602,7 +604,7 @@ class CompareState extends State<CompareView> {
                               greenSideMode != Mode.stats &&
                               redSideMode != Mode.stats)
                             CompareThingy(
-                              label: "Acc. of Est.",
+                              label: t.statCellNum.accOfEst,
                               greenSide: theGreenSide[2].esttracc!,
                               redSide: theRedSide[2].esttracc!,
                               fractionDigits: 2,
@@ -800,7 +802,7 @@ class CompareState extends State<CompareView> {
                               const Divider(),
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 16),
-                                child: Text("Win Chance",
+                                child: Text(t.winChance,
                                     style: TextStyle(
                                         fontFamily: "Eurostile Round Extended",
                                         fontSize: bigScreen ? 42 : 28)),
@@ -808,7 +810,7 @@ class CompareState extends State<CompareView> {
                               if (greenSideMode != Mode.stats && redSideMode != Mode.stats &&
                               theGreenSide[2].gamesPlayed > 9 && theRedSide[2].gamesPlayed > 9)
                               CompareThingy(
-                                label: "By Glicko",
+                                label: t.byGlicko,
                                 greenSide: getWinrateByTR(
                                         theGreenSide[2].glicko!,
                                         theGreenSide[2].rd!,
@@ -825,7 +827,7 @@ class CompareState extends State<CompareView> {
                                 higherIsBetter: true,
                               ),
                               CompareThingy(
-                                label: "By Est. TR",
+                                label: t.byEstTR,
                                 greenSide: getWinrateByTR(
                                         theGreenSide[2].estTr!.estglicko,
                                         theGreenSide[2].rd ?? noTrRd,
@@ -845,7 +847,7 @@ class CompareState extends State<CompareView> {
                           )
                         ],
                       )
-                  ] : [const Text("Please, enter username, user ID, or APM-PPS-VS values (divider doesn't matter) to both of fields")],
+                  ] : [Text(t.compareViewNoValues)],
                 )
         ),
       ),
@@ -893,7 +895,7 @@ class PlayerSelector extends StatelessWidget {
           underFieldString = "${data[2].apm} APM, ${data[2].pps} PPS, ${data[2].vs} VS";
           break;
         case Mode.averages:
-          underFieldString = "Average ${data[2].rank.toUpperCase()} rank";
+          underFieldString = t.averageXrank(rankLetter: data[2].rank.toUpperCase());
           break;
       }
     }
@@ -1105,7 +1107,7 @@ class CompareBoolThingy extends StatelessWidget {
             ],
           )),
           child: Text(
-            greenSide ? "Yes" : "No",
+            greenSide ? t.yes : t.no,
             style: const TextStyle(
               fontSize: 22,
               shadows: <Shadow>[
@@ -1158,7 +1160,7 @@ class CompareBoolThingy extends StatelessWidget {
             ],
           )),
           child: Text(
-            redSide ? "Yes" : "No",
+            redSide ? t.yes : t.no,
             style: const TextStyle(
               fontSize: 22,
               shadows: <Shadow>[
@@ -1266,7 +1268,7 @@ class CompareRegTimeThingy extends StatelessWidget {
       this.fractionDigits});
 
   String verdict(DateTime? greenSide, DateTime? redSide) {
-    var f = NumberFormat("#,### days later;#,### days before");
+    var f = NumberFormat("#,### ${t.daysLater};#,### ${t.dayseBefore}");
     String result = "---";
     if (greenSide != null && redSide != null) {
       result = f.format(greenSide.difference(redSide).inDays);
@@ -1300,7 +1302,7 @@ class CompareRegTimeThingy extends StatelessWidget {
               ],
             )),
             child: Text(
-              greenSide != null ? f.format(greenSide!) : "From beginning",
+              greenSide != null ? f.format(greenSide!) : t.fromBeginning,
               style: const TextStyle(
                 fontSize: 22,
                 shadows: <Shadow>[
@@ -1351,7 +1353,7 @@ class CompareRegTimeThingy extends StatelessWidget {
               ],
             )),
             child: Text(
-              redSide != null ? f.format(redSide!) : "From beginning",
+              redSide != null ? f.format(redSide!) : t.fromBeginning,
               style: const TextStyle(
                 fontSize: 22,
                 shadows: <Shadow>[

@@ -128,7 +128,7 @@ class TLThingy extends StatelessWidget {
                                       showLabels: false,
                                       showTicks: false,
                                       radiusFactor: 2.1,
-                                      centerY: 0.4,
+                                      centerY: 0.5,
                                       minimum: 0,
                                       maximum: 1,
                                       ranges: [
@@ -192,7 +192,7 @@ class TLThingy extends StatelessWidget {
                                       showTicks: false,
                                       showLabels: false,
                                       radiusFactor: 2.1,
-                                      centerY: 0.4,
+                                      centerY: 0.5,
                                       minimum: 1.8,
                                       maximum: 2.4,
                                       ranges: [
@@ -235,7 +235,7 @@ class TLThingy extends StatelessWidget {
                                                 )
                                               ],
                                             ));
-                                      },), verticalAlignment: GaugeAlignment.far, positionFactor: 0.05,),
+                                      },), verticalAlignment: GaugeAlignment.far, positionFactor: 0.05),
                                       if (oldTl != null) GaugeAnnotation(widget: Text(fDiff.format(tl.nerdStats!.vsapm - oldTl!.nerdStats!.vsapm), style: TextStyle(
                                           color: tl.nerdStats!.vsapm - oldTl!.nerdStats!.vsapm < 0 ?
                                           Colors.red :
