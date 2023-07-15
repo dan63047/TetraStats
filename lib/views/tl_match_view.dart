@@ -207,7 +207,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
                             higherIsBetter: true,
                           ),
                           CompareThingy(
-                            label: t.statCellNum.estOfTR,
+                            label: t.statCellNum.estOfTRShort,
                             greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).estTr.esttr,
                             redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).estTr.esttr,
                             fractionDigits: 2,
@@ -475,8 +475,7 @@ class CompareThingy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var f = NumberFormat("#,###.##");
-    f.maximumFractionDigits = fractionDigits ?? 0;
+    NumberFormat f = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: fractionDigits ?? 0);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
       child: Row(

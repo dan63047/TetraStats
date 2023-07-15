@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:tetra_stats/views/main_view.dart';
 import 'package:tetra_stats/views/ranks_averages_view.dart';
@@ -13,15 +14,15 @@ class TLLeaderboardView extends StatefulWidget {
   State<StatefulWidget> createState() => TLLeaderboardState();
 }
 
-final DateFormat dateFormat = DateFormat.yMMMd().add_Hms();
-final NumberFormat f2 = NumberFormat.decimalPatternDigits(decimalDigits: 2);
 
 class TLLeaderboardState extends State<TLLeaderboardView> {
   @override
   Widget build(BuildContext context) {
+    final t = Translations.of(context);
+    final NumberFormat f2 = NumberFormat.decimalPattern(LocaleSettings.currentLocale.languageCode)..maximumFractionDigits = 2;
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Tetra League Leaderboard"),
+        title: Text(t.tlLeaderboard),
         actions: [
           IconButton(
             onPressed: () {
@@ -34,7 +35,7 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
               );
             },
             icon: const Icon(Icons.compress),
-            tooltip: "Averages",
+            tooltip: t.averages,
           ),
         ],
       ),
@@ -54,9 +55,9 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
                         headerSliverBuilder: (context, value) {
                           String howManyPlayers(int numberOfPlayers) => Intl.plural(
                                 numberOfPlayers,
-                                zero: 'Empty list. Looks like something is wrong...',
-                                one: 'There is only one player... What?',
-                                other: 'There are $numberOfPlayers ranked players.',
+                                zero: t.lbViewZeroEntrys,
+                                one: t.lbViewOneEntry,
+                                other: t.lbViewManyEntrys(numberOfPlayers: numberOfPlayers),
                                 name: 'howManyPeople',
                                 args: [numberOfPlayers],
                                 desc: 'Description of how many people are seen in a place.',

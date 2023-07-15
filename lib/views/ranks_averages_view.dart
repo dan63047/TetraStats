@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/views/tl_leaderboard_view.dart';
 
 class RankAveragesView extends StatefulWidget {
@@ -23,9 +25,10 @@ class RanksAverages extends State<RankAveragesView> {
 
   @override
   Widget build(BuildContext context) {
+    final NumberFormat f2 = NumberFormat.decimalPattern(LocaleSettings.currentLocale.languageCode)..maximumFractionDigits = 2;
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Ranks averages"),
+        title: Text(t.rankAveragesViewTitle),
       ),
       backgroundColor: Colors.black,
       body: SafeArea(

@@ -221,7 +221,14 @@ class SettingsState extends State<SettingsView> {
             trailing: DropdownButton(
                 items: locales,
                 value: LocaleSettings.currentLocale,
-                onChanged: (value) => LocaleSettings.setLocale(value!),
+                onChanged: (value){
+                  LocaleSettings.setLocale(value!);
+                  if(value.languageCode == Platform.localeName.substring(0, 2)){
+                    prefs.remove('locale');
+                  }else{
+                    prefs.setString('locale', value.languageCode);
+                  }
+                },
               ),
           ),
           const Divider(),

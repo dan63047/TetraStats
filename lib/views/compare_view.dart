@@ -593,7 +593,7 @@ class CompareState extends State<CompareView> {
                             higherIsBetter: true,
                           ),
                           CompareThingy(
-                            label: t.statCellNum.estOfTR,
+                            label: t.statCellNum.estOfTRShort,
                             greenSide: theGreenSide[2].estTr!.esttr,
                             redSide: theRedSide[2].estTr!.esttr,
                             fractionDigits: 2,
@@ -604,7 +604,7 @@ class CompareState extends State<CompareView> {
                               greenSideMode != Mode.stats &&
                               redSideMode != Mode.stats)
                             CompareThingy(
-                              label: t.statCellNum.accOfEst,
+                              label: t.statCellNum.accOfEstShort,
                               greenSide: theGreenSide[2].esttracc!,
                               redSide: theRedSide[2].esttracc!,
                               fractionDigits: 2,
@@ -964,7 +964,7 @@ class CompareThingy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var f = NumberFormat("#,###.##");
+    var f = NumberFormat.decimalPattern(LocaleSettings.currentLocale.languageCode);
     f.maximumFractionDigits = fractionDigits ?? 0;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
@@ -1278,7 +1278,7 @@ class CompareRegTimeThingy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    DateFormat f = DateFormat.yMMMd();
+    DateFormat f = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
       child: Row(

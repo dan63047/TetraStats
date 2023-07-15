@@ -7,8 +7,6 @@ import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
 
 var fDiff = NumberFormat("+#,###.###;-#,###.###");
-final NumberFormat f2 = NumberFormat.decimalPatternDigits(decimalDigits: 2);
-final NumberFormat f3 = NumberFormat.decimalPatternDigits(decimalDigits: 3);
 
 class TLThingy extends StatelessWidget {
   final TetraLeagueAlpha tl;
@@ -20,6 +18,8 @@ class TLThingy extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = Translations.of(context);
     final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
+    final NumberFormat f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
+    final NumberFormat f3 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 3);
     return LayoutBuilder(builder: (context, constraints) {
       bool bigScreen = constraints.maxWidth > 768;
       return ListView.builder(
@@ -315,7 +315,7 @@ class TLThingy extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    "${t.statCellNum.estOfTR}:",
+                                    "${bigScreen ? t.statCellNum.estOfTR : t.statCellNum.estOfTRShort}:",
                                     style: const TextStyle(fontSize: 24),
                                   ),
                                   Text(
@@ -329,7 +329,7 @@ class TLThingy extends StatelessWidget {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      "${t.statCellNum.accOfEst}:",
+                                      "${bigScreen ? t.statCellNum.accOfEst : t.statCellNum.accOfEstShort}:",
                                       style: const TextStyle(fontSize: 24),
                                     ),
                                     Text(

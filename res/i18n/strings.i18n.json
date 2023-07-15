@@ -11,6 +11,8 @@
     "other": "Other",
     "zen": "Zen",
     "bio": "Bio",
+    "openSearch": "Search player",
+    "closeSearch": "Close search",
     "refresh": "Refresh",
     "showStoredData": "Show stored data",
     "statsCalc": "Stats Calculator",
@@ -94,6 +96,11 @@
     "fromBeginning": "From beginning",
     "calc": "Calc",
     "calcViewNoValues": "Enter values to calculate the stats",
+    "rankAveragesViewTitle": "Ranks cutoff and average stats",
+    "averages": "Averages",
+    "lbViewZeroEntrys": "Empty list. Looks like something is wrong...",
+    "lbViewOneEntry": "There is only one player... What?",
+    "lbViewManyEntrys": "There are ${numberOfPlayers} ranked players.",
     "statCellNum":{
         "xpLevel": "XP Level",
         "xpProgress": "Progress to next level",
@@ -121,6 +128,7 @@
         "keys": "Key\nPresses",
         "kpp": "KP Per\nPiece",
         "kps": "KP Per\nSecond",
+        "tr": "Tetra Rating",
         "app": "Attack Per Piece",
         "appDescription": "(Abbreviated as APP) Main efficiency metric. Tells how many attack you producing per piece",
         "vsapmDescription": "Basically, tells how much and how efficient you using garbage in your attacks",
@@ -139,7 +147,9 @@
         "area": "Area",
         "areaDescription": "How much space your shape takes up on the graph, if you exclude the cheese and vs/apm sections",
         "estOfTR": "Est. of TR",
-        "accOfEst": "Accuracy"
+        "estOfTRShort": "Est. TR",
+        "accOfEst": "Accuracy",
+        "accOfEstShort": "Acc."
     },
     "playerRole(map)": {
         "user": "User",

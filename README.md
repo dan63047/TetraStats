@@ -18,10 +18,10 @@
 - ~~Ability to compare player with APM-PPS-VS stats~~
 - ~~Ability to fetch Tetra League leaderboard~~
 - ~~Average stats for ranks~~
-- ~~Ability to compare player with avgRank~~ *dev build are here*
-- UI Animations
-- i18n, EN and RU locales
-- Talk with osk about CORS and EndContext in TL matches
+- ~~Ability to compare player with avgRank~~
+- UI Animations *lol*
+- ~~i18n, EN and RU locales~~ *dev build are here*
+- Talk with osk about CORS and EndContext in TL matches *idk lol*
 - RELEASE ??? *that will be v1.0.0*
 
 ---

@@ -297,8 +297,7 @@ class _ListEntry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var f = NumberFormat("#,###.##");
-    f.maximumFractionDigits = fractionDigits ?? 0;
+    NumberFormat f = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: fractionDigits ?? 0);
     return ListTile(title: Text(label), trailing: Text(f.format(value), style: const TextStyle(fontSize: 22)));
   }
 }

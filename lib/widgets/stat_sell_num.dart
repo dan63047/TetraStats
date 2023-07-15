@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 
 class StatCellNum extends StatelessWidget {
   const StatCellNum(
@@ -24,8 +25,7 @@ class StatCellNum extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    NumberFormat f =
-        NumberFormat.decimalPatternDigits(decimalDigits: fractionDigits ?? 0);
+    NumberFormat f = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: fractionDigits ?? 0);
     return Column(
       children: [
         Text(
@@ -54,7 +54,7 @@ class StatCellNum extends StatelessWidget {
                   showDialog(
                       context: context,
                       builder: (BuildContext context) => AlertDialog(
-                            title: Text(playerStatLabel,
+                            title: Text(playerStatLabel.replaceAll(RegExp(r'\n'), " "),
                                 style: const TextStyle(
                                     fontFamily: "Eurostile Round Extended")),
                             content: SingleChildScrollView(

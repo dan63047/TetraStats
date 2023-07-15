@@ -1,9 +1,9 @@
 /// Generated file. Do not edit.
 ///
 /// Locales: 2
-/// Strings: 828 (414 per locale)
+/// Strings: 848 (424 per locale)
 ///
-/// Built on 2023-07-14 at 20:17 UTC
+/// Built on 2023-07-15 at 16:11 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -159,6 +159,8 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get other => 'Other';
 	String get zen => 'Zen';
 	String get bio => 'Bio';
+	String get openSearch => 'Search player';
+	String get closeSearch => 'Close search';
 	String get refresh => 'Refresh';
 	String get showStoredData => 'Show stored data';
 	String get statsCalc => 'Stats Calculator';
@@ -242,6 +244,11 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get fromBeginning => 'From beginning';
 	String get calc => 'Calc';
 	String get calcViewNoValues => 'Enter values to calculate the stats';
+	String get rankAveragesViewTitle => 'Ranks cutoff and average stats';
+	String get averages => 'Averages';
+	String get lbViewZeroEntrys => 'Empty list. Looks like something is wrong...';
+	String get lbViewOneEntry => 'There is only one player... What?';
+	String lbViewManyEntrys({required Object numberOfPlayers}) => 'There are ${numberOfPlayers} ranked players.';
 	late final _StringsStatCellNumEn statCellNum = _StringsStatCellNumEn._(_root);
 	Map<String, String> get playerRole => {
 		'user': 'User',
@@ -551,6 +558,7 @@ class _StringsStatCellNumEn {
 	String get keys => 'Key\nPresses';
 	String get kpp => 'KP Per\nPiece';
 	String get kps => 'KP Per\nSecond';
+	String get tr => 'Tetra Rating';
 	String get app => 'Attack Per Piece';
 	String get appDescription => '(Abbreviated as APP) Main efficiency metric. Tells how many attack you producing per piece';
 	String get vsapmDescription => 'Basically, tells how much and how efficient you using garbage in your attacks';
@@ -569,7 +577,9 @@ class _StringsStatCellNumEn {
 	String get area => 'Area';
 	String get areaDescription => 'How much space your shape takes up on the graph, if you exclude the cheese and vs/apm sections';
 	String get estOfTR => 'Est. of TR';
+	String get estOfTRShort => 'Est. TR';
 	String get accOfEst => 'Accuracy';
+	String get accOfEstShort => 'Acc.';
 }
 
 // Path: numOfGameActions
@@ -646,6 +656,8 @@ class _StringsRu implements _StringsEn {
 	@override String get other => 'Другое';
 	@override String get zen => 'Дзен';
 	@override String get bio => 'Биография';
+	@override String get openSearch => 'Искать игрока';
+	@override String get closeSearch => 'Закрыть поиск';
 	@override String get refresh => 'Обновить';
 	@override String get showStoredData => 'Показать сохранённые данные';
 	@override String get statsCalc => 'Калькулятор статистики';
@@ -655,7 +667,7 @@ class _StringsRu implements _StringsEn {
 	@override String get becameTracked => 'Добавлен в список отслеживания!';
 	@override String get stoppedBeingTracked => 'Удалён из списка отслеживания!';
 	@override String get compare => 'Сравнить';
-	@override String get tlLeaderboard => 'Таблица лидеров Тетра Лиги';
+	@override String get tlLeaderboard => 'Рейтинговая таблица';
 	@override String get noRecords => 'Нет записей';
 	@override String get noRecord => 'Нет рекорда';
 	@override String get notEnoughData => 'Недостаточно данных';
@@ -725,10 +737,15 @@ class _StringsRu implements _StringsEn {
 	@override String get yes => 'Да';
 	@override String get no => 'Нет';
 	@override String get daysLater => 'дней позже';
-	@override String get dayseBefore => 'дней до';
+	@override String get dayseBefore => 'дней раньше';
 	@override String get fromBeginning => 'С начала';
 	@override String get calc => 'Считать';
 	@override String get calcViewNoValues => 'Введите значения, чтобы посчитать статистику';
+	@override String get rankAveragesViewTitle => 'Требования рангов и средние значения';
+	@override String get averages => 'Средние значения';
+	@override String get lbViewZeroEntrys => 'Рейтинговая таблица пуста. Похоже, что-то здесь не так...';
+	@override String get lbViewOneEntry => 'В рейтинговой таблице всего один игрок... Чего?';
+	@override String lbViewManyEntrys({required Object numberOfPlayers}) => 'В рейтинговой таблице находится ${numberOfPlayers} игроков.';
 	@override late final _StringsStatCellNumRu statCellNum = _StringsStatCellNumRu._(_root);
 	@override Map<String, String> get playerRole => {
 		'user': 'Пользователь',
@@ -1038,6 +1055,7 @@ class _StringsStatCellNumRu implements _StringsStatCellNumEn {
 	@override String get keys => 'Нажатий\nКлавиш';
 	@override String get kpp => 'Нажатий\nна Фигуру';
 	@override String get kps => 'Нажатий\nв Секунду';
+	@override String get tr => 'Тетра Рейтинг';
 	@override String get app => 'Атака на Фигуру';
 	@override String get appDescription => '(Сокращенно APP) Главный показатель эффективности. Показывает, сколько атаки приходится на одну фигуру';
 	@override String get vsapmDescription => 'В основном, показывает как много мусора игрок использует в своих атаках и насколько эффективно.';
@@ -1056,7 +1074,9 @@ class _StringsStatCellNumRu implements _StringsStatCellNumEn {
 	@override String get area => 'Area';
 	@override String get areaDescription => 'Какую площадь занимает диаграмма, если не брать в расчёт индекс сыра и VS/APM';
 	@override String get estOfTR => 'Расчётный TR';
+	@override String get estOfTRShort => 'Расч. TR';
 	@override String get accOfEst => 'Точность расчёта';
+	@override String get accOfEstShort => 'Точность';
 }
 
 // Path: numOfGameActions
@@ -1112,6 +1132,8 @@ extension on _StringsEn {
 			case 'other': return 'Other';
 			case 'zen': return 'Zen';
 			case 'bio': return 'Bio';
+			case 'openSearch': return 'Search player';
+			case 'closeSearch': return 'Close search';
 			case 'refresh': return 'Refresh';
 			case 'showStoredData': return 'Show stored data';
 			case 'statsCalc': return 'Stats Calculator';
@@ -1195,6 +1217,11 @@ extension on _StringsEn {
 			case 'fromBeginning': return 'From beginning';
 			case 'calc': return 'Calc';
 			case 'calcViewNoValues': return 'Enter values to calculate the stats';
+			case 'rankAveragesViewTitle': return 'Ranks cutoff and average stats';
+			case 'averages': return 'Averages';
+			case 'lbViewZeroEntrys': return 'Empty list. Looks like something is wrong...';
+			case 'lbViewOneEntry': return 'There is only one player... What?';
+			case 'lbViewManyEntrys': return ({required Object numberOfPlayers}) => 'There are ${numberOfPlayers} ranked players.';
 			case 'statCellNum.xpLevel': return 'XP Level';
 			case 'statCellNum.xpProgress': return 'Progress to next level';
 			case 'statCellNum.xpFrom0To5000': return 'Progress from 0 XP to level 5000';
@@ -1221,6 +1248,7 @@ extension on _StringsEn {
 			case 'statCellNum.keys': return 'Key\nPresses';
 			case 'statCellNum.kpp': return 'KP Per\nPiece';
 			case 'statCellNum.kps': return 'KP Per\nSecond';
+			case 'statCellNum.tr': return 'Tetra Rating';
 			case 'statCellNum.app': return 'Attack Per Piece';
 			case 'statCellNum.appDescription': return '(Abbreviated as APP) Main efficiency metric. Tells how many attack you producing per piece';
 			case 'statCellNum.vsapmDescription': return 'Basically, tells how much and how efficient you using garbage in your attacks';
@@ -1239,7 +1267,9 @@ extension on _StringsEn {
 			case 'statCellNum.area': return 'Area';
 			case 'statCellNum.areaDescription': return 'How much space your shape takes up on the graph, if you exclude the cheese and vs/apm sections';
 			case 'statCellNum.estOfTR': return 'Est. of TR';
+			case 'statCellNum.estOfTRShort': return 'Est. TR';
 			case 'statCellNum.accOfEst': return 'Accuracy';
+			case 'statCellNum.accOfEstShort': return 'Acc.';
 			case 'playerRole.user': return 'User';
 			case 'playerRole.banned': return 'Banned';
 			case 'playerRole.bot': return 'Bot';
@@ -1534,6 +1564,8 @@ extension on _StringsRu {
 			case 'other': return 'Другое';
 			case 'zen': return 'Дзен';
 			case 'bio': return 'Биография';
+			case 'openSearch': return 'Искать игрока';
+			case 'closeSearch': return 'Закрыть поиск';
 			case 'refresh': return 'Обновить';
 			case 'showStoredData': return 'Показать сохранённые данные';
 			case 'statsCalc': return 'Калькулятор статистики';
@@ -1543,7 +1575,7 @@ extension on _StringsRu {
 			case 'becameTracked': return 'Добавлен в список отслеживания!';
 			case 'stoppedBeingTracked': return 'Удалён из списка отслеживания!';
 			case 'compare': return 'Сравнить';
-			case 'tlLeaderboard': return 'Таблица лидеров Тетра Лиги';
+			case 'tlLeaderboard': return 'Рейтинговая таблица';
 			case 'noRecords': return 'Нет записей';
 			case 'noRecord': return 'Нет рекорда';
 			case 'notEnoughData': return 'Недостаточно данных';
@@ -1613,10 +1645,15 @@ extension on _StringsRu {
 			case 'yes': return 'Да';
 			case 'no': return 'Нет';
 			case 'daysLater': return 'дней позже';
-			case 'dayseBefore': return 'дней до';
+			case 'dayseBefore': return 'дней раньше';
 			case 'fromBeginning': return 'С начала';
 			case 'calc': return 'Считать';
 			case 'calcViewNoValues': return 'Введите значения, чтобы посчитать статистику';
+			case 'rankAveragesViewTitle': return 'Требования рангов и средние значения';
+			case 'averages': return 'Средние значения';
+			case 'lbViewZeroEntrys': return 'Рейтинговая таблица пуста. Похоже, что-то здесь не так...';
+			case 'lbViewOneEntry': return 'В рейтинговой таблице всего один игрок... Чего?';
+			case 'lbViewManyEntrys': return ({required Object numberOfPlayers}) => 'В рейтинговой таблице находится ${numberOfPlayers} игроков.';
 			case 'statCellNum.xpLevel': return 'Уровень\nопыта';
 			case 'statCellNum.xpProgress': return 'Прогресс до следующего уровня';
 			case 'statCellNum.xpFrom0To5000': return 'Прогресс от 0 XP до 5000 уровня';
@@ -1643,6 +1680,7 @@ extension on _StringsRu {
 			case 'statCellNum.keys': return 'Нажатий\nКлавиш';
 			case 'statCellNum.kpp': return 'Нажатий\nна Фигуру';
 			case 'statCellNum.kps': return 'Нажатий\nв Секунду';
+			case 'statCellNum.tr': return 'Тетра Рейтинг';
 			case 'statCellNum.app': return 'Атака на Фигуру';
 			case 'statCellNum.appDescription': return '(Сокращенно APP) Главный показатель эффективности. Показывает, сколько атаки приходится на одну фигуру';
 			case 'statCellNum.vsapmDescription': return 'В основном, показывает как много мусора игрок использует в своих атаках и насколько эффективно.';
@@ -1661,7 +1699,9 @@ extension on _StringsRu {
 			case 'statCellNum.area': return 'Area';
 			case 'statCellNum.areaDescription': return 'Какую площадь занимает диаграмма, если не брать в расчёт индекс сыра и VS/APM';
 			case 'statCellNum.estOfTR': return 'Расчётный TR';
+			case 'statCellNum.estOfTRShort': return 'Расч. TR';
 			case 'statCellNum.accOfEst': return 'Точность расчёта';
+			case 'statCellNum.accOfEstShort': return 'Точность';
 			case 'playerRole.user': return 'Пользователь';
 			case 'playerRole.banned': return 'Заблокированный пользователь';
 			case 'playerRole.bot': return 'Бот';
