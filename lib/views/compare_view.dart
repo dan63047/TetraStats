@@ -78,6 +78,7 @@ class CompareState extends State<CompareView> {
         theRedSide = [null,
         null,
         TetraLeagueAlpha(
+          timestamp: DateTime.now(),
           apm: apm,
           pps: pps,
           vs: vs,
@@ -153,6 +154,7 @@ class CompareState extends State<CompareView> {
         theGreenSide = [null,
         null,
         TetraLeagueAlpha(
+          timestamp: DateTime.now(),
           apm: apm,
           pps: pps,
           vs: vs,
@@ -847,7 +849,7 @@ class CompareState extends State<CompareView> {
                           )
                         ],
                       )
-                  ] : [Text(t.compareViewNoValues)],
+                  ] : [Text(t.compareViewNoValues(avgR: "\$avdR"))], // This is so fucked up holy shit
                 )
         ),
       ),

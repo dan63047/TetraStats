@@ -127,7 +127,11 @@ class TetrioPlayer {
     userId = json['_id'];
     username = json['username'];
     state = stateTime;
-    role = json['role'];
+    if (json['role'] == "retrived from p1nkl0bst3r api"){ //i fucked my own db lol i remove it later
+      role = "p1nkl0bst3r";
+    }else{
+      role = json['role'];
+    }
     registrationTime = json['ts'] != null ? DateTime.parse(json['ts']) : null;
     if (json['badges'] != null) {
       json['badges'].forEach((v) {
@@ -179,7 +183,7 @@ class TetrioPlayer {
     return data;
   }
 
-  bool isSameState(TetrioPlayer other) {
+  bool isSameState(covariant TetrioPlayer other) {
     if (userId != other.userId) return false;
     if (username != other.username) return false;
     if (role != other.role) return false;
@@ -199,6 +203,10 @@ class TetrioPlayer {
     if (tlSeason1 != other.tlSeason1) return false;
     if (distinguishment != other.distinguishment) return false;
     return true;
+  }
+
+  bool checkForRetrivedHistory(covariant TetrioPlayer other) {
+    return tlSeason1.lessStrictCheck(other.tlSeason1);
   }
 
   @override
@@ -712,7 +720,8 @@ class TetraLeagueAlpha {
   List? records;
 
   TetraLeagueAlpha(
-      {required this.gamesPlayed,
+      {required this.timestamp,
+      required this.gamesPlayed,
       required this.gamesWon,
       required this.bestRank,
       required this.decaying,
@@ -768,6 +777,8 @@ class TetraLeagueAlpha {
 
   @override
   bool operator ==(covariant TetraLeagueAlpha other) => gamesPlayed == other.gamesPlayed && rd == other.rd;
+
+  bool lessStrictCheck (covariant TetraLeagueAlpha other) => gamesPlayed == other.gamesPlayed && glicko == other.glicko;
 
   double? get esttracc => (estTr != null) ? estTr!.esttr - rating : null;
 
@@ -911,7 +922,7 @@ class TetrioPlayersLeaderboard {
     avgRD /= filtredLeaderboard.length;
     avgGamesPlayed = (totalGamesPlayed / filtredLeaderboard.length).floor();
     avgGamesWon = (totalGamesWon / filtredLeaderboard.length).floor();
-    return [TetraLeagueAlpha(apm: avgAPM, pps: avgPPS, vs: avgVS, glicko: avgGlicko, rd: avgRD, gamesPlayed: avgGamesPlayed, gamesWon: avgGamesWon, bestRank: rank, decaying: false, rating: avgTR, rank: rank, percentileRank: rank, percentile: 0, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1),
+    return [TetraLeagueAlpha(timestamp: DateTime.now(), apm: avgAPM, pps: avgPPS, vs: avgVS, glicko: avgGlicko, rd: avgRD, gamesPlayed: avgGamesPlayed, gamesWon: avgGamesWon, bestRank: rank, decaying: false, rating: avgTR, rank: rank, percentileRank: rank, percentile: 0, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1),
     {"totalGamesPlayed": totalGamesPlayed, "totalGamesWon": totalGamesWon, "players": filtredLeaderboard.length, "lowestTR": lowestTR, "toEnterTR": leaderboard[(leaderboard.length * rankCutoffs[rank]!).floor()-1].rating}];
   }
 

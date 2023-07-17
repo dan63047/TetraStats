@@ -54,14 +54,14 @@ class TLThingy extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                "${t.top} ${f2.format(tl.percentile * 100)}% (${tl.percentileRank.toUpperCase()}) • ${t.topRank}: ${tl.bestRank.toUpperCase()} • Glicko: ${f2.format(tl.glicko!)}±${f2.format(tl.rd!)}${tl.decaying ? ' • ${t.decaying}' : ''}",
+                                "${t.top} ${f2.format(tl.percentile * 100)}% (${tl.percentileRank.toUpperCase()})${tl.bestRank != "z" ? " • ${t.topRank}: ${tl.bestRank.toUpperCase()}" : ""} • Glicko: ${f2.format(tl.glicko!)}±${f2.format(tl.rd!)}${tl.decaying ? ' • ${t.decaying}' : ''}",
                                 textAlign: TextAlign.center,
                               ),
                             ],
                           ),
                         ],
                       ),
-                    if (tl.gamesPlayed >= 10 && tl.rd! < 100) Padding(
+                    if (tl.gamesPlayed >= 10 && tl.rd! < 100 && tl.nextAt >=0 && tl.prevAt >= 0) Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: SfLinearGauge(
                         minimum: tl.nextAt.toDouble(),

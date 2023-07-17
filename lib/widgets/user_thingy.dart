@@ -158,8 +158,8 @@ class UserThingy extends StatelessWidget {
                     ]),
             ],
           ),
-          (player.role != "banned")
-              ? Wrap(
+          if (!["banned", "p1nkl0bst3r"].contains(player.role))
+              Wrap(
                   direction: Axis.horizontal,
                   alignment: WrapAlignment.center,
                   spacing: 25,
@@ -200,8 +200,8 @@ class UserThingy extends StatelessWidget {
                       playerStatLabel: t.statCellNum.friends,
                       higherIsBetter: true,),
                   ],
-                )
-              : Text(
+                ),
+              if (player.role == "banned") Text(
                   t.bigRedBanned,
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -211,6 +211,14 @@ class UserThingy extends StatelessWidget {
                     fontSize: bigScreen ? 60 : 45,
                   ),
                 ),
+              if (player.role == "p1nkl0bst3r") Text(
+                t.p1nkl0bst3rAlert,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontFamily: "Eurostile Round",
+                  fontSize: 16,
+                )
+              ),
           if (player.badstanding != null && player.badstanding!)
             Text(
               t.bigRedBadStanding,
@@ -222,7 +230,7 @@ class UserThingy extends StatelessWidget {
                 fontSize: bigScreen ? 60 : 45,
               ),
             ),
-          Row(
+          if (player.role != "p1nkl0bst3r") Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(

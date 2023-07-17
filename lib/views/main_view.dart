@@ -16,7 +16,7 @@ import 'package:tetra_stats/widgets/tl_thingy.dart';
 import 'package:tetra_stats/widgets/user_thingy.dart';
 
 late Future<List> me;
-String _searchFor = "dan63047";
+String _searchFor = "6098518e3d5155e6ec429cdc";
 String _titleNickname = "dan63047";
 final TetrioService teto = TetrioService();
 late SharedPreferences prefs;
@@ -103,15 +103,16 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
     prefs = await SharedPreferences.getInstance();
   }
 
-  void changePlayer(String player) {
+  void changePlayer(String player, {bool fetchHistory = false}) {
     setState(() {
       _searchFor = player;
-      me = fetch(_searchFor);
+      me = fetch(_searchFor, fetchHistory: fetchHistory);
     });
   }
 
-  Future<List> fetch(String nickOrID) async {
+  Future<List> fetch(String nickOrID, {bool fetchHistory = false}) async {
     TetrioPlayer me = await teto.fetchPlayer(nickOrID);
+    _searchFor = me.userId;
     setState((){_titleNickname = me.username;});
     var tlStream = await teto.getTLStream(me.userId);
     List<TetraLeagueAlphaRecord> tlMatches = [];
@@ -119,11 +120,9 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
     List<TetrioPlayer> states = [];
     TetraLeagueAlpha? compareWith;
     var uniqueTL = <dynamic>{};
-    if (isTracking){
-      teto.storeState(me);
-      teto.saveTLMatchesFromStream(await teto.getTLStream(me.userId));
-      states.addAll(await teto.getPlayer(me.userId));
-      for (var element in states) {
+    states.addAll(await teto.getPlayer(me.userId));
+    if(fetchHistory) await teto.fetchAndsaveTLHistory(_searchFor);
+    for (var element in states) {
         if (uniqueTL.isNotEmpty && uniqueTL.last != element.tlSeason1) uniqueTL.add(element.tlSeason1);
         if (uniqueTL.isEmpty) uniqueTL.add(element.tlSeason1);
         }
@@ -151,6 +150,9 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.estTr != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.estTr!.esttr)], child: Text(t.statCellNum.estOfTR.replaceAll(RegExp(r'\n'), " "))),
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.esttracc != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.esttracc!)], child: Text(t.statCellNum.accOfEst.replaceAll(RegExp(r'\n'), " "))),
     ];
+    if (isTracking){
+      await teto.storeState(me);
+      await teto.saveTLMatchesFromStream(await teto.getTLStream(me.userId));
     tlMatches.addAll(await teto.getTLMatchesbyPlayerID(me.userId));
     for (var match in tlStream.records) {
       if (!tlMatches.contains(match)) tlMatches.add(match);
@@ -221,6 +223,10 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
           PopupMenuButton(
             itemBuilder: (BuildContext context) => <PopupMenuEntry>[
               PopupMenuItem(
+                value: "test",
+                child: Text("fetchAndsaveTLHistory"),
+              ),
+              PopupMenuItem(
                 value: "refresh",
                 child: Text(t.refresh),
               ),
@@ -239,6 +245,8 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
             ],
             onSelected: (value) {
               if (value == "refresh") {changePlayer(_searchFor);
+              return;}
+              if (value == "test"){changePlayer(_searchFor, fetchHistory: true);
               return;}
               Navigator.pushNamed(context, value);
             },

@@ -2,7 +2,7 @@
 
 <center>Track your and other players stats in TETR.IO</center>
 
-![Screenshot of the app](https://imgur.com/GGL0fux.png)
+![Screenshot of the app](https://imgur.com/eAtFeBF.png)
 
 # Development Roadmap
 - ~~Ability to fetch player~~
@@ -21,10 +21,13 @@
 - ~~Ability to compare player with avgRank~~
 - UI Animations *lol*
 - ~~i18n, EN and RU locales~~ *dev build are here*
-- Talk with osk about CORS and EndContext in TL matches *idk lol*
+- ~~Talk with osk about CORS and EndContext in TL matches~~ *k*
+- storeState becomes slow when there a lot of entries, needs to fix
+- im still not rendering distinguishment
 - RELEASE ??? *that will be v1.0.0*
 
 ---
 
 Special thanks to kerrmunism for formulas
+
 and to osk for TETR.IO

@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/services/sqlite_db_controller.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
+import 'package:csv/csv.dart';
 
 const String dbName = "TetraStats.db";
 const String tetrioUsersTable = "tetrioUsers";
@@ -88,8 +89,49 @@ class TetrioService extends DB {
 
   Future<String> getNicknameByID(String id) async {
     if (id.length <= 16) return id;
-    TetrioPlayer player = await getPlayer(id).then((value) => value.last);
-    return player.username;
+    try{
+      return await getPlayer(id).then((value) => value.last.username);
+    } catch (e){
+      return await fetchPlayer(id).then((value) => value.username);
+    }
+  }
+
+  Future<List<TetrioPlayer>> fetchAndsaveTLHistory(String id) async {
+     var url = Uri.https('api.p1nkl0bst3r.xyz', 'tlhist/$id');
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      List<List<dynamic>> csv = const CsvToListConverter().convert(response.body)..removeAt(0);
+      List<TetrioPlayer> history = [];
+      String nick = await getNicknameByID(id);
+      for (List<dynamic> entry in csv){
+        TetrioPlayer state = TetrioPlayer(
+          userId: id,
+          username: nick,
+          role: "p1nkl0bst3r",
+          state: DateTime.parse(entry[9]),
+          badges: [],
+          friendCount: -1,
+          gamesPlayed: -1,
+          gamesWon: -1,
+          gameTime: const Duration(seconds: -1),
+          xp: -1,
+          supporterTier: 0,
+          verified: false,
+          connections: Connections(),
+          tlSeason1: TetraLeagueAlpha(timestamp: DateTime.parse(entry[9]), apm: entry[6], pps: entry[7], vs: entry[8], glicko: entry[4], rd: noTrRd, gamesPlayed: entry[1], gamesWon: entry[2], bestRank: "z", decaying: false, rating: entry[3], rank: entry[5], percentileRank: entry[5], percentile: rankCutoffs[entry[5]]!, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1),
+          sprint: [],
+          blitz: []
+          );
+        history.add(state);
+        // _players.addEntries({state.userId: [state]}.entries);
+        await storeState(state, isFromHistory: true);
+      }
+      return history;
+    }
+    else {
+      developer.log("fetchTLHistory: Probably, history doesn't exist", name: "services/tetrio_crud", error: response.statusCode);
+      throw Exception('Failed to fetch player');
+    }
   }
 
   Future<TetrioPlayersLeaderboard> fetchTLLeaderboard() async {
@@ -277,25 +319,26 @@ class TetrioService extends DB {
     }
   }
 
-  Future<void> storeState(TetrioPlayer tetrioPlayer) async {
+  Future<void> storeState(TetrioPlayer tetrioPlayer, {bool isFromHistory = false}) async {
     ensureDbIsOpen();
     final db = getDatabaseOrThrow();
     late List<TetrioPlayer> states;
     try {
-      states = await getPlayer(tetrioPlayer.userId);
-    } on TetrioPlayerNotExist {
+      states = _players[tetrioPlayer.userId]!;
+      //states = await getPlayer(tetrioPlayer.userId);
+    } catch (e) {
       await createPlayer(tetrioPlayer);
       states = await getPlayer(tetrioPlayer.userId);
     }
-    bool test = _players[tetrioPlayer.userId]!.last.isSameState(tetrioPlayer);
-    if (test == false) states.add(tetrioPlayer);
+    bool test = isFromHistory ? _players[tetrioPlayer.userId]!.last.checkForRetrivedHistory(tetrioPlayer) : _players[tetrioPlayer.userId]!.last.isSameState(tetrioPlayer);
+    if (test == false) isFromHistory ? states.insert(0, tetrioPlayer) : states.add(tetrioPlayer);
     final Map<String, dynamic> statesJson = {};
     for (var e in states) {
       statesJson.addEntries({e.state.millisecondsSinceEpoch.toString(): e.toJson()}.entries);
     }
-    db.update(tetrioUsersTable, {idCol: tetrioPlayer.userId, nickCol: tetrioPlayer.username, statesCol: jsonEncode(statesJson)},
+    await db.update(tetrioUsersTable, {idCol: tetrioPlayer.userId, nickCol: tetrioPlayer.username, statesCol: jsonEncode(statesJson)},
         where: '$idCol = ?', whereArgs: [tetrioPlayer.userId]);
-    _players[tetrioPlayer.userId]!.add(tetrioPlayer);
+    isFromHistory ? _players[tetrioPlayer.userId]!.insert(0, tetrioPlayer) : _players[tetrioPlayer.userId]!.add(tetrioPlayer);
     _tetrioStreamController.add(_players);
   }
 
@@ -310,7 +353,7 @@ class TetrioService extends DB {
     for (var e in states) {
       statesJson.addEntries({e.state.millisecondsSinceEpoch.toString(): e.toJson()}.entries);
     }
-    db.update(tetrioUsersTable, {idCol: tetrioPlayer.userId, nickCol: tetrioPlayer.username, statesCol: jsonEncode(statesJson)},
+    await db.update(tetrioUsersTable, {idCol: tetrioPlayer.userId, nickCol: tetrioPlayer.username, statesCol: jsonEncode(statesJson)},
         where: '$idCol = ?', whereArgs: [tetrioPlayer.userId]);
     _players[tetrioPlayer.userId]!.add(tetrioPlayer);
     _tetrioStreamController.add(_players);
@@ -322,7 +365,7 @@ class TetrioService extends DB {
     List<TetrioPlayer> states = [];
     final results = await db.query(tetrioUsersTable, limit: 1, where: '$idCol = ?', whereArgs: [id.toLowerCase()]);
     if (results.isEmpty) {
-      throw TetrioPlayerNotExist();
+      return states;
     } else {
       dynamic rawStates = results.first['jsonStates'] as String;
       rawStates = json.decode(rawStates);

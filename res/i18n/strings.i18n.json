@@ -86,7 +86,7 @@
     "winChance": "Win Chance",
     "byGlicko": "By Glicko",
     "byEstTR": "By Est. TR",
-    "compareViewNoValues": "Please, enter username, user ID, or APM-PPS-VS values (divider doesn't matter, only order matter) to both of fields",
+    "compareViewNoValues": "Please, enter username, user ID, APM-PPS-VS values (divider doesn't matter, only order matter) or $avgR (where R is rank) to both of fields",
     "compareViewWrongValue": "Falied to assign ${value}",
     "mostRecentOne": "Most recent one",
     "yes": "Yes",
@@ -101,6 +101,7 @@
     "lbViewZeroEntrys": "Empty list. Looks like something is wrong...",
     "lbViewOneEntry": "There is only one player... What?",
     "lbViewManyEntrys": "There are ${numberOfPlayers} ranked players.",
+    "p1nkl0bst3rAlert": "That data was retrived from third party API maintained by p1nkl0bst3r",
     "statCellNum":{
         "xpLevel": "XP Level",
         "xpProgress": "Progress to next level",

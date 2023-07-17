@@ -1,9 +1,9 @@
 /// Generated file. Do not edit.
 ///
 /// Locales: 2
-/// Strings: 848 (424 per locale)
+/// Strings: 850 (425 per locale)
 ///
-/// Built on 2023-07-15 at 16:11 UTC
+/// Built on 2023-07-17 at 17:33 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -234,7 +234,7 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get winChance => 'Win Chance';
 	String get byGlicko => 'By Glicko';
 	String get byEstTR => 'By Est. TR';
-	String get compareViewNoValues => 'Please, enter username, user ID, or APM-PPS-VS values (divider doesn\'t matter, only order matter) to both of fields';
+	String compareViewNoValues({required Object avgR}) => 'Please, enter username, user ID, APM-PPS-VS values (divider doesn\'t matter, only order matter) or ${avgR} (where R is rank) to both of fields';
 	String compareViewWrongValue({required Object value}) => 'Falied to assign ${value}';
 	String get mostRecentOne => 'Most recent one';
 	String get yes => 'Yes';
@@ -249,6 +249,7 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get lbViewZeroEntrys => 'Empty list. Looks like something is wrong...';
 	String get lbViewOneEntry => 'There is only one player... What?';
 	String lbViewManyEntrys({required Object numberOfPlayers}) => 'There are ${numberOfPlayers} ranked players.';
+	String get p1nkl0bst3rAlert => 'That data was retrived from third party API maintained by p1nkl0bst3r';
 	late final _StringsStatCellNumEn statCellNum = _StringsStatCellNumEn._(_root);
 	Map<String, String> get playerRole => {
 		'user': 'User',
@@ -731,7 +732,7 @@ class _StringsRu implements _StringsEn {
 	@override String get winChance => 'Шансы на победу';
 	@override String get byGlicko => 'По Glicko';
 	@override String get byEstTR => 'По расч. TR';
-	@override String get compareViewNoValues => 'Пожалуйста, введите никнейм, ID или значения APM-PPS-VS (неважно, какой разделитель, важен порядок) в оба поля';
+	@override String compareViewNoValues({required Object avgR}) => 'Пожалуйста, введите никнейм, ID, APM-PPS-VS (неважно, какой разделитель, важен порядок) или ${avgR} (где R это ранг), в оба поля';
 	@override String compareViewWrongValue({required Object value}) => 'Не удалось получить ${value}';
 	@override String get mostRecentOne => 'Самый последний';
 	@override String get yes => 'Да';
@@ -746,6 +747,7 @@ class _StringsRu implements _StringsEn {
 	@override String get lbViewZeroEntrys => 'Рейтинговая таблица пуста. Похоже, что-то здесь не так...';
 	@override String get lbViewOneEntry => 'В рейтинговой таблице всего один игрок... Чего?';
 	@override String lbViewManyEntrys({required Object numberOfPlayers}) => 'В рейтинговой таблице находится ${numberOfPlayers} игроков.';
+	@override String get p1nkl0bst3rAlert => 'Эти данные были получены из стороннего API, который поддерживается p1nkl0bst3r';
 	@override late final _StringsStatCellNumRu statCellNum = _StringsStatCellNumRu._(_root);
 	@override Map<String, String> get playerRole => {
 		'user': 'Пользователь',
@@ -1207,7 +1209,7 @@ extension on _StringsEn {
 			case 'winChance': return 'Win Chance';
 			case 'byGlicko': return 'By Glicko';
 			case 'byEstTR': return 'By Est. TR';
-			case 'compareViewNoValues': return 'Please, enter username, user ID, or APM-PPS-VS values (divider doesn\'t matter, only order matter) to both of fields';
+			case 'compareViewNoValues': return ({required Object avgR}) => 'Please, enter username, user ID, APM-PPS-VS values (divider doesn\'t matter, only order matter) or ${avgR} (where R is rank) to both of fields';
 			case 'compareViewWrongValue': return ({required Object value}) => 'Falied to assign ${value}';
 			case 'mostRecentOne': return 'Most recent one';
 			case 'yes': return 'Yes';
@@ -1222,6 +1224,7 @@ extension on _StringsEn {
 			case 'lbViewZeroEntrys': return 'Empty list. Looks like something is wrong...';
 			case 'lbViewOneEntry': return 'There is only one player... What?';
 			case 'lbViewManyEntrys': return ({required Object numberOfPlayers}) => 'There are ${numberOfPlayers} ranked players.';
+			case 'p1nkl0bst3rAlert': return 'That data was retrived from third party API maintained by p1nkl0bst3r';
 			case 'statCellNum.xpLevel': return 'XP Level';
 			case 'statCellNum.xpProgress': return 'Progress to next level';
 			case 'statCellNum.xpFrom0To5000': return 'Progress from 0 XP to level 5000';
@@ -1639,7 +1642,7 @@ extension on _StringsRu {
 			case 'winChance': return 'Шансы на победу';
 			case 'byGlicko': return 'По Glicko';
 			case 'byEstTR': return 'По расч. TR';
-			case 'compareViewNoValues': return 'Пожалуйста, введите никнейм, ID или значения APM-PPS-VS (неважно, какой разделитель, важен порядок) в оба поля';
+			case 'compareViewNoValues': return ({required Object avgR}) => 'Пожалуйста, введите никнейм, ID, APM-PPS-VS (неважно, какой разделитель, важен порядок) или ${avgR} (где R это ранг), в оба поля';
 			case 'compareViewWrongValue': return ({required Object value}) => 'Не удалось получить ${value}';
 			case 'mostRecentOne': return 'Самый последний';
 			case 'yes': return 'Да';
@@ -1654,6 +1657,7 @@ extension on _StringsRu {
 			case 'lbViewZeroEntrys': return 'Рейтинговая таблица пуста. Похоже, что-то здесь не так...';
 			case 'lbViewOneEntry': return 'В рейтинговой таблице всего один игрок... Чего?';
 			case 'lbViewManyEntrys': return ({required Object numberOfPlayers}) => 'В рейтинговой таблице находится ${numberOfPlayers} игроков.';
+			case 'p1nkl0bst3rAlert': return 'Эти данные были получены из стороннего API, который поддерживается p1nkl0bst3r';
 			case 'statCellNum.xpLevel': return 'Уровень\nопыта';
 			case 'statCellNum.xpProgress': return 'Прогресс до следующего уровня';
 			case 'statCellNum.xpFrom0To5000': return 'Прогресс от 0 XP до 5000 уровня';

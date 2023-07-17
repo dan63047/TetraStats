@@ -98,7 +98,7 @@ packages:
     source: hosted
     version: "3.0.3"
   csv:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: csv
       sha256: "016b31a51a913744a0a1655c74ff13c9379e1200e246a03d96c81c5d9ed297b5"
