@@ -117,15 +117,30 @@ class TetrioService extends DB {
           xp: -1,
           supporterTier: 0,
           verified: false,
-          connections: Connections(),
-          tlSeason1: TetraLeagueAlpha(timestamp: DateTime.parse(entry[9]), apm: entry[6], pps: entry[7], vs: entry[8], glicko: entry[4], rd: noTrRd, gamesPlayed: entry[1], gamesWon: entry[2], bestRank: "z", decaying: false, rating: entry[3], rank: entry[5], percentileRank: entry[5], percentile: rankCutoffs[entry[5]]!, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1),
+          connections: null,
+          tlSeason1: TetraLeagueAlpha(timestamp: DateTime.parse(entry[9]), apm: entry[6] != '' ? entry[6] : null, pps: entry[7] != '' ? entry[7] : null, vs: entry[8] != '' ? entry[8] : null, glicko: entry[4], rd: noTrRd, gamesPlayed: entry[1], gamesWon: entry[2], bestRank: "z", decaying: false, rating: entry[3], rank: entry[5], percentileRank: entry[5], percentile: rankCutoffs[entry[5]]!, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1),
           sprint: [],
           blitz: []
           );
-        history.add(state);
-        // _players.addEntries({state.userId: [state]}.entries);
-        await storeState(state, isFromHistory: true);
+          history.add(state);
       }
+      ensureDbIsOpen();
+      final db = getDatabaseOrThrow();
+      late List<TetrioPlayer> states;
+      try{
+        states = _players[id]!;
+      }catch(e){
+        var player = await fetchPlayer(id);
+        await createPlayer(player);
+        states = _players[id]!;
+      }
+      states.insertAll(0, history.reversed);
+      final Map<String, dynamic> statesJson = {};
+      for (var e in states) {
+        statesJson.addEntries({(e.state.millisecondsSinceEpoch ~/ 1000).toString(): e.toJson()}.entries);
+      }
+      await db.update(tetrioUsersTable, {idCol: id, nickCol: nick, statesCol: jsonEncode(statesJson)}, where: '$idCol = ?', whereArgs: [id]);
+      _tetrioStreamController.add(_players);
       return history;
     }
     else {
@@ -270,7 +285,7 @@ class TetrioService extends DB {
     if (results.isNotEmpty) {
       throw TetrioPlayerAlreadyExist();
     }
-    final Map<String, dynamic> statesJson = {tetrioPlayer.state.millisecondsSinceEpoch.toString(): tetrioPlayer.toJson()};
+    final Map<String, dynamic> statesJson = {(tetrioPlayer.state.millisecondsSinceEpoch ~/ 1000).toString(): tetrioPlayer.toJson()};
     db.insert(tetrioUsersTable, {idCol: tetrioPlayer.userId, nickCol: tetrioPlayer.username, statesCol: jsonEncode(statesJson)});
     _players.addEntries({
       tetrioPlayer.userId: [tetrioPlayer]
@@ -319,7 +334,7 @@ class TetrioService extends DB {
     }
   }
 
-  Future<void> storeState(TetrioPlayer tetrioPlayer, {bool isFromHistory = false}) async {
+  Future<void> storeState(TetrioPlayer tetrioPlayer) async {
     ensureDbIsOpen();
     final db = getDatabaseOrThrow();
     late List<TetrioPlayer> states;
@@ -330,15 +345,15 @@ class TetrioService extends DB {
       await createPlayer(tetrioPlayer);
       states = await getPlayer(tetrioPlayer.userId);
     }
-    bool test = isFromHistory ? _players[tetrioPlayer.userId]!.last.checkForRetrivedHistory(tetrioPlayer) : _players[tetrioPlayer.userId]!.last.isSameState(tetrioPlayer);
-    if (test == false) isFromHistory ? states.insert(0, tetrioPlayer) : states.add(tetrioPlayer);
+    bool test = _players[tetrioPlayer.userId]!.last.isSameState(tetrioPlayer);
+    if (test == false) states.add(tetrioPlayer);
     final Map<String, dynamic> statesJson = {};
     for (var e in states) {
-      statesJson.addEntries({e.state.millisecondsSinceEpoch.toString(): e.toJson()}.entries);
+      statesJson.addEntries({(e.state.millisecondsSinceEpoch ~/ 1000).toString(): e.toJson()}.entries);
     }
     await db.update(tetrioUsersTable, {idCol: tetrioPlayer.userId, nickCol: tetrioPlayer.username, statesCol: jsonEncode(statesJson)},
         where: '$idCol = ?', whereArgs: [tetrioPlayer.userId]);
-    isFromHistory ? _players[tetrioPlayer.userId]!.insert(0, tetrioPlayer) : _players[tetrioPlayer.userId]!.add(tetrioPlayer);
+    _players[tetrioPlayer.userId]!.add(tetrioPlayer);
     _tetrioStreamController.add(_players);
   }
 
@@ -369,7 +384,7 @@ class TetrioService extends DB {
     } else {
       dynamic rawStates = results.first['jsonStates'] as String;
       rawStates = json.decode(rawStates);
-      rawStates.forEach((k, v) => states.add(TetrioPlayer.fromJson(v, DateTime.fromMillisecondsSinceEpoch(int.parse(k)))));
+      rawStates.forEach((k, v) => states.add(TetrioPlayer.fromJson(v, DateTime.fromMillisecondsSinceEpoch(int.parse(k) * 1000), id, results.first[nickCol] as String)));
       _players.removeWhere((key, value) => key == id);
       _players.addEntries({states.last.userId: states}.entries);
       _tetrioStreamController.add(_players);
@@ -395,9 +410,9 @@ class TetrioService extends DB {
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      if (jsonDecode(response.body)['success']) {
-        TetrioPlayer player = TetrioPlayer.fromJson(
-            jsonDecode(response.body)['data']['user'], DateTime.fromMillisecondsSinceEpoch(jsonDecode(response.body)['cache']['cached_at'], isUtc: true));
+      var json = jsonDecode(response.body);
+      if (json['success']) {
+        TetrioPlayer player = TetrioPlayer.fromJson(json['data']['user'], DateTime.fromMillisecondsSinceEpoch(json['cache']['cached_at'], isUtc: true), json['data']['user']['_id'], json['data']['user']['username']);
         developer.log("fetchPlayer: $user retrieved and cached", name: "services/tetrio_crud");
         _playersCache[jsonDecode(response.body)['cache']['cached_until'].toString()] = player;
         return player;
@@ -421,7 +436,7 @@ class TetrioService extends DB {
       // what the fuck am i doing here?
       var test = json.decode(row['jsonStates'] as String);
       List<TetrioPlayer> states = [];
-      test.forEach((k, v) => states.add(TetrioPlayer.fromJson(v, DateTime.fromMillisecondsSinceEpoch(int.parse(k)))));
+      test.forEach((k, v) => states.add(TetrioPlayer.fromJson(v, DateTime.fromMillisecondsSinceEpoch(int.parse(k) * 1000), row[idCol] as String, row[nickCol] as String)));
       data.addEntries({states.last.userId: states}.entries);
       return data;
     });

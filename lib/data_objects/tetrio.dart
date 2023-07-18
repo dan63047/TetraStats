@@ -31,7 +31,8 @@ const Map<String, double> rankCutoffs = {
   "c": 0.9,
   "c-": 0.95,
   "d+": 0.975,
-  "d": 1
+  "d": 1,
+  "z": -1
 };
 const Map<String, Color> rankColors = { // thanks osk for const rankColors at https://ch.tetr.io/res/js/base.js:418
 	'x': Color(0xFFFF45FF),
@@ -85,7 +86,7 @@ class TetrioPlayer {
   late bool verified;
   bool? badstanding;
   String? botmaster;
-  late Connections connections;
+  Connections? connections;
   late TetraLeagueAlpha tlSeason1;
   List<RecordSingle?> sprint = [];
   List<RecordSingle?> blitz = [];
@@ -122,34 +123,30 @@ class TetrioPlayer {
 
   double get level => pow((xp / 500), 0.6) + (xp / (5000 + (max(0, xp - 4 * pow(10, 6)) / 5000))) + 1;
 
-  TetrioPlayer.fromJson(Map<String, dynamic> json, DateTime stateTime) {
+  TetrioPlayer.fromJson(Map<String, dynamic> json, DateTime stateTime, String id, String nick) {
     //developer.log("TetrioPlayer.fromJson $stateTime: $json", name: "data_objects/tetrio");
-    userId = json['_id'];
-    username = json['username'];
+    userId = id;
+    username = nick;
     state = stateTime;
-    if (json['role'] == "retrived from p1nkl0bst3r api"){ //i fucked my own db lol i remove it later
-      role = "p1nkl0bst3r";
-    }else{
-      role = json['role'];
-    }
+    role = json['role'];
     registrationTime = json['ts'] != null ? DateTime.parse(json['ts']) : null;
     if (json['badges'] != null) {
       json['badges'].forEach((v) {
         badges.add(Badge.fromJson(v));
       });
     }
-    xp = json['xp'].toDouble();
-    gamesPlayed = json['gamesplayed'];
-    gamesWon = json['gameswon'];
-    gameTime = doubleSecondsToDuration(json['gametime'].toDouble());
+    xp = json['xp'] != null ? json['xp'].toDouble() : -1;
+    gamesPlayed = json['gamesplayed'] ?? -1;
+    gamesWon = json['gameswon'] ?? -1;
+    gameTime = json['gametime'] != null && json['gametime'] != -1 ? doubleSecondsToDuration(json['gametime'].toDouble()) : const Duration(seconds: -1);
     country = json['country'];
-    supporterTier = json['supporter_tier'];
-    verified = json['verified'];
+    supporterTier = json['supporter_tier'] ?? 0;
+    verified = json['verified'] ?? false;
     tlSeason1 = TetraLeagueAlpha.fromJson(json['league'], stateTime);
     avatarRevision = json['avatar_revision'];
     bannerRevision = json['banner_revision'];
     bio = json['bio'];
-    connections = Connections.fromJson(json['connections']);
+    if (json['connections'] != null && json['connections'].isNotEmpty) connections = Connections.fromJson(json['connections']);
     distinguishment = json['distinguishment'] != null ? Distinguishment.fromJson(json['distinguishment']) : null;
     friendCount = json['friend_count'] ?? 0;
     badstanding = json['badstanding'];
@@ -158,25 +155,25 @@ class TetrioPlayer {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['_id'] = userId;
-    data['username'] = username;
+    // data['_id'] = userId;
+    // data['username'] = username;
     data['role'] = role;
     if (registrationTime != null) data['ts'] = registrationTime?.toString();
-    data['badges'] = badges.map((v) => v.toJson()).toList();
-    data['xp'] = xp;
-    data['gamesplayed'] = gamesPlayed;
-    data['gameswon'] = gamesWon;
-    data['gametime'] = gameTime.inMicroseconds / 1000000;
+    if (badges.isNotEmpty) data['badges'] = badges.map((v) => v.toJson()).toList();
+    if (xp >= 0) data['xp'] = xp;
+    if (gamesPlayed >= 0) data['gamesplayed'] = gamesPlayed;
+    if (gamesWon >= 0) data['gameswon'] = gamesWon;
+    if (!gameTime.isNegative) data['gametime'] = gameTime.inMicroseconds / 1000000;
     if (country != null) data['country'] = country;
-    data['supporter_tier'] = supporterTier;
-    data['verified'] = verified;
+    if (supporterTier > 0) data['supporter_tier'] = supporterTier;
+    if (verified) data['verified'] = verified;
     data['league'] = tlSeason1.toJson();
     if (distinguishment != null) data['distinguishment'] = distinguishment?.toJson();
     if (avatarRevision != null) data['avatar_revision'] = avatarRevision;
     if (bannerRevision != null) data['banner_revision'] = bannerRevision;
-    if (data['bio'] != null) data['bio'] = bio;
-    data['connections'] = connections.toJson();
-    data['friend_count'] = friendCount;
+    if (bio != null) data['bio'] = bio;
+    if (connections != null) data['connections'] = connections!.toJson();
+    if (friendCount > 0) data['friend_count'] = friendCount;
     if (badstanding != null) data['badstanding'] = badstanding;
     if (botmaster != null) data['botmaster'] = botmaster;
     //developer.log("TetrioPlayer.toJson: $data", name: "data_objects/tetrio");
@@ -741,7 +738,7 @@ class TetraLeagueAlpha {
       this.pps,
       this.vs,
       this.records}){
-        nerdStats = (apm != null && pps != null && apm != null) ? NerdStats(apm!, pps!, vs!) : null;
+        nerdStats = (apm != null && pps != null && vs != null) ? NerdStats(apm!, pps!, vs!) : null;
         estTr = (nerdStats != null) ? EstTr(apm!, pps!, vs!, (rd != null) ? rd! : 69, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp, nerdStats!.gbe) : null;
         playstyle =(nerdStats != null) ? Playstyle(apm!, pps!, nerdStats!.app, nerdStats!.vsapm, nerdStats!.dsp, nerdStats!.gbe, estTr!.srarea, estTr!.statrank) : null;
       }
@@ -750,29 +747,28 @@ class TetraLeagueAlpha {
 
   TetraLeagueAlpha.fromJson(Map<String, dynamic> json, ts) {
     timestamp = ts;
-    gamesPlayed = json['gamesplayed'];
-    gamesWon = json['gameswon'];
-    rating = json['rating'].toDouble();
+    gamesPlayed = json['gamesplayed'] ?? 0;
+    gamesWon = json['gameswon'] ?? 0;
+    rating = json['rating'] != null ? json['rating'].toDouble() : -1;
     glicko = json['glicko']?.toDouble();
-    rd = json['rd']?.toDouble();
-    rank = json['rank'];
-    bestRank = json['bestrank'].toString();
-    apm = json['apm']?.toDouble();
-    pps = json['pps']?.toDouble();
-    vs = json['vs']?.toDouble();
-    decaying = json['decaying'];
-    standing = json['standing'];
-    percentile = json['percentile'].toDouble();
-    standingLocal = json['standing_local'];
+    rd = json['rd'] != null ? json['rd']!.toDouble() : noTrRd;
+    rank = json['rank'] != null ? json['rank']!.toString() : 'z';
+    bestRank = json['bestrank'] != null ? json['bestrank']!.toString() : 'z';
+    apm = json['apm'] != null ? json['apm']!.toDouble() : null;
+    pps = json['pps'] != null ? json['pps']!.toDouble() : null;
+    vs = json['vs'] != null ? json['vs']!.toDouble() : null;
+    decaying = json['decaying'] ?? false;
+    standing = json['standing'] ?? -1;
+    percentile = json['percentile'] != null ? json['percentile'].toDouble() : rankCutoffs[rank];
+    standingLocal = json['standing_local'] ?? -1;
     prevRank = json['prev_rank'];
-    prevAt = json['prev_at'];
+    prevAt = json['prev_at'] ?? -1;
     nextRank = json['next_rank'];
-    nextAt = json['next_at'];
-    percentileRank = json['percentile_rank'];
+    nextAt = json['next_at'] ?? -1;
+    percentileRank = json['percentile_rank'] ?? rank;
     nerdStats = (apm != null && pps != null && vs != null) ? NerdStats(apm!, pps!, vs!) : null;
     estTr = (nerdStats != null) ? EstTr(apm!, pps!, vs!, (rd != null) ? rd! : 69, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp, nerdStats!.gbe) : null;
-    playstyle =
-        (nerdStats != null) ? Playstyle(apm!, pps!, nerdStats!.app, nerdStats!.vsapm, nerdStats!.dsp, nerdStats!.gbe, estTr!.srarea, estTr!.statrank) : null;
+    playstyle = (nerdStats != null) ? Playstyle(apm!, pps!, nerdStats!.app, nerdStats!.vsapm, nerdStats!.dsp, nerdStats!.gbe, estTr!.srarea, estTr!.statrank) : null;
   }
 
   @override
@@ -784,25 +780,25 @@ class TetraLeagueAlpha {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['gamesplayed'] = gamesPlayed;
-    data['gameswon'] = gamesWon;
-    data['rating'] = rating;
+    if (gamesPlayed > 0) data['gamesplayed'] = gamesPlayed;
+    if (gamesWon > 0) data['gameswon'] = gamesWon;
+    if (rating >= 0) data['rating'] = rating;
     if (glicko != null) data['glicko'] = glicko;
-    if (rd != null) data['rd'] = rd;
-    data['rank'] = rank;
-    data['bestrank'] = bestRank;
+    if (rd != null && rd != noTrRd) data['rd'] = rd;
+    if (rank != 'z') data['rank'] = rank;
+    if (bestRank != 'z') data['bestrank'] = bestRank;
     if (apm != null) data['apm'] = apm;
     if (pps != null) data['pps'] = pps;
     if (vs != null) data['vs'] = vs;
-    data['decaying'] = decaying;
-    data['standing'] = standing;
-    data['percentile'] = percentile;
-    data['standing_local'] = standingLocal;
+    if (decaying) data['decaying'] = decaying;
+    if (standing >= 0) data['standing'] = standing;
+    if (!rankCutoffs.containsValue(percentile)) data['percentile'] = percentile;
+    if (standingLocal >= 0) data['standing_local'] = standingLocal;
     if (prevRank != null) data['prev_rank'] = prevRank;
-    data['prev_at'] = prevAt;
+    if (prevAt >= 0) data['prev_at'] = prevAt;
     if (nextRank != null) data['next_rank'] = nextRank;
-    data['next_at'] = nextAt;
-    data['percentile_rank'] = percentileRank;
+    if (nextAt >= 0) data['next_at'] = nextAt;
+    if (percentileRank != rank) data['percentile_rank'] = percentileRank;
     return data;
   }
 }
