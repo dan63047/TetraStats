@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer' as developer;
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/services/sqlite_db_controller.dart';
@@ -97,7 +98,12 @@ class TetrioService extends DB {
   }
 
   Future<List<TetrioPlayer>> fetchAndsaveTLHistory(String id) async {
-     var url = Uri.https('api.p1nkl0bst3r.xyz', 'tlhist/$id');
+    Uri url;
+    if (kIsWeb) {
+      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLHistory", "user": id});
+    } else {
+      url = Uri.https('api.p1nkl0bst3r.xyz', 'tlhist/$id');
+    }
     final response = await http.get(url);
     if (response.statusCode == 200) {
       List<List<dynamic>> csv = const CsvToListConverter().convert(response.body)..removeAt(0);
@@ -162,8 +168,12 @@ class TetrioService extends DB {
     }catch(e){
       developer.log("fetchTLLeaderboard: Trying to retrieve leaderboard", name: "services/tetrio_crud");
     }
-    
-    var url = Uri.https('ch.tetr.io', 'api/users/lists/league/all');
+    Uri url;
+    if (kIsWeb) {
+      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLLeaderboard"});
+    } else {
+      url = Uri.https('ch.tetr.io', 'api/users/lists/league/all');
+    }
     final response = await http.get(url);
     if (response.statusCode == 200) {
       var rawJson = jsonDecode(response.body);
@@ -196,7 +206,12 @@ class TetrioService extends DB {
       developer.log("getTLStream: Trying to retrieve stream $userID", name: "services/tetrio_crud");
     }
     
-    var url = Uri.https('ch.tetr.io', 'api/streams/league_userrecent_${userID.toLowerCase().trim()}');
+    Uri url;
+    if (kIsWeb) {
+      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "tetrioUserTL", "user": userID.toLowerCase().trim()});
+    } else {
+      url = Uri.https('ch.tetr.io', 'api/streams/league_userrecent_${userID.toLowerCase().trim()}');
+    }
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -251,7 +266,12 @@ class TetrioService extends DB {
       developer.log("fetchRecords: Trying to retrieve $userID records", name: "services/tetrio_crud");
     }
     
-    var url = Uri.https('ch.tetr.io', 'api/users/${userID.toLowerCase().trim()}/records');
+    Uri url;
+    if (kIsWeb) {
+      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "tetrioUserRecords", "user": userID.toLowerCase().trim()});
+    } else {
+      url = Uri.https('ch.tetr.io', 'api/users/${userID.toLowerCase().trim()}/records');
+    }
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -406,7 +426,12 @@ class TetrioService extends DB {
       developer.log("fetchPlayer: Trying to retrieve $user", name: "services/tetrio_crud");
     }
     
-    var url = Uri.https('ch.tetr.io', 'api/users/${user.toLowerCase().trim()}');
+    Uri url;
+    if (kIsWeb) {
+      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "tetrioUser", "user": user.toLowerCase().trim()});
+    } else {
+      url = Uri.https('ch.tetr.io', 'api/users/${user.toLowerCase().trim()}');
+    }
     final response = await http.get(url);
 
     if (response.statusCode == 200) {

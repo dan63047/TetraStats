@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:math';
@@ -15,7 +16,7 @@ import 'package:tetra_stats/widgets/stat_sell_num.dart';
 import 'package:tetra_stats/widgets/tl_thingy.dart';
 import 'package:tetra_stats/widgets/user_thingy.dart';
 
-late Future<List> me;
+Future<List> me = Future.delayed(const Duration(seconds: 60), () => [null, null, null, null, null, null]);
 String _searchFor = "6098518e3d5155e6ec429cdc";
 String _titleNickname = "dan63047";
 final TetrioService teto = TetrioService();
@@ -120,8 +121,8 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
     List<TetrioPlayer> states = [];
     TetraLeagueAlpha? compareWith;
     var uniqueTL = <dynamic>{};
-    states.addAll(await teto.getPlayer(me.userId));
     if(fetchHistory) await teto.fetchAndsaveTLHistory(_searchFor);
+    states.addAll(await teto.getPlayer(me.userId));
     for (var element in states) {
         if (uniqueTL.isNotEmpty && uniqueTL.last != element.tlSeason1) uniqueTL.add(element.tlSeason1);
         if (uniqueTL.isEmpty) uniqueTL.add(element.tlSeason1);
@@ -223,12 +224,12 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
           PopupMenuButton(
             itemBuilder: (BuildContext context) => <PopupMenuEntry>[
               PopupMenuItem(
-                value: "test",
-                child: Text("fetchAndsaveTLHistory"),
-              ),
-              PopupMenuItem(
                 value: "refresh",
                 child: Text(t.refresh),
+              ),
+              PopupMenuItem(
+                value: "test",
+                child: Text(t.fetchAndsaveTLHistory),
               ),
               PopupMenuItem(
                 value: "/states",
@@ -271,7 +272,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                     },
                     notificationPredicate: (notification) {
                       // with NestedScrollView local(depth == 2) OverscrollNotification are not sent
-                      if (notification is OverscrollNotification || Platform.isIOS) {
+                      if (!kIsWeb && (notification is OverscrollNotification || Platform.isIOS)) {
                         return notification.depth == 2;
                       }
                       return notification.depth == 0;

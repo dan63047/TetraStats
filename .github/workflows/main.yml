@@ -38,7 +38,7 @@ jobs:
           discussionCategory: autobuilded-releases
           artifacts: "build/windows/runner/Release/TetraStats-${{github.ref_name}}-windows.zip"
           tag: Auto-${{ github.run_number }}
-          body: This build was builded with GitHub Action workflow
+          body: Builded with GitHub Action workflow
           token: ${{ secrets.TOKEN }}
   build-and-release-android:
     name: Build Android App
@@ -63,5 +63,5 @@ jobs:
           discussionCategory: autobuilded-releases
           artifacts: "build/app/outputs/flutter-apk/*"
           tag: Auto-${{ github.run_number }}
-          body: This build was builded with GitHub Action workflow
+          body: Builded with GitHub Action workflow
           token: ${{ secrets.TOKEN }}

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:file_selector/file_selector.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
@@ -8,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsView extends StatefulWidget {
   const SettingsView({Key? key}) : super(key: key);
@@ -39,6 +41,15 @@ class SettingsState extends State<SettingsView> {
     setState(() {
       _packageInfo = info;
     });
+  }
+
+  Future<void> _launchInBrowser(Uri url) async {
+    if (!await launchUrl(
+      url,
+      mode: LaunchMode.externalApplication,
+    )) {
+      throw Exception('Could not launch $url');
+    }
   }
 
   Future<void> _getPreferences() async {
@@ -84,29 +95,9 @@ class SettingsState extends State<SettingsView> {
             title: Text(t.exportDB),
             subtitle: Text(t.exportDBDescription),
             onTap: () {
-              if (Platform.isLinux || Platform.isWindows) {
-                showDialog(
-                    context: context,
-                    builder: (BuildContext context) => AlertDialog(
-                          title: Text(t.desktopExportAlertTitle,
-                              style: const TextStyle(
-                                  fontFamily: "Eurostile Round Extended")),
-                          content: SingleChildScrollView(
-                            child: ListBody(children: [
-                              Text(t.desktopExportText)
-                            ]),
-                          ),
-                          actions: <Widget>[
-                            TextButton(
-                              child: Text(t.popupActions.ok),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        ));
-              }
-              if (Platform.isAndroid){
+              if (kIsWeb){
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.notForWeb)));
+              } else if (Platform.isAndroid){
                 var downloadFolder = Directory("/storage/emulated/0/Download");
                 File exportedDB = File("${downloadFolder.path}/TetraStats.db");
                 getApplicationDocumentsDirectory().then((value) {
@@ -130,6 +121,27 @@ class SettingsState extends State<SettingsView> {
                           ],
                         ));
                 });
+              } else if (Platform.isLinux || Platform.isWindows) {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) => AlertDialog(
+                    title: Text(t.desktopExportAlertTitle,
+                        style: const TextStyle(
+                            fontFamily: "Eurostile Round Extended")),
+                    content: SingleChildScrollView(
+                      child: ListBody(children: [
+                        Text(t.desktopExportText)
+                      ]),
+                    ),
+                    actions: <Widget>[
+                      TextButton(
+                        child: Text(t.popupActions.ok),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  ));
               }
             },
           ),
@@ -137,7 +149,9 @@ class SettingsState extends State<SettingsView> {
             title: Text(t.importDB),
             subtitle: Text(t.importDBDescription),
             onTap: () {
-              if(Platform.isAndroid){
+              if (kIsWeb){
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.notForWeb)));
+              }else if(Platform.isAndroid){
                 FilePicker.platform.pickFiles(
                   type: FileType.any,
                 ).then((value){
@@ -233,6 +247,9 @@ class SettingsState extends State<SettingsView> {
           ),
           const Divider(),
           ListTile(
+            onTap: (){
+              _launchInBrowser(Uri.https("github.com", "dan63047/TetraStats"));
+            },
             title: Text(t.aboutApp),
             subtitle: Text(t.aboutAppText(appName: _packageInfo.appName, packageName: _packageInfo.packageName, version: _packageInfo.version, buildNumber: _packageInfo.buildNumber)),
           ),

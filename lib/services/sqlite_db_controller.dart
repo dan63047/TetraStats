@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart' show MissingPlatformDirectoryException, getApplicationDocumentsDirectory;
 import 'package:tetra_stats/services/crud_exceptions.dart';
@@ -14,8 +15,13 @@ class DB {
       throw DatabaseAlreadyOpen();
     }
     try {
-      final docsPath = await getApplicationDocumentsDirectory();
-      final dbPath = join(docsPath.path, dbName);
+      String dbPath;
+      if (kIsWeb) {
+        dbPath = dbName;
+      } else {
+        final docsPath = await getApplicationDocumentsDirectory();
+        dbPath = join(docsPath.path, dbName);
+      }
       final db = await openDatabase(dbPath);
       _db = db;
       await db.execute(createTetrioUsersTable);

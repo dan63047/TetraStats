@@ -1,9 +1,12 @@
 /// Generated file. Do not edit.
 ///
-/// Locales: 2
-/// Strings: 850 (425 per locale)
+/// Original: res/i18n
+/// To regenerate, run: `dart run slang`
 ///
-/// Built on 2023-07-17 at 17:33 UTC
+/// Locales: 2
+/// Strings: 856 (428 per locale)
+///
+/// Built on 2023-07-20 at 16:26 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -162,6 +165,7 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get openSearch => 'Search player';
 	String get closeSearch => 'Close search';
 	String get refresh => 'Refresh';
+	String get fetchAndsaveTLHistory => 'Get player history';
 	String get showStoredData => 'Show stored data';
 	String get statsCalc => 'Stats Calculator';
 	String get settings => 'Settings';
@@ -215,7 +219,7 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get yourIDText => 'Every time when app loads, stats of that player will be fetched. Please prefer ID over nickname because nickname can be changed.';
 	String get language => 'Language';
 	String get aboutApp => 'About app';
-	String aboutAppText({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Version ${version} Build ${buildNumber}\n\nDeveloped by dan63047\nFormulas provided by kerrmunism';
+	String aboutAppText({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Version ${version} Build ${buildNumber}\n\nDeveloped by dan63047\nFormulas provided by kerrmunism\nHistory provided by p1nkl0bst3r';
 	String stateViewTitle({required Object nickname, required Object date}) => '${nickname} account on ${date}';
 	String statesViewTitle({required Object number, required Object nickname}) => '${number} states of ${nickname} account';
 	String statesViewEntry({required Object level, required Object gameTime, required Object friends, required Object rd}) => 'Level ${level}, ${gameTime} of gametime, ${friends} friends, ${rd} RD';
@@ -250,6 +254,7 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get lbViewOneEntry => 'There is only one player... What?';
 	String lbViewManyEntrys({required Object numberOfPlayers}) => 'There are ${numberOfPlayers} ranked players.';
 	String get p1nkl0bst3rAlert => 'That data was retrived from third party API maintained by p1nkl0bst3r';
+	String get notForWeb => 'Function is not available for web version';
 	late final _StringsStatCellNumEn statCellNum = _StringsStatCellNumEn._(_root);
 	Map<String, String> get playerRole => {
 		'user': 'User',
@@ -542,6 +547,7 @@ class _StringsStatCellNumEn {
 	String get friends => 'Friends';
 	String get apm => 'Attack\nPer Minute';
 	String get vs => 'Versus\nScore';
+	String get recordLB => 'Leaderboard placement';
 	String get lbp => 'Leaderboard\nplacement';
 	String get lbpShort => '№ in LB';
 	String get lbpc => 'Country LB\nplacement';
@@ -660,6 +666,7 @@ class _StringsRu implements _StringsEn {
 	@override String get openSearch => 'Искать игрока';
 	@override String get closeSearch => 'Закрыть поиск';
 	@override String get refresh => 'Обновить';
+	@override String get fetchAndsaveTLHistory => 'Получить историю игрока';
 	@override String get showStoredData => 'Показать сохранённые данные';
 	@override String get statsCalc => 'Калькулятор статистики';
 	@override String get settings => 'Настройки';
@@ -713,7 +720,7 @@ class _StringsRu implements _StringsEn {
 	@override String get yourIDText => 'Каждый раз, когда приложение запускается, приложение будет получать статистику этого игрока. Пожалуйста, отдайте предпочтение ID, так как никнейм можно изменить.';
 	@override String get language => 'Язык (Language)';
 	@override String get aboutApp => 'О приложении';
-	@override String aboutAppText({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Версия ${version} Сборка ${buildNumber}\n\nРазработал dan63047\nФормулы предоставил kerrmunism';
+	@override String aboutAppText({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Версия ${version} Сборка ${buildNumber}\n\nРазработал dan63047\nФормулы предоставил kerrmunism\nИсторию предоставляет p1nkl0bst3r';
 	@override String stateViewTitle({required Object nickname, required Object date}) => 'Аккаунт ${nickname} ${date}';
 	@override String statesViewTitle({required Object number, required Object nickname}) => '${number} состояний аккаунта ${nickname}';
 	@override String statesViewEntry({required Object level, required Object gameTime, required Object friends, required Object rd}) => '${level} уровень, ${gameTime} сыграно, ${friends} друзей, ${rd} RD';
@@ -748,6 +755,7 @@ class _StringsRu implements _StringsEn {
 	@override String get lbViewOneEntry => 'В рейтинговой таблице всего один игрок... Чего?';
 	@override String lbViewManyEntrys({required Object numberOfPlayers}) => 'В рейтинговой таблице находится ${numberOfPlayers} игроков.';
 	@override String get p1nkl0bst3rAlert => 'Эти данные были получены из стороннего API, который поддерживается p1nkl0bst3r';
+	@override String get notForWeb => 'Функция недоступна для веб версии';
 	@override late final _StringsStatCellNumRu statCellNum = _StringsStatCellNumRu._(_root);
 	@override Map<String, String> get playerRole => {
 		'user': 'Пользователь',
@@ -1040,6 +1048,7 @@ class _StringsStatCellNumRu implements _StringsStatCellNumEn {
 	@override String get friends => 'Друзей';
 	@override String get apm => 'Атака в\nМинуту';
 	@override String get vs => 'Показатель\nVersus';
+	@override String get recordLB => 'Место в таблице';
 	@override String get lbp => 'Положение\nв рейтинге';
 	@override String get lbpShort => '№ в рейтинге';
 	@override String get lbpc => 'Положение\nв рейтинге страны';
@@ -1137,6 +1146,7 @@ extension on _StringsEn {
 			case 'openSearch': return 'Search player';
 			case 'closeSearch': return 'Close search';
 			case 'refresh': return 'Refresh';
+			case 'fetchAndsaveTLHistory': return 'Get player history';
 			case 'showStoredData': return 'Show stored data';
 			case 'statsCalc': return 'Stats Calculator';
 			case 'settings': return 'Settings';
@@ -1190,7 +1200,7 @@ extension on _StringsEn {
 			case 'yourIDText': return 'Every time when app loads, stats of that player will be fetched. Please prefer ID over nickname because nickname can be changed.';
 			case 'language': return 'Language';
 			case 'aboutApp': return 'About app';
-			case 'aboutAppText': return ({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Version ${version} Build ${buildNumber}\n\nDeveloped by dan63047\nFormulas provided by kerrmunism';
+			case 'aboutAppText': return ({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Version ${version} Build ${buildNumber}\n\nDeveloped by dan63047\nFormulas provided by kerrmunism\nHistory provided by p1nkl0bst3r';
 			case 'stateViewTitle': return ({required Object nickname, required Object date}) => '${nickname} account on ${date}';
 			case 'statesViewTitle': return ({required Object number, required Object nickname}) => '${number} states of ${nickname} account';
 			case 'statesViewEntry': return ({required Object level, required Object gameTime, required Object friends, required Object rd}) => 'Level ${level}, ${gameTime} of gametime, ${friends} friends, ${rd} RD';
@@ -1225,6 +1235,7 @@ extension on _StringsEn {
 			case 'lbViewOneEntry': return 'There is only one player... What?';
 			case 'lbViewManyEntrys': return ({required Object numberOfPlayers}) => 'There are ${numberOfPlayers} ranked players.';
 			case 'p1nkl0bst3rAlert': return 'That data was retrived from third party API maintained by p1nkl0bst3r';
+			case 'notForWeb': return 'Function is not available for web version';
 			case 'statCellNum.xpLevel': return 'XP Level';
 			case 'statCellNum.xpProgress': return 'Progress to next level';
 			case 'statCellNum.xpFrom0To5000': return 'Progress from 0 XP to level 5000';
@@ -1234,6 +1245,7 @@ extension on _StringsEn {
 			case 'statCellNum.friends': return 'Friends';
 			case 'statCellNum.apm': return 'Attack\nPer Minute';
 			case 'statCellNum.vs': return 'Versus\nScore';
+			case 'statCellNum.recordLB': return 'Leaderboard placement';
 			case 'statCellNum.lbp': return 'Leaderboard\nplacement';
 			case 'statCellNum.lbpShort': return '№ in LB';
 			case 'statCellNum.lbpc': return 'Country LB\nplacement';
@@ -1570,6 +1582,7 @@ extension on _StringsRu {
 			case 'openSearch': return 'Искать игрока';
 			case 'closeSearch': return 'Закрыть поиск';
 			case 'refresh': return 'Обновить';
+			case 'fetchAndsaveTLHistory': return 'Получить историю игрока';
 			case 'showStoredData': return 'Показать сохранённые данные';
 			case 'statsCalc': return 'Калькулятор статистики';
 			case 'settings': return 'Настройки';
@@ -1623,7 +1636,7 @@ extension on _StringsRu {
 			case 'yourIDText': return 'Каждый раз, когда приложение запускается, приложение будет получать статистику этого игрока. Пожалуйста, отдайте предпочтение ID, так как никнейм можно изменить.';
 			case 'language': return 'Язык (Language)';
 			case 'aboutApp': return 'О приложении';
-			case 'aboutAppText': return ({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Версия ${version} Сборка ${buildNumber}\n\nРазработал dan63047\nФормулы предоставил kerrmunism';
+			case 'aboutAppText': return ({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Версия ${version} Сборка ${buildNumber}\n\nРазработал dan63047\nФормулы предоставил kerrmunism\nИсторию предоставляет p1nkl0bst3r';
 			case 'stateViewTitle': return ({required Object nickname, required Object date}) => 'Аккаунт ${nickname} ${date}';
 			case 'statesViewTitle': return ({required Object number, required Object nickname}) => '${number} состояний аккаунта ${nickname}';
 			case 'statesViewEntry': return ({required Object level, required Object gameTime, required Object friends, required Object rd}) => '${level} уровень, ${gameTime} сыграно, ${friends} друзей, ${rd} RD';
@@ -1658,6 +1671,7 @@ extension on _StringsRu {
 			case 'lbViewOneEntry': return 'В рейтинговой таблице всего один игрок... Чего?';
 			case 'lbViewManyEntrys': return ({required Object numberOfPlayers}) => 'В рейтинговой таблице находится ${numberOfPlayers} игроков.';
 			case 'p1nkl0bst3rAlert': return 'Эти данные были получены из стороннего API, который поддерживается p1nkl0bst3r';
+			case 'notForWeb': return 'Функция недоступна для веб версии';
 			case 'statCellNum.xpLevel': return 'Уровень\nопыта';
 			case 'statCellNum.xpProgress': return 'Прогресс до следующего уровня';
 			case 'statCellNum.xpFrom0To5000': return 'Прогресс от 0 XP до 5000 уровня';
@@ -1667,6 +1681,7 @@ extension on _StringsRu {
 			case 'statCellNum.friends': return 'Друзей';
 			case 'statCellNum.apm': return 'Атака в\nМинуту';
 			case 'statCellNum.vs': return 'Показатель\nVersus';
+			case 'statCellNum.recordLB': return 'Место в таблице';
 			case 'statCellNum.lbp': return 'Положение\nв рейтинге';
 			case 'statCellNum.lbpShort': return '№ в рейтинге';
 			case 'statCellNum.lbpc': return 'Положение\nв рейтинге страны';

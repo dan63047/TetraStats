@@ -2,7 +2,7 @@ name: tetra_stats
 description: Track your and other player stats in TETR.IO
 publish_to: 'none'
 
-version: 0.2.0+4
+version: 1.0.0+5
 
 environment:
   sdk: '>=2.19.6 <3.0.0'
@@ -24,6 +24,7 @@ dependencies:
   sqflite: ^2.2.8+2
   sqflite_common_ffi: any
   sqlite3_flutter_libs: ^0.5.15
+  sqflite_common_ffi_web: '>=0.1.0-dev.1'
   path_provider: ^2.0.15
   path: ^1.8.2
   fl_chart: ^0.62.0
@@ -36,6 +37,7 @@ dependencies:
   slang: ^3.20.0
   slang_flutter: ^3.20.0
   csv: ^5.0.2
+  url_launcher: ^6.1.12
 
 dev_dependencies:
   flutter_test:
