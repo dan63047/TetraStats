@@ -72,7 +72,12 @@ class TetrioService extends DB {
 
   Future<void> _loadPlayers() async {
     final allPlayers = await getAllPlayers();
-    _players = allPlayers.toList().first; // ???
+    try{
+      _players = allPlayers.toList().first; // ???
+    }catch (e){
+      developer.log("_loadPlayers: allPlayers.toList().first did oopsie", name: "services/tetrio_crud", error: e);
+      _players = {};
+    }
     _tetrioStreamController.add(_players);
   }
 
