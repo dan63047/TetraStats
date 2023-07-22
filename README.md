@@ -10,7 +10,7 @@ If you want an app, you can find it [here](https://github.com/dan63047/TetraStat
 # Available functionality
 - Advanced stats for players
 - Rank cutoffs and averages
-- Sqlite Database and service, that can work with it
+- Sqlite database, that can store all data
 - Comparison to players, rank averages, and player stats from the past
 - Stats Calculator
 - Player history in charts

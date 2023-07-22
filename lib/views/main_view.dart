@@ -81,7 +81,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
 
   @override
   void initState() {
-    teto.open();
+    initDB();
     _scrollController = ScrollController();
     _tabController = TabController(length: 6, vsync: this);
     if (widget.player != null){
@@ -111,6 +111,10 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
     });
   }
 
+  void initDB() async{
+    await teto.open();
+  }
+
   Future<List> fetch(String nickOrID, {bool fetchHistory = false}) async {
     TetrioPlayer me = await teto.fetchPlayer(nickOrID);
     _searchFor = me.userId;
@@ -121,6 +125,22 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
     List<TetrioPlayer> states = [];
     TetraLeagueAlpha? compareWith;
     var uniqueTL = <dynamic>{};
+    if (isTracking){
+      await teto.storeState(me);
+      await teto.saveTLMatchesFromStream(await teto.getTLStream(me.userId));
+    tlMatches.addAll(await teto.getTLMatchesbyPlayerID(me.userId));
+    for (var match in tlStream.records) {
+      if (!tlMatches.contains(match)) tlMatches.add(match);
+    }
+    tlMatches.sort((a, b) {
+      if(a.timestamp.isBefore(b.timestamp)) return 1;
+      if(a.timestamp.isAtSameMomentAs(b.timestamp)) return 0;
+      if(a.timestamp.isAfter(b.timestamp)) return -1;
+      return 0;
+      });
+    } else{
+      tlMatches = tlStream.records;
+    }
     if(fetchHistory) await teto.fetchAndsaveTLHistory(_searchFor);
     states.addAll(await teto.getPlayer(me.userId));
     for (var element in states) {
@@ -151,22 +171,6 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.estTr != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.estTr!.esttr)], child: Text(t.statCellNum.estOfTR.replaceAll(RegExp(r'\n'), " "))),
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.esttracc != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.esttracc!)], child: Text(t.statCellNum.accOfEst.replaceAll(RegExp(r'\n'), " "))),
     ];
-    if (isTracking){
-      await teto.storeState(me);
-      await teto.saveTLMatchesFromStream(await teto.getTLStream(me.userId));
-    tlMatches.addAll(await teto.getTLMatchesbyPlayerID(me.userId));
-    for (var match in tlStream.records) {
-      if (!tlMatches.contains(match)) tlMatches.add(match);
-    }
-    tlMatches.sort((a, b) {
-      if(a.timestamp.isBefore(b.timestamp)) return 1;
-      if(a.timestamp.isAtSameMomentAs(b.timestamp)) return 0;
-      if(a.timestamp.isAfter(b.timestamp)) return -1;
-      return 0;
-      });
-    } else{
-      tlMatches = tlStream.records;
-    }
     Map<String, dynamic> records = await teto.fetchRecords(me.userId);
     return [me, records, states, tlMatches, compareWith, isTracking];
   }
