@@ -116,7 +116,12 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
   }
 
   Future<List> fetch(String nickOrID, {bool fetchHistory = false}) async {
-    TetrioPlayer me = await teto.fetchPlayer(nickOrID);
+    TetrioPlayer me;
+    if (nickOrID.startsWith("ds:")){
+      me = await teto.fetchPlayer(nickOrID.substring(3), isItDiscordID: true);
+    }else{
+      me = await teto.fetchPlayer(nickOrID);
+    }
     _searchFor = me.userId;
     setState((){_titleNickname = me.username;});
     var tlStream = await teto.getTLStream(me.userId);

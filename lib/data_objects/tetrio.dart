@@ -894,32 +894,214 @@ class TetrioPlayersLeaderboard {
   TetrioPlayersLeaderboard(this.type, this.leaderboard);
 
   List<dynamic> getAverageOfRank(String rank){
+    if (rank.isNotEmpty && !rankCutoffs.keys.contains(rank)) throw Exception("Invalid rank");
     List<TetrioPlayerFromLeaderboard> filtredLeaderboard = List.from(leaderboard); 
-    filtredLeaderboard.removeWhere((element) => element.rank != rank);
-    if (filtredLeaderboard.isEmpty) throw Exception("Invalid rank");
-    double avgAPM = 0, avgPPS = 0, avgVS = 0, avgTR = 0, avgGlicko = 0, avgRD = 0, lowestTR = 25000;
-    int avgGamesPlayed = 0, avgGamesWon = 0, totalGamesPlayed = 0, totalGamesWon = 0;
-    for (var entry in filtredLeaderboard){
-      avgAPM += entry.apm;
-      avgPPS += entry.pps;
-      avgVS += entry.vs;
-      avgTR += entry.rating;
-      avgGlicko += entry.glicko;
-      avgRD += entry.rd;
-      totalGamesPlayed += entry.gamesPlayed;
-      totalGamesWon += entry.gamesWon;
-      if (entry.rating < lowestTR) lowestTR = entry.rating;
+    if (rank.isNotEmpty) {
+      filtredLeaderboard.removeWhere((element) => element.rank != rank);
+    } else {
+      rank = "z";
     }
-    avgAPM /= filtredLeaderboard.length;
-    avgPPS /= filtredLeaderboard.length;
-    avgVS /= filtredLeaderboard.length;
-    avgTR /= filtredLeaderboard.length;
-    avgGlicko /= filtredLeaderboard.length;
-    avgRD /= filtredLeaderboard.length;
-    avgGamesPlayed = (totalGamesPlayed / filtredLeaderboard.length).floor();
-    avgGamesWon = (totalGamesWon / filtredLeaderboard.length).floor();
-    return [TetraLeagueAlpha(timestamp: DateTime.now(), apm: avgAPM, pps: avgPPS, vs: avgVS, glicko: avgGlicko, rd: avgRD, gamesPlayed: avgGamesPlayed, gamesWon: avgGamesWon, bestRank: rank, decaying: false, rating: avgTR, rank: rank, percentileRank: rank, percentile: 0, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1),
-    {"totalGamesPlayed": totalGamesPlayed, "totalGamesWon": totalGamesWon, "players": filtredLeaderboard.length, "lowestTR": lowestTR, "toEnterTR": leaderboard[(leaderboard.length * rankCutoffs[rank]!).floor()-1].rating}];
+    if (filtredLeaderboard.isNotEmpty){
+      double avgAPM = 0,
+        avgPPS = 0,
+        avgVS = 0,
+        avgTR = 0,
+        avgGlicko = 0,
+        avgRD = 0,
+        lowestTR = 25000,
+        lowestGlicko = double.infinity,
+        lowestWinrate = double.infinity,
+        lowestAPM = double.infinity,
+        lowestPPS = double.infinity,
+        lowestVS = double.infinity,
+        highestTR = 0,
+        highestGlicko = 0,
+        highestWinrate = 0,
+        highestAPM = 0,
+        highestPPS = 0,
+        highestVS = 0;
+      int avgGamesPlayed = 0,
+        avgGamesWon = 0,
+        totalGamesPlayed = 0,
+        totalGamesWon = 0,
+        lowestGamesPlayed = pow(2, 53) as int,
+        lowestGamesWon = pow(2, 53) as int,
+        highestGamesPlayed = 0,
+        highestGamesWon = 0;
+      String lowestTRid = "", lowestTRnick = "",
+        lowestGlickoID = "", lowestGlickoNick = "",
+        lowestGamesPlayedID = "", lowestGamesPlayedNick = "",
+        lowestGamesWonID = "", lowestGamesWonNick = "",
+        lowestWinrateID = "", lowestWinrateNick = "",
+        lowestAPMid = "", lowestAPMnick = "",
+        lowestPPSid = "", lowestPPSnick = "",
+        lowestVSid = "", lowestVSnick = "",
+        highestTRid = "", highestTRnick = "",
+        highestGlickoID = "", highestGlickoNick = "",
+        highestGamesPlayedID = "", highestGamesPlayedNick = "",
+        highestGamesWonID = "", highestGamesWonNick = "",
+        highestWinrateID = "", highestWinrateNick = "",
+        highestAPMid = "", highestAPMnick = "",
+        highestPPSid = "", highestPPSnick = "",
+        highestVSid = "", highestVSnick = "";
+      for (var entry in filtredLeaderboard){
+        avgAPM += entry.apm;
+        avgPPS += entry.pps;
+        avgVS += entry.vs;
+        avgTR += entry.rating;
+        avgGlicko += entry.glicko;
+        avgRD += entry.rd;
+        totalGamesPlayed += entry.gamesPlayed;
+        totalGamesWon += entry.gamesWon;
+        if (entry.rating < lowestTR){
+          lowestTR = entry.rating;
+          lowestTRid = entry.userId;
+          lowestTRnick = entry.username;
+        }
+        if (entry.glicko < lowestGlicko){
+          lowestGlicko = entry.glicko;
+          lowestGlickoID = entry.userId;
+          lowestGlickoNick = entry.username;
+        }
+        if (entry.gamesPlayed < lowestGamesPlayed){
+          lowestGamesPlayed = entry.gamesPlayed;
+          lowestGamesPlayedID = entry.userId;
+          lowestGamesPlayedNick = entry.username;
+        }
+        if (entry.gamesWon < lowestGamesWon){
+          lowestGamesWon = entry.gamesWon;
+          lowestGamesWonID = entry.userId;
+          lowestGamesWonNick = entry.username;
+        }
+        if (entry.winrate < lowestWinrate){
+          lowestWinrate = entry.winrate;
+          lowestWinrateID = entry.userId;
+          lowestWinrateNick = entry.username;
+        }
+        if (entry.apm < lowestAPM){
+          lowestAPM = entry.apm;
+          lowestAPMid = entry.userId;
+          lowestAPMnick = entry.username;
+        }
+        if (entry.pps < lowestPPS){
+          lowestPPS = entry.pps;
+          lowestPPSid = entry.userId;
+          lowestPPSnick = entry.username;
+        }
+        if (entry.vs < lowestVS){
+          lowestVS = entry.vs;
+          lowestVSid = entry.userId;
+          lowestVSnick = entry.username;
+        }
+        if (entry.rating > highestTR){
+          highestTR = entry.rating;
+          highestTRid = entry.userId;
+          highestTRnick = entry.username;
+        }
+        if (entry.glicko > highestGlicko){
+          highestGlicko = entry.glicko;
+          highestGlickoID = entry.userId;
+          highestGlickoNick = entry.username;
+        }
+        if (entry.gamesPlayed > highestGamesPlayed){
+          highestGamesPlayed = entry.gamesPlayed;
+          highestGamesPlayedID = entry.userId;
+          highestGamesPlayedNick = entry.username;
+        }
+        if (entry.gamesWon > highestGamesWon){
+          highestGamesWon = entry.gamesWon;
+          highestGamesWonID = entry.userId;
+          highestGamesWonNick = entry.username;
+        }
+        if (entry.winrate > highestWinrate){
+          highestWinrate = entry.winrate;
+          highestWinrateID = entry.userId;
+          highestWinrateNick = entry.username;
+        }
+        if (entry.apm > highestAPM){
+          highestAPM = entry.apm;
+          highestAPMid = entry.userId;
+          highestAPMnick = entry.username;
+        }
+        if (entry.pps > highestPPS){
+          highestPPS = entry.pps;
+          highestPPSid = entry.userId;
+          highestPPSnick = entry.username;
+        }
+        if (entry.vs > highestVS){
+          highestVS = entry.vs;
+          highestVSid = entry.userId;
+          highestVSnick = entry.username;
+        }
+      }
+      avgAPM /= filtredLeaderboard.length;
+      avgPPS /= filtredLeaderboard.length;
+      avgVS /= filtredLeaderboard.length;
+      avgTR /= filtredLeaderboard.length;
+      avgGlicko /= filtredLeaderboard.length;
+      avgRD /= filtredLeaderboard.length;
+      avgGamesPlayed = (totalGamesPlayed / filtredLeaderboard.length).floor();
+      avgGamesWon = (totalGamesWon / filtredLeaderboard.length).floor();
+      return [TetraLeagueAlpha(timestamp: DateTime.now(), apm: avgAPM, pps: avgPPS, vs: avgVS, glicko: avgGlicko, rd: avgRD, gamesPlayed: avgGamesPlayed, gamesWon: avgGamesWon, bestRank: rank, decaying: false, rating: avgTR, rank: rank, percentileRank: rank, percentile: rankCutoffs[rank]!, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1),
+      {
+        "totalGamesPlayed": totalGamesPlayed,
+        "totalGamesWon": totalGamesWon,
+        "players": filtredLeaderboard.length,
+        "lowestTR": lowestTR,
+        "lowestTRid": lowestTRid,
+        "lowestTRnick": lowestTRnick,
+        "lowestGlicko": lowestGlicko,
+        "lowestGlickoID": lowestGlickoID,
+        "lowestGlickoNick": lowestGlickoNick,
+        "lowestGamesPlayed": lowestGamesPlayed,
+        "lowestGamesPlayedID": lowestGamesPlayedID,
+        "lowestGamesPlayedNick": lowestGamesPlayedNick,
+        "lowestGamesWon": lowestGamesWon,
+        "lowestGamesWonID": lowestGamesWonID,
+        "lowestGamesWonNick": lowestGamesWonNick,
+        "lowestWinrate": lowestWinrate,
+        "lowestWinrateID": lowestWinrateID,
+        "lowestWinrateNick": lowestWinrateNick,
+        "lowestAPM": lowestAPM,
+        "lowestAPMid": lowestAPMid,
+        "lowestAPMnick": lowestAPMnick,
+        "lowestPPS": lowestPPS,
+        "lowestPPSid": lowestPPSid,
+        "lowestPPSnick": lowestPPSnick,
+        "lowestVS": lowestVS,
+        "lowestVSid": lowestVSid,
+        "lowestVSnick": lowestVSnick,
+        "highestTR": highestTR,
+        "highestTRid": highestTRid,
+        "highestTRnick": highestTRnick,
+        "highestGlicko": highestGlicko,
+        "highestGlickoID": highestGlickoID,
+        "highestGlickoNick": highestGlickoNick,
+        "highestGamesPlayed": highestGamesPlayed,
+        "highestGamesPlayedID": highestGamesPlayedID,
+        "highestGamesPlayedNick": highestGamesPlayedNick,
+        "highestGamesWon": highestGamesWon,
+        "highestGamesWonID": highestGamesWonID,
+        "highestGamesWonNick": highestGamesWonNick,
+        "highestWinrate": highestWinrate,
+        "highestWinrateID": highestWinrateID,
+        "highestWinrateNick": highestWinrateNick,
+        "highestAPM": highestAPM,
+        "highestAPMid": highestAPMid,
+        "highestAPMnick": highestAPMnick,
+        "highestPPS": highestPPS,
+        "highestPPSid": highestPPSid,
+        "highestPPSnick": highestPPSnick,
+        "highestVS": highestVS,
+        "highestVSid": highestVSid,
+        "highestVSnick": highestVSnick,
+        "toEnterTR": rank.toLowerCase() != "z" ? leaderboard[(leaderboard.length * rankCutoffs[rank]!).floor()-1].rating : lowestTR,
+        "entries": filtredLeaderboard
+      }];
+    }else{
+      return [TetraLeagueAlpha(timestamp: DateTime.now(), apm: 0, pps: 0, vs: 0, glicko: 0, rd: noTrRd, gamesPlayed: 0, gamesWon: 0, bestRank: rank, decaying: false, rating: 0, rank: rank, percentileRank: rank, percentile: rankCutoffs[rank]!, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1),
+      {"players": filtredLeaderboard.length, "lowestTR": 0, "toEnterTR": 0}];
+    }
   }
 
   Map<String, List<dynamic>> get averages => {
@@ -939,7 +1121,8 @@ class TetrioPlayersLeaderboard {
     'c': getAverageOfRank("c"),
     'c-': getAverageOfRank("c-"),
     'd+': getAverageOfRank("d+"),
-    'd': getAverageOfRank("d")
+    'd': getAverageOfRank("d"),
+    'z': getAverageOfRank("z")
     };
 
   TetrioPlayersLeaderboard.fromJson(List<dynamic> json, String t, DateTime ts) {
@@ -994,6 +1177,7 @@ class TetrioPlayerFromLeaderboard {
     this.vs,
     this.decaying);
 
+  double get winrate => gamesWon / gamesPlayed;
   get app => apm / (pps * 60);
   get vsapm => vs / apm;
 

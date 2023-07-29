@@ -67,7 +67,7 @@ class TLThingy extends StatelessWidget {
                         minimum: tl.nextAt.toDouble(),
                         maximum: tl.prevAt.toDouble(),
                         interval: tl.prevAt.toDouble() - tl.nextAt.toDouble(), 
-                        ranges: [LinearGaugeRange(startValue: tl.standing.toDouble(), endValue: tl.prevAt.toDouble(), color: Colors.cyanAccent,)],
+                        ranges: [LinearGaugeRange(startValue: tl.standing.toDouble() <= tl.prevAt.toDouble() ? tl.standing.toDouble() : tl.prevAt.toDouble(), endValue: tl.prevAt.toDouble(), color: Colors.cyanAccent,)],
                         //barPointers: [LinearBarPointer(value: 80)],
                         isAxisInversed: true,
                         isMirrored: true,

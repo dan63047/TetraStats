@@ -135,7 +135,7 @@ class TetrioService extends DB {
           );
           history.add(state);
       }
-      ensureDbIsOpen();
+      await ensureDbIsOpen();
       final db = getDatabaseOrThrow();
       late List<TetrioPlayer> states;
       try{
@@ -237,7 +237,7 @@ class TetrioService extends DB {
   }
 
   Future<void> saveTLMatchesFromStream(TetraLeagueAlphaStream stream) async {
-    ensureDbIsOpen();
+    await ensureDbIsOpen();
     final db = getDatabaseOrThrow();
     for (TetraLeagueAlphaRecord match in stream.records) {
        final results = await db.query(tetraLeagueMatchesTable, where: '$idCol = ?', whereArgs: [match.ownId]);
@@ -247,7 +247,7 @@ class TetrioService extends DB {
   }
 
   Future<List<TetraLeagueAlphaRecord>> getTLMatchesbyPlayerID(String playerID) async {
-    ensureDbIsOpen();
+    await ensureDbIsOpen();
     final db = getDatabaseOrThrow();
     List<TetraLeagueAlphaRecord> matches = [];
     final results = await db.query(tetraLeagueMatchesTable, where: '($player1id = ?) OR ($player2id = ?)', whereArgs: [playerID, playerID]);
@@ -304,7 +304,7 @@ class TetrioService extends DB {
   }
 
   Future<void> createPlayer(TetrioPlayer tetrioPlayer) async {
-    ensureDbIsOpen();
+    await ensureDbIsOpen();
     final db = getDatabaseOrThrow();
     final results = await db.query(tetrioUsersTable, limit: 1, where: '$idCol = ?', whereArgs: [tetrioPlayer.userId.toLowerCase()]);
     if (results.isNotEmpty) {
@@ -319,7 +319,7 @@ class TetrioService extends DB {
   }
 
   Future<void> addPlayerToTrack(TetrioPlayer tetrioPlayer) async {
-    ensureDbIsOpen();
+    await ensureDbIsOpen();
     final db = getDatabaseOrThrow();
     final results = await db.query(tetrioUsersToTrackTable, where: '$idCol = ?', whereArgs: [tetrioPlayer.userId.toLowerCase()]);
     if (results.isNotEmpty) {
@@ -329,7 +329,7 @@ class TetrioService extends DB {
   }
 
   Future<bool> isPlayerTracking(String id) async {
-    ensureDbIsOpen();
+    await ensureDbIsOpen();
     final db = getDatabaseOrThrow();
     final results = await db.query(tetrioUsersToTrackTable, where: '$idCol = ?', whereArgs: [id.toLowerCase()]);
     if (results.isEmpty) {
@@ -360,12 +360,11 @@ class TetrioService extends DB {
   }
 
   Future<void> storeState(TetrioPlayer tetrioPlayer) async {
-    ensureDbIsOpen();
+    await ensureDbIsOpen();
     final db = getDatabaseOrThrow();
     late List<TetrioPlayer> states;
     try {
       states = _players[tetrioPlayer.userId]!;
-      //states = await getPlayer(tetrioPlayer.userId);
     } catch (e) {
       await createPlayer(tetrioPlayer);
       states = await getPlayer(tetrioPlayer.userId);
@@ -383,7 +382,7 @@ class TetrioService extends DB {
   }
 
   Future<void> deleteState(TetrioPlayer tetrioPlayer) async {
-    ensureDbIsOpen();
+    await ensureDbIsOpen();
     final db = getDatabaseOrThrow();
     late List<TetrioPlayer> states;
     states = await getPlayer(tetrioPlayer.userId);
@@ -400,7 +399,7 @@ class TetrioService extends DB {
   }
 
   Future<List<TetrioPlayer>> getPlayer(String id) async {
-    ensureDbIsOpen();
+    await ensureDbIsOpen();
     final db = getDatabaseOrThrow();
     List<TetrioPlayer> states = [];
     final results = await db.query(tetrioUsersTable, limit: 1, where: '$idCol = ?', whereArgs: [id.toLowerCase()]);
@@ -417,7 +416,7 @@ class TetrioService extends DB {
     }
   }
 
-  Future<TetrioPlayer> fetchPlayer(String user) async {
+  Future<TetrioPlayer> fetchPlayer(String user, {bool isItDiscordID = false}) async {
     try{
       var cached = _playersCache.entries.firstWhere((element) => element.value.userId == user || element.value.username == user);
     if (DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true).isAfter(DateTime.now())){
@@ -430,7 +429,29 @@ class TetrioService extends DB {
     }catch(e){
       developer.log("fetchPlayer: Trying to retrieve $user", name: "services/tetrio_crud");
     }
-    
+
+    if (isItDiscordID){
+      Uri dUrl;
+      if (kIsWeb) {
+        dUrl = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "tetrioUserByDiscordID", "user": user.toLowerCase().trim()});
+      } else {
+        dUrl = Uri.https('ch.tetr.io', 'api/users/search/${user.toLowerCase().trim()}');
+      }
+      final response = await http.get(dUrl);
+      if (response.statusCode == 200) {
+        var json = jsonDecode(response.body);
+        if (json['success'] && json['data'] != null) {
+          user = json['data']['user']['_id'];
+        } else {
+          developer.log("fetchPlayer User dosen't exist", name: "services/tetrio_crud", error: response.body);
+          throw TetrioPlayerNotExist();
+        }
+      } else {
+      developer.log("fetchPlayer Failed to fetch player", name: "services/tetrio_crud", error: response.statusCode);
+      throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
+      }
+    }
+
     Uri url;
     if (kIsWeb) {
       url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "tetrioUser", "user": user.toLowerCase().trim()});
