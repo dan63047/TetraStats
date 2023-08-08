@@ -893,7 +893,7 @@ class TetrioPlayersLeaderboard {
 
   TetrioPlayersLeaderboard(this.type, this.leaderboard);
 
-  List<dynamic> getAverageOfRank(String rank){
+  List<dynamic> getAverageOfRank(String rank){ // TODO: that function is a mess, there must be a better way to do this
     if (rank.isNotEmpty && !rankCutoffs.keys.contains(rank)) throw Exception("Invalid rank");
     List<TetrioPlayerFromLeaderboard> filtredLeaderboard = List.from(leaderboard); 
     if (rank.isNotEmpty) {
@@ -908,18 +908,65 @@ class TetrioPlayersLeaderboard {
         avgTR = 0,
         avgGlicko = 0,
         avgRD = 0,
+        avgAPP = 0,
+        avgVSAPM = 0,
+        avgDSS = 0,
+        avgDSP = 0,
+        avgAPPDSP = 0,
+        avgCheese = 0,
+        avgGBE = 0,
+        avgNyaAPP = 0,
+        avgArea = 0,
+        avgEstTR = 0,
+        avgEstAcc = 0,
+        avgOpener = 0,
+        avgPlonk = 0,
+        avgStride = 0,
+        avgInfDS = 0,
         lowestTR = 25000,
         lowestGlicko = double.infinity,
+        lowestRD = double.infinity,
         lowestWinrate = double.infinity,
         lowestAPM = double.infinity,
         lowestPPS = double.infinity,
         lowestVS = double.infinity,
-        highestTR = 0,
-        highestGlicko = 0,
-        highestWinrate = 0,
-        highestAPM = 0,
-        highestPPS = 0,
-        highestVS = 0;
+        lowestAPP = double.infinity,
+        lowestVSAPM = double.infinity,
+        lowestDSS = double.infinity,
+        lowestDSP = double.infinity,
+        lowestAPPDSP = double.infinity,
+        lowestCheese = double.infinity,
+        lowestGBE = double.infinity,
+        lowestNyaAPP = double.infinity,
+        lowestArea = double.infinity,
+        lowestEstTR = double.infinity,
+        lowestEstAcc = double.infinity,
+        lowestOpener = double.infinity,
+        lowestPlonk = double.infinity,
+        lowestStride = double.infinity,
+        lowestInfDS = double.infinity,
+        highestTR = double.negativeInfinity,
+        highestGlicko = double.negativeInfinity,
+        highestRD = double.negativeInfinity,
+        highestWinrate = double.negativeInfinity,
+        highestAPM = double.negativeInfinity,
+        highestPPS = double.negativeInfinity,
+        highestVS = double.negativeInfinity,
+        highestAPP = double.negativeInfinity,
+        highestVSAPM = double.negativeInfinity,
+        highestDSS = double.negativeInfinity,
+        highestDSP = double.negativeInfinity,
+        highestAPPDSP = double.negativeInfinity,
+        highestCheese = double.negativeInfinity,
+        highestGBE = double.negativeInfinity,
+        highestNyaAPP = double.negativeInfinity,
+        highestArea = double.negativeInfinity,
+        highestEstTR = double.negativeInfinity,
+        highestEstAcc = double.negativeInfinity,
+        highestOpener = double.negativeInfinity,
+        highestPlonk = double.negativeInfinity,
+        highestStride = double.negativeInfinity,
+        highestInfDS = double.negativeInfinity;
       int avgGamesPlayed = 0,
         avgGamesWon = 0,
         totalGamesPlayed = 0,
@@ -930,20 +977,52 @@ class TetrioPlayersLeaderboard {
         highestGamesWon = 0;
       String lowestTRid = "", lowestTRnick = "",
         lowestGlickoID = "", lowestGlickoNick = "",
+        lowestRdID = "", lowestRdNick = "",
         lowestGamesPlayedID = "", lowestGamesPlayedNick = "",
         lowestGamesWonID = "", lowestGamesWonNick = "",
         lowestWinrateID = "", lowestWinrateNick = "",
         lowestAPMid = "", lowestAPMnick = "",
         lowestPPSid = "", lowestPPSnick = "",
         lowestVSid = "", lowestVSnick = "",
+        lowestAPPid = "", lowestAPPnick = "",
+        lowestVSAPMid = "", lowestVSAPMnick = "",
+        lowestDSSid = "", lowestDSSnick = "",
+        lowestDSPid = "", lowestDSPnick = "",
+        lowestAPPDSPid = "", lowestAPPDSPnick = "",
+        lowestCheeseID = "", lowestCheeseNick = "",
+        lowestGBEid = "", lowestGBEnick = "",
+        lowestNyaAPPid = "", lowestNyaAPPnick = "",
+        lowestAreaID = "", lowestAreaNick = "",
+        lowestEstTRid = "", lowestEstTRnick = "",
+        lowestEstAccID = "", lowestEstAccNick = "",
+        lowestOpenerID = "", lowestOpenerNick = "",
+        lowestPlonkID = "", lowestPlonkNick = "",
+        lowestStrideID = "", lowestStrideNick = "",
+        lowestInfDSid = "", lowestInfDSnick = "",
         highestTRid = "", highestTRnick = "",
         highestGlickoID = "", highestGlickoNick = "",
+        highestRdID = "", highestRdNick = "",
         highestGamesPlayedID = "", highestGamesPlayedNick = "",
         highestGamesWonID = "", highestGamesWonNick = "",
         highestWinrateID = "", highestWinrateNick = "",
         highestAPMid = "", highestAPMnick = "",
         highestPPSid = "", highestPPSnick = "",
-        highestVSid = "", highestVSnick = "";
+        highestVSid = "", highestVSnick = "",
+        highestAPPid = "", highestAPPnick = "",
+        highestVSAPMid = "", highestVSAPMnick = "",
+        highestDSSid = "", highestDSSnick = "",
+        highestDSPid = "", highestDSPnick = "",
+        highestAPPDSPid = "", highestAPPDSPnick = "",
+        highestCheeseID = "", highestCheeseNick = "",
+        highestGBEid = "", highestGBEnick = "",
+        highestNyaAPPid = "", highestNyaAPPnick = "",
+        highestAreaID = "", highestAreaNick = "",
+        highestEstTRid = "", highestEstTRnick = "",
+        highestEstAccID = "", highestEstAccNick = "",
+        highestOpenerID = "", highestOpenerNick = "",
+        highestPlonkID = "", highestPlonkNick = "",
+        highestStrideID = "", highestStrideNick = "",
+        highestInfDSid = "", highestInfDSnick = "";
       for (var entry in filtredLeaderboard){
         avgAPM += entry.apm;
         avgPPS += entry.pps;
@@ -951,6 +1030,21 @@ class TetrioPlayersLeaderboard {
         avgTR += entry.rating;
         avgGlicko += entry.glicko;
         avgRD += entry.rd;
+        avgAPP += entry.nerdStats.app;
+        avgVSAPM += entry.nerdStats.vsapm;
+        avgDSS += entry.nerdStats.dss;
+        avgDSP += entry.nerdStats.dsp;
+        avgAPPDSP += entry.nerdStats.appdsp;
+        avgCheese += entry.nerdStats.cheese;
+        avgGBE += entry.nerdStats.gbe;
+        avgNyaAPP += entry.nerdStats.nyaapp;
+        avgArea += entry.nerdStats.area;
+        avgEstTR += entry.estTr.esttr;
+        avgEstAcc += entry.esttracc;
+        avgOpener += entry.playstyle.opener;
+        avgPlonk += entry.playstyle.plonk;
+        avgStride += entry.playstyle.stride;
+        avgInfDS += entry.playstyle.infds;
         totalGamesPlayed += entry.gamesPlayed;
         totalGamesWon += entry.gamesWon;
         if (entry.rating < lowestTR){
@@ -962,6 +1056,11 @@ class TetrioPlayersLeaderboard {
           lowestGlicko = entry.glicko;
           lowestGlickoID = entry.userId;
           lowestGlickoNick = entry.username;
+        }
+        if (entry.rd < lowestRD){
+          lowestRD = entry.rd;
+          lowestRdID = entry.userId;
+          lowestRdNick = entry.username;
         }
         if (entry.gamesPlayed < lowestGamesPlayed){
           lowestGamesPlayed = entry.gamesPlayed;
@@ -993,6 +1092,81 @@ class TetrioPlayersLeaderboard {
           lowestVSid = entry.userId;
           lowestVSnick = entry.username;
         }
+        if (entry.nerdStats.app < lowestAPP){
+          lowestAPP = entry.nerdStats.app;
+          lowestAPPid = entry.userId;
+          lowestAPPnick = entry.username;
+        }
+        if (entry.nerdStats.vsapm < lowestVSAPM){
+          lowestVSAPM = entry.nerdStats.vsapm;
+          lowestVSAPMid = entry.userId;
+          lowestVSAPMnick = entry.username;
+        }
+        if (entry.nerdStats.dss < lowestDSS){
+          lowestDSS = entry.nerdStats.dss;
+          lowestDSSid = entry.userId;
+          lowestDSSnick = entry.username;
+        }
+        if (entry.nerdStats.dsp < lowestDSP){
+          lowestDSP = entry.nerdStats.dsp;
+          lowestDSPid = entry.userId;
+          lowestDSPnick = entry.username;
+        }
+        if (entry.nerdStats.appdsp < lowestAPPDSP){
+          lowestAPPDSP = entry.nerdStats.appdsp;
+          lowestAPPDSPid = entry.userId;
+          lowestAPPDSPnick = entry.username;
+        }
+        if (entry.nerdStats.cheese < lowestCheese){
+          lowestCheese = entry.nerdStats.cheese;
+          lowestCheeseID = entry.userId;
+          lowestCheeseNick = entry.username;
+        }
+        if (entry.nerdStats.gbe < lowestGBE){
+          lowestGBE = entry.nerdStats.gbe;
+          lowestGBEid = entry.userId;
+          lowestGBEnick = entry.username;
+        }
+        if (entry.nerdStats.nyaapp < lowestNyaAPP){
+          lowestNyaAPP = entry.nerdStats.nyaapp;
+          lowestNyaAPPid = entry.userId;
+          lowestNyaAPPnick = entry.username;
+        }
+        if (entry.nerdStats.area < lowestArea){
+          lowestArea = entry.nerdStats.area;
+          lowestAreaID = entry.userId;
+          lowestAreaNick = entry.username;
+        }
+        if (entry.estTr.esttr < lowestEstTR){
+          lowestEstTR = entry.estTr.esttr;
+          lowestEstTRid = entry.userId;
+          lowestEstTRnick = entry.username;
+        }
+        if (entry.esttracc < lowestEstAcc){
+          lowestEstAcc = entry.esttracc;
+          lowestEstAccID = entry.userId;
+          lowestEstAccNick = entry.username;
+        }
+        if (entry.playstyle.opener < lowestOpener){
+          lowestOpener = entry.playstyle.opener;
+          lowestOpenerID = entry.userId;
+          lowestOpenerNick = entry.username;
+        }
+        if (entry.playstyle.plonk < lowestPlonk){
+          lowestPlonk = entry.playstyle.plonk;
+          lowestPlonkID = entry.userId;
+          lowestPlonkNick = entry.username;
+        }
+        if (entry.playstyle.stride < lowestStride){
+          lowestStride = entry.playstyle.stride;
+          lowestStrideID = entry.userId;
+          lowestStrideNick = entry.username;
+        }
+        if (entry.playstyle.infds < lowestInfDS){
+          lowestInfDS = entry.playstyle.infds;
+          lowestInfDSid = entry.userId;
+          lowestInfDSnick = entry.username;
+        }
         if (entry.rating > highestTR){
           highestTR = entry.rating;
           highestTRid = entry.userId;
@@ -1002,6 +1176,11 @@ class TetrioPlayersLeaderboard {
           highestGlicko = entry.glicko;
           highestGlickoID = entry.userId;
           highestGlickoNick = entry.username;
+        }
+        if (entry.rd > highestRD){
+          highestRD = entry.rd;
+          highestRdID = entry.userId;
+          highestRdNick = entry.username;
         }
         if (entry.gamesPlayed > highestGamesPlayed){
           highestGamesPlayed = entry.gamesPlayed;
@@ -1033,6 +1212,81 @@ class TetrioPlayersLeaderboard {
           highestVSid = entry.userId;
           highestVSnick = entry.username;
         }
+        if (entry.nerdStats.app > highestAPP){
+          highestAPP = entry.nerdStats.app;
+          highestAPPid = entry.userId;
+          highestAPPnick = entry.username;
+        }
+        if (entry.nerdStats.vsapm > highestVSAPM){
+          highestVSAPM = entry.nerdStats.vsapm;
+          highestVSAPMid = entry.userId;
+          highestVSAPMnick = entry.username;
+        }
+        if (entry.nerdStats.dss > highestDSS){
+          highestDSS = entry.nerdStats.dss;
+          highestDSSid = entry.userId;
+          highestDSSnick = entry.username;
+        }
+        if (entry.nerdStats.dsp > highestDSP){
+          highestDSP = entry.nerdStats.dsp;
+          highestDSPid = entry.userId;
+          highestDSPnick = entry.username;
+        }
+        if (entry.nerdStats.appdsp > highestAPPDSP){
+          highestAPPDSP = entry.nerdStats.appdsp;
+          highestAPPDSPid = entry.userId;
+          highestAPPDSPnick = entry.username;
+        }
+        if (entry.nerdStats.cheese > highestCheese){
+          highestCheese = entry.nerdStats.cheese;
+          highestCheeseID = entry.userId;
+          highestCheeseNick = entry.username;
+        }
+        if (entry.nerdStats.gbe > highestGBE){
+          highestGBE = entry.nerdStats.gbe;
+          highestGBEid = entry.userId;
+          highestGBEnick = entry.username;
+        }
+        if (entry.nerdStats.nyaapp > highestNyaAPP){
+          highestNyaAPP = entry.nerdStats.nyaapp;
+          highestNyaAPPid = entry.userId;
+          highestNyaAPPnick = entry.username;
+        }
+        if (entry.nerdStats.area > highestArea){
+          highestArea = entry.nerdStats.area;
+          highestAreaID = entry.userId;
+          highestAreaNick = entry.username;
+        }
+        if (entry.estTr.esttr > highestEstTR){
+          highestEstTR = entry.estTr.esttr;
+          highestEstTRid = entry.userId;
+          highestEstTRnick = entry.username;
+        }
+        if (entry.esttracc > highestEstAcc){
+          highestEstAcc = entry.esttracc;
+          highestEstAccID = entry.userId;
+          highestEstAccNick = entry.username;
+        }
+        if (entry.playstyle.opener > highestOpener){
+          highestOpener = entry.playstyle.opener;
+          highestOpenerID = entry.userId;
+          highestOpenerNick = entry.username;
+        }
+        if (entry.playstyle.plonk > highestPlonk){
+          highestPlonk = entry.playstyle.plonk;
+          highestPlonkID = entry.userId;
+          highestPlonkNick = entry.username;
+        }
+        if (entry.playstyle.stride > highestStride){
+          highestStride = entry.playstyle.stride;
+          highestStrideID = entry.userId;
+          highestStrideNick = entry.username;
+        }
+        if (entry.playstyle.infds > highestInfDS){
+          highestInfDS = entry.playstyle.infds;
+          highestInfDSid = entry.userId;
+          highestInfDSnick = entry.username;
+        }
       }
       avgAPM /= filtredLeaderboard.length;
       avgPPS /= filtredLeaderboard.length;
@@ -1040,6 +1294,21 @@ class TetrioPlayersLeaderboard {
       avgTR /= filtredLeaderboard.length;
       avgGlicko /= filtredLeaderboard.length;
       avgRD /= filtredLeaderboard.length;
+      avgAPP /= filtredLeaderboard.length;
+      avgVSAPM /= filtredLeaderboard.length;
+      avgDSS /= filtredLeaderboard.length;
+      avgDSP /= filtredLeaderboard.length;
+      avgAPPDSP /= leaderboard.length;
+      avgCheese /= filtredLeaderboard.length;
+      avgGBE /= filtredLeaderboard.length;
+      avgNyaAPP /= filtredLeaderboard.length;
+      avgArea /= filtredLeaderboard.length;
+      avgEstTR /= filtredLeaderboard.length;
+      avgEstAcc /= filtredLeaderboard.length;
+      avgOpener /= filtredLeaderboard.length;
+      avgPlonk /= filtredLeaderboard.length;
+      avgStride /= filtredLeaderboard.length;
+      avgInfDS /= filtredLeaderboard.length;
       avgGamesPlayed = (totalGamesPlayed / filtredLeaderboard.length).floor();
       avgGamesWon = (totalGamesWon / filtredLeaderboard.length).floor();
       return [TetraLeagueAlpha(timestamp: DateTime.now(), apm: avgAPM, pps: avgPPS, vs: avgVS, glicko: avgGlicko, rd: avgRD, gamesPlayed: avgGamesPlayed, gamesWon: avgGamesWon, bestRank: rank, decaying: false, rating: avgTR, rank: rank, percentileRank: rank, percentile: rankCutoffs[rank]!, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1),
@@ -1053,6 +1322,9 @@ class TetrioPlayersLeaderboard {
         "lowestGlicko": lowestGlicko,
         "lowestGlickoID": lowestGlickoID,
         "lowestGlickoNick": lowestGlickoNick,
+        "lowestRD": lowestRD,
+        "lowestRdID": lowestRdID,
+        "lowestRdNick": lowestRdNick,
         "lowestGamesPlayed": lowestGamesPlayed,
         "lowestGamesPlayedID": lowestGamesPlayedID,
         "lowestGamesPlayedNick": lowestGamesPlayedNick,
@@ -1071,12 +1343,60 @@ class TetrioPlayersLeaderboard {
         "lowestVS": lowestVS,
         "lowestVSid": lowestVSid,
         "lowestVSnick": lowestVSnick,
+        "lowestAPP": lowestAPP,
+        "lowestAPPid": lowestAPPid,
+        "lowestAPPnick": lowestAPPnick,
+        "lowestVSAPM": lowestVSAPM,
+        "lowestVSAPMid": lowestVSAPMid,
+        "lowestVSAPMnick": lowestVSAPMnick,
+        "lowestDSS": lowestDSS,
+        "lowestDSSid": lowestDSSid,
+        "lowestDSSnick": lowestDSSnick,
+        "lowestDSP": lowestDSP,
+        "lowestDSPid": lowestDSPid,
+        "lowestDSPnick": lowestDSPnick,
+        "lowestAPPDSP": lowestAPPDSP,
+        "lowestAPPDSPid": lowestAPPDSPid,
+        "lowestAPPDSPnick": lowestAPPDSPnick,
+        "lowestCheese": lowestCheese,
+        "lowestCheeseID": lowestCheeseID,
+        "lowestCheeseNick": lowestCheeseNick,
+        "lowestGBE": lowestGBE,
+        "lowestGBEid": lowestGBEid,
+        "lowestGBEnick": lowestGBEnick,
+        "lowestNyaAPP": lowestNyaAPP,
+        "lowestNyaAPPid": lowestNyaAPPid,
+        "lowestNyaAPPnick": lowestNyaAPPnick,
+        "lowestArea": lowestArea,
+        "lowestAreaID": lowestAreaID,
+        "lowestAreaNick": lowestAreaNick,
+        "lowestEstTR": lowestEstTR,
+        "lowestEstTRid": lowestEstTRid,
+        "lowestEstTRnick": lowestEstTRnick,
+        "lowestEstAcc": lowestEstAcc,
+        "lowestEstAccID": lowestEstAccID,
+        "lowestEstAccNick": lowestEstAccNick,
+        "lowestOpener": lowestOpener,
+        "lowestOpenerID": lowestOpenerID,
+        "lowestOpenerNick": lowestOpenerNick,
+        "lowestPlonk": lowestPlonk,
+        "lowestPlonkID": lowestPlonkID,
+        "lowestPlonkNick": lowestPlonkNick,
+        "lowestStride": lowestStride,
+        "lowestStrideID": lowestStrideID,
+        "lowestStrideNick": lowestStrideNick,
+        "lowestInfDS": lowestInfDS,
+        "lowestInfDSid": lowestInfDSid,
+        "lowestInfDSnick": lowestInfDSnick,
         "highestTR": highestTR,
         "highestTRid": highestTRid,
         "highestTRnick": highestTRnick,
         "highestGlicko": highestGlicko,
         "highestGlickoID": highestGlickoID,
         "highestGlickoNick": highestGlickoNick,
+        "highestRD": highestRD,
+        "highestRdID": highestRdID,
+        "highestRdNick": highestRdNick,
         "highestGamesPlayed": highestGamesPlayed,
         "highestGamesPlayedID": highestGamesPlayedID,
         "highestGamesPlayedNick": highestGamesPlayedNick,
@@ -1095,6 +1415,66 @@ class TetrioPlayersLeaderboard {
         "highestVS": highestVS,
         "highestVSid": highestVSid,
         "highestVSnick": highestVSnick,
+        "highestAPP": highestAPP,
+        "highestAPPid": highestAPPid,
+        "highestAPPnick": highestAPPnick,
+        "highestVSAPM": highestVSAPM,
+        "highestVSAPMid": highestVSAPMid,
+        "highestVSAPMnick": highestVSAPMnick,
+        "highestDSS": highestDSS,
+        "highestDSSid": highestDSSid,
+        "highestDSSnick": highestDSSnick,
+        "highestDSP": highestDSP,
+        "highestDSPid": highestDSPid,
+        "highestDSPnick": highestDSPnick,
+        "highestAPPDSP": highestAPPDSP,
+        "highestAPPDSPid": highestAPPDSPid,
+        "highestAPPDSPnick": highestAPPDSPnick,
+        "highestCheese": highestCheese,
+        "highestCheeseID": highestCheeseID,
+        "highestCheeseNick": highestCheeseNick,
+        "highestGBE": highestGBE,
+        "highestGBEid": highestGBEid,
+        "highestGBEnick": highestGBEnick,
+        "highestNyaAPP": highestNyaAPP,
+        "highestNyaAPPid": highestNyaAPPid,
+        "highestNyaAPPnick": highestNyaAPPnick,
+        "highestArea": highestArea,
+        "highestAreaID": highestAreaID,
+        "highestAreaNick": highestAreaNick,
+        "highestEstTR": highestEstTR,
+        "highestEstTRid": highestEstTRid,
+        "highestEstTRnick": highestEstTRnick,
+        "highestEstAcc": highestEstAcc,
+        "highestEstAccID": highestEstAccID,
+        "highestEstAccNick": highestEstAccNick,
+        "highestOpener": highestOpener,
+        "highestOpenerID": highestOpenerID,
+        "highestOpenerNick": highestOpenerNick,
+        "highestPlonk": highestPlonk,
+        "highestPlonkID": highestPlonkID,
+        "highestPlonkNick": highestPlonkNick,
+        "highestStride": highestStride,
+        "highestStrideID": highestStrideID,
+        "highestStrideNick": highestStrideNick,
+        "highestInfDS": highestInfDS,
+        "highestInfDSid": highestInfDSid,
+        "highestInfDSnick": highestInfDSnick,
+        "avgAPP": avgAPP,
+        "avgVSAPM": avgVSAPM,
+        "avgDSS": avgDSS,
+        "avgDSP": avgDSP,
+        "avgAPPDSP": avgAPPDSP,
+        "avgCheese": avgCheese,
+        "avgGBE": avgGBE,
+        "avgNyaAPP": avgNyaAPP,
+        "avgArea": avgArea,
+        "avgEstTR": avgEstTR,
+        "avgEstAcc": avgEstAcc,
+        "avgOpener": avgOpener,
+        "avgPlonk": avgPlonk,
+        "avgStride": avgStride,
+        "avgInfDS": avgInfDS,
         "toEnterTR": rank.toLowerCase() != "z" ? leaderboard[(leaderboard.length * rankCutoffs[rank]!).floor()-1].rating : lowestTR,
         "entries": filtredLeaderboard
       }];
@@ -1155,6 +1535,9 @@ class TetrioPlayerFromLeaderboard {
   late double pps;
   late double vs;
   late bool decaying;
+  late NerdStats nerdStats;
+  late EstTr estTr;
+  late Playstyle playstyle;
 
   TetrioPlayerFromLeaderboard(
     this.userId,
@@ -1178,8 +1561,7 @@ class TetrioPlayerFromLeaderboard {
     this.decaying);
 
   double get winrate => gamesWon / gamesPlayed;
-  get app => apm / (pps * 60);
-  get vsapm => vs / apm;
+  double get esttracc => estTr.esttr - rating;
 
   TetrioPlayerFromLeaderboard.fromJson(Map<String, dynamic> json, DateTime ts) {
     userId = json['_id'];
@@ -1201,5 +1583,8 @@ class TetrioPlayerFromLeaderboard {
     pps = json['league']['pps'].toDouble();
     vs = json['league']['vs'].toDouble();
     decaying = json['league']['decaying'];
+    nerdStats =  NerdStats(apm, pps, vs);
+    estTr = EstTr(apm, pps, vs, rd, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
+    playstyle = Playstyle(apm, pps, nerdStats.app, nerdStats.vsapm, nerdStats.dsp, nerdStats.gbe, estTr.srarea, estTr.statrank);
   }
 }
