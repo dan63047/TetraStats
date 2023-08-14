@@ -1313,6 +1313,7 @@ class TetrioPlayersLeaderboard {
       avgGamesWon = (totalGamesWon / filtredLeaderboard.length).floor();
       return [TetraLeagueAlpha(timestamp: DateTime.now(), apm: avgAPM, pps: avgPPS, vs: avgVS, glicko: avgGlicko, rd: avgRD, gamesPlayed: avgGamesPlayed, gamesWon: avgGamesWon, bestRank: rank, decaying: false, rating: avgTR, rank: rank, percentileRank: rank, percentile: rankCutoffs[rank]!, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1),
       {
+        "everyone": rank == "",
         "totalGamesPlayed": totalGamesPlayed,
         "totalGamesWon": totalGamesWon,
         "players": filtredLeaderboard.length,

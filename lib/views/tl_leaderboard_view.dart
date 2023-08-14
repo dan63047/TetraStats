@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:tetra_stats/views/main_view.dart';
+import 'package:tetra_stats/views/rank_averages_view.dart';
 import 'package:tetra_stats/views/ranks_averages_view.dart';
 
 final TetrioService teto = TetrioService();
@@ -67,10 +68,23 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
                             SliverToBoxAdapter(
                                 child: Padding(
                               padding: const EdgeInsets.only(left: 16),
-                              child: Text(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                Text(
                                 howManyPlayers(allPlayers.length),
                                 style: const TextStyle(color: Colors.white, fontSize: 25),
                               ),
+                              TextButton(onPressed: (){
+                                Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RankView(rank: snapshot.data!.getAverageOfRank("")),
+                        ),
+                      );
+                              }, child: Text("Values for everyone",
+                                style: const TextStyle(fontSize: 25)))
+                              ],) 
                             )),
                             const SliverToBoxAdapter(child: Divider())
                           ];

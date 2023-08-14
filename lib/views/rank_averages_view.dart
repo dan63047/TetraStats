@@ -1,9 +1,13 @@
+import 'dart:math';
+
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 //import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/views/main_view.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
+import 'package:tetra_stats/widgets/tl_thingy.dart';
 //import 'package:tetra_stats/widgets/tl_thingy.dart';
 
 final DateFormat dateFormat =
@@ -65,14 +69,10 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                             Stack(
                               alignment: Alignment.topCenter,
                               children: [
-                                Container(
-                                  padding:
-                                      EdgeInsets.fromLTRB(0, pfpHeight, 0, 0),
-                                  child: Image.asset(
+                                Image.asset(
                                       "res/tetrio_tl_alpha_ranks/${widget.rank[0].rank}.png",
                                       fit: BoxFit.fitHeight,
                                       height: 128),
-                                ),
                               ],
                             ),
                             Flexible(
@@ -92,35 +92,35 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                             )),
                           ],
                         ),
-                        Wrap(
-                          direction: Axis.horizontal,
-                          alignment: WrapAlignment.center,
-                          spacing: 25,
-                          crossAxisAlignment: WrapCrossAlignment.start,
-                          clipBehavior: Clip.hardEdge, // hard WHAT???
-                          children: [
-                            StatCellNum(
-                              playerStat: widget.rank[1]["totalGamesPlayed"],
-                              playerStatLabel: "Total games\nplayed",
-                              isScreenBig: bigScreen,
-                              higherIsBetter: true,
-                            ),
-                            StatCellNum(
-                              playerStat: widget.rank[1]["totalGamesWon"],
-                              playerStatLabel: "Total games\nwon",
-                              isScreenBig: bigScreen,
-                              higherIsBetter: true,
-                            ),
-                            StatCellNum(
-                                playerStat: (widget.rank[1]["totalGamesWon"] /
-                                        widget.rank[1]["totalGamesPlayed"]) *
-                                    100,
-                                playerStatLabel: t.statCellNum.winrate,
-                                fractionDigits: 3,
-                                isScreenBig: bigScreen,
-                                higherIsBetter: true)
-                          ],
-                        ),
+                        // Wrap(
+                        //   direction: Axis.horizontal,
+                        //   alignment: WrapAlignment.center,
+                        //   spacing: 25,
+                        //   crossAxisAlignment: WrapCrossAlignment.start,
+                        //   clipBehavior: Clip.hardEdge, // hard WHAT???
+                        //   children: [
+                        //     StatCellNum(
+                        //       playerStat: widget.rank[1]["totalGamesPlayed"],
+                        //       playerStatLabel: "Total games\nplayed",
+                        //       isScreenBig: bigScreen,
+                        //       higherIsBetter: true,
+                        //     ),
+                        //     StatCellNum(
+                        //       playerStat: widget.rank[1]["totalGamesWon"],
+                        //       playerStatLabel: "Total games\nwon",
+                        //       isScreenBig: bigScreen,
+                        //       higherIsBetter: true,
+                        //     ),
+                        //     StatCellNum(
+                        //         playerStat: (widget.rank[1]["totalGamesWon"] /
+                        //                 widget.rank[1]["totalGamesPlayed"]) *
+                        //             100,
+                        //         playerStatLabel: t.statCellNum.winrate,
+                        //         fractionDigits: 3,
+                        //         isScreenBig: bigScreen,
+                        //         higherIsBetter: true)
+                        //   ],
+                        // ),
                       ],
                     )),
                     SliverToBoxAdapter(
@@ -142,11 +142,57 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                   controller: _tabController,
                   children: [
                     Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text("Chart",
-                            style: TextStyle(
-                                fontFamily: "Eurostile Round Extended",
-                                fontSize: bigScreen ? 42 : 28)),
+                        LayoutBuilder(builder: (context, constraints) {
+                          return true ?
+      Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [Column(
+            children: [
+              Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text("X axis:", style: const TextStyle(fontSize: 22))),
+                  DropdownButton(
+                        items: chartsData,
+                        value: chartsData[chartsIndex].value,
+                        onChanged: (value) {
+                          chartsIndex = chartsData.indexWhere((element) => element.value == value);
+                          _justUpdate();
+                        }
+                      ),
+                ],
+              ),
+            ],
+          ),Column(
+            children: [
+              Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text("Y axis:", style: const TextStyle(fontSize: 22)),
+                  ),
+                  DropdownButton(
+                        items: chartsData,
+                        value: chartsData[chartsIndex].value,
+                        onChanged: (value) {
+                          chartsIndex = chartsData.indexWhere((element) => element.value == value);
+                          _justUpdate();
+                        }
+                      ),
+                ],
+              ),
+            ],
+          ),],),
+          if(chartsData[chartsIndex].value!.length > 1) _ChartThigy(data: chartsData[chartsIndex].value!, title: "ss", yAxisTitle: chartsShortTitles[chartsIndex], bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? f2 : NumberFormat.compact(),)
+          else Center(child: Text(t.notEnoughData, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))
+        ],
+      ) : Center(child: Text(t.noHistorySaved, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)));
+                        })
                       ],
                     ),
                     Column(
@@ -273,7 +319,8 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                   fractionDigits: 2),
                               _ListEntry(
                                   value: widget.rank[1]["lowestAPP"],
-                                  label: t.statCellNum.app.replaceAll(RegExp(r'\n'), " "),
+                                  label: t.statCellNum.app
+                                      .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["lowestAPPid"],
                                   username: widget.rank[1]["lowestAPPnick"],
                                   approximate: false,
@@ -285,91 +332,100 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                   username: widget.rank[1]["lowestVSAPMnick"],
                                   approximate: false,
                                   fractionDigits: 3),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["lowestDSS"],
-                                  label: t.statCellNum.dss.replaceAll(RegExp(r'\n'), " "),
+                                  label: t.statCellNum.dss
+                                      .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["lowestDSSid"],
                                   username: widget.rank[1]["lowestDSSnick"],
                                   approximate: false,
                                   fractionDigits: 3),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["lowestDSP"],
-                                  label: t.statCellNum.dsp.replaceAll(RegExp(r'\n'), " "),
+                                  label: t.statCellNum.dsp
+                                      .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["lowestDSPid"],
                                   username: widget.rank[1]["lowestDSPnick"],
                                   approximate: false,
                                   fractionDigits: 3),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["lowestAPPDSP"],
-                                  label: t.statCellNum.dsp.replaceAll(RegExp(r'\n'), " "),
+                                  label: t.statCellNum.dsp
+                                      .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["lowestAPPDSPid"],
                                   username: widget.rank[1]["lowestAPPDSPnick"],
                                   approximate: false,
                                   fractionDigits: 3),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["lowestCheese"],
-                                  label: t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "),
+                                  label: t.statCellNum.cheese
+                                      .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["lowestCheeseID"],
                                   username: widget.rank[1]["lowestCheeseNick"],
                                   approximate: false,
                                   fractionDigits: 2),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["lowestGBE"],
-                                  label: t.statCellNum.gbe.replaceAll(RegExp(r'\n'), " "),
+                                  label: t.statCellNum.gbe
+                                      .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["lowestGBEid"],
                                   username: widget.rank[1]["lowestGBEnick"],
                                   approximate: false,
                                   fractionDigits: 3),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["lowestNyaAPP"],
-                                  label: t.statCellNum.nyaapp.replaceAll(RegExp(r'\n'), " "),
+                                  label: t.statCellNum.nyaapp
+                                      .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["lowestNyaAPPid"],
                                   username: widget.rank[1]["lowestNyaAPPnick"],
                                   approximate: false,
                                   fractionDigits: 3),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["lowestArea"],
-                                  label: t.statCellNum.area.replaceAll(RegExp(r'\n'), " "),
+                                  label: t.statCellNum.area
+                                      .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["lowestAreaID"],
                                   username: widget.rank[1]["lowestAreaNick"],
                                   approximate: false,
                                   fractionDigits: 1),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["lowestEstTR"],
-                                  label: t.statCellNum.estOfTR.replaceAll(RegExp(r'\n'), " "),
+                                  label: t.statCellNum.estOfTR
+                                      .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["lowestEstTRid"],
                                   username: widget.rank[1]["lowestEstTRnick"],
                                   approximate: false,
                                   fractionDigits: 2),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["lowestEstAcc"],
-                                  label: t.statCellNum.accOfEst.replaceAll(RegExp(r'\n'), " "),
+                                  label: t.statCellNum.accOfEst
+                                      .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["lowestEstAccID"],
                                   username: widget.rank[1]["lowestEstAccNick"],
                                   approximate: false,
                                   fractionDigits: 3),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["lowestOpener"],
                                   label: "Opener",
                                   id: widget.rank[1]["lowestOpenerID"],
                                   username: widget.rank[1]["lowestOpenerNick"],
                                   approximate: false,
                                   fractionDigits: 3),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["lowestPlonk"],
                                   label: "Plonk",
                                   id: widget.rank[1]["lowestPlonkID"],
                                   username: widget.rank[1]["lowestPlonkNick"],
                                   approximate: false,
                                   fractionDigits: 3),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["lowestStride"],
                                   label: "Stride",
                                   id: widget.rank[1]["lowestStrideID"],
                                   username: widget.rank[1]["lowestStrideNick"],
                                   approximate: false,
                                   fractionDigits: 3),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["lowestInfDS"],
                                   label: "InfDS",
                                   id: widget.rank[1]["lowestInfDSid"],
@@ -388,180 +444,186 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                 fontFamily: "Eurostile Round Extended",
                                 fontSize: bigScreen ? 42 : 28)),
                         Expanded(
-                          child: ListView(
-                            children: [
-                              _ListEntry(
-                                  value: widget.rank[0].rating,
-                                  label: "Tetra Rating",
-                                  id: "",
-                                  username: "",
-                                  approximate: true,
-                                  fractionDigits: 2),
-                              _ListEntry(
-                                  value: widget.rank[0].glicko,
-                                  label: "Glicko",
-                                  id: "",
-                                  username: "",
-                                  approximate: true,
-                                  fractionDigits: 2),
-                              _ListEntry(
-                                  value: widget.rank[0].rd,
-                                  label: "Rating Deviation",
-                                  id: "",
-                                  username: "",
-                                  approximate: true,
-                                  fractionDigits: 3),
-                              _ListEntry(
-                                  value: widget.rank[0].gamesPlayed,
-                                  label: "Games Played",
-                                  id: "",
-                                  username: "",
-                                  approximate: true,
-                                  fractionDigits: 0),
-                              _ListEntry(
-                                  value: widget.rank[0].gamesWon,
-                                  label: "Games Won",
-                                  id: "",
-                                  username: "",
-                                  approximate: true,
-                                  fractionDigits: 0),
-                              _ListEntry(
-                                  value: widget.rank[0].winrate*100,
-                                  label: "Winrate",
-                                  id: "",
-                                  username: "",
-                                  approximate: true,
-                                  fractionDigits: 2),
-                              _ListEntry(
-                                  value: widget.rank[0].apm,
-                                  label: "Attack per Minute",
-                                  id: "",
-                                  username: "",
-                                  approximate: true,
-                                  fractionDigits: 2),
-                              _ListEntry(
-                                  value: widget.rank[0].pps,
-                                  label: "Pieces per Second",
-                                  id: "",
-                                  username: "",
-                                  approximate: true,
-                                  fractionDigits: 2),
-                              _ListEntry(
-                                  value: widget.rank[0].vs,
-                                  label: "Versus Score",
-                                  id: "",
-                                  username: "",
-                                  approximate: true,
-                                  fractionDigits: 2),
-                              _ListEntry(
-                                  value: widget.rank[1]["avgAPP"],
-                                  label: "Attack Per Piece",
-                                  id: "",
-                                  username: "",
-                                  approximate: true,
-                                  fractionDigits: 3),
-                              _ListEntry(
-                                  value: widget.rank[1]["avgAPP"],
-                                  label: "VS / APM",
-                                  id: "",
-                                  username: "",
-                                  approximate: true,
-                                  fractionDigits: 3),
-                              _ListEntry(
-                                  value: widget.rank[1]["avgDSS"],
-                                  label: t.statCellNum.dss.replaceAll(RegExp(r'\n'), " "),
-                                  id: "",
-                                  username: "",
-                                  approximate: true,
-                                  fractionDigits: 3),
-                            _ListEntry(
-                                  value: widget.rank[1]["avgDSP"],
-                                  label: t.statCellNum.dsp.replaceAll(RegExp(r'\n'), " "),
-                                  id: "",
-                                  username: "",
-                                  approximate: true,
-                                  fractionDigits: 3),
-                            _ListEntry(
-                                  value: widget.rank[1]["avgAPPDSP"],
-                                  label: t.statCellNum.dsp.replaceAll(RegExp(r'\n'), " "),
-                                  id: "",
-                                  username: "",
-                                  approximate: true,
-                                  fractionDigits: 3),
-                            _ListEntry(
-                                  value: widget.rank[1]["avgCheese"],
-                                  label: t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "),
-                                  id: "",
-                                  username: "",
-                                  approximate: true,
-                                  fractionDigits: 2),
-                            _ListEntry(
-                                  value: widget.rank[1]["avgGBE"],
-                                  label: t.statCellNum.gbe.replaceAll(RegExp(r'\n'), " "),
-                                  id: "",
-                                  username: "",
-                                  approximate: true,
-                                  fractionDigits: 3),
-                            _ListEntry(
-                                  value: widget.rank[1]["avgNyaAPP"],
-                                  label: t.statCellNum.nyaapp.replaceAll(RegExp(r'\n'), " "),
-                                  id: "",
-                                  username: "",
-                                  approximate: true,
-                                  fractionDigits: 3),
-                            _ListEntry(
-                                  value: widget.rank[1]["avgArea"],
-                                  label: t.statCellNum.area.replaceAll(RegExp(r'\n'), " "),
-                                  id: "",
-                                  username: "",
-                                  approximate: true,
-                                  fractionDigits: 1),
-                            _ListEntry(
-                                  value: widget.rank[1]["avgEstTR"],
-                                  label: t.statCellNum.estOfTR.replaceAll(RegExp(r'\n'), " "),
-                                  id: "",
-                                  username: "",
-                                  approximate: true,
-                                  fractionDigits: 2),
-                            _ListEntry(
-                                  value: widget.rank[1]["avgEstAcc"],
-                                  label: t.statCellNum.accOfEst.replaceAll(RegExp(r'\n'), " "),
-                                  id: "",
-                                  username: "",
-                                  approximate: true,
-                                  fractionDigits: 3),
-                            _ListEntry(
-                                  value: widget.rank[1]["avgOpener"],
-                                  label: "Opener",
-                                  id: "",
-                                  username: "",
-                                  approximate: true,
-                                  fractionDigits: 3),
-                            _ListEntry(
-                                  value: widget.rank[1]["avgPlonk"],
-                                  label: "Plonk",
-                                  id: "",
-                                  username: "",
-                                  approximate: true,
-                                  fractionDigits: 3),
-                            _ListEntry(
-                                  value: widget.rank[1]["avgStride"],
-                                  label: "Stride",
-                                  id: "",
-                                  username: "",
-                                  approximate: true,
-                                  fractionDigits: 3),
-                            _ListEntry(
-                                  value: widget.rank[1]["avgInfDS"],
-                                  label: "InfDS",
-                                  id: "",
-                                  username: "",
-                                  approximate: true,
-                                  fractionDigits: 3),
-                            ]
-                            )
-                          )
-                        ],
+                            child: ListView(children: [
+                          _ListEntry(
+                              value: widget.rank[0].rating,
+                              label: "Tetra Rating",
+                              id: "",
+                              username: "",
+                              approximate: true,
+                              fractionDigits: 2),
+                          _ListEntry(
+                              value: widget.rank[0].glicko,
+                              label: "Glicko",
+                              id: "",
+                              username: "",
+                              approximate: true,
+                              fractionDigits: 2),
+                          _ListEntry(
+                              value: widget.rank[0].rd,
+                              label: "Rating Deviation",
+                              id: "",
+                              username: "",
+                              approximate: true,
+                              fractionDigits: 3),
+                          _ListEntry(
+                              value: widget.rank[0].gamesPlayed,
+                              label: "Games Played",
+                              id: "",
+                              username: "",
+                              approximate: true,
+                              fractionDigits: 0),
+                          _ListEntry(
+                              value: widget.rank[0].gamesWon,
+                              label: "Games Won",
+                              id: "",
+                              username: "",
+                              approximate: true,
+                              fractionDigits: 0),
+                          _ListEntry(
+                              value: widget.rank[0].winrate * 100,
+                              label: "Winrate",
+                              id: "",
+                              username: "",
+                              approximate: true,
+                              fractionDigits: 2),
+                          _ListEntry(
+                              value: widget.rank[0].apm,
+                              label: "Attack per Minute",
+                              id: "",
+                              username: "",
+                              approximate: true,
+                              fractionDigits: 2),
+                          _ListEntry(
+                              value: widget.rank[0].pps,
+                              label: "Pieces per Second",
+                              id: "",
+                              username: "",
+                              approximate: true,
+                              fractionDigits: 2),
+                          _ListEntry(
+                              value: widget.rank[0].vs,
+                              label: "Versus Score",
+                              id: "",
+                              username: "",
+                              approximate: true,
+                              fractionDigits: 2),
+                          _ListEntry(
+                              value: widget.rank[1]["avgAPP"],
+                              label: "Attack Per Piece",
+                              id: "",
+                              username: "",
+                              approximate: true,
+                              fractionDigits: 3),
+                          _ListEntry(
+                              value: widget.rank[1]["avgAPP"],
+                              label: "VS / APM",
+                              id: "",
+                              username: "",
+                              approximate: true,
+                              fractionDigits: 3),
+                          _ListEntry(
+                              value: widget.rank[1]["avgDSS"],
+                              label: t.statCellNum.dss
+                                  .replaceAll(RegExp(r'\n'), " "),
+                              id: "",
+                              username: "",
+                              approximate: true,
+                              fractionDigits: 3),
+                          _ListEntry(
+                              value: widget.rank[1]["avgDSP"],
+                              label: t.statCellNum.dsp
+                                  .replaceAll(RegExp(r'\n'), " "),
+                              id: "",
+                              username: "",
+                              approximate: true,
+                              fractionDigits: 3),
+                          _ListEntry(
+                              value: widget.rank[1]["avgAPPDSP"],
+                              label: t.statCellNum.dsp
+                                  .replaceAll(RegExp(r'\n'), " "),
+                              id: "",
+                              username: "",
+                              approximate: true,
+                              fractionDigits: 3),
+                          _ListEntry(
+                              value: widget.rank[1]["avgCheese"],
+                              label: t.statCellNum.cheese
+                                  .replaceAll(RegExp(r'\n'), " "),
+                              id: "",
+                              username: "",
+                              approximate: true,
+                              fractionDigits: 2),
+                          _ListEntry(
+                              value: widget.rank[1]["avgGBE"],
+                              label: t.statCellNum.gbe
+                                  .replaceAll(RegExp(r'\n'), " "),
+                              id: "",
+                              username: "",
+                              approximate: true,
+                              fractionDigits: 3),
+                          _ListEntry(
+                              value: widget.rank[1]["avgNyaAPP"],
+                              label: t.statCellNum.nyaapp
+                                  .replaceAll(RegExp(r'\n'), " "),
+                              id: "",
+                              username: "",
+                              approximate: true,
+                              fractionDigits: 3),
+                          _ListEntry(
+                              value: widget.rank[1]["avgArea"],
+                              label: t.statCellNum.area
+                                  .replaceAll(RegExp(r'\n'), " "),
+                              id: "",
+                              username: "",
+                              approximate: true,
+                              fractionDigits: 1),
+                          _ListEntry(
+                              value: widget.rank[1]["avgEstTR"],
+                              label: t.statCellNum.estOfTR
+                                  .replaceAll(RegExp(r'\n'), " "),
+                              id: "",
+                              username: "",
+                              approximate: true,
+                              fractionDigits: 2),
+                          _ListEntry(
+                              value: widget.rank[1]["avgEstAcc"],
+                              label: t.statCellNum.accOfEst
+                                  .replaceAll(RegExp(r'\n'), " "),
+                              id: "",
+                              username: "",
+                              approximate: true,
+                              fractionDigits: 3),
+                          _ListEntry(
+                              value: widget.rank[1]["avgOpener"],
+                              label: "Opener",
+                              id: "",
+                              username: "",
+                              approximate: true,
+                              fractionDigits: 3),
+                          _ListEntry(
+                              value: widget.rank[1]["avgPlonk"],
+                              label: "Plonk",
+                              id: "",
+                              username: "",
+                              approximate: true,
+                              fractionDigits: 3),
+                          _ListEntry(
+                              value: widget.rank[1]["avgStride"],
+                              label: "Stride",
+                              id: "",
+                              username: "",
+                              approximate: true,
+                              fractionDigits: 3),
+                          _ListEntry(
+                              value: widget.rank[1]["avgInfDS"],
+                              label: "InfDS",
+                              id: "",
+                              username: "",
+                              approximate: true,
+                              fractionDigits: 3),
+                        ]))
+                      ],
                     ),
                     Column(
                       children: [
@@ -636,9 +698,10 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                   username: widget.rank[1]["highestVSnick"],
                                   approximate: false,
                                   fractionDigits: 2),
-                                  _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["highestAPP"],
-                                  label: t.statCellNum.app.replaceAll(RegExp(r'\n'), " "),
+                                  label: t.statCellNum.app
+                                      .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["highestAPPid"],
                                   username: widget.rank[1]["highestAPPnick"],
                                   approximate: false,
@@ -650,91 +713,100 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                   username: widget.rank[1]["highestVSAPMnick"],
                                   approximate: false,
                                   fractionDigits: 3),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["highestDSS"],
-                                  label: t.statCellNum.dss.replaceAll(RegExp(r'\n'), " "),
+                                  label: t.statCellNum.dss
+                                      .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["highestDSSid"],
                                   username: widget.rank[1]["highestDSSnick"],
                                   approximate: false,
                                   fractionDigits: 3),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["highestDSP"],
-                                  label: t.statCellNum.dsp.replaceAll(RegExp(r'\n'), " "),
+                                  label: t.statCellNum.dsp
+                                      .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["highestDSPid"],
                                   username: widget.rank[1]["highestDSPnick"],
                                   approximate: false,
                                   fractionDigits: 3),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["highestAPPDSP"],
-                                  label: t.statCellNum.dsp.replaceAll(RegExp(r'\n'), " "),
+                                  label: t.statCellNum.dsp
+                                      .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["highestAPPDSPid"],
                                   username: widget.rank[1]["highestAPPDSPnick"],
                                   approximate: false,
                                   fractionDigits: 3),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["highestCheese"],
-                                  label: t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "),
+                                  label: t.statCellNum.cheese
+                                      .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["highestCheeseID"],
                                   username: widget.rank[1]["highestCheeseNick"],
                                   approximate: false,
                                   fractionDigits: 2),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["highestGBE"],
-                                  label: t.statCellNum.gbe.replaceAll(RegExp(r'\n'), " "),
+                                  label: t.statCellNum.gbe
+                                      .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["highestGBEid"],
                                   username: widget.rank[1]["highestGBEnick"],
                                   approximate: false,
                                   fractionDigits: 3),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["highestNyaAPP"],
-                                  label: t.statCellNum.nyaapp.replaceAll(RegExp(r'\n'), " "),
+                                  label: t.statCellNum.nyaapp
+                                      .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["highestNyaAPPid"],
                                   username: widget.rank[1]["highestNyaAPPnick"],
                                   approximate: false,
                                   fractionDigits: 3),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["highestArea"],
-                                  label: t.statCellNum.area.replaceAll(RegExp(r'\n'), " "),
+                                  label: t.statCellNum.area
+                                      .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["highestAreaID"],
                                   username: widget.rank[1]["highestAreaNick"],
                                   approximate: false,
                                   fractionDigits: 1),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["highestEstTR"],
-                                  label: t.statCellNum.estOfTR.replaceAll(RegExp(r'\n'), " "),
+                                  label: t.statCellNum.estOfTR
+                                      .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["highestEstTRid"],
                                   username: widget.rank[1]["highestEstTRnick"],
                                   approximate: false,
                                   fractionDigits: 2),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["highestEstAcc"],
-                                  label: t.statCellNum.accOfEst.replaceAll(RegExp(r'\n'), " "),
+                                  label: t.statCellNum.accOfEst
+                                      .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["highestEstAccID"],
                                   username: widget.rank[1]["highestEstAccNick"],
                                   approximate: false,
                                   fractionDigits: 3),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["highestOpener"],
                                   label: "Opener",
                                   id: widget.rank[1]["highestOpenerID"],
                                   username: widget.rank[1]["highestOpenerNick"],
                                   approximate: false,
                                   fractionDigits: 3),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["highestPlonk"],
                                   label: "Plonk",
                                   id: widget.rank[1]["highestPlonkID"],
                                   username: widget.rank[1]["highestPlonkNick"],
                                   approximate: false,
                                   fractionDigits: 3),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["highestStride"],
                                   label: "Stride",
                                   id: widget.rank[1]["highestStrideID"],
                                   username: widget.rank[1]["highestStrideNick"],
                                   approximate: false,
                                   fractionDigits: 3),
-                            _ListEntry(
+                              _ListEntry(
                                   value: widget.rank[1]["highestInfDS"],
                                   label: "InfDS",
                                   id: widget.rank[1]["highestInfDSid"],
@@ -747,7 +819,47 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                       ],
                     ),
                     Column(
-                      children: [],
+                      children: [
+                         Expanded(
+                          child: ListView(
+                            children: [
+                              _ListEntry(
+                                  value: widget.rank[1]["totalGamesPlayed"],
+                                  label: "Total Games Played",
+                                  id: "",
+                                  username: "",
+                                  approximate: true,
+                                  fractionDigits: 0),
+                              _ListEntry(
+                                  value: widget.rank[1]["totalGamesWon"],
+                                  label: "Total Games Won",
+                                  id: "",
+                                  username: "",
+                                  approximate: true,
+                                  fractionDigits: 0),
+                              _ListEntry(
+                                  value: (widget.rank[1]["totalGamesWon"] /
+                                         widget.rank[1]["totalGamesPlayed"]) *
+                                    100,
+                                  label: "Winrate",
+                                  id: "",
+                                  username: "",
+                                  approximate: true,
+                                  fractionDigits: 3),
+                              Center(
+                                child: Text("Typical TL profile",
+                                style: TextStyle(
+                                  fontFamily: "Eurostile Round Extended",
+                                  fontSize: bigScreen ? 42 : 28)),
+                              ),
+                              SizedBox(
+                                height: 800,
+                                child: TLThingy(tl: widget.rank[0], userID: ""),
+                              )
+                            ]
+                            )
+                          )
+                      ],
                     ),
                   ],
                 ))));
@@ -797,5 +909,97 @@ class _ListEntry extends StatelessWidget {
             }
           : null,
     );
+  }
+}
+
+class _ChartThigy extends StatelessWidget {
+  final List<FlSpot> data;
+  final String title;
+  final String yAxisTitle;
+  final bool bigScreen;
+  final double leftSpace;
+  final NumberFormat yFormat;
+  const _ChartThigy(
+      {required this.data,
+      required this.title,
+      required this.yAxisTitle,
+      required this.bigScreen,
+      required this.leftSpace,
+      required this.yFormat});
+
+  @override
+  Widget build(BuildContext context) {
+    double xInterval = bigScreen
+        ? max(1, (data.last.x - data.first.x) / 6)
+        : max(1, (data.last.x - data.first.x) / 3);
+    return SizedBox(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height - 104,
+        child: Stack(
+          children: [
+            Padding(
+              padding: bigScreen
+                  ? const EdgeInsets.fromLTRB(40, 40, 40, 48)
+                  : const EdgeInsets.fromLTRB(0, 40, 16, 48),
+              child: LineChart(LineChartData(
+                  lineBarsData: [LineChartBarData(spots: data)],
+                  borderData: FlBorderData(show: false),
+                  gridData: FlGridData(verticalInterval: xInterval),
+                  titlesData: FlTitlesData(
+                      topTitles:
+                          AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      rightTitles:
+                          AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      bottomTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                              interval: xInterval,
+                              showTitles: true,
+                              reservedSize: 30,
+                              getTitlesWidget: (double value, TitleMeta meta) {
+                                return value != meta.min && value != meta.max
+                                    ? SideTitleWidget(
+                                        axisSide: meta.axisSide,
+                                        child: Text(DateFormat.yMMMd(
+                                                LocaleSettings
+                                                    .currentLocale.languageCode)
+                                            .format(DateTime
+                                                .fromMillisecondsSinceEpoch(
+                                                    value.floor()))),
+                                      )
+                                    : Container();
+                              })),
+                      leftTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize: leftSpace,
+                              getTitlesWidget: (double value, TitleMeta meta) {
+                                return value != meta.min && value != meta.max
+                                    ? SideTitleWidget(
+                                        axisSide: meta.axisSide,
+                                        child: Text(yFormat.format(value)),
+                                      )
+                                    : Container();
+                              }))),
+                  lineTouchData: LineTouchData(
+                      touchTooltipData: LineTouchTooltipData(
+                    fitInsideHorizontally: true,
+                    fitInsideVertically: true,
+                    getTooltipItems: (touchedSpots) {
+                      return [
+                        for (var v in touchedSpots)
+                          LineTooltipItem("${f4.format(v.y)} $yAxisTitle \n",
+                              const TextStyle(),
+                              children: [
+                                TextSpan(
+                                    text: dateFormat.format(
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                            v.x.floor())))
+                              ])
+                      ];
+                    },
+                  )))),
+            ),
+          ],
+        ));
   }
 }
