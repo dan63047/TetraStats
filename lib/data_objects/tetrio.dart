@@ -535,7 +535,30 @@ class EstTr {
     double temp = (1500 - estglicko) * pi;
     double temp2 = pow((15.9056943314 * (pow(_rd, 2)) + 3527584.25978), 0.5) as double;
     double temp3 = 1 + pow(10, (temp / temp2)) as double;
-    esttr = 25000 / temp3;
+    //esttr = 25000 / temp3;
+    double ntemp = _pps*(150+(((_vs/_apm) - 1.66)*35))+_app*290+_dsp*700;
+    esttr = 25000 / 
+    (
+      1 + pow(10, (
+        (
+          (
+            1500-(
+              0.000013*pow(ntemp, 3) - 0.0196 *pow(ntemp, 2) + (12.645*ntemp)-1005.4
+            )
+          )*pi
+        )/sqrt(
+          (
+            (
+              3*pow(ln10, 2)
+            )*pow(60, 2)
+          )+(
+            2500*(
+              (64*pow(pi,2))+(147*pow(ln10, 2))
+            )
+          )
+        )
+      ))
+    );
   }
 }
 

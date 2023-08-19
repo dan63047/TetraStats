@@ -3,15 +3,46 @@ import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:tetra_stats/data_objects/tetrio.dart';
 //import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
-import 'package:tetra_stats/views/main_view.dart';
+import 'package:tetra_stats/views/main_view.dart' show MainView, f4, f2;
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
 import 'package:tetra_stats/widgets/tl_thingy.dart';
 //import 'package:tetra_stats/widgets/tl_thingy.dart';
 
-final DateFormat dateFormat =
-    DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
+List chartsShortTitles = [
+  "TR",
+  "Glicko",
+  "RD",
+  "GP",
+  "GW",
+  "WR%",
+  "APM",
+  "PPS",
+  "VS",
+  "APP",
+  "DS/S",
+  "DS/P",
+  "APP + DS/P",
+  "VS/APM",
+  "Cheese",
+  "GbE",
+  "wAPP",
+  "Area",
+  "eTR",
+  "±eTR",
+  "Opener",
+  "Plonk",
+  "Inf. DS",
+  "Stride",
+  "Stride - Plonk",
+  "Opener - Inf. DS"
+  ];
+var chartsShortTitlesDropdowns = <DropdownMenuItem>[for (String e in chartsShortTitles) DropdownMenuItem(child: Text(e), value: e,)];
+int chartsIndexX = 0;
+int chartsIndexY = 6;
+//final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
 double pfpHeight = 128;
 
 class RankView extends StatefulWidget {
@@ -142,57 +173,84 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                   controller: _tabController,
                   children: [
                     Column(
-                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        LayoutBuilder(builder: (context, constraints) {
-                          return true ?
-      Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [Column(
-            children: [
-              Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text("X axis:", style: const TextStyle(fontSize: 22))),
-                  DropdownButton(
-                        items: chartsData,
-                        value: chartsData[chartsIndex].value,
-                        onChanged: (value) {
-                          chartsIndex = chartsData.indexWhere((element) => element.value == value);
-                          _justUpdate();
-                        }
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [Column(
+                          children: [
+                            Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text("X axis:", style: const TextStyle(fontSize: 22))),
+                                DropdownButton(
+                                      items: chartsShortTitlesDropdowns,
+                                      value: chartsShortTitlesDropdowns[chartsIndexX].value,
+                                      onChanged: (value) {
+                                        chartsIndexX = chartsShortTitlesDropdowns.indexWhere((element) => element.value == value);
+                                        _justUpdate();
+                                      }
+                                    ),
+                              ],
+                            ),
+                          ],
+                        ),Column(
+                          children: [
+                            Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text("Y axis:", style: const TextStyle(fontSize: 22)),
+                                ),
+                                DropdownButton(
+                                      items: chartsShortTitlesDropdowns,
+                                      value: chartsShortTitlesDropdowns[chartsIndexY].value,
+                                      onChanged: (value) {
+                                        chartsIndexY = chartsShortTitlesDropdowns.indexWhere((element) => element.value == value);
+                                        _justUpdate();
+                                      }
+                                    ),
+                              ],
+                            ),
+                          ],
+                        ),],),
+                        if(widget.rank[1]["entries"].length > 1) SizedBox(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height - 104,
+        child: Stack(
+          children: [
+            Padding(
+              padding: bigScreen
+                  ? const EdgeInsets.fromLTRB(40, 40, 40, 48)
+                  : const EdgeInsets.fromLTRB(0, 40, 16, 48),
+              child: ScatterChart(
+                ScatterChartData(
+                  scatterSpots: [ for (TetrioPlayerFromLeaderboard entry in widget.rank[1]["entries"]) MyScatterSpot(takeStat(entry, chartsShortTitles[chartsIndexX]), takeStat(entry, chartsShortTitles[chartsIndexY]), entry.userId, entry.username, color: rankColors[entry.rank])],
+                  scatterTouchData: ScatterTouchData(touchTooltipData: ScatterTouchTooltipData(
+                    fitInsideHorizontally: true, fitInsideVertically: true, getTooltipItems: (touchedSpot) {
+                    touchedSpot as MyScatterSpot;
+                  return ScatterTooltipItem("${touchedSpot.nickname}\n", textStyle: TextStyle(fontFamily: "Eurostile Round Extended"), children: [TextSpan(text: "${f4.format(touchedSpot.x)} ${chartsShortTitles[chartsIndexX]}\n${f4.format(touchedSpot.y)} ${chartsShortTitles[chartsIndexY]}", style: TextStyle(fontFamily: "Eurostile Round"))]);
+                }),
+                touchCallback:(event, response) {
+                  if (event.runtimeType == FlTapDownEvent && response?.touchedSpot?.spot != null){
+                    var spot = response?.touchedSpot?.spot as MyScatterSpot;
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MainView(player: spot.nickname),
+                        maintainState: false,
                       ),
-                ],
+                    );
+                  }
+                },),
+                ),
+                swapAnimationDuration: Duration(milliseconds: 150), // Optional
+                swapAnimationCurve: Curves.linear, // Optional
               ),
-            ],
-          ),Column(
-            children: [
-              Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text("Y axis:", style: const TextStyle(fontSize: 22)),
-                  ),
-                  DropdownButton(
-                        items: chartsData,
-                        value: chartsData[chartsIndex].value,
-                        onChanged: (value) {
-                          chartsIndex = chartsData.indexWhere((element) => element.value == value);
-                          _justUpdate();
-                        }
-                      ),
-                ],
-              ),
-            ],
-          ),],),
-          if(chartsData[chartsIndex].value!.length > 1) _ChartThigy(data: chartsData[chartsIndex].value!, title: "ss", yAxisTitle: chartsShortTitles[chartsIndex], bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? f2 : NumberFormat.compact(),)
-          else Center(child: Text(t.notEnoughData, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))
-        ],
-      ) : Center(child: Text(t.noHistorySaved, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)));
-                        })
+            ),
+          ],
+        ))
+                        else Center(child: Text(t.notEnoughData, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))
                       ],
                     ),
                     Column(
@@ -235,7 +293,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                         builder: (context) => MainView(
                                             player: widget
                                                 .rank[1]["entries"][index]
-                                                .userId),
+                                                .username),
                                         maintainState: false,
                                       ),
                                     );
@@ -912,94 +970,69 @@ class _ListEntry extends StatelessWidget {
   }
 }
 
-class _ChartThigy extends StatelessWidget {
-  final List<FlSpot> data;
-  final String title;
-  final String yAxisTitle;
-  final bool bigScreen;
-  final double leftSpace;
-  final NumberFormat yFormat;
-  const _ChartThigy(
-      {required this.data,
-      required this.title,
-      required this.yAxisTitle,
-      required this.bigScreen,
-      required this.leftSpace,
-      required this.yFormat});
-
-  @override
-  Widget build(BuildContext context) {
-    double xInterval = bigScreen
-        ? max(1, (data.last.x - data.first.x) / 6)
-        : max(1, (data.last.x - data.first.x) / 3);
-    return SizedBox(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height - 104,
-        child: Stack(
-          children: [
-            Padding(
-              padding: bigScreen
-                  ? const EdgeInsets.fromLTRB(40, 40, 40, 48)
-                  : const EdgeInsets.fromLTRB(0, 40, 16, 48),
-              child: LineChart(LineChartData(
-                  lineBarsData: [LineChartBarData(spots: data)],
-                  borderData: FlBorderData(show: false),
-                  gridData: FlGridData(verticalInterval: xInterval),
-                  titlesData: FlTitlesData(
-                      topTitles:
-                          AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                      rightTitles:
-                          AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                      bottomTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                              interval: xInterval,
-                              showTitles: true,
-                              reservedSize: 30,
-                              getTitlesWidget: (double value, TitleMeta meta) {
-                                return value != meta.min && value != meta.max
-                                    ? SideTitleWidget(
-                                        axisSide: meta.axisSide,
-                                        child: Text(DateFormat.yMMMd(
-                                                LocaleSettings
-                                                    .currentLocale.languageCode)
-                                            .format(DateTime
-                                                .fromMillisecondsSinceEpoch(
-                                                    value.floor()))),
-                                      )
-                                    : Container();
-                              })),
-                      leftTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                              showTitles: true,
-                              reservedSize: leftSpace,
-                              getTitlesWidget: (double value, TitleMeta meta) {
-                                return value != meta.min && value != meta.max
-                                    ? SideTitleWidget(
-                                        axisSide: meta.axisSide,
-                                        child: Text(yFormat.format(value)),
-                                      )
-                                    : Container();
-                              }))),
-                  lineTouchData: LineTouchData(
-                      touchTooltipData: LineTouchTooltipData(
-                    fitInsideHorizontally: true,
-                    fitInsideVertically: true,
-                    getTooltipItems: (touchedSpots) {
-                      return [
-                        for (var v in touchedSpots)
-                          LineTooltipItem("${f4.format(v.y)} $yAxisTitle \n",
-                              const TextStyle(),
-                              children: [
-                                TextSpan(
-                                    text: dateFormat.format(
-                                        DateTime.fromMillisecondsSinceEpoch(
-                                            v.x.floor())))
-                              ])
-                      ];
-                    },
-                  )))),
-            ),
-          ],
-        ));
+double takeStat(TetrioPlayerFromLeaderboard entry, String stat) {
+  switch (stat) {
+    case "TR":
+      return entry.rating;
+    case "Glicko":
+      return entry.glicko;
+    case "RD":
+      return entry.rd;
+    case "GP":
+      return entry.gamesPlayed.toDouble();
+    case "GW":
+      return entry.gamesWon.toDouble();
+    case "WR%":
+      return entry.winrate*100;
+    case "APM":
+      return entry.apm;
+    case "PPS":
+      return entry.pps;
+    case "VS":
+      return entry.vs;
+    case "APP":
+      return entry.nerdStats.app;
+    case "DS/S":
+      return entry.nerdStats.dss;
+    case "DS/P":
+      return entry.nerdStats.dsp;
+    case "APP + DS/P":
+      return entry.nerdStats.appdsp;
+    case "VS/APM":
+      return entry.nerdStats.vsapm;
+    case "Cheese":
+      return entry.nerdStats.cheese;
+    case "GbE":
+      return entry.nerdStats.gbe;
+    case "wAPP":
+      return entry.nerdStats.nyaapp;
+    case "Area":
+      return entry.nerdStats.area;
+    case "eTR":
+      return entry.estTr.esttr;
+    case "±eTR":
+      return entry.esttracc;
+    case "Opener":
+      return entry.playstyle.opener;
+    case "Plonk":
+      return entry.playstyle.plonk;
+    case "Inf. DS":
+      return entry.playstyle.infds;
+    case "Stride":
+      return entry.playstyle.stride;
+    case "Stride - Plonk":
+      return entry.playstyle.stride - entry.playstyle.plonk;
+    case "Opener - Inf. DS":
+      return entry.playstyle.opener - entry.playstyle.infds;
+    default:
+      throw ArgumentError.value(stat, "Incorrect stat", "We don't have that stat");
   }
+}
+
+class MyScatterSpot extends ScatterSpot{
+  String id;
+  String nickname;
+
+  MyScatterSpot(super.x, super.y, this.id, this.nickname, {super.color});
+  
 }
