@@ -81,7 +81,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
     bool bigScreen = MediaQuery.of(context).size.width > 768;
     return Scaffold(
         appBar: AppBar(
-          title: Text(widget.rank[0].rank.toUpperCase()),
+          title: Text(widget.rank[1]["everyone"] ? t.everyoneAverages : t.rankAverages(rank: widget.rank[0].rank.toUpperCase())),
         ),
         backgroundColor: Colors.black,
         body: SafeArea(
@@ -110,12 +110,12 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                 child: Column(
                               children: [
                                 Text(
-                                    "Values for ${widget.rank[0].rank.toUpperCase()} rank",
+                                    widget.rank[1]["everyone"] ? t.everyoneAverages : t.rankAverages(rank: widget.rank[0].rank.toUpperCase()),
                                     style: TextStyle(
                                         fontFamily: "Eurostile Round Extended",
                                         fontSize: bigScreen ? 42 : 28)),
                                 Text(
-                                    "${widget.rank[1]["entries"].length} players",
+                                    t.players(n: widget.rank[1]["entries"].length),
                                     style: TextStyle(
                                         fontFamily: "Eurostile Round Extended",
                                         fontSize: bigScreen ? 42 : 28)),
@@ -123,48 +123,19 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                             )),
                           ],
                         ),
-                        // Wrap(
-                        //   direction: Axis.horizontal,
-                        //   alignment: WrapAlignment.center,
-                        //   spacing: 25,
-                        //   crossAxisAlignment: WrapCrossAlignment.start,
-                        //   clipBehavior: Clip.hardEdge, // hard WHAT???
-                        //   children: [
-                        //     StatCellNum(
-                        //       playerStat: widget.rank[1]["totalGamesPlayed"],
-                        //       playerStatLabel: "Total games\nplayed",
-                        //       isScreenBig: bigScreen,
-                        //       higherIsBetter: true,
-                        //     ),
-                        //     StatCellNum(
-                        //       playerStat: widget.rank[1]["totalGamesWon"],
-                        //       playerStatLabel: "Total games\nwon",
-                        //       isScreenBig: bigScreen,
-                        //       higherIsBetter: true,
-                        //     ),
-                        //     StatCellNum(
-                        //         playerStat: (widget.rank[1]["totalGamesWon"] /
-                        //                 widget.rank[1]["totalGamesPlayed"]) *
-                        //             100,
-                        //         playerStatLabel: t.statCellNum.winrate,
-                        //         fractionDigits: 3,
-                        //         isScreenBig: bigScreen,
-                        //         higherIsBetter: true)
-                        //   ],
-                        // ),
                       ],
                     )),
                     SliverToBoxAdapter(
                         child: TabBar(
                       controller: _tabController,
                       isScrollable: true,
-                      tabs: const [
-                        Tab(text: "Chart"),
-                        Tab(text: "Entries"),
-                        Tab(text: "Minimums"),
-                        Tab(text: "Averages"),
-                        Tab(text: "Maximums"),
-                        Tab(text: "Other"),
+                      tabs: [
+                        Tab(text: t.chart),
+                        Tab(text: t.entries),
+                        Tab(text: t.minimums),
+                        Tab(text: t.averages),
+                        Tab(text: t.maximums),
+                        Tab(text: t.other),
                       ],
                     )),
                   ];
@@ -174,15 +145,18 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                   children: [
                     Column(
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        Wrap(
+                          direction: Axis.horizontal,
+                          alignment: WrapAlignment.center,
+                          spacing: 25,
                           children: [Column(
                           children: [
                             Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
-                                  child: Text("X axis:", style: const TextStyle(fontSize: 22))),
+                                  child: Text(t.currentAxis(axis: "X"), style: const TextStyle(fontSize: 22))),
                                 DropdownButton(
                                       items: chartsShortTitlesDropdowns,
                                       value: chartsShortTitlesDropdowns[chartsIndexX].value,
@@ -197,10 +171,11 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                         ),Column(
                           children: [
                             Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
-                                  child: Text("Y axis:", style: const TextStyle(fontSize: 22)),
+                                  child: Text(t.currentAxis(axis: "Y"), style: const TextStyle(fontSize: 22)),
                                 ),
                                 DropdownButton(
                                       items: chartsShortTitlesDropdowns,
@@ -225,15 +200,15 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                   : const EdgeInsets.fromLTRB(0, 40, 16, 48),
               child: ScatterChart(
                 ScatterChartData(
-                  scatterSpots: [ for (TetrioPlayerFromLeaderboard entry in widget.rank[1]["entries"]) MyScatterSpot(takeStat(entry, chartsShortTitles[chartsIndexX]), takeStat(entry, chartsShortTitles[chartsIndexY]), entry.userId, entry.username, color: rankColors[entry.rank])],
+                  scatterSpots: [ for (TetrioPlayerFromLeaderboard entry in widget.rank[1]["entries"]) _MyScatterSpot(takeStat(entry, chartsShortTitles[chartsIndexX]), takeStat(entry, chartsShortTitles[chartsIndexY]), entry.userId, entry.username, color: rankColors[entry.rank])],
                   scatterTouchData: ScatterTouchData(touchTooltipData: ScatterTouchTooltipData(
                     fitInsideHorizontally: true, fitInsideVertically: true, getTooltipItems: (touchedSpot) {
-                    touchedSpot as MyScatterSpot;
+                    touchedSpot as _MyScatterSpot;
                   return ScatterTooltipItem("${touchedSpot.nickname}\n", textStyle: TextStyle(fontFamily: "Eurostile Round Extended"), children: [TextSpan(text: "${f4.format(touchedSpot.x)} ${chartsShortTitles[chartsIndexX]}\n${f4.format(touchedSpot.y)} ${chartsShortTitles[chartsIndexY]}", style: TextStyle(fontFamily: "Eurostile Round"))]);
                 }),
                 touchCallback:(event, response) {
                   if (event.runtimeType == FlTapDownEvent && response?.touchedSpot?.spot != null){
-                    var spot = response?.touchedSpot?.spot as MyScatterSpot;
+                    var spot = response?.touchedSpot?.spot as _MyScatterSpot;
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -255,7 +230,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                     ),
                     Column(
                       children: [
-                        Text("Entries",
+                        Text(t.entries,
                             style: TextStyle(
                                 fontFamily: "Eurostile Round Extended",
                                 fontSize: bigScreen ? 42 : 28)),
@@ -305,7 +280,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                     ),
                     Column(
                       children: [
-                        Text("Lowest Values",
+                        Text(t.lowestValues,
                             style: TextStyle(
                                 fontFamily: "Eurostile Round Extended",
                                 fontSize: bigScreen ? 42 : 28)),
@@ -314,7 +289,8 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                             children: [
                               _ListEntry(
                                   value: widget.rank[1]["lowestTR"],
-                                  label: "Tetra Rating",
+                                  label: t.statCellNum.tr
+                                  .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["lowestTRid"],
                                   username: widget.rank[1]["lowestTRnick"],
                                   approximate: false,
@@ -328,49 +304,56 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                   fractionDigits: 2),
                               _ListEntry(
                                   value: widget.rank[1]["lowestRD"],
-                                  label: "Rating Deviation",
+                                  label: t.statCellNum.rd
+                                  .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["lowestRdID"],
                                   username: widget.rank[1]["lowestRdNick"],
                                   approximate: false,
                                   fractionDigits: 3),
                               _ListEntry(
                                   value: widget.rank[1]["lowestGamesPlayed"],
-                                  label: "Games Played",
+                                  label: t.statCellNum.gamesPlayed
+                                  .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["lowestGamesPlayedID"],
                                   username: widget.rank[1]
                                       ["lowestGamesPlayedNick"],
                                   approximate: false),
                               _ListEntry(
                                   value: widget.rank[1]["lowestGamesWon"],
-                                  label: "Games Won",
+                                  label: t.statCellNum.gamesWonTL
+                                  .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["lowestGamesWonID"],
                                   username: widget.rank[1]
                                       ["lowestGamesWonNick"],
                                   approximate: false),
                               _ListEntry(
                                   value: widget.rank[1]["lowestWinrate"] * 100,
-                                  label: "Winrate Percentage",
+                                  label: t.statCellNum.winrate
+                                  .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["lowestWinrateID"],
                                   username: widget.rank[1]["lowestWinrateNick"],
                                   approximate: false,
                                   fractionDigits: 2),
                               _ListEntry(
                                   value: widget.rank[1]["lowestAPM"],
-                                  label: "Attack Per Minute",
+                                  label: t.statCellNum.apm
+                                  .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["lowestAPMid"],
                                   username: widget.rank[1]["lowestAPMnick"],
                                   approximate: false,
                                   fractionDigits: 2),
                               _ListEntry(
                                   value: widget.rank[1]["lowestPPS"],
-                                  label: "Pieces Per Second",
+                                  label: t.statCellNum.pps
+                                  .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["lowestPPSid"],
                                   username: widget.rank[1]["lowestPPSnick"],
                                   approximate: false,
                                   fractionDigits: 2),
                               _ListEntry(
                                   value: widget.rank[1]["lowestVS"],
-                                  label: "Versus Score",
+                                  label: t.statCellNum.vs
+                                  .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["lowestVSid"],
                                   username: widget.rank[1]["lowestVSnick"],
                                   approximate: false,
@@ -485,7 +468,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                   fractionDigits: 3),
                               _ListEntry(
                                   value: widget.rank[1]["lowestInfDS"],
-                                  label: "InfDS",
+                                  label: "Inf. DS",
                                   id: widget.rank[1]["lowestInfDSid"],
                                   username: widget.rank[1]["lowestInfDSnick"],
                                   approximate: false,
@@ -497,7 +480,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                     ),
                     Column(
                       children: [
-                        Text("Average Values",
+                        Text(t.averageValues,
                             style: TextStyle(
                                 fontFamily: "Eurostile Round Extended",
                                 fontSize: bigScreen ? 42 : 28)),
@@ -505,7 +488,8 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                             child: ListView(children: [
                           _ListEntry(
                               value: widget.rank[0].rating,
-                              label: "Tetra Rating",
+                              label: t.statCellNum.tr
+                                  .replaceAll(RegExp(r'\n'), " "),
                               id: "",
                               username: "",
                               approximate: true,
@@ -519,56 +503,64 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                               fractionDigits: 2),
                           _ListEntry(
                               value: widget.rank[0].rd,
-                              label: "Rating Deviation",
+                              label: t.statCellNum.rd
+                                  .replaceAll(RegExp(r'\n'), " "),
                               id: "",
                               username: "",
                               approximate: true,
                               fractionDigits: 3),
                           _ListEntry(
                               value: widget.rank[0].gamesPlayed,
-                              label: "Games Played",
+                              label: t.statCellNum.gamesPlayed
+                                  .replaceAll(RegExp(r'\n'), " "),
                               id: "",
                               username: "",
                               approximate: true,
                               fractionDigits: 0),
                           _ListEntry(
                               value: widget.rank[0].gamesWon,
-                              label: "Games Won",
+                              label: t.statCellNum.gamesWonTL
+                                  .replaceAll(RegExp(r'\n'), " "),
                               id: "",
                               username: "",
                               approximate: true,
                               fractionDigits: 0),
                           _ListEntry(
                               value: widget.rank[0].winrate * 100,
-                              label: "Winrate",
+                              label: t.statCellNum.winrate
+                                  .replaceAll(RegExp(r'\n'), " "),
                               id: "",
                               username: "",
                               approximate: true,
                               fractionDigits: 2),
                           _ListEntry(
                               value: widget.rank[0].apm,
-                              label: "Attack per Minute",
+                              label: t.statCellNum.apm
+                                  .replaceAll(RegExp(r'\n'), " "),
                               id: "",
                               username: "",
                               approximate: true,
                               fractionDigits: 2),
                           _ListEntry(
                               value: widget.rank[0].pps,
-                              label: "Pieces per Second",
+                              label: t.statCellNum.pps
+                                  .replaceAll(RegExp(r'\n'), " "),
                               id: "",
                               username: "",
                               approximate: true,
                               fractionDigits: 2),
                           _ListEntry(
                               value: widget.rank[0].vs,
-                              label: "Versus Score",
+                              label: t.statCellNum.vs
+                                  .replaceAll(RegExp(r'\n'), " "),
                               id: "",
                               username: "",
                               approximate: true,
                               fractionDigits: 2),
                           _ListEntry(
                               value: widget.rank[1]["avgAPP"],
-                              label: "Attack Per Piece",
+                              label: t.statCellNum.app
+                                  .replaceAll(RegExp(r'\n'), " "),
                               id: "",
                               username: "",
                               approximate: true,
@@ -675,7 +667,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                               fractionDigits: 3),
                           _ListEntry(
                               value: widget.rank[1]["avgInfDS"],
-                              label: "InfDS",
+                              label: "Inf. DS",
                               id: "",
                               username: "",
                               approximate: true,
@@ -685,7 +677,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                     ),
                     Column(
                       children: [
-                        Text("Highest Values",
+                        Text(t.highestValues,
                             style: TextStyle(
                                 fontFamily: "Eurostile Round Extended",
                                 fontSize: bigScreen ? 42 : 28)),
@@ -694,7 +686,8 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                             children: [
                               _ListEntry(
                                   value: widget.rank[1]["highestTR"],
-                                  label: "Tetra Rating",
+                                  label: t.statCellNum.tr
+                                  .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["highestTRid"],
                                   username: widget.rank[1]["highestTRnick"],
                                   approximate: false,
@@ -708,28 +701,32 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                   fractionDigits: 2),
                               _ListEntry(
                                   value: widget.rank[1]["highestRD"],
-                                  label: "Rating Deviation",
+                                  label: t.statCellNum.rd
+                                  .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["highestRdID"],
                                   username: widget.rank[1]["highestRdNick"],
                                   approximate: false,
                                   fractionDigits: 3),
                               _ListEntry(
                                   value: widget.rank[1]["highestGamesPlayed"],
-                                  label: "Games Played",
+                                  label: t.statCellNum.gamesPlayed
+                                  .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["highestGamesPlayedID"],
                                   username: widget.rank[1]
                                       ["highestGamesPlayedNick"],
                                   approximate: false),
                               _ListEntry(
                                   value: widget.rank[1]["highestGamesWon"],
-                                  label: "Games Won",
+                                  label: t.statCellNum.gamesWonTL
+                                  .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["highestGamesWonID"],
                                   username: widget.rank[1]
                                       ["highestGamesWonNick"],
                                   approximate: false),
                               _ListEntry(
                                   value: widget.rank[1]["highestWinrate"] * 100,
-                                  label: "Winrate Percentage",
+                                  label: t.statCellNum.winrate
+                                  .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["highestWinrateID"],
                                   username: widget.rank[1]
                                       ["highestWinrateNick"],
@@ -737,21 +734,24 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                   fractionDigits: 2),
                               _ListEntry(
                                   value: widget.rank[1]["highestAPM"],
-                                  label: "Attack Per Minute",
+                                  label: t.statCellNum.apm
+                                  .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["highestAPMid"],
                                   username: widget.rank[1]["highestAPMnick"],
                                   approximate: false,
                                   fractionDigits: 2),
                               _ListEntry(
                                   value: widget.rank[1]["highestPPS"],
-                                  label: "Pieces Per Second",
+                                  label: t.statCellNum.pps
+                                  .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["highestPPSid"],
                                   username: widget.rank[1]["highestPPSnick"],
                                   approximate: false,
                                   fractionDigits: 2),
                               _ListEntry(
                                   value: widget.rank[1]["highestVS"],
-                                  label: "Versus Score",
+                                  label: t.statCellNum.vs
+                                  .replaceAll(RegExp(r'\n'), " "),
                                   id: widget.rank[1]["highestVSid"],
                                   username: widget.rank[1]["highestVSnick"],
                                   approximate: false,
@@ -866,7 +866,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                   fractionDigits: 3),
                               _ListEntry(
                                   value: widget.rank[1]["highestInfDS"],
-                                  label: "InfDS",
+                                  label: "Inf. DS",
                                   id: widget.rank[1]["highestInfDSid"],
                                   username: widget.rank[1]["highestInfDSnick"],
                                   approximate: false,
@@ -883,14 +883,14 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                             children: [
                               _ListEntry(
                                   value: widget.rank[1]["totalGamesPlayed"],
-                                  label: "Total Games Played",
+                                  label: t.statCellNum.totalGames,
                                   id: "",
                                   username: "",
                                   approximate: true,
                                   fractionDigits: 0),
                               _ListEntry(
                                   value: widget.rank[1]["totalGamesWon"],
-                                  label: "Total Games Won",
+                                  label: t.statCellNum.totalWon,
                                   id: "",
                                   username: "",
                                   approximate: true,
@@ -899,21 +899,13 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                   value: (widget.rank[1]["totalGamesWon"] /
                                          widget.rank[1]["totalGamesPlayed"]) *
                                     100,
-                                  label: "Winrate",
+                                  label: t.statCellNum.winrate
+                                  .replaceAll(RegExp(r'\n'), " "),
                                   id: "",
                                   username: "",
                                   approximate: true,
                                   fractionDigits: 3),
-                              Center(
-                                child: Text("Typical TL profile",
-                                style: TextStyle(
-                                  fontFamily: "Eurostile Round Extended",
-                                  fontSize: bigScreen ? 42 : 28)),
-                              ),
-                              SizedBox(
-                                height: 800,
-                                child: TLThingy(tl: widget.rank[0], userID: ""),
-                              )
+                              
                             ]
                             )
                           )
@@ -952,7 +944,7 @@ class _ListEntry extends StatelessWidget {
         children: [
           Text(f.format(value),
               style: const TextStyle(fontSize: 22, height: 0.9)),
-          if (id.isNotEmpty) Text('for player $username')
+          if (id.isNotEmpty) Text(t.forPlayer(username: username))
         ],
       ),
       onTap: id.isNotEmpty
@@ -1029,10 +1021,10 @@ double takeStat(TetrioPlayerFromLeaderboard entry, String stat) {
   }
 }
 
-class MyScatterSpot extends ScatterSpot{
+class _MyScatterSpot extends ScatterSpot{
   String id;
   String nickname;
 
-  MyScatterSpot(super.x, super.y, this.id, this.nickname, {super.color});
+  _MyScatterSpot(super.x, super.y, this.id, this.nickname, {super.color});
   
 }

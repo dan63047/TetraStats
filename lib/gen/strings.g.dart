@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 856 (428 per locale)
+/// Strings: 896 (448 per locale)
 ///
-/// Built on 2023-07-20 at 16:26 UTC
+/// Built on 2023-08-20 at 21:53 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -252,7 +252,26 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get averages => 'Averages';
 	String get lbViewZeroEntrys => 'Empty list. Looks like something is wrong...';
 	String get lbViewOneEntry => 'There is only one player... What?';
-	String lbViewManyEntrys({required Object numberOfPlayers}) => 'There are ${numberOfPlayers} ranked players.';
+	String lbViewManyEntrys({required Object numberOfPlayers}) => 'There are ${numberOfPlayers}.';
+	String get everyoneAverages => 'Values for leaderboard';
+	String rankAverages({required Object rank}) => 'Values for ${rank} rank';
+	String players({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		zero: '${n} players',
+		one: '${n} player',
+		two: '${n} players',
+		few: '${n} players',
+		many: '${n} players',
+		other: '${n} players',
+	);
+	String get chart => 'Chart';
+	String get entries => 'Entries';
+	String get minimums => 'Minimums';
+	String get maximums => 'Maximums';
+	String get lowestValues => 'Lowest Values';
+	String get averageValues => 'Average Values';
+	String get highestValues => 'Highest Values';
+	String forPlayer({required Object username}) => 'for player ${username}';
+	String currentAxis({required Object axis}) => '${axis} axis:';
 	String get p1nkl0bst3rAlert => 'That data was retrived from third party API maintained by p1nkl0bst3r';
 	String get notForWeb => 'Function is not available for web version';
 	late final _StringsStatCellNumEn statCellNum = _StringsStatCellNumEn._(_root);
@@ -544,6 +563,8 @@ class _StringsStatCellNumEn {
 	String get hoursPlayed => 'Hours\nPlayed';
 	String get onlineGames => 'Online\nGames';
 	String get gamesWon => 'Games\nWon';
+	String get totalGames => 'Total Games Played';
+	String get totalWon => 'Total Games Won';
 	String get friends => 'Friends';
 	String get apm => 'Attack\nPer Minute';
 	String get vs => 'Versus\nScore';
@@ -566,6 +587,7 @@ class _StringsStatCellNumEn {
 	String get kpp => 'KP Per\nPiece';
 	String get kps => 'KP Per\nSecond';
 	String get tr => 'Tetra Rating';
+	String get rd => 'Rating Deviation';
 	String get app => 'Attack Per Piece';
 	String get appDescription => '(Abbreviated as APP) Main efficiency metric. Tells how many attack you producing per piece';
 	String get vsapmDescription => 'Basically, tells how much and how efficient you using garbage in your attacks';
@@ -753,7 +775,26 @@ class _StringsRu implements _StringsEn {
 	@override String get averages => 'Средние значения';
 	@override String get lbViewZeroEntrys => 'Рейтинговая таблица пуста. Похоже, что-то здесь не так...';
 	@override String get lbViewOneEntry => 'В рейтинговой таблице всего один игрок... Чего?';
-	@override String lbViewManyEntrys({required Object numberOfPlayers}) => 'В рейтинговой таблице находится ${numberOfPlayers} игроков.';
+	@override String lbViewManyEntrys({required Object numberOfPlayers}) => 'В рейтинговой таблице находится ${numberOfPlayers}.';
+	@override String get everyoneAverages => 'Значения таблицы';
+	@override String rankAverages({required Object rank}) => 'Значения для ${rank} ранга';
+	@override String players({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
+		zero: '${n} игроков',
+		one: '${n} игрок',
+		two: '${n} игрока',
+		few: '${n} игрока',
+		many: '${n} игроков',
+		other: '${n} игроков',
+	);
+	@override String get chart => 'График';
+	@override String get entries => 'Список';
+	@override String get minimums => 'Минимумы';
+	@override String get maximums => 'Максимумы';
+	@override String get lowestValues => 'Самые низкие показатели';
+	@override String get averageValues => 'Средние значения показателей';
+	@override String get highestValues => 'Самые высокие показатели';
+	@override String forPlayer({required Object username}) => 'для игрока ${username}';
+	@override String currentAxis({required Object axis}) => 'Ось ${axis}:';
 	@override String get p1nkl0bst3rAlert => 'Эти данные были получены из стороннего API, который поддерживается p1nkl0bst3r';
 	@override String get notForWeb => 'Функция недоступна для веб версии';
 	@override late final _StringsStatCellNumRu statCellNum = _StringsStatCellNumRu._(_root);
@@ -1045,6 +1086,8 @@ class _StringsStatCellNumRu implements _StringsStatCellNumEn {
 	@override String get hoursPlayed => 'Часов\nСыграно';
 	@override String get onlineGames => 'Онлайн\nИгр';
 	@override String get gamesWon => 'Онлайн\nПобед';
+	@override String get totalGames => 'Всего матчей';
+	@override String get totalWon => 'Всего побед';
 	@override String get friends => 'Друзей';
 	@override String get apm => 'Атака в\nМинуту';
 	@override String get vs => 'Показатель\nVersus';
@@ -1067,6 +1110,7 @@ class _StringsStatCellNumRu implements _StringsStatCellNumEn {
 	@override String get kpp => 'Нажатий\nна Фигуру';
 	@override String get kps => 'Нажатий\nв Секунду';
 	@override String get tr => 'Тетра Рейтинг';
+	@override String get rd => 'Отклонение рейтинга';
 	@override String get app => 'Атака на Фигуру';
 	@override String get appDescription => '(Сокращенно APP) Главный показатель эффективности. Показывает, сколько атаки приходится на одну фигуру';
 	@override String get vsapmDescription => 'В основном, показывает как много мусора игрок использует в своих атаках и насколько эффективно.';
@@ -1233,7 +1277,26 @@ extension on _StringsEn {
 			case 'averages': return 'Averages';
 			case 'lbViewZeroEntrys': return 'Empty list. Looks like something is wrong...';
 			case 'lbViewOneEntry': return 'There is only one player... What?';
-			case 'lbViewManyEntrys': return ({required Object numberOfPlayers}) => 'There are ${numberOfPlayers} ranked players.';
+			case 'lbViewManyEntrys': return ({required Object numberOfPlayers}) => 'There are ${numberOfPlayers}.';
+			case 'everyoneAverages': return 'Values for leaderboard';
+			case 'rankAverages': return ({required Object rank}) => 'Values for ${rank} rank';
+			case 'players': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+				zero: '${n} players',
+				one: '${n} player',
+				two: '${n} players',
+				few: '${n} players',
+				many: '${n} players',
+				other: '${n} players',
+			);
+			case 'chart': return 'Chart';
+			case 'entries': return 'Entries';
+			case 'minimums': return 'Minimums';
+			case 'maximums': return 'Maximums';
+			case 'lowestValues': return 'Lowest Values';
+			case 'averageValues': return 'Average Values';
+			case 'highestValues': return 'Highest Values';
+			case 'forPlayer': return ({required Object username}) => 'for player ${username}';
+			case 'currentAxis': return ({required Object axis}) => '${axis} axis:';
 			case 'p1nkl0bst3rAlert': return 'That data was retrived from third party API maintained by p1nkl0bst3r';
 			case 'notForWeb': return 'Function is not available for web version';
 			case 'statCellNum.xpLevel': return 'XP Level';
@@ -1242,6 +1305,8 @@ extension on _StringsEn {
 			case 'statCellNum.hoursPlayed': return 'Hours\nPlayed';
 			case 'statCellNum.onlineGames': return 'Online\nGames';
 			case 'statCellNum.gamesWon': return 'Games\nWon';
+			case 'statCellNum.totalGames': return 'Total Games Played';
+			case 'statCellNum.totalWon': return 'Total Games Won';
 			case 'statCellNum.friends': return 'Friends';
 			case 'statCellNum.apm': return 'Attack\nPer Minute';
 			case 'statCellNum.vs': return 'Versus\nScore';
@@ -1264,6 +1329,7 @@ extension on _StringsEn {
 			case 'statCellNum.kpp': return 'KP Per\nPiece';
 			case 'statCellNum.kps': return 'KP Per\nSecond';
 			case 'statCellNum.tr': return 'Tetra Rating';
+			case 'statCellNum.rd': return 'Rating Deviation';
 			case 'statCellNum.app': return 'Attack Per Piece';
 			case 'statCellNum.appDescription': return '(Abbreviated as APP) Main efficiency metric. Tells how many attack you producing per piece';
 			case 'statCellNum.vsapmDescription': return 'Basically, tells how much and how efficient you using garbage in your attacks';
@@ -1669,7 +1735,26 @@ extension on _StringsRu {
 			case 'averages': return 'Средние значения';
 			case 'lbViewZeroEntrys': return 'Рейтинговая таблица пуста. Похоже, что-то здесь не так...';
 			case 'lbViewOneEntry': return 'В рейтинговой таблице всего один игрок... Чего?';
-			case 'lbViewManyEntrys': return ({required Object numberOfPlayers}) => 'В рейтинговой таблице находится ${numberOfPlayers} игроков.';
+			case 'lbViewManyEntrys': return ({required Object numberOfPlayers}) => 'В рейтинговой таблице находится ${numberOfPlayers}.';
+			case 'everyoneAverages': return 'Значения таблицы';
+			case 'rankAverages': return ({required Object rank}) => 'Значения для ${rank} ранга';
+			case 'players': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
+				zero: '${n} игроков',
+				one: '${n} игрок',
+				two: '${n} игрока',
+				few: '${n} игрока',
+				many: '${n} игроков',
+				other: '${n} игроков',
+			);
+			case 'chart': return 'График';
+			case 'entries': return 'Список';
+			case 'minimums': return 'Минимумы';
+			case 'maximums': return 'Максимумы';
+			case 'lowestValues': return 'Самые низкие показатели';
+			case 'averageValues': return 'Средние значения показателей';
+			case 'highestValues': return 'Самые высокие показатели';
+			case 'forPlayer': return ({required Object username}) => 'для игрока ${username}';
+			case 'currentAxis': return ({required Object axis}) => 'Ось ${axis}:';
 			case 'p1nkl0bst3rAlert': return 'Эти данные были получены из стороннего API, который поддерживается p1nkl0bst3r';
 			case 'notForWeb': return 'Функция недоступна для веб версии';
 			case 'statCellNum.xpLevel': return 'Уровень\nопыта';
@@ -1678,6 +1763,8 @@ extension on _StringsRu {
 			case 'statCellNum.hoursPlayed': return 'Часов\nСыграно';
 			case 'statCellNum.onlineGames': return 'Онлайн\nИгр';
 			case 'statCellNum.gamesWon': return 'Онлайн\nПобед';
+			case 'statCellNum.totalGames': return 'Всего матчей';
+			case 'statCellNum.totalWon': return 'Всего побед';
 			case 'statCellNum.friends': return 'Друзей';
 			case 'statCellNum.apm': return 'Атака в\nМинуту';
 			case 'statCellNum.vs': return 'Показатель\nVersus';
@@ -1700,6 +1787,7 @@ extension on _StringsRu {
 			case 'statCellNum.kpp': return 'Нажатий\nна Фигуру';
 			case 'statCellNum.kps': return 'Нажатий\nв Секунду';
 			case 'statCellNum.tr': return 'Тетра Рейтинг';
+			case 'statCellNum.rd': return 'Отклонение рейтинга';
 			case 'statCellNum.app': return 'Атака на Фигуру';
 			case 'statCellNum.appDescription': return '(Сокращенно APP) Главный показатель эффективности. Показывает, сколько атаки приходится на одну фигуру';
 			case 'statCellNum.vsapmDescription': return 'В основном, показывает как много мусора игрок использует в своих атаках и насколько эффективно.';

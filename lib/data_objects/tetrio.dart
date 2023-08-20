@@ -32,7 +32,8 @@ const Map<String, double> rankCutoffs = {
   "c-": 0.95,
   "d+": 0.975,
   "d": 1,
-  "z": -1
+  "z": -1,
+  "": 0.5
 };
 const Map<String, Color> rankColors = { // thanks osk for const rankColors at https://ch.tetr.io/res/js/base.js:418
 	'x': Color(0xFFFF45FF),
@@ -921,8 +922,6 @@ class TetrioPlayersLeaderboard {
     List<TetrioPlayerFromLeaderboard> filtredLeaderboard = List.from(leaderboard); 
     if (rank.isNotEmpty) {
       filtredLeaderboard.removeWhere((element) => element.rank != rank);
-    } else {
-      rank = "z";
     }
     if (filtredLeaderboard.isNotEmpty){
       double avgAPM = 0,
@@ -1334,7 +1333,7 @@ class TetrioPlayersLeaderboard {
       avgInfDS /= filtredLeaderboard.length;
       avgGamesPlayed = (totalGamesPlayed / filtredLeaderboard.length).floor();
       avgGamesWon = (totalGamesWon / filtredLeaderboard.length).floor();
-      return [TetraLeagueAlpha(timestamp: DateTime.now(), apm: avgAPM, pps: avgPPS, vs: avgVS, glicko: avgGlicko, rd: avgRD, gamesPlayed: avgGamesPlayed, gamesWon: avgGamesWon, bestRank: rank, decaying: false, rating: avgTR, rank: rank, percentileRank: rank, percentile: rankCutoffs[rank]!, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1),
+      return [TetraLeagueAlpha(timestamp: DateTime.now(), apm: avgAPM, pps: avgPPS, vs: avgVS, glicko: avgGlicko, rd: avgRD, gamesPlayed: avgGamesPlayed, gamesWon: avgGamesWon, bestRank: rank, decaying: false, rating: avgTR, rank: rank == "" ? "z" : rank, percentileRank: rank, percentile: rankCutoffs[rank]!, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1),
       {
         "everyone": rank == "",
         "totalGamesPlayed": totalGamesPlayed,

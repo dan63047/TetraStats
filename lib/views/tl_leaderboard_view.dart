@@ -58,7 +58,7 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
                                 numberOfPlayers,
                                 zero: t.lbViewZeroEntrys,
                                 one: t.lbViewOneEntry,
-                                other: t.lbViewManyEntrys(numberOfPlayers: numberOfPlayers),
+                                other: t.lbViewManyEntrys(numberOfPlayers: t.players(n: numberOfPlayers)),
                                 name: 'howManyPeople',
                                 args: [numberOfPlayers],
                                 desc: 'Description of how many people are seen in a place.',
@@ -82,7 +82,7 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
                           builder: (context) => RankView(rank: snapshot.data!.getAverageOfRank("")),
                         ),
                       );
-                              }, child: Text("Values for everyone",
+                              }, child: Text(t.everyoneAverages,
                                 style: const TextStyle(fontSize: 25)))
                               ],) 
                             )),

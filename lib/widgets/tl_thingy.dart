@@ -12,7 +12,8 @@ class TLThingy extends StatelessWidget {
   final TetraLeagueAlpha tl;
   final String userID;
   final TetraLeagueAlpha? oldTl;
-  const TLThingy({Key? key, required this.tl, required this.userID, this.oldTl}) : super(key: key);
+  final bool showTitle;
+  const TLThingy({Key? key, required this.tl, required this.userID, this.oldTl, this.showTitle = true}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +30,7 @@ class TLThingy extends StatelessWidget {
           return Column(
             children: (tl.gamesPlayed > 0)
                 ? [
-                    Text(t.tetraLeague, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                    if (showTitle) Text(t.tetraLeague, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
                     if (oldTl != null) Text(t.comparingWith(date: dateFormat.format(oldTl!.timestamp))),
                     if (tl.gamesPlayed >= 10)
                       Wrap(
