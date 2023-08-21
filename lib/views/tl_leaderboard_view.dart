@@ -68,8 +68,9 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
                             SliverToBoxAdapter(
                                 child: Padding(
                               padding: const EdgeInsets.only(left: 16),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              child: Wrap(
+                                direction: Axis.horizontal,
+                                alignment: WrapAlignment.spaceBetween,
                                 children: [
                                 Text(
                                 howManyPlayers(allPlayers.length),
