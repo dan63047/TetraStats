@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -7,9 +5,6 @@ import 'package:tetra_stats/data_objects/tetrio.dart';
 //import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/views/main_view.dart' show MainView, f4, f2;
-import 'package:tetra_stats/widgets/stat_sell_num.dart';
-import 'package:tetra_stats/widgets/tl_thingy.dart';
-//import 'package:tetra_stats/widgets/tl_thingy.dart';
 
 List chartsShortTitles = [
   "TR",
@@ -39,7 +34,7 @@ List chartsShortTitles = [
   "Stride - Plonk",
   "Opener - Inf. DS"
   ];
-var chartsShortTitlesDropdowns = <DropdownMenuItem>[for (String e in chartsShortTitles) DropdownMenuItem(child: Text(e), value: e,)];
+var chartsShortTitlesDropdowns = <DropdownMenuItem>[for (String e in chartsShortTitles) DropdownMenuItem(value: e,child: Text(e),)];
 int chartsIndexX = 0;
 int chartsIndexY = 6;
 //final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
@@ -204,7 +199,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                   scatterTouchData: ScatterTouchData(touchTooltipData: ScatterTouchTooltipData(
                     fitInsideHorizontally: true, fitInsideVertically: true, getTooltipItems: (touchedSpot) {
                     touchedSpot as _MyScatterSpot;
-                  return ScatterTooltipItem("${touchedSpot.nickname}\n", textStyle: TextStyle(fontFamily: "Eurostile Round Extended"), children: [TextSpan(text: "${f4.format(touchedSpot.x)} ${chartsShortTitles[chartsIndexX]}\n${f4.format(touchedSpot.y)} ${chartsShortTitles[chartsIndexY]}", style: TextStyle(fontFamily: "Eurostile Round"))]);
+                  return ScatterTooltipItem("${touchedSpot.nickname}\n", textStyle: const TextStyle(fontFamily: "Eurostile Round Extended"), children: [TextSpan(text: "${f4.format(touchedSpot.x)} ${chartsShortTitles[chartsIndexX]}\n${f4.format(touchedSpot.y)} ${chartsShortTitles[chartsIndexY]}", style: const TextStyle(fontFamily: "Eurostile Round"))]);
                 }),
                 touchCallback:(event, response) {
                   if (event.runtimeType == FlTapDownEvent && response?.touchedSpot?.spot != null){
@@ -219,7 +214,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                   }
                 },),
                 ),
-                swapAnimationDuration: Duration(milliseconds: 150), // Optional
+                swapAnimationDuration: const Duration(milliseconds: 150), // Optional
                 swapAnimationCurve: Curves.linear, // Optional
               ),
             ),

@@ -2,7 +2,7 @@ name: tetra_stats
 description: Track your and other player stats in TETR.IO
 publish_to: 'none'
 
-version: 1.0.1+6
+version: 1.1.0+7
 
 environment:
   sdk: '>=2.19.6 <3.0.0'
@@ -38,6 +38,7 @@ dependencies:
   slang_flutter: ^3.20.0
   csv: ^5.0.2
   url_launcher: ^6.1.12
+  flutter_svg: any
 
 dev_dependencies:
   flutter_test:
@@ -79,6 +80,8 @@ flutter:
      - res/avatars/tetrio_anon.png
      - res/avatars/tetrio_banned.png
      - res/icons/kagari.png
+     - res/icons/osk.svg
+     - res/icons/tetrio-logo.svg
      - res/tetrio_tl_alpha_ranks/x.png
      - res/tetrio_tl_alpha_ranks/u.png
      - res/tetrio_tl_alpha_ranks/ss.png

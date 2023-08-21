@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
@@ -331,7 +332,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                                   ? snapshot.data![1]['blitz'][0]
                                   : null),
                           _OtherThingy(
-                              zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio)
+                              zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment,)
                         ],
                       ),
                     ),
@@ -581,7 +582,7 @@ class _HistoryChartThigy extends StatelessWidget{
               bottomTitles: AxisTitles(sideTitles: SideTitles(interval: xInterval, showTitles: true, reservedSize: 30, getTitlesWidget: (double value, TitleMeta meta){
                 return value != meta.min && value != meta.max ? SideTitleWidget(
                   axisSide: meta.axisSide,
-                  child: Text(DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode) .format(DateTime.fromMillisecondsSinceEpoch(value.floor()))),
+                  child: Text(DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).format(DateTime.fromMillisecondsSinceEpoch(value.floor()))),
                 ) : Container();
               })),
               leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: leftSpace, getTitlesWidget: (double value, TitleMeta meta){
@@ -628,7 +629,12 @@ class _RecordThingy extends StatelessWidget {
                                 fontFamily: "Eurostile Round Extended",
                                 fontSize: bigScreen ? 42 : 28)),
                       if (record!.stream.contains("40l"))
-                        Text(
+                        if (record!.endContext!.finalTime.inMicroseconds > 60000000) Text(
+                          "${(record!.endContext!.finalTime.inMicroseconds/1000000/60).floor()}:${(f2.format(record!.endContext!.finalTime.inMicroseconds /1000000 % 60))}",
+                            style: TextStyle(
+                                fontFamily: "Eurostile Round Extended",
+                                fontSize: bigScreen ? 42 : 28))
+                        else Text(
                             timeInSec.format(
                                 record!.endContext!.finalTime.inMicroseconds /
                                     1000000),
@@ -936,8 +942,33 @@ class _RecordThingy extends StatelessWidget {
 class _OtherThingy extends StatelessWidget {
   final TetrioZen? zen;
   final String? bio;
-  const _OtherThingy({Key? key, required this.zen, required this.bio})
+  final Distinguishment? distinguishment;
+  const _OtherThingy({Key? key, required this.zen, required this.bio, required this.distinguishment})
       : super(key: key);
+
+  List<InlineSpan> getDistinguishmentSetOfWidgets(String text) {
+    var exploded = text.split(" ");
+    List<InlineSpan> result = [];
+    for (String shit in exploded){
+      switch (shit) {
+        case "%osk%":
+          result.add(WidgetSpan(child: Padding(
+            padding: const EdgeInsets.only(left: 8),
+            child: SvgPicture.asset("res/icons/osk.svg", height: 28),
+          )));
+          break;
+        case "%tetrio%":
+          result.add(WidgetSpan(child: Padding(
+            padding: const EdgeInsets.only(left: 8),
+            child: SvgPicture.asset("res/icons/tetrio-logo.svg", height: 28),
+          )));
+          break;
+        default:
+          result.add(TextSpan(text: " $shit", style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)));
+      }
+    }
+    return result;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -949,27 +980,19 @@ class _OtherThingy extends StatelessWidget {
         itemBuilder: (BuildContext context, int index) {
           return Column(
             children: [
-              Text(t.other,
-                  style: TextStyle(
-                      fontFamily: "Eurostile Round Extended",
-                      fontSize: bigScreen ? 42 : 28)),
-              if (zen != null)
+              if (distinguishment != null)
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 48, 0, 48),
+                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 48),
                   child: Column(
                     children: [
-                      Text(t.zen,
-                          style: TextStyle(
-                              fontFamily: "Eurostile Round Extended",
-                              fontSize: bigScreen ? 42 : 28)),
-                      Text(
-                          "${t.statCellNum.level} ${NumberFormat.decimalPattern().format(zen!.level)}",
-                          style: TextStyle(
-                              fontFamily: "Eurostile Round Extended",
-                              fontSize: bigScreen ? 42 : 28)),
-                      Text(
-                          "${t.statCellNum.score} ${NumberFormat.decimalPattern().format(zen!.score)}",
-                          style: const TextStyle(fontSize: 18)),
+                      Text(t.distinguishment, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                      RichText(
+                        text: TextSpan(
+                          style: DefaultTextStyle.of(context).style,
+                          children: getDistinguishmentSetOfWidgets(distinguishment!.header!),
+                        ),
+                      ),
+                      Text(distinguishment!.footer!, style: const TextStyle(fontSize: 18)),
                     ],
                   ),
                 ),
@@ -978,14 +1001,23 @@ class _OtherThingy extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(0, 0, 0, 48),
                   child: Column(
                     children: [
-                      Text(t.bio,
-                          style: TextStyle(
-                              fontFamily: "Eurostile Round Extended",
-                              fontSize: bigScreen ? 42 : 28)),
+                      Text(t.bio, style: TextStyle(fontFamily: "Eurostile Round Extended",fontSize: bigScreen ? 42 : 28)),
                       Text(bio!, style: const TextStyle(fontSize: 18)),
                     ],
                   ),
                 ),
+              if (zen != null)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                  child: Column(
+                    children: [
+                      Text(t.zen, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                      Text("${t.statCellNum.level} ${NumberFormat.decimalPattern().format(zen!.level)}", style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+                      Text("${t.statCellNum.score} ${NumberFormat.decimalPattern().format(zen!.score)}", style: const TextStyle(fontSize: 18)),
+                    ],
+                  ),
+                ),
+              
             ],
           );
         },

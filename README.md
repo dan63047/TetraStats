@@ -1,26 +1,22 @@
 # Tetra Stats
 
-<center>Track your and other players stats in TETR.IO</center>
+Track your and other players stats in TETR.IO
 
-![Screenshot of the app](https://imgur.com/CKGYyBg.png)
+You can [download an app](https://github.com/dan63047/TetraStats/releases), or [use web version](https://ts.dan63.by).
 
-You can [try it out right now](https://ts.dan63.by)!!! (web version)
+![Screenshot of the app 1](https://imgur.com/CKGYyBg.png)
 
-If you want an app, you can find it [here](https://github.com/dan63047/TetraStats/releases)! 
 # Available functionality
 - Advanced stats for players
-- Rank cutoffs and averages
-- Sqlite database, that can store all data
+- Ranks cutoffs
+- Minimums, averages, and maximums for every stat of every rank, as well, as whole leaderboard
+- Chart for analyzing tetra league state
+- Local database, that can store players data
 - Comparison to players, rank averages, and player stats from the past
 - Stats Calculator
 - Player history in charts
 
-# I forgor💀 to do
-- UI Animations 
-- im still not rendering distinguishment
-
----
-
-Special thanks to kerrmunism for formulas
-
-and to osk for TETR.IO
+# Special thanks
+- **kerrmunism** — formulas
+- **p1nkl0bst3r** — providing players history
+- **osk** and his team — TETR.IO

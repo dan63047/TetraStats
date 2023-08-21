@@ -29,7 +29,7 @@ void main() async {
     LocaleSettings.setLocaleRaw(locale);
   }
   runApp(TranslationProvider(
-    child: MyApp(),
+    child: const MyApp(),
   ));
 }
 
@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         title: "Tetra Stats", 
         home: const MainView(),
-        scrollBehavior: MaterialScrollBehavior().copyWith(
+        scrollBehavior: const MaterialScrollBehavior().copyWith(
         dragDevices: {PointerDeviceKind.mouse, PointerDeviceKind.touch, PointerDeviceKind.stylus, PointerDeviceKind.unknown},
         ),
         locale: TranslationProvider.of(context).flutterLocale,

@@ -250,7 +250,7 @@ class CompareState extends State<CompareView> {
         titleRedSide = "${theRedSide[2].apm} APM, ${theRedSide[2].pps} PPS, ${theRedSide[2].vs} VS";
         break;
       case Mode.averages:
-        titleRedSide = t.averageXrank(rankLetter: theRedSide[2].rank.toUpperCase());;
+        titleRedSide = t.averageXrank(rankLetter: theRedSide[2].rank.toUpperCase());
         break;
     }
     return Scaffold(
@@ -863,7 +863,7 @@ class PlayerSelector extends StatelessWidget {
   final Function fetch;
   final Function change;
   final Function updateState;
-  PlayerSelector(
+  const PlayerSelector(
       {super.key,
       required this.data,
       required this.mode,

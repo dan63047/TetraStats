@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="166.54634mm"
+   height="76.409546mm"
+   viewBox="0 0 166.54634 76.409546"
+   version="1.1"
+   id="svg4765"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
+   sodipodi:docname="osk.svg">
+  <defs
+     id="defs4759" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#000000"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="396.72531"
+     inkscape:cy="87.674744"
+     inkscape:document-units="mm"
+     inkscape:current-layer="text9244"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:pagecheckerboard="true"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="1676"
+     inkscape:window-y="-4"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata4762">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-1.6253191,-1.133197)">
+    <g
+       aria-label="osk"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:112.90530396px;line-height:1.25;font-family:'Franklin Gothic Medium';-inkscape-font-specification:'Franklin Gothic Medium, ';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.17609692"
+       id="text9244">
+      <path
+         d="m 26.984908,77.542744 q -12.349017,0 -18.8543029,-8.875857 -6.505286,-8.875856 -6.505286,-20.342801 0,-12.349018 7.16684,-20.56332 7.2219699,-8.214302 19.0196919,-8.214302 11.191298,0 18.358138,7.993784 7.22197,7.993784 7.22197,20.783838 0,13.175961 -7.497617,21.224874 -7.442489,7.993784 -18.909434,7.993784 z M 27.425945,67.17839 q 12.679795,0 12.679795,-18.909434 0,-8.545079 -3.032125,-13.451608 -3.032125,-4.961659 -9.316893,-4.961659 -6.505286,0 -9.64767,5.127047 -3.142384,5.071918 -3.142384,13.506738 0,9.096375 3.307773,13.892645 3.362902,4.796271 9.151504,4.796271 z"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:112.90530396px;font-family:'Franklin Gothic Medium';-inkscape-font-specification:'Franklin Gothic Medium, ';fill:#ffffff;fill-opacity:1;stroke-width:1.17609692"
+         id="path9246"
+         inkscape:connector-curvature="0" />
+      <path
+         d="m 58.188231,63.594969 11.797722,-2.260311 q 2.701347,6.780934 11.907981,6.780934 11.68746,0 11.68746,-6.891193 0,-2.205182 -1.81927,-3.63855 -1.81928,-1.433368 -4.30011,-1.929534 L 77.318182,53.726781 q -16.86964,-3.252643 -16.86964,-16.483733 0,-7.387359 5.347566,-12.514407 5.347565,-5.182177 15.932437,-5.182177 17.641459,0 21.555645,12.955443 l -11.191286,2.260311 q -1.76415,-6.284768 -10.033581,-6.284768 -10.033577,0 -10.033577,6.284768 0,4.355234 8.104043,6.00912 l 11.963115,2.48083 q 13.947766,2.866736 13.947766,15.987567 0,9.206634 -7.166836,13.782386 -7.16684,4.520623 -17.035029,4.520623 -8.54508,0 -15.105495,-3.418032 -6.560416,-3.473161 -8.545079,-10.529743 z"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:112.90530396px;font-family:'Franklin Gothic Medium';-inkscape-font-specification:'Franklin Gothic Medium, ';fill:#ffffff;fill-opacity:1;stroke-width:1.17609692"
+         id="path9248"
+         inkscape:connector-curvature="0" />
+      <path
+         d="M 168.17166,76.385023 H 154.94057 L 140.71715,47.82792 128.36813,61.665435 V 76.385023 H 116.34989 V 12.359895 L 5.1654951,12.359394 5.1657664,1.133197 H 128.36813 V 47.82792 c 1.06584,-1.396615 1.91116,-2.444077 2.53596,-3.142384 l 22.05182,-23.981351 h 13.50674 l -16.75938,18.413267 z"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:112.90530396px;font-family:'Franklin Gothic Medium';-inkscape-font-specification:'Franklin Gothic Medium, ';fill:#ffffff;fill-opacity:1;stroke-width:1.17609692"
+         id="path9250"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cccccccccccccccc" />
+    </g>
+  </g>
+</svg>

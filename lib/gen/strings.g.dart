@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 896 (448 per locale)
+/// Strings: 898 (449 per locale)
 ///
-/// Built on 2023-08-20 at 21:53 UTC
+/// Built on 2023-08-21 at 09:52 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -160,6 +160,7 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get sprint => '40 Lines';
 	String get blitz => 'Blitz';
 	String get other => 'Other';
+	String get distinguishment => 'Distinguishment';
 	String get zen => 'Zen';
 	String get bio => 'Bio';
 	String get openSearch => 'Search player';
@@ -683,6 +684,7 @@ class _StringsRu implements _StringsEn {
 	@override String get sprint => '40 линий';
 	@override String get blitz => 'Блиц';
 	@override String get other => 'Другое';
+	@override String get distinguishment => 'Заслуга';
 	@override String get zen => 'Дзен';
 	@override String get bio => 'Биография';
 	@override String get openSearch => 'Искать игрока';
@@ -1185,6 +1187,7 @@ extension on _StringsEn {
 			case 'sprint': return '40 Lines';
 			case 'blitz': return 'Blitz';
 			case 'other': return 'Other';
+			case 'distinguishment': return 'Distinguishment';
 			case 'zen': return 'Zen';
 			case 'bio': return 'Bio';
 			case 'openSearch': return 'Search player';
@@ -1643,6 +1646,7 @@ extension on _StringsRu {
 			case 'sprint': return '40 линий';
 			case 'blitz': return 'Блиц';
 			case 'other': return 'Другое';
+			case 'distinguishment': return 'Заслуга';
 			case 'zen': return 'Дзен';
 			case 'bio': return 'Биография';
 			case 'openSearch': return 'Искать игрока';

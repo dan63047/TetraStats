@@ -1,3 +1,5 @@
+// ignore_for_file: hash_and_equals
+
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -533,9 +535,9 @@ class EstTr {
     statrank = 11.2 * atan((srarea - 93) / 130) + 1;
     if (statrank <= 0) statrank = 0.001;
     estglicko = (4.0867 * srarea + 186.68);
-    double temp = (1500 - estglicko) * pi;
-    double temp2 = pow((15.9056943314 * (pow(_rd, 2)) + 3527584.25978), 0.5) as double;
-    double temp3 = 1 + pow(10, (temp / temp2)) as double;
+    // double temp = (1500 - estglicko) * pi;
+    // double temp2 = pow((15.9056943314 * (pow(_rd, 2)) + 3527584.25978), 0.5) as double;
+    // double temp3 = 1 + pow(10, (temp / temp2)) as double;
     //esttr = 25000 / temp3;
     double ntemp = _pps*(150+(((_vs/_apm) - 1.66)*35))+_app*290+_dsp*700;
     esttr = 25000 / 
