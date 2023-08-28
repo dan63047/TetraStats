@@ -6,7 +6,7 @@ import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/views/main_view.dart' show MainView, f4, f2;
 
-List chartsShortTitles = [
+const List chartsShortTitles = [
   "TR",
   "Glicko",
   "RD",

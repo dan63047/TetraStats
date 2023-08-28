@@ -3,6 +3,7 @@
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:vector_math/vector_math.dart';
 
 const double noTrRd = 60.9;
@@ -37,6 +38,35 @@ const Map<String, double> rankCutoffs = {
   "z": -1,
   "": 0.5
 };
+enum Stats {
+  tr,
+  glicko,
+  rd,
+  gp,
+  gw,
+  wr,
+  apm,
+  pps,
+  vs,
+  app,
+  dss,
+  dsp,
+  appdsp,
+  vsapm,
+  cheese,
+  gbe,
+  nyaapp,
+  area,
+  eTR,
+  acceTR,
+  opener,
+  plonk,
+  infDS,
+  stride,
+  stridemMinusPlonk,
+  openerMinusInfDS
+  }
+
 const Map<String, Color> rankColors = { // thanks osk for const rankColors at https://ch.tetr.io/res/js/base.js:418
 	'x': Color(0xFFFF45FF),
 	'u': Color(0xFFFF3813),
@@ -58,6 +88,9 @@ const Map<String, Color> rankColors = { // thanks osk for const rankColors at ht
 	'z': Color(0xFF375433)
 };
 
+String getStatNameByEnum(Stats stat){
+  return t[stat.name];
+}
 
 Duration doubleSecondsToDuration(double value) {
   value = value * 1000000;
@@ -212,6 +245,63 @@ class TetrioPlayer {
   @override
   String toString() {
     return "$username ($state)";
+  }
+
+  num? getStatByEnum(Stats stat){
+    switch (stat) {
+      case Stats.tr:
+        return tlSeason1.rating;
+      case Stats.glicko:
+        return tlSeason1.glicko;
+      case Stats.rd:
+        return tlSeason1.rd;
+      case Stats.gp:
+        return tlSeason1.gamesPlayed;
+      case Stats.gw:
+        return tlSeason1.gamesWon;
+      case Stats.wr:
+        return tlSeason1.winrate;
+      case Stats.apm:
+        return tlSeason1.apm;
+      case Stats.pps:
+        return tlSeason1.pps;
+      case Stats.vs:
+        return tlSeason1.vs;
+      case Stats.app:
+        return tlSeason1.nerdStats?.app;
+      case Stats.dss:
+        return tlSeason1.nerdStats?.dss;
+      case Stats.dsp:
+        return tlSeason1.nerdStats?.dsp;
+      case Stats.appdsp:
+        return tlSeason1.nerdStats?.appdsp;
+      case Stats.vsapm:
+        return tlSeason1.nerdStats?.vsapm;
+      case Stats.cheese:
+        return tlSeason1.nerdStats?.cheese;
+      case Stats.gbe:
+        return tlSeason1.nerdStats?.gbe;
+      case Stats.nyaapp:
+        return tlSeason1.nerdStats?.nyaapp;
+      case Stats.area:
+        return tlSeason1.nerdStats?.area;
+      case Stats.eTR:
+        return tlSeason1.estTr?.esttr;
+      case Stats.acceTR:
+        return tlSeason1.esttracc;
+      case Stats.opener:
+        return tlSeason1.playstyle?.opener;
+      case Stats.plonk:
+        return tlSeason1.playstyle?.plonk;
+      case Stats.infDS:
+        return tlSeason1.playstyle?.infds;
+      case Stats.stride:
+        return tlSeason1.playstyle?.stride;
+      case Stats.stridemMinusPlonk:
+        return tlSeason1.playstyle != null ? tlSeason1.playstyle!.stride - tlSeason1.playstyle!.plonk : null;
+      case Stats.openerMinusInfDS:
+        return tlSeason1.playstyle != null ? tlSeason1.playstyle!.opener - tlSeason1.playstyle!.infds : null;
+    }
   }
 
   @override
@@ -919,7 +1009,13 @@ class TetrioPlayersLeaderboard {
 
   TetrioPlayersLeaderboard(this.type, this.leaderboard);
 
-  List<dynamic> getAverageOfRank(String rank){ // TODO: that function is a mess, there must be a better way to do this
+  List<num> getStatRanking(List<TetrioPlayerFromLeaderboard> leaderboard, Stats stat){
+    var lb = leaderboard.map((e) => e.getStatByEnum(stat)).toList();
+    lb.sort();
+    return lb.reversed.toList();
+  }
+
+  List<dynamic> getAverageOfRank(String rank){ // i tried to refactor it and that's was terrible
     if (rank.isNotEmpty && !rankCutoffs.keys.contains(rank)) throw Exception("Invalid rank");
     List<TetrioPlayerFromLeaderboard> filtredLeaderboard = List.from(leaderboard); 
     if (rank.isNotEmpty) {
@@ -1611,5 +1707,62 @@ class TetrioPlayerFromLeaderboard {
     nerdStats =  NerdStats(apm, pps, vs);
     estTr = EstTr(apm, pps, vs, rd, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
     playstyle = Playstyle(apm, pps, nerdStats.app, nerdStats.vsapm, nerdStats.dsp, nerdStats.gbe, estTr.srarea, estTr.statrank);
+  }
+
+  num getStatByEnum(Stats stat){
+    switch (stat) {
+      case Stats.tr:
+        return rating;
+      case Stats.glicko:
+        return glicko;
+      case Stats.rd:
+        return rd;
+      case Stats.gp:
+        return gamesPlayed;
+      case Stats.gw:
+        return gamesWon;
+      case Stats.wr:
+        return winrate;
+      case Stats.apm:
+        return apm;
+      case Stats.pps:
+        return pps;
+      case Stats.vs:
+        return vs;
+      case Stats.app:
+        return nerdStats.app;
+      case Stats.dss:
+        return nerdStats.dss;
+      case Stats.dsp:
+        return nerdStats.dsp;
+      case Stats.appdsp:
+        return nerdStats.appdsp;
+      case Stats.vsapm:
+        return nerdStats.vsapm;
+      case Stats.cheese:
+        return nerdStats.cheese;
+      case Stats.gbe:
+        return nerdStats.gbe;
+      case Stats.nyaapp:
+        return nerdStats.nyaapp;
+      case Stats.area:
+        return nerdStats.area;
+      case Stats.eTR:
+        return estTr.esttr;
+      case Stats.acceTR:
+        return esttracc;
+      case Stats.opener:
+        return playstyle.opener;
+      case Stats.plonk:
+        return playstyle.plonk;
+      case Stats.infDS:
+        return playstyle.infds;
+      case Stats.stride:
+        return playstyle.stride;
+      case Stats.stridemMinusPlonk:
+        return playstyle.stride - playstyle.plonk;
+      case Stats.openerMinusInfDS:
+        return playstyle.opener - playstyle.infds;
+    }
   }
 }
