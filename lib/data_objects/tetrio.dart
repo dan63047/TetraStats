@@ -67,6 +67,35 @@ enum Stats {
   openerMinusInfDS
   }
 
+const Map<Stats, String> chartsShortTitles = {
+  Stats.tr: "TR",
+  Stats.glicko: "Glicko",
+  Stats.rd: "RD",
+  Stats.gp: "GP",
+  Stats.gw: "GW",
+  Stats.wr: "WR%",
+  Stats.apm: "APM",
+  Stats.pps: "PPS",
+  Stats.vs: "VS",
+  Stats.app: "APP",
+  Stats.dss: "DS/S",
+  Stats.dsp: "DS/P",
+  Stats.appdsp: "APP + DS/P",
+  Stats.vsapm: "VS/APM",
+  Stats.cheese: "Cheese",
+  Stats.gbe: "GbE",
+  Stats.nyaapp: "wAPP",
+  Stats.area: "Area",
+  Stats.eTR: "eTR",
+  Stats.acceTR: "±eTR",
+  Stats.opener: "Opener",
+  Stats.plonk: "Plonk",
+  Stats.infDS: "Inf. DS",
+  Stats.stride: "Stride",
+  Stats.stridemMinusPlonk: "Stride - Plonk",
+  Stats.openerMinusInfDS: "Opener - Inf. DS" 
+  };
+
 const Map<String, Color> rankColors = { // thanks osk for const rankColors at https://ch.tetr.io/res/js/base.js:418
 	'x': Color(0xFFFF45FF),
 	'u': Color(0xFFFF3813),
@@ -1009,10 +1038,21 @@ class TetrioPlayersLeaderboard {
 
   TetrioPlayersLeaderboard(this.type, this.leaderboard);
 
-  List<num> getStatRanking(List<TetrioPlayerFromLeaderboard> leaderboard, Stats stat){
-    var lb = leaderboard.map((e) => e.getStatByEnum(stat)).toList();
-    lb.sort();
-    return lb.reversed.toList();
+  List<TetrioPlayerFromLeaderboard> getStatRanking(List<TetrioPlayerFromLeaderboard> leaderboard, Stats stat, {bool reversed = false, String country = ""}){
+    List<TetrioPlayerFromLeaderboard> lb = List.from(leaderboard);
+    if (country.isNotEmpty){
+      lb.removeWhere((element) => element.country != country);
+    }
+    lb.sort(((a, b) {
+      if (a.getStatByEnum(stat) > b.getStatByEnum(stat)){
+        return reversed ? 1 : -1;
+      }else if (a.getStatByEnum(stat) == b.getStatByEnum(stat)){
+        return 0;
+      }else{
+        return reversed ? -1 : 1;
+      }
+    }));
+    return lb;
   }
 
   List<dynamic> getAverageOfRank(String rank){ // i tried to refactor it and that's was terrible
@@ -1689,7 +1729,7 @@ class TetrioPlayerFromLeaderboard {
     username = json['username'];
     role = json['role'];
     xp = json['xp'].toDouble();
-    country = json['country '];
+    country = json['country'];
     supporter = json['supporter'];
     verified = json['verified'];
     timestamp = ts;
@@ -1722,7 +1762,7 @@ class TetrioPlayerFromLeaderboard {
       case Stats.gw:
         return gamesWon;
       case Stats.wr:
-        return winrate;
+        return winrate*100;
       case Stats.apm:
         return apm;
       case Stats.pps:

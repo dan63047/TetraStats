@@ -100,10 +100,13 @@
     "calcViewNoValues": "Введите значения, чтобы посчитать статистику",
     "rankAveragesViewTitle": "Требования рангов и средние значения",
     "averages": "Средние значения",
-    "lbViewZeroEntrys": "Рейтинговая таблица пуста. Похоже, что-то здесь не так...",
-    "lbViewOneEntry": "В рейтинговой таблице всего один игрок... Чего?",
-    "lbViewManyEntrys": "В рейтинговой таблице находится ${numberOfPlayers}.",
+    "lbViewZeroEntrys": "Рейтинговая таблица пуста",
+    "lbViewOneEntry": "В рейтинговой таблице всего один игрок",
+    "lbViewManyEntrys": "В рейтинговой таблице находится ${numberOfPlayers}",
     "everyoneAverages": "Значения таблицы",
+    "sortBy": "Cортировать по",
+    "reversed": "Наоборот",
+    "country": "Страна",
     "rankAverages": "Значения для $rank ранга",
     "players":{
         "zero": "$n игроков",
@@ -205,6 +208,8 @@
         "socketException": "Невозможно подключиться к ${host}: ${message}"
     },
     "countries(map)": {
+        "": "Не выбрана",
+
         "AF": "Афганистан",
         "AX": "Аландские острова",
         "AL": "Албания",

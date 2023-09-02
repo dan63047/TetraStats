@@ -69,7 +69,8 @@ class TLThingy extends StatelessWidget {
                         maximum: tl.prevAt.toDouble(),
                         interval: tl.prevAt.toDouble() - tl.nextAt.toDouble(), 
                         ranges: [LinearGaugeRange(startValue: tl.standing.toDouble() <= tl.prevAt.toDouble() ? tl.standing.toDouble() : tl.prevAt.toDouble(), endValue: tl.prevAt.toDouble(), color: Colors.cyanAccent,)],
-                        //barPointers: [LinearBarPointer(value: 80)],
+                        markerPointers: [LinearShapePointer(value: tl.standing.toDouble() <= tl.prevAt.toDouble() ? tl.standing.toDouble() : tl.prevAt.toDouble(), position: LinearElementPosition.inside, shapeType: LinearShapePointerType.triangle, color: Colors.white, height: 20),
+                        LinearWidgetPointer(offset: 4, position: LinearElementPosition.outside, value: tl.standing.toDouble() <= tl.prevAt.toDouble() ? tl.standing.toDouble() : tl.prevAt.toDouble(), child: Text(NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 0).format(tl.standing)))],
                         isAxisInversed: true,
                         isMirrored: true,
                         showTicks: true,
@@ -97,7 +98,6 @@ class TLThingy extends StatelessWidget {
                           if (tl.apm != null) StatCellNum(playerStat: tl.apm!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.apm, higherIsBetter: true, oldPlayerStat: oldTl?.apm),
                           if (tl.pps != null) StatCellNum(playerStat: tl.pps!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.pps, higherIsBetter: true, oldPlayerStat: oldTl?.pps),
                           if (tl.vs != null) StatCellNum(playerStat: tl.vs!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.vs, higherIsBetter: true, oldPlayerStat: oldTl?.vs),
-                          if (tl.standing > 0) StatCellNum(playerStat: tl.standing, isScreenBig: bigScreen, playerStatLabel: t.statCellNum.lbp, higherIsBetter: false, oldPlayerStat: oldTl?.standing),
                           if (tl.standingLocal > 0) StatCellNum(playerStat: tl.standingLocal, isScreenBig: bigScreen, playerStatLabel: t.statCellNum.lbpc, higherIsBetter: false, oldPlayerStat: oldTl?.standingLocal),
                           StatCellNum(playerStat: tl.gamesPlayed, isScreenBig: bigScreen, playerStatLabel: t.statCellNum.gamesPlayed, higherIsBetter: true, oldPlayerStat: oldTl?.gamesPlayed),
                           StatCellNum(playerStat: tl.gamesWon, isScreenBig: bigScreen, playerStatLabel: t.statCellNum.gamesWonTL, higherIsBetter: true, oldPlayerStat: oldTl?.gamesWon),
@@ -352,10 +352,10 @@ class TLThingy extends StatelessWidget {
                         clipBehavior: Clip.hardEdge,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(20, 0, 20, 48),
+                            padding: const EdgeInsets.fromLTRB(18, 0, 18, 44),
                             child: SizedBox(
-                              height: 300,
-                              width: 300,
+                              height: 310,
+                              width: 310,
                               child: RadarChart(
                                 RadarChartData(
                                   radarShape: RadarShape.polygon,
@@ -377,21 +377,21 @@ class TLThingy extends StatelessWidget {
                                           angle: angle,
                                         );
                                       case 2:
-                                        return RadarChartTitle(text: 'VS', angle: angle);
+                                        return RadarChartTitle(text: 'VS', angle: angle, positionPercentageOffset: 0.05);
                                       case 3:
-                                        return RadarChartTitle(text: 'APP', angle: angle + 180);
+                                        return RadarChartTitle(text: 'APP', angle: angle + 180, positionPercentageOffset: 0.05);
                                       case 4:
-                                        return RadarChartTitle(text: 'DS/S', angle: angle + 180);
+                                        return RadarChartTitle(text: 'DS/S', angle: angle + 180, positionPercentageOffset: 0.05);
                                       case 5:
-                                        return RadarChartTitle(text: 'DS/P', angle: angle + 180);
+                                        return RadarChartTitle(text: 'DS/P', angle: angle + 180, positionPercentageOffset: 0.05);
                                       case 6:
-                                        return RadarChartTitle(text: 'APP+DS/P', angle: angle + 180);
+                                        return RadarChartTitle(text: 'APP+DS/P', angle: angle + 180, positionPercentageOffset: 0.05);
                                       case 7:
-                                        return RadarChartTitle(text: 'VS/APM', angle: angle + 180);
+                                        return RadarChartTitle(text: 'VS/APM', angle: angle + 180, positionPercentageOffset: 0.05);
                                       case 8:
-                                        return RadarChartTitle(text: 'Cheese', angle: angle);
+                                        return RadarChartTitle(text: 'Cheese', angle: angle, positionPercentageOffset: 0.05);
                                       case 9:
-                                        return RadarChartTitle(text: 'Gb Eff.', angle: angle);
+                                        return RadarChartTitle(text: 'Gb Eff.', angle: angle, positionPercentageOffset: 0.05);
                                       default:
                                         return const RadarChartTitle(text: '');
                                     }
@@ -435,34 +435,30 @@ class TLThingy extends StatelessWidget {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(20, 0, 20, 48),
+                            padding: const EdgeInsets.fromLTRB(18, 0, 18, 44),
                             child: SizedBox(
-                              height: 300,
-                              width: 300,
+                              height: 310,
+                              width: 310,
                               child: RadarChart(
                                 RadarChartData(
                                   radarShape: RadarShape.polygon,
                                   tickCount: 4,
-                                  ticksTextStyle: const TextStyle(color: Colors.transparent, fontSize: 10),
+                                  ticksTextStyle: const TextStyle(color: Colors.white24, fontSize: 10),
                                   radarBorderData: const BorderSide(color: Colors.transparent, width: 1),
                                   gridBorderData: const BorderSide(color: Colors.white24, width: 1),
                                   tickBorderData: const BorderSide(color: Colors.transparent, width: 1),
+                                  titleTextStyle: const TextStyle(height: 1.1),
+                                  radarTouchData: RadarTouchData(),
                                   getTitle: (index, angle) {
                                     switch (index) {
                                       case 0:
-                                        return RadarChartTitle(
-                                          text: 'Opener',
-                                          angle: angle,
-                                        );
+                                        return RadarChartTitle(text: 'Opener\n${f2.format(tl.playstyle!.opener)}', angle: 0, positionPercentageOffset: 0.05);
                                       case 1:
-                                        return RadarChartTitle(
-                                          text: 'Stride',
-                                          angle: angle,
-                                        );
+                                        return RadarChartTitle(text: 'Stride\n${f2.format(tl.playstyle!.stride)}', angle: 0, positionPercentageOffset: 0.05);
                                       case 2:
-                                        return RadarChartTitle(text: 'Inf Ds', angle: angle + 180);
+                                        return RadarChartTitle(text: 'Inf Ds\n${f2.format(tl.playstyle!.infds)}', angle: angle + 180, positionPercentageOffset: 0.05);
                                       case 3:
-                                        return RadarChartTitle(text: 'Plonk', angle: angle);
+                                        return RadarChartTitle(text: 'Plonk\n${f2.format(tl.playstyle!.plonk)}', angle: 0, positionPercentageOffset: 0.05);
                                       default:
                                         return const RadarChartTitle(text: '');
                                     }

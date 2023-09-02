@@ -10,6 +10,7 @@ double? vs;
 NerdStats? nerdStats;
 EstTr? estTr;
 Playstyle? playstyle;
+final NumberFormat f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
 
 class CalcView extends StatefulWidget {
   const CalcView({Key? key}) : super(key: key);
@@ -129,10 +130,10 @@ class CalcState extends State<CalcView> {
                         clipBehavior: Clip.hardEdge,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(20, 0, 20, 48),
+                            padding: const EdgeInsets.fromLTRB(18, 0, 18, 44),
                             child: SizedBox(
-                              height: 300,
-                              width: 300,
+                              height: 310,
+                              width: 310,
                               child: RadarChart(
                                 RadarChartData(
                                   radarShape: RadarShape.polygon,
@@ -154,21 +155,21 @@ class CalcState extends State<CalcView> {
                                           angle: angle,
                                         );
                                       case 2:
-                                        return RadarChartTitle(text: 'VS', angle: angle);
+                                        return RadarChartTitle(text: 'VS', angle: angle, positionPercentageOffset: 0.05);
                                       case 3:
-                                        return RadarChartTitle(text: 'APP', angle: angle + 180);
+                                        return RadarChartTitle(text: 'APP', angle: angle + 180, positionPercentageOffset: 0.05);
                                       case 4:
-                                        return RadarChartTitle(text: 'DS/S', angle: angle + 180);
+                                        return RadarChartTitle(text: 'DS/S', angle: angle + 180, positionPercentageOffset: 0.05);
                                       case 5:
-                                        return RadarChartTitle(text: 'DS/P', angle: angle + 180);
+                                        return RadarChartTitle(text: 'DS/P', angle: angle + 180, positionPercentageOffset: 0.05);
                                       case 6:
-                                        return RadarChartTitle(text: 'APP+DS/P', angle: angle + 180);
+                                        return RadarChartTitle(text: 'APP+DS/P', angle: angle + 180, positionPercentageOffset: 0.05);
                                       case 7:
-                                        return RadarChartTitle(text: 'VS/APM', angle: angle + 180);
+                                        return RadarChartTitle(text: 'VS/APM', angle: angle + 180, positionPercentageOffset: 0.05);
                                       case 8:
-                                        return RadarChartTitle(text: 'Cheese', angle: angle);
+                                        return RadarChartTitle(text: 'Cheese', angle: angle, positionPercentageOffset: 0.05);
                                       case 9:
-                                        return RadarChartTitle(text: 'Gb Eff.', angle: angle);
+                                        return RadarChartTitle(text: 'Gb Eff.', angle: angle, positionPercentageOffset: 0.05);
                                       default:
                                         return const RadarChartTitle(text: '');
                                     }
@@ -212,34 +213,30 @@ class CalcState extends State<CalcView> {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(20, 0, 20, 48),
+                            padding: const EdgeInsets.fromLTRB(18, 0, 18, 44),
                             child: SizedBox(
-                              height: 300,
-                              width: 300,
+                              height: 310,
+                              width: 310,
                               child: RadarChart(
                                 RadarChartData(
                                   radarShape: RadarShape.polygon,
                                   tickCount: 4,
-                                  ticksTextStyle: const TextStyle(color: Colors.transparent, fontSize: 10),
+                                  ticksTextStyle: const TextStyle(color: Colors.white24, fontSize: 10),
                                   radarBorderData: const BorderSide(color: Colors.transparent, width: 1),
                                   gridBorderData: const BorderSide(color: Colors.white24, width: 1),
                                   tickBorderData: const BorderSide(color: Colors.transparent, width: 1),
+                                  titleTextStyle: const TextStyle(height: 1.1),
+                                  radarTouchData: RadarTouchData(),
                                   getTitle: (index, angle) {
                                     switch (index) {
                                       case 0:
-                                        return RadarChartTitle(
-                                          text: 'Opener',
-                                          angle: angle,
-                                        );
+                                        return RadarChartTitle(text: 'Opener\n${f2.format(playstyle!.opener)}', angle: 0, positionPercentageOffset: 0.05);
                                       case 1:
-                                        return RadarChartTitle(
-                                          text: 'Stride',
-                                          angle: angle,
-                                        );
+                                        return RadarChartTitle(text: 'Stride\n${f2.format(playstyle!.stride)}', angle: 0, positionPercentageOffset: 0.05);
                                       case 2:
-                                        return RadarChartTitle(text: 'Inf Ds', angle: angle + 180);
+                                        return RadarChartTitle(text: 'Inf Ds\n${f2.format(playstyle!.infds)}', angle: angle + 180, positionPercentageOffset: 0.05);
                                       case 3:
-                                        return RadarChartTitle(text: 'Plonk', angle: angle);
+                                        return RadarChartTitle(text: 'Plonk\n${f2.format(playstyle!.plonk)}', angle: 0, positionPercentageOffset: 0.05);
                                       default:
                                         return const RadarChartTitle(text: '');
                                     }

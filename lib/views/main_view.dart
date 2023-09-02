@@ -23,7 +23,7 @@ String _titleNickname = "dan63047";
 final TetrioService teto = TetrioService();
 late SharedPreferences prefs;
 var chartsData = <DropdownMenuItem<List<FlSpot>>>[];
-List chartsShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR"];
+List historyShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR"];
 int chartsIndex = 0; 
 const allowedHeightForPlayerIdInPixels = 40.0;
 const allowedHeightForPlayerBioInPixels = 30.0;
@@ -508,12 +508,18 @@ class _TLRecords extends StatelessWidget {
                 fontSize: 28,)),
               title: Text("vs. ${value.endContext.firstWhere((element) => element.userId != userID).username}"),
               subtitle: Text(dateFormat.format(value.timestamp)),
-              trailing: Column(mainAxisAlignment: MainAxisAlignment.center,
+              trailing: Table(defaultColumnWidth: IntrinsicColumnWidth(),
+              defaultVerticalAlignment: TableCellVerticalAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              columnWidths: {
+                0: FixedColumnWidth(50),
+                2: FixedColumnWidth(50),
+              },
                 children: [
-                Text("${f2.format(value.endContext.firstWhere((element) => element.userId == userID).secondary)} : ${f2.format(value.endContext.firstWhere((element) => element.userId != userID).secondary)} APM", style: const TextStyle(height: 1.1)),
-                Text("${f2.format(value.endContext.firstWhere((element) => element.userId == userID).tertiary)} : ${f2.format(value.endContext.firstWhere((element) => element.userId != userID).tertiary)} PPS", style: const TextStyle(height: 1.1)),
-                Text("${f2.format(value.endContext.firstWhere((element) => element.userId == userID).extra)} : ${f2.format(value.endContext.firstWhere((element) => element.userId != userID).extra)} VS", style: const TextStyle(height: 1.1)),
-              ]),
+                TableRow(children: [Text(f2.format(value.endContext.firstWhere((element) => element.userId == userID).secondary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: const TextStyle(height: 1.1)), Text(f2.format(value.endContext.firstWhere((element) => element.userId != userID).secondary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" APM", textAlign: TextAlign.right, style: const TextStyle(height: 1.1))]),
+                TableRow(children: [Text(f2.format(value.endContext.firstWhere((element) => element.userId == userID).tertiary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: const TextStyle(height: 1.1)), Text(f2.format(value.endContext.firstWhere((element) => element.userId != userID).tertiary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" PPS", textAlign: TextAlign.right, style: const TextStyle(height: 1.1))]),
+                TableRow(children: [Text(f2.format(value.endContext.firstWhere((element) => element.userId == userID).extra), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: const TextStyle(height: 1.1)), Text(f2.format(value.endContext.firstWhere((element) => element.userId != userID).extra), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" VS", textAlign: TextAlign.right, style: const TextStyle(height: 1.1))]),
+              ],),
               onTap: (){Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -546,7 +552,7 @@ class _History extends StatelessWidget{
                   update();
                 }
               ),
-          if(chartsData[chartsIndex].value!.length > 1) _HistoryChartThigy(data: chartsData[chartsIndex].value!, title: "ss", yAxisTitle: chartsShortTitles[chartsIndex], bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? f2 : NumberFormat.compact(),)
+          if(chartsData[chartsIndex].value!.length > 1) _HistoryChartThigy(data: chartsData[chartsIndex].value!, title: "ss", yAxisTitle: historyShortTitles[chartsIndex], bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? f2 : NumberFormat.compact(),)
           else Center(child: Text(t.notEnoughData, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))
         ],
       ),

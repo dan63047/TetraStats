@@ -100,10 +100,13 @@
     "calcViewNoValues": "Enter values to calculate the stats",
     "rankAveragesViewTitle": "Ranks cutoff and average stats",
     "averages": "Averages",
-    "lbViewZeroEntrys": "Empty list. Looks like something is wrong...",
-    "lbViewOneEntry": "There is only one player... What?",
-    "lbViewManyEntrys": "There are ${numberOfPlayers}.",
+    "lbViewZeroEntrys": "Empty list",
+    "lbViewOneEntry": "There is only one player",
+    "lbViewManyEntrys": "There are ${numberOfPlayers}",
     "everyoneAverages": "Values for leaderboard",
+    "sortBy": "Sort by",
+    "reversed": "Reversed",
+    "country": "Country",
     "rankAverages": "Values for $rank rank",
     "players":{
         "zero": "$n players",
@@ -205,6 +208,8 @@
         "socketException": "Can't connect with ${host}: ${message}"
     },
     "countries(map)": {
+        "": "Not selected",
+
         "AF": "Afghanistan",
         "AX": "\u00c5land Islands",
         "AL": "Albania",

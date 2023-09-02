@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 898 (449 per locale)
+/// Strings: 906 (453 per locale)
 ///
-/// Built on 2023-08-21 at 09:52 UTC
+/// Built on 2023-09-02 at 21:37 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -251,10 +251,13 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get calcViewNoValues => 'Enter values to calculate the stats';
 	String get rankAveragesViewTitle => 'Ranks cutoff and average stats';
 	String get averages => 'Averages';
-	String get lbViewZeroEntrys => 'Empty list. Looks like something is wrong...';
-	String get lbViewOneEntry => 'There is only one player... What?';
-	String lbViewManyEntrys({required Object numberOfPlayers}) => 'There are ${numberOfPlayers}.';
+	String get lbViewZeroEntrys => 'Empty list';
+	String get lbViewOneEntry => 'There is only one player';
+	String lbViewManyEntrys({required Object numberOfPlayers}) => 'There are ${numberOfPlayers}';
 	String get everyoneAverages => 'Values for leaderboard';
+	String get sortBy => 'Sort by';
+	String get reversed => 'Reversed';
+	String get country => 'Country';
 	String rankAverages({required Object rank}) => 'Values for ${rank} rank';
 	String players({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
 		zero: '${n} players',
@@ -290,6 +293,7 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	late final _StringsPopupActionsEn popupActions = _StringsPopupActionsEn._(_root);
 	late final _StringsErrorsEn errors = _StringsErrorsEn._(_root);
 	Map<String, String> get countries => {
+		'': 'Not selected',
 		'AF': 'Afghanistan',
 		'AX': 'Åland Islands',
 		'AL': 'Albania',
@@ -775,10 +779,13 @@ class _StringsRu implements _StringsEn {
 	@override String get calcViewNoValues => 'Введите значения, чтобы посчитать статистику';
 	@override String get rankAveragesViewTitle => 'Требования рангов и средние значения';
 	@override String get averages => 'Средние значения';
-	@override String get lbViewZeroEntrys => 'Рейтинговая таблица пуста. Похоже, что-то здесь не так...';
-	@override String get lbViewOneEntry => 'В рейтинговой таблице всего один игрок... Чего?';
-	@override String lbViewManyEntrys({required Object numberOfPlayers}) => 'В рейтинговой таблице находится ${numberOfPlayers}.';
+	@override String get lbViewZeroEntrys => 'Рейтинговая таблица пуста';
+	@override String get lbViewOneEntry => 'В рейтинговой таблице всего один игрок';
+	@override String lbViewManyEntrys({required Object numberOfPlayers}) => 'В рейтинговой таблице находится ${numberOfPlayers}';
 	@override String get everyoneAverages => 'Значения таблицы';
+	@override String get sortBy => 'Cортировать по';
+	@override String get reversed => 'Наоборот';
+	@override String get country => 'Страна';
 	@override String rankAverages({required Object rank}) => 'Значения для ${rank} ранга';
 	@override String players({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
 		zero: '${n} игроков',
@@ -814,6 +821,7 @@ class _StringsRu implements _StringsEn {
 	@override late final _StringsPopupActionsRu popupActions = _StringsPopupActionsRu._(_root);
 	@override late final _StringsErrorsRu errors = _StringsErrorsRu._(_root);
 	@override Map<String, String> get countries => {
+		'': 'Не выбрана',
 		'AF': 'Афганистан',
 		'AX': 'Аландские острова',
 		'AL': 'Албания',
@@ -1278,10 +1286,13 @@ extension on _StringsEn {
 			case 'calcViewNoValues': return 'Enter values to calculate the stats';
 			case 'rankAveragesViewTitle': return 'Ranks cutoff and average stats';
 			case 'averages': return 'Averages';
-			case 'lbViewZeroEntrys': return 'Empty list. Looks like something is wrong...';
-			case 'lbViewOneEntry': return 'There is only one player... What?';
-			case 'lbViewManyEntrys': return ({required Object numberOfPlayers}) => 'There are ${numberOfPlayers}.';
+			case 'lbViewZeroEntrys': return 'Empty list';
+			case 'lbViewOneEntry': return 'There is only one player';
+			case 'lbViewManyEntrys': return ({required Object numberOfPlayers}) => 'There are ${numberOfPlayers}';
 			case 'everyoneAverages': return 'Values for leaderboard';
+			case 'sortBy': return 'Sort by';
+			case 'reversed': return 'Reversed';
+			case 'country': return 'Country';
 			case 'rankAverages': return ({required Object rank}) => 'Values for ${rank} rank';
 			case 'players': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
 				zero: '${n} players',
@@ -1372,6 +1383,7 @@ extension on _StringsEn {
 			case 'errors.connection': return ({required Object code, required Object message}) => 'Some issue with connection: ${code} ${message}';
 			case 'errors.noSuchUser': return 'No such user';
 			case 'errors.socketException': return ({required Object host, required Object message}) => 'Can\'t connect with ${host}: ${message}';
+			case 'countries.': return 'Not selected';
 			case 'countries.AF': return 'Afghanistan';
 			case 'countries.AX': return 'Åland Islands';
 			case 'countries.AL': return 'Albania';
@@ -1737,10 +1749,13 @@ extension on _StringsRu {
 			case 'calcViewNoValues': return 'Введите значения, чтобы посчитать статистику';
 			case 'rankAveragesViewTitle': return 'Требования рангов и средние значения';
 			case 'averages': return 'Средние значения';
-			case 'lbViewZeroEntrys': return 'Рейтинговая таблица пуста. Похоже, что-то здесь не так...';
-			case 'lbViewOneEntry': return 'В рейтинговой таблице всего один игрок... Чего?';
-			case 'lbViewManyEntrys': return ({required Object numberOfPlayers}) => 'В рейтинговой таблице находится ${numberOfPlayers}.';
+			case 'lbViewZeroEntrys': return 'Рейтинговая таблица пуста';
+			case 'lbViewOneEntry': return 'В рейтинговой таблице всего один игрок';
+			case 'lbViewManyEntrys': return ({required Object numberOfPlayers}) => 'В рейтинговой таблице находится ${numberOfPlayers}';
 			case 'everyoneAverages': return 'Значения таблицы';
+			case 'sortBy': return 'Cортировать по';
+			case 'reversed': return 'Наоборот';
+			case 'country': return 'Страна';
 			case 'rankAverages': return ({required Object rank}) => 'Значения для ${rank} ранга';
 			case 'players': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
 				zero: '${n} игроков',
@@ -1831,6 +1846,7 @@ extension on _StringsRu {
 			case 'errors.connection': return ({required Object code, required Object message}) => 'Проблема с подключением: ${code} ${message}';
 			case 'errors.noSuchUser': return 'Нет такого пользователя';
 			case 'errors.socketException': return ({required Object host, required Object message}) => 'Невозможно подключиться к ${host}: ${message}';
+			case 'countries.': return 'Не выбрана';
 			case 'countries.AF': return 'Афганистан';
 			case 'countries.AX': return 'Аландские острова';
 			case 'countries.AL': return 'Албания';

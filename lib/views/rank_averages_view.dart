@@ -6,39 +6,9 @@ import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/views/main_view.dart' show MainView, f4, f2;
 
-const List chartsShortTitles = [
-  "TR",
-  "Glicko",
-  "RD",
-  "GP",
-  "GW",
-  "WR%",
-  "APM",
-  "PPS",
-  "VS",
-  "APP",
-  "DS/S",
-  "DS/P",
-  "APP + DS/P",
-  "VS/APM",
-  "Cheese",
-  "GbE",
-  "wAPP",
-  "Area",
-  "eTR",
-  "±eTR",
-  "Opener",
-  "Plonk",
-  "Inf. DS",
-  "Stride",
-  "Stride - Plonk",
-  "Opener - Inf. DS"
-  ];
-var chartsShortTitlesDropdowns = <DropdownMenuItem>[for (String e in chartsShortTitles) DropdownMenuItem(value: e,child: Text(e),)];
-int chartsIndexX = 0;
-int chartsIndexY = 6;
-//final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
-double pfpHeight = 128;
+var chartsShortTitlesDropdowns = <DropdownMenuItem>[for (MapEntry e in chartsShortTitles.entries) DropdownMenuItem(value: e.key, child: Text(e.value),)];
+Stats chartsX = Stats.tr;
+Stats chartsY = Stats.apm;
 
 class RankView extends StatefulWidget {
   final List rank;
@@ -154,9 +124,9 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                   child: Text(t.currentAxis(axis: "X"), style: const TextStyle(fontSize: 22))),
                                 DropdownButton(
                                       items: chartsShortTitlesDropdowns,
-                                      value: chartsShortTitlesDropdowns[chartsIndexX].value,
+                                      value: chartsX,
                                       onChanged: (value) {
-                                        chartsIndexX = chartsShortTitlesDropdowns.indexWhere((element) => element.value == value);
+                                        chartsX = value;
                                         _justUpdate();
                                       }
                                     ),
@@ -174,9 +144,9 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                 ),
                                 DropdownButton(
                                       items: chartsShortTitlesDropdowns,
-                                      value: chartsShortTitlesDropdowns[chartsIndexY].value,
+                                      value: chartsY,
                                       onChanged: (value) {
-                                        chartsIndexY = chartsShortTitlesDropdowns.indexWhere((element) => element.value == value);
+                                        chartsY = value;
                                         _justUpdate();
                                       }
                                     ),
@@ -195,11 +165,11 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                   : const EdgeInsets.fromLTRB(0, 40, 16, 48),
               child: ScatterChart(
                 ScatterChartData(
-                  scatterSpots: [ for (TetrioPlayerFromLeaderboard entry in widget.rank[1]["entries"]) _MyScatterSpot(takeStat(entry, chartsShortTitles[chartsIndexX]), takeStat(entry, chartsShortTitles[chartsIndexY]), entry.userId, entry.username, color: rankColors[entry.rank])],
+                  scatterSpots: [ for (TetrioPlayerFromLeaderboard entry in widget.rank[1]["entries"]) _MyScatterSpot(entry.getStatByEnum(chartsX) as double, entry.getStatByEnum(chartsY) as double, entry.userId, entry.username, color: rankColors[entry.rank])],
                   scatterTouchData: ScatterTouchData(touchTooltipData: ScatterTouchTooltipData(
                     fitInsideHorizontally: true, fitInsideVertically: true, getTooltipItems: (touchedSpot) {
                     touchedSpot as _MyScatterSpot;
-                  return ScatterTooltipItem("${touchedSpot.nickname}\n", textStyle: const TextStyle(fontFamily: "Eurostile Round Extended"), children: [TextSpan(text: "${f4.format(touchedSpot.x)} ${chartsShortTitles[chartsIndexX]}\n${f4.format(touchedSpot.y)} ${chartsShortTitles[chartsIndexY]}", style: const TextStyle(fontFamily: "Eurostile Round"))]);
+                  return ScatterTooltipItem("${touchedSpot.nickname}\n", textStyle: const TextStyle(fontFamily: "Eurostile Round Extended"), children: [TextSpan(text: "${f4.format(touchedSpot.x)} ${chartsShortTitles[chartsX]}\n${f4.format(touchedSpot.y)} ${chartsShortTitles[chartsY]}", style: const TextStyle(fontFamily: "Eurostile Round"))]);
                 }),
                 touchCallback:(event, response) {
                   if (event.runtimeType == FlTapDownEvent && response?.touchedSpot?.spot != null){
@@ -956,66 +926,6 @@ class _ListEntry extends StatelessWidget {
     );
   }
 }
-
-double takeStat(TetrioPlayerFromLeaderboard entry, String stat) {
-  switch (stat) {
-    case "TR":
-      return entry.rating;
-    case "Glicko":
-      return entry.glicko;
-    case "RD":
-      return entry.rd;
-    case "GP":
-      return entry.gamesPlayed.toDouble();
-    case "GW":
-      return entry.gamesWon.toDouble();
-    case "WR%":
-      return entry.winrate*100;
-    case "APM":
-      return entry.apm;
-    case "PPS":
-      return entry.pps;
-    case "VS":
-      return entry.vs;
-    case "APP":
-      return entry.nerdStats.app;
-    case "DS/S":
-      return entry.nerdStats.dss;
-    case "DS/P":
-      return entry.nerdStats.dsp;
-    case "APP + DS/P":
-      return entry.nerdStats.appdsp;
-    case "VS/APM":
-      return entry.nerdStats.vsapm;
-    case "Cheese":
-      return entry.nerdStats.cheese;
-    case "GbE":
-      return entry.nerdStats.gbe;
-    case "wAPP":
-      return entry.nerdStats.nyaapp;
-    case "Area":
-      return entry.nerdStats.area;
-    case "eTR":
-      return entry.estTr.esttr;
-    case "±eTR":
-      return entry.esttracc;
-    case "Opener":
-      return entry.playstyle.opener;
-    case "Plonk":
-      return entry.playstyle.plonk;
-    case "Inf. DS":
-      return entry.playstyle.infds;
-    case "Stride":
-      return entry.playstyle.stride;
-    case "Stride - Plonk":
-      return entry.playstyle.stride - entry.playstyle.plonk;
-    case "Opener - Inf. DS":
-      return entry.playstyle.opener - entry.playstyle.infds;
-    default:
-      throw ArgumentError.value(stat, "Incorrect stat", "We don't have that stat");
-  }
-}
-
 class _MyScatterSpot extends ScatterSpot{
   String id;
   String nickname;
