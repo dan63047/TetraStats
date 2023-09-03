@@ -148,11 +148,13 @@ class CalcState extends State<CalcView> {
                                         return RadarChartTitle(
                                           text: 'APM',
                                           angle: angle,
+                                          positionPercentageOffset: 0.05
                                         );
                                       case 1:
                                         return RadarChartTitle(
                                           text: 'PPS',
                                           angle: angle,
+                                          positionPercentageOffset: 0.05
                                         );
                                       case 2:
                                         return RadarChartTitle(text: 'VS', angle: angle, positionPercentageOffset: 0.05);

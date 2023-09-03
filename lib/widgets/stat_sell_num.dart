@@ -47,6 +47,7 @@ class StatCellNum extends StatelessWidget {
                 style: const TextStyle(
                   fontFamily: "Eurostile Round",
                   fontSize: 16,
+                  height: 1.1
                 ),
               )
             : TextButton(
@@ -76,6 +77,7 @@ class StatCellNum extends StatelessWidget {
                   style: const TextStyle(
                     fontFamily: "Eurostile Round",
                     fontSize: 16,
+                    height: 1.1
                   ),
                 )),
       ],

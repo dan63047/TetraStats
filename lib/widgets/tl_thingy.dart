@@ -367,15 +367,9 @@ class TLThingy extends StatelessWidget {
                                   getTitle: (index, angle) {
                                     switch (index) {
                                       case 0:
-                                        return RadarChartTitle(
-                                          text: 'APM',
-                                          angle: angle,
-                                        );
+                                        return RadarChartTitle(text: 'APM', angle: angle, positionPercentageOffset: 0.05);
                                       case 1:
-                                        return RadarChartTitle(
-                                          text: 'PPS',
-                                          angle: angle,
-                                        );
+                                        return RadarChartTitle(text: 'PPS', angle: angle, positionPercentageOffset: 0.05);
                                       case 2:
                                         return RadarChartTitle(text: 'VS', angle: angle, positionPercentageOffset: 0.05);
                                       case 3:
