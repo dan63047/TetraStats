@@ -321,16 +321,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                     ],
                                   ),
                                   onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => MainView(
-                                            player: widget
-                                                .rank[1]["entries"][index]
-                                                .username),
-                                        maintainState: false,
-                                      ),
-                                    );
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => MainView(player: they[index].username), maintainState: false));
                                   },
                                 );
                               }),

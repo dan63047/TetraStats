@@ -33,7 +33,7 @@ class RanksAverages extends State<RankAveragesView> {
       ),
       backgroundColor: Colors.black,
       body: SafeArea(
-          child: ListView.builder(
+          child: averages.isEmpty ? const Center(child: Text('Fetching...')) : ListView.builder(
             itemCount: averages.length,
             itemBuilder: (context, index){
               bool bigScreen = MediaQuery.of(context).size.width > 768;

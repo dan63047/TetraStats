@@ -11,6 +11,7 @@ import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
+import 'package:tetra_stats/views/ranks_averages_view.dart';
 import 'package:tetra_stats/views/tl_leaderboard_view.dart' show TLLeaderboardView;
 import 'package:tetra_stats/views/tl_match_view.dart' show TlMatchResultView;
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
@@ -466,6 +467,20 @@ class _NavDrawerState extends State<NavDrawer> {
                           },
                         ),
                       ),
+                      SliverToBoxAdapter(
+                        child: ListTile(
+                          leading: const Icon(Icons.compress),
+                          title: Text(t.rankAveragesViewTitle),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const RankAveragesView(),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
                       const SliverToBoxAdapter(child: Divider())
                     ];
                   },
@@ -508,17 +523,17 @@ class _TLRecords extends StatelessWidget {
                 fontSize: 28,)),
               title: Text("vs. ${value.endContext.firstWhere((element) => element.userId != userID).username}"),
               subtitle: Text(dateFormat.format(value.timestamp)),
-              trailing: Table(defaultColumnWidth: IntrinsicColumnWidth(),
+              trailing: Table(defaultColumnWidth: const IntrinsicColumnWidth(),
               defaultVerticalAlignment: TableCellVerticalAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
-              columnWidths: {
+              columnWidths: const {
                 0: FixedColumnWidth(50),
                 2: FixedColumnWidth(50),
               },
                 children: [
-                TableRow(children: [Text(f2.format(value.endContext.firstWhere((element) => element.userId == userID).secondary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: const TextStyle(height: 1.1)), Text(f2.format(value.endContext.firstWhere((element) => element.userId != userID).secondary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" APM", textAlign: TextAlign.right, style: const TextStyle(height: 1.1))]),
-                TableRow(children: [Text(f2.format(value.endContext.firstWhere((element) => element.userId == userID).tertiary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: const TextStyle(height: 1.1)), Text(f2.format(value.endContext.firstWhere((element) => element.userId != userID).tertiary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" PPS", textAlign: TextAlign.right, style: const TextStyle(height: 1.1))]),
-                TableRow(children: [Text(f2.format(value.endContext.firstWhere((element) => element.userId == userID).extra), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: const TextStyle(height: 1.1)), Text(f2.format(value.endContext.firstWhere((element) => element.userId != userID).extra), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" VS", textAlign: TextAlign.right, style: const TextStyle(height: 1.1))]),
+                TableRow(children: [Text(f2.format(value.endContext.firstWhere((element) => element.userId == userID).secondary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(f2.format(value.endContext.firstWhere((element) => element.userId != userID).secondary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" APM", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
+                TableRow(children: [Text(f2.format(value.endContext.firstWhere((element) => element.userId == userID).tertiary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(f2.format(value.endContext.firstWhere((element) => element.userId != userID).tertiary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" PPS", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
+                TableRow(children: [Text(f2.format(value.endContext.firstWhere((element) => element.userId == userID).extra), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(f2.format(value.endContext.firstWhere((element) => element.userId != userID).extra), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" VS", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
               ],),
               onTap: (){Navigator.push(
                     context,
@@ -583,8 +598,8 @@ class _HistoryChartThigy extends StatelessWidget{
               lineBarsData: [LineChartBarData(spots: data)],
               borderData: FlBorderData(show: false),
               gridData: FlGridData(verticalInterval: xInterval),
-              titlesData: FlTitlesData(topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              titlesData: FlTitlesData(topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
               bottomTitles: AxisTitles(sideTitles: SideTitles(interval: xInterval, showTitles: true, reservedSize: 30, getTitlesWidget: (double value, TitleMeta meta){
                 return value != meta.min && value != meta.max ? SideTitleWidget(
                   axisSide: meta.axisSide,
