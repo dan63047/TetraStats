@@ -780,8 +780,11 @@ class EndContextMulti {
   late List extraTracking;
   late bool success;
   late NerdStats nerdStats;
+  late List<NerdStats> nerdStatsTracking;
   late EstTr estTr;
+  late List<EstTr> estTrTracking;
   late Playstyle playstyle;
+  late List<Playstyle> playstyleTracking;
 
   EndContextMulti(
       {required this.userId,
@@ -817,8 +820,11 @@ class EndContextMulti {
     extra = json['points']['extra']['vs'].toDouble();
     extraTracking = json['points']['extraAvgTracking']['aggregatestats___vsscore'].map((e) => e.toDouble()).toList();
     nerdStats = NerdStats(secondary, tertiary, extra);
+    nerdStatsTracking = [for (int i = 0; i < secondaryTracking.length; i++) NerdStats(secondaryTracking[i], tertiaryTracking[i], extraTracking[i])];
     estTr = EstTr(secondary, tertiary, extra, noTrRd, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
+    estTrTracking = [for (int i = 0; i < secondaryTracking.length; i++) EstTr(secondaryTracking[i], tertiaryTracking[i], extraTracking[i], noTrRd, nerdStatsTracking[i].app, nerdStatsTracking[i].dss, nerdStatsTracking[i].dsp, nerdStatsTracking[i].gbe)];
     playstyle = Playstyle(secondary, tertiary, nerdStats.app, nerdStats.vsapm, nerdStats.dsp, nerdStats.gbe, estTr.srarea, estTr.statrank);
+    playstyleTracking = [for (int i = 0; i < secondaryTracking.length; i++) Playstyle(secondaryTracking[i], tertiaryTracking[i], nerdStatsTracking[i].app, nerdStatsTracking[i].vsapm, nerdStatsTracking[i].dsp, nerdStatsTracking[i].gbe, estTrTracking[i].srarea, estTrTracking[i].statrank)];
   }
 
   Map<String, dynamic> toJson() {

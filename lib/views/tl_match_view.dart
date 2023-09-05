@@ -6,6 +6,8 @@ import 'package:tetra_stats/gen/strings.g.dart';
 
 
 final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
+int roundSelector = -1; // -1 = match averages, otherwise round number-1
+List<DropdownMenuItem> rounds = []; // index zero will be match stats
 
 class TlMatchResultView extends StatefulWidget {
   final TetraLeagueAlphaRecord record;
@@ -23,7 +25,15 @@ class TlMatchResultState extends State<TlMatchResultView> {
   @override
   void initState(){
     _scrollController = ScrollController();
+    rounds = [const DropdownMenuItem(value: -1, child: Text("Match"))];
+    rounds.addAll([for (int i = 0; i < widget.record.endContext.first.secondaryTracking.length; i++) DropdownMenuItem(value: i, child: Text("Round ${i+1}"))]);
     super.initState();
+  }
+
+  @override
+  void dispose(){
+    roundSelector = -1;
+    super.dispose();
   }
 
   @override
@@ -32,8 +42,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
     bool bigScreen = MediaQuery.of(context).size.width > 768;
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-            "${widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).username.toUpperCase()} ${t.vs} ${widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).username.toUpperCase()} in TL match ${dateFormat.format(widget.record.timestamp)}"),
+        title: Text("${widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).username.toUpperCase()} ${t.vs} ${widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).username.toUpperCase()} in TL match ${dateFormat.format(widget.record.timestamp)}"),
       ),
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -100,6 +109,23 @@ class TlMatchResultState extends State<TlMatchResultView> {
                   ),
                 ),
               ),
+              SliverToBoxAdapter(
+                child: Center(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      Text("Stats for: ",
+                      style: const TextStyle(color: Colors.white, fontSize: 25)),
+                      DropdownButton(items: rounds, value: roundSelector, onChanged: ((value) {
+                        roundSelector = value;
+                        setState(() {});
+                      }),),
+                    ],
+                  ),
+                ),
+              ),
               const SliverToBoxAdapter(
                 child: Divider(),
               )
@@ -111,22 +137,22 @@ class TlMatchResultState extends State<TlMatchResultView> {
                             children: [
                                 CompareThingy(
                                   label: "APM",
-                                  greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).secondary,
-                                  redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).secondary,
+                                  greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).secondary : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).secondaryTracking[roundSelector],
+                                  redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).secondary : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).secondaryTracking[roundSelector],
                                   fractionDigits: 2,
                                   higherIsBetter: true,
                                 ),
                                 CompareThingy(
                                   label: "PPS",
-                                  greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).tertiary,
-                                  redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).tertiary,
+                                  greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).tertiary : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).tertiaryTracking[roundSelector],
+                                  redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).tertiary : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).tertiaryTracking[roundSelector],
                                   fractionDigits: 2,
                                   higherIsBetter: true,
                                 ),
                                 CompareThingy(
                                   label: "VS",
-                                  greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).extra,
-                                  redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).extra,
+                                  greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).extra : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).extraTracking[roundSelector],
+                                  redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).extra : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).extraTracking[roundSelector],
                                   fractionDigits: 2,
                                   higherIsBetter: true,
                                 ),
@@ -144,73 +170,100 @@ class TlMatchResultState extends State<TlMatchResultView> {
                           ),
                           CompareThingy(
                             label: "APP",
-                            greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.app,
-                            redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.app,
+                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.app : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].app,
+                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.app : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].app,
                             fractionDigits: 3,
                             higherIsBetter: true,
                           ),
                           CompareThingy(
                             label: "VS/APM",
-                            greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.vsapm,
-                            redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.vsapm,
+                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.vsapm : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].vsapm,
+                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.vsapm : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].vsapm,
                             fractionDigits: 3,
                             higherIsBetter: true,
                           ),
                           CompareThingy(
                             label: "DS/S",
-                            greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.dss,
-                            redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.dss,
+                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.dss : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].dss,
+                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.dss : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].dss,
                             fractionDigits: 3,
                             higherIsBetter: true,
                           ),
                           CompareThingy(
                             label: "DS/P",
-                            greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.dsp,
-                            redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.dsp,
+                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.dsp : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].dsp,
+                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.dsp : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].dsp,
                             fractionDigits: 3,
                             higherIsBetter: true,
                           ),
                           CompareThingy(
                             label: "APP + DS/P",
-                            greenSide:
-                                widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.appdsp,
-                            redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.appdsp,
+                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.appdsp : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].appdsp,
+                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.appdsp : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].appdsp,
                             fractionDigits: 3,
                             higherIsBetter: true,
                           ),
                           CompareThingy(
                             label: t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "),
-                            greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.cheese,
-                            redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.cheese,
+                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.cheese : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].cheese,
+                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.cheese : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].cheese,
                             fractionDigits: 2,
                             higherIsBetter: true,
                           ),
                           CompareThingy(
                             label: "Gb Eff.",
-                            greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.gbe,
-                            redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.gbe,
+                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.gbe : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].gbe,
+                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.gbe : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].gbe,
                             fractionDigits: 3,
                             higherIsBetter: true,
                           ),
                           CompareThingy(
                             label: "wAPP",
-                            greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.nyaapp,
-                            redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.nyaapp,
+                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.nyaapp : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].nyaapp,
+                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.nyaapp : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].nyaapp,
                             fractionDigits: 3,
                             higherIsBetter: true,
                           ),
                           CompareThingy(
                             label: "Area",
-                            greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.area,
-                            redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.area,
+                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.area : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].area,
+                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.area : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].area,
                             fractionDigits: 2,
                             higherIsBetter: true,
                           ),
                           CompareThingy(
                             label: t.statCellNum.estOfTRShort,
-                            greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).estTr.esttr,
-                            redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).estTr.esttr,
+                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).estTr.esttr : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).estTrTracking[roundSelector].esttr,
+                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).estTr.esttr : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).estTrTracking[roundSelector].esttr,
                             fractionDigits: 2,
+                            higherIsBetter: true,
+                          ),
+                          CompareThingy(
+                            label: "Opener",
+                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle.opener : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyleTracking[roundSelector].opener,
+                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle.opener : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyleTracking[roundSelector].opener,
+                            fractionDigits: 3,
+                            higherIsBetter: true,
+                          ),
+                          CompareThingy(
+                            label: "Plonk",
+                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle.plonk : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyleTracking[roundSelector].plonk,
+                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle.plonk : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyleTracking[roundSelector].plonk,
+                            fractionDigits: 3,
+                            higherIsBetter: true,
+                          ),
+                          CompareThingy(
+                            label: "Stride",
+                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle.stride : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyleTracking[roundSelector].stride,
+                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle.stride : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyleTracking[roundSelector].stride,
+                            fractionDigits: 3,
+                            higherIsBetter: true,
+                          ),
+                          CompareThingy(
+                            label: "Inf. DS",
+                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle.infds : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyleTracking[roundSelector].infds,
+                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle.infds : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyleTracking[roundSelector].infds,
+                            fractionDigits: 3,
                             higherIsBetter: true,
                           ),
                           Wrap(
@@ -219,70 +272,43 @@ class TlMatchResultState extends State<TlMatchResultView> {
                             spacing: 25,
                             crossAxisAlignment: WrapCrossAlignment.start,
                             clipBehavior: Clip.hardEdge,
-                            children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(20, 20, 20, 20),
+                            children: [Padding(
+                                padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
                                 child: SizedBox(
-                                  height: 300,
-                                  width: 300,
-                                  child: RadarChart(
-                                    RadarChartData(
-                                      radarShape: RadarShape.polygon,
-                                      tickCount: 4,
-                                      ticksTextStyle: const TextStyle(
-                                          color: Colors.transparent,
-                                          fontSize: 10),
-                                      radarBorderData: const BorderSide(
-                                          color: Colors.transparent, width: 1),
-                                      gridBorderData: const BorderSide(
-                                          color: Colors.white24, width: 1),
-                                      tickBorderData: const BorderSide(
-                                          color: Colors.transparent, width: 1),
+                                height: 310,
+                                width: 310,
+                                child: RadarChart(
+                                RadarChartData(
+                                  radarShape: RadarShape.polygon,
+                                  tickCount: 4,
+                                  ticksTextStyle: const TextStyle(color: Colors.transparent, fontSize: 10),
+                                  radarBorderData: const BorderSide(color: Colors.transparent, width: 1),
+                                  gridBorderData: const BorderSide(color: Colors.white24, width: 1),
+                                  tickBorderData: const BorderSide(color: Colors.transparent, width: 1),
                                       getTitle: (index, angle) {
                                         switch (index) {
                                           case 0:
-                                            return RadarChartTitle(
-                                              text: 'APM',
-                                              angle: angle,
-                                            );
+                                            return RadarChartTitle(text: 'APM', angle: angle, positionPercentageOffset: 0.05);
                                           case 1:
-                                            return RadarChartTitle(
-                                              text: 'PPS',
-                                              angle: angle,
-                                            );
+                                            return RadarChartTitle(text: 'PPS', angle: angle, positionPercentageOffset: 0.05);
                                           case 2:
-                                            return RadarChartTitle(
-                                                text: 'VS', angle: angle);
+                                            return RadarChartTitle(text: 'VS', angle: angle, positionPercentageOffset: 0.05);
                                           case 3:
-                                            return RadarChartTitle(
-                                                text: 'APP',
-                                                angle: angle + 180);
+                                            return RadarChartTitle(text: 'APP', angle: angle + 180, positionPercentageOffset: 0.05);
                                           case 4:
-                                            return RadarChartTitle(
-                                                text: 'DS/S',
-                                                angle: angle + 180);
+                                            return RadarChartTitle(text: 'DS/S', angle: angle + 180, positionPercentageOffset: 0.05);
                                           case 5:
-                                            return RadarChartTitle(
-                                                text: 'DS/P',
-                                                angle: angle + 180);
+                                            return RadarChartTitle(text: 'DS/P', angle: angle + 180, positionPercentageOffset: 0.05);
                                           case 6:
-                                            return RadarChartTitle(
-                                                text: 'APP+DS/P',
-                                                angle: angle + 180);
+                                            return RadarChartTitle(text: 'APP+DS/P', angle: angle + 180, positionPercentageOffset: 0.05);
                                           case 7:
-                                            return RadarChartTitle(
-                                                text: 'VS/APM',
-                                                angle: angle + 180);
+                                            return RadarChartTitle(text: 'VS/APM', angle: angle + 180, positionPercentageOffset: 0.05);
                                           case 8:
-                                            return RadarChartTitle(
-                                                text: 'Cheese', angle: angle);
+                                            return RadarChartTitle(text: 'Cheese', angle: angle, positionPercentageOffset: 0.05);
                                           case 9:
-                                            return RadarChartTitle(
-                                                text: 'Gb Eff.', angle: angle);
+                                            return RadarChartTitle(text: 'Gb Eff.', angle: angle, positionPercentageOffset: 0.05);
                                           default:
-                                            return const RadarChartTitle(
-                                                text: '');
+                                            return const RadarChartTitle(text: '');
                                         }
                                       },
                                       dataSets: [
@@ -291,16 +317,16 @@ class TlMatchResultState extends State<TlMatchResultView> {
                                               115, 76, 175, 79),
                                           borderColor: Colors.green,
                                           dataEntries: [
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).secondary * apmWeight),
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).tertiary * ppsWeight),
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).extra * vsWeight),
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.app * appWeight),
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.dss * dssWeight),
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.dsp * dspWeight),
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.appdsp * appdspWeight),
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.vsapm * vsapmWeight),
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.cheese * cheeseWeight),
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.gbe * gbeWeight),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).secondary * apmWeight : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).secondaryTracking[roundSelector] * apmWeight),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).tertiary * ppsWeight : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).tertiaryTracking[roundSelector] * ppsWeight),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).extra * vsWeight : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).extraTracking[roundSelector] * vsWeight),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.app * appWeight : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].app * appWeight),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.dss * dssWeight : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].dss * dssWeight),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.dsp * dspWeight : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].dsp * dspWeight),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.appdsp * appdspWeight : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].appdsp * appdspWeight),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.vsapm * vsapmWeight : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].vsapm * vsapmWeight),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.cheese * cheeseWeight : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].cheese * cheeseWeight),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.gbe * gbeWeight : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].gbe),
                                           ],
                                         ),
                                         RadarDataSet(
@@ -308,16 +334,16 @@ class TlMatchResultState extends State<TlMatchResultView> {
                                               115, 244, 67, 54),
                                           borderColor: Colors.red,
                                           dataEntries: [
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).secondary * apmWeight),
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).tertiary * ppsWeight),
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).extra * vsWeight),
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.app * appWeight),
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.dss * dssWeight),
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.dsp * dspWeight),
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.appdsp * appdspWeight),
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.vsapm * vsapmWeight),
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.cheese * cheeseWeight),
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.gbe * gbeWeight),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).secondary * apmWeight : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).secondaryTracking[roundSelector] * apmWeight),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).tertiary * ppsWeight : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).tertiaryTracking[roundSelector] * ppsWeight),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).extra * vsWeight : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).extraTracking[roundSelector] * vsWeight),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.app * appWeight : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].app * appWeight),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.dss * dssWeight : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].dss * dssWeight),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.dsp * dspWeight : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].dsp * dspWeight),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.appdsp * appdspWeight : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].appdsp * appdspWeight),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.vsapm * vsapmWeight : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].vsapm * vsapmWeight),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.cheese * cheeseWeight : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].cheese * cheeseWeight),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.gbe * gbeWeight : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].gbe * gbeWeight),
                                           ],
                                         ),
                                         RadarDataSet(
@@ -346,46 +372,30 @@ class TlMatchResultState extends State<TlMatchResultView> {
                                 ),
                               ),
                               Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(20, 20, 20, 20),
+                                padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
                                 child: SizedBox(
-                                  height: 300,
-                                  width: 300,
-                                  child: RadarChart(
-                                    RadarChartData(
-                                      radarShape: RadarShape.polygon,
-                                      tickCount: 4,
-                                      ticksTextStyle: const TextStyle(
-                                          color: Colors.transparent,
-                                          fontSize: 10),
-                                      radarBorderData: const BorderSide(
-                                          color: Colors.transparent, width: 1),
-                                      gridBorderData: const BorderSide(
-                                          color: Colors.white24, width: 1),
-                                      tickBorderData: const BorderSide(
-                                          color: Colors.transparent, width: 1),
+                                height: 310,
+                                width: 310,
+                                child: RadarChart(RadarChartData(
+                                  radarShape: RadarShape.polygon,
+                                  tickCount: 4,
+                                  ticksTextStyle: const TextStyle(color: Colors.white24, fontSize: 10),
+                                  radarBorderData: const BorderSide(color: Colors.transparent, width: 1),
+                                  gridBorderData: const BorderSide(color: Colors.white24, width: 1),
+                                  tickBorderData: const BorderSide(color: Colors.transparent, width: 1),
+                                  titleTextStyle: const TextStyle(height: 1.1),
                                       getTitle: (index, angle) {
                                         switch (index) {
                                           case 0:
-                                            return RadarChartTitle(
-                                              text: 'Opener',
-                                              angle: angle,
-                                            );
+                                            return RadarChartTitle(text: 'Opener', angle: angle, positionPercentageOffset: 0.05);
                                           case 1:
-                                            return RadarChartTitle(
-                                              text: 'Stride',
-                                              angle: angle,
-                                            );
+                                            return RadarChartTitle(text: 'Stride', angle: angle, positionPercentageOffset: 0.05);
                                           case 2:
-                                            return RadarChartTitle(
-                                                text: 'Inf Ds',
-                                                angle: angle + 180);
+                                            return RadarChartTitle(text: 'Inf Ds', angle: angle + 180, positionPercentageOffset: 0.05);
                                           case 3:
-                                            return RadarChartTitle(
-                                                text: 'Plonk', angle: angle);
+                                            return RadarChartTitle(text: 'Plonk', angle: angle, positionPercentageOffset: 0.05);
                                           default:
-                                            return const RadarChartTitle(
-                                                text: '');
+                                            return const RadarChartTitle(text: '');
                                         }
                                       },
                                       dataSets: [
@@ -394,10 +404,10 @@ class TlMatchResultState extends State<TlMatchResultView> {
                                               115, 76, 175, 79),
                                           borderColor: Colors.green,
                                           dataEntries: [
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle.opener),
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle.stride),
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle.infds),
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle.plonk),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle.opener : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyleTracking[roundSelector].opener),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle.stride : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyleTracking[roundSelector].stride),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle.infds : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyleTracking[roundSelector].infds),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle.plonk : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyleTracking[roundSelector].plonk),
                                           ],
                                         ),
                                         RadarDataSet(
@@ -405,10 +415,10 @@ class TlMatchResultState extends State<TlMatchResultView> {
                                               115, 244, 67, 54),
                                           borderColor: Colors.red,
                                           dataEntries: [
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle.opener),
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle.stride),
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle.infds),
-                                            RadarEntry(value: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle.plonk),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle.opener : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyleTracking[roundSelector].opener),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle.stride : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyleTracking[roundSelector].stride),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle.infds : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyleTracking[roundSelector].infds),
+                                            RadarEntry(value: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle.plonk : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyleTracking[roundSelector].plonk),
                                           ],
                                         ),
                                         RadarDataSet(

@@ -348,7 +348,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                     var err = snapshot.error as ConnectionIssue;
                     errText = t.errors.connection(code: err.code, message: err.message);
                     break;
-                    case SocketException: // cant catch
+                    case SocketException: // TODO: Find a way to catch
                     var err = snapshot.error as SocketException;
                     errText = t.errors.socketException(host: err.address!.host, message: err.osError!.message);
                     break;
@@ -508,19 +508,18 @@ class _NavDrawerState extends State<NavDrawer> {
 class _TLRecords extends StatelessWidget {
   final String userID;
   final List<TetraLeagueAlphaRecord> data;
-
   const _TLRecords({required this.userID, required this.data});
 
   @override
   Widget build(BuildContext context) {
+      bool bigScreen = MediaQuery.of(context).size.width > 768;
       return ListView( // TODO: Redo using ListView.builder()
         physics: const AlwaysScrollableScrollPhysics(),
         children: (data.isNotEmpty)
             ? [for (var value in data) ListTile(
               leading: Text("${value.endContext.firstWhere((element) => element.userId == userID).points} : ${value.endContext.firstWhere((element) => element.userId != userID).points}",
-              style: const TextStyle(
-                fontFamily: "Eurostile Round Extended",
-                fontSize: 28,)),
+              style: bigScreen ? const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28) :
+              const TextStyle(fontSize: 28)),
               title: Text("vs. ${value.endContext.firstWhere((element) => element.userId != userID).username}"),
               subtitle: Text(dateFormat.format(value.timestamp)),
               trailing: Table(defaultColumnWidth: const IntrinsicColumnWidth(),

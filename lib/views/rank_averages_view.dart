@@ -243,7 +243,6 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                     ),
                     Column(
                       children: [
-                        Text(t.entries, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
                         Padding(
                           padding: const EdgeInsets.only(left: 16),
                           child: Wrap(
