@@ -25,8 +25,8 @@ class TlMatchResultState extends State<TlMatchResultView> {
   @override
   void initState(){
     _scrollController = ScrollController();
-    rounds = [const DropdownMenuItem(value: -1, child: Text("Match"))];
-    rounds.addAll([for (int i = 0; i < widget.record.endContext.first.secondaryTracking.length; i++) DropdownMenuItem(value: i, child: Text("Round ${i+1}"))]);
+    rounds = [DropdownMenuItem(value: -1, child: Text(t.match))];
+    rounds.addAll([for (int i = 0; i < widget.record.endContext.first.secondaryTracking.length; i++) DropdownMenuItem(value: i, child: Text(t.roundNumber(n: i+1)))]);
     super.initState();
   }
 
@@ -42,7 +42,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
     bool bigScreen = MediaQuery.of(context).size.width > 768;
     return Scaffold(
       appBar: AppBar(
-        title: Text("${widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).username.toUpperCase()} ${t.vs} ${widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).username.toUpperCase()} in TL match ${dateFormat.format(widget.record.timestamp)}"),
+        title: Text("${widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).username.toUpperCase()} ${t.vs} ${widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).username.toUpperCase()} ${t.inTLmatch} ${dateFormat.format(widget.record.timestamp)}"),
       ),
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -116,7 +116,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
                     crossAxisAlignment: CrossAxisAlignment.baseline,
                     textBaseline: TextBaseline.alphabetic,
                     children: [
-                      Text("Stats for: ",
+                      Text("${t.statsFor}: ",
                       style: const TextStyle(color: Colors.white, fontSize: 25)),
                       DropdownButton(items: rounds, value: roundSelector, onChanged: ((value) {
                         roundSelector = value;

@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 906 (453 per locale)
+/// Strings: 914 (457 per locale)
 ///
-/// Built on 2023-09-02 at 21:37 UTC
+/// Built on 2023-09-06 at 18:46 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -234,6 +234,10 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String trackedPlayersStatesDeleted({required Object nickname}) => '${nickname} states was removed from database!';
 	String averageXrank({required Object rankLetter}) => 'Average ${rankLetter} rank';
 	String get vs => 'vs';
+	String get inTLmatch => 'in TL match';
+	String get match => 'Match';
+	String roundNumber({required Object n}) => 'Round ${n}';
+	String get statsFor => 'Stats for';
 	String get registred => 'Registred';
 	String get playedTL => 'Played Tetra League';
 	String get winChance => 'Win Chance';
@@ -762,6 +766,10 @@ class _StringsRu implements _StringsEn {
 	@override String trackedPlayersStatesDeleted({required Object nickname}) => 'Состояния аккаунта ${nickname} были удалены из локальной базы данных!';
 	@override String averageXrank({required Object rankLetter}) => 'Средний ${rankLetter} ранг';
 	@override String get vs => 'против';
+	@override String get inTLmatch => 'в матче ТЛ';
+	@override String get match => 'Матч';
+	@override String roundNumber({required Object n}) => 'Раунд ${n}';
+	@override String get statsFor => 'Статистика за';
 	@override String get registred => 'Зарегистрирован';
 	@override String get playedTL => 'Играл в Тетра Лигу';
 	@override String get winChance => 'Шансы на победу';
@@ -1269,6 +1277,10 @@ extension on _StringsEn {
 			case 'trackedPlayersStatesDeleted': return ({required Object nickname}) => '${nickname} states was removed from database!';
 			case 'averageXrank': return ({required Object rankLetter}) => 'Average ${rankLetter} rank';
 			case 'vs': return 'vs';
+			case 'inTLmatch': return 'in TL match';
+			case 'match': return 'Match';
+			case 'roundNumber': return ({required Object n}) => 'Round ${n}';
+			case 'statsFor': return 'Stats for';
 			case 'registred': return 'Registred';
 			case 'playedTL': return 'Played Tetra League';
 			case 'winChance': return 'Win Chance';
@@ -1732,6 +1744,10 @@ extension on _StringsRu {
 			case 'trackedPlayersStatesDeleted': return ({required Object nickname}) => 'Состояния аккаунта ${nickname} были удалены из локальной базы данных!';
 			case 'averageXrank': return ({required Object rankLetter}) => 'Средний ${rankLetter} ранг';
 			case 'vs': return 'против';
+			case 'inTLmatch': return 'в матче ТЛ';
+			case 'match': return 'Матч';
+			case 'roundNumber': return ({required Object n}) => 'Раунд ${n}';
+			case 'statsFor': return 'Статистика за';
 			case 'registred': return 'Зарегистрирован';
 			case 'playedTL': return 'Играл в Тетра Лигу';
 			case 'winChance': return 'Шансы на победу';
