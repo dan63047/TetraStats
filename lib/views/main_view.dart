@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
@@ -31,6 +32,7 @@ const allowedHeightForPlayerBioInPixels = 30.0;
 const givenTextHeightByScreenPercentage = 0.3;
 final NumberFormat timeInSec = NumberFormat("#,###.###s.");
 final NumberFormat f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
+final NumberFormat secs = NumberFormat("00.###");
 final NumberFormat f4 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 4);
 final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
 
@@ -348,19 +350,37 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                     var err = snapshot.error as ConnectionIssue;
                     errText = t.errors.connection(code: err.code, message: err.message);
                     break;
-                    case SocketException: // TODO: Find a way to catch
-                    var err = snapshot.error as SocketException;
-                    errText = t.errors.socketException(host: err.address!.host, message: err.osError!.message);
+                    case P1nkl0bst3rForbidden:
+                    errText = t.errors.p1nkl0bst3rForbidden;
+                    break;
+                    case P1nkl0bst3rTooManyRequests:
+                    errText = t.errors.p1nkl0bst3rTooManyRequests;
+                    break;
+                    case P1nkl0bst3rInternalProblem:
+                    errText = kIsWeb ? t.errors.p1nkl0bst3rinternalWebVersion : t.errors.p1nkl0bst3rinternal;
+                    break;
+                    case TetrioHistoryNotExist:
+                    errText = t.errors.history;
+                    break;
+                    case TetrioForbidden:
+                    errText = t.errors.forbidden;
+                    break;
+                    case TetrioTooManyRequests:
+                    errText = t.errors.tooManyRequests;
+                    break;
+                    case TetrioOskwareBridgeProblem:
+                    errText = t.errors.oskwareBridge;
+                    break;
+                    case TetrioInternalProblem:
+                    errText = kIsWeb ? t.errors.internalWebVersion : t.errors.internal;
+                    break;
+                    case ClientException:
+                    errText = t.errors.clientException;
                     break;
                     default:
                     errText = snapshot.error.toString();
                   }
-                  return Center(
-                      child: Text(errText,
-                          style: const TextStyle(
-                              fontFamily: "Eurostile Round Extended",
-                              fontSize: 42),
-                          textAlign: TextAlign.center));
+                  return Center(child: Text(errText, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center));
                 }
                 break;
               default:
@@ -570,7 +590,7 @@ class _History extends StatelessWidget{
           else Center(child: Text(t.notEnoughData, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))
         ],
       ),
-    ] : [Center(child: Text(t.noHistorySaved, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))]);
+    ] : [Center(child: Text(t.noHistorySaved, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))]);
   }
 }
 
@@ -650,7 +670,7 @@ class _RecordThingy extends StatelessWidget {
                                 fontSize: bigScreen ? 42 : 28)),
                       if (record!.stream.contains("40l"))
                         if (record!.endContext!.finalTime.inMicroseconds > 60000000) Text(
-                          "${(record!.endContext!.finalTime.inMicroseconds/1000000/60).floor()}:${(f2.format(record!.endContext!.finalTime.inMicroseconds /1000000 % 60))}",
+                          "${(record!.endContext!.finalTime.inMicroseconds/1000000/60).floor()}:${(secs.format(record!.endContext!.finalTime.inMicroseconds /1000000 % 60))}",
                             style: TextStyle(
                                 fontFamily: "Eurostile Round Extended",
                                 fontSize: bigScreen ? 42 : 28))
@@ -755,194 +775,108 @@ class _RecordThingy extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text("${t.numOfGameActions.pc}:",
-                                      style: const TextStyle(fontSize: 24)),
-                                  Text(
-                                    record!.endContext!.clears.allClears
-                                        .toString(),
-                                    style: const TextStyle(fontSize: 24),
-                                  ),
+                                  Text("${t.numOfGameActions.pc}:", style: const TextStyle(fontSize: 24)),
+                                  Text(record!.endContext!.clears.allClears.toString(), style: const TextStyle(fontSize: 24)),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("${t.numOfGameActions.hold}:", style: const TextStyle(fontSize: 24)),
+                                  Text(record!.endContext!.holds.toString(), style: const TextStyle(fontSize: 24)),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("${t.numOfGameActions.tspinsTotal}:", style: const TextStyle(fontSize: 24)),
+                                  Text(record!.endContext!.tSpins.toString(), style: const TextStyle(fontSize: 24)),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(" - T-spin zero:", style: TextStyle(fontSize: 18)),
+                                  Text(record!.endContext!.clears.tSpinZeros.toString(), style: const TextStyle(fontSize: 18)),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(" - T-spin singles:", style: TextStyle(fontSize: 18)),
+                                  Text(record!.endContext!.clears.tSpinSingles.toString(), style: const TextStyle(fontSize: 18)),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(" - T-spin doubles:", style: TextStyle(fontSize: 18)),
+                                  Text(record!.endContext!.clears.tSpinDoubles.toString(), style: const TextStyle(fontSize: 18)),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(" - T-spin triples:", style: TextStyle(fontSize: 18)),
+                                  Text(record!.endContext!.clears.tSpinTriples.toString(), style: const TextStyle(fontSize: 18)),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(" - T-spin mini zero:", style: TextStyle(fontSize: 18)),
+                                  Text(record!.endContext!.clears.tSpinMiniZeros.toString(), style: const TextStyle(fontSize: 18)),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(" - T-spin mini singles:", style: TextStyle(fontSize: 18)),
+                                  Text(record!.endContext!.clears.tSpinMiniSingles.toString(), style: const TextStyle(fontSize: 18)),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(" - T-spin mini doubles:", style: TextStyle(fontSize: 18)),
+                                  Text(record!.endContext!.clears.tSpinMiniDoubles.toString(), style: const TextStyle(fontSize: 18)),
+                                ],
+                              ),
+                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("${t.numOfGameActions.lineClears}:", style: const TextStyle(fontSize: 24)),
+                                  Text(record!.endContext!.lines.toString(), style: const TextStyle(fontSize: 24)),
                                 ],
                               ),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text("${t.numOfGameActions.hold}:",
-                                      style: const TextStyle(fontSize: 24)),
-                                  Text(
-                                    record!.endContext!.holds.toString(),
-                                    style: const TextStyle(fontSize: 24),
-                                  ),
+                                  const Text(" - Singles:", style: TextStyle(fontSize: 18)),
+                                  Text(record!.endContext!.clears.singles.toString(), style: const TextStyle(fontSize: 18)),
                                 ],
                               ),
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text("${t.numOfGameActions.tspinsTotal}:",
-                                      style: const TextStyle(fontSize: 24)),
-                                  Text(
-                                    record!.endContext!.tSpins.toString(),
-                                    style: const TextStyle(fontSize: 24),
-                                  ),
+                                  const Text(" - Doubles:", style: TextStyle(fontSize: 18)),
+                                  Text(record!.endContext!.clears.doubles.toString(), style: const TextStyle(fontSize: 18)),
                                 ],
                               ),
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(" - T-spin zero:",
-                                      style: TextStyle(fontSize: 18)),
-                                  Text(
-                                    record!.endContext!.clears.tSpinZeros
-                                        .toString(),
-                                    style: const TextStyle(fontSize: 18),
-                                  ),
+                                  const Text(" - Triples:", style: TextStyle(fontSize: 18)),
+                                  Text(record!.endContext!.clears.triples.toString(), style: const TextStyle(fontSize: 18)),
                                 ],
                               ),
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(" - T-spin singles:",
-                                      style: TextStyle(fontSize: 18)),
-                                  Text(
-                                    record!.endContext!.clears.tSpinSingles
-                                        .toString(),
-                                    style: const TextStyle(fontSize: 18),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(" - T-spin doubles:",
-                                      style: TextStyle(fontSize: 18)),
-                                  Text(
-                                    record!.endContext!.clears.tSpinDoubles
-                                        .toString(),
-                                    style: const TextStyle(fontSize: 18),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(" - T-spin triples:",
-                                      style: TextStyle(fontSize: 18)),
-                                  Text(
-                                    record!.endContext!.clears.tSpinTriples
-                                        .toString(),
-                                    style: const TextStyle(fontSize: 18),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(" - T-spin mini zero:",
-                                      style: TextStyle(fontSize: 18)),
-                                  Text(
-                                    record!.endContext!.clears.tSpinMiniZeros
-                                        .toString(),
-                                    style: const TextStyle(fontSize: 18),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(" - T-spin mini singles:",
-                                      style: TextStyle(fontSize: 18)),
-                                  Text(
-                                    record!.endContext!.clears.tSpinMiniSingles
-                                        .toString(),
-                                    style: const TextStyle(fontSize: 18),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(" - T-spin mini doubles:",
-                                      style: TextStyle(fontSize: 18)),
-                                  Text(
-                                    record!.endContext!.clears.tSpinMiniDoubles
-                                        .toString(),
-                                    style: const TextStyle(fontSize: 18),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("${t.numOfGameActions.lineClears}:",
-                                      style: const TextStyle(fontSize: 24)),
-                                  Text(
-                                    record!.endContext!.lines.toString(),
-                                    style: const TextStyle(fontSize: 24),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(" - Singles:",
-                                      style: TextStyle(fontSize: 18)),
-                                  Text(
-                                    record!.endContext!.clears.singles
-                                        .toString(),
-                                    style: const TextStyle(fontSize: 18),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(" - Doubles:",
-                                      style: TextStyle(fontSize: 18)),
-                                  Text(
-                                    record!.endContext!.clears.doubles
-                                        .toString(),
-                                    style: const TextStyle(fontSize: 18),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(" - Triples:",
-                                      style: TextStyle(fontSize: 18)),
-                                  Text(
-                                    record!.endContext!.clears.triples
-                                        .toString(),
-                                    style: const TextStyle(fontSize: 18),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(" - Quads:",
-                                      style: TextStyle(fontSize: 18)),
-                                  Text(
-                                    record!.endContext!.clears.quads.toString(),
-                                    style: const TextStyle(fontSize: 18),
-                                  ),
+                                  const Text(" - Quads:", style: TextStyle(fontSize: 18)),
+                                  Text(record!.endContext!.clears.quads.toString(), style: const TextStyle(fontSize: 18)),
                                 ],
                               ),
                             ],
@@ -951,7 +885,7 @@ class _RecordThingy extends StatelessWidget {
                       ),
                     ]
                   : [
-                      Text(t.noRecord, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28))
+                      Text(t.noRecord, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28))
                     ],
             );
           });

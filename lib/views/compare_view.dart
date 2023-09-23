@@ -875,7 +875,10 @@ class CompareState extends State<CompareView> {
                           )
                         ],
                       )
-                  ] : [Text(t.compareViewNoValues(avgR: "\$avgR"))], // This is so fucked up holy shit
+                  ] : [Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(t.compareViewNoValues(avgR: "\$avgR"), textAlign: TextAlign.center),
+                  )], // This is so fucked up holy shit
                 )
         ),
       ),

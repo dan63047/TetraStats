@@ -44,12 +44,14 @@ class RanksAverages extends State<RankAveragesView> {
                 subtitle: Text("${f2.format(averages[keys[index]]?[0].apm)} APM, ${f2.format(averages[keys[index]]?[0].pps)} PPS, ${f2.format(averages[keys[index]]?[0].vs)} VS, ${f2.format(averages[keys[index]]?[0].nerdStats.app)} APP, ${f2.format(averages[keys[index]]?[0].nerdStats.vsapm)} VS/APM"),
                 trailing: Text("${f2.format(averages[keys[index]]?[1]["toEnterTR"])} TR", style: bigScreen ? const TextStyle(fontSize: 28) : null),
                 onTap: (){
-                  Navigator.push(
+                  if (averages[keys[index]]?[1]["players"] > 0) {
+                    Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => RankView(rank: averages[keys[index]]!),
                         ),
                       );
+                  }
                 },
                 );
           })

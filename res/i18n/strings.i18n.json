@@ -72,8 +72,11 @@
     "aboutAppText": "${appName} (${packageName}) Version ${version} Build ${buildNumber}\n\nDeveloped by dan63047\nFormulas provided by kerrmunism\nHistory provided by p1nkl0bst3r",
     "stateViewTitle": "${nickname} account on ${date}",
     "statesViewTitle": "${number} states of ${nickname} account",
+    "matchesViewTitle": "${nickname} TL matches",
     "statesViewEntry": "Level ${level}, ${gameTime} of gametime, ${friends} friends, ${rd} RD",
     "stateRemoved": "${date} state was removed from database!",
+    "matchRemoved": "${date} match was removed from database!",
+    "viewAllMatches": "View all matches",
     "trackedPlayersViewTitle": "Stored data",
     "trackedPlayersZeroEntrys": "Empty list. Press \"Track\" button in previous view to add current player here",
     "trackedPlayersOneEntry": "There is only one player",
@@ -209,7 +212,17 @@
     "errors":{
         "connection": "Some issue with connection: ${code} ${message}",
         "noSuchUser": "No such user",
-        "socketException": "Can't connect with ${host}: ${message}"
+        "history": "History for that player is missing",
+        "clientException": "No internet connection",
+        "forbidden": "Your IP address is blocked.\nChange IP address or reach out to osk",
+        "tooManyRequests": "You have been rate limited. Try again later",
+        "internal": "Something happend on the tetr.io side",
+        "internalWebVersion": "Something happend on the tetr.io side (or on oskware_bridge, idk honestly)",
+        "oskwareBridge": "Something happend with oskware_bridge. Let dan63047 know",
+        "p1nkl0bst3rForbidden": "Third party API blocked your IP address.\nChange IP address or reach out to p1nkl0bst3r",
+        "p1nkl0bst3rTooManyRequests": "Too many requests to third party API. Try again later",
+        "p1nkl0bst3rinternal": "Something happend on the p1nkl0bst3r side",
+        "p1nkl0bst3rinternalWebVersion": "Something happend on the p1nkl0bst3r side (or on oskware_bridge, idk honestly)"
     },
     "countries(map)": {
         "": "Not selected",

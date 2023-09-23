@@ -72,8 +72,11 @@
     "aboutAppText": "${appName} (${packageName}) Версия ${version} Сборка ${buildNumber}\n\nРазработал dan63047\nФормулы предоставил kerrmunism\nИсторию предоставляет p1nkl0bst3r",
     "stateViewTitle": "Аккаунт ${nickname} ${date}",
     "statesViewTitle": "${number} состояний аккаунта ${nickname}",
+    "matchesViewTitle": "Матчи аккаунта ${nickname}",
     "statesViewEntry": "${level} уровень, ${gameTime} сыграно, ${friends} друзей, ${rd} RD",
     "stateRemoved": "Состояние от ${date} было удалено из локальной базы данных!",
+    "matchRemoved": "Матч от ${date} был удален из локальной базы данных!",
+    "viewAllMatches": "Все матчи",
     "trackedPlayersViewTitle": "Сохранённые данные",
     "trackedPlayersZeroEntrys": "Пустой список. Вернитесь на предыдущий экран и нажмите кнопку \"Отслеживать\", чтобы текущий игрок появился здесь",
     "trackedPlayersOneEntry": "В списке только один игрок",
@@ -209,7 +212,17 @@
     "errors":{
         "connection": "Проблема с подключением: ${code} ${message}",
         "noSuchUser": "Нет такого пользователя",
-        "socketException": "Невозможно подключиться к ${host}: ${message}"
+        "history": "История данного игрока отсутствует",
+        "clientException": "Нет соединения с интернетом",
+        "forbidden": "Ваш IP адрес заблокирован.\nСмените IP адрес или свяжитесь с osk-ом",
+        "tooManyRequests": "Слишком много запросов. Попробуйте позже",
+        "internal": "Что-то случилось на стороне tetr.io",
+        "internalWebVersion": "Что-то случилось на стороне tetr.io (или на стороне oskware_bridge, я хз если честно)",
+        "oskwareBridge": "Что-то случилось с oskware_bridge. Дайте dan63047 знать",
+        "p1nkl0bst3rForbidden": "Стороннее API заблокировало ваш IP адрес.\nСмените IP адрес или свяжитесь с p1nkl0bst3r-ом",
+        "p1nkl0bst3rTooManyRequests": "Слишком много запросов к стороннему API. Попробуйте позже",
+        "p1nkl0bst3rinternal": "Что-то случилось на стороне p1nkl0bst3r-а",
+        "p1nkl0bst3rinternalWebVersion": "Что-то случилось на стороне p1nkl0bst3r-а (или на стороне oskware_bridge, я хз если честно)"
     },
     "countries(map)": {
         "": "Не выбрана",

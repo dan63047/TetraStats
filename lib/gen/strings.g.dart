@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 914 (457 per locale)
+/// Strings: 940 (470 per locale)
 ///
-/// Built on 2023-09-06 at 18:46 UTC
+/// Built on 2023-09-23 at 18:57 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -223,8 +223,11 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String aboutAppText({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Version ${version} Build ${buildNumber}\n\nDeveloped by dan63047\nFormulas provided by kerrmunism\nHistory provided by p1nkl0bst3r';
 	String stateViewTitle({required Object nickname, required Object date}) => '${nickname} account on ${date}';
 	String statesViewTitle({required Object number, required Object nickname}) => '${number} states of ${nickname} account';
+	String matchesViewTitle({required Object nickname}) => '${nickname} TL matches';
 	String statesViewEntry({required Object level, required Object gameTime, required Object friends, required Object rd}) => 'Level ${level}, ${gameTime} of gametime, ${friends} friends, ${rd} RD';
 	String stateRemoved({required Object date}) => '${date} state was removed from database!';
+	String matchRemoved({required Object date}) => '${date} match was removed from database!';
+	String get viewAllMatches => 'View all matches';
 	String get trackedPlayersViewTitle => 'Stored data';
 	String get trackedPlayersZeroEntrys => 'Empty list. Press "Track" button in previous view to add current player here';
 	String get trackedPlayersOneEntry => 'There is only one player';
@@ -654,7 +657,17 @@ class _StringsErrorsEn {
 	// Translations
 	String connection({required Object code, required Object message}) => 'Some issue with connection: ${code} ${message}';
 	String get noSuchUser => 'No such user';
-	String socketException({required Object host, required Object message}) => 'Can\'t connect with ${host}: ${message}';
+	String get history => 'History for that player is missing';
+	String get clientException => 'No internet connection';
+	String get forbidden => 'Your IP address is blocked.\nChange IP address or reach out to osk';
+	String get tooManyRequests => 'You have been rate limited. Try again later';
+	String get internal => 'Something happend on the tetr.io side';
+	String get internalWebVersion => 'Something happend on the tetr.io side (or on oskware_bridge, idk honestly)';
+	String get oskwareBridge => 'Something happend with oskware_bridge. Let dan63047 know';
+	String get p1nkl0bst3rForbidden => 'Third party API blocked your IP address.\nChange IP address or reach out to p1nkl0bst3r';
+	String get p1nkl0bst3rTooManyRequests => 'Too many requests to third party API. Try again later';
+	String get p1nkl0bst3rinternal => 'Something happend on the p1nkl0bst3r side';
+	String get p1nkl0bst3rinternalWebVersion => 'Something happend on the p1nkl0bst3r side (or on oskware_bridge, idk honestly)';
 }
 
 // Path: <root>
@@ -755,8 +768,11 @@ class _StringsRu implements _StringsEn {
 	@override String aboutAppText({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Версия ${version} Сборка ${buildNumber}\n\nРазработал dan63047\nФормулы предоставил kerrmunism\nИсторию предоставляет p1nkl0bst3r';
 	@override String stateViewTitle({required Object nickname, required Object date}) => 'Аккаунт ${nickname} ${date}';
 	@override String statesViewTitle({required Object number, required Object nickname}) => '${number} состояний аккаунта ${nickname}';
+	@override String matchesViewTitle({required Object nickname}) => 'Матчи аккаунта ${nickname}';
 	@override String statesViewEntry({required Object level, required Object gameTime, required Object friends, required Object rd}) => '${level} уровень, ${gameTime} сыграно, ${friends} друзей, ${rd} RD';
 	@override String stateRemoved({required Object date}) => 'Состояние от ${date} было удалено из локальной базы данных!';
+	@override String matchRemoved({required Object date}) => 'Матч от ${date} был удален из локальной базы данных!';
+	@override String get viewAllMatches => 'Все матчи';
 	@override String get trackedPlayersViewTitle => 'Сохранённые данные';
 	@override String get trackedPlayersZeroEntrys => 'Пустой список. Вернитесь на предыдущий экран и нажмите кнопку "Отслеживать", чтобы текущий игрок появился здесь';
 	@override String get trackedPlayersOneEntry => 'В списке только один игрок';
@@ -1186,7 +1202,17 @@ class _StringsErrorsRu implements _StringsErrorsEn {
 	// Translations
 	@override String connection({required Object code, required Object message}) => 'Проблема с подключением: ${code} ${message}';
 	@override String get noSuchUser => 'Нет такого пользователя';
-	@override String socketException({required Object host, required Object message}) => 'Невозможно подключиться к ${host}: ${message}';
+	@override String get history => 'История данного игрока отсутствует';
+	@override String get clientException => 'Нет соединения с интернетом';
+	@override String get forbidden => 'Ваш IP адрес заблокирован.\nСмените IP адрес или свяжитесь с osk-ом';
+	@override String get tooManyRequests => 'Слишком много запросов. Попробуйте позже';
+	@override String get internal => 'Что-то случилось на стороне tetr.io';
+	@override String get internalWebVersion => 'Что-то случилось на стороне tetr.io (или на стороне oskware_bridge, я хз если честно)';
+	@override String get oskwareBridge => 'Что-то случилось с oskware_bridge. Дайте dan63047 знать';
+	@override String get p1nkl0bst3rForbidden => 'Стороннее API заблокировало ваш IP адрес.\nСмените IP адрес или свяжитесь с p1nkl0bst3r-ом';
+	@override String get p1nkl0bst3rTooManyRequests => 'Слишком много запросов к стороннему API. Попробуйте позже';
+	@override String get p1nkl0bst3rinternal => 'Что-то случилось на стороне p1nkl0bst3r-а';
+	@override String get p1nkl0bst3rinternalWebVersion => 'Что-то случилось на стороне p1nkl0bst3r-а (или на стороне oskware_bridge, я хз если честно)';
 }
 
 /// Flat map(s) containing all translations.
@@ -1266,8 +1292,11 @@ extension on _StringsEn {
 			case 'aboutAppText': return ({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Version ${version} Build ${buildNumber}\n\nDeveloped by dan63047\nFormulas provided by kerrmunism\nHistory provided by p1nkl0bst3r';
 			case 'stateViewTitle': return ({required Object nickname, required Object date}) => '${nickname} account on ${date}';
 			case 'statesViewTitle': return ({required Object number, required Object nickname}) => '${number} states of ${nickname} account';
+			case 'matchesViewTitle': return ({required Object nickname}) => '${nickname} TL matches';
 			case 'statesViewEntry': return ({required Object level, required Object gameTime, required Object friends, required Object rd}) => 'Level ${level}, ${gameTime} of gametime, ${friends} friends, ${rd} RD';
 			case 'stateRemoved': return ({required Object date}) => '${date} state was removed from database!';
+			case 'matchRemoved': return ({required Object date}) => '${date} match was removed from database!';
+			case 'viewAllMatches': return 'View all matches';
 			case 'trackedPlayersViewTitle': return 'Stored data';
 			case 'trackedPlayersZeroEntrys': return 'Empty list. Press "Track" button in previous view to add current player here';
 			case 'trackedPlayersOneEntry': return 'There is only one player';
@@ -1394,7 +1423,17 @@ extension on _StringsEn {
 			case 'popupActions.ok': return 'OK';
 			case 'errors.connection': return ({required Object code, required Object message}) => 'Some issue with connection: ${code} ${message}';
 			case 'errors.noSuchUser': return 'No such user';
-			case 'errors.socketException': return ({required Object host, required Object message}) => 'Can\'t connect with ${host}: ${message}';
+			case 'errors.history': return 'History for that player is missing';
+			case 'errors.clientException': return 'No internet connection';
+			case 'errors.forbidden': return 'Your IP address is blocked.\nChange IP address or reach out to osk';
+			case 'errors.tooManyRequests': return 'You have been rate limited. Try again later';
+			case 'errors.internal': return 'Something happend on the tetr.io side';
+			case 'errors.internalWebVersion': return 'Something happend on the tetr.io side (or on oskware_bridge, idk honestly)';
+			case 'errors.oskwareBridge': return 'Something happend with oskware_bridge. Let dan63047 know';
+			case 'errors.p1nkl0bst3rForbidden': return 'Third party API blocked your IP address.\nChange IP address or reach out to p1nkl0bst3r';
+			case 'errors.p1nkl0bst3rTooManyRequests': return 'Too many requests to third party API. Try again later';
+			case 'errors.p1nkl0bst3rinternal': return 'Something happend on the p1nkl0bst3r side';
+			case 'errors.p1nkl0bst3rinternalWebVersion': return 'Something happend on the p1nkl0bst3r side (or on oskware_bridge, idk honestly)';
 			case 'countries.': return 'Not selected';
 			case 'countries.AF': return 'Afghanistan';
 			case 'countries.AX': return 'Åland Islands';
@@ -1733,8 +1772,11 @@ extension on _StringsRu {
 			case 'aboutAppText': return ({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Версия ${version} Сборка ${buildNumber}\n\nРазработал dan63047\nФормулы предоставил kerrmunism\nИсторию предоставляет p1nkl0bst3r';
 			case 'stateViewTitle': return ({required Object nickname, required Object date}) => 'Аккаунт ${nickname} ${date}';
 			case 'statesViewTitle': return ({required Object number, required Object nickname}) => '${number} состояний аккаунта ${nickname}';
+			case 'matchesViewTitle': return ({required Object nickname}) => 'Матчи аккаунта ${nickname}';
 			case 'statesViewEntry': return ({required Object level, required Object gameTime, required Object friends, required Object rd}) => '${level} уровень, ${gameTime} сыграно, ${friends} друзей, ${rd} RD';
 			case 'stateRemoved': return ({required Object date}) => 'Состояние от ${date} было удалено из локальной базы данных!';
+			case 'matchRemoved': return ({required Object date}) => 'Матч от ${date} был удален из локальной базы данных!';
+			case 'viewAllMatches': return 'Все матчи';
 			case 'trackedPlayersViewTitle': return 'Сохранённые данные';
 			case 'trackedPlayersZeroEntrys': return 'Пустой список. Вернитесь на предыдущий экран и нажмите кнопку "Отслеживать", чтобы текущий игрок появился здесь';
 			case 'trackedPlayersOneEntry': return 'В списке только один игрок';
@@ -1861,7 +1903,17 @@ extension on _StringsRu {
 			case 'popupActions.ok': return 'OK';
 			case 'errors.connection': return ({required Object code, required Object message}) => 'Проблема с подключением: ${code} ${message}';
 			case 'errors.noSuchUser': return 'Нет такого пользователя';
-			case 'errors.socketException': return ({required Object host, required Object message}) => 'Невозможно подключиться к ${host}: ${message}';
+			case 'errors.history': return 'История данного игрока отсутствует';
+			case 'errors.clientException': return 'Нет соединения с интернетом';
+			case 'errors.forbidden': return 'Ваш IP адрес заблокирован.\nСмените IP адрес или свяжитесь с osk-ом';
+			case 'errors.tooManyRequests': return 'Слишком много запросов. Попробуйте позже';
+			case 'errors.internal': return 'Что-то случилось на стороне tetr.io';
+			case 'errors.internalWebVersion': return 'Что-то случилось на стороне tetr.io (или на стороне oskware_bridge, я хз если честно)';
+			case 'errors.oskwareBridge': return 'Что-то случилось с oskware_bridge. Дайте dan63047 знать';
+			case 'errors.p1nkl0bst3rForbidden': return 'Стороннее API заблокировало ваш IP адрес.\nСмените IP адрес или свяжитесь с p1nkl0bst3r-ом';
+			case 'errors.p1nkl0bst3rTooManyRequests': return 'Слишком много запросов к стороннему API. Попробуйте позже';
+			case 'errors.p1nkl0bst3rinternal': return 'Что-то случилось на стороне p1nkl0bst3r-а';
+			case 'errors.p1nkl0bst3rinternalWebVersion': return 'Что-то случилось на стороне p1nkl0bst3r-а (или на стороне oskware_bridge, я хз если честно)';
 			case 'countries.': return 'Не выбрана';
 			case 'countries.AF': return 'Афганистан';
 			case 'countries.AX': return 'Аландские острова';
