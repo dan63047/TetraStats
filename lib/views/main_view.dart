@@ -50,6 +50,14 @@ Future<void> copyToClipboard(String text) async {
   await Clipboard.setData(ClipboardData(text: text));
 }
 
+String get40lTime(int microseconds){
+    if (microseconds > 60000000) {
+      return "${(microseconds/1000000/60).floor()}:${(secs.format(microseconds /1000000 % 60))}";
+    } else{
+      return timeInSec.format(microseconds / 1000000);
+    }                      
+  }
+
 class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
   final bodyGlobalKey = GlobalKey();
   bool _searchBoolean = false;
@@ -128,7 +136,10 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
     }
     _searchFor = me.userId;
     setState((){_titleNickname = me.username;});
-    var tlStream = await teto.getTLStream(me.userId);
+    List<dynamic> requests = await Future.wait([teto.getTLStream(_searchFor), teto.fetchRecords(_searchFor), teto.fetchNews(_searchFor)]);
+    TetraLeagueAlphaStream tlStream = requests[0] as TetraLeagueAlphaStream;
+    Map<String, dynamic> records = requests[1] as Map<String, dynamic>;
+    List<News> news = requests[2] as List<News>;
     List<TetraLeagueAlphaRecord> tlMatches = [];
     bool isTracking = await teto.isPlayerTracking(me.userId);
     List<TetrioPlayer> states = [];
@@ -136,7 +147,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
     var uniqueTL = <dynamic>{};
     if (isTracking){
       await teto.storeState(me);
-      await teto.saveTLMatchesFromStream(await teto.getTLStream(me.userId));
+      await teto.saveTLMatchesFromStream(tlStream);
     tlMatches.addAll(await teto.getTLMatchesbyPlayerID(me.userId));
     for (var match in tlStream.records) {
       if (!tlMatches.contains(match)) tlMatches.add(match);
@@ -180,8 +191,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.estTr != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.estTr!.esttr)], child: Text(t.statCellNum.estOfTR.replaceAll(RegExp(r'\n'), " "))),
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.esttracc != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.esttracc!)], child: Text(t.statCellNum.accOfEst.replaceAll(RegExp(r'\n'), " "))),
     ];
-    Map<String, dynamic> records = await teto.fetchRecords(me.userId);
-    return [me, records, states, tlMatches, compareWith, isTracking];
+    return [me, records, states, tlMatches, compareWith, isTracking, news];
   }
 
   void _justUpdate() {
@@ -335,7 +345,9 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                                   ? snapshot.data![1]['blitz'][0]
                                   : null),
                           _OtherThingy(
-                              zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment,)
+                              zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio,
+                              distinguishment: snapshot.data![0].distinguishment,
+                              newsletter: snapshot.data![6],)
                         ],
                       ),
                     ),
@@ -454,7 +466,7 @@ class _NavDrawerState extends State<NavDrawer> {
               final allPlayers = (snapshot.data != null)
                   ? snapshot.data as Map<String, List<TetrioPlayer>>
                   : <String, List<TetrioPlayer>>{};
-              List<String> keys = allPlayers.keys.toList();
+              List<String> keys = allPlayers.keys.toList().reversed.toList(); // this is so dumb
               return NestedScrollView(
                   headerSliverBuilder: (context, value) {
                     return [
@@ -669,15 +681,7 @@ class _RecordThingy extends StatelessWidget {
                                 fontFamily: "Eurostile Round Extended",
                                 fontSize: bigScreen ? 42 : 28)),
                       if (record!.stream.contains("40l"))
-                        if (record!.endContext!.finalTime.inMicroseconds > 60000000) Text(
-                          "${(record!.endContext!.finalTime.inMicroseconds/1000000/60).floor()}:${(secs.format(record!.endContext!.finalTime.inMicroseconds /1000000 % 60))}",
-                            style: TextStyle(
-                                fontFamily: "Eurostile Round Extended",
-                                fontSize: bigScreen ? 42 : 28))
-                        else Text(
-                            timeInSec.format(
-                                record!.endContext!.finalTime.inMicroseconds /
-                                    1000000),
+                        Text(get40lTime(record!.endContext!.finalTime.inMicroseconds),
                             style: TextStyle(
                                 fontFamily: "Eurostile Round Extended",
                                 fontSize: bigScreen ? 42 : 28))
@@ -897,7 +901,8 @@ class _OtherThingy extends StatelessWidget {
   final TetrioZen? zen;
   final String? bio;
   final Distinguishment? distinguishment;
-  const _OtherThingy({Key? key, required this.zen, required this.bio, required this.distinguishment})
+  final List<News>? newsletter;
+  const _OtherThingy({Key? key, required this.zen, required this.bio, required this.distinguishment, this.newsletter})
       : super(key: key);
 
   List<InlineSpan> getDistinguishmentSetOfWidgets(String text) {
@@ -924,15 +929,115 @@ class _OtherThingy extends StatelessWidget {
     return result;
   }
 
+  ListTile getNewsTile(News news){
+    Map<String, String> gametypes = {
+      "40l": t.sprint,
+      "blitz": t.blitz,
+      "5mblast": "5,000,000 Blast"
+    };
+
+    switch (news.type) {
+      case "leaderboard":
+        return ListTile(
+          title: RichText(
+            text: TextSpan(
+              style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16),
+              text: t.newsParts.leaderboardStart,
+              children: [
+                TextSpan(text: "№${news.data["rank"]} ", style: const TextStyle(fontWeight: FontWeight.bold)),
+                TextSpan(text: t.newsParts.leaderboardMiddle),
+                TextSpan(text: "№${gametypes[news.data["gametype"]]}", style: const TextStyle(fontWeight: FontWeight.bold)),
+              ]
+            )
+          ),
+          subtitle: Text(dateFormat.format(news.timestamp)),
+        );
+      case "personalbest":
+      return ListTile(
+          title: RichText(
+            text: TextSpan(
+              style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16),
+              text: t.newsParts.personalbest,
+              children: [
+                TextSpan(text: "${gametypes[news.data["gametype"]]} ", style: const TextStyle(fontWeight: FontWeight.bold)),
+                TextSpan(text: t.newsParts.personalbestMiddle),
+                TextSpan(text: news.data["gametype"] == "blitz" ? NumberFormat.decimalPattern().format(news.data["result"]) : get40lTime((news.data["result"]*1000).floor()), style: const TextStyle(fontWeight: FontWeight.bold)),
+              ]
+            )
+          ),
+          subtitle: Text(dateFormat.format(news.timestamp)),
+        );
+      case "badge":
+        return ListTile(
+          title: RichText(
+            text: TextSpan(
+              style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16),
+              text: t.newsParts.badgeStart,
+              children: [
+                TextSpan(text: "${news.data["label"]} ", style: const TextStyle(fontWeight: FontWeight.bold)),
+                TextSpan(text: t.newsParts.badgeEnd)
+              ]
+            )
+          ),
+          subtitle: Text(dateFormat.format(news.timestamp)),
+        );
+      case "rankup":
+        return ListTile(
+          title: RichText(
+            text: TextSpan(
+              style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16),
+              text: t.newsParts.rankupStart,
+              children: [
+                TextSpan(text: t.newsParts.rankupMiddle(r: news.data["rank"].toString().toUpperCase()), style: const TextStyle(fontWeight: FontWeight.bold)),
+                TextSpan(text: t.newsParts.rankupEnd)
+              ]
+            )
+          ),
+          subtitle: Text(dateFormat.format(news.timestamp)),
+        );
+      case "supporter":
+        return ListTile(
+          title: RichText(
+            text: TextSpan(
+              style: TextStyle(fontFamily: 'Eurostile Round', fontSize: 16),
+              text: t.newsParts.supporterStart,
+              children: [
+                TextSpan(text: t.newsParts.tetoSupporter, style: TextStyle(fontWeight: FontWeight.bold))
+              ]
+            )
+          ),
+          subtitle: Text(dateFormat.format(news.timestamp)),
+        );
+      case "supporter_gift":
+        return ListTile(
+          title: RichText(
+            text: TextSpan(
+              style: TextStyle(fontFamily: 'Eurostile Round', fontSize: 16),
+              text: t.newsParts.supporterGiftStart,
+              children: [
+                TextSpan(text: t.newsParts.tetoSupporter, style: TextStyle(fontWeight: FontWeight.bold))
+              ]
+            )
+          ),
+          subtitle: Text(dateFormat.format(news.timestamp)),
+        );
+      default:
+      return ListTile(
+        title: Text(t.newsParts.unknownNews(type: news.type)),
+        subtitle: Text(dateFormat.format(news.timestamp)),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
       bool bigScreen = constraints.maxWidth > 768;
       return ListView.builder(
         physics: const AlwaysScrollableScrollPhysics(),
-        itemCount: 1,
+        itemCount: newsletter!.length+1,
         itemBuilder: (BuildContext context, int index) {
-          return Column(
+          return index == 0 ? Column(
             children: [
               if (distinguishment != null)
                 Padding(
@@ -962,7 +1067,7 @@ class _OtherThingy extends StatelessWidget {
                 ),
               if (zen != null)
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 48),
                   child: Column(
                     children: [
                       Text(t.zen, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
@@ -971,9 +1076,10 @@ class _OtherThingy extends StatelessWidget {
                     ],
                   ),
                 ),
-              
+              if (newsletter != null && newsletter!.isNotEmpty)
+                Text(t.news, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
             ],
-          );
+          ) : getNewsTile(newsletter![index-1]);          
         },
       );
     });

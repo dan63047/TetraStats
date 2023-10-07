@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 940 (470 per locale)
+/// Strings: 970 (485 per locale)
 ///
-/// Built on 2023-09-23 at 18:57 UTC
+/// Built on 2023-10-07 at 16:34 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -163,6 +163,8 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get distinguishment => 'Distinguishment';
 	String get zen => 'Zen';
 	String get bio => 'Bio';
+	String get news => 'News';
+	late final _StringsNewsPartsEn newsParts = _StringsNewsPartsEn._(_root);
 	String get openSearch => 'Search player';
 	String get closeSearch => 'Close search';
 	String get refresh => 'Refresh';
@@ -562,6 +564,28 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	};
 }
 
+// Path: newsParts
+class _StringsNewsPartsEn {
+	_StringsNewsPartsEn._(this._root);
+
+	final _StringsEn _root; // ignore: unused_field
+
+	// Translations
+	String get leaderboardStart => 'Got ';
+	String get leaderboardMiddle => 'on ';
+	String get personalbest => 'Got a new PB in ';
+	String get personalbestMiddle => 'of ';
+	String get badgeStart => 'Obtained a ';
+	String get badgeEnd => 'badge';
+	String get rankupStart => 'Obtained ';
+	String rankupMiddle({required Object r}) => '${r} rank ';
+	String get rankupEnd => 'in Tetra League';
+	String get tetoSupporter => 'TETR.IO supporter';
+	String get supporterStart => 'Become a ';
+	String get supporterGiftStart => 'Received the gift of ';
+	String unknownNews({required Object type}) => 'Unknown news of type ${type}';
+}
+
 // Path: statCellNum
 class _StringsStatCellNumEn {
 	_StringsStatCellNumEn._(this._root);
@@ -571,7 +595,8 @@ class _StringsStatCellNumEn {
 	// Translations
 	String get xpLevel => 'XP Level';
 	String get xpProgress => 'Progress to next level';
-	String get xpFrom0To5000 => 'Progress from 0 XP to level 5000';
+	String xpFrom0ToLevel({required Object n}) => 'Progress from 0 XP to level ${n}';
+	String get xpLeft => 'XP left';
 	String get hoursPlayed => 'Hours\nPlayed';
 	String get onlineGames => 'Online\nGames';
 	String get gamesWon => 'Games\nWon';
@@ -708,6 +733,8 @@ class _StringsRu implements _StringsEn {
 	@override String get distinguishment => 'Заслуга';
 	@override String get zen => 'Дзен';
 	@override String get bio => 'Биография';
+	@override String get news => 'Новости';
+	@override late final _StringsNewsPartsRu newsParts = _StringsNewsPartsRu._(_root);
 	@override String get openSearch => 'Искать игрока';
 	@override String get closeSearch => 'Закрыть поиск';
 	@override String get refresh => 'Обновить';
@@ -1107,6 +1134,28 @@ class _StringsRu implements _StringsEn {
 	};
 }
 
+// Path: newsParts
+class _StringsNewsPartsRu implements _StringsNewsPartsEn {
+	_StringsNewsPartsRu._(this._root);
+
+	@override final _StringsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get leaderboardStart => 'Взял ';
+	@override String get leaderboardMiddle => 'в таблице ';
+	@override String get personalbest => 'Поставил новый ЛР в ';
+	@override String get personalbestMiddle => 'с результатом в ';
+	@override String get badgeStart => 'Заработал значок ';
+	@override String get badgeEnd => '';
+	@override String get rankupStart => 'Заработал ';
+	@override String rankupMiddle({required Object r}) => '${r} ранг ';
+	@override String get rankupEnd => 'в Тетра Лиге';
+	@override String get tetoSupporter => 'TETR.IO supporter';
+	@override String get supporterStart => 'Стал обладателем ';
+	@override String get supporterGiftStart => 'Получил подарок в виде ';
+	@override String unknownNews({required Object type}) => 'Неизвестная новость типа ${type}';
+}
+
 // Path: statCellNum
 class _StringsStatCellNumRu implements _StringsStatCellNumEn {
 	_StringsStatCellNumRu._(this._root);
@@ -1116,7 +1165,8 @@ class _StringsStatCellNumRu implements _StringsStatCellNumEn {
 	// Translations
 	@override String get xpLevel => 'Уровень\nопыта';
 	@override String get xpProgress => 'Прогресс до следующего уровня';
-	@override String get xpFrom0To5000 => 'Прогресс от 0 XP до 5000 уровня';
+	@override String xpFrom0ToLevel({required Object n}) => 'Прогресс от 0 XP до ${n} уровня';
+	@override String get xpLeft => 'XP осталось';
 	@override String get hoursPlayed => 'Часов\nСыграно';
 	@override String get onlineGames => 'Онлайн\nИгр';
 	@override String get gamesWon => 'Онлайн\nПобед';
@@ -1232,6 +1282,20 @@ extension on _StringsEn {
 			case 'distinguishment': return 'Distinguishment';
 			case 'zen': return 'Zen';
 			case 'bio': return 'Bio';
+			case 'news': return 'News';
+			case 'newsParts.leaderboardStart': return 'Got ';
+			case 'newsParts.leaderboardMiddle': return 'on ';
+			case 'newsParts.personalbest': return 'Got a new PB in ';
+			case 'newsParts.personalbestMiddle': return 'of ';
+			case 'newsParts.badgeStart': return 'Obtained a ';
+			case 'newsParts.badgeEnd': return 'badge';
+			case 'newsParts.rankupStart': return 'Obtained ';
+			case 'newsParts.rankupMiddle': return ({required Object r}) => '${r} rank ';
+			case 'newsParts.rankupEnd': return 'in Tetra League';
+			case 'newsParts.tetoSupporter': return 'TETR.IO supporter';
+			case 'newsParts.supporterStart': return 'Become a ';
+			case 'newsParts.supporterGiftStart': return 'Received the gift of ';
+			case 'newsParts.unknownNews': return ({required Object type}) => 'Unknown news of type ${type}';
 			case 'openSearch': return 'Search player';
 			case 'closeSearch': return 'Close search';
 			case 'refresh': return 'Refresh';
@@ -1356,7 +1420,8 @@ extension on _StringsEn {
 			case 'notForWeb': return 'Function is not available for web version';
 			case 'statCellNum.xpLevel': return 'XP Level';
 			case 'statCellNum.xpProgress': return 'Progress to next level';
-			case 'statCellNum.xpFrom0To5000': return 'Progress from 0 XP to level 5000';
+			case 'statCellNum.xpFrom0ToLevel': return ({required Object n}) => 'Progress from 0 XP to level ${n}';
+			case 'statCellNum.xpLeft': return 'XP left';
 			case 'statCellNum.hoursPlayed': return 'Hours\nPlayed';
 			case 'statCellNum.onlineGames': return 'Online\nGames';
 			case 'statCellNum.gamesWon': return 'Games\nWon';
@@ -1712,6 +1777,20 @@ extension on _StringsRu {
 			case 'distinguishment': return 'Заслуга';
 			case 'zen': return 'Дзен';
 			case 'bio': return 'Биография';
+			case 'news': return 'Новости';
+			case 'newsParts.leaderboardStart': return 'Взял ';
+			case 'newsParts.leaderboardMiddle': return 'в таблице ';
+			case 'newsParts.personalbest': return 'Поставил новый ЛР в ';
+			case 'newsParts.personalbestMiddle': return 'с результатом в ';
+			case 'newsParts.badgeStart': return 'Заработал значок ';
+			case 'newsParts.badgeEnd': return '';
+			case 'newsParts.rankupStart': return 'Заработал ';
+			case 'newsParts.rankupMiddle': return ({required Object r}) => '${r} ранг ';
+			case 'newsParts.rankupEnd': return 'в Тетра Лиге';
+			case 'newsParts.tetoSupporter': return 'TETR.IO supporter';
+			case 'newsParts.supporterStart': return 'Стал обладателем ';
+			case 'newsParts.supporterGiftStart': return 'Получил подарок в виде ';
+			case 'newsParts.unknownNews': return ({required Object type}) => 'Неизвестная новость типа ${type}';
 			case 'openSearch': return 'Искать игрока';
 			case 'closeSearch': return 'Закрыть поиск';
 			case 'refresh': return 'Обновить';
@@ -1836,7 +1915,8 @@ extension on _StringsRu {
 			case 'notForWeb': return 'Функция недоступна для веб версии';
 			case 'statCellNum.xpLevel': return 'Уровень\nопыта';
 			case 'statCellNum.xpProgress': return 'Прогресс до следующего уровня';
-			case 'statCellNum.xpFrom0To5000': return 'Прогресс от 0 XP до 5000 уровня';
+			case 'statCellNum.xpFrom0ToLevel': return ({required Object n}) => 'Прогресс от 0 XP до ${n} уровня';
+			case 'statCellNum.xpLeft': return 'XP осталось';
 			case 'statCellNum.hoursPlayed': return 'Часов\nСыграно';
 			case 'statCellNum.onlineGames': return 'Онлайн\nИгр';
 			case 'statCellNum.gamesWon': return 'Онлайн\nПобед';

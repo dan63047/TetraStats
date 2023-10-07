@@ -53,8 +53,9 @@ class TetrioService extends DB {
   final Map<String, TetrioPlayer> _playersCache = {};
   final Map<String, Map<String, dynamic>> _recordsCache = {};
   final Map<String, TetrioPlayersLeaderboard> _leaderboardsCache = {};
+  final Map<String, List<News>> _newsCache = {};
   final Map<String, TetraLeagueAlphaStream> _tlStreamsCache = {}; // i'm trying to respect oskware api It should look something like {"cached_until": TetrioPlayer}
-  final client = UserAgentClient("Tetra Stats v1.2.3 (dm @dan63047 if someone abuse that software)", http.Client());
+  final client = UserAgentClient("ebany u rot yatogo kazino blyat' (Tetra Stats v1.2.4 dev build)", http.Client());
   static final TetrioService _shared = TetrioService._sharedInstance();
   factory TetrioService() => _shared;
   late final StreamController<Map<String, List<TetrioPlayer>>> _tetrioStreamController;
@@ -229,6 +230,63 @@ class TetrioService extends DB {
           throw TetrioInternalProblem();
         default:
           developer.log("fetchTLLeaderboard: Failed to fetch leaderboard", name: "services/tetrio_crud", error: response.statusCode);
+          throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
+      }
+    } on http.ClientException catch (e, s) {
+      developer.log("$e, $s");
+      throw http.ClientException(e.message, e.uri);
+    }
+  }
+
+  // TODO: Future<List<News>> getNews(String userID) async
+  Future<List<News>> fetchNews(String userID) async{
+    try{
+      var cached = _newsCache.entries.firstWhere((element) => element.value[0].stream == "user_$userID");
+    if (DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true).isAfter(DateTime.now())){
+      developer.log("fetchNews: News for $userID retrieved from cache, that expires ${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)}", name: "services/tetrio_crud");
+      return cached.value;
+    }else{
+      _newsCache.remove(cached.key);
+      developer.log("fetchNews: Cached news for $userID expired (${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)})", name: "services/tetrio_crud");
+    }
+    }catch(e){
+      developer.log("fetchNews: Trying to retrieve news for $userID", name: "services/tetrio_crud");
+    }
+    
+    Uri url;
+    if (kIsWeb) {
+      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "tetrioNews", "user": userID.toLowerCase().trim(), "limit": "100"});
+    } else {
+      url = Uri.https('ch.tetr.io', 'api/news/user_${userID.toLowerCase().trim()}', {"limit": "100"});
+    }
+    try {
+      final response = await client.get(url);
+
+      switch (response.statusCode) {
+        case 200:
+          var payload = jsonDecode(response.body);
+          if (payload['success']) {
+            List<News> news = [for (var entry in payload['data']['news']) News.fromJson(entry)];
+            developer.log("fetchNews: $userID news retrieved and cached", name: "services/tetrio_crud");
+            _newsCache[payload['cache']['cached_until'].toString()] = news;
+            return news;
+          } else {
+            developer.log("fetchNews: User dosen't exist", name: "services/tetrio_crud", error: response.body);
+            throw TetrioPlayerNotExist();
+          }
+        case 403:
+          throw TetrioForbidden();
+        case 429:
+          throw TetrioTooManyRequests();
+        case 418:
+          throw TetrioOskwareBridgeProblem();
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+          throw TetrioInternalProblem();
+        default:
+          developer.log("fetchNews: Failed to fetch stream", name: "services/tetrio_crud", error: response.statusCode);
           throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
       }
     } on http.ClientException catch (e, s) {

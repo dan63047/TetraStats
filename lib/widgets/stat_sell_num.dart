@@ -29,7 +29,7 @@ class StatCellNum extends StatelessWidget {
     return Column(
       children: [
         Text(
-          f.format(playerStat),
+           fractionDigits == null ? f.format(playerStat.floor()) : f.format(playerStat),
           style: TextStyle(
             fontFamily: "Eurostile Round Extended",
             fontSize: isScreenBig ? 32 : 24,

@@ -1037,6 +1037,24 @@ class Distinguishment {
   }
 }
 
+class News {
+  late String id;
+  late String stream;
+  late String type;
+  late Map<String, dynamic> data;
+  late DateTime timestamp;
+
+  News({required this.type, required this.id, required this.stream, required this.data, required this.timestamp});
+
+  News.fromJson(Map<String, dynamic> json){
+    id = json["_id"];
+    stream = json["stream"];
+    type = json["type"];
+    data = json["data"];
+    timestamp = DateTime.parse(json['ts']);
+  }
+}
+
 class TetrioPlayersLeaderboard {
   late String type;
   late DateTime timestamp;

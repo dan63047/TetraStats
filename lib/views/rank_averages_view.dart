@@ -377,7 +377,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                           _ListEntry(value: widget.rank[0].pps, label: t.statCellNum.pps.replaceAll(RegExp(r'\n'), " "), id: "", username: "", approximate: true, fractionDigits: 2),
                           _ListEntry(value: widget.rank[0].vs, label: t.statCellNum.vs.replaceAll(RegExp(r'\n'), " "), id: "", username: "", approximate: true, fractionDigits: 2),
                           _ListEntry(value: widget.rank[1]["avgAPP"], label: t.statCellNum.app.replaceAll(RegExp(r'\n'), " "), id: "", username: "", approximate: true, fractionDigits: 3),
-                          _ListEntry(value: widget.rank[1]["avgAPP"], label: "VS / APM", id: "", username: "", approximate: true, fractionDigits: 3),
+                          _ListEntry(value: widget.rank[1]["avgVSAPM"], label: "VS / APM", id: "", username: "", approximate: true, fractionDigits: 3),
                           _ListEntry(value: widget.rank[1]["avgDSS"], label: t.statCellNum.dss.replaceAll(RegExp(r'\n'), " "), id: "", username: "", approximate: true, fractionDigits: 3),
                           _ListEntry(value: widget.rank[1]["avgDSP"], label: t.statCellNum.dsp.replaceAll(RegExp(r'\n'), " "), id: "", username: "", approximate: true, fractionDigits: 3),
                           _ListEntry(value: widget.rank[1]["avgAPPDSP"], label: t.statCellNum.appdsp.replaceAll(RegExp(r'\n'), " "), id: "", username: "", approximate: true, fractionDigits: 3),
