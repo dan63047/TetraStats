@@ -639,7 +639,6 @@ class EstTr {
   final double _apm;
   final double _pps;
   final double _vs;
-  final double _rd;
   final double _app;
   final double _dss;
   final double _dsp;
@@ -649,15 +648,11 @@ class EstTr {
   late double statrank;
   late double estglicko;
 
-  EstTr(this._apm, this._pps, this._vs, this._rd, this._app, this._dss, this._dsp, this._gbe) {
+  EstTr(this._apm, this._pps, this._vs, this._app, this._dss, this._dsp, this._gbe) {
     srarea = (_apm * 0) + (_pps * 135) + (_vs * 0) + (_app * 290) + (_dss * 0) + (_dsp * 700) + (_gbe * 0);
     statrank = 11.2 * atan((srarea - 93) / 130) + 1;
     if (statrank <= 0) statrank = 0.001;
     estglicko = (4.0867 * srarea + 186.68);
-    // double temp = (1500 - estglicko) * pi;
-    // double temp2 = pow((15.9056943314 * (pow(_rd, 2)) + 3527584.25978), 0.5) as double;
-    // double temp3 = 1 + pow(10, (temp / temp2)) as double;
-    //esttr = 25000 / temp3;
     double ntemp = _pps*(150+(((_vs/_apm) - 1.66)*35))+_app*290+_dsp*700;
     esttr = 25000 / 
     (
@@ -821,8 +816,8 @@ class EndContextMulti {
     extraTracking = json['points']['extraAvgTracking']['aggregatestats___vsscore'].map((e) => e.toDouble()).toList();
     nerdStats = NerdStats(secondary, tertiary, extra);
     nerdStatsTracking = [for (int i = 0; i < secondaryTracking.length; i++) NerdStats(secondaryTracking[i], tertiaryTracking[i], extraTracking[i])];
-    estTr = EstTr(secondary, tertiary, extra, noTrRd, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
-    estTrTracking = [for (int i = 0; i < secondaryTracking.length; i++) EstTr(secondaryTracking[i], tertiaryTracking[i], extraTracking[i], noTrRd, nerdStatsTracking[i].app, nerdStatsTracking[i].dss, nerdStatsTracking[i].dsp, nerdStatsTracking[i].gbe)];
+    estTr = EstTr(secondary, tertiary, extra, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
+    estTrTracking = [for (int i = 0; i < secondaryTracking.length; i++) EstTr(secondaryTracking[i], tertiaryTracking[i], extraTracking[i], nerdStatsTracking[i].app, nerdStatsTracking[i].dss, nerdStatsTracking[i].dsp, nerdStatsTracking[i].gbe)];
     playstyle = Playstyle(secondary, tertiary, nerdStats.app, nerdStats.vsapm, nerdStats.dsp, nerdStats.gbe, estTr.srarea, estTr.statrank);
     playstyleTracking = [for (int i = 0; i < secondaryTracking.length; i++) Playstyle(secondaryTracking[i], tertiaryTracking[i], nerdStatsTracking[i].app, nerdStatsTracking[i].vsapm, nerdStatsTracking[i].dsp, nerdStatsTracking[i].gbe, estTrTracking[i].srarea, estTrTracking[i].statrank)];
   }
@@ -890,7 +885,7 @@ class TetraLeagueAlpha {
       this.vs,
       this.records}){
         nerdStats = (apm != null && pps != null && vs != null) ? NerdStats(apm!, pps!, vs!) : null;
-        estTr = (nerdStats != null) ? EstTr(apm!, pps!, vs!, (rd != null) ? rd! : 69, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp, nerdStats!.gbe) : null;
+        estTr = (nerdStats != null) ? EstTr(apm!, pps!, vs!, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp, nerdStats!.gbe) : null;
         playstyle =(nerdStats != null) ? Playstyle(apm!, pps!, nerdStats!.app, nerdStats!.vsapm, nerdStats!.dsp, nerdStats!.gbe, estTr!.srarea, estTr!.statrank) : null;
       }
 
@@ -918,7 +913,7 @@ class TetraLeagueAlpha {
     nextAt = json['next_at'] ?? -1;
     percentileRank = json['percentile_rank'] ?? rank;
     nerdStats = (apm != null && pps != null && vs != null) ? NerdStats(apm!, pps!, vs!) : null;
-    estTr = (nerdStats != null) ? EstTr(apm!, pps!, vs!, (rd != null) ? rd! : 69, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp, nerdStats!.gbe) : null;
+    estTr = (nerdStats != null) ? EstTr(apm!, pps!, vs!, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp, nerdStats!.gbe) : null;
     playstyle = (nerdStats != null) ? Playstyle(apm!, pps!, nerdStats!.app, nerdStats!.vsapm, nerdStats!.dsp, nerdStats!.gbe, estTr!.srarea, estTr!.statrank) : null;
   }
 
@@ -1769,7 +1764,7 @@ class TetrioPlayerFromLeaderboard {
     vs = json['league']['vs'].toDouble();
     decaying = json['league']['decaying'];
     nerdStats =  NerdStats(apm, pps, vs);
-    estTr = EstTr(apm, pps, vs, rd, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
+    estTr = EstTr(apm, pps, vs, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
     playstyle = Playstyle(apm, pps, nerdStats.app, nerdStats.vsapm, nerdStats.dsp, nerdStats.gbe, estTr.srarea, estTr.statrank);
   }
 

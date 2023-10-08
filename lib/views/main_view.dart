@@ -12,12 +12,14 @@ import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
-import 'package:tetra_stats/views/ranks_averages_view.dart';
+import 'package:tetra_stats/views/ranks_averages_view.dart' show RankAveragesView;
 import 'package:tetra_stats/views/tl_leaderboard_view.dart' show TLLeaderboardView;
 import 'package:tetra_stats/views/tl_match_view.dart' show TlMatchResultView;
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
 import 'package:tetra_stats/widgets/tl_thingy.dart';
 import 'package:tetra_stats/widgets/user_thingy.dart';
+import 'package:window_manager/window_manager.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 Future<List> me = Future.delayed(const Duration(seconds: 60), () => [null, null, null, null, null, null]);
 String _searchFor = "6098518e3d5155e6ec429cdc";
@@ -136,10 +138,25 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
     }
     _searchFor = me.userId;
     setState((){_titleNickname = me.username;});
-    List<dynamic> requests = await Future.wait([teto.getTLStream(_searchFor), teto.fetchRecords(_searchFor), teto.fetchNews(_searchFor)]);
-    TetraLeagueAlphaStream tlStream = requests[0] as TetraLeagueAlphaStream;
-    Map<String, dynamic> records = requests[1] as Map<String, dynamic>;
-    List<News> news = requests[2] as List<News>;
+    await windowManager.setTitle('Tetra Stats: $_titleNickname'); //TODO: Change window title on every view
+    late List<dynamic> requests;
+    late TetraLeagueAlphaStream tlStream;
+    late Map<String, dynamic> records;
+    late List<News> news;
+    late double? topTR;
+    if (me.tlSeason1.gamesPlayed > 9) {
+      requests = await Future.wait([teto.getTLStream(_searchFor), teto.fetchRecords(_searchFor), teto.fetchNews(_searchFor), teto.fetchTopTR(_searchFor)]);
+      tlStream = requests[0] as TetraLeagueAlphaStream;
+      records = requests[1] as Map<String, dynamic>;
+      news = requests[2] as List<News>;
+      topTR = requests[3] as double?;
+    }else{
+      requests = await Future.wait([teto.getTLStream(_searchFor), teto.fetchRecords(_searchFor), teto.fetchNews(_searchFor)]);
+      tlStream = requests[0] as TetraLeagueAlphaStream;
+      records = requests[1] as Map<String, dynamic>;
+      news = requests[2] as List<News>;
+      topTR = null;
+    }
     List<TetraLeagueAlphaRecord> tlMatches = [];
     bool isTracking = await teto.isPlayerTracking(me.userId);
     List<TetrioPlayer> states = [];
@@ -191,7 +208,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.estTr != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.estTr!.esttr)], child: Text(t.statCellNum.estOfTR.replaceAll(RegExp(r'\n'), " "))),
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.esttracc != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.esttracc!)], child: Text(t.statCellNum.accOfEst.replaceAll(RegExp(r'\n'), " "))),
     ];
-    return [me, records, states, tlMatches, compareWith, isTracking, news];
+    return [me, records, states, tlMatches, compareWith, isTracking, news, topTR];
   }
 
   void _justUpdate() {
@@ -330,24 +347,12 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                       body: TabBarView(
                         controller: _tabController,
                         children: [
-                          TLThingy(
-                              tl: snapshot.data![0].tlSeason1,
-                              userID: snapshot.data![0].userId,
-                              oldTl: snapshot.data![4]),
+                          TLThingy(tl: snapshot.data![0].tlSeason1, userID: snapshot.data![0].userId, oldTl: snapshot.data![4], topTR: snapshot.data![7]),
                           _TLRecords(userID: snapshot.data![0].userId, data: snapshot.data![3]),
                           _History(states: snapshot.data![2], update: _justUpdate),
-                          _RecordThingy(
-                              record: (snapshot.data![1]['sprint'].isNotEmpty)
-                                  ? snapshot.data![1]['sprint'][0]
-                                  : null),
-                          _RecordThingy(
-                              record: (snapshot.data![1]['blitz'].isNotEmpty)
-                                  ? snapshot.data![1]['blitz'][0]
-                                  : null),
-                          _OtherThingy(
-                              zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio,
-                              distinguishment: snapshot.data![0].distinguishment,
-                              newsletter: snapshot.data![6],)
+                          _RecordThingy(record: (snapshot.data![1]['sprint'].isNotEmpty) ? snapshot.data![1]['sprint'][0] : null),
+                          _RecordThingy(record: (snapshot.data![1]['blitz'].isNotEmpty) ? snapshot.data![1]['blitz'][0] : null),
+                          _OtherThingy(zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6],)
                         ],
                       ),
                     ),
@@ -466,7 +471,7 @@ class _NavDrawerState extends State<NavDrawer> {
               final allPlayers = (snapshot.data != null)
                   ? snapshot.data as Map<String, List<TetrioPlayer>>
                   : <String, List<TetrioPlayer>>{};
-              List<String> keys = allPlayers.keys.toList().reversed.toList(); // this is so dumb
+              List<String> keys = allPlayers.keys.toList();
               return NestedScrollView(
                   headerSliverBuilder: (context, value) {
                     return [
@@ -521,9 +526,9 @@ class _NavDrawerState extends State<NavDrawer> {
                       itemBuilder: (context, index) {
                         return ListTile(
                           title: Text(
-                              allPlayers[keys[index]]?.last.username as String),
+                              allPlayers[keys[allPlayers.length-1-index]]?.last.username as String),
                           onTap: () {
-                            widget.changePlayer(keys[index]);
+                            widget.changePlayer(keys[allPlayers.length-1-index]);
                             Navigator.of(context).pop();
                           },
                         );
@@ -966,6 +971,14 @@ class _OtherThingy extends StatelessWidget {
             )
           ),
           subtitle: Text(dateFormat.format(news.timestamp)),
+          leading: Image.asset(
+            "res/icons/improvement-local.png",
+            height: 48,
+            width: 48,
+            errorBuilder: (context, error, stackTrace) {
+              return Image.asset("res/icons/kagari.png", height: 64, width: 64);
+            },
+          ),
         );
       case "badge":
         return ListTile(
@@ -980,6 +993,14 @@ class _OtherThingy extends StatelessWidget {
             )
           ),
           subtitle: Text(dateFormat.format(news.timestamp)),
+          leading: Image.asset(
+            "res/tetrio_badges/${news.data["type"]}.png",
+            height: 48,
+            width: 48,
+            errorBuilder: (context, error, stackTrace) {
+              return Image.asset("res/icons/kagari.png", height: 64, width: 64);
+            },
+          ),
         );
       case "rankup":
         return ListTile(
@@ -994,32 +1015,56 @@ class _OtherThingy extends StatelessWidget {
             )
           ),
           subtitle: Text(dateFormat.format(news.timestamp)),
+          leading: Image.asset(
+            "res/tetrio_tl_alpha_ranks/${news.data["rank"]}.png",
+            height: 48,
+            width: 48,
+            errorBuilder: (context, error, stackTrace) {
+              return Image.asset("res/icons/kagari.png", height: 64, width: 64);
+            },
+          ),
         );
       case "supporter":
         return ListTile(
           title: RichText(
             text: TextSpan(
-              style: TextStyle(fontFamily: 'Eurostile Round', fontSize: 16),
+              style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16),
               text: t.newsParts.supporterStart,
               children: [
-                TextSpan(text: t.newsParts.tetoSupporter, style: TextStyle(fontWeight: FontWeight.bold))
+                TextSpan(text: t.newsParts.tetoSupporter, style: const TextStyle(fontWeight: FontWeight.bold))
               ]
             )
           ),
           subtitle: Text(dateFormat.format(news.timestamp)),
+          leading: Image.asset(
+            "res/icons/supporter-tag.png",
+            height: 48,
+            width: 48,
+            errorBuilder: (context, error, stackTrace) {
+              return Image.asset("res/icons/kagari.png", height: 64, width: 64);
+            },
+          ),
         );
       case "supporter_gift":
         return ListTile(
           title: RichText(
             text: TextSpan(
-              style: TextStyle(fontFamily: 'Eurostile Round', fontSize: 16),
+              style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16),
               text: t.newsParts.supporterGiftStart,
               children: [
-                TextSpan(text: t.newsParts.tetoSupporter, style: TextStyle(fontWeight: FontWeight.bold))
+                TextSpan(text: t.newsParts.tetoSupporter, style: const TextStyle(fontWeight: FontWeight.bold))
               ]
             )
           ),
           subtitle: Text(dateFormat.format(news.timestamp)),
+          leading: Image.asset(
+            "res/icons/supporter-tag.png",
+            height: 48,
+            width: 48,
+            errorBuilder: (context, error, stackTrace) {
+              return Image.asset("res/icons/kagari.png", height: 64, width: 64);
+            },
+          ),
         );
       default:
       return ListTile(
@@ -1057,11 +1102,11 @@ class _OtherThingy extends StatelessWidget {
                 ),
               if (bio != null)
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 48),
+                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 48),
                   child: Column(
                     children: [
                       Text(t.bio, style: TextStyle(fontFamily: "Eurostile Round Extended",fontSize: bigScreen ? 42 : 28)),
-                      Text(bio!, style: const TextStyle(fontSize: 18)),
+                      MarkdownBody(data: bio!, styleSheet: MarkdownStyleSheet(textScaleFactor: 1.5, textAlign: WrapAlignment.center)) // Text(bio!, style: const TextStyle(fontSize: 18)),
                     ],
                   ),
                 ),

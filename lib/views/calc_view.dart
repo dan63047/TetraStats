@@ -42,7 +42,7 @@ class CalcState extends State<CalcView> {
     vs = double.tryParse(vsController.text);
     if (apm != null && pps != null && vs != null) {
       nerdStats = NerdStats(apm!, pps!, vs!);
-      estTr = EstTr(apm!, pps!, vs!, 60.9, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp, nerdStats!.gbe);
+      estTr = EstTr(apm!, pps!, vs!, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp, nerdStats!.gbe);
       playstyle = Playstyle(apm!, pps!, nerdStats!.app, nerdStats!.vsapm, nerdStats!.dsp, nerdStats!.gbe, estTr!.srarea, estTr!.statrank);
       setState(() {});
     } else {
@@ -124,7 +124,7 @@ class CalcState extends State<CalcView> {
                       _ListEntry(value: estTr!.esttr, label: t.statCellNum.estOfTR, fractionDigits: 3),
                       Wrap(
                         direction: Axis.horizontal,
-                        alignment: WrapAlignment.spaceAround,
+                        alignment: WrapAlignment.center,
                         spacing: 25,
                         crossAxisAlignment: WrapCrossAlignment.start,
                         clipBehavior: Clip.hardEdge,

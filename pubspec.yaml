@@ -39,6 +39,8 @@ dependencies:
   csv: ^5.0.2
   url_launcher: ^6.1.12
   flutter_svg: any
+  window_manager: ^0.3.7
+  flutter_markdown: ^0.6.18
 
 dev_dependencies:
   flutter_test:
@@ -82,6 +84,8 @@ flutter:
      - res/icons/kagari.png
      - res/icons/osk.svg
      - res/icons/tetrio-logo.svg
+     - res/icons/improvement-local.png
+     - res/icons/supporter-tag.png
      - res/tetrio_tl_alpha_ranks/x.png
      - res/tetrio_tl_alpha_ranks/u.png
      - res/tetrio_tl_alpha_ranks/ss.png
@@ -127,6 +131,9 @@ flutter:
      - res/tetrio_badges/hnprism_1.png
      - res/tetrio_badges/hnprism_2.png
      - res/tetrio_badges/hnprism_3.png
+     - res/tetrio_badges/hnstratosphere50_1.png
+     - res/tetrio_badges/hnstratosphere50_2.png
+     - res/tetrio_badges/hnstratosphere50_3.png
      - res/tetrio_badges/ift_1.png
      - res/tetrio_badges/ift_2.png
      - res/tetrio_badges/ift_3.png
@@ -140,6 +147,7 @@ flutter:
      - res/tetrio_badges/mmc_tabi_superlobby.png
      - res/tetrio_badges/mmc_tabi_superlobby2.png
      - res/tetrio_badges/mmc_tabi_superlobby3.png
+     - res/tetrio_badges/mmc_tabi_superlobby4.png
      - res/tetrio_badges/redgevo_1.png
      - res/tetrio_badges/redgevo_2.png
      - res/tetrio_badges/redgevo_3.png
@@ -169,6 +177,9 @@ flutter:
      - res/tetrio_badges/thaitour_1.png
      - res/tetrio_badges/thaitour_2.png
      - res/tetrio_badges/thaitour_3.png
+     - res/tetrio_badges/ttsdpf_1.png
+     - res/tetrio_badges/ttsdpf_2.png
+     - res/tetrio_badges/ttsdpf_3.png
      - res/tetrio_badges/ttsdtc_1.png
      - res/tetrio_badges/ttsdtc_2.png
      - res/tetrio_badges/ttsdtc_3.png

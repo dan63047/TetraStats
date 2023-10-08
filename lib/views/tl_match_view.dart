@@ -268,7 +268,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
                           ),
                           Wrap(
                             direction: Axis.horizontal,
-                            alignment: WrapAlignment.spaceAround,
+                            alignment: WrapAlignment.center,
                             spacing: 25,
                             crossAxisAlignment: WrapCrossAlignment.start,
                             clipBehavior: Clip.hardEdge,

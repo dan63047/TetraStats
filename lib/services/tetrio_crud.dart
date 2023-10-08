@@ -54,6 +54,7 @@ class TetrioService extends DB {
   final Map<String, Map<String, dynamic>> _recordsCache = {};
   final Map<String, TetrioPlayersLeaderboard> _leaderboardsCache = {};
   final Map<String, List<News>> _newsCache = {};
+  final Map<String, Map<String, double?>> _topTRcache = {};
   final Map<String, TetraLeagueAlphaStream> _tlStreamsCache = {}; // i'm trying to respect oskware api It should look something like {"cached_until": TetrioPlayer}
   final client = UserAgentClient("ebany u rot yatogo kazino blyat' (Tetra Stats v1.2.4 dev build)", http.Client());
   static final TetrioService _shared = TetrioService._sharedInstance();
@@ -102,6 +103,58 @@ class TetrioService extends DB {
       return await getPlayer(id).then((value) => value.last.username);
     } catch (e){
       return await fetchPlayer(id).then((value) => value.username);
+    }
+  }
+
+  Future<double?> fetchTopTR(String id) async {
+    try{
+      var cached = _topTRcache.entries.firstWhere((element) => element.value.keys.first == id);
+    if (DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true).isAfter(DateTime.now())){
+      developer.log("fetchTopTR: Top TR retrieved from cache, that expires ${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)}", name: "services/tetrio_crud");
+      return cached.value.values.first;
+    }else{
+      _topTRcache.remove(cached.key);
+      developer.log("fetchTopTR: Top TR expired (${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)})", name: "services/tetrio_crud");
+    }
+    }catch(e){
+      developer.log("fetchTopTR: Trying to retrieve Top TR", name: "services/tetrio_crud");
+    }
+
+    Uri url;
+    if (kIsWeb) {
+      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLHistory", "user": id});
+    } else {
+      url = Uri.https('api.p1nkl0bst3r.xyz', 'toptr/$id');
+    }
+    try{
+      final response = await client.get(url);
+
+      switch (response.statusCode) {
+        case 200:
+          _topTRcache[(DateTime.now().millisecondsSinceEpoch + 300000).toString()] = {id: double.tryParse(response.body)};
+          return double.tryParse(response.body);
+        case 404:
+          developer.log("fetchTopTR: Probably, player doesn't have top TR", name: "services/tetrio_crud", error: response.statusCode);
+          _topTRcache[(DateTime.now().millisecondsSinceEpoch + 300000).toString()] = {id: null};
+          return null;
+        case 403:
+          throw P1nkl0bst3rForbidden();
+        case 429:
+          throw P1nkl0bst3rTooManyRequests();
+        case 418:
+          throw TetrioOskwareBridgeProblem();
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+          throw P1nkl0bst3rInternalProblem();
+        default:
+          developer.log("fetchTopTR: Failed to fetch top TR", name: "services/tetrio_crud", error: response.statusCode);
+          throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
+      }
+    } on http.ClientException catch (e, s) {
+      developer.log("$e, $s");
+      throw http.ClientException(e.message, e.uri);
     }
   }
 
@@ -238,7 +291,6 @@ class TetrioService extends DB {
     }
   }
 
-  // TODO: Future<List<News>> getNews(String userID) async
   Future<List<News>> fetchNews(String userID) async{
     try{
       var cached = _newsCache.entries.firstWhere((element) => element.value[0].stream == "user_$userID");

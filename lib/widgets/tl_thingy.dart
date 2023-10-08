@@ -13,7 +13,8 @@ class TLThingy extends StatelessWidget {
   final String userID;
   final TetraLeagueAlpha? oldTl;
   final bool showTitle;
-  const TLThingy({Key? key, required this.tl, required this.userID, this.oldTl, this.showTitle = true}) : super(key: key);
+  final double? topTR;
+  const TLThingy({Key? key, required this.tl, required this.userID, this.oldTl, this.showTitle = true, this.topTR}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +56,7 @@ class TLThingy extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                "${t.top} ${f2.format(tl.percentile * 100)}% (${tl.percentileRank.toUpperCase()})${tl.bestRank != "z" ? " • ${t.topRank}: ${tl.bestRank.toUpperCase()}" : ""} • Glicko: ${f2.format(tl.glicko!)}±${f2.format(tl.rd!)}${tl.decaying ? ' • ${t.decaying}' : ''}",
+                                "${t.top} ${f2.format(tl.percentile * 100)}% (${tl.percentileRank.toUpperCase()})${tl.bestRank != "z" ? " • ${t.topRank}: ${tl.bestRank.toUpperCase()}" : ""}${topTR != null ? " (${f2.format(topTR)} TR)" : ""} • Glicko: ${f2.format(tl.glicko!)}±${f2.format(tl.rd!)}${tl.decaying ? ' • ${t.decaying}' : ''}",
                                 textAlign: TextAlign.center,
                               ),
                             ],
@@ -346,7 +347,7 @@ class TLThingy extends StatelessWidget {
                     if (tl.nerdStats != null)
                       Wrap(
                         direction: Axis.horizontal,
-                        alignment: WrapAlignment.spaceAround,
+                        alignment: WrapAlignment.center,
                         spacing: 25,
                         crossAxisAlignment: WrapCrossAlignment.start,
                         clipBehavior: Clip.hardEdge,
