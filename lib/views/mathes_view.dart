@@ -1,11 +1,14 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/views/tl_match_view.dart';
+import 'package:window_manager/window_manager.dart';
 
 final TetrioService teto = TetrioService();
 final NumberFormat f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
+late String oldWindowTitle;
 
 class MatchesView extends StatefulWidget {
   final String userID;
@@ -17,6 +20,22 @@ class MatchesView extends StatefulWidget {
 }
 
 class MatchesState extends State<MatchesView> {
+
+  @override
+  void initState() {
+    if (!Platform.isAndroid && !Platform.isIOS){
+      windowManager.getTitle().then((value) => oldWindowTitle = value);
+      windowManager.setTitle("Tetra Stats: ${t.matchesViewTitle(nickname: widget.username)}");
+    }
+    super.initState();
+  }
+
+  @override
+  void dispose(){
+    if (!Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);

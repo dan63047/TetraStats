@@ -1,15 +1,18 @@
 import 'dart:io';
+import 'package:tetra_stats/main.dart' show packageInfo;
 import 'package:file_selector/file_selector.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:window_manager/window_manager.dart';
+
+late String oldWindowTitle;
 
 class SettingsView extends StatefulWidget {
   const SettingsView({Key? key}) : super(key: key);
@@ -19,11 +22,6 @@ class SettingsView extends StatefulWidget {
 }
 
 class SettingsState extends State<SettingsView> {
-  PackageInfo _packageInfo = PackageInfo(
-      appName: "TetraStats",
-      packageName: "idk man",
-      version: "some numbers",
-      buildNumber: "anotherNumber");
   late SharedPreferences prefs;
   final TetrioService teto = TetrioService();
   String defaultNickname = "Checking...";
@@ -31,16 +29,18 @@ class SettingsState extends State<SettingsView> {
 
   @override
   void initState() {
-    _initPackageInfo();
+    if (!Platform.isAndroid && !Platform.isIOS){
+      windowManager.getTitle().then((value) => oldWindowTitle = value);
+      windowManager.setTitle("Tetra Stats: ${t.settings}");
+    }
     _getPreferences();
     super.initState();
   }
 
-  Future<void> _initPackageInfo() async {
-    final info = await PackageInfo.fromPlatform();
-    setState(() {
-      _packageInfo = info;
-    });
+  @override
+  void dispose(){
+    if (!Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
+    super.dispose();
   }
 
   Future<void> _launchInBrowser(Uri url) async {
@@ -251,7 +251,7 @@ class SettingsState extends State<SettingsView> {
               _launchInBrowser(Uri.https("github.com", "dan63047/TetraStats"));
             },
             title: Text(t.aboutApp),
-            subtitle: Text(t.aboutAppText(appName: _packageInfo.appName, packageName: _packageInfo.packageName, version: _packageInfo.version, buildNumber: _packageInfo.buildNumber)),
+            subtitle: Text(t.aboutAppText(appName: packageInfo.appName, packageName: packageInfo.packageName, version: packageInfo.version, buildNumber: packageInfo.buildNumber)),
           ),
         ],
       )),

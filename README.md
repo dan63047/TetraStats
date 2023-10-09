@@ -18,5 +18,8 @@ You can [download an app](https://github.com/dan63047/TetraStats/releases), or [
 
 # Special thanks
 - **kerrmunism** — formulas
-- **p1nkl0bst3r** — providing players history
+- **p1nkl0bst3r** — providing players history and peak TR
 - **osk** and his team — TETR.IO
+
+## Legal note
+I do NOT own any assets located in `/res/*`, excluding app icon (`/res/icons/app.png`) and localization (`/res/i18n/*`), which is distributed under GNU license (as well, as this software)

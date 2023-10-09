@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
@@ -6,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
+import 'package:window_manager/window_manager.dart';
 
 enum Mode{
   player,
@@ -18,8 +20,8 @@ Mode redSideMode = Mode.player;
 List<dynamic> theRedSide = [null, null, null];
 final TetrioService teto = TetrioService();
 final DateFormat dateFormat = DateFormat.yMd(LocaleSettings.currentLocale.languageCode).add_Hm();
-// ignore: unnecessary_string_escapes
 var numbersReg = RegExp(r'\d+(\.\d*)*');
+late String oldWindowTitle;
 
 class CompareView extends StatefulWidget {
   final List<dynamic> greenSide;
@@ -42,6 +44,9 @@ class CompareState extends State<CompareView> {
     fetchGreenSide(widget.greenSide[0].userId);
     if (widget.redSide[0] != null) fetchRedSide(widget.redSide[0].userId); 
     _scrollController = ScrollController();
+    if (!Platform.isAndroid && !Platform.isIOS){
+      windowManager.getTitle().then((value) => oldWindowTitle = value);
+    }
     super.initState();
   }
 
@@ -51,6 +56,7 @@ class CompareState extends State<CompareView> {
     greenSideMode = Mode.player;
     theRedSide = [null, null, null];
     redSideMode = Mode.player;
+    if (!Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
     super.dispose();
   }
 
@@ -253,6 +259,7 @@ class CompareState extends State<CompareView> {
         titleRedSide = t.averageXrank(rankLetter: theRedSide[2].rank.toUpperCase());
         break;
     }
+    windowManager.setTitle("Tetra Stats: $titleGreenSide ${t.vs} $titleRedSide");
     return Scaffold(
       appBar: AppBar(title: Text("$titleGreenSide ${t.vs} $titleRedSide")),
       backgroundColor: Colors.black,

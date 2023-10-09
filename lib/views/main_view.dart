@@ -29,9 +29,6 @@ late SharedPreferences prefs;
 var chartsData = <DropdownMenuItem<List<FlSpot>>>[];
 List historyShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR"];
 int chartsIndex = 0; 
-const allowedHeightForPlayerIdInPixels = 40.0;
-const allowedHeightForPlayerBioInPixels = 30.0;
-const givenTextHeightByScreenPercentage = 0.3;
 final NumberFormat timeInSec = NumberFormat("#,###.###s.");
 final NumberFormat f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
 final NumberFormat secs = NumberFormat("00.###");
@@ -138,7 +135,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
     }
     _searchFor = me.userId;
     setState((){_titleNickname = me.username;});
-    await windowManager.setTitle('Tetra Stats: $_titleNickname'); //TODO: Change window title on every view
+    if (!Platform.isAndroid && !Platform.isIOS) await windowManager.setTitle(widget.title);
     late List<dynamic> requests;
     late TetraLeagueAlphaStream tlStream;
     late Map<String, dynamic> records;
@@ -400,19 +397,8 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                   return Center(child: Text(errText, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center));
                 }
                 break;
-              default:
-                return const Center(
-                    child: Text('default case of FutureBuilder',
-                        style: TextStyle(
-                            fontFamily: "Eurostile Round Extended",
-                            fontSize: 42),
-                        textAlign: TextAlign.center));
             }
-            return const Center(
-                child: Text('end of FutureBuilder',
-                    style: TextStyle(
-                        fontFamily: "Eurostile Round Extended", fontSize: 42),
-                    textAlign: TextAlign.center));
+            return const Center(child: Text('default case of FutureBuilder', style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42), textAlign: TextAlign.center));
           },
         ),
       ),
@@ -1089,14 +1075,14 @@ class _OtherThingy extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(0, 0, 0, 48),
                   child: Column(
                     children: [
-                      Text(t.distinguishment, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                      Text(t.distinguishment, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28), textAlign: TextAlign.center),
                       RichText(
                         text: TextSpan(
                           style: DefaultTextStyle.of(context).style,
                           children: getDistinguishmentSetOfWidgets(distinguishment!.header!),
                         ),
                       ),
-                      Text(distinguishment!.footer!, style: const TextStyle(fontSize: 18)),
+                      Text(distinguishment!.footer!, style: const TextStyle(fontSize: 18), textAlign: TextAlign.center),
                     ],
                   ),
                 ),

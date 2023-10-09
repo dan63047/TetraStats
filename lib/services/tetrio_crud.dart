@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer' as developer;
+import 'package:tetra_stats/main.dart' show packageInfo;
 import 'package:flutter/foundation.dart';
 import 'package:tetra_stats/services/custom_http_client.dart';
 import 'package:http/http.dart' as http;
@@ -56,7 +57,7 @@ class TetrioService extends DB {
   final Map<String, List<News>> _newsCache = {};
   final Map<String, Map<String, double?>> _topTRcache = {};
   final Map<String, TetraLeagueAlphaStream> _tlStreamsCache = {}; // i'm trying to respect oskware api It should look something like {"cached_until": TetrioPlayer}
-  final client = UserAgentClient("ebany u rot yatogo kazino blyat' (Tetra Stats v1.2.4 dev build)", http.Client());
+  final client = UserAgentClient("package info thingy: ${packageInfo.version} (Tetra Stats v1.2.4 dev build)", http.Client());
   static final TetrioService _shared = TetrioService._sharedInstance();
   factory TetrioService() => _shared;
   late final StreamController<Map<String, List<TetrioPlayer>>> _tetrioStreamController;
@@ -122,7 +123,7 @@ class TetrioService extends DB {
 
     Uri url;
     if (kIsWeb) {
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLHistory", "user": id});
+      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "PeakTR", "user": id});
     } else {
       url = Uri.https('api.p1nkl0bst3r.xyz', 'toptr/$id');
     }

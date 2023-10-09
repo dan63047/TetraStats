@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -13,6 +14,8 @@ import 'package:tetra_stats/views/settings_view.dart';
 import 'package:tetra_stats/views/tracked_players_view.dart';
 import 'package:tetra_stats/views/calc_view.dart';
 
+late final PackageInfo packageInfo;
+
 void main() async {
   if (kIsWeb) {
     sqfliteFfiInit();
@@ -22,10 +25,13 @@ void main() async {
     databaseFactory = databaseFactoryFfi;
   }
   WidgetsFlutterBinding.ensureInitialized();
-  await WindowManager.instance.ensureInitialized();
-  windowManager.waitUntilReadyToShow().then((_) async {
+  if (!Platform.isAndroid && !Platform.isIOS){
+    await WindowManager.instance.ensureInitialized();
+    windowManager.waitUntilReadyToShow().then((_) async {
      await windowManager.setTitle('Tetra Stats');
-  });
+    });
+  }
+  packageInfo = await PackageInfo.fromPlatform();
   prefs = await SharedPreferences.getInstance();
   String? locale = prefs.getString("locale");
   if (locale == null){

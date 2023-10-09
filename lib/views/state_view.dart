@@ -1,9 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/widgets/tl_thingy.dart';
 import 'package:tetra_stats/widgets/user_thingy.dart';
+import 'package:window_manager/window_manager.dart';
 
 final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
 
@@ -15,13 +17,26 @@ class StateView extends StatefulWidget {
   State<StatefulWidget> createState() => StateState();
 }
 
+late String oldWindowTitle;
+
 class StateState extends State<StateView> {
   late ScrollController _scrollController;
 
   @override
   void initState() {
     _scrollController = ScrollController();
+    if (!Platform.isAndroid && !Platform.isIOS){
+      windowManager.getTitle().then((value) => oldWindowTitle = value);
+      windowManager.setTitle("Tetra Stats: ${t.stateViewTitle(nickname: widget.state.username.toUpperCase(), date: dateFormat.format(widget.state.state))}");
+    }
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    if (!Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
+    super.dispose();
   }
 
   void _justUpdate() {

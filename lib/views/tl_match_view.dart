@@ -1,13 +1,16 @@
+import 'dart:io';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:window_manager/window_manager.dart';
 
 
 final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
 int roundSelector = -1; // -1 = match averages, otherwise round number-1
 List<DropdownMenuItem> rounds = []; // index zero will be match stats
+late String oldWindowTitle;
 
 class TlMatchResultView extends StatefulWidget {
   final TetraLeagueAlphaRecord record;
@@ -27,12 +30,17 @@ class TlMatchResultState extends State<TlMatchResultView> {
     _scrollController = ScrollController();
     rounds = [DropdownMenuItem(value: -1, child: Text(t.match))];
     rounds.addAll([for (int i = 0; i < widget.record.endContext.first.secondaryTracking.length; i++) DropdownMenuItem(value: i, child: Text(t.roundNumber(n: i+1)))]);
+    if (!Platform.isAndroid && !Platform.isIOS){
+      windowManager.getTitle().then((value) => oldWindowTitle = value);
+      windowManager.setTitle("Tetra Stats: ${widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).username.toUpperCase()} ${t.vs} ${widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).username.toUpperCase()} ${t.inTLmatch} ${dateFormat.format(widget.record.timestamp)}");
+    }
     super.initState();
   }
 
   @override
   void dispose(){
     roundSelector = -1;
+    if (!Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
     super.dispose();
   }
 

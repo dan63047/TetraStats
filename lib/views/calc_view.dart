@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:window_manager/window_manager.dart';
 
 double? apm;
 double? pps;
@@ -11,6 +13,7 @@ NerdStats? nerdStats;
 EstTr? estTr;
 Playstyle? playstyle;
 final NumberFormat f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
+late String oldWindowTitle;
 
 class CalcView extends StatefulWidget {
   const CalcView({Key? key}) : super(key: key);
@@ -28,11 +31,16 @@ class CalcState extends State<CalcView> {
   @override
   void initState() {
     _scrollController = ScrollController();
+    if (!Platform.isAndroid && !Platform.isIOS){
+      windowManager.getTitle().then((value) => oldWindowTitle = value);
+      windowManager.setTitle("Tetra Stats: ${t.statsCalc}");
+    } 
     super.initState();
   }
 
   @override
   void dispose() {
+    if (!Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
     super.dispose();
   }
 

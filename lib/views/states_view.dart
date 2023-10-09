@@ -1,9 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/views/mathes_view.dart';
 import 'package:tetra_stats/views/state_view.dart';
+import 'package:window_manager/window_manager.dart';
 
 class StatesView extends StatefulWidget {
   final List<TetrioPlayer> states;
@@ -13,7 +15,24 @@ class StatesView extends StatefulWidget {
   State<StatefulWidget> createState() => StatesState();
 }
 
+late String oldWindowTitle;
+
 class StatesState extends State<StatesView> {
+  @override
+  void initState() {
+    if (!Platform.isAndroid && !Platform.isIOS){
+      windowManager.getTitle().then((value) => oldWindowTitle = value);
+      windowManager.setTitle("Tetra Stats: ${t.statesViewTitle(number: widget.states.length, nickname: widget.states.last.username.toUpperCase())}");
+    }
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    if (!Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);

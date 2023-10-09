@@ -1,10 +1,11 @@
+import 'dart:io';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
-//import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/views/main_view.dart' show MainView, f4, f2;
+import 'package:window_manager/window_manager.dart';
 
 var chartsShortTitlesDropdowns = <DropdownMenuItem>[for (MapEntry e in chartsShortTitles.entries) DropdownMenuItem(value: e.key, child: Text(e.value),)];
 Stats chartsX = Stats.tr;
@@ -14,6 +15,7 @@ Stats sortBy = Stats.tr;
 bool reversed = false;
 List<DropdownMenuItem> itemCountries = [for (MapEntry e in t.countries.entries) DropdownMenuItem(value: e.key, child: Text(e.value))];
 String country = "";
+late String oldWindowTitle;
 
 class RankView extends StatefulWidget {
   final List rank;
@@ -31,6 +33,10 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
   void initState() {
     _scrollController = ScrollController();
     _tabController = TabController(length: 6, vsync: this);
+    if (!Platform.isAndroid && !Platform.isIOS){
+      windowManager.getTitle().then((value) => oldWindowTitle = value);
+      windowManager.setTitle("Tetra Stats: ${widget.rank[1]["everyone"] ? t.everyoneAverages : t.rankAverages(rank: widget.rank[0].rank.toUpperCase())}");
+    }
     super.initState();
   }
 
@@ -38,6 +44,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
   void dispose() {
     _tabController.dispose();
     _scrollController.dispose();
+    if (!Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
     super.dispose();
   }
 

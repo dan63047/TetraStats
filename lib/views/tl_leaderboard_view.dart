@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
@@ -6,6 +7,7 @@ import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:tetra_stats/views/main_view.dart';
 import 'package:tetra_stats/views/rank_averages_view.dart';
 import 'package:tetra_stats/views/ranks_averages_view.dart';
+import 'package:window_manager/window_manager.dart';
 
 final TetrioService teto = TetrioService();
 List<DropdownMenuItem> itemStats = [for (MapEntry e in chartsShortTitles.entries) DropdownMenuItem(value: e.key, child: Text(e.value))];
@@ -13,6 +15,7 @@ Stats sortBy = Stats.tr;
 bool reversed = false;
 List<DropdownMenuItem> itemCountries = [for (MapEntry e in t.countries.entries) DropdownMenuItem(value: e.key, child: Text(e.value))];
 String country = "";
+late String oldWindowTitle;
 
 class TLLeaderboardView extends StatefulWidget {
   const TLLeaderboardView({Key? key}) : super(key: key);
@@ -21,8 +24,22 @@ class TLLeaderboardView extends StatefulWidget {
   State<StatefulWidget> createState() => TLLeaderboardState();
 }
 
-
 class TLLeaderboardState extends State<TLLeaderboardView> {
+  @override
+  void initState() {
+    if (!Platform.isAndroid && !Platform.isIOS){
+      windowManager.getTitle().then((value) => oldWindowTitle = value);
+      windowManager.setTitle("Tetra Stats: ${t.tlLeaderboard}");
+    }
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    if (!Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);
