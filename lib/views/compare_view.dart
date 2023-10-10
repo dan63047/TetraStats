@@ -44,7 +44,7 @@ class CompareState extends State<CompareView> {
     fetchGreenSide(widget.greenSide[0].userId);
     if (widget.redSide[0] != null) fetchRedSide(widget.redSide[0].userId); 
     _scrollController = ScrollController();
-    if (!Platform.isAndroid && !Platform.isIOS){
+    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS){
       windowManager.getTitle().then((value) => oldWindowTitle = value);
     }
     super.initState();
@@ -56,7 +56,7 @@ class CompareState extends State<CompareView> {
     greenSideMode = Mode.player;
     theRedSide = [null, null, null];
     redSideMode = Mode.player;
-    if (!Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
+    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
     super.dispose();
   }
 

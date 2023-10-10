@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
@@ -33,7 +34,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
   void initState() {
     _scrollController = ScrollController();
     _tabController = TabController(length: 6, vsync: this);
-    if (!Platform.isAndroid && !Platform.isIOS){
+    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS){
       windowManager.getTitle().then((value) => oldWindowTitle = value);
       windowManager.setTitle("Tetra Stats: ${widget.rank[1]["everyone"] ? t.everyoneAverages : t.rankAverages(rank: widget.rank[0].rank.toUpperCase())}");
     }
@@ -44,7 +45,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
   void dispose() {
     _tabController.dispose();
     _scrollController.dispose();
-    if (!Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
+    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
     super.dispose();
   }
 

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
@@ -20,7 +21,7 @@ class TrackedPlayersView extends StatefulWidget {
 class TrackedPlayersState extends State<TrackedPlayersView> {
   @override
   void initState() {
-    if (!Platform.isAndroid && !Platform.isIOS){
+    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS){
       windowManager.getTitle().then((value) => oldWindowTitle = value);
       windowManager.setTitle("Tetra Stats: ${t.trackedPlayersViewTitle}");
     }
@@ -29,7 +30,7 @@ class TrackedPlayersState extends State<TrackedPlayersView> {
 
   @override
   void dispose() {
-    if (!Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
+    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
     super.dispose();
   }
 

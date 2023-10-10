@@ -25,7 +25,7 @@ void main() async {
     databaseFactory = databaseFactoryFfi;
   }
   WidgetsFlutterBinding.ensureInitialized();
-  if (!Platform.isAndroid && !Platform.isIOS){
+  if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS){
     await WindowManager.instance.ensureInitialized();
     windowManager.waitUntilReadyToShow().then((_) async {
      await windowManager.setTitle('Tetra Stats');

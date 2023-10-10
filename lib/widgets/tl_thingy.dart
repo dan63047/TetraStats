@@ -55,9 +55,15 @@ class TLThingy extends StatelessWidget {
                                   Colors.green
                                 ),
                               ),
-                              Text(
-                                "${t.top} ${f2.format(tl.percentile * 100)}% (${tl.percentileRank.toUpperCase()})${tl.bestRank != "z" ? " • ${t.topRank}: ${tl.bestRank.toUpperCase()}" : ""}${topTR != null ? " (${f2.format(topTR)} TR)" : ""} • Glicko: ${f2.format(tl.glicko!)}±${f2.format(tl.rd!)}${tl.decaying ? ' • ${t.decaying}' : ''}",
-                                textAlign: TextAlign.center,
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "${t.top} ${f2.format(tl.percentile * 100)}% (${tl.percentileRank.toUpperCase()})${tl.bestRank != "z" ? " • ${t.topRank}: ${tl.bestRank.toUpperCase()}" : ""}${topTR != null ? " (${f2.format(topTR)} TR)" : ""} • Glicko: ${f2.format(tl.glicko!)}±${f2.format(tl.rd!)}",
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  if (tl.decaying) Icon(Icons.trending_up, color: tl.rd! > 98 ? Colors.red : Colors.yellow,)
+                                ],
                               ),
                             ],
                           ),

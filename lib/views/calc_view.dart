@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
@@ -31,7 +32,7 @@ class CalcState extends State<CalcView> {
   @override
   void initState() {
     _scrollController = ScrollController();
-    if (!Platform.isAndroid && !Platform.isIOS){
+    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS){
       windowManager.getTitle().then((value) => oldWindowTitle = value);
       windowManager.setTitle("Tetra Stats: ${t.statsCalc}");
     } 
@@ -40,7 +41,7 @@ class CalcState extends State<CalcView> {
 
   @override
   void dispose() {
-    if (!Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
+    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
     super.dispose();
   }
 

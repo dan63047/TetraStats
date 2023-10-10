@@ -135,7 +135,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
     }
     _searchFor = me.userId;
     setState((){_titleNickname = me.username;});
-    if (!Platform.isAndroid && !Platform.isIOS) await windowManager.setTitle(widget.title);
+    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) await windowManager.setTitle(widget.title);
     late List<dynamic> requests;
     late TetraLeagueAlphaStream tlStream;
     late Map<String, dynamic> records;

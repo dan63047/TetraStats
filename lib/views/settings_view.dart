@@ -29,7 +29,7 @@ class SettingsState extends State<SettingsView> {
 
   @override
   void initState() {
-    if (!Platform.isAndroid && !Platform.isIOS){
+    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS){
       windowManager.getTitle().then((value) => oldWindowTitle = value);
       windowManager.setTitle("Tetra Stats: ${t.settings}");
     }
@@ -39,7 +39,7 @@ class SettingsState extends State<SettingsView> {
 
   @override
   void dispose(){
-    if (!Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
+    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
     super.dispose();
   }
 

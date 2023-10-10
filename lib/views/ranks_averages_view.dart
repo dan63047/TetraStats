@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
@@ -24,7 +25,7 @@ class RanksAverages extends State<RankAveragesView> {
       averages = value.averages;
       setState(() {});
     });
-    if (!Platform.isAndroid && !Platform.isIOS){
+    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS){
       windowManager.getTitle().then((value) => oldWindowTitle = value);
       windowManager.setTitle("Tetra Stats: ${t.rankAveragesViewTitle}");
     }
@@ -33,7 +34,7 @@ class RanksAverages extends State<RankAveragesView> {
 
   @override
   void dispose() {
-    if (!Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
+    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
     super.dispose();
   }
 

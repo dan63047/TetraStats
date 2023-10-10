@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
@@ -27,16 +28,13 @@ class TLLeaderboardView extends StatefulWidget {
 class TLLeaderboardState extends State<TLLeaderboardView> {
   @override
   void initState() {
-    if (!Platform.isAndroid && !Platform.isIOS){
-      windowManager.getTitle().then((value) => oldWindowTitle = value);
-      windowManager.setTitle("Tetra Stats: ${t.tlLeaderboard}");
-    }
+    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) windowManager.getTitle().then((value) => oldWindowTitle = value);
     super.initState();
   }
 
   @override
   void dispose() {
-    if (!Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
+    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
     super.dispose();
   }
 
@@ -75,6 +73,7 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
                   return const Center(child: Text('Fetching...'));
                   case ConnectionState.done:
                     final allPlayers = snapshot.data?.getStatRanking(snapshot.data!.leaderboard, sortBy, reversed: reversed, country: country);
+                    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) windowManager.setTitle("Tetra Stats: ${t.tlLeaderboard} - ${t.players(n: allPlayers!.length)}");
                     return NestedScrollView(
                         headerSliverBuilder: (context, value) {
                           String howManyPlayers(int numberOfPlayers) => Intl.plural(
