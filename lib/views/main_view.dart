@@ -1077,6 +1077,7 @@ class _OtherThingy extends StatelessWidget {
                     children: [
                       Text(t.distinguishment, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28), textAlign: TextAlign.center),
                       RichText(
+                        textAlign: TextAlign.center,
                         text: TextSpan(
                           style: DefaultTextStyle.of(context).style,
                           children: getDistinguishmentSetOfWidgets(distinguishment!.header!),

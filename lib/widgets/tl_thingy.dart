@@ -55,14 +55,24 @@ class TLThingy extends StatelessWidget {
                                   Colors.green
                                 ),
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                              Column(
                                 children: [
-                                  Text(
-                                    "${t.top} ${f2.format(tl.percentile * 100)}% (${tl.percentileRank.toUpperCase()})${tl.bestRank != "z" ? " • ${t.topRank}: ${tl.bestRank.toUpperCase()}" : ""}${topTR != null ? " (${f2.format(topTR)} TR)" : ""} • Glicko: ${f2.format(tl.glicko!)}±${f2.format(tl.rd!)}",
+                                  RichText(
                                     textAlign: TextAlign.center,
+                                    softWrap: true,
+                                    text: TextSpan(
+                                      style: DefaultTextStyle.of(context).style,
+                                      children: [
+                                        TextSpan(text: "${t.top} ${f2.format(tl.percentile * 100)}% (${tl.percentileRank.toUpperCase()})"),
+                                        if (tl.bestRank != "z") const TextSpan(text: " • "),
+                                        if (tl.bestRank != "z") TextSpan(text: "${t.topRank}: ${tl.bestRank.toUpperCase()}"),
+                                        if (topTR != null) TextSpan(text: " (${f2.format(topTR)} TR)"),
+                                        TextSpan(text: " • Glicko: ${f2.format(tl.glicko!)}±"),
+                                        TextSpan(text: f2.format(tl.rd!), style: tl.decaying ? TextStyle(color: tl.rd! > 98 ? Colors.red : Colors.yellow) : null),
+                                        if (tl.decaying) WidgetSpan(child: Icon(Icons.trending_up, color: tl.rd! > 98 ? Colors.red : Colors.yellow,), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic) 
+                                      ],
+                                    ),
                                   ),
-                                  if (tl.decaying) Icon(Icons.trending_up, color: tl.rd! > 98 ? Colors.red : Colors.yellow,)
                                 ],
                               ),
                             ],
