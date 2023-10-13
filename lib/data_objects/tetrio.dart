@@ -750,7 +750,7 @@ class TetraLeagueAlphaRecord{
   }
 
   @override
-  bool operator ==(covariant TetraLeagueAlphaRecord other) => ownId == other.ownId;
+  bool operator ==(covariant TetraLeagueAlphaRecord other) => (ownId == other.ownId) || (replayId == other.replayId);
 
   @override
   String toString() {
