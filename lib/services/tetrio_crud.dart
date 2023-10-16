@@ -407,10 +407,32 @@ class TetrioService extends DB {
     await ensureDbIsOpen();
     final db = getDatabaseOrThrow();
     for (TetraLeagueAlphaRecord match in stream.records) {
-       final results = await db.query(tetraLeagueMatchesTable, where: '$idCol = ?', whereArgs: [match.ownId]);
+       final results = await db.query(tetraLeagueMatchesTable, where: '$replayID = ?', whereArgs: [match.replayId]);
     if (results.isNotEmpty) continue;
     db.insert(tetraLeagueMatchesTable, {idCol: match.ownId, replayID: match.replayId, timestamp: match.timestamp.toString(), player1id: match.endContext.first.userId, player2id: match.endContext.last.userId, endContext1: jsonEncode(match.endContext.first.toJson()), endContext2: jsonEncode(match.endContext.last.toJson())});
     }
+  }
+
+  Future<void> removeDuplicatesFromTLMatches() async{
+    await ensureDbIsOpen();
+    final db = getDatabaseOrThrow();
+    await db.execute("""
+      DELETE FROM $tetraLeagueMatchesTable 
+      WHERE 
+        $idCol IN (
+        SELECT 
+          $idCol 
+        FROM (
+          SELECT 
+            $idCol,
+            ROW_NUMBER() OVER (
+              PARTITION BY $replayID
+              ORDER BY $replayID) AS row_num
+          FROM $tetraLeagueMatchesTable    
+        ) t
+          WHERE row_num > 1
+      );
+    """);
   }
 
   Future<List<TetraLeagueAlphaRecord>> getTLMatchesbyPlayerID(String playerID) async {

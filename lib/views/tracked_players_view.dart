@@ -41,6 +41,21 @@ class TrackedPlayersState extends State<TrackedPlayersView> {
     return Scaffold(
       appBar: AppBar(
         title: Text(t.trackedPlayersViewTitle),
+        actions: [
+          PopupMenuButton(
+            icon: const Icon(Icons.settings_backup_restore),
+            itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+              PopupMenuItem(
+                value: 1,
+                child: Text("Remove duplicated TL mathces"),
+              ),
+            ],
+            onSelected: (value) {
+              if (value == 1) {teto.removeDuplicatesFromTLMatches();
+              return;}
+              Navigator.pushNamed(context, value);
+            })
+        ],
       ),
       backgroundColor: Colors.black,
       body: SafeArea(
