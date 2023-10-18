@@ -159,11 +159,12 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
     List<TetrioPlayer> states = [];
     TetraLeagueAlpha? compareWith;
     var uniqueTL = <dynamic>{};
+    tlMatches = tlStream.records;
     if (isTracking){
       await teto.storeState(me);
       await teto.saveTLMatchesFromStream(tlStream);
-    tlMatches.addAll(await teto.getTLMatchesbyPlayerID(me.userId));
-    for (var match in tlStream.records) {
+    var storedRecords = await teto.getTLMatchesbyPlayerID(me.userId);
+    for (var match in storedRecords) {
       if (!tlMatches.contains(match)) tlMatches.add(match);
     }
     tlMatches.sort((a, b) {
@@ -172,8 +173,6 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
       if(a.timestamp.isAfter(b.timestamp)) return -1;
       return 0;
       });
-    } else{
-      tlMatches = tlStream.records;
     }
     if(fetchHistory) await teto.fetchAndsaveTLHistory(_searchFor);
     states.addAll(await teto.getPlayer(me.userId));

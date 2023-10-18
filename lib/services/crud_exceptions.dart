@@ -24,7 +24,17 @@ class P1nkl0bst3rTooManyRequests implements Exception {}
 
 class P1nkl0bst3rForbidden implements Exception {}
 
+class SzyTooManyRequests implements Exception {}
+
+class SzyForbidden implements Exception {}
+
+class SzyNotFound implements Exception {}
+
+class TetrioReplayAlreadyExist implements Exception {}
+
 class P1nkl0bst3rInternalProblem implements Exception {}
+
+class SzyInternalProblem implements Exception {}
 
 class TetrioOskwareBridgeProblem implements Exception {}
 

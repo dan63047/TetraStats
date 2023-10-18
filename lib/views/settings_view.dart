@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:tetra_stats/utils/open_in_browser.dart';
 import 'package:window_manager/window_manager.dart';
 
 late String oldWindowTitle;
@@ -41,15 +41,6 @@ class SettingsState extends State<SettingsView> {
   void dispose(){
     if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
     super.dispose();
-  }
-
-  Future<void> _launchInBrowser(Uri url) async {
-    if (!await launchUrl(
-      url,
-      mode: LaunchMode.externalApplication,
-    )) {
-      throw Exception('Could not launch $url');
-    }
   }
 
   Future<void> _getPreferences() async {
@@ -248,7 +239,7 @@ class SettingsState extends State<SettingsView> {
           const Divider(),
           ListTile(
             onTap: (){
-              _launchInBrowser(Uri.https("github.com", "dan63047/TetraStats"));
+              launchInBrowser(Uri.https("github.com", "dan63047/TetraStats"));
             },
             title: Text(t.aboutApp),
             subtitle: Text(t.aboutAppText(appName: packageInfo.appName, packageName: packageInfo.packageName, version: packageInfo.version, buildNumber: packageInfo.buildNumber)),

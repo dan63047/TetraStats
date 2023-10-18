@@ -1,11 +1,19 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
+import 'package:tetra_stats/services/crud_exceptions.dart';
+
+import 'main_view.dart' show teto;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:tetra_stats/utils/open_in_browser.dart';
 import 'package:window_manager/window_manager.dart';
+// ignore: avoid_web_libraries_in_flutter
+// import 'dart:html' show AnchorElement, document;
 
 
 final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
@@ -52,6 +60,52 @@ class TlMatchResultState extends State<TlMatchResultView> {
     return Scaffold(
       appBar: AppBar(
         title: Text("${widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).username.toUpperCase()} ${t.vs} ${widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).username.toUpperCase()} ${t.inTLmatch} ${dateFormat.format(widget.record.timestamp)}"),
+        actions: [
+          PopupMenuButton(
+            enabled: widget.record.replayAvalable,
+            itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+              const PopupMenuItem(
+                value: 1,
+                child: Text("Download le replay"),
+              ),
+              const PopupMenuItem(
+                value: 2,
+                child: Text("Open le replay in TETR.IO"),
+              ),
+            ],
+            onSelected: (value) async {
+              switch (value) {
+                case 1:
+                  if (kIsWeb){
+                    // final _base64 = base64Encode([1,2,3,4,5]);
+                    // final anchor = AnchorElement(href: 'data:application/octet-stream;base64,$_base64')..target = 'blank';
+                    //final anchor = AnchorElement(href: 'https://inoue.szy.lol/api/replay/${widget.record.replayId}')..target = 'blank';
+                    //anchor.download = "${widget.record.replayId}.ttrm";
+                    //document.body!.append(anchor);
+                    //anchor.click();
+                    //anchor.remove();
+                  } else{
+                    try{
+                      String path = await teto.szyDownloadAndSaveReplay(widget.record.replayId);
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Replay saved to $path")));
+                    } on TetrioReplayAlreadyExist{
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Replay already saved")));
+                    } on SzyNotFound {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Replay expired (i think)")));
+                    } on SzyForbidden {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Request has been rejected")));
+                    } on SzyTooManyRequests {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.tooManyRequests)));
+                    }
+                  }
+                  break;
+                case 2:
+                  await launchInBrowser(Uri.parse("https://tetr.io/#r:${widget.record.replayId}"));
+                  break;
+                default:
+              }
+            })
+        ]
       ),
       backgroundColor: Colors.black,
       body: SafeArea(

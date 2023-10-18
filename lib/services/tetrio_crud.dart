@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer' as developer;
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 import 'package:tetra_stats/main.dart' show packageInfo;
 import 'package:flutter/foundation.dart';
 import 'package:tetra_stats/services/custom_http_client.dart';
@@ -57,7 +59,8 @@ class TetrioService extends DB {
   final Map<String, List<News>> _newsCache = {};
   final Map<String, Map<String, double?>> _topTRcache = {};
   final Map<String, TetraLeagueAlphaStream> _tlStreamsCache = {}; // i'm trying to respect oskware api It should look something like {"cached_until": TetrioPlayer}
-  final client = UserAgentClient("Tetra Stats v${packageInfo.version} (dm @dan63047 if someone abuse that software)", http.Client());
+  // final client = UserAgentClient("Tetra Stats v${packageInfo.version} (dm @dan63047 if someone abuse that software)", http.Client());
+  final client = UserAgentClient("Kagari-chan loves osk (Tetra Stats dev build)", http.Client());
   static final TetrioService _shared = TetrioService._sharedInstance();
   factory TetrioService() => _shared;
   late final StreamController<Map<String, List<TetrioPlayer>>> _tetrioStreamController;
@@ -104,6 +107,42 @@ class TetrioService extends DB {
       return await getPlayer(id).then((value) => value.last.username);
     } catch (e){
       return await fetchPlayer(id).then((value) => value.username);
+    }
+  }
+
+  Future<String> szyDownloadAndSaveReplay(String replayID) async {
+    Uri url = Uri.https('inoue.szy.lol', '/api/replay/$replayID');
+    var downloadPath = await getDownloadsDirectory();
+    downloadPath ??= Platform.isAndroid ? Directory("/storage/emulated/0/Download") : await getApplicationDocumentsDirectory();
+    var replayFile = File("${downloadPath.path}/$replayID.ttrm");
+    if (replayFile.existsSync()) throw TetrioReplayAlreadyExist();
+    try{
+      final response = await client.get(url);
+
+      switch (response.statusCode) {
+        case 200:
+          await replayFile.writeAsBytes(response.bodyBytes);
+          return replayFile.path;
+        case 404:
+          throw SzyNotFound();
+        case 403:
+          throw SzyForbidden();
+        case 429:
+          throw SzyTooManyRequests();
+        case 418:
+          throw TetrioOskwareBridgeProblem();
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+          throw SzyInternalProblem();
+        default:
+          developer.log("szyDownloadAndSaveReplay: Failed to download a replay", name: "services/tetrio_crud", error: response.statusCode);
+          throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
+      }
+    } on http.ClientException catch (e, s) {
+      developer.log("$e, $s");
+      throw http.ClientException(e.message, e.uri);
     }
   }
 
@@ -441,7 +480,7 @@ class TetrioService extends DB {
     List<TetraLeagueAlphaRecord> matches = [];
     final results = await db.query(tetraLeagueMatchesTable, where: '($player1id = ?) OR ($player2id = ?)', whereArgs: [playerID, playerID]);
     for (var match in results){
-      matches.add(TetraLeagueAlphaRecord(ownId: match[idCol].toString(), replayId: match[replayID].toString(), timestamp: DateTime.parse(match[timestamp].toString()), endContext:[EndContextMulti.fromJson(jsonDecode(match[endContext1].toString())), EndContextMulti.fromJson(jsonDecode(match[endContext2].toString()))]));
+      matches.add(TetraLeagueAlphaRecord(ownId: match[idCol].toString(), replayId: match[replayID].toString(), timestamp: DateTime.parse(match[timestamp].toString()), endContext:[EndContextMulti.fromJson(jsonDecode(match[endContext1].toString())), EndContextMulti.fromJson(jsonDecode(match[endContext2].toString()))], replayAvalable: false));
     }
     return matches;
   }

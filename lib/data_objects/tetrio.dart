@@ -728,15 +728,17 @@ class TetraLeagueAlphaRecord{
   late String replayId;
   late String ownId;
   late DateTime timestamp;
+  late bool replayAvalable;
   late List<EndContextMulti> endContext;
 
-  TetraLeagueAlphaRecord({required this.replayId, required this.ownId, required this.timestamp, required this.endContext});
+  TetraLeagueAlphaRecord({required this.replayId, required this.ownId, required this.timestamp, required this.endContext, required this.replayAvalable});
 
   TetraLeagueAlphaRecord.fromJson(Map<String, dynamic> json) {
     ownId = json['_id'];
     endContext = [EndContextMulti.fromJson(json['endcontext'][0]), EndContextMulti.fromJson(json['endcontext'][1])];
     replayId = json['replayid'];
     timestamp = DateTime.parse(json['ts']);
+    replayAvalable = true;
   }
 
   Map<String, dynamic> toJson() {
