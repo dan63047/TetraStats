@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart' show MissingPlatformDirectoryException, getApplicationDocumentsDirectory;
@@ -57,5 +58,22 @@ class DB {
     } on DatabaseAlreadyOpen {
       // empty
     }
+  }
+
+  Future<int> compressDB() async{
+    await ensureDbIsOpen();
+    final db = getDatabaseOrThrow();
+    String dbPath;
+    if (kIsWeb) {
+      dbPath = dbName;
+    } else {
+      final docsPath = await getApplicationDocumentsDirectory();
+      dbPath = join(docsPath.path, dbName);
+    }
+    var dbFile = File(dbPath);
+    var dbStats = await dbFile.stat();
+    await db.execute("VACUUM");
+    var newDBStats = await dbFile.stat();
+    return dbStats.size - newDBStats.size;
   }
 }

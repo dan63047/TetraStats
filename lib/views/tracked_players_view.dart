@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
+import 'package:tetra_stats/utils/filesizes_converter.dart';
 import 'package:tetra_stats/views/states_view.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -49,11 +50,21 @@ class TrackedPlayersState extends State<TrackedPlayersView> {
                 value: 1,
                 child: Text("Remove duplicated TL mathces"),
               ),
+              PopupMenuItem(
+                value: 2,
+                child: Text("Compress DB"),
+              ),
             ],
             onSelected: (value) {
-              if (value == 1) {teto.removeDuplicatesFromTLMatches();
-              return;}
-              Navigator.pushNamed(context, value);
+              switch (value) {
+                case 1:
+                  teto.removeDuplicatesFromTLMatches();
+                  break;
+                case 2:
+                  teto.compressDB().then((value) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Space saved: ${bytesToSize(value)}"))));
+                  break;
+                default:
+              }
             })
         ],
       ),

@@ -236,6 +236,11 @@ class SettingsState extends State<SettingsView> {
                 },
               ),
           ),
+          ListTile(title: Text("Customization"),
+          trailing: Icon(Icons.arrow_right),
+          onTap: () {
+            Navigator.pushNamed(context, "/customization");
+          },),
           const Divider(),
           ListTile(
             onTap: (){
