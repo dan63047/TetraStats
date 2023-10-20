@@ -1,15 +1,9 @@
 import 'dart:io';
-import 'package:tetra_stats/main.dart' show packageInfo;
-import 'package:file_selector/file_selector.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:tetra_stats/main.dart' show accentColor;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
-import 'package:tetra_stats/services/crud_exceptions.dart';
-import 'package:tetra_stats/services/tetrio_crud.dart';
-import 'package:tetra_stats/utils/open_in_browser.dart';
 import 'package:window_manager/window_manager.dart';
 
 late String oldWindowTitle;
@@ -60,7 +54,11 @@ class CustomizationState extends State<CustomizationView> {
       body: SafeArea(
           child: ListView(
         children: [
-          ListTile(title: Text("Accent Color"),),
+          ListTile(title: Text("Accent Color"),
+          onTap: () {
+            accentColor = Colors.cyanAccent;
+            setState(() {});
+          },),
           ListTile(title: Text("Font"),),
           ListTile(title: Text("Stats Table in TL mathes list"),),
         ],

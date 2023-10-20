@@ -16,6 +16,7 @@ import 'package:tetra_stats/views/tracked_players_view.dart';
 import 'package:tetra_stats/views/calc_view.dart';
 
 late final PackageInfo packageInfo;
+Color accentColor = Colors.cyanAccent;
 
 void main() async {
   if (kIsWeb) {

@@ -192,7 +192,7 @@ class TLThingy extends StatelessWidget {
                                               ],
                                             ));
                                       },), verticalAlignment: GaugeAlignment.far, positionFactor: 0.05,),
-                                      if (oldTl != null) GaugeAnnotation(widget: Text(fDiff.format(tl.nerdStats!.app - oldTl!.nerdStats!.app), style: TextStyle(
+                                      if (oldTl != null && oldTl!.gamesPlayed > 0) GaugeAnnotation(widget: Text(fDiff.format(tl.nerdStats!.app - oldTl!.nerdStats!.app), style: TextStyle(
                                           color: tl.nerdStats!.app - oldTl!.nerdStats!.app < 0 ?
                                           Colors.red :
                                           Colors.green
@@ -254,7 +254,7 @@ class TLThingy extends StatelessWidget {
                                               ],
                                             ));
                                       },), verticalAlignment: GaugeAlignment.far, positionFactor: 0.05),
-                                      if (oldTl != null) GaugeAnnotation(widget: Text(fDiff.format(tl.nerdStats!.vsapm - oldTl!.nerdStats!.vsapm), style: TextStyle(
+                                      if (oldTl != null && oldTl!.gamesPlayed > 0) GaugeAnnotation(widget: Text(fDiff.format(tl.nerdStats!.vsapm - oldTl!.nerdStats!.vsapm), style: TextStyle(
                                           color: tl.nerdStats!.vsapm - oldTl!.nerdStats!.vsapm < 0 ?
                                           Colors.red :
                                           Colors.green
