@@ -306,13 +306,13 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                     onRefresh: () {
                       return Future(() => changePlayer(snapshot.data![0].userId));
                     },
-                    notificationPredicate: (notification) {
-                      // with NestedScrollView local(depth == 2) OverscrollNotification are not sent
-                      if (!kIsWeb && (notification is OverscrollNotification || Platform.isIOS)) {
-                        return notification.depth == 2;
-                      }
-                      return notification.depth == 0;
-                    },
+                    // notificationPredicate: (notification) {
+                    //   // with NestedScrollView local(depth == 2) OverscrollNotification are not sent
+                    //   if (!kIsWeb && (notification is OverscrollNotification || Platform.isIOS)) {
+                    //     return notification.depth == 2;
+                    //   }
+                    //   return notification.depth == 0;
+                    // },
                     child: NestedScrollView(
                       controller: _scrollController,
                       physics: const AlwaysScrollableScrollPhysics(),
@@ -343,7 +343,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                       body: TabBarView(
                         controller: _tabController,
                         children: [
-                          TLThingy(tl: snapshot.data![0].tlSeason1, userID: snapshot.data![0].userId, oldTl: snapshot.data![4], topTR: snapshot.data![7]),
+                          TLThingy(tl: snapshot.data![0].tlSeason1, userID: snapshot.data![0].userId, states: snapshot.data![2], topTR: snapshot.data![7]),
                           _TLRecords(userID: snapshot.data![0].userId, data: snapshot.data![3]),
                           _History(states: snapshot.data![2], update: _justUpdate),
                           _RecordThingy(record: (snapshot.data![1]['sprint'].isNotEmpty) ? snapshot.data![1]['sprint'][0] : null),

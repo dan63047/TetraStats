@@ -58,6 +58,6 @@ class StateState extends State<StateView> {
                 headerSliverBuilder: (context, value) {
                   return [SliverToBoxAdapter(child: UserThingy(player: widget.state, showStateTimestamp: true, setState: _justUpdate))];
                 },
-                body: TLThingy(tl: widget.state.tlSeason1, userID: widget.state.userId))));
+                body: TLThingy(tl: widget.state.tlSeason1, userID: widget.state.userId, states: [],))));
   }
 }

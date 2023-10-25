@@ -7,50 +7,90 @@ import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
 
 var fDiff = NumberFormat("+#,###.###;-#,###.###");
+RangeValues _currentRangeValues = const RangeValues(0, 1);
+final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
+final NumberFormat f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
+final NumberFormat f3 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 3);
+TetraLeagueAlpha? oldTl;
+late TetraLeagueAlpha currentTl;
+late List<TetrioPlayer> sortedStates;
 
-class TLThingy extends StatelessWidget {
+class TLThingy extends StatefulWidget {
   final TetraLeagueAlpha tl;
   final String userID;
-  final TetraLeagueAlpha? oldTl;
+  final List<TetrioPlayer> states;
   final bool showTitle;
   final double? topTR;
-  const TLThingy({Key? key, required this.tl, required this.userID, this.oldTl, this.showTitle = true, this.topTR}) : super(key: key);
+  const TLThingy({Key? key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.topTR}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final t = Translations.of(context);
-    final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
-    final NumberFormat f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
-    final NumberFormat f3 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 3);
+  State<TLThingy> createState() => _TLThingyState();
+}
+
+class _TLThingyState extends State<TLThingy> {
+  
+@override
+  void initState() {
+    sortedStates = widget.states.reversed.toList();
+    oldTl = sortedStates[1].tlSeason1;
+    currentTl = widget.tl;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) { 
+  final t = Translations.of(context);
     return LayoutBuilder(builder: (context, constraints) {
-      bool bigScreen = constraints.maxWidth > 768;
+    bool bigScreen = constraints.maxWidth > 768;
+      print(_currentRangeValues);
       return ListView.builder(
         physics: const ClampingScrollPhysics(),
         itemCount: 1,
         itemBuilder: (BuildContext context, int index) {
           return Column(
-            children: (tl.gamesPlayed > 0)
+            children: (currentTl.gamesPlayed > 0)
                 ? [
-                    if (showTitle) Text(t.tetraLeague, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                    if (widget.showTitle) Text(t.tetraLeague, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
                     if (oldTl != null) Text(t.comparingWith(date: dateFormat.format(oldTl!.timestamp))),
-                    if (tl.gamesPlayed >= 10)
+                    RangeSlider(values: _currentRangeValues, max: widget.states.length.toDouble(),
+                    labels: RangeLabels(
+                        _currentRangeValues.start.round().toString(),
+                        _currentRangeValues.end.round().toString(),
+                      ),
+                     onChanged: (RangeValues values) {
+                        setState(() {
+                          _currentRangeValues = values;
+                          if (values.start.round() == 0){
+                            currentTl = widget.tl;
+                          }else{
+                            currentTl = sortedStates[values.start.round()-1].tlSeason1;
+                          }
+                          if (values.end.round() == 0){
+                            oldTl = widget.tl;
+                          }else{
+                            oldTl = sortedStates[values.end.round()-1].tlSeason1;
+                          }
+                        });
+                      },
+                    ),
+                    if (currentTl.gamesPlayed >= 10)
                       Wrap(
                         direction: Axis.horizontal,
                         alignment: WrapAlignment.spaceAround,
                         crossAxisAlignment: WrapCrossAlignment.center,
                         clipBehavior: Clip.hardEdge,
                         children: [
-                          userID == "5e32fc85ab319c2ab1beb07c" // he love her so much, you can't even imagine
+                          widget.userID == "5e32fc85ab319c2ab1beb07c" // he love her so much, you can't even imagine
                               ? Image.asset("res/icons/kagari.png", height: 128) // Btw why she wearing Kazamatsuri high school uniform?
-                              : Image.asset("res/tetrio_tl_alpha_ranks/${tl.rank}.png", height: 128),
+                              : Image.asset("res/tetrio_tl_alpha_ranks/${currentTl.rank}.png", height: 128),
                           Column(
                             children: [
-                              Text("${f2.format(tl.rating)} TR", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                              Text("${f2.format(currentTl.rating)} TR", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
                               if (oldTl != null) Text(
-                                "${fDiff.format(tl.rating - oldTl!.rating)} TR",
+                                "${fDiff.format(currentTl.rating - oldTl!.rating)} TR",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  color: tl.rating - oldTl!.rating < 0 ?
+                                  color: currentTl.rating - oldTl!.rating < 0 ?
                                   Colors.red :
                                   Colors.green
                                 ),
@@ -63,13 +103,13 @@ class TLThingy extends StatelessWidget {
                                     text: TextSpan(
                                       style: DefaultTextStyle.of(context).style,
                                       children: [
-                                        TextSpan(text: "${t.top} ${f2.format(tl.percentile * 100)}% (${tl.percentileRank.toUpperCase()})"),
-                                        if (tl.bestRank != "z") const TextSpan(text: " • "),
-                                        if (tl.bestRank != "z") TextSpan(text: "${t.topRank}: ${tl.bestRank.toUpperCase()}"),
-                                        if (topTR != null) TextSpan(text: " (${f2.format(topTR)} TR)"),
-                                        TextSpan(text: " • Glicko: ${f2.format(tl.glicko!)}±"),
-                                        TextSpan(text: f2.format(tl.rd!), style: tl.decaying ? TextStyle(color: tl.rd! > 98 ? Colors.red : Colors.yellow) : null),
-                                        if (tl.decaying) WidgetSpan(child: Icon(Icons.trending_up, color: tl.rd! > 98 ? Colors.red : Colors.yellow,), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic) 
+                                        TextSpan(text: "${t.top} ${f2.format(currentTl.percentile * 100)}% (${currentTl.percentileRank.toUpperCase()})"),
+                                        if (currentTl.bestRank != "z") const TextSpan(text: " • "),
+                                        if (currentTl.bestRank != "z") TextSpan(text: "${t.topRank}: ${currentTl.bestRank.toUpperCase()}"),
+                                        if (widget.topTR != null) TextSpan(text: " (${f2.format(widget.topTR)} TR)"),
+                                        TextSpan(text: " • Glicko: ${f2.format(currentTl.glicko!)}±"),
+                                        TextSpan(text: f2.format(currentTl.rd!), style: currentTl.decaying ? TextStyle(color: currentTl.rd! > 98 ? Colors.red : Colors.yellow) : null),
+                                        if (currentTl.decaying) WidgetSpan(child: Icon(Icons.trending_up, color: currentTl.rd! > 98 ? Colors.red : Colors.yellow,), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic) 
                                       ],
                                     ),
                                   ),
@@ -79,23 +119,23 @@ class TLThingy extends StatelessWidget {
                           ),
                         ],
                       ),
-                    if (tl.gamesPlayed >= 10 && tl.rd! < 100 && tl.nextAt >=0 && tl.prevAt >= 0) Padding(
+                    if (currentTl.gamesPlayed >= 10 && currentTl.rd! < 100 && currentTl.nextAt >=0 && currentTl.prevAt >= 0) Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: SfLinearGauge(
-                        minimum: tl.nextAt.toDouble(),
-                        maximum: tl.prevAt.toDouble(),
-                        interval: tl.prevAt.toDouble() - tl.nextAt.toDouble(), 
-                        ranges: [LinearGaugeRange(startValue: tl.standing.toDouble() <= tl.prevAt.toDouble() ? tl.standing.toDouble() : tl.prevAt.toDouble(), endValue: tl.prevAt.toDouble(), color: Colors.cyanAccent,)],
-                        markerPointers: [LinearShapePointer(value: tl.standing.toDouble() <= tl.prevAt.toDouble() ? tl.standing.toDouble() : tl.prevAt.toDouble(), position: LinearElementPosition.inside, shapeType: LinearShapePointerType.triangle, color: Colors.white, height: 20),
-                        LinearWidgetPointer(offset: 4, position: LinearElementPosition.outside, value: tl.standing.toDouble() <= tl.prevAt.toDouble() ? tl.standing.toDouble() : tl.prevAt.toDouble(), child: Text(NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 0).format(tl.standing)))],
+                        minimum: currentTl.nextAt.toDouble(),
+                        maximum: currentTl.prevAt.toDouble(),
+                        interval: currentTl.prevAt.toDouble() - currentTl.nextAt.toDouble(), 
+                        ranges: [LinearGaugeRange(startValue: currentTl.standing.toDouble() <= currentTl.prevAt.toDouble() ? currentTl.standing.toDouble() : currentTl.prevAt.toDouble(), endValue: currentTl.prevAt.toDouble(), color: Colors.cyanAccent,)],
+                        markerPointers: [LinearShapePointer(value: currentTl.standing.toDouble() <= currentTl.prevAt.toDouble() ? currentTl.standing.toDouble() : currentTl.prevAt.toDouble(), position: LinearElementPosition.inside, shapeType: LinearShapePointerType.triangle, color: Colors.white, height: 20),
+                        LinearWidgetPointer(offset: 4, position: LinearElementPosition.outside, value: currentTl.standing.toDouble() <= currentTl.prevAt.toDouble() ? currentTl.standing.toDouble() : currentTl.prevAt.toDouble(), child: Text(NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 0).format(currentTl.standing)))],
                         isAxisInversed: true,
                         isMirrored: true,
                         showTicks: true,
                         showLabels: true
                         ),
                     ),
-                    if (tl.gamesPlayed < 10)
-                      Text(t.gamesUntilRanked(left: 10 - tl.gamesPlayed),
+                    if (currentTl.gamesPlayed < 10)
+                      Text(t.gamesUntilRanked(left: 10 - currentTl.gamesPlayed),
                           softWrap: true,
                           textAlign: TextAlign.center,
                           style: TextStyle(
@@ -112,17 +152,17 @@ class TLThingy extends StatelessWidget {
                         crossAxisAlignment: WrapCrossAlignment.start,
                         clipBehavior: Clip.hardEdge,
                         children: [
-                          if (tl.apm != null) StatCellNum(playerStat: tl.apm!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.apm, higherIsBetter: true, oldPlayerStat: oldTl?.apm),
-                          if (tl.pps != null) StatCellNum(playerStat: tl.pps!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.pps, higherIsBetter: true, oldPlayerStat: oldTl?.pps),
-                          if (tl.vs != null) StatCellNum(playerStat: tl.vs!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.vs, higherIsBetter: true, oldPlayerStat: oldTl?.vs),
-                          if (tl.standingLocal > 0) StatCellNum(playerStat: tl.standingLocal, isScreenBig: bigScreen, playerStatLabel: t.statCellNum.lbpc, higherIsBetter: false, oldPlayerStat: oldTl?.standingLocal),
-                          StatCellNum(playerStat: tl.gamesPlayed, isScreenBig: bigScreen, playerStatLabel: t.statCellNum.gamesPlayed, higherIsBetter: true, oldPlayerStat: oldTl?.gamesPlayed),
-                          StatCellNum(playerStat: tl.gamesWon, isScreenBig: bigScreen, playerStatLabel: t.statCellNum.gamesWonTL, higherIsBetter: true, oldPlayerStat: oldTl?.gamesWon),
-                          StatCellNum(playerStat: tl.winrate * 100, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.winrate, higherIsBetter: true, oldPlayerStat: oldTl != null ? oldTl!.winrate*100 : null),
+                          if (currentTl.apm != null) StatCellNum(playerStat: currentTl.apm!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.apm, higherIsBetter: true, oldPlayerStat: oldTl?.apm),
+                          if (currentTl.pps != null) StatCellNum(playerStat: currentTl.pps!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.pps, higherIsBetter: true, oldPlayerStat: oldTl?.pps),
+                          if (currentTl.vs != null) StatCellNum(playerStat: currentTl.vs!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.vs, higherIsBetter: true, oldPlayerStat: oldTl?.vs),
+                          if (currentTl.standingLocal > 0) StatCellNum(playerStat: currentTl.standingLocal, isScreenBig: bigScreen, playerStatLabel: t.statCellNum.lbpc, higherIsBetter: false, oldPlayerStat: oldTl?.standingLocal),
+                          StatCellNum(playerStat: currentTl.gamesPlayed, isScreenBig: bigScreen, playerStatLabel: t.statCellNum.gamesPlayed, higherIsBetter: true, oldPlayerStat: oldTl?.gamesPlayed),
+                          StatCellNum(playerStat: currentTl.gamesWon, isScreenBig: bigScreen, playerStatLabel: t.statCellNum.gamesWonTL, higherIsBetter: true, oldPlayerStat: oldTl?.gamesWon),
+                          StatCellNum(playerStat: currentTl.winrate * 100, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.winrate, higherIsBetter: true, oldPlayerStat: oldTl != null ? oldTl!.winrate*100 : null),
                         ],
                       ),
                     ),
-                    if (tl.nerdStats != null)
+                    if (currentTl.nerdStats != null)
                       Column(
                         children: [
                           Text(t.nerdStats, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
@@ -158,7 +198,7 @@ class TLThingy extends StatelessWidget {
                                       ],
                                       pointers: [
                                         NeedlePointer(
-                                          value: tl.nerdStats!.app,
+                                          value: currentTl.nerdStats!.app,
                                           enableAnimation: true,
                                           needleLength: 0.9,
                                           needleStartWidth: 2,
@@ -167,7 +207,7 @@ class TLThingy extends StatelessWidget {
                                           gradient: const LinearGradient(colors: [Colors.transparent, Colors.white], begin: Alignment.bottomCenter, end: Alignment.topCenter, stops: [0.5, 1]),)
                                         ],
                                       annotations: [GaugeAnnotation(
-                                        widget: TextButton(child: Text(f3.format(tl.nerdStats!.app),
+                                        widget: TextButton(child: Text(f3.format(currentTl.nerdStats!.app),
                                         style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, color: Colors.white)),
                                         onPressed: (){
                                           showDialog(
@@ -179,7 +219,7 @@ class TLThingy extends StatelessWidget {
                                               content:  SingleChildScrollView(
                                                 child: ListBody(children: [
                                                   Text(t.statCellNum.appDescription),
-                                                  Text("${t.exactValue}: ${tl.nerdStats!.app}")
+                                                  Text("${t.exactValue}: ${currentTl.nerdStats!.app}")
                                                 ]),
                                               ),
                                               actions: <Widget>[
@@ -192,8 +232,8 @@ class TLThingy extends StatelessWidget {
                                               ],
                                             ));
                                       },), verticalAlignment: GaugeAlignment.far, positionFactor: 0.05,),
-                                      if (oldTl != null && oldTl!.gamesPlayed > 0) GaugeAnnotation(widget: Text(fDiff.format(tl.nerdStats!.app - oldTl!.nerdStats!.app), style: TextStyle(
-                                          color: tl.nerdStats!.app - oldTl!.nerdStats!.app < 0 ?
+                                      if (oldTl != null && oldTl!.gamesPlayed > 0) GaugeAnnotation(widget: Text(fDiff.format(currentTl.nerdStats!.app - oldTl!.nerdStats!.app), style: TextStyle(
+                                          color: currentTl.nerdStats!.app - oldTl!.nerdStats!.app < 0 ?
                                           Colors.red :
                                           Colors.green
                                         ),), positionFactor: 0.05,)],
@@ -220,7 +260,7 @@ class TLThingy extends StatelessWidget {
                                       ],
                                       pointers: [
                                         NeedlePointer(
-                                          value: tl.nerdStats!.vsapm,
+                                          value: currentTl.nerdStats!.vsapm,
                                           enableAnimation: true,
                                           needleLength: 0.9,
                                           needleStartWidth: 2,
@@ -229,7 +269,7 @@ class TLThingy extends StatelessWidget {
                                           gradient: const LinearGradient(colors: [Colors.transparent, Colors.white], begin: Alignment.bottomCenter, end: Alignment.topCenter, stops: [0.5, 1]),)
                                         ],
                                       annotations: [GaugeAnnotation(
-                                        widget: TextButton(child: Text(f3.format(tl.nerdStats!.vsapm),
+                                        widget: TextButton(child: Text(f3.format(currentTl.nerdStats!.vsapm),
                                         style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, color: Colors.white)),
                                         onPressed: (){
                                           showDialog(
@@ -241,7 +281,7 @@ class TLThingy extends StatelessWidget {
                                               content: SingleChildScrollView(
                                                 child: ListBody(children: [
                                                   Text(t.statCellNum.vsapmDescription),
-                                                  Text("${t.exactValue}: ${tl.nerdStats!.vsapm}")
+                                                  Text("${t.exactValue}: ${currentTl.nerdStats!.vsapm}")
                                                 ]),
                                               ),
                                               actions: <Widget>[
@@ -254,8 +294,8 @@ class TLThingy extends StatelessWidget {
                                               ],
                                             ));
                                       },), verticalAlignment: GaugeAlignment.far, positionFactor: 0.05),
-                                      if (oldTl != null && oldTl!.gamesPlayed > 0) GaugeAnnotation(widget: Text(fDiff.format(tl.nerdStats!.vsapm - oldTl!.nerdStats!.vsapm), style: TextStyle(
-                                          color: tl.nerdStats!.vsapm - oldTl!.nerdStats!.vsapm < 0 ?
+                                      if (oldTl != null && oldTl!.gamesPlayed > 0) GaugeAnnotation(widget: Text(fDiff.format(currentTl.nerdStats!.vsapm - oldTl!.nerdStats!.vsapm), style: TextStyle(
+                                          color: currentTl.nerdStats!.vsapm - oldTl!.nerdStats!.vsapm < 0 ?
                                           Colors.red :
                                           Colors.green
                                         ),), positionFactor: 0.05,)],
@@ -269,59 +309,59 @@ class TLThingy extends StatelessWidget {
                               crossAxisAlignment: WrapCrossAlignment.start,
                               clipBehavior: Clip.hardEdge,
                               children: [
-                                StatCellNum(playerStat: tl.nerdStats!.dss, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.dss,
+                                StatCellNum(playerStat: currentTl.nerdStats!.dss, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.dss,
                                 alertWidgets: [Text(t.statCellNum.dssDescription),
                                     Text("${t.formula}: (VS / 100) - (APM / 60)"),
-                                    Text("${t.exactValue}: ${tl.nerdStats!.dss}"),],
+                                    Text("${t.exactValue}: ${currentTl.nerdStats!.dss}"),],
                                     okText: t.popupActions.ok,
                                     higherIsBetter: true,
                                     oldPlayerStat: oldTl?.nerdStats?.dss,),
-                                StatCellNum(playerStat: tl.nerdStats!.dsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.dsp,
+                                StatCellNum(playerStat: currentTl.nerdStats!.dsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.dsp,
                                 alertWidgets: [Text(t.statCellNum.dspDescription),
                                     Text("${t.formula}: DS/S / PPS"),
-                                    Text("${t.exactValue}: ${tl.nerdStats!.dsp}"),],
+                                    Text("${t.exactValue}: ${currentTl.nerdStats!.dsp}"),],
                                     okText: t.popupActions.ok,
                                     higherIsBetter: true,
                                     oldPlayerStat: oldTl?.nerdStats?.dsp,),
-                                StatCellNum(playerStat: tl.nerdStats!.appdsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.appdsp,
+                                StatCellNum(playerStat: currentTl.nerdStats!.appdsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.appdsp,
                                 alertWidgets: [Text(t.statCellNum.appdspDescription),
                                     Text("${t.formula}: APP + DS/P"),
-                                    Text("${t.exactValue}: ${tl.nerdStats!.appdsp}"),],
+                                    Text("${t.exactValue}: ${currentTl.nerdStats!.appdsp}"),],
                                     okText: t.popupActions.ok,
                                     higherIsBetter: true,
                                     oldPlayerStat: oldTl?.nerdStats?.appdsp,),
-                                StatCellNum(playerStat: tl.nerdStats!.cheese, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.cheese,
+                                StatCellNum(playerStat: currentTl.nerdStats!.cheese, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.cheese,
                                 alertWidgets: [Text(t.statCellNum.cheeseDescription),
                                     Text("${t.formula}: (DS/P * 150) + ((VS/APM - 2) * 50) + (0.6 - APP) * 125"),
-                                    Text("${t.exactValue}: ${tl.nerdStats!.cheese}"),],
+                                    Text("${t.exactValue}: ${currentTl.nerdStats!.cheese}"),],
                                     okText: t.popupActions.ok,
                                     higherIsBetter: true,
                                     oldPlayerStat: oldTl?.nerdStats?.cheese,),
-                                StatCellNum(playerStat: tl.nerdStats!.gbe, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.gbe,
+                                StatCellNum(playerStat: currentTl.nerdStats!.gbe, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.gbe,
                                 alertWidgets: [Text(t.statCellNum.gbeDescription),
                                     Text("${t.formula}: ((APP * DS/S) / PPS) * 2"),
-                                    Text("${t.exactValue}: ${tl.nerdStats!.gbe}"),],
+                                    Text("${t.exactValue}: ${currentTl.nerdStats!.gbe}"),],
                                     okText: t.popupActions.ok,
                                     higherIsBetter: true,
                                     oldPlayerStat: oldTl?.nerdStats?.gbe,),
-                                StatCellNum(playerStat: tl.nerdStats!.nyaapp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.nyaapp,
+                                StatCellNum(playerStat: currentTl.nerdStats!.nyaapp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.nyaapp,
                                 alertWidgets: [Text(t.statCellNum.nyaappDescription),
                                     Text("${t.formula}: APP - 5 * tan(radians((Cheese Index / -30) + 1))"),
-                                    Text("${t.exactValue}:  ${tl.nerdStats!.nyaapp}"),],
+                                    Text("${t.exactValue}:  ${currentTl.nerdStats!.nyaapp}"),],
                                     okText: t.popupActions.ok,
                                     higherIsBetter: true,
                                     oldPlayerStat: oldTl?.nerdStats?.nyaapp,),
-                                StatCellNum(playerStat: tl.nerdStats!.area, isScreenBig: bigScreen, fractionDigits: 1, playerStatLabel: t.statCellNum.area,
+                                StatCellNum(playerStat: currentTl.nerdStats!.area, isScreenBig: bigScreen, fractionDigits: 1, playerStatLabel: t.statCellNum.area,
                                 alertWidgets: [Text(t.statCellNum.areaDescription),
                                     Text("${t.formula}: APM * 1 + PPS * 45 + VS * 0.444 + APP * 185 + DS/S * 175 + DS/P * 450 + Garbage Effi * 315"),
-                                    Text("${t.exactValue}:  ${tl.nerdStats!.area}"),],
+                                    Text("${t.exactValue}:  ${currentTl.nerdStats!.area}"),],
                                     okText: t.popupActions.ok,
                                     higherIsBetter: true,
                                     oldPlayerStat: oldTl?.nerdStats?.area,)
                               ])
                         ],
                       ),
-                    if (tl.estTr != null)
+                    if (currentTl.estTr != null)
                       Padding(
                         padding: const EdgeInsets.fromLTRB(0, 16, 0, 48),
                         child: SizedBox(
@@ -337,12 +377,12 @@ class TLThingy extends StatelessWidget {
                                     style: const TextStyle(fontSize: 24),
                                   ),
                                   Text(
-                                    f2.format(tl.estTr!.esttr),
+                                    f2.format(currentTl.estTr!.esttr),
                                     style: const TextStyle(fontSize: 24),
                                   ),
                                 ],
                               ),
-                              if (tl.rating >= 0)
+                              if (currentTl.rating >= 0)
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
@@ -351,7 +391,7 @@ class TLThingy extends StatelessWidget {
                                       style: const TextStyle(fontSize: 24),
                                     ),
                                     Text(
-                                      fDiff.format(tl.esttracc!),
+                                      fDiff.format(currentTl.esttracc!),
                                       style: const TextStyle(fontSize: 24),
                                     ),
                                   ],
@@ -360,7 +400,7 @@ class TLThingy extends StatelessWidget {
                           ),
                         ),
                       ),
-                    if (tl.nerdStats != null)
+                    if (currentTl.nerdStats != null)
                       Wrap(
                         direction: Axis.horizontal,
                         alignment: WrapAlignment.center,
@@ -410,16 +450,16 @@ class TLThingy extends StatelessWidget {
                                   dataSets: [
                                     RadarDataSet(
                                       dataEntries: [
-                                        RadarEntry(value: tl.apm! * apmWeight),
-                                        RadarEntry(value: tl.pps! * ppsWeight),
-                                        RadarEntry(value: tl.vs! * vsWeight),
-                                        RadarEntry(value: tl.nerdStats!.app * appWeight),
-                                        RadarEntry(value: tl.nerdStats!.dss * dssWeight),
-                                        RadarEntry(value: tl.nerdStats!.dsp * dspWeight),
-                                        RadarEntry(value: tl.nerdStats!.appdsp * appdspWeight),
-                                        RadarEntry(value: tl.nerdStats!.vsapm * vsapmWeight),
-                                        RadarEntry(value: tl.nerdStats!.cheese * cheeseWeight),
-                                        RadarEntry(value: tl.nerdStats!.gbe * gbeWeight),
+                                        RadarEntry(value: currentTl.apm! * apmWeight),
+                                        RadarEntry(value: currentTl.pps! * ppsWeight),
+                                        RadarEntry(value: currentTl.vs! * vsWeight),
+                                        RadarEntry(value: currentTl.nerdStats!.app * appWeight),
+                                        RadarEntry(value: currentTl.nerdStats!.dss * dssWeight),
+                                        RadarEntry(value: currentTl.nerdStats!.dsp * dspWeight),
+                                        RadarEntry(value: currentTl.nerdStats!.appdsp * appdspWeight),
+                                        RadarEntry(value: currentTl.nerdStats!.vsapm * vsapmWeight),
+                                        RadarEntry(value: currentTl.nerdStats!.cheese * cheeseWeight),
+                                        RadarEntry(value: currentTl.nerdStats!.gbe * gbeWeight),
                                       ],
                                     ),
                                     RadarDataSet(
@@ -463,13 +503,13 @@ class TLThingy extends StatelessWidget {
                                   getTitle: (index, angle) {
                                     switch (index) {
                                       case 0:
-                                        return RadarChartTitle(text: 'Opener\n${f2.format(tl.playstyle!.opener)}', angle: 0, positionPercentageOffset: 0.05);
+                                        return RadarChartTitle(text: 'Opener\n${f2.format(currentTl.playstyle!.opener)}', angle: 0, positionPercentageOffset: 0.05);
                                       case 1:
-                                        return RadarChartTitle(text: 'Stride\n${f2.format(tl.playstyle!.stride)}', angle: 0, positionPercentageOffset: 0.05);
+                                        return RadarChartTitle(text: 'Stride\n${f2.format(currentTl.playstyle!.stride)}', angle: 0, positionPercentageOffset: 0.05);
                                       case 2:
-                                        return RadarChartTitle(text: 'Inf Ds\n${f2.format(tl.playstyle!.infds)}', angle: angle + 180, positionPercentageOffset: 0.05);
+                                        return RadarChartTitle(text: 'Inf Ds\n${f2.format(currentTl.playstyle!.infds)}', angle: angle + 180, positionPercentageOffset: 0.05);
                                       case 3:
-                                        return RadarChartTitle(text: 'Plonk\n${f2.format(tl.playstyle!.plonk)}', angle: 0, positionPercentageOffset: 0.05);
+                                        return RadarChartTitle(text: 'Plonk\n${f2.format(currentTl.playstyle!.plonk)}', angle: 0, positionPercentageOffset: 0.05);
                                       default:
                                         return const RadarChartTitle(text: '');
                                     }
@@ -477,10 +517,10 @@ class TLThingy extends StatelessWidget {
                                   dataSets: [
                                     RadarDataSet(
                                       dataEntries: [
-                                        RadarEntry(value: tl.playstyle!.opener),
-                                        RadarEntry(value: tl.playstyle!.stride),
-                                        RadarEntry(value: tl.playstyle!.infds),
-                                        RadarEntry(value: tl.playstyle!.plonk),
+                                        RadarEntry(value: currentTl.playstyle!.opener),
+                                        RadarEntry(value: currentTl.playstyle!.stride),
+                                        RadarEntry(value: currentTl.playstyle!.infds),
+                                        RadarEntry(value: currentTl.playstyle!.plonk),
                                       ],
                                     ),
                                     RadarDataSet(

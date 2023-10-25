@@ -16,7 +16,6 @@ import 'package:tetra_stats/views/tracked_players_view.dart';
 import 'package:tetra_stats/views/calc_view.dart';
 
 late final PackageInfo packageInfo;
-Color accentColor = Colors.cyanAccent;
 
 void main() async {
   if (kIsWeb) {
@@ -63,7 +62,7 @@ class MyApp extends StatelessWidget {
         routes: {"/settings": (context) => const SettingsView(), "/states": (context) => const TrackedPlayersView(), "/calc": (context) => const CalcView(), "/customization": (context) => const CustomizationView()},
         theme: ThemeData(
             fontFamily: 'Eurostile Round',
-            colorScheme: const ColorScheme.dark(primary: Colors.cyanAccent, secondary: Colors.white),
+            colorScheme: ColorScheme.dark(primary: Colors.cyanAccent, secondary: Colors.white),
             scaffoldBackgroundColor: Colors.black
             )
           );
