@@ -10,13 +10,14 @@ import 'package:tetra_stats/views/rank_averages_view.dart';
 import 'package:tetra_stats/views/ranks_averages_view.dart';
 import 'package:window_manager/window_manager.dart';
 
-final TetrioService teto = TetrioService();
-List<DropdownMenuItem> itemStats = [for (MapEntry e in chartsShortTitles.entries) DropdownMenuItem(value: e.key, child: Text(e.value))];
-Stats sortBy = Stats.tr;
+final TetrioService _teto = TetrioService();
+List<DropdownMenuItem> _itemStats = [for (MapEntry e in chartsShortTitles.entries) DropdownMenuItem(value: e.key, child: Text(e.value))];
+Stats _sortBy = Stats.tr;
 bool reversed = false;
-List<DropdownMenuItem> itemCountries = [for (MapEntry e in t.countries.entries) DropdownMenuItem(value: e.key, child: Text(e.value))];
-String country = "";
-late String oldWindowTitle;
+List<DropdownMenuItem> _itemCountries = [for (MapEntry e in t.countries.entries) DropdownMenuItem(value: e.key, child: Text(e.value))];
+String _country = "";
+late String _oldWindowTitle;
+final NumberFormat _f4 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 4);
 
 class TLLeaderboardView extends StatefulWidget {
   const TLLeaderboardView({Key? key}) : super(key: key);
@@ -28,20 +29,20 @@ class TLLeaderboardView extends StatefulWidget {
 class TLLeaderboardState extends State<TLLeaderboardView> {
   @override
   void initState() {
-    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) windowManager.getTitle().then((value) => oldWindowTitle = value);
+    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) windowManager.getTitle().then((value) => _oldWindowTitle = value);
     super.initState();
   }
 
   @override
   void dispose() {
-    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
+    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(_oldWindowTitle);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);
-    final NumberFormat f2 = NumberFormat.decimalPattern(LocaleSettings.currentLocale.languageCode)..maximumFractionDigits = 2;
+    final NumberFormat _f2 = NumberFormat.decimalPattern(LocaleSettings.currentLocale.languageCode)..maximumFractionDigits = 2;
     return Scaffold(
       appBar: AppBar(
         title: Text(t.tlLeaderboard),
@@ -64,7 +65,7 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
       backgroundColor: Colors.black,
       body: SafeArea(
           child: FutureBuilder(
-              future: teto.fetchTLLeaderboard(),
+              future: _teto.fetchTLLeaderboard(),
               builder: (context, snapshot) {
                 switch (snapshot.connectionState) {
                   case ConnectionState.none:
@@ -72,7 +73,7 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
                   case ConnectionState.active:
                   return const Center(child: Text('Fetching...'));
                   case ConnectionState.done:
-                    final allPlayers = snapshot.data?.getStatRanking(snapshot.data!.leaderboard, sortBy, reversed: reversed, country: country);
+                    final allPlayers = snapshot.data?.getStatRanking(snapshot.data!.leaderboard, _sortBy, reversed: reversed, country: _country);
                     if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) windowManager.setTitle("Tetra Stats: ${t.tlLeaderboard} - ${t.players(n: allPlayers!.length)}");
                     return NestedScrollView(
                         headerSliverBuilder: (context, value) {
@@ -124,8 +125,8 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
                                     children: [
                                       Text("${t.sortBy}: ",
                                       style: const TextStyle(color: Colors.white, fontSize: 25)),
-                                      DropdownButton(items: itemStats, value: sortBy, onChanged: ((value) {
-                                        sortBy = value;
+                                      DropdownButton(items: _itemStats, value: _sortBy, onChanged: ((value) {
+                                        _sortBy = value;
                                         setState(() {});
                                       }),),
                                     ],
@@ -155,8 +156,8 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
                                     children: [
                                       Text("${t.country}: ",
                                       style: const TextStyle(color: Colors.white, fontSize: 25)),
-                                      DropdownButton(items: itemCountries, value: country, onChanged: ((value) {
-                                        country = value;
+                                      DropdownButton(items: _itemCountries, value: _country, onChanged: ((value) {
+                                        _country = value;
                                         setState(() {});
                                       }),),
                                     ],
@@ -174,11 +175,11 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
                               return ListTile(
                                 leading: Text((index+1).toString(), style: bigScreen ? const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28) : null),
                                 title: Text(allPlayers[index].username, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
-                                subtitle: Text(sortBy == Stats.tr ? "${f2.format(allPlayers[index].apm)} APM, ${f2.format(allPlayers[index].pps)} PPS, ${f2.format(allPlayers[index].vs)} VS, ${f2.format(allPlayers[index].nerdStats.app)} APP, ${f2.format(allPlayers[index].nerdStats.vsapm)} VS/APM" : "${f4.format(allPlayers[index].getStatByEnum(sortBy))} ${chartsShortTitles[sortBy]}"),
+                                subtitle: Text(_sortBy == Stats.tr ? "${_f2.format(allPlayers[index].apm)} APM, ${_f2.format(allPlayers[index].pps)} PPS, ${_f2.format(allPlayers[index].vs)} VS, ${_f2.format(allPlayers[index].nerdStats.app)} APP, ${_f2.format(allPlayers[index].nerdStats.vsapm)} VS/APM" : "${_f4.format(allPlayers[index].getStatByEnum(_sortBy))} ${chartsShortTitles[_sortBy]}"),
                                 trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text("${f2.format(allPlayers[index].rating)} TR", style: bigScreen ? const TextStyle(fontSize: 28) : null),
+                                    Text("${_f2.format(allPlayers[index].rating)} TR", style: bigScreen ? const TextStyle(fontSize: 28) : null),
                                     Image.asset("res/tetrio_tl_alpha_ranks/${allPlayers[index].rank}.png", height: bigScreen ? 48 : 16),
                                   ],
                                 ),

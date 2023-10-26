@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/views/rank_averages_view.dart';
-import 'package:tetra_stats/views/tl_leaderboard_view.dart';
 import 'package:window_manager/window_manager.dart';
+import 'main_view.dart'; // lol
 
 class RankAveragesView extends StatefulWidget {
   const RankAveragesView({Key? key}) : super(key: key);

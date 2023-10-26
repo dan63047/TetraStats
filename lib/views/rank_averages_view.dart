@@ -5,18 +5,20 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
-import 'package:tetra_stats/views/main_view.dart' show MainView, f4, f2;
+import 'package:tetra_stats/views/main_view.dart' show MainView;
 import 'package:window_manager/window_manager.dart';
 
-var chartsShortTitlesDropdowns = <DropdownMenuItem>[for (MapEntry e in chartsShortTitles.entries) DropdownMenuItem(value: e.key, child: Text(e.value),)];
-Stats chartsX = Stats.tr;
-Stats chartsY = Stats.apm;
-List<DropdownMenuItem> itemStats = [for (MapEntry e in chartsShortTitles.entries) DropdownMenuItem(value: e.key, child: Text(e.value))];
-Stats sortBy = Stats.tr;
-bool reversed = false;
-List<DropdownMenuItem> itemCountries = [for (MapEntry e in t.countries.entries) DropdownMenuItem(value: e.key, child: Text(e.value))];
-String country = "";
-late String oldWindowTitle;
+var _chartsShortTitlesDropdowns = <DropdownMenuItem>[for (MapEntry e in chartsShortTitles.entries) DropdownMenuItem(value: e.key, child: Text(e.value),)];
+Stats _chartsX = Stats.tr;
+Stats _chartsY = Stats.apm;
+List<DropdownMenuItem> _itemStats = [for (MapEntry e in chartsShortTitles.entries) DropdownMenuItem(value: e.key, child: Text(e.value))];
+Stats _sortBy = Stats.tr;
+bool _reversed = false;
+List<DropdownMenuItem> _itemCountries = [for (MapEntry e in t.countries.entries) DropdownMenuItem(value: e.key, child: Text(e.value))];
+String _country = "";
+late String _oldWindowTitle;
+final NumberFormat _f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
+final NumberFormat _f4 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 4);
 
 class RankView extends StatefulWidget {
   final List rank;
@@ -35,7 +37,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
     _scrollController = ScrollController();
     _tabController = TabController(length: 6, vsync: this);
     if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS){
-      windowManager.getTitle().then((value) => oldWindowTitle = value);
+      windowManager.getTitle().then((value) => _oldWindowTitle = value);
       windowManager.setTitle("Tetra Stats: ${widget.rank[1]["everyone"] ? t.everyoneAverages : t.rankAverages(rank: widget.rank[0].rank.toUpperCase())}");
     }
     super.initState();
@@ -45,7 +47,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
   void dispose() {
     _tabController.dispose();
     _scrollController.dispose();
-    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
+    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(_oldWindowTitle);
     super.dispose();
   }
 
@@ -57,7 +59,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     final t = Translations.of(context);
     bool bigScreen = MediaQuery.of(context).size.width > 768;
-    List<TetrioPlayerFromLeaderboard> they = TetrioPlayersLeaderboard("lol", []).getStatRanking(widget.rank[1]["entries"]!, sortBy, reversed: reversed, country: country);
+    List<TetrioPlayerFromLeaderboard> they = TetrioPlayersLeaderboard("lol", []).getStatRanking(widget.rank[1]["entries"]!, _sortBy, reversed: _reversed, country: _country);
     return Scaffold(
         appBar: AppBar(
           title: Text(widget.rank[1]["everyone"] ? t.everyoneAverages : t.rankAverages(rank: widget.rank[0].rank.toUpperCase())),
@@ -135,10 +137,10 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                             style:
                                                 const TextStyle(fontSize: 22))),
                                     DropdownButton(
-                                        items: chartsShortTitlesDropdowns,
-                                        value: chartsX,
+                                        items: _chartsShortTitlesDropdowns,
+                                        value: _chartsX,
                                         onChanged: (value) {
-                                          chartsX = value;
+                                          _chartsX = value;
                                           _justUpdate();
                                         }),
                                   ],
@@ -156,10 +158,10 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                           style: const TextStyle(fontSize: 22)),
                                     ),
                                     DropdownButton(
-                                        items: chartsShortTitlesDropdowns,
-                                        value: chartsY,
+                                        items: _chartsShortTitlesDropdowns,
+                                        value: _chartsY,
                                         onChanged: (value) {
-                                          chartsY = value;
+                                          _chartsY = value;
                                           _justUpdate();
                                         }),
                                   ],
@@ -186,9 +188,9 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                           for (TetrioPlayerFromLeaderboard entry
                                               in widget.rank[1]["entries"])
                                             _MyScatterSpot(
-                                                entry.getStatByEnum(chartsX)
+                                                entry.getStatByEnum(_chartsX)
                                                     as double,
-                                                entry.getStatByEnum(chartsY)
+                                                entry.getStatByEnum(_chartsY)
                                                     as double,
                                                 entry.userId,
                                                 entry.username,
@@ -211,7 +213,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                                         children: [
                                                           TextSpan(
                                                               text:
-                                                                  "${f4.format(touchedSpot.x)} ${chartsShortTitles[chartsX]}\n${f4.format(touchedSpot.y)} ${chartsShortTitles[chartsY]}",
+                                                                  "${_f4.format(touchedSpot.x)} ${chartsShortTitles[_chartsX]}\n${_f4.format(touchedSpot.y)} ${chartsShortTitles[_chartsY]}",
                                                               style: const TextStyle(
                                                                   fontFamily:
                                                                       "Eurostile Round"))
@@ -266,10 +268,10 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                 children: [
                                   Text("${t.sortBy}: ", style: const TextStyle(color: Colors.white, fontSize: 25)),
                                   DropdownButton(
-                                    items: itemStats,
-                                    value: sortBy,
+                                    items: _itemStats,
+                                    value: _sortBy,
                                     onChanged: ((value) {
-                                      sortBy = value;
+                                      _sortBy = value;
                                       setState(() {});
                                     }),
                                   ),
@@ -283,10 +285,10 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                   Text("${t.reversed}: ", style: const TextStyle(color: Colors.white, fontSize: 25)),
                                   Padding(padding: const EdgeInsets.fromLTRB(0, 5.5, 0, 7.5),
                                     child: Checkbox(
-                                      value: reversed,
+                                      value: _reversed,
                                       checkColor: Colors.black,
                                       onChanged: ((value) {
-                                        reversed = value!;
+                                        _reversed = value!;
                                         setState(() {});
                                       }),
                                     ),
@@ -300,10 +302,10 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                 children: [
                                   Text("${t.country}: ", style: const TextStyle(color: Colors.white, fontSize: 25)),
                                   DropdownButton(
-                                    items: itemCountries,
-                                    value: country,
+                                    items: _itemCountries,
+                                    value: _country,
                                     onChanged: ((value) {
-                                      country = value;
+                                      _country = value;
                                       setState(() {});
                                     }),
                                   ),
@@ -319,11 +321,11 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                 bool bigScreen = MediaQuery.of(context).size.width > 768;
                                 return ListTile(
                                   title: Text(they[index].username, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
-                                  subtitle: Text(sortBy == Stats.tr ? "${f2.format(they[index].apm)} APM, ${f2.format(they[index].pps)} PPS, ${f2.format(they[index].vs)} VS, ${f2.format(they[index].nerdStats.app)} APP, ${f2.format(they[index].nerdStats.vsapm)} VS/APM" : "${f4.format(they[index].getStatByEnum(sortBy))} ${chartsShortTitles[sortBy]}"),
+                                  subtitle: Text(_sortBy == Stats.tr ? "${_f2.format(they[index].apm)} APM, ${_f2.format(they[index].pps)} PPS, ${_f2.format(they[index].vs)} VS, ${_f2.format(they[index].nerdStats.app)} APP, ${_f2.format(they[index].nerdStats.vsapm)} VS/APM" : "${_f4.format(they[index].getStatByEnum(_sortBy))} ${chartsShortTitles[_sortBy]}"),
                                   trailing: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Text("${f2.format(they[index].rating)} TR", style: bigScreen ? const TextStyle(fontSize: 28) : null),
+                                      Text("${_f2.format(they[index].rating)} TR", style: bigScreen ? const TextStyle(fontSize: 28) : null),
                                       Image.asset("res/tetrio_tl_alpha_ranks/${they[index].rank}.png", height: bigScreen ? 48 : 16),
                                     ],
                                   ),

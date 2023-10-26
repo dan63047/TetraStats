@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
+import 'package:tetra_stats/main.dart' show prefs;
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/views/ranks_averages_view.dart' show RankAveragesView;
 import 'package:tetra_stats/views/tl_leaderboard_view.dart' show TLLeaderboardView;
@@ -25,15 +26,14 @@ Future<List> me = Future.delayed(const Duration(seconds: 60), () => [null, null,
 String _searchFor = "6098518e3d5155e6ec429cdc";
 String _titleNickname = "dan63047";
 final TetrioService teto = TetrioService();
-late SharedPreferences prefs;
 var chartsData = <DropdownMenuItem<List<FlSpot>>>[];
-List historyShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR"];
-int chartsIndex = 0; 
-final NumberFormat timeInSec = NumberFormat("#,###.###s.");
-final NumberFormat f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
-final NumberFormat secs = NumberFormat("00.###");
-final NumberFormat f4 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 4);
-final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
+List _historyShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR"];
+int _chartsIndex = 0; 
+final NumberFormat _timeInSec = NumberFormat("#,###.###s.");
+final NumberFormat _secs = NumberFormat("00.###");
+final NumberFormat _f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
+final NumberFormat _f4 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 4);
+final DateFormat _dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
 
 class MainView extends StatefulWidget {
   final String? player;
@@ -51,9 +51,9 @@ Future<void> copyToClipboard(String text) async {
 
 String get40lTime(int microseconds){
     if (microseconds > 60000000) {
-      return "${(microseconds/1000000/60).floor()}:${(secs.format(microseconds /1000000 % 60))}";
+      return "${(microseconds/1000000/60).floor()}:${(_secs.format(microseconds /1000000 % 60))}";
     } else{
-      return timeInSec.format(microseconds / 1000000);
+      return _timeInSec.format(microseconds / 1000000);
     }                      
   }
 
@@ -543,7 +543,7 @@ class _TLRecords extends StatelessWidget {
               style: bigScreen ? const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28) :
               const TextStyle(fontSize: 28)),
               title: Text("vs. ${value.endContext.firstWhere((element) => element.userId != userID).username}"),
-              subtitle: Text(dateFormat.format(value.timestamp)),
+              subtitle: Text(_dateFormat.format(value.timestamp)),
               trailing: Table(defaultColumnWidth: const IntrinsicColumnWidth(),
               defaultVerticalAlignment: TableCellVerticalAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
@@ -552,9 +552,9 @@ class _TLRecords extends StatelessWidget {
                 2: FixedColumnWidth(50),
               },
                 children: [
-                TableRow(children: [Text(f2.format(value.endContext.firstWhere((element) => element.userId == userID).secondary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(f2.format(value.endContext.firstWhere((element) => element.userId != userID).secondary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" APM", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
-                TableRow(children: [Text(f2.format(value.endContext.firstWhere((element) => element.userId == userID).tertiary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(f2.format(value.endContext.firstWhere((element) => element.userId != userID).tertiary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" PPS", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
-                TableRow(children: [Text(f2.format(value.endContext.firstWhere((element) => element.userId == userID).extra), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(f2.format(value.endContext.firstWhere((element) => element.userId != userID).extra), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" VS", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
+                TableRow(children: [Text(_f2.format(value.endContext.firstWhere((element) => element.userId == userID).secondary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(_f2.format(value.endContext.firstWhere((element) => element.userId != userID).secondary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" APM", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
+                TableRow(children: [Text(_f2.format(value.endContext.firstWhere((element) => element.userId == userID).tertiary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(_f2.format(value.endContext.firstWhere((element) => element.userId != userID).tertiary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" PPS", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
+                TableRow(children: [Text(_f2.format(value.endContext.firstWhere((element) => element.userId == userID).extra), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(_f2.format(value.endContext.firstWhere((element) => element.userId != userID).extra), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" VS", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
               ],),
               onTap: (){Navigator.push(
                     context,
@@ -582,13 +582,13 @@ class _History extends StatelessWidget{
         children: [
           DropdownButton(
                 items: chartsData,
-                value: chartsData[chartsIndex].value,
+                value: chartsData[_chartsIndex].value,
                 onChanged: (value) {
-                  chartsIndex = chartsData.indexWhere((element) => element.value == value);
+                  _chartsIndex = chartsData.indexWhere((element) => element.value == value);
                   update();
                 }
               ),
-          if(chartsData[chartsIndex].value!.length > 1) _HistoryChartThigy(data: chartsData[chartsIndex].value!, title: "ss", yAxisTitle: historyShortTitles[chartsIndex], bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? f2 : NumberFormat.compact(),)
+          if(chartsData[_chartsIndex].value!.length > 1) _HistoryChartThigy(data: chartsData[_chartsIndex].value!, title: "ss", yAxisTitle: _historyShortTitles[_chartsIndex], bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? _f2 : NumberFormat.compact(),)
           else Center(child: Text(t.notEnoughData, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))
         ],
       ),
@@ -634,7 +634,7 @@ class _HistoryChartThigy extends StatelessWidget{
                 ) : Container();
               }))),
               lineTouchData: LineTouchData(touchTooltipData: LineTouchTooltipData( fitInsideHorizontally: true, fitInsideVertically: true, getTooltipItems: (touchedSpots) {
-                return [for (var v in touchedSpots) LineTooltipItem("${f4.format(v.y)} $yAxisTitle \n", const TextStyle(), children: [TextSpan(text: dateFormat.format(DateTime.fromMillisecondsSinceEpoch(v.x.floor())))])];
+                return [for (var v in touchedSpots) LineTooltipItem("${_f4.format(v.y)} $yAxisTitle \n", const TextStyle(), children: [TextSpan(text: _dateFormat.format(DateTime.fromMillisecondsSinceEpoch(v.x.floor())))])];
               },))
               )
             ),
@@ -688,7 +688,7 @@ class _RecordThingy extends StatelessWidget {
                             playerStatLabel: "Leaderboard Placement",
                             isScreenBig: bigScreen,
                             higherIsBetter: false),
-                      Text(t.obtainDate(date: dateFormat.format(record!.timestamp!)),
+                      Text(t.obtainDate(date: _dateFormat.format(record!.timestamp!)),
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontFamily: "Eurostile Round",
@@ -940,7 +940,7 @@ class _OtherThingy extends StatelessWidget {
               ]
             )
           ),
-          subtitle: Text(dateFormat.format(news.timestamp)),
+          subtitle: Text(_dateFormat.format(news.timestamp)),
         );
       case "personalbest":
       return ListTile(
@@ -955,7 +955,7 @@ class _OtherThingy extends StatelessWidget {
               ]
             )
           ),
-          subtitle: Text(dateFormat.format(news.timestamp)),
+          subtitle: Text(_dateFormat.format(news.timestamp)),
           leading: Image.asset(
             "res/icons/improvement-local.png",
             height: 48,
@@ -977,7 +977,7 @@ class _OtherThingy extends StatelessWidget {
               ]
             )
           ),
-          subtitle: Text(dateFormat.format(news.timestamp)),
+          subtitle: Text(_dateFormat.format(news.timestamp)),
           leading: Image.asset(
             "res/tetrio_badges/${news.data["type"]}.png",
             height: 48,
@@ -999,7 +999,7 @@ class _OtherThingy extends StatelessWidget {
               ]
             )
           ),
-          subtitle: Text(dateFormat.format(news.timestamp)),
+          subtitle: Text(_dateFormat.format(news.timestamp)),
           leading: Image.asset(
             "res/tetrio_tl_alpha_ranks/${news.data["rank"]}.png",
             height: 48,
@@ -1020,7 +1020,7 @@ class _OtherThingy extends StatelessWidget {
               ]
             )
           ),
-          subtitle: Text(dateFormat.format(news.timestamp)),
+          subtitle: Text(_dateFormat.format(news.timestamp)),
           leading: Image.asset(
             "res/icons/supporter-tag.png",
             height: 48,
@@ -1041,7 +1041,7 @@ class _OtherThingy extends StatelessWidget {
               ]
             )
           ),
-          subtitle: Text(dateFormat.format(news.timestamp)),
+          subtitle: Text(_dateFormat.format(news.timestamp)),
           leading: Image.asset(
             "res/icons/supporter-tag.png",
             height: 48,
@@ -1054,7 +1054,7 @@ class _OtherThingy extends StatelessWidget {
       default:
       return ListTile(
         title: Text(t.newsParts.unknownNews(type: news.type)),
-        subtitle: Text(dateFormat.format(news.timestamp)),
+        subtitle: Text(_dateFormat.format(news.timestamp)),
       );
     }
   }

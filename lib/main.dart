@@ -16,6 +16,7 @@ import 'package:tetra_stats/views/tracked_players_view.dart';
 import 'package:tetra_stats/views/calc_view.dart';
 
 late final PackageInfo packageInfo;
+late SharedPreferences prefs;
 
 void main() async {
   if (kIsWeb) {

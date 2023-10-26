@@ -1,12 +1,12 @@
 import 'dart:io';
 import 'dart:math';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
+import 'package:tetra_stats/widgets/vs_graphs.dart';
 import 'package:window_manager/window_manager.dart';
 
 enum Mode{
@@ -612,13 +612,13 @@ class CompareState extends State<CompareView> {
                               theGreenSide[2].gamesPlayed > 9 &&
                               greenSideMode != Mode.stats &&
                               redSideMode != Mode.stats)
-                            CompareThingy(
-                              label: t.statCellNum.accOfEstShort,
-                              greenSide: theGreenSide[2].esttracc!,
-                              redSide: theRedSide[2].esttracc!,
-                              fractionDigits: 2,
-                              higherIsBetter: true,
-                            ),
+                          CompareThingy(
+                            label: t.statCellNum.accOfEstShort,
+                            greenSide: theGreenSide[2].esttracc!,
+                            redSide: theRedSide[2].esttracc!,
+                            fractionDigits: 2,
+                            higherIsBetter: true,
+                          ),
                           CompareThingy(
                             label: "Opener",
                             greenSide: theGreenSide[2].playstyle!.opener,
@@ -647,239 +647,51 @@ class CompareState extends State<CompareView> {
                             fractionDigits: 3,
                             higherIsBetter: true,
                           ),
-                          Wrap(
-                            direction: Axis.horizontal,
-                            alignment: WrapAlignment.center,
-                            spacing: 25,
-                            crossAxisAlignment: WrapCrossAlignment.start,
-                            clipBehavior: Clip.hardEdge,
-                            children: [
-                              Padding(
-                            padding: const EdgeInsets.fromLTRB(18, 0, 18, 44),
-                            child: SizedBox(
-                              height: 310,
-                              width: 310,
-                              child: RadarChart(
-                                RadarChartData(
-                                  radarShape: RadarShape.polygon,
-                                  tickCount: 4,
-                                  ticksTextStyle: const TextStyle(color: Colors.transparent, fontSize: 10),
-                                  radarBorderData: const BorderSide(color: Colors.transparent, width: 1),
-                                  gridBorderData: const BorderSide(color: Colors.white24, width: 1),
-                                  tickBorderData: const BorderSide(color: Colors.transparent, width: 1),
-                                  getTitle: (index, angle) {
-                                    switch (index) {
-                                      case 0:
-                                        return RadarChartTitle(
-                                          text: 'APM',
-                                          angle: angle,
-                                          positionPercentageOffset: 0.05
-                                        );
-                                      case 1:
-                                        return RadarChartTitle(
-                                          text: 'PPS',
-                                          angle: angle,
-                                          positionPercentageOffset: 0.05
-                                        );
-                                      case 2:
-                                        return RadarChartTitle(text: 'VS', angle: angle, positionPercentageOffset: 0.05);
-                                      case 3:
-                                        return RadarChartTitle(text: 'APP', angle: angle + 180, positionPercentageOffset: 0.05);
-                                      case 4:
-                                        return RadarChartTitle(text: 'DS/S', angle: angle + 180, positionPercentageOffset: 0.05);
-                                      case 5:
-                                        return RadarChartTitle(text: 'DS/P', angle: angle + 180, positionPercentageOffset: 0.05);
-                                      case 6:
-                                        return RadarChartTitle(text: 'APP+DS/P', angle: angle + 180, positionPercentageOffset: 0.05);
-                                      case 7:
-                                        return RadarChartTitle(text: 'VS/APM', angle: angle + 180, positionPercentageOffset: 0.05);
-                                      case 8:
-                                        return RadarChartTitle(text: 'Cheese', angle: angle, positionPercentageOffset: 0.05);
-                                      case 9:
-                                        return RadarChartTitle(text: 'Gb Eff.', angle: angle, positionPercentageOffset: 0.05);
-                                      default:
-                                        return const RadarChartTitle(text: '');
-                                    }
-                                      },
-                                      dataSets: [
-                                        RadarDataSet(
-                                          fillColor: const Color.fromARGB(115, 76, 175, 79),
-                                          borderColor: Colors.green,
-                                          dataEntries: [
-                                            RadarEntry(value: theGreenSide[2].apm! * apmWeight),
-                                            RadarEntry(value: theGreenSide[2].pps! * ppsWeight),
-                                            RadarEntry(value: theGreenSide[2].vs! * vsWeight),
-                                            RadarEntry(value: theGreenSide[2].nerdStats!.app * appWeight),
-                                            RadarEntry(value: theGreenSide[2].nerdStats!.dss * dssWeight),
-                                            RadarEntry(value: theGreenSide[2].nerdStats!.dsp * dspWeight),
-                                            RadarEntry(value: theGreenSide[2].nerdStats!.appdsp * appdspWeight),
-                                            RadarEntry(value: theGreenSide[2].nerdStats!.vsapm * vsapmWeight),
-                                            RadarEntry(value: theGreenSide[2].nerdStats!.cheese * cheeseWeight),
-                                            RadarEntry(value: theGreenSide[2].nerdStats!.gbe * gbeWeight),
-                                          ],
-                                        ),
-                                        RadarDataSet(
-                                          fillColor: const Color.fromARGB(115, 244, 67, 54),
-                                          borderColor: Colors.red,
-                                          dataEntries: [
-                                            RadarEntry(value: theRedSide[2].apm! * apmWeight),
-                                            RadarEntry(value: theRedSide[2].pps! * ppsWeight),
-                                            RadarEntry(value: theRedSide[2].vs! * vsWeight),
-                                            RadarEntry(value: theRedSide[2].nerdStats!.app * appWeight),
-                                            RadarEntry(value: theRedSide[2].nerdStats!.dss * dssWeight),
-                                            RadarEntry(value: theRedSide[2].nerdStats!.dsp * dspWeight),
-                                            RadarEntry(value: theRedSide[2].nerdStats!.appdsp * appdspWeight),
-                                            RadarEntry(value: theRedSide[2].nerdStats!.vsapm * vsapmWeight),
-                                            RadarEntry(value: theRedSide[2].nerdStats!.cheese * cheeseWeight),
-                                            RadarEntry(value: theRedSide[2].nerdStats!.gbe * gbeWeight),
-                                          ],
-                                        ),
-                                        RadarDataSet(
-                                          fillColor: Colors.transparent,
-                                          borderColor: Colors.transparent,
-                                          dataEntries: [
-                                            const RadarEntry(value: 0),
-                                            const RadarEntry(value: 0),
-                                            const RadarEntry(value: 0),
-                                            const RadarEntry(value: 0),
-                                            const RadarEntry(value: 0),
-                                            const RadarEntry(value: 0),
-                                            const RadarEntry(value: 0),
-                                            const RadarEntry(value: 0),
-                                            const RadarEntry(value: 0),
-                                            const RadarEntry(value: 0),
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                    swapAnimationDuration: const Duration(milliseconds: 150),
-                                    swapAnimationCurve: Curves.linear,
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                            padding: const EdgeInsets.fromLTRB(18, 0, 18, 44),
-                            child: SizedBox(
-                              height: 310,
-                              width: 310,
-                              child: RadarChart(
-                                RadarChartData(
-                                  radarShape: RadarShape.polygon,
-                                  tickCount: 4,
-                                  ticksTextStyle: const TextStyle(color: Colors.white24, fontSize: 10),
-                                  radarBorderData: const BorderSide(color: Colors.transparent, width: 1),
-                                  gridBorderData: const BorderSide(color: Colors.white24, width: 1),
-                                  tickBorderData: const BorderSide(color: Colors.transparent, width: 1),
-                                  titleTextStyle: const TextStyle(height: 1.1),
-                                  radarTouchData: RadarTouchData(),
-                                      getTitle: (index, angle) {
-                                        switch (index) {
-                                          case 0:
-                                            return RadarChartTitle(text: 'Opener',angle: angle, positionPercentageOffset: 0.05);
-                                          case 1:
-                                            return RadarChartTitle(text: 'Stride', angle: angle, positionPercentageOffset: 0.05);
-                                          case 2:
-                                            return RadarChartTitle(text: 'Inf Ds', angle: angle + 180, positionPercentageOffset: 0.05);
-                                          case 3:
-                                            return RadarChartTitle(text: 'Plonk', angle: angle, positionPercentageOffset: 0.05);
-                                          default:
-                                            return const RadarChartTitle(text: '');
-                                        }
-                                      },
-                                      dataSets: [
-                                        RadarDataSet(
-                                          fillColor: const Color.fromARGB(115, 76, 175, 79),
-                                          borderColor: Colors.green,
-                                          dataEntries: [
-                                            RadarEntry(value: theGreenSide[2].playstyle!.opener),
-                                            RadarEntry(value: theGreenSide[2].playstyle!.stride),
-                                            RadarEntry(value: theGreenSide[2].playstyle!.infds),
-                                            RadarEntry(value: theGreenSide[2].playstyle!.plonk),
-                                          ],
-                                        ),
-                                        RadarDataSet(
-                                          fillColor: const Color.fromARGB(115, 244, 67, 54),
-                                          borderColor: Colors.red,
-                                          dataEntries: [
-                                            RadarEntry(value: theRedSide[2].playstyle!.opener),
-                                            RadarEntry(value: theRedSide[2].playstyle!.stride),
-                                            RadarEntry(value: theRedSide[2].playstyle!.infds),
-                                            RadarEntry(value: theRedSide[2].playstyle!.plonk),
-                                          ],
-                                        ),
-                                        RadarDataSet(
-                                          fillColor: Colors.transparent,
-                                          borderColor: Colors.transparent,
-                                          dataEntries: [
-                                            const RadarEntry(value: 0),
-                                            const RadarEntry(value: 0),
-                                            const RadarEntry(value: 0),
-                                            const RadarEntry(value: 0),
-                                          ],
-                                        ),
-                                        RadarDataSet(
-                                          fillColor: Colors.transparent,
-                                          borderColor: Colors.transparent,
-                                          dataEntries: [
-                                            const RadarEntry(value: 1),
-                                            const RadarEntry(value: 1),
-                                            const RadarEntry(value: 1),
-                                            const RadarEntry(value: 1),
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                    swapAnimationDuration: const Duration(milliseconds: 150), // Optional
-                                    swapAnimationCurve: Curves.linear, // Optional
-                                  ),
-                                ),
-                              ),
-                              const Divider(),
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 16),
-                                child: Text(t.winChance,
-                                    style: TextStyle(
-                                        fontFamily: "Eurostile Round Extended",
-                                        fontSize: bigScreen ? 42 : 28)),
-                              ),
-                              if (greenSideMode != Mode.stats && redSideMode != Mode.stats &&
-                              theGreenSide[2].gamesPlayed > 9 && theRedSide[2].gamesPlayed > 9)
-                              CompareThingy(
-                                label: t.byGlicko,
-                                greenSide: getWinrateByTR(
-                                        theGreenSide[2].glicko!,
-                                        theGreenSide[2].rd!,
-                                        theRedSide[2].glicko!,
-                                        theRedSide[2].rd!) *
-                                    100,
-                                redSide: getWinrateByTR(
-                                        theRedSide[2].glicko!,
-                                        theRedSide[2].rd!,
-                                        theGreenSide[2].glicko!,
-                                        theGreenSide[2].rd!) *
-                                    100,
-                                fractionDigits: 2,
-                                higherIsBetter: true,
-                              ),
-                              CompareThingy(
-                                label: t.byEstTR,
-                                greenSide: getWinrateByTR(
-                                        theGreenSide[2].estTr!.estglicko,
-                                        theGreenSide[2].rd ?? noTrRd,
-                                        theRedSide[2].estTr!.estglicko,
-                                        theRedSide[2].rd ?? noTrRd) *
-                                    100,
-                                redSide: getWinrateByTR(
-                                        theRedSide[2].estTr!.estglicko,
-                                        theRedSide[2].rd ?? noTrRd,
-                                        theGreenSide[2].estTr!.estglicko,
-                                        theGreenSide[2].rd ?? noTrRd) *
-                                    100,
-                                fractionDigits: 2,
-                                higherIsBetter: true,
-                              ),
-                            ],
-                          )
+                          VsGraphs(theGreenSide[2].apm!, theGreenSide[2].pps!, theGreenSide[2].vs!, theGreenSide[2].nerdStats!, theGreenSide[2].playstyle!, theRedSide[2].apm!, theRedSide[2].pps!, theRedSide[2].vs!, theRedSide[2].nerdStats!, theRedSide[2].playstyle!),
+                          const Divider(),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: Text(t.winChance,
+                                style: TextStyle(
+                                    fontFamily: "Eurostile Round Extended",
+                                    fontSize: bigScreen ? 42 : 28)),
+                          ),
+                          if (greenSideMode != Mode.stats && redSideMode != Mode.stats &&
+                          theGreenSide[2].gamesPlayed > 9 && theRedSide[2].gamesPlayed > 9)
+                          CompareThingy(
+                            label: t.byGlicko,
+                            greenSide: getWinrateByTR(
+                                    theGreenSide[2].glicko!,
+                                    theGreenSide[2].rd!,
+                                    theRedSide[2].glicko!,
+                                    theRedSide[2].rd!) *
+                                100,
+                            redSide: getWinrateByTR(
+                                    theRedSide[2].glicko!,
+                                    theRedSide[2].rd!,
+                                    theGreenSide[2].glicko!,
+                                    theGreenSide[2].rd!) *
+                                100,
+                            fractionDigits: 2,
+                            higherIsBetter: true,
+                          ),
+                          CompareThingy(
+                            label: t.byEstTR,
+                            greenSide: getWinrateByTR(
+                                    theGreenSide[2].estTr!.estglicko,
+                                    theGreenSide[2].rd ?? noTrRd,
+                                    theRedSide[2].estTr!.estglicko,
+                                    theRedSide[2].rd ?? noTrRd) *
+                                100,
+                            redSide: getWinrateByTR(
+                                    theRedSide[2].estTr!.estglicko,
+                                    theRedSide[2].rd ?? noTrRd,
+                                    theGreenSide[2].estTr!.estglicko,
+                                    theGreenSide[2].rd ?? noTrRd) *
+                                100,
+                            fractionDigits: 2,
+                            higherIsBetter: true,
+                          ),
                         ],
                       )
                   ] : [Padding(

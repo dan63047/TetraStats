@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:tetra_stats/widgets/graphs.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
 
 var fDiff = NumberFormat("+#,###.###;-#,###.###");
-RangeValues _currentRangeValues = const RangeValues(0, 1);
 final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
 final NumberFormat f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
 final NumberFormat f3 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 3);
+late RangeValues _currentRangeValues;
 TetraLeagueAlpha? oldTl;
 late TetraLeagueAlpha currentTl;
 late List<TetrioPlayer> sortedStates;
@@ -31,8 +31,13 @@ class _TLThingyState extends State<TLThingy> {
   
 @override
   void initState() {
+    _currentRangeValues = const RangeValues(0, 1);
     sortedStates = widget.states.reversed.toList();
-    oldTl = sortedStates[1].tlSeason1;
+    try{
+      oldTl = sortedStates[1].tlSeason1;
+    }on RangeError{
+      oldTl = null;
+    }
     currentTl = widget.tl;
     super.initState();
   }
@@ -52,7 +57,7 @@ class _TLThingyState extends State<TLThingy> {
                 ? [
                     if (widget.showTitle) Text(t.tetraLeague, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
                     if (oldTl != null) Text(t.comparingWith(date: dateFormat.format(oldTl!.timestamp))),
-                    RangeSlider(values: _currentRangeValues, max: widget.states.length.toDouble(),
+                    if (oldTl != null) RangeSlider(values: _currentRangeValues, max: widget.states.length.toDouble(),
                     labels: RangeLabels(
                         _currentRangeValues.start.round().toString(),
                         _currentRangeValues.end.round().toString(),
@@ -400,158 +405,7 @@ class _TLThingyState extends State<TLThingy> {
                           ),
                         ),
                       ),
-                    if (currentTl.nerdStats != null)
-                      Wrap(
-                        direction: Axis.horizontal,
-                        alignment: WrapAlignment.center,
-                        spacing: 25,
-                        crossAxisAlignment: WrapCrossAlignment.start,
-                        clipBehavior: Clip.hardEdge,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(18, 0, 18, 44),
-                            child: SizedBox(
-                              height: 310,
-                              width: 310,
-                              child: RadarChart(
-                                RadarChartData(
-                                  radarShape: RadarShape.polygon,
-                                  tickCount: 4,
-                                  ticksTextStyle: const TextStyle(color: Colors.transparent, fontSize: 10),
-                                  radarBorderData: const BorderSide(color: Colors.transparent, width: 1),
-                                  gridBorderData: const BorderSide(color: Colors.white24, width: 1),
-                                  tickBorderData: const BorderSide(color: Colors.transparent, width: 1),
-                                  getTitle: (index, angle) {
-                                    switch (index) {
-                                      case 0:
-                                        return RadarChartTitle(text: 'APM', angle: angle, positionPercentageOffset: 0.05);
-                                      case 1:
-                                        return RadarChartTitle(text: 'PPS', angle: angle, positionPercentageOffset: 0.05);
-                                      case 2:
-                                        return RadarChartTitle(text: 'VS', angle: angle, positionPercentageOffset: 0.05);
-                                      case 3:
-                                        return RadarChartTitle(text: 'APP', angle: angle + 180, positionPercentageOffset: 0.05);
-                                      case 4:
-                                        return RadarChartTitle(text: 'DS/S', angle: angle + 180, positionPercentageOffset: 0.05);
-                                      case 5:
-                                        return RadarChartTitle(text: 'DS/P', angle: angle + 180, positionPercentageOffset: 0.05);
-                                      case 6:
-                                        return RadarChartTitle(text: 'APP+DS/P', angle: angle + 180, positionPercentageOffset: 0.05);
-                                      case 7:
-                                        return RadarChartTitle(text: 'VS/APM', angle: angle + 180, positionPercentageOffset: 0.05);
-                                      case 8:
-                                        return RadarChartTitle(text: 'Cheese', angle: angle, positionPercentageOffset: 0.05);
-                                      case 9:
-                                        return RadarChartTitle(text: 'Gb Eff.', angle: angle, positionPercentageOffset: 0.05);
-                                      default:
-                                        return const RadarChartTitle(text: '');
-                                    }
-                                  },
-                                  dataSets: [
-                                    RadarDataSet(
-                                      dataEntries: [
-                                        RadarEntry(value: currentTl.apm! * apmWeight),
-                                        RadarEntry(value: currentTl.pps! * ppsWeight),
-                                        RadarEntry(value: currentTl.vs! * vsWeight),
-                                        RadarEntry(value: currentTl.nerdStats!.app * appWeight),
-                                        RadarEntry(value: currentTl.nerdStats!.dss * dssWeight),
-                                        RadarEntry(value: currentTl.nerdStats!.dsp * dspWeight),
-                                        RadarEntry(value: currentTl.nerdStats!.appdsp * appdspWeight),
-                                        RadarEntry(value: currentTl.nerdStats!.vsapm * vsapmWeight),
-                                        RadarEntry(value: currentTl.nerdStats!.cheese * cheeseWeight),
-                                        RadarEntry(value: currentTl.nerdStats!.gbe * gbeWeight),
-                                      ],
-                                    ),
-                                    RadarDataSet(
-                                      fillColor: Colors.transparent,
-                                      borderColor: Colors.transparent,
-                                      dataEntries: [
-                                        const RadarEntry(value: 0),
-                                        const RadarEntry(value: 0),
-                                        const RadarEntry(value: 0),
-                                        const RadarEntry(value: 0),
-                                        const RadarEntry(value: 0),
-                                        const RadarEntry(value: 0),
-                                        const RadarEntry(value: 0),
-                                        const RadarEntry(value: 0),
-                                        const RadarEntry(value: 0),
-                                        const RadarEntry(value: 0),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                                swapAnimationDuration: const Duration(milliseconds: 150), // Optional
-                                swapAnimationCurve: Curves.linear, // Optional
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(18, 0, 18, 44),
-                            child: SizedBox(
-                              height: 310,
-                              width: 310,
-                              child: RadarChart(
-                                RadarChartData(
-                                  radarShape: RadarShape.polygon,
-                                  tickCount: 4,
-                                  ticksTextStyle: const TextStyle(color: Colors.white24, fontSize: 10),
-                                  radarBorderData: const BorderSide(color: Colors.transparent, width: 1),
-                                  gridBorderData: const BorderSide(color: Colors.white24, width: 1),
-                                  tickBorderData: const BorderSide(color: Colors.transparent, width: 1),
-                                  titleTextStyle: const TextStyle(height: 1.1),
-                                  radarTouchData: RadarTouchData(),
-                                  getTitle: (index, angle) {
-                                    switch (index) {
-                                      case 0:
-                                        return RadarChartTitle(text: 'Opener\n${f2.format(currentTl.playstyle!.opener)}', angle: 0, positionPercentageOffset: 0.05);
-                                      case 1:
-                                        return RadarChartTitle(text: 'Stride\n${f2.format(currentTl.playstyle!.stride)}', angle: 0, positionPercentageOffset: 0.05);
-                                      case 2:
-                                        return RadarChartTitle(text: 'Inf Ds\n${f2.format(currentTl.playstyle!.infds)}', angle: angle + 180, positionPercentageOffset: 0.05);
-                                      case 3:
-                                        return RadarChartTitle(text: 'Plonk\n${f2.format(currentTl.playstyle!.plonk)}', angle: 0, positionPercentageOffset: 0.05);
-                                      default:
-                                        return const RadarChartTitle(text: '');
-                                    }
-                                  },
-                                  dataSets: [
-                                    RadarDataSet(
-                                      dataEntries: [
-                                        RadarEntry(value: currentTl.playstyle!.opener),
-                                        RadarEntry(value: currentTl.playstyle!.stride),
-                                        RadarEntry(value: currentTl.playstyle!.infds),
-                                        RadarEntry(value: currentTl.playstyle!.plonk),
-                                      ],
-                                    ),
-                                    RadarDataSet(
-                                      fillColor: Colors.transparent,
-                                      borderColor: Colors.transparent,
-                                      dataEntries: [
-                                        const RadarEntry(value: 0),
-                                        const RadarEntry(value: 0),
-                                        const RadarEntry(value: 0),
-                                        const RadarEntry(value: 0),
-                                      ],
-                                    ),
-                                    RadarDataSet(
-                                      fillColor: Colors.transparent,
-                                      borderColor: Colors.transparent,
-                                      dataEntries: [
-                                        const RadarEntry(value: 1),
-                                        const RadarEntry(value: 1),
-                                        const RadarEntry(value: 1),
-                                        const RadarEntry(value: 1),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                                swapAnimationDuration: const Duration(milliseconds: 150), // Optional
-                                swapAnimationCurve: Curves.linear, // Optional
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
+                    if (currentTl.nerdStats != null) Graphs(currentTl.apm!, currentTl.pps!, currentTl.vs!, currentTl.nerdStats!, currentTl.playstyle!)
                   ]
                 : [
                     Text(t.neverPlayedTL, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)),
