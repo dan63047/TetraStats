@@ -17,6 +17,11 @@ import 'package:tetra_stats/views/calc_view.dart';
 
 late final PackageInfo packageInfo;
 late SharedPreferences prefs;
+ColorScheme sheme = ColorScheme.dark(primary: Colors.cyanAccent, secondary: Colors.white);
+
+void setAccentColor(Color color){
+    sheme = ColorScheme.dark(primary: color, secondary: Colors.white);
+}
 
 void main() async {
   if (kIsWeb) {
@@ -63,7 +68,7 @@ class MyApp extends StatelessWidget {
         routes: {"/settings": (context) => const SettingsView(), "/states": (context) => const TrackedPlayersView(), "/calc": (context) => const CalcView(), "/customization": (context) => const CustomizationView()},
         theme: ThemeData(
             fontFamily: 'Eurostile Round',
-            colorScheme: ColorScheme.dark(primary: Colors.cyanAccent, secondary: Colors.white),
+            colorScheme: sheme,
             scaffoldBackgroundColor: Colors.black
             )
           );

@@ -3,9 +3,7 @@
 import 'dart:io';
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/widgets/vs_graphs.dart';
-
 import 'main_view.dart' show teto;
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';

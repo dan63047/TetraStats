@@ -4,6 +4,7 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:tetra_stats/main.dart';
 import 'package:window_manager/window_manager.dart';
 
 late String oldWindowTitle;
@@ -45,7 +46,7 @@ class CustomizationState extends State<CustomizationView> {
   }
 
   ThemeData getTheme(BuildContext context, Color color){
-    return Theme.of(context).copyWith();
+    return Theme.of(context).copyWith(colorScheme: ColorScheme.dark(primary: color, secondary: Colors.white));
   }
 
   @override
@@ -62,65 +63,62 @@ class CustomizationState extends State<CustomizationView> {
         title: Text(t.settings),
       ),
       backgroundColor: Colors.black,
-      body: Theme(
-        data: getTheme(context, currentColor),
-        child: SafeArea(
-            child: ListView(
-          children: [
-            ListTile(
-                title: Text("Accent Color"),
-                trailing: ColorIndicator(HSVColor.fromColor(Theme.of(context).primaryColorDark)),
-                onTap: () {
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) => AlertDialog(
-                              title: const Text('Pick a color!'),
-                              content: SingleChildScrollView(
-                                child: ColorPicker(
-                                  pickerColor: pickerColor,
-                                  onColorChanged: changeColor,
-                                ),
-                                // Use Material color picker:
-                                //
-                                // child: MaterialPicker(
-                                //   pickerColor: pickerColor,
-                                //   onColorChanged: changeColor,
-                                //   showLabel: true, // only on portrait mode
-                                // ),
-                                //
-                                // Use Block color picker:
-                                //
-                                // child: BlockPicker(
-                                //   pickerColor: currentColor,
-                                //   onColorChanged: changeColor,
-                                // ),
-                                //
-                                // child: MultipleChoiceBlockPicker(
-                                //   pickerColors: currentColors,
-                                //   onColorsChanged: changeColors,
-                                // ),
+      body: SafeArea(
+          child: ListView(
+        children: [
+          ListTile(
+              title: Text("Accent Color"),
+              trailing: ColorIndicator(HSVColor.fromColor(Theme.of(context).colorScheme.primary)),
+              onTap: () {
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                            title: const Text('Pick a color!'),
+                            content: SingleChildScrollView(
+                              child: ColorPicker(
+                                pickerColor: pickerColor,
+                                onColorChanged: changeColor,
                               ),
-                              actions: <Widget>[
-                                ElevatedButton(
-                                  child: const Text('Got it'),
-                                  onPressed: () {
-                                    setState(() {
-                                      currentColor = pickerColor;
-                                    });
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ]));
-                }),
-            ListTile(
-              title: Text("Font"),
-            ),
-            ListTile(
-              title: Text("Stats Table in TL mathes list"),
-            ),
-          ],
-        )),
-      ),
+                              // Use Material color picker:
+                              //
+                              // child: MaterialPicker(
+                              //   pickerColor: pickerColor,
+                              //   onColorChanged: changeColor,
+                              //   showLabel: true, // only on portrait mode
+                              // ),
+                              //
+                              // Use Block color picker:
+                              //
+                              // child: BlockPicker(
+                              //   pickerColor: currentColor,
+                              //   onColorChanged: changeColor,
+                              // ),
+                              //
+                              // child: MultipleChoiceBlockPicker(
+                              //   pickerColors: currentColors,
+                              //   onColorsChanged: changeColors,
+                              // ),
+                            ),
+                            actions: <Widget>[
+                              ElevatedButton(
+                                child: const Text('Got it'),
+                                onPressed: () {
+                                  setState(() {
+                                    setAccentColor(pickerColor);
+                                  });
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ]));
+              }),
+          ListTile(
+            title: Text("Font"),
+          ),
+          ListTile(
+            title: Text("Stats Table in TL mathes list"),
+          ),
+        ],
+      )),
     );
   }
 }
