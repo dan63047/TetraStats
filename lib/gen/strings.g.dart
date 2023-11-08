@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 970 (485 per locale)
+/// Strings: 986 (493 per locale)
 ///
-/// Built on 2023-10-07 at 16:34 UTC
+/// Built on 2023-11-08 at 22:09 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -196,10 +196,9 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get notSupporter => 'Not a supporter';
 	String get assignedManualy => 'That badge was assigned manualy by TETR.IO admins';
 	String supporter({required Object tier}) => 'Supporter tier ${tier}';
-	String comparingWith({required Object date}) => 'Comparing with data from ${date}';
+	String comparingWith({required Object newDate, required Object oldDate}) => 'Data from ${newDate} comparing with ${oldDate}';
 	String get top => 'Top';
 	String get topRank => 'Top Rank';
-	String get decaying => 'Decaying';
 	String gamesUntilRanked({required Object left}) => '${left} games until being ranked';
 	String get nerdStats => 'Nerd Stats';
 	String get playersYouTrack => 'Players you track';
@@ -222,7 +221,7 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get yourIDText => 'Every time when app loads, stats of that player will be fetched. Please prefer ID over nickname because nickname can be changed.';
 	String get language => 'Language';
 	String get aboutApp => 'About app';
-	String aboutAppText({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Version ${version} Build ${buildNumber}\n\nDeveloped by dan63047\nFormulas provided by kerrmunism\nHistory provided by p1nkl0bst3r';
+	String aboutAppText({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Version ${version} Build ${buildNumber}\n\nDeveloped by dan63047\nFormulas provided by kerrmunism\nHistory provided by p1nkl0bst3r\nTETR.IO replay grabber API by szy';
 	String stateViewTitle({required Object nickname, required Object date}) => '${nickname} account on ${date}';
 	String statesViewTitle({required Object number, required Object nickname}) => '${number} states of ${nickname} account';
 	String matchesViewTitle({required Object nickname}) => '${nickname} TL matches';
@@ -237,9 +236,15 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String trackedPlayersEntry({required Object nickname, required Object numberOfStates}) => '${nickname}: ${numberOfStates} states';
 	String trackedPlayersDescription({required Object firstStateDate, required Object lastStateDate}) => 'From ${firstStateDate} until ${lastStateDate}';
 	String trackedPlayersStatesDeleted({required Object nickname}) => '${nickname} states was removed from database!';
+	String get duplicatedFix => 'Remove duplicated TL mathces';
+	String get compressDB => 'Compress DB';
+	String SpaceSaved({required Object size}) => 'Space saved: ${size}';
 	String averageXrank({required Object rankLetter}) => 'Average ${rankLetter} rank';
 	String get vs => 'vs';
 	String get inTLmatch => 'in TL match';
+	String get downloadReplay => 'Download .ttrm replay';
+	String get openReplay => 'Open replay in TETR.IO';
+	String replaySaved({required Object path}) => 'Replay saved to ${path}';
 	String get match => 'Match';
 	String roundNumber({required Object n}) => 'Round ${n}';
 	String get statsFor => 'Stats for';
@@ -693,6 +698,9 @@ class _StringsErrorsEn {
 	String get p1nkl0bst3rTooManyRequests => 'Too many requests to third party API. Try again later';
 	String get p1nkl0bst3rinternal => 'Something happend on the p1nkl0bst3r side';
 	String get p1nkl0bst3rinternalWebVersion => 'Something happend on the p1nkl0bst3r side (or on oskware_bridge, idk honestly)';
+	String get replayAlreadySaved => 'Replay already saved';
+	String get replayExpired => 'Replay expired and not available anymore';
+	String get replayRejected => 'Third party API blocked your IP address.\nChange IP address or reach out to szy';
 }
 
 // Path: <root>
@@ -766,10 +774,9 @@ class _StringsRu implements _StringsEn {
 	@override String get notSupporter => 'Нет саппортерки';
 	@override String supporter({required Object tier}) => 'Саппортерка ${tier} уровня';
 	@override String get assignedManualy => 'Этот значок был присвоен вручную администрацией TETR.IO';
-	@override String comparingWith({required Object date}) => 'Сравнивая с данными от ${date}';
+	@override String comparingWith({required Object newDate, required Object oldDate}) => 'Данные от ${newDate} в сравнении с данными от ${oldDate}';
 	@override String get top => 'Топ';
 	@override String get topRank => 'Топ Ранг';
-	@override String get decaying => 'Загнивает';
 	@override String gamesUntilRanked({required Object left}) => '${left} матчей до получения рейтинга';
 	@override String get nerdStats => 'Для задротов';
 	@override String get playersYouTrack => 'Отслеживаемые игроки';
@@ -792,7 +799,7 @@ class _StringsRu implements _StringsEn {
 	@override String get yourIDText => 'Каждый раз, когда приложение запускается, приложение будет получать статистику этого игрока. Пожалуйста, отдайте предпочтение ID, так как никнейм можно изменить.';
 	@override String get language => 'Язык (Language)';
 	@override String get aboutApp => 'О приложении';
-	@override String aboutAppText({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Версия ${version} Сборка ${buildNumber}\n\nРазработал dan63047\nФормулы предоставил kerrmunism\nИсторию предоставляет p1nkl0bst3r';
+	@override String aboutAppText({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Версия ${version} Сборка ${buildNumber}\n\nРазработал dan63047\nФормулы предоставил kerrmunism\nИсторию предоставляет p1nkl0bst3r\nВозможность скачивать повторы из TETR.IO предоставляет szy';
 	@override String stateViewTitle({required Object nickname, required Object date}) => 'Аккаунт ${nickname} ${date}';
 	@override String statesViewTitle({required Object number, required Object nickname}) => '${number} состояний аккаунта ${nickname}';
 	@override String matchesViewTitle({required Object nickname}) => 'Матчи аккаунта ${nickname}';
@@ -807,9 +814,15 @@ class _StringsRu implements _StringsEn {
 	@override String trackedPlayersEntry({required Object nickname, required Object numberOfStates}) => '${nickname}: ${numberOfStates} состояний';
 	@override String trackedPlayersDescription({required Object firstStateDate, required Object lastStateDate}) => 'Начиная с ${firstStateDate} и заканчивая ${lastStateDate}';
 	@override String trackedPlayersStatesDeleted({required Object nickname}) => 'Состояния аккаунта ${nickname} были удалены из локальной базы данных!';
+	@override String get duplicatedFix => 'Удалить дубликаты матчей в Тетра Лиге';
+	@override String get compressDB => 'Сжать базу данных';
+	@override String SpaceSaved({required Object size}) => 'Места освобождено: ${size}';
 	@override String averageXrank({required Object rankLetter}) => 'Средний ${rankLetter} ранг';
 	@override String get vs => 'против';
 	@override String get inTLmatch => 'в матче ТЛ';
+	@override String get downloadReplay => 'Скачать .ttrm повтор';
+	@override String get openReplay => 'Открыть повтор в TETR.IO';
+	@override String replaySaved({required Object path}) => 'Повтор сохранён по пути ${path}';
 	@override String get match => 'Матч';
 	@override String roundNumber({required Object n}) => 'Раунд ${n}';
 	@override String get statsFor => 'Статистика за';
@@ -1263,6 +1276,9 @@ class _StringsErrorsRu implements _StringsErrorsEn {
 	@override String get p1nkl0bst3rTooManyRequests => 'Слишком много запросов к стороннему API. Попробуйте позже';
 	@override String get p1nkl0bst3rinternal => 'Что-то случилось на стороне p1nkl0bst3r-а';
 	@override String get p1nkl0bst3rinternalWebVersion => 'Что-то случилось на стороне p1nkl0bst3r-а (или на стороне oskware_bridge, я хз если честно)';
+	@override String get replayAlreadySaved => 'Повтор уже сохранён';
+	@override String get replayExpired => 'Повтор истёк и больше недоступен';
+	@override String get replayRejected => 'Стороннее API заблокировало ваш IP адрес.\nСмените IP адрес или свяжитесь с szy';
 }
 
 /// Flat map(s) containing all translations.
@@ -1327,10 +1343,9 @@ extension on _StringsEn {
 			case 'notSupporter': return 'Not a supporter';
 			case 'assignedManualy': return 'That badge was assigned manualy by TETR.IO admins';
 			case 'supporter': return ({required Object tier}) => 'Supporter tier ${tier}';
-			case 'comparingWith': return ({required Object date}) => 'Comparing with data from ${date}';
+			case 'comparingWith': return ({required Object newDate, required Object oldDate}) => 'Data from ${newDate} comparing with ${oldDate}';
 			case 'top': return 'Top';
 			case 'topRank': return 'Top Rank';
-			case 'decaying': return 'Decaying';
 			case 'gamesUntilRanked': return ({required Object left}) => '${left} games until being ranked';
 			case 'nerdStats': return 'Nerd Stats';
 			case 'playersYouTrack': return 'Players you track';
@@ -1353,7 +1368,7 @@ extension on _StringsEn {
 			case 'yourIDText': return 'Every time when app loads, stats of that player will be fetched. Please prefer ID over nickname because nickname can be changed.';
 			case 'language': return 'Language';
 			case 'aboutApp': return 'About app';
-			case 'aboutAppText': return ({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Version ${version} Build ${buildNumber}\n\nDeveloped by dan63047\nFormulas provided by kerrmunism\nHistory provided by p1nkl0bst3r';
+			case 'aboutAppText': return ({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Version ${version} Build ${buildNumber}\n\nDeveloped by dan63047\nFormulas provided by kerrmunism\nHistory provided by p1nkl0bst3r\nTETR.IO replay grabber API by szy';
 			case 'stateViewTitle': return ({required Object nickname, required Object date}) => '${nickname} account on ${date}';
 			case 'statesViewTitle': return ({required Object number, required Object nickname}) => '${number} states of ${nickname} account';
 			case 'matchesViewTitle': return ({required Object nickname}) => '${nickname} TL matches';
@@ -1368,9 +1383,15 @@ extension on _StringsEn {
 			case 'trackedPlayersEntry': return ({required Object nickname, required Object numberOfStates}) => '${nickname}: ${numberOfStates} states';
 			case 'trackedPlayersDescription': return ({required Object firstStateDate, required Object lastStateDate}) => 'From ${firstStateDate} until ${lastStateDate}';
 			case 'trackedPlayersStatesDeleted': return ({required Object nickname}) => '${nickname} states was removed from database!';
+			case 'duplicatedFix': return 'Remove duplicated TL mathces';
+			case 'compressDB': return 'Compress DB';
+			case 'SpaceSaved': return ({required Object size}) => 'Space saved: ${size}';
 			case 'averageXrank': return ({required Object rankLetter}) => 'Average ${rankLetter} rank';
 			case 'vs': return 'vs';
 			case 'inTLmatch': return 'in TL match';
+			case 'downloadReplay': return 'Download .ttrm replay';
+			case 'openReplay': return 'Open replay in TETR.IO';
+			case 'replaySaved': return ({required Object path}) => 'Replay saved to ${path}';
 			case 'match': return 'Match';
 			case 'roundNumber': return ({required Object n}) => 'Round ${n}';
 			case 'statsFor': return 'Stats for';
@@ -1499,6 +1520,9 @@ extension on _StringsEn {
 			case 'errors.p1nkl0bst3rTooManyRequests': return 'Too many requests to third party API. Try again later';
 			case 'errors.p1nkl0bst3rinternal': return 'Something happend on the p1nkl0bst3r side';
 			case 'errors.p1nkl0bst3rinternalWebVersion': return 'Something happend on the p1nkl0bst3r side (or on oskware_bridge, idk honestly)';
+			case 'errors.replayAlreadySaved': return 'Replay already saved';
+			case 'errors.replayExpired': return 'Replay expired and not available anymore';
+			case 'errors.replayRejected': return 'Third party API blocked your IP address.\nChange IP address or reach out to szy';
 			case 'countries.': return 'Not selected';
 			case 'countries.AF': return 'Afghanistan';
 			case 'countries.AX': return 'Åland Islands';
@@ -1822,10 +1846,9 @@ extension on _StringsRu {
 			case 'notSupporter': return 'Нет саппортерки';
 			case 'supporter': return ({required Object tier}) => 'Саппортерка ${tier} уровня';
 			case 'assignedManualy': return 'Этот значок был присвоен вручную администрацией TETR.IO';
-			case 'comparingWith': return ({required Object date}) => 'Сравнивая с данными от ${date}';
+			case 'comparingWith': return ({required Object newDate, required Object oldDate}) => 'Данные от ${newDate} в сравнении с данными от ${oldDate}';
 			case 'top': return 'Топ';
 			case 'topRank': return 'Топ Ранг';
-			case 'decaying': return 'Загнивает';
 			case 'gamesUntilRanked': return ({required Object left}) => '${left} матчей до получения рейтинга';
 			case 'nerdStats': return 'Для задротов';
 			case 'playersYouTrack': return 'Отслеживаемые игроки';
@@ -1848,7 +1871,7 @@ extension on _StringsRu {
 			case 'yourIDText': return 'Каждый раз, когда приложение запускается, приложение будет получать статистику этого игрока. Пожалуйста, отдайте предпочтение ID, так как никнейм можно изменить.';
 			case 'language': return 'Язык (Language)';
 			case 'aboutApp': return 'О приложении';
-			case 'aboutAppText': return ({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Версия ${version} Сборка ${buildNumber}\n\nРазработал dan63047\nФормулы предоставил kerrmunism\nИсторию предоставляет p1nkl0bst3r';
+			case 'aboutAppText': return ({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Версия ${version} Сборка ${buildNumber}\n\nРазработал dan63047\nФормулы предоставил kerrmunism\nИсторию предоставляет p1nkl0bst3r\nВозможность скачивать повторы из TETR.IO предоставляет szy';
 			case 'stateViewTitle': return ({required Object nickname, required Object date}) => 'Аккаунт ${nickname} ${date}';
 			case 'statesViewTitle': return ({required Object number, required Object nickname}) => '${number} состояний аккаунта ${nickname}';
 			case 'matchesViewTitle': return ({required Object nickname}) => 'Матчи аккаунта ${nickname}';
@@ -1863,9 +1886,15 @@ extension on _StringsRu {
 			case 'trackedPlayersEntry': return ({required Object nickname, required Object numberOfStates}) => '${nickname}: ${numberOfStates} состояний';
 			case 'trackedPlayersDescription': return ({required Object firstStateDate, required Object lastStateDate}) => 'Начиная с ${firstStateDate} и заканчивая ${lastStateDate}';
 			case 'trackedPlayersStatesDeleted': return ({required Object nickname}) => 'Состояния аккаунта ${nickname} были удалены из локальной базы данных!';
+			case 'duplicatedFix': return 'Удалить дубликаты матчей в Тетра Лиге';
+			case 'compressDB': return 'Сжать базу данных';
+			case 'SpaceSaved': return ({required Object size}) => 'Места освобождено: ${size}';
 			case 'averageXrank': return ({required Object rankLetter}) => 'Средний ${rankLetter} ранг';
 			case 'vs': return 'против';
 			case 'inTLmatch': return 'в матче ТЛ';
+			case 'downloadReplay': return 'Скачать .ttrm повтор';
+			case 'openReplay': return 'Открыть повтор в TETR.IO';
+			case 'replaySaved': return ({required Object path}) => 'Повтор сохранён по пути ${path}';
 			case 'match': return 'Матч';
 			case 'roundNumber': return ({required Object n}) => 'Раунд ${n}';
 			case 'statsFor': return 'Статистика за';
@@ -1994,6 +2023,9 @@ extension on _StringsRu {
 			case 'errors.p1nkl0bst3rTooManyRequests': return 'Слишком много запросов к стороннему API. Попробуйте позже';
 			case 'errors.p1nkl0bst3rinternal': return 'Что-то случилось на стороне p1nkl0bst3r-а';
 			case 'errors.p1nkl0bst3rinternalWebVersion': return 'Что-то случилось на стороне p1nkl0bst3r-а (или на стороне oskware_bridge, я хз если честно)';
+			case 'errors.replayAlreadySaved': return 'Повтор уже сохранён';
+			case 'errors.replayExpired': return 'Повтор истёк и больше недоступен';
+			case 'errors.replayRejected': return 'Стороннее API заблокировало ваш IP адрес.\nСмените IP адрес или свяжитесь с szy';
 			case 'countries.': return 'Не выбрана';
 			case 'countries.AF': return 'Афганистан';
 			case 'countries.AX': return 'Аландские острова';

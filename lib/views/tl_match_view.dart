@@ -63,13 +63,13 @@ class TlMatchResultState extends State<TlMatchResultView> {
           PopupMenuButton(
             enabled: widget.record.replayAvalable,
             itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 1,
-                child: Text("Download le replay"),
+                child: Text(t.downloadReplay),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 2,
-                child: Text("Open le replay in TETR.IO"),
+                child: Text(t.openReplay),
               ),
             ],
             onSelected: (value) async {
@@ -86,13 +86,13 @@ class TlMatchResultState extends State<TlMatchResultView> {
                   } else{
                     try{
                       String path = await teto.szyDownloadAndSaveReplay(widget.record.replayId);
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Replay saved to $path")));
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.replaySaved(path: path))));
                     } on TetrioReplayAlreadyExist{
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Replay already saved")));
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.replayAlreadySaved)));
                     } on SzyNotFound {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Replay expired (i think)")));
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.replayExpired)));
                     } on SzyForbidden {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Request has been rejected")));
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.replayRejected)));
                     } on SzyTooManyRequests {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.tooManyRequests)));
                     }

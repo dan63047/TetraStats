@@ -113,9 +113,11 @@ class CustomizationState extends State<CustomizationView> {
               }),
           ListTile(
             title: Text("Font"),
+            subtitle: Text("Not implemented"),
           ),
           ListTile(
             title: Text("Stats Table in TL mathes list"),
+            subtitle: Text("Not implemented"),
           ),
         ],
       )),

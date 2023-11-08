@@ -801,8 +801,8 @@ class EndContextMulti {
       required this.success});
 
   EndContextMulti.fromJson(Map<String, dynamic> json) {
-    userId = json['user']['_id'];
-    username = json['user']['username'];
+    userId = json['id'] ?? json['user']['_id'];
+    username = json['username'] ?? json['user']['username'];
     handling = Handling.fromJson(json['handling']);
     success = json['success'];
     inputs = json['inputs'];

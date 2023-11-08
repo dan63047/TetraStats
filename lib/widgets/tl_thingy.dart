@@ -47,7 +47,6 @@ class _TLThingyState extends State<TLThingy> {
   final t = Translations.of(context);
     return LayoutBuilder(builder: (context, constraints) {
     bool bigScreen = constraints.maxWidth > 768;
-      print(_currentRangeValues);
       return ListView.builder(
         physics: const ClampingScrollPhysics(),
         itemCount: 1,
@@ -56,7 +55,8 @@ class _TLThingyState extends State<TLThingy> {
             children: (currentTl.gamesPlayed > 0)
                 ? [
                     if (widget.showTitle) Text(t.tetraLeague, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                    if (oldTl != null) Text(t.comparingWith(date: dateFormat.format(oldTl!.timestamp))),
+                    if (oldTl != null) Text(t.comparingWith(newDate: dateFormat.format(currentTl.timestamp), oldDate: dateFormat.format(oldTl!.timestamp)),
+                    textAlign: TextAlign.center,),
                     if (oldTl != null) RangeSlider(values: _currentRangeValues, max: widget.states.length.toDouble(),
                     labels: RangeLabels(
                         _currentRangeValues.start.round().toString(),

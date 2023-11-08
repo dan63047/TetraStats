@@ -48,11 +48,11 @@ class TrackedPlayersState extends State<TrackedPlayersView> {
             itemBuilder: (BuildContext context) => <PopupMenuEntry>[
               PopupMenuItem(
                 value: 1,
-                child: Text("Remove duplicated TL mathces"),
+                child: Text(t.duplicatedFix),
               ),
               PopupMenuItem(
                 value: 2,
-                child: Text("Compress DB"),
+                child: Text(t.compressDB),
               ),
             ],
             onSelected: (value) {
@@ -61,7 +61,7 @@ class TrackedPlayersState extends State<TrackedPlayersView> {
                   teto.removeDuplicatesFromTLMatches();
                   break;
                 case 2:
-                  teto.compressDB().then((value) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Space saved: ${bytesToSize(value)}"))));
+                  teto.compressDB().then((value) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.SpaceSaved(size: bytesToSize(value))))));
                   break;
                 default:
               }
