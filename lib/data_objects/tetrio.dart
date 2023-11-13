@@ -1761,9 +1761,9 @@ class TetrioPlayerFromLeaderboard {
     rd = json['league']['rd'].toDouble();
     rank = json['league']['rank'];
     bestRank = json['league']['bestrank'];
-    apm = json['league']['apm'].toDouble();
-    pps = json['league']['pps'].toDouble();
-    vs = json['league']['vs'].toDouble();
+    apm = json['league']['apm'] != null ? json['league']['apm'].toDouble() : 0.00;
+    pps = json['league']['apm'] != null ? json['league']['pps'].toDouble() : 0.00;
+    vs = json['league']['apm'] != null ? json['league']['vs'].toDouble(): 0.00;
     decaying = json['league']['decaying'];
     nerdStats =  NerdStats(apm, pps, vs);
     estTr = EstTr(apm, pps, vs, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
