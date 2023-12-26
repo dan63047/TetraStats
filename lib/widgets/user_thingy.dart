@@ -397,11 +397,11 @@ class UserThingy extends StatelessWidget {
                     tooltip: badge.label,
                     icon: Image.asset(
                       "res/tetrio_badges/${badge.badgeId}.png",
-                      height: 64,
-                      width: 64,
+                      height: 32,
+                      width: 32,
                       errorBuilder: (context, error, stackTrace) {
                         developer.log("Error with building $badge", name: "main_view", error: error, stackTrace: stackTrace);
-                        return Image.asset("res/icons/kagari.png", height: 64, width: 64);
+                        return Image.asset("res/icons/kagari.png", height: 32, width: 32);
                       },
                     ))
             ],

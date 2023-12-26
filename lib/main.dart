@@ -14,6 +14,7 @@ import 'package:tetra_stats/views/main_view.dart';
 import 'package:tetra_stats/views/settings_view.dart';
 import 'package:tetra_stats/views/tracked_players_view.dart';
 import 'package:tetra_stats/views/calc_view.dart';
+import 'package:go_router/go_router.dart';
 
 late final PackageInfo packageInfo;
 late SharedPreferences prefs;
@@ -22,6 +23,33 @@ ColorScheme sheme = ColorScheme.dark(primary: Colors.cyanAccent, secondary: Colo
 void setAccentColor(Color color){
     sheme = ColorScheme.dark(primary: color, secondary: Colors.white);
 }
+
+final router = GoRouter(
+  routes: [
+    GoRoute(
+      path: "/",
+      builder: (_, __) => const MainView(),
+      routes: [
+         GoRoute(
+          path: 'settings',
+          builder: (_, __) => const SettingsView(),
+        ),
+        GoRoute(
+          path: 'states',
+          builder: (_, __) => const TrackedPlayersView(),
+        ),
+        GoRoute(
+          path: 'calc',
+          builder: (_, __) => const CalcView(),
+        ),
+        GoRoute(
+          path: 'customization',
+          builder: (_, __) => const CustomizationView(),
+        ),
+      ]
+    )
+  ],
+);
 
 void main() async {
   if (kIsWeb) {
@@ -56,16 +84,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
         title: "Tetra Stats", 
-        home: const MainView(),
+        routerConfig: router,
         scrollBehavior: const MaterialScrollBehavior().copyWith(
         dragDevices: {PointerDeviceKind.mouse, PointerDeviceKind.touch, PointerDeviceKind.stylus, PointerDeviceKind.unknown},
         ),
         locale: TranslationProvider.of(context).flutterLocale,
         supportedLocales: AppLocaleUtils.supportedLocales,
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
-        routes: {"/settings": (context) => const SettingsView(), "/states": (context) => const TrackedPlayersView(), "/calc": (context) => const CalcView(), "/customization": (context) => const CustomizationView()},
         theme: ThemeData(
             fontFamily: 'Eurostile Round',
             colorScheme: sheme,

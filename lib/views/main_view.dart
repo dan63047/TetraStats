@@ -21,6 +21,7 @@ import 'package:tetra_stats/widgets/tl_thingy.dart';
 import 'package:tetra_stats/widgets/user_thingy.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:go_router/go_router.dart';
 
 Future<List> me = Future.delayed(const Duration(seconds: 60), () => [null, null, null, null, null, null]);
 String _searchFor = "6098518e3d5155e6ec429cdc";
@@ -264,7 +265,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                 child: Text(t.refresh),
               ),
               PopupMenuItem(
-                value: "test",
+                value: "history",
                 child: Text(t.fetchAndsaveTLHistory),
               ),
               PopupMenuItem(
@@ -283,9 +284,10 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
             onSelected: (value) {
               if (value == "refresh") {changePlayer(_searchFor);
               return;}
-              if (value == "test"){changePlayer(_searchFor, fetchHistory: true);
+              if (value == "history"){changePlayer(_searchFor, fetchHistory: true);
               return;}
-              Navigator.pushNamed(context, value);
+              //Navigator.pushNamed(context, value);
+              context.go(value);
             },
           ),
         ] : null,
@@ -895,7 +897,8 @@ class _OtherThingy extends StatelessWidget {
   const _OtherThingy({Key? key, required this.zen, required this.bio, required this.distinguishment, this.newsletter})
       : super(key: key);
 
-  List<InlineSpan> getDistinguishmentSetOfWidgets(String text) {
+  List<InlineSpan> getDistinguishmentSetOfWidgets(String? text) {
+    if (text == null) return [TextSpan(text: "Header is missing", style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.redAccent))];
     var exploded = text.split(" ");
     List<InlineSpan> result = [];
     for (String shit in exploded){
@@ -1079,10 +1082,10 @@ class _OtherThingy extends StatelessWidget {
                         textAlign: TextAlign.center,
                         text: TextSpan(
                           style: DefaultTextStyle.of(context).style,
-                          children: getDistinguishmentSetOfWidgets(distinguishment!.header!),
+                          children: getDistinguishmentSetOfWidgets(distinguishment!.header),
                         ),
                       ),
-                      Text(distinguishment!.footer!, style: const TextStyle(fontSize: 18), textAlign: TextAlign.center),
+                      Text(distinguishment!.footer ?? "Footer is missing" , style: const TextStyle(fontSize: 18), textAlign: TextAlign.center),
                     ],
                   ),
                 ),

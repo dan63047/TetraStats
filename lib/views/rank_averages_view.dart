@@ -194,7 +194,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                                     as double,
                                                 entry.userId,
                                                 entry.username,
-                                                color: rankColors[entry.rank])
+                                                dotPainter: FlDotCirclePainter(color: rankColors[entry.rank]??Colors.white, radius: 3))
                                         ],
                                         scatterTouchData: ScatterTouchData(
                                           touchTooltipData:
@@ -503,6 +503,7 @@ class _ListEntry extends StatelessWidget {
 class _MyScatterSpot extends ScatterSpot {
   String id;
   String nickname;
-
-  _MyScatterSpot(super.x, super.y, this.id, this.nickname, {super.color});
+  //Color color;
+  //FlDotPainter painter = FlDotCirclePainter(color: color, radius: 2);
+  _MyScatterSpot(super.x, super.y, this.id, this.nickname, {FlDotPainter? super.dotPainter});
 }
