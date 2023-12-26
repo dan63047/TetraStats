@@ -18,7 +18,7 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           channel: 'stable'
-          flutter-version: '3.10.5'
+          flutter-version: '3.16.5'
       - name: Install project dependencies
         run: flutter pub get
       - name: Build artifacts
@@ -50,7 +50,7 @@ jobs:
           java-version: '12.x'
       - uses: subosito/flutter-action@v1
         with:
-          flutter-version: '3.10.5'
+          flutter-version: '3.16.5'
       - run: flutter pub get
       # - run: flutter test                      // lmao. Tests? Who needs it?
       - run: flutter build apk --split-per-abi

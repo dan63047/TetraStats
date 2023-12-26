@@ -25,6 +25,7 @@ void setAccentColor(Color color){
 }
 
 final router = GoRouter(
+  //initialLocation: "/",
   routes: [
     GoRoute(
       path: "/",
@@ -47,6 +48,10 @@ final router = GoRouter(
           builder: (_, __) => const CustomizationView(),
         ),
       ]
+    ),
+    GoRoute(
+      path: "/u/:userId",
+      builder: (_, __) => MainView(player: __.pathParameters['userId'])
     )
   ],
 );
