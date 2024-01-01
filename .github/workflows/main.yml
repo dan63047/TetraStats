@@ -46,13 +46,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: subosito/flutter-action@v1
+      - uses: ashutoshvarma/setup-ninja@master
         with:
           channel: 'stable'
           flutter-version: '3.16.5'
       - name: Install project dependencies
         run: flutter pub get
-      - name: Setup Ninja
-        uses: ashutoshvarma/setup-ninja@master
       - name: Build artifacts
         env:
           CMAKE_MAKE_PROGRAM: Ninja
