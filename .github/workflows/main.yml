@@ -51,8 +51,8 @@ jobs:
           flutter-version: '3.16.5'
       - name: Install project dependencies
         run: flutter pub get
-      - name: Install Ninja
-        run: sudo apt-get --assume-yes install ninja
+      - name: Setup Ninja
+        uses: ashutoshvarma/setup-ninja@master
       - name: Build artifacts
         env:
           CMAKE_MAKE_PROGRAM: Ninja
