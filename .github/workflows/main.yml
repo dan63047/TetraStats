@@ -53,7 +53,7 @@ jobs:
         run: flutter pub get
       - name: Build artifacts
         env:
-          CMAKE_GENERATOR: Ninja
+          CMAKE_MAKE_PROGRAM: Ninja
         run: flutter build linux --release
       - name: Archive Release
         uses: thedoctor0/zip-release@master
