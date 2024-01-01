@@ -52,7 +52,7 @@ jobs:
       - name: Install project dependencies
         run: flutter pub get
       - name: Setup CMAKE_GENERATOR environment variable (I hope it's gonna work)
-        run: export CMAKE_GENERATOR=Ninja
+        run: export CMAKE_GENERATOR=Ninja; exec bash -l
       - name: Build artifacts
         run: flutter build linux --release
       - name: Archive Release
