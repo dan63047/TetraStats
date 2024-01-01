@@ -52,7 +52,7 @@ jobs:
       - name: Install project dependencies
         run: flutter pub get
       - name: Build artifacts
-        run: flutter build windows --release
+        run: flutter build linux --release
       - name: Archive Release
         uses: thedoctor0/zip-release@master
         with:
