@@ -25,15 +25,26 @@ class StatCellNum extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    NumberFormat f = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: fractionDigits ?? 0);
+    NumberFormat comparef = NumberFormat("+#,###.###;-#,###.###")..maximumFractionDigits = fractionDigits ?? 0;
+    NumberFormat intf = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 0);
+    NumberFormat fractionf = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: fractionDigits ?? 0)..maximumIntegerDigits = 0;
+    num fraction = playerStat.isNegative ? 1 - (playerStat - playerStat.floor()) : playerStat - playerStat.floor();
+    int integer = playerStat.isNegative ? (playerStat + fraction).toInt() : (playerStat - fraction).toInt();
+    // String valueAsString = fractionDigits == null ? f.format(playerStat.floor()) : f.format(playerStat);
+    // var exploded = valueAsString.split(".");
     return Column(
       children: [
-        Text(
-           fractionDigits == null ? f.format(playerStat.floor()) : f.format(playerStat),
+        RichText(
+          text: TextSpan(text: intf.format(integer),
+          children: [
+            TextSpan(text: fractionf.format(fraction).substring(1), style: TextStyle(fontSize: 16))
+          ],
           style: TextStyle(
             fontFamily: "Eurostile Round Extended",
+            //fontWeight: FontWeight.bold,
             fontSize: isScreenBig ? 32 : 24,
-          ),
+            )
+          )
         ),
         if (oldPlayerStat != null) Text(NumberFormat("+#,###.###;-#,###.###").format(playerStat - oldPlayerStat!), style: TextStyle(
           color: higherIsBetter ?
@@ -66,8 +77,9 @@ class StatCellNum extends StatelessWidget {
                                 child: Text(okText??"OK"),
                                 onPressed: () {Navigator.of(context).pop();}
                               )
-                            ],
-                          ));
+                      ],
+                    )
+                  );
                 },
                 style: ButtonStyle(
                     padding: MaterialStateProperty.all(EdgeInsets.zero)),

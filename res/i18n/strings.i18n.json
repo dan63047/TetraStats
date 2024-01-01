@@ -68,6 +68,7 @@
     "formula": "Formula",
     "exactValue": "Exact value",
     "neverPlayedTL": "That user never played Tetra League",
+    "botTL": "Bots are not allowed to play Tetra League",
     "exportDB": "Export local database",
     "exportDBDescription": "It contains states and Tetra League records of the tracked players and list of tracked players.",
     "desktopExportAlertTitle": "Desktop export",

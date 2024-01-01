@@ -20,8 +20,9 @@ class TLThingy extends StatefulWidget {
   final String userID;
   final List<TetrioPlayer> states;
   final bool showTitle;
+  final bool bot;
   final double? topTR;
-  const TLThingy({Key? key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.topTR}) : super(key: key);
+  const TLThingy({Key? key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.bot=false, this.topTR}) : super(key: key);
 
   @override
   State<TLThingy> createState() => _TLThingyState();
@@ -408,7 +409,7 @@ class _TLThingyState extends State<TLThingy> {
                     if (currentTl.nerdStats != null) Graphs(currentTl.apm!, currentTl.pps!, currentTl.vs!, currentTl.nerdStats!, currentTl.playstyle!)
                   ]
                 : [
-                    Text(t.neverPlayedTL, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)),
+                    Text(widget.bot ? t.botTL : t.neverPlayedTL, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
                   ],
           );
         },

@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 986 (493 per locale)
+/// Strings: 988 (494 per locale)
 ///
-/// Built on 2023-11-08 at 22:09 UTC
+/// Built on 2024-01-01 at 16:00 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -24,8 +24,8 @@ const AppLocale _baseLocale = AppLocale.en;
 /// - LocaleSettings.setLocale(AppLocale.en) // set locale
 /// - Locale locale = AppLocale.en.flutterLocale // get flutter locale from enum
 /// - if (LocaleSettings.currentLocale == AppLocale.en) // locale check
-enum AppLocale with BaseAppLocale<AppLocale, _StringsEn> {
-	en(languageCode: 'en', build: _StringsEn.build),
+enum AppLocale with BaseAppLocale<AppLocale, Translations> {
+	en(languageCode: 'en', build: Translations.build),
 	ru(languageCode: 'ru', build: _StringsRu.build);
 
 	const AppLocale({required this.languageCode, this.scriptCode, this.countryCode, required this.build}); // ignore: unused_element
@@ -33,10 +33,10 @@ enum AppLocale with BaseAppLocale<AppLocale, _StringsEn> {
 	@override final String languageCode;
 	@override final String? scriptCode;
 	@override final String? countryCode;
-	@override final TranslationBuilder<AppLocale, _StringsEn> build;
+	@override final TranslationBuilder<AppLocale, Translations> build;
 
 	/// Gets current instance managed by [LocaleSettings].
-	_StringsEn get translations => LocaleSettings.instance.translationMap[this]!;
+	Translations get translations => LocaleSettings.instance.translationMap[this]!;
 }
 
 /// Method A: Simple
@@ -48,7 +48,7 @@ enum AppLocale with BaseAppLocale<AppLocale, _StringsEn> {
 /// Usage:
 /// String a = t.someKey.anotherKey;
 /// String b = t['someKey.anotherKey']; // Only for edge cases!
-_StringsEn get t => LocaleSettings.instance.currentTranslations;
+Translations get t => LocaleSettings.instance.currentTranslations;
 
 /// Method B: Advanced
 ///
@@ -65,17 +65,10 @@ _StringsEn get t => LocaleSettings.instance.currentTranslations;
 /// final t = Translations.of(context); // Get t variable.
 /// String a = t.someKey.anotherKey; // Use t variable.
 /// String b = t['someKey.anotherKey']; // Only for edge cases!
-class Translations {
-	Translations._(); // no constructor
-
-	static _StringsEn of(BuildContext context) => InheritedLocaleData.of<AppLocale, _StringsEn>(context).translations;
-}
-
-/// The provider for method B
-class TranslationProvider extends BaseTranslationProvider<AppLocale, _StringsEn> {
+class TranslationProvider extends BaseTranslationProvider<AppLocale, Translations> {
 	TranslationProvider({required super.child}) : super(settings: LocaleSettings.instance);
 
-	static InheritedLocaleData<AppLocale, _StringsEn> of(BuildContext context) => InheritedLocaleData.of<AppLocale, _StringsEn>(context);
+	static InheritedLocaleData<AppLocale, Translations> of(BuildContext context) => InheritedLocaleData.of<AppLocale, Translations>(context);
 }
 
 /// Method B shorthand via [BuildContext] extension method.
@@ -84,11 +77,11 @@ class TranslationProvider extends BaseTranslationProvider<AppLocale, _StringsEn>
 /// Usage (e.g. in a widget's build method):
 /// context.t.someKey.anotherKey
 extension BuildContextTranslationsExtension on BuildContext {
-	_StringsEn get t => TranslationProvider.of(this).translations;
+	Translations get t => TranslationProvider.of(this).translations;
 }
 
 /// Manages all translation instances and the current locale
-class LocaleSettings extends BaseFlutterLocaleSettings<AppLocale, _StringsEn> {
+class LocaleSettings extends BaseFlutterLocaleSettings<AppLocale, Translations> {
 	LocaleSettings._() : super(utils: AppLocaleUtils.instance);
 
 	static final instance = LocaleSettings._();
@@ -110,7 +103,7 @@ class LocaleSettings extends BaseFlutterLocaleSettings<AppLocale, _StringsEn> {
 }
 
 /// Provides utility functions without any side effects.
-class AppLocaleUtils extends BaseAppLocaleUtils<AppLocale, _StringsEn> {
+class AppLocaleUtils extends BaseAppLocaleUtils<AppLocale, Translations> {
 	AppLocaleUtils._() : super(baseLocale: _baseLocale, locales: AppLocale.values);
 
 	static final instance = AppLocaleUtils._();
@@ -126,11 +119,16 @@ class AppLocaleUtils extends BaseAppLocaleUtils<AppLocale, _StringsEn> {
 // translations
 
 // Path: <root>
-class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
+class Translations implements BaseTranslations<AppLocale, Translations> {
+	/// Returns the current translations of the given [context].
+	///
+	/// Usage:
+	/// final t = Translations.of(context);
+	static Translations of(BuildContext context) => InheritedLocaleData.of<AppLocale, Translations>(context).translations;
 
 	/// You can call this constructor and build your own translation instance of this locale.
 	/// Constructing via the enum [AppLocale.build] is preferred.
-	_StringsEn.build({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver})
+	Translations.build({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver})
 		: assert(overrides == null, 'Set "translation_overrides: true" in order to enable this feature.'),
 		  $meta = TranslationMetadata(
 		    locale: AppLocale.en,
@@ -142,12 +140,12 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	}
 
 	/// Metadata for the translations of <en>.
-	@override final TranslationMetadata<AppLocale, _StringsEn> $meta;
+	@override final TranslationMetadata<AppLocale, Translations> $meta;
 
 	/// Access flat map
 	dynamic operator[](String key) => $meta.getTranslation(key);
 
-	late final _StringsEn _root = this; // ignore: unused_field
+	late final Translations _root = this; // ignore: unused_field
 
 	// Translations
 	Map<String, String> get locales => {
@@ -205,6 +203,7 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get formula => 'Formula';
 	String get exactValue => 'Exact value';
 	String get neverPlayedTL => 'That user never played Tetra League';
+	String get botTL => 'Bots are not allowed to play Tetra League';
 	String get exportDB => 'Export local database';
 	String get exportDBDescription => 'It contains states and Tetra League records of the tracked players and list of tracked players.';
 	String get desktopExportAlertTitle => 'Desktop export';
@@ -573,7 +572,7 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 class _StringsNewsPartsEn {
 	_StringsNewsPartsEn._(this._root);
 
-	final _StringsEn _root; // ignore: unused_field
+	final Translations _root; // ignore: unused_field
 
 	// Translations
 	String get leaderboardStart => 'Got ';
@@ -595,7 +594,7 @@ class _StringsNewsPartsEn {
 class _StringsStatCellNumEn {
 	_StringsStatCellNumEn._(this._root);
 
-	final _StringsEn _root; // ignore: unused_field
+	final Translations _root; // ignore: unused_field
 
 	// Translations
 	String get xpLevel => 'XP Level';
@@ -657,7 +656,7 @@ class _StringsStatCellNumEn {
 class _StringsNumOfGameActionsEn {
 	_StringsNumOfGameActionsEn._(this._root);
 
-	final _StringsEn _root; // ignore: unused_field
+	final Translations _root; // ignore: unused_field
 
 	// Translations
 	String get pc => 'All Clears';
@@ -670,7 +669,7 @@ class _StringsNumOfGameActionsEn {
 class _StringsPopupActionsEn {
 	_StringsPopupActionsEn._(this._root);
 
-	final _StringsEn _root; // ignore: unused_field
+	final Translations _root; // ignore: unused_field
 
 	// Translations
 	String get cancel => 'Cancel';
@@ -682,7 +681,7 @@ class _StringsPopupActionsEn {
 class _StringsErrorsEn {
 	_StringsErrorsEn._(this._root);
 
-	final _StringsEn _root; // ignore: unused_field
+	final Translations _root; // ignore: unused_field
 
 	// Translations
 	String connection({required Object code, required Object message}) => 'Some issue with connection: ${code} ${message}';
@@ -704,8 +703,7 @@ class _StringsErrorsEn {
 }
 
 // Path: <root>
-class _StringsRu implements _StringsEn {
-
+class _StringsRu implements Translations {
 	/// You can call this constructor and build your own translation instance of this locale.
 	/// Constructing via the enum [AppLocale.build] is preferred.
 	_StringsRu.build({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver})
@@ -720,7 +718,7 @@ class _StringsRu implements _StringsEn {
 	}
 
 	/// Metadata for the translations of <ru>.
-	@override final TranslationMetadata<AppLocale, _StringsEn> $meta;
+	@override final TranslationMetadata<AppLocale, Translations> $meta;
 
 	/// Access flat map
 	@override dynamic operator[](String key) => $meta.getTranslation(key);
@@ -783,6 +781,7 @@ class _StringsRu implements _StringsEn {
 	@override String get formula => 'Формула';
 	@override String get exactValue => 'Точное значение';
 	@override String get neverPlayedTL => 'Этот игрок никогда не играл в Тетра Лигу';
+	@override String get botTL => 'Ботам нельзя играть в Тетра Лигу';
 	@override String get exportDB => 'Экспортировать локальную базу данных';
 	@override String get exportDBDescription => 'Она содержит состояния аккаунтов и их матчей в Тетра Лиге для отслеживаемых игроков и список таких игроков.';
 	@override String get desktopExportAlertTitle => 'Экспорт на десктопе';
@@ -1284,7 +1283,7 @@ class _StringsErrorsRu implements _StringsErrorsEn {
 /// Flat map(s) containing all translations.
 /// Only for edge cases! For simple maps, use the map function of this library.
 
-extension on _StringsEn {
+extension on Translations {
 	dynamic _flatMapFunction(String path) {
 		switch (path) {
 			case 'locales.en': return 'English';
@@ -1352,6 +1351,7 @@ extension on _StringsEn {
 			case 'formula': return 'Formula';
 			case 'exactValue': return 'Exact value';
 			case 'neverPlayedTL': return 'That user never played Tetra League';
+			case 'botTL': return 'Bots are not allowed to play Tetra League';
 			case 'exportDB': return 'Export local database';
 			case 'exportDBDescription': return 'It contains states and Tetra League records of the tracked players and list of tracked players.';
 			case 'desktopExportAlertTitle': return 'Desktop export';
@@ -1855,6 +1855,7 @@ extension on _StringsRu {
 			case 'formula': return 'Формула';
 			case 'exactValue': return 'Точное значение';
 			case 'neverPlayedTL': return 'Этот игрок никогда не играл в Тетра Лигу';
+			case 'botTL': return 'Ботам нельзя играть в Тетра Лигу';
 			case 'exportDB': return 'Экспортировать локальную базу данных';
 			case 'exportDBDescription': return 'Она содержит состояния аккаунтов и их матчей в Тетра Лиге для отслеживаемых игроков и список таких игроков.';
 			case 'desktopExportAlertTitle': return 'Экспорт на десктопе';

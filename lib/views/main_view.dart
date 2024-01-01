@@ -1,3 +1,5 @@
+// ignore_for_file: type_literal_in_constant_pattern
+
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -51,11 +53,7 @@ Future<void> copyToClipboard(String text) async {
 }
 
 String get40lTime(int microseconds){
-    if (microseconds > 60000000) {
-      return "${(microseconds/1000000/60).floor()}:${(_secs.format(microseconds /1000000 % 60))}";
-    } else{
-      return _timeInSec.format(microseconds / 1000000);
-    }                      
+  return microseconds > 60000000 ? "${(microseconds/1000000/60).floor()}:${(_secs.format(microseconds /1000000 % 60))}" : _timeInSec.format(microseconds / 1000000);
   }
 
 class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
@@ -345,7 +343,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                       body: TabBarView(
                         controller: _tabController,
                         children: [
-                          TLThingy(tl: snapshot.data![0].tlSeason1, userID: snapshot.data![0].userId, states: snapshot.data![2], topTR: snapshot.data![7]),
+                          TLThingy(tl: snapshot.data![0].tlSeason1, userID: snapshot.data![0].userId, states: snapshot.data![2], topTR: snapshot.data![7], bot: snapshot.data![0].role == "bot"),
                           _TLRecords(userID: snapshot.data![0].userId, data: snapshot.data![3]),
                           _History(states: snapshot.data![2], update: _justUpdate),
                           _RecordThingy(record: (snapshot.data![1]['sprint'].isNotEmpty) ? snapshot.data![1]['sprint'][0] : null),
@@ -565,7 +563,7 @@ class _TLRecords extends StatelessWidget {
                     ),
                   );},
             )]
-            : [Center(child: Text(t.noRecords, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))],
+            : [Center(child: Text(t.noRecords, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)))],
       );
   }
 }
@@ -591,10 +589,10 @@ class _History extends StatelessWidget{
                 }
               ),
           if(chartsData[_chartsIndex].value!.length > 1) _HistoryChartThigy(data: chartsData[_chartsIndex].value!, title: "ss", yAxisTitle: _historyShortTitles[_chartsIndex], bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? _f2 : NumberFormat.compact(),)
-          else Center(child: Text(t.notEnoughData, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))
+          else Center(child: Text(t.notEnoughData, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)))
         ],
       ),
-    ] : [Center(child: Text(t.noHistorySaved, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))]);
+    ] : [Center(child: Text(t.noHistorySaved, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)))]);
   }
 }
 
@@ -881,7 +879,7 @@ class _RecordThingy extends StatelessWidget {
                       ),
                     ]
                   : [
-                      Text(t.noRecord, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28))
+                      Text(t.noRecord, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28))
                     ],
             );
           });
@@ -897,8 +895,9 @@ class _OtherThingy extends StatelessWidget {
   const _OtherThingy({Key? key, required this.zen, required this.bio, required this.distinguishment, this.newsletter})
       : super(key: key);
 
-  List<InlineSpan> getDistinguishmentSetOfWidgets(String? text) {
-    if (text == null) return [TextSpan(text: "Header is missing", style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.redAccent))];
+  List<InlineSpan> getDistinguishmentTitle(String? text) {
+    if (distinguishment?.type == "twc") return [const TextSpan(text: "TETR.IO World Champion", style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.yellowAccent))];
+    if (text == null) return [const TextSpan(text: "Header is missing", style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.redAccent))];
     var exploded = text.split(" ");
     List<InlineSpan> result = [];
     for (String shit in exploded){
@@ -920,6 +919,12 @@ class _OtherThingy extends StatelessWidget {
       }
     }
     return result;
+  }
+
+  String getDistinguishmentSubtitle(String? text){
+    if (distinguishment?.type == "twc") return "${distinguishment?.detail} TETR.IO World Championship";
+    if (text == null) return "Footer is missing";
+    return text;
   }
 
   ListTile getNewsTile(News news){
@@ -1082,10 +1087,10 @@ class _OtherThingy extends StatelessWidget {
                         textAlign: TextAlign.center,
                         text: TextSpan(
                           style: DefaultTextStyle.of(context).style,
-                          children: getDistinguishmentSetOfWidgets(distinguishment!.header),
+                          children: getDistinguishmentTitle(distinguishment?.header),
                         ),
                       ),
-                      Text(distinguishment!.footer ?? "Footer is missing" , style: const TextStyle(fontSize: 18), textAlign: TextAlign.center),
+                      Text(getDistinguishmentSubtitle(distinguishment?.footer), style: const TextStyle(fontSize: 18), textAlign: TextAlign.center),
                     ],
                   ),
                 ),
