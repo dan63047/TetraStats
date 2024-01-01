@@ -52,7 +52,7 @@ jobs:
       - name: Install project dependencies
         run: flutter pub get
       - name: Install Ninja
-        run: sudo apt-get --assume-yes install python-software-properties
+        run: sudo apt-get --assume-yes install ninja
       - name: Build artifacts
         env:
           CMAKE_MAKE_PROGRAM: Ninja
