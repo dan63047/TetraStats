@@ -674,6 +674,7 @@ class CompareState extends State<CompareView> {
                                 100,
                             fractionDigits: 2,
                             higherIsBetter: true,
+                            postfix: "%",
                           ),
                           CompareThingy(
                             label: t.byEstTR,
@@ -691,6 +692,7 @@ class CompareState extends State<CompareView> {
                                 100,
                             fractionDigits: 2,
                             higherIsBetter: true,
+                            postfix: "%",
                           ),
                         ],
                       )
@@ -798,18 +800,20 @@ class CompareThingy extends StatelessWidget {
   final String label;
   final bool higherIsBetter;
   final int? fractionDigits;
+  final String? postfix;
   const CompareThingy(
       {super.key,
       required this.greenSide,
       required this.redSide,
       required this.label,
       required this.higherIsBetter,
-      this.fractionDigits});
+      this.fractionDigits,
+      this.postfix});
 
   String verdict(num greenSide, num redSide, int fraction) {
     var f = NumberFormat("+#,###.##;-#,###.##");
     f.maximumFractionDigits = fraction;
-    return f.format((greenSide - redSide));
+    return f.format((greenSide - redSide)) + (postfix ?? "");
   }
 
   @override
@@ -841,7 +845,7 @@ class CompareThingy extends StatelessWidget {
               ],
             )),
             child: Text(
-              f.format(greenSide),
+              f.format(greenSide) + (postfix ?? ""),
               style: const TextStyle(
                 fontSize: 22,
                 shadows: <Shadow>[
@@ -895,7 +899,7 @@ class CompareThingy extends StatelessWidget {
               ],
             )),
             child: Text(
-              f.format(redSide),
+              f.format(redSide) + (postfix ?? ""),
               style: const TextStyle(
                 fontSize: 22,
                 shadows: <Shadow>[
