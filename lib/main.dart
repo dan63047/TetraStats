@@ -25,7 +25,7 @@ void setAccentColor(Color color){
 }
 
 final router = GoRouter(
-  //initialLocation: "/",
+  initialLocation: "/",
   routes: [
     GoRoute(
       path: "/",
