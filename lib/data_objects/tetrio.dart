@@ -398,12 +398,14 @@ class Clears {
   late int doubles;
   late int triples;
   late int quads;
+  late int pentas;
   late int allClears;
   late int tSpinZeros;
   late int tSpinSingles;
   late int tSpinDoubles;
   late int tSpinTriples;
   late int tSpinQuads;
+  late int tSpinPentas;
   late int tSpinMiniZeros;
   late int tSpinMiniSingles;
   late int tSpinMiniDoubles;
@@ -413,11 +415,13 @@ class Clears {
       required this.doubles,
       required this.triples,
       required this.quads,
+      required this.pentas,
       required this.allClears,
       required this.tSpinZeros,
       required this.tSpinSingles,
       required this.tSpinDoubles,
       required this.tSpinTriples,
+      required this.tSpinPentas,
       required this.tSpinQuads,
       required this.tSpinMiniZeros,
       required this.tSpinMiniSingles,
@@ -428,6 +432,7 @@ class Clears {
     doubles = json['doubles'];
     triples = json['triples'];
     quads = json['quads'];
+    pentas = json['pentas']??0;
     tSpinZeros = json['realtspins'];
     tSpinMiniZeros = json['minitspins'];
     tSpinMiniSingles = json['minitspinsingles'];
@@ -436,6 +441,7 @@ class Clears {
     tSpinDoubles = json['tspindoubles'];
     tSpinTriples = json['tspintriples'];
     tSpinQuads = json['tspinquads'];
+    tSpinPentas = json['tspinpentas']??0;
     allClears = json['allclear'];
   }
 
@@ -445,6 +451,7 @@ class Clears {
     data['doubles'] = doubles;
     data['triples'] = triples;
     data['quads'] = quads;
+    data['pentas'] = pentas;
     data['realtspins'] = tSpinZeros;
     data['minitspins'] = tSpinMiniZeros;
     data['minitspinsingles'] = tSpinMiniSingles;
@@ -453,6 +460,7 @@ class Clears {
     data['tspindoubles'] = tSpinDoubles;
     data['tspintriples'] = tSpinTriples;
     data['tspinquads'] = tSpinQuads;
+    data['tspinpentas'] = tSpinPentas;
     data['allclear'] = allClears;
     return data;
   }

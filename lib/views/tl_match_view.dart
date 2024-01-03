@@ -2,6 +2,7 @@
 
 import 'dart:io';
 import 'package:tetra_stats/services/crud_exceptions.dart';
+import 'package:tetra_stats/views/compare_view.dart' show CompareThingy, CompareBoolThingy;
 import 'package:tetra_stats/widgets/vs_graphs.dart';
 import 'main_view.dart' show teto;
 import 'package:flutter/foundation.dart';
@@ -341,138 +342,42 @@ class TlMatchResultState extends State<TlMatchResultView> {
                             roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyleTracking[roundSelector]
                           )
                         ],
+                      ),
+                      const Divider(),
+                      Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: Text("Handling",
+                                style: TextStyle(
+                                    fontFamily: "Eurostile Round Extended",
+                                    fontSize: bigScreen ? 42 : 28)),
+                          ),
+                          CompareThingy(
+                            greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.das,
+                            redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.das,
+                            label: "DAS",
+                            higherIsBetter: false),
+                          CompareThingy(
+                            greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.arr,
+                            redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.arr,
+                            label: "ARR",
+                            higherIsBetter: false),
+                          CompareThingy(
+                            greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.sdf,
+                            redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.sdf,
+                            label: "SDF",
+                            higherIsBetter: true),
+                          CompareBoolThingy(
+                            greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.safeLock,
+                            redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.safeLock,
+                            label: "safeLock",
+                            trueIsBetter: true)
+                        ],
                       )
                   ],
                 )
         ),
-      ),
-    );
-  }
-}
-
-
-class CompareThingy extends StatelessWidget {
-  final num greenSide;
-  final num redSide;
-  final String label;
-  final bool higherIsBetter;
-  final int? fractionDigits;
-  const CompareThingy(
-      {super.key,
-      required this.greenSide,
-      required this.redSide,
-      required this.label,
-      required this.higherIsBetter,
-      this.fractionDigits});
-
-  String verdict(num greenSide, num redSide, int fraction) {
-    var f = NumberFormat("+#,###.##;-#,###.##");
-    f.maximumFractionDigits = fraction;
-    return f.format((greenSide - redSide));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    NumberFormat f = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: fractionDigits ?? 0);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Expanded(
-              child: Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-              colors: const [Colors.green, Colors.transparent],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              stops: [
-                0.0,
-                higherIsBetter
-                    ? greenSide > redSide
-                        ? 0.6
-                        : 0
-                    : greenSide < redSide
-                        ? 0.6
-                        : 0
-              ],
-            )),
-            child: Text(
-              f.format(greenSide),
-              style: const TextStyle(
-                fontSize: 22,
-                shadows: <Shadow>[
-                  Shadow(
-                    offset: Offset(0.0, 0.0),
-                    blurRadius: 3.0,
-                    color: Colors.black,
-                  ),
-                  Shadow(
-                    offset: Offset(0.0, 0.0),
-                    blurRadius: 8.0,
-                    color: Colors.black,
-                  ),
-                ],
-              ),
-              textAlign: TextAlign.start,
-            ),
-          )),
-          Column(
-            children: [
-              Text(
-                label,
-                style: const TextStyle(fontSize: 22),
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                verdict(greenSide, redSide,
-                    fractionDigits != null ? fractionDigits! + 2 : 0),
-                style: const TextStyle(fontSize: 16),
-                textAlign: TextAlign.center,
-              )
-            ],
-          ),
-          Expanded(
-              child: Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-              colors: const [Colors.red, Colors.transparent],
-              begin: Alignment.centerRight,
-              end: Alignment.centerLeft,
-              stops: [
-                0.0,
-                higherIsBetter
-                    ? redSide > greenSide
-                        ? 0.6
-                        : 0
-                    : redSide < greenSide
-                        ? 0.6
-                        : 0
-              ],
-            )),
-            child: Text(
-              f.format(redSide),
-              style: const TextStyle(
-                fontSize: 22,
-                shadows: <Shadow>[
-                  Shadow(
-                    offset: Offset(0.0, 0.0),
-                    blurRadius: 3.0,
-                    color: Colors.black,
-                  ),
-                  Shadow(
-                    offset: Offset(0.0, 0.0),
-                    blurRadius: 8.0,
-                    color: Colors.black,
-                  ),
-                ],
-              ),
-              textAlign: TextAlign.end,
-            ),
-          )),
-        ],
       ),
     );
   }

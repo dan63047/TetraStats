@@ -215,6 +215,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
     final t = Translations.of(context);
     return Scaffold(
       drawer: widget.player == null ? NavDrawer(changePlayer) : null,
+      drawerEdgeDragWidth: MediaQuery.of(context).size.width * 0.2,
       appBar: AppBar(
         title: !_searchBoolean
             ? Text(
@@ -327,6 +328,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                           SliverToBoxAdapter(
                             child: TabBar(
                               controller: _tabController,
+                              padding: EdgeInsets.all(0.0),
                               isScrollable: true,
                               tabs: [
                                 Tab(text: t.tetraLeague),
