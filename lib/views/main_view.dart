@@ -1,5 +1,6 @@
 // ignore_for_file: type_literal_in_constant_pattern
 
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
+import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:tetra_stats/main.dart' show prefs;
@@ -268,6 +270,10 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                 child: Text(t.fetchAndsaveTLHistory),
               ),
               PopupMenuItem(
+                value: "test",
+                child: Text("Test replay reading"),
+              ),
+              PopupMenuItem(
                 value: "/states",
                 child: Text(t.showStoredData),
               ),
@@ -281,12 +287,21 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
               ),
             ],
             onSelected: (value) {
-              if (value == "refresh") {changePlayer(_searchFor);
-              return;}
-              if (value == "history"){changePlayer(_searchFor, fetchHistory: true);
-              return;}
-              //Navigator.pushNamed(context, value);
-              context.go(value);
+              switch (value){
+                case "refresh":
+                  changePlayer(_searchFor);
+                  break;
+                case "history":
+                  changePlayer(_searchFor, fetchHistory: true);
+                  break;
+                case "test":
+                  var replayfile = File("/home/dan63047/Загрузки/659337dd1eef65e513c5dc8d.ttrm").readAsStringSync();
+                  var testObject = ReplayData.fromJson(jsonDecode(replayfile));
+                  print("lol");
+                  break;
+                default:
+                  context.go(value);
+              }
             },
           ),
         ] : null,

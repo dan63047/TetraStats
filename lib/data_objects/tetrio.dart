@@ -445,6 +445,26 @@ class Clears {
     allClears = json['allclear'];
   }
 
+  Clears operator + (Clears other){
+    return Clears(
+      singles: singles + other.singles,
+      doubles: doubles + other.doubles,
+      triples: triples + other.triples,
+      quads: quads + other.quads,
+      pentas: pentas + other.pentas,
+      allClears: allClears + other.allClears,
+      tSpinZeros: tSpinZeros + other.tSpinZeros,
+      tSpinSingles: tSpinSingles + other.tSpinSingles,
+      tSpinDoubles: tSpinDoubles + other.tSpinDoubles,
+      tSpinTriples: tSpinTriples + other.tSpinTriples,
+      tSpinPentas: tSpinPentas + other.tSpinPentas,
+      tSpinQuads: tSpinQuads + other.tSpinQuads,
+      tSpinMiniZeros: tSpinMiniZeros + other.tSpinMiniZeros,
+      tSpinMiniSingles: tSpinMiniSingles + other.tSpinMiniSingles,
+      tSpinMiniDoubles: tSpinMiniDoubles + other.tSpinMiniDoubles
+      );
+  }
+
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['singles'] = singles;
@@ -499,6 +519,10 @@ class Finesse {
     combo = json['combo'];
     faults = json['faults'];
     perfectPieces = json['perfectpieces'];
+  }
+
+  Finesse operator + (Finesse other){
+    return Finesse(combo: max(combo, other.combo), faults: faults + other.faults, perfectPieces: perfectPieces + other.perfectPieces);
   }
 
   Map<String, dynamic> toJson() {
