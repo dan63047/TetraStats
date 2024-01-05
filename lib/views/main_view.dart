@@ -35,7 +35,7 @@ var chartsData = <DropdownMenuItem<List<FlSpot>>>[];
 List _historyShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR"];
 int _chartsIndex = 0; 
 final NumberFormat _timeInSec = NumberFormat("#,###.###s.");
-final NumberFormat _secs = NumberFormat("00.###");
+final NumberFormat secs = NumberFormat("00.###");
 final NumberFormat _f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
 final NumberFormat _f4 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 4);
 final DateFormat _dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
@@ -55,7 +55,7 @@ Future<void> copyToClipboard(String text) async {
 }
 
 String get40lTime(int microseconds){
-  return microseconds > 60000000 ? "${(microseconds/1000000/60).floor()}:${(_secs.format(microseconds /1000000 % 60))}" : _timeInSec.format(microseconds / 1000000);
+  return microseconds > 60000000 ? "${(microseconds/1000000/60).floor()}:${(secs.format(microseconds /1000000 % 60))}" : _timeInSec.format(microseconds / 1000000);
   }
 
 class _MainState extends State<MainView> with SingleTickerProviderStateMixin {

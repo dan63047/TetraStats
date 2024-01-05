@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
 import 'package:tetra_stats/main.dart' show packageInfo;
 import 'package:flutter/foundation.dart';
 import 'package:tetra_stats/services/custom_http_client.dart';
@@ -47,6 +48,15 @@ const String createTetrioTLRecordsTable = '''
           "timestamp"	TEXT,
           "endContext1"	TEXT,
           "endContext2"	TEXT,
+          PRIMARY KEY("id")
+        )
+''';
+
+const String createTetrioTLReplayStats = '''
+        CREATE TABLE "tetrioTLReplayStats" (
+          "id"	TEXT NOT NULL,
+          "player1"	TEXT NOT NULL,
+          "player2"	TEXT NOT NULL,
           PRIMARY KEY("id")
         )
 ''';
@@ -110,19 +120,19 @@ class TetrioService extends DB {
     }
   }
 
-  Future<String> szyDownloadAndSaveReplay(String replayID) async {
+  Future<List<dynamic>> szyGetReplay(String replayID) async {
     Uri url = Uri.https('inoue.szy.lol', '/api/replay/$replayID');
     var downloadPath = await getDownloadsDirectory();
     downloadPath ??= Platform.isAndroid ? Directory("/storage/emulated/0/Download") : await getApplicationDocumentsDirectory();
     var replayFile = File("${downloadPath.path}/$replayID.ttrm");
-    if (replayFile.existsSync()) throw TetrioReplayAlreadyExist();
+    if (replayFile.existsSync()) return [replayFile.readAsStringSync(), replayFile.readAsBytesSync()];
     try{
       final response = await client.get(url);
 
       switch (response.statusCode) {
         case 200:
-          await replayFile.writeAsBytes(response.bodyBytes);
-          return replayFile.path;
+          developer.log("szyDownload: Replay downloaded", name: "services/tetrio_crud", error: response.statusCode);
+          return [response.body, response.bodyBytes];
         case 404:
           throw SzyNotFound();
         case 403:
@@ -137,13 +147,29 @@ class TetrioService extends DB {
         case 504:
           throw SzyInternalProblem();
         default:
-          developer.log("szyDownloadAndSaveReplay: Failed to download a replay", name: "services/tetrio_crud", error: response.statusCode);
+          developer.log("szyDownload: Failed to download a replay", name: "services/tetrio_crud", error: response.statusCode);
           throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
       }
     } on http.ClientException catch (e, s) {
       developer.log("$e, $s");
       throw http.ClientException(e.message, e.uri);
     }
+  }
+
+  Future<String> SaveReplay(String replayID) async {
+    Uri url = Uri.https('inoue.szy.lol', '/api/replay/$replayID');
+    var downloadPath = await getDownloadsDirectory();
+    downloadPath ??= Platform.isAndroid ? Directory("/storage/emulated/0/Download") : await getApplicationDocumentsDirectory();
+    var replayFile = File("${downloadPath.path}/$replayID.ttrm");
+    if (replayFile.existsSync()) throw TetrioReplayAlreadyExist();
+    var replay = await szyGetReplay(replayID);
+    await replayFile.writeAsBytes(replay[1]);
+    return replayFile.path;
+  }
+
+  Future<ReplayData> analyzeReplay(String replayID) async{
+    Map<String, dynamic> toAnalyze = jsonDecode((await szyGetReplay(replayID))[0]);
+    return ReplayData.fromJson(toAnalyze);
   }
 
   Future<double?> fetchTopTR(String id) async {

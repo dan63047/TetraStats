@@ -237,6 +237,7 @@ class SettingsState extends State<SettingsView> {
               ),
           ),
           ListTile(title: Text("Customization"),
+          subtitle: Text("I don't want to implement this"),
           trailing: Icon(Icons.arrow_right),
           onTap: () {
             Navigator.pushNamed(context, "/customization");

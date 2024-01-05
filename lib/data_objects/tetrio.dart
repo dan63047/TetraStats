@@ -856,6 +856,12 @@ class EndContextMulti {
     playstyleTracking = [for (int i = 0; i < secondaryTracking.length; i++) Playstyle(secondaryTracking[i], tertiaryTracking[i], nerdStatsTracking[i].app, nerdStatsTracking[i].vsapm, nerdStatsTracking[i].dsp, nerdStatsTracking[i].gbe, estTrTracking[i].srarea, estTrTracking[i].statrank)];
   }
 
+  @override
+  bool operator == (covariant EndContextMulti other){
+    if (userId != other.userId) return false;
+    return true;
+  }
+
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['user'] = {'_id': userId, 'username': username};

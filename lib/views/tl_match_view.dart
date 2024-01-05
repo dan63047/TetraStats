@@ -1,10 +1,11 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:io';
+import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/views/compare_view.dart' show CompareThingy, CompareBoolThingy;
 import 'package:tetra_stats/widgets/vs_graphs.dart';
-import 'main_view.dart' show teto;
+import 'main_view.dart' show teto, secs;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -21,6 +22,10 @@ int roundSelector = -1; // -1 = match averages, otherwise round number-1
 List<DropdownMenuItem> rounds = []; // index zero will be match stats
 late String oldWindowTitle;
 
+Duration framesToTime(int frames){
+  return Duration(microseconds: frames~/6e-5);
+}
+
 class TlMatchResultView extends StatefulWidget {
   final TetraLeagueAlphaRecord record;
   final String initPlayerId;
@@ -33,12 +38,14 @@ class TlMatchResultView extends StatefulWidget {
 
 class TlMatchResultState extends State<TlMatchResultView> {
   late ScrollController _scrollController;
+  late Future<ReplayData?> replayData;
 
   @override
   void initState(){
     _scrollController = ScrollController();
     rounds = [DropdownMenuItem(value: -1, child: Text(t.match))];
     rounds.addAll([for (int i = 0; i < widget.record.endContext.first.secondaryTracking.length; i++) DropdownMenuItem(value: i, child: Text(t.roundNumber(n: i+1)))]);
+    replayData = teto.analyzeReplay(widget.record.replayId);
     if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS){
       windowManager.getTitle().then((value) => oldWindowTitle = value);
       windowManager.setTitle("Tetra Stats: ${widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).username.toUpperCase()} ${t.vs} ${widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).username.toUpperCase()} ${t.inTLmatch} ${dateFormat.format(widget.record.timestamp)}");
@@ -86,7 +93,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
                     //anchor.remove();
                   } else{
                     try{
-                      String path = await teto.szyDownloadAndSaveReplay(widget.record.replayId);
+                      String path = await teto.SaveReplay(widget.record.replayId);
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.replaySaved(path: path))));
                     } on TetrioReplayAlreadyExist{
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.replayAlreadySaved)));
@@ -189,6 +196,22 @@ class TlMatchResultState extends State<TlMatchResultView> {
                   ),
                 ),
               ),
+              SliverToBoxAdapter(child: FutureBuilder(future: replayData, builder: (context, snapshot) {
+                switch(snapshot.connectionState){
+                          case ConnectionState.none:
+                          case ConnectionState.waiting:
+                          case ConnectionState.active:
+                            return CircularProgressIndicator();
+                          case ConnectionState.done:
+                          if (!snapshot.hasError){
+                            var time = framesToTime(snapshot.data!.totalLength);
+                            return Center(child: Text("Match Length: ${time.inMinutes}:${secs.format(time.inMicroseconds /1000000 % 60)}"));
+                          }else{
+                            return Text("skill issue");
+                          }
+                            
+                        }
+              },),),
               const SliverToBoxAdapter(
                 child: Divider(),
               )
@@ -219,6 +242,39 @@ class TlMatchResultState extends State<TlMatchResultView> {
                                   fractionDigits: 2,
                                   higherIsBetter: true,
                                 ),
+                                FutureBuilder(future: replayData, builder: (BuildContext context, AsyncSnapshot<ReplayData?> snapshot){
+                                  switch(snapshot.connectionState){
+                                    case ConnectionState.none:
+                                    case ConnectionState.waiting:
+                                    case ConnectionState.active:
+                                      return LinearProgressIndicator();
+                                    case ConnectionState.done:
+                                    if (!snapshot.hasError){
+                                      var greenSidePlayer = snapshot.data!.endcontext.indexWhere(((element) => element.userId == widget.initPlayerId));
+                                      var redSidePlayer = snapshot.data!.endcontext.indexWhere(((element) => element.userId != widget.initPlayerId));
+                                      return Column(children: [
+                                        CompareThingy(greenSide: snapshot.data!.totalStats[greenSidePlayer].piecesPlaced,
+                                          redSide: snapshot.data!.totalStats[redSidePlayer].piecesPlaced,
+                                          label: "Pieces Placed", higherIsBetter: true),
+                                        CompareThingy(greenSide: snapshot.data!.totalStats[greenSidePlayer].linesCleared,
+                                          redSide: snapshot.data!.totalStats[redSidePlayer].linesCleared,
+                                          label: "Lines Cleared", higherIsBetter: true),
+                                        CompareThingy(greenSide: snapshot.data!.totalStats[greenSidePlayer].finessePercentage * 100,
+                                          redSide: snapshot.data!.totalStats[redSidePlayer].finessePercentage * 100,
+                                          label: "Finnese", postfix: "%", fractionDigits: 2, higherIsBetter: true),
+                                        CompareThingy(greenSide: snapshot.data!.totalStats[greenSidePlayer].topCombo,
+                                          redSide: snapshot.data!.totalStats[redSidePlayer].topCombo,
+                                          label: "Best Combo", higherIsBetter: true),
+                                        CompareThingy(greenSide: snapshot.data!.totalStats[greenSidePlayer].topBtB,
+                                          redSide: snapshot.data!.totalStats[redSidePlayer].topBtB,
+                                          label: "Best BtB", higherIsBetter: true),
+                                      ],);
+                                    }else{
+                                      return Text("skill issue");
+                                    }
+                                      
+                                  }
+                                })
                             ],
                           ),
                     const Divider(),
@@ -356,12 +412,12 @@ class TlMatchResultState extends State<TlMatchResultView> {
                           CompareThingy(
                             greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.das,
                             redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.das,
-                            label: "DAS",
+                            label: "DAS", fractionDigits: 1,
                             higherIsBetter: false),
                           CompareThingy(
                             greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.arr,
                             redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.arr,
-                            label: "ARR",
+                            label: "ARR", fractionDigits: 1,
                             higherIsBetter: false),
                           CompareThingy(
                             greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.sdf,

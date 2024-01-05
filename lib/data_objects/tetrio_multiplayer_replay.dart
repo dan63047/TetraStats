@@ -49,6 +49,8 @@ class ReplayStats{
   late Finesse finesse;
   late int kills;
 
+  double get finessePercentage => finesse.perfectPieces / piecesPlaced;
+
   ReplayStats({
     required this.seed,
     required this.linesCleared,
@@ -116,6 +118,7 @@ class ReplayStats{
 
 class ReplayData{
   late String id;
+  late Map<dynamic, dynamic> rawJson;
   late List<EndContextMulti> endcontext;
   late List<List<ReplayStats>> stats;
   late List<ReplayStats> totalStats;
@@ -126,10 +129,15 @@ class ReplayData{
     required this.id,
     required this.endcontext,
     required this.stats,
-    required this.roundLengths
-  });
+    required this.totalStats,
+    required this.roundLengths,
+    required this.totalLength
+  }){
+    rawJson = {};
+  }
 
   ReplayData.fromJson(Map<String, dynamic> json){
+    rawJson = json;
     id = json["_id"];
     endcontext = [EndContextMulti.fromJson(json["endcontext"][0]), EndContextMulti.fromJson(json["endcontext"][1])];
     roundLengths = [];

@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 988 (494 per locale)
+/// Strings: 994 (497 per locale)
 ///
-/// Built on 2024-01-01 at 16:00 UTC
+/// Built on 2024-01-05 at 16:51 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -178,6 +178,8 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get tlLeaderboard => 'Tetra League leaderboard';
 	String get noRecords => 'No records';
 	String get noRecord => 'No record';
+	String get botRecord => 'Bots are not allowed to set records';
+	String get anonRecord => 'Guests are not allowed to set records';
 	String get notEnoughData => 'Not enough data';
 	String get noHistorySaved => 'No history saved';
 	String obtainDate({required Object date}) => 'Obtained ${date}';
@@ -204,6 +206,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get exactValue => 'Exact value';
 	String get neverPlayedTL => 'That user never played Tetra League';
 	String get botTL => 'Bots are not allowed to play Tetra League';
+	String get anonTL => 'Guests are not allowed to play Tetra League';
 	String get exportDB => 'Export local database';
 	String get exportDBDescription => 'It contains states and Tetra League records of the tracked players and list of tracked players.';
 	String get desktopExportAlertTitle => 'Desktop export';
@@ -756,6 +759,8 @@ class _StringsRu implements Translations {
 	@override String get tlLeaderboard => 'Рейтинговая таблица';
 	@override String get noRecords => 'Нет записей';
 	@override String get noRecord => 'Нет рекорда';
+	@override String get botRecord => 'Ботам нельзя ставить рекорды';
+	@override String get anonRecord => 'Гостям нельзя ставить рекорды';
 	@override String get notEnoughData => 'Недостаточно данных';
 	@override String get noHistorySaved => 'Нет сохранённой истории';
 	@override String obtainDate({required Object date}) => 'Получено ${date}';
@@ -782,6 +787,7 @@ class _StringsRu implements Translations {
 	@override String get exactValue => 'Точное значение';
 	@override String get neverPlayedTL => 'Этот игрок никогда не играл в Тетра Лигу';
 	@override String get botTL => 'Ботам нельзя играть в Тетра Лигу';
+	@override String get anonTL => 'Гостям нельзя играть в Тетра Лигу';
 	@override String get exportDB => 'Экспортировать локальную базу данных';
 	@override String get exportDBDescription => 'Она содержит состояния аккаунтов и их матчей в Тетра Лиге для отслеживаемых игроков и список таких игроков.';
 	@override String get desktopExportAlertTitle => 'Экспорт на десктопе';
@@ -1326,6 +1332,8 @@ extension on Translations {
 			case 'tlLeaderboard': return 'Tetra League leaderboard';
 			case 'noRecords': return 'No records';
 			case 'noRecord': return 'No record';
+			case 'botRecord': return 'Bots are not allowed to set records';
+			case 'anonRecord': return 'Guests are not allowed to set records';
 			case 'notEnoughData': return 'Not enough data';
 			case 'noHistorySaved': return 'No history saved';
 			case 'obtainDate': return ({required Object date}) => 'Obtained ${date}';
@@ -1352,6 +1360,7 @@ extension on Translations {
 			case 'exactValue': return 'Exact value';
 			case 'neverPlayedTL': return 'That user never played Tetra League';
 			case 'botTL': return 'Bots are not allowed to play Tetra League';
+			case 'anonTL': return 'Guests are not allowed to play Tetra League';
 			case 'exportDB': return 'Export local database';
 			case 'exportDBDescription': return 'It contains states and Tetra League records of the tracked players and list of tracked players.';
 			case 'desktopExportAlertTitle': return 'Desktop export';
@@ -1830,6 +1839,8 @@ extension on _StringsRu {
 			case 'tlLeaderboard': return 'Рейтинговая таблица';
 			case 'noRecords': return 'Нет записей';
 			case 'noRecord': return 'Нет рекорда';
+			case 'botRecord': return 'Ботам нельзя ставить рекорды';
+			case 'anonRecord': return 'Гостям нельзя ставить рекорды';
 			case 'notEnoughData': return 'Недостаточно данных';
 			case 'noHistorySaved': return 'Нет сохранённой истории';
 			case 'obtainDate': return ({required Object date}) => 'Получено ${date}';
@@ -1856,6 +1867,7 @@ extension on _StringsRu {
 			case 'exactValue': return 'Точное значение';
 			case 'neverPlayedTL': return 'Этот игрок никогда не играл в Тетра Лигу';
 			case 'botTL': return 'Ботам нельзя играть в Тетра Лигу';
+			case 'anonTL': return 'Гостям нельзя играть в Тетра Лигу';
 			case 'exportDB': return 'Экспортировать локальную базу данных';
 			case 'exportDBDescription': return 'Она содержит состояния аккаунтов и их матчей в Тетра Лиге для отслеживаемых игроков и список таких игроков.';
 			case 'desktopExportAlertTitle': return 'Экспорт на десктопе';
