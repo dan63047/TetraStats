@@ -65,6 +65,7 @@ class TetrioService extends DB {
   Map<String, List<TetrioPlayer>> _players = {};
   final Map<String, TetrioPlayer> _playersCache = {};
   final Map<String, Map<String, dynamic>> _recordsCache = {};
+  final Map<String, dynamic> _replaysCache = {};
   final Map<String, TetrioPlayersLeaderboard> _leaderboardsCache = {};
   final Map<String, List<News>> _newsCache = {};
   final Map<String, Map<String, double?>> _topTRcache = {};
@@ -121,6 +122,12 @@ class TetrioService extends DB {
   }
 
   Future<List<dynamic>> szyGetReplay(String replayID) async {
+    try{
+      var cached = _replaysCache.entries.firstWhere((element) => element.key == replayID);
+      return cached.value;
+    }catch (e){
+      // actually going to obtain
+    }
     Uri url = Uri.https('inoue.szy.lol', '/api/replay/$replayID');
     var downloadPath = await getDownloadsDirectory();
     downloadPath ??= Platform.isAndroid ? Directory("/storage/emulated/0/Download") : await getApplicationDocumentsDirectory();
@@ -132,6 +139,7 @@ class TetrioService extends DB {
       switch (response.statusCode) {
         case 200:
           developer.log("szyDownload: Replay downloaded", name: "services/tetrio_crud", error: response.statusCode);
+          _replaysCache[replayID] = [response.body, response.bodyBytes];
           return [response.body, response.bodyBytes];
         case 404:
           throw SzyNotFound();
@@ -157,7 +165,6 @@ class TetrioService extends DB {
   }
 
   Future<String> SaveReplay(String replayID) async {
-    Uri url = Uri.https('inoue.szy.lol', '/api/replay/$replayID');
     var downloadPath = await getDownloadsDirectory();
     downloadPath ??= Platform.isAndroid ? Directory("/storage/emulated/0/Download") : await getApplicationDocumentsDirectory();
     var replayFile = File("${downloadPath.path}/$replayID.ttrm");

@@ -166,6 +166,7 @@ flutter:
      - res/tetrio_badges/sfu_raccoon_1.png
      - res/tetrio_badges/sfu_raccoon_2.png
      - res/tetrio_badges/sfu_raccoon_3.png
+     - res/tetrio_badges/streamersuperlobby.png
      - res/tetrio_badges/superlobby.png
      - res/tetrio_badges/superlobby2.png
      - res/tetrio_badges/taws_u50_1.png
@@ -185,6 +186,10 @@ flutter:
      - res/tetrio_badges/ttsdtc_1.png
      - res/tetrio_badges/ttsdtc_2.png
      - res/tetrio_badges/ttsdtc_3.png
+     - res/tetrio_badges/twc23_1.png
+     - res/tetrio_badges/twc23_2.png
+     - res/tetrio_badges/twc23_3.png
+     - res/tetrio_badges/twc23_4.png
      - res/tetrio_badges/ubcea_1.png
      - res/tetrio_badges/ubcea_2.png
      - res/tetrio_badges/ubcea_3.png

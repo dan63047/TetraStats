@@ -201,13 +201,18 @@ class TlMatchResultState extends State<TlMatchResultView> {
                           case ConnectionState.none:
                           case ConnectionState.waiting:
                           case ConnectionState.active:
-                            return CircularProgressIndicator();
+                            return const LinearProgressIndicator();
                           case ConnectionState.done:
                           if (!snapshot.hasError){
-                            var time = framesToTime(snapshot.data!.totalLength);
-                            return Center(child: Text("Match Length: ${time.inMinutes}:${secs.format(time.inMicroseconds /1000000 % 60)}"));
+                            if (roundSelector.isNegative){
+                              var time = framesToTime(snapshot.data!.totalLength);
+                              return Center(child: Text("Match Length: ${time.inMinutes}:${secs.format(time.inMicroseconds /1000000 % 60)}", textAlign: TextAlign.center));
+                            }else{
+                              var time = framesToTime(snapshot.data!.roundLengths[roundSelector]);
+                              return Center(child: Text("Round Length: ${time.inMinutes}:${secs.format(time.inMicroseconds /1000000 % 60)}\nWinner: ${snapshot.data!.roundWinners[roundSelector][1]}", textAlign: TextAlign.center,));
+                            }
                           }else{
-                            return Text("skill issue");
+                            return const Text("skill issue", textAlign: TextAlign.center);
                           }
                             
                         }
@@ -247,27 +252,47 @@ class TlMatchResultState extends State<TlMatchResultView> {
                                     case ConnectionState.none:
                                     case ConnectionState.waiting:
                                     case ConnectionState.active:
-                                      return LinearProgressIndicator();
+                                      return const LinearProgressIndicator();
                                     case ConnectionState.done:
                                     if (!snapshot.hasError){
-                                      var greenSidePlayer = snapshot.data!.endcontext.indexWhere(((element) => element.userId == widget.initPlayerId));
-                                      var redSidePlayer = snapshot.data!.endcontext.indexWhere(((element) => element.userId != widget.initPlayerId));
+                                      var greenSidePlayer = snapshot.data!.endcontext.indexWhere((element) => element.userId == widget.initPlayerId);
+                                      var redSidePlayer = snapshot.data!.endcontext.indexWhere((element) => element.userId != widget.initPlayerId);
                                       return Column(children: [
-                                        CompareThingy(greenSide: snapshot.data!.totalStats[greenSidePlayer].piecesPlaced,
-                                          redSide: snapshot.data!.totalStats[redSidePlayer].piecesPlaced,
+                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].piecesPlaced : snapshot.data!.stats[roundSelector][greenSidePlayer].piecesPlaced,
+                                          redSide: roundSelector.isNegative ?  snapshot.data!.totalStats[redSidePlayer].piecesPlaced : snapshot.data!.stats[roundSelector][redSidePlayer].piecesPlaced,
                                           label: "Pieces Placed", higherIsBetter: true),
-                                        CompareThingy(greenSide: snapshot.data!.totalStats[greenSidePlayer].linesCleared,
-                                          redSide: snapshot.data!.totalStats[redSidePlayer].linesCleared,
+                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].linesCleared : snapshot.data!.stats[roundSelector][greenSidePlayer].linesCleared,
+                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].linesCleared : snapshot.data!.stats[roundSelector][redSidePlayer].linesCleared,
                                           label: "Lines Cleared", higherIsBetter: true),
-                                        CompareThingy(greenSide: snapshot.data!.totalStats[greenSidePlayer].finessePercentage * 100,
-                                          redSide: snapshot.data!.totalStats[redSidePlayer].finessePercentage * 100,
+                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].finessePercentage * 100 : snapshot.data!.stats[roundSelector][greenSidePlayer].finessePercentage * 100,
+                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].finessePercentage * 100 : snapshot.data!.stats[roundSelector][redSidePlayer].finessePercentage * 100,
                                           label: "Finnese", postfix: "%", fractionDigits: 2, higherIsBetter: true),
-                                        CompareThingy(greenSide: snapshot.data!.totalStats[greenSidePlayer].topCombo,
-                                          redSide: snapshot.data!.totalStats[redSidePlayer].topCombo,
+                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].topSpike : snapshot.data!.stats[roundSelector][greenSidePlayer].topSpike,
+                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].topSpike : snapshot.data!.stats[roundSelector][redSidePlayer].topSpike,
+                                          label: "Best Spike", higherIsBetter: true),
+                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].topCombo : snapshot.data!.stats[roundSelector][greenSidePlayer].topCombo,
+                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].topCombo : snapshot.data!.stats[roundSelector][redSidePlayer].topCombo,
                                           label: "Best Combo", higherIsBetter: true),
-                                        CompareThingy(greenSide: snapshot.data!.totalStats[greenSidePlayer].topBtB,
-                                          redSide: snapshot.data!.totalStats[redSidePlayer].topBtB,
+                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].topBtB : snapshot.data!.stats[roundSelector][greenSidePlayer].topBtB,
+                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].topBtB : snapshot.data!.stats[roundSelector][redSidePlayer].topBtB,
                                           label: "Best BtB", higherIsBetter: true),
+                                        const Divider(),
+                                        Padding(
+                                          padding: const EdgeInsets.only(bottom: 16),
+                                          child: Text("Garbage", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                                        ),
+                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].garbage.sent : snapshot.data!.stats[roundSelector][greenSidePlayer].garbage.sent,
+                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].garbage.sent : snapshot.data!.stats[roundSelector][redSidePlayer].garbage.sent,
+                                          label: "Sent", higherIsBetter: true),
+                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].garbage.recived : snapshot.data!.stats[roundSelector][greenSidePlayer].garbage.recived,
+                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].garbage.recived : snapshot.data!.stats[roundSelector][redSidePlayer].garbage.recived,
+                                          label: "Recived", higherIsBetter: true),
+                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].garbage.attack : snapshot.data!.stats[roundSelector][greenSidePlayer].garbage.attack,
+                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].garbage.attack : snapshot.data!.stats[roundSelector][redSidePlayer].garbage.attack,
+                                          label: "Attack", higherIsBetter: true),
+                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].garbage.cleared : snapshot.data!.stats[roundSelector][greenSidePlayer].garbage.cleared,
+                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].garbage.cleared : snapshot.data!.stats[roundSelector][redSidePlayer].garbage.cleared,
+                                          label: "Cleared", higherIsBetter: true),
                                       ],);
                                     }else{
                                       return Text("skill issue");
@@ -412,17 +437,17 @@ class TlMatchResultState extends State<TlMatchResultView> {
                           CompareThingy(
                             greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.das,
                             redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.das,
-                            label: "DAS", fractionDigits: 1,
+                            label: "DAS", fractionDigits: 1, postfix: "F",
                             higherIsBetter: false),
                           CompareThingy(
                             greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.arr,
                             redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.arr,
-                            label: "ARR", fractionDigits: 1,
+                            label: "ARR", fractionDigits: 1, postfix: "F",
                             higherIsBetter: false),
                           CompareThingy(
                             greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.sdf,
                             redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.sdf,
-                            label: "SDF",
+                            label: "SDF", prefix: "x",
                             higherIsBetter: true),
                           CompareBoolThingy(
                             greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.safeLock,

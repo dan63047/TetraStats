@@ -801,6 +801,7 @@ class CompareThingy extends StatelessWidget {
   final bool higherIsBetter;
   final int? fractionDigits;
   final String? postfix;
+  final String? prefix;
   const CompareThingy(
       {super.key,
       required this.greenSide,
@@ -808,6 +809,7 @@ class CompareThingy extends StatelessWidget {
       required this.label,
       required this.higherIsBetter,
       this.fractionDigits,
+      this.prefix,
       this.postfix});
 
   String verdict(num greenSide, num redSide, int fraction) {
@@ -845,7 +847,7 @@ class CompareThingy extends StatelessWidget {
               ],
             )),
             child: Text(
-              f.format(greenSide) + (postfix ?? ""),
+              (prefix ?? "") + f.format(greenSide) + (postfix ?? ""),
               style: const TextStyle(
                 fontSize: 22,
                 shadows: <Shadow>[
@@ -899,7 +901,7 @@ class CompareThingy extends StatelessWidget {
               ],
             )),
             child: Text(
-              f.format(redSide) + (postfix ?? ""),
+              (prefix ?? "") + f.format(redSide) + (postfix ?? ""),
               style: const TextStyle(
                 fontSize: 22,
                 shadows: <Shadow>[

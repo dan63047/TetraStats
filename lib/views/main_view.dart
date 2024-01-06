@@ -270,10 +270,6 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                 child: Text(t.fetchAndsaveTLHistory),
               ),
               PopupMenuItem(
-                value: "test",
-                child: Text("Test replay reading"),
-              ),
-              PopupMenuItem(
                 value: "/states",
                 child: Text(t.showStoredData),
               ),
@@ -293,11 +289,6 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                   break;
                 case "history":
                   changePlayer(_searchFor, fetchHistory: true);
-                  break;
-                case "test":
-                  var replayfile = File("/home/dan63047/Загрузки/659337dd1eef65e513c5dc8d.ttrm").readAsStringSync();
-                  var testObject = ReplayData.fromJson(jsonDecode(replayfile));
-                  print("lol");
                   break;
                 default:
                   context.go(value);
