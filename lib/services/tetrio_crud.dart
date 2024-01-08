@@ -17,6 +17,7 @@ const String dbName = "TetraStats.db";
 const String tetrioUsersTable = "tetrioUsers";
 const String tetrioUsersToTrackTable = "tetrioUsersToTrack";
 const String tetraLeagueMatchesTable = "tetrioAlphaLeagueMathces";
+const String tetrioTLReplayStatsTable = "tetrioTLReplayStats";
 const String idCol = "id";
 const String replayID = "replayId";
 const String nickCol = "nickname";
@@ -53,10 +54,9 @@ const String createTetrioTLRecordsTable = '''
 ''';
 
 const String createTetrioTLReplayStats = '''
-        CREATE TABLE "tetrioTLReplayStats" (
+        CREATE TABLE IF NOT EXISTS "tetrioTLReplayStats" (
           "id"	TEXT NOT NULL,
-          "player1"	TEXT NOT NULL,
-          "player2"	TEXT NOT NULL,
+          "data"	TEXT NOT NULL,
           PRIMARY KEY("id")
         )
 ''';
@@ -121,6 +121,12 @@ class TetrioService extends DB {
     }
   }
 
+  Future<void> saveReplayStats(ReplayData replay) async {
+    await ensureDbIsOpen();
+    final db = getDatabaseOrThrow();
+    db.insert(tetrioTLReplayStatsTable, {idCol: replay.id, "data": jsonEncode(replay.toJson())});
+  }
+
   Future<List<dynamic>> szyGetReplay(String replayID) async {
     try{
       var cached = _replaysCache.entries.firstWhere((element) => element.key == replayID);
@@ -164,7 +170,7 @@ class TetrioService extends DB {
     }
   }
 
-  Future<String> SaveReplay(String replayID) async {
+  Future<String> saveReplay(String replayID) async {
     var downloadPath = await getDownloadsDirectory();
     downloadPath ??= Platform.isAndroid ? Directory("/storage/emulated/0/Download") : await getApplicationDocumentsDirectory();
     var replayFile = File("${downloadPath.path}/$replayID.ttrm");
@@ -175,8 +181,14 @@ class TetrioService extends DB {
   }
 
   Future<ReplayData> analyzeReplay(String replayID) async{
+    await ensureDbIsOpen();
+    final db = getDatabaseOrThrow();
+    final results = await db.query(tetrioTLReplayStatsTable, where: '$idCol = ?', whereArgs: [replayID]);
+    if (results.isNotEmpty) return ReplayData.fromJson(jsonDecode(results.first["data"].toString())); 
     Map<String, dynamic> toAnalyze = jsonDecode((await szyGetReplay(replayID))[0]);
-    return ReplayData.fromJson(toAnalyze);
+    ReplayData data = ReplayData.fromJson(toAnalyze);
+    saveReplayStats(data);
+    return data;
   }
 
   Future<double?> fetchTopTR(String id) async {

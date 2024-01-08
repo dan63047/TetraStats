@@ -93,7 +93,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
                     //anchor.remove();
                   } else{
                     try{
-                      String path = await teto.SaveReplay(widget.record.replayId);
+                      String path = await teto.saveReplay(widget.record.replayId);
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.replaySaved(path: path))));
                     } on TetrioReplayAlreadyExist{
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.replayAlreadySaved)));
@@ -264,6 +264,9 @@ class TlMatchResultState extends State<TlMatchResultView> {
                                         CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].linesCleared : snapshot.data!.stats[roundSelector][greenSidePlayer].linesCleared,
                                           redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].linesCleared : snapshot.data!.stats[roundSelector][redSidePlayer].linesCleared,
                                           label: "Lines Cleared", higherIsBetter: true),
+                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].score : snapshot.data!.stats[roundSelector][greenSidePlayer].score,
+                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].score : snapshot.data!.stats[roundSelector][redSidePlayer].score,
+                                          label: "Score", higherIsBetter: true),
                                         CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].finessePercentage * 100 : snapshot.data!.stats[roundSelector][greenSidePlayer].finessePercentage * 100,
                                           redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].finessePercentage * 100 : snapshot.data!.stats[roundSelector][redSidePlayer].finessePercentage * 100,
                                           label: "Finnese", postfix: "%", fractionDigits: 2, higherIsBetter: true),
@@ -293,9 +296,23 @@ class TlMatchResultState extends State<TlMatchResultView> {
                                         CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].garbage.cleared : snapshot.data!.stats[roundSelector][greenSidePlayer].garbage.cleared,
                                           redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].garbage.cleared : snapshot.data!.stats[roundSelector][redSidePlayer].garbage.cleared,
                                           label: "Cleared", higherIsBetter: true),
+                                        const Divider(),
+                                        Padding(
+                                          padding: const EdgeInsets.only(bottom: 16),
+                                          child: Text("Line Clears", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                                        ),
+                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].clears.allClears : snapshot.data!.stats[roundSelector][greenSidePlayer].clears.allClears,
+                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].clears.allClears : snapshot.data!.stats[roundSelector][redSidePlayer].clears.allClears,
+                                          label: "PC", higherIsBetter: true),
+                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].tspins : snapshot.data!.stats[roundSelector][greenSidePlayer].tspins,
+                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].tspins : snapshot.data!.stats[roundSelector][redSidePlayer].tspins,
+                                          label: "T-spins", higherIsBetter: true),
+                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].clears.quads : snapshot.data!.stats[roundSelector][greenSidePlayer].clears.quads,
+                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].clears.quads : snapshot.data!.stats[roundSelector][redSidePlayer].clears.quads,
+                                          label: "Quads", higherIsBetter: true),
                                       ],);
                                     }else{
-                                      return Text("skill issue");
+                                      return Container();
                                     }
                                       
                                   }

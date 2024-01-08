@@ -164,25 +164,43 @@ class ReplayData{
 
   ReplayData.fromJson(Map<String, dynamic> json){
     rawJson = json;
-    id = json["_id"];
-    endcontext = [EndContextMulti.fromJson(json["endcontext"][0]), EndContextMulti.fromJson(json["endcontext"][1])];
+    id = json['_id'];
+    endcontext = [EndContextMulti.fromJson(json['endcontext'][0]), EndContextMulti.fromJson(json['endcontext'][1])];
     roundLengths = [];
     totalLength = 0;
     stats = [];
     roundWinners = [];
     totalStats = [ReplayStats.createEmpty(), ReplayStats.createEmpty()];
-    int firstInEndContext = json["data"][0]["board"].indexWhere((element) => element["id"] == endcontext[0].userId);
-    int secondInEndContext = json["data"][0]["board"].indexWhere((element) => element["id"] == endcontext[1].userId);
+    int firstInEndContext = json['data'][0]['board'].indexWhere((element) => element['id'] == endcontext[0].userId);
+    int secondInEndContext = json['data'][0]['board'].indexWhere((element) => element['id'] == endcontext[1].userId);
     for(var round in json['data']) {
       roundLengths.add(max(round['replays'][0]['frames'], round['replays'][1]['frames']));
       totalLength = totalLength + max(round['replays'][0]['frames'], round['replays'][1]['frames']);
-      int winner = round['board'].indexWhere((element) => element["success"] == true);
-      roundWinners.add([round['board'][winner]["id"], round['board'][winner]["username"]]);
+      int winner = round['board'].indexWhere((element) => element['success'] == true);
+      roundWinners.add([round['board'][winner]['id'], round['board'][winner]['username']]);
       ReplayStats playerOne = ReplayStats.fromJson(round['replays'][firstInEndContext]['events'].last['data']['export']['stats'], biggestSpikeFromReplay(round['replays'][secondInEndContext]['events'])); // (events contain recived attacks)
       ReplayStats playerTwo = ReplayStats.fromJson(round['replays'][secondInEndContext]['events'].last['data']['export']['stats'], biggestSpikeFromReplay(round['replays'][firstInEndContext]['events']));
       stats.add([playerOne, playerTwo]);
       totalStats[0] = totalStats[0] + playerOne;
       totalStats[1] = totalStats[1] + playerTwo;
     }
+  }
+
+  Map<String, dynamic> toJson(){
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['_id'] = id;
+    data['endcontext'] = [endcontext[0].toJson(), endcontext[1].toJson()];
+    data['data'] = [];
+    for(var round in rawJson['data']) {
+      List<dynamic> eventsPlayerOne = round['replays'][0]['events'];
+      List<dynamic> eventsPlayerTwo = round['replays'][1]['events'];
+      eventsPlayerOne.removeWhere((v) => (v['type'] == 'ige' && v['data']['data']['type'] != 'interaction') || (v['type'] != 'end' && v['type'] != 'ige'));
+      eventsPlayerTwo.removeWhere((v) => (v['type'] == 'ige' && v['data']['data']['type'] != 'interaction') || (v['type'] != 'end' && v['type'] != 'ige'));
+      data['data'].add({'board': round['board'], 'replays': [
+        {'frames': round['replays'][0]['frames'], 'events': eventsPlayerOne},
+        {'frames': round['replays'][1]['frames'], 'events': eventsPlayerTwo}
+      ]});
+    }
+    return data;
   }
 }
