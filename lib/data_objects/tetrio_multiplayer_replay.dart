@@ -68,6 +68,7 @@ class ReplayStats{
   late int topBtB;
   late int topSpike;
   late int tspins;
+  late double roundLength; // in seconds
   late Clears clears;
   late Garbage garbage;
   late Finesse finesse;
@@ -85,12 +86,13 @@ class ReplayStats{
     required this.topBtB,
     required this.topSpike,
     required this.tspins,
+    required this.roundLength,
     required this.clears,
     required this.garbage,
     required this.finesse,
   });
 
-  ReplayStats.fromJson(Map<String, dynamic> json, int inputTopSpike){
+  ReplayStats.fromJson(Map<String, dynamic> json, int inputTopSpike, int framesLength){
     seed = json['seed'];
     linesCleared = json['lines'];
     piecesPlaced = json['piecesplaced'];
@@ -101,10 +103,15 @@ class ReplayStats{
     topBtB = json['topbtb'];
     topSpike = inputTopSpike;
     tspins = json['tspins'];
+    roundLength = framesLength / 60;
     clears = Clears.fromJson(json['clears']);
     garbage = Garbage.fromJson(json['garbage']);
     finesse = Finesse.fromJson(json['finesse']);
   }
+
+  double get kpp => inputs / piecesPlaced;
+  double get kps => inputs / roundLength;
+  double get spp => score / piecesPlaced;
 
   ReplayStats.createEmpty(){
     seed = -1;
@@ -117,6 +124,7 @@ class ReplayStats{
     topBtB = 0;
     topSpike = 0;
     tspins = 0;
+    roundLength = 0.0;
     clears = Clears(singles: 0, doubles: 0, triples: 0, quads: 0, pentas: 0, allClears: 0, tSpinZeros: 0, tSpinSingles: 0, tSpinDoubles: 0, tSpinTriples: 0, tSpinPentas: 0, tSpinQuads: 0, tSpinMiniZeros: 0, tSpinMiniSingles: 0, tSpinMiniDoubles: 0);
     garbage = Garbage(sent: 0, recived: 0, attack: 0, cleared: 0);
     finesse = Finesse(combo: 0, faults: 0, perfectPieces: 0);
@@ -133,6 +141,7 @@ class ReplayStats{
     topBtB: max(topBtB, other.topBtB),
     topSpike: max(topSpike, other.topSpike),
     tspins: tspins + other.tspins,
+    roundLength: roundLength + other.roundLength,
     clears: clears + other.clears,
     garbage: garbage + other.garbage,
     finesse: finesse + other.finesse
@@ -171,15 +180,15 @@ class ReplayData{
     stats = [];
     roundWinners = [];
     totalStats = [ReplayStats.createEmpty(), ReplayStats.createEmpty()];
-    int firstInEndContext = json['data'][0]['board'].indexWhere((element) => element['id'] == endcontext[0].userId);
-    int secondInEndContext = json['data'][0]['board'].indexWhere((element) => element['id'] == endcontext[1].userId);
     for(var round in json['data']) {
+      int firstInEndContext = round['replays'][0]["events"].last['data']['export']['options']['gameid'].startsWith(endcontext[0].userId) ? 0 : 1;
+      int secondInEndContext = round['replays'][1]["events"].last['data']['export']['options']['gameid'].startsWith(endcontext[1].userId) ? 1 : 0;
       roundLengths.add(max(round['replays'][0]['frames'], round['replays'][1]['frames']));
       totalLength = totalLength + max(round['replays'][0]['frames'], round['replays'][1]['frames']);
       int winner = round['board'].indexWhere((element) => element['success'] == true);
       roundWinners.add([round['board'][winner]['id'], round['board'][winner]['username']]);
-      ReplayStats playerOne = ReplayStats.fromJson(round['replays'][firstInEndContext]['events'].last['data']['export']['stats'], biggestSpikeFromReplay(round['replays'][secondInEndContext]['events'])); // (events contain recived attacks)
-      ReplayStats playerTwo = ReplayStats.fromJson(round['replays'][secondInEndContext]['events'].last['data']['export']['stats'], biggestSpikeFromReplay(round['replays'][firstInEndContext]['events']));
+      ReplayStats playerOne = ReplayStats.fromJson(round['replays'][firstInEndContext]['events'].last['data']['export']['stats'], biggestSpikeFromReplay(round['replays'][secondInEndContext]['events']), round['replays'][firstInEndContext]['frames']); // (events contain recived attacks)
+      ReplayStats playerTwo = ReplayStats.fromJson(round['replays'][secondInEndContext]['events'].last['data']['export']['stats'], biggestSpikeFromReplay(round['replays'][firstInEndContext]['events']), round['replays'][secondInEndContext]['frames']);
       stats.add([playerOne, playerTwo]);
       totalStats[0] = totalStats[0] + playerOne;
       totalStats[1] = totalStats[1] + playerTwo;
