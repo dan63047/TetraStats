@@ -17,7 +17,7 @@ final NumberFormat f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings
 late String oldWindowTitle;
 
 class CalcView extends StatefulWidget {
-  const CalcView({Key? key}) : super(key: key);
+  const CalcView({super.key});
 
   @override
   State<StatefulWidget> createState() => CalcState();

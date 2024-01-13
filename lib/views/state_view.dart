@@ -12,7 +12,7 @@ final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.lang
 
 class StateView extends StatefulWidget {
   final TetrioPlayer state;
-  const StateView({Key? key, required this.state}) : super(key: key);
+  const StateView({super.key, required this.state});
 
   @override
   State<StatefulWidget> createState() => StateState();
@@ -58,6 +58,6 @@ class StateState extends State<StateView> {
                 headerSliverBuilder: (context, value) {
                   return [SliverToBoxAdapter(child: UserThingy(player: widget.state, showStateTimestamp: true, setState: _justUpdate))];
                 },
-                body: TLThingy(tl: widget.state.tlSeason1, userID: widget.state.userId, states: [],))));
+                body: TLThingy(tl: widget.state.tlSeason1, userID: widget.state.userId, states: const [],))));
   }
 }

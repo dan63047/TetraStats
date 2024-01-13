@@ -28,7 +28,7 @@ class UserThingy extends StatelessWidget {
   final bool showStateTimestamp;
   final Function setState;
   
-  const UserThingy({Key? key, required this.player, required this.showStateTimestamp, required this.setState}) : super(key: key);
+  const UserThingy({super.key, required this.player, required this.showStateTimestamp, required this.setState});
 
   @override
   Widget build(BuildContext context) {

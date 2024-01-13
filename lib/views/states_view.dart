@@ -10,7 +10,7 @@ import 'package:window_manager/window_manager.dart';
 
 class StatesView extends StatefulWidget {
   final List<TetrioPlayer> states;
-  const StatesView({Key? key, required this.states}) : super(key: key);
+  const StatesView({super.key, required this.states});
 
   @override
   State<StatefulWidget> createState() => StatesState();

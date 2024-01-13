@@ -1,8 +1,8 @@
 // ignore_for_file: type_literal_in_constant_pattern
 
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart';
@@ -12,7 +12,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
-import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:tetra_stats/main.dart' show prefs;
@@ -33,7 +32,8 @@ String _titleNickname = "dan63047";
 final TetrioService teto = TetrioService();
 var chartsData = <DropdownMenuItem<List<FlSpot>>>[];
 List _historyShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR"];
-int _chartsIndex = 0; 
+int _chartsIndex = 0;
+late ScrollController _scrollController;
 final NumberFormat _timeInSec = NumberFormat("#,###.###s.");
 final NumberFormat secs = NumberFormat("00.###");
 final NumberFormat _f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
@@ -42,7 +42,7 @@ final DateFormat _dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.lan
 
 class MainView extends StatefulWidget {
   final String? player;
-  const MainView({Key? key, this.player}) : super(key: key);
+  const MainView({super.key, this.player});
 
   String get title => "Tetra Stats: $_titleNickname";
 
@@ -58,11 +58,10 @@ String get40lTime(int microseconds){
   return microseconds > 60000000 ? "${(microseconds/1000000/60).floor()}:${(secs.format(microseconds /1000000 % 60))}" : _timeInSec.format(microseconds / 1000000);
   }
 
-class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
+class _MainState extends State<MainView> with TickerProviderStateMixin {
   final bodyGlobalKey = GlobalKey();
   bool _searchBoolean = false;
   late TabController _tabController;
-  late ScrollController _scrollController;
   late bool fixedScroll;
 
   Widget _searchTextField() {
@@ -313,13 +312,13 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                     onRefresh: () {
                       return Future(() => changePlayer(snapshot.data![0].userId));
                     },
-                    // notificationPredicate: (notification) {
-                    //   // with NestedScrollView local(depth == 2) OverscrollNotification are not sent
-                    //   if (!kIsWeb && (notification is OverscrollNotification || Platform.isIOS)) {
-                    //     return notification.depth == 2;
-                    //   }
-                    //   return notification.depth == 0;
-                    // },
+                    notificationPredicate: (notification) {
+                      // with NestedScrollView local(depth == 2) OverscrollNotification are not sent
+                      if (!kIsWeb && (notification is OverscrollNotification || Platform.isIOS)) {
+                        return notification.depth == 2;
+                      }
+                      return notification.depth == 0;
+                    },
                     child: NestedScrollView(
                       controller: _scrollController,
                       physics: const AlwaysScrollableScrollPhysics(),
@@ -334,7 +333,7 @@ class _MainState extends State<MainView> with SingleTickerProviderStateMixin {
                           SliverToBoxAdapter(
                             child: TabBar(
                               controller: _tabController,
-                              padding: EdgeInsets.all(0.0),
+                              padding: const EdgeInsets.all(0.0),
                               isScrollable: true,
                               tabs: [
                                 Tab(text: t.tetraLeague),
@@ -423,18 +422,15 @@ class NavDrawer extends StatefulWidget {
 }
 
 class _NavDrawerState extends State<NavDrawer> {
-  late ScrollController _scrollController;
   String homePlayerNickname = "Checking...";
   @override
   void initState() {
     super.initState();
     _setHomePlayerNickname(prefs.getString("player"));
-    _scrollController = ScrollController();
   }
 
   @override
   void dispose() {
-    _scrollController.dispose();
     super.dispose();
   }
 
@@ -584,8 +580,7 @@ class _History extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     bool bigScreen = MediaQuery.of(context).size.width > 768;
-    return ListView(physics: const ClampingScrollPhysics(),
-    children: states.isNotEmpty ? [
+    return states.isNotEmpty ? 
       Column(
         children: [
           DropdownButton(
@@ -599,55 +594,135 @@ class _History extends StatelessWidget{
           if(chartsData[_chartsIndex].value!.length > 1) _HistoryChartThigy(data: chartsData[_chartsIndex].value!, title: "ss", yAxisTitle: _historyShortTitles[_chartsIndex], bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? _f2 : NumberFormat.compact(),)
           else Center(child: Text(t.notEnoughData, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)))
         ],
-      ),
-    ] : [Center(child: Text(t.noHistorySaved, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)))]);
+      )
+     : Center(child: Text(t.noHistorySaved, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)));
   }
 }
 
-class _HistoryChartThigy extends StatelessWidget{
+class _HistoryChartThigy extends StatefulWidget{
   final List<FlSpot> data;
   final String title;
   final String yAxisTitle;
   final bool bigScreen;
   final double leftSpace;
   final NumberFormat yFormat;
+
   const _HistoryChartThigy({required this.data, required this.title, required this.yAxisTitle, required this.bigScreen, required this.leftSpace, required this.yFormat});
-  
+
   @override
-  Widget build(BuildContext context) {    
-    double xInterval = bigScreen ? max(1, (data.last.x - data.first.x) / 6) : max(1, (data.last.x - data.first.x) / 3);
+  State<_HistoryChartThigy> createState() => _HistoryChartThigyState();
+}
+
+class _HistoryChartThigyState extends State<_HistoryChartThigy> {
+  late double minX;
+  late double maxX;
+  late double minY;
+  late double maxY;
+
+  @override
+  void initState(){
+    super.initState();
+    minX = widget.data.first.x;
+    maxX = widget.data.last.x;
+    minY = widget.data.reduce((value, element){
+      num n = min(value.y, element.y);
+      if (value.y == n) {
+        return value;
+      } else {
+        return element;
+      }
+    }).y;
+    maxY = widget.data.reduce((value, element){
+      num n = max(value.y, element.y);
+      if (value.y == n) {
+        return value;
+      } else {
+        return element;
+      }
+    }).y;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double xScale = maxX - minX;
+    double xInterval = widget.bigScreen ? max(1, xScale / 6) : max(1, xScale / 3);
+    EdgeInsets padding = widget.bigScreen ? const EdgeInsets.fromLTRB(40, 30, 40, 30) : const EdgeInsets.fromLTRB(0, 40, 16, 48);
+    double graphStartX = padding.left+widget.leftSpace;
+    double graphEndX = MediaQuery.sizeOf(context).width - padding.right;
     return SizedBox(
       width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height - 100,
-      child: Stack(
-        children: [
-          Padding( padding: bigScreen ? const EdgeInsets.fromLTRB(40, 40, 40, 48) : const EdgeInsets.fromLTRB(0, 40, 16, 48) ,
-          child: LineChart(
-            LineChartData(
-              lineBarsData: [LineChartBarData(spots: data)],
-              borderData: FlBorderData(show: false),
-              gridData: FlGridData(verticalInterval: xInterval),
-              titlesData: FlTitlesData(topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              bottomTitles: AxisTitles(sideTitles: SideTitles(interval: xInterval, showTitles: true, reservedSize: 30, getTitlesWidget: (double value, TitleMeta meta){
-                return value != meta.min && value != meta.max ? SideTitleWidget(
-                  axisSide: meta.axisSide,
-                  child: Text(DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).format(DateTime.fromMillisecondsSinceEpoch(value.floor()))),
-                ) : Container();
-              })),
-              leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: leftSpace, getTitlesWidget: (double value, TitleMeta meta){
-                return value != meta.min && value != meta.max ? SideTitleWidget(
-                  axisSide: meta.axisSide,
-                  child: Text(yFormat.format(value)),
-                ) : Container();
-              }))),
-              lineTouchData: LineTouchData(touchTooltipData: LineTouchTooltipData( fitInsideHorizontally: true, fitInsideVertically: true, getTooltipItems: (touchedSpots) {
-                return [for (var v in touchedSpots) LineTooltipItem("${_f4.format(v.y)} $yAxisTitle \n", const TextStyle(), children: [TextSpan(text: _dateFormat.format(DateTime.fromMillisecondsSinceEpoch(v.x.floor())))])];
-              },))
-              )
+      height: MediaQuery.of(context).size.height - 104,
+      child: Listener(
+        onPointerSignal: (signal) {
+        if (signal is PointerScrollEvent) {
+          double scrollPosRelativeX = (signal.position.dx - graphStartX) / (graphEndX - graphStartX);
+          double newMinX, newMaxX;
+          newMinX = minX - (xScale / 5e2) * signal.scrollDelta.dy * scrollPosRelativeX;
+          newMaxX = maxX + (xScale / 5e2) * signal.scrollDelta.dy * (1-scrollPosRelativeX);
+          if ((newMaxX - newMinX).isNegative) return;
+          setState(() {
+            minX = max(newMinX, widget.data.first.x);
+            maxX = min(newMaxX, widget.data.last.x);
+            _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+          });
+        }
+      },
+        child:
+          GestureDetector(
+            onDoubleTap: () {
+              setState(() {
+                minX = widget.data.first.x;
+                maxX = widget.data.last.x;
+              });
+            },
+            onHorizontalDragUpdate: (dragUpdDet) {
+                var horizontalDistance = dragUpdDet.primaryDelta ?? 0;
+                if (horizontalDistance == 0) return;
+
+                setState(() {
+                  minX -= (xScale / 7e2) * horizontalDistance;
+                  maxX -= (xScale / 7e2) * horizontalDistance;
+
+                  if (minX < widget.data.first.x) {
+                    minX = widget.data.first.x;
+                    maxX = widget.data.first.x + xScale;
+                  }
+                  if (maxX > widget.data.last.x) {
+                    maxX = widget.data.last.x;
+                    minX = maxX - xScale;
+                  }
+                });
+            },
+            child: Padding( padding: padding,
+            child: LineChart(
+              LineChartData(
+                lineBarsData: [LineChartBarData(spots: widget.data)],
+                clipData: const FlClipData.all(),
+                borderData: FlBorderData(show: false),
+                gridData: FlGridData(verticalInterval: xInterval),
+                minX: minX,
+                maxX: maxX,
+                titlesData: FlTitlesData(topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                bottomTitles: AxisTitles(sideTitles: SideTitles(interval: xInterval, showTitles: true, reservedSize: 30, getTitlesWidget: (double value, TitleMeta meta){
+                  return value != meta.min && value != meta.max ? SideTitleWidget(
+                    axisSide: meta.axisSide,
+                    child: Text(DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).format(DateTime.fromMillisecondsSinceEpoch(value.floor()))),
+                  ) : Container();
+                })),
+                leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: widget.leftSpace, getTitlesWidget: (double value, TitleMeta meta){
+                  return value != meta.min && value != meta.max ? SideTitleWidget(
+                    axisSide: meta.axisSide,
+                    child: Text(widget.yFormat.format(value)),
+                  ) : Container();
+                }))),
+                lineTouchData: LineTouchData(touchTooltipData: LineTouchTooltipData( fitInsideHorizontally: true, fitInsideVertically: true, getTooltipItems: (touchedSpots) {
+                  return [for (var v in touchedSpots) LineTooltipItem("${_f4.format(v.y)} ${widget.yAxisTitle} \n", const TextStyle(), children: [TextSpan(text: _dateFormat.format(DateTime.fromMillisecondsSinceEpoch(v.x.floor())))])];
+                },))
+                )
+              ),
             ),
           ),
-        ],
       )
     );
   }
@@ -655,7 +730,7 @@ class _HistoryChartThigy extends StatelessWidget{
 
 class _RecordThingy extends StatelessWidget {
   final RecordSingle? record;
-  const _RecordThingy({Key? key, required this.record}) : super(key: key);
+  const _RecordThingy({required this.record});
 
   @override
   Widget build(BuildContext context) {
@@ -900,8 +975,7 @@ class _OtherThingy extends StatelessWidget {
   final String? bio;
   final Distinguishment? distinguishment;
   final List<News>? newsletter;
-  const _OtherThingy({Key? key, required this.zen, required this.bio, required this.distinguishment, this.newsletter})
-      : super(key: key);
+  const _OtherThingy({required this.zen, required this.bio, required this.distinguishment, this.newsletter});
 
   List<InlineSpan> getDistinguishmentTitle(String? text) {
     if (distinguishment?.type == "twc") return [const TextSpan(text: "TETR.IO World Champion", style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.yellowAccent))];

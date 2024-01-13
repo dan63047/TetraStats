@@ -22,7 +22,7 @@ class TLThingy extends StatefulWidget {
   final bool showTitle;
   final bool bot;
   final double? topTR;
-  const TLThingy({Key? key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.bot=false, this.topTR}) : super(key: key);
+  const TLThingy({super.key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.bot=false, this.topTR});
 
   @override
   State<TLThingy> createState() => _TLThingyState();

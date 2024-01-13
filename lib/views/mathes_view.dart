@@ -14,7 +14,7 @@ late String oldWindowTitle;
 class MatchesView extends StatefulWidget {
   final String userID;
   final String username;
-  const MatchesView({Key? key, required this.userID, required this.username}) : super(key: key);
+  const MatchesView({super.key, required this.userID, required this.username});
 
   @override
   State<StatefulWidget> createState() => MatchesState();

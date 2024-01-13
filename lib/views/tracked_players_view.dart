@@ -13,7 +13,7 @@ final TetrioService teto = TetrioService();
 late String oldWindowTitle;
 
 class TrackedPlayersView extends StatefulWidget {
-  const TrackedPlayersView({Key? key}) : super(key: key);
+  const TrackedPlayersView({super.key});
 
   @override
   State<StatefulWidget> createState() => TrackedPlayersState();

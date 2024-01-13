@@ -940,9 +940,9 @@ class TetraLeagueAlpha {
     rd = json['rd'] != null ? json['rd']!.toDouble() : noTrRd;
     rank = json['rank'] != null ? json['rank']!.toString() : 'z';
     bestRank = json['bestrank'] != null ? json['bestrank']!.toString() : 'z';
-    apm = json['apm'] != null ? json['apm']!.toDouble() : null;
-    pps = json['pps'] != null ? json['pps']!.toDouble() : null;
-    vs = json['vs'] != null ? json['vs']!.toDouble() : null;
+    apm = json['apm']?.toDouble();
+    pps = json['pps']?.toDouble();
+    vs = json['vs']?.toDouble();
     decaying = json['decaying'] ?? false;
     standing = json['standing'] ?? -1;
     percentile = json['percentile'] != null ? json['percentile'].toDouble() : rankCutoffs[rank];

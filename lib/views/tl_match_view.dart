@@ -29,8 +29,7 @@ Duration framesToTime(int frames){
 class TlMatchResultView extends StatefulWidget {
   final TetraLeagueAlphaRecord record;
   final String initPlayerId;
-  const TlMatchResultView({Key? key, required this.record, required this.initPlayerId})
-      : super(key: key);
+  const TlMatchResultView({super.key, required this.record, required this.initPlayerId});
 
   @override
   State<StatefulWidget> createState() => TlMatchResultState();

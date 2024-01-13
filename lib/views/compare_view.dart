@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
@@ -28,8 +30,7 @@ class CompareView extends StatefulWidget {
   final List<dynamic> redSide;
   final Mode greenMode;
   final Mode redMode;
-  const CompareView({Key? key, required this.greenSide, required this.redSide, required this.greenMode, required this.redMode})
-      : super(key: key);
+  const CompareView({super.key, required this.greenSide, required this.redSide, required this.greenMode, required this.redMode});
 
   @override
   State<StatefulWidget> createState() => CompareState();

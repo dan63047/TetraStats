@@ -22,7 +22,7 @@ final NumberFormat _f4 = NumberFormat.decimalPatternDigits(locale: LocaleSetting
 
 class RankView extends StatefulWidget {
   final List rank;
-  const RankView({Key? key, required this.rank}) : super(key: key);
+  const RankView({super.key, required this.rank});
 
   @override
   State<StatefulWidget> createState() => RankState();
@@ -505,5 +505,5 @@ class _MyScatterSpot extends ScatterSpot {
   String nickname;
   //Color color;
   //FlDotPainter painter = FlDotCirclePainter(color: color, radius: 2);
-  _MyScatterSpot(super.x, super.y, this.id, this.nickname, {FlDotPainter? super.dotPainter});
+  _MyScatterSpot(super.x, super.y, this.id, this.nickname, {super.dotPainter});
 }

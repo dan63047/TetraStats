@@ -20,7 +20,7 @@ late String _oldWindowTitle;
 final NumberFormat _f4 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 4);
 
 class TLLeaderboardView extends StatefulWidget {
-  const TLLeaderboardView({Key? key}) : super(key: key);
+  const TLLeaderboardView({super.key});
 
   @override
   State<StatefulWidget> createState() => TLLeaderboardState();
@@ -42,7 +42,7 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
   @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);
-    final NumberFormat _f2 = NumberFormat.decimalPattern(LocaleSettings.currentLocale.languageCode)..maximumFractionDigits = 2;
+    final NumberFormat f2 = NumberFormat.decimalPattern(LocaleSettings.currentLocale.languageCode)..maximumFractionDigits = 2;
     return Scaffold(
       appBar: AppBar(
         title: Text(t.tlLeaderboard),
@@ -175,11 +175,11 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
                               return ListTile(
                                 leading: Text((index+1).toString(), style: bigScreen ? const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28) : null),
                                 title: Text(allPlayers[index].username, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
-                                subtitle: Text(_sortBy == Stats.tr ? "${_f2.format(allPlayers[index].apm)} APM, ${_f2.format(allPlayers[index].pps)} PPS, ${_f2.format(allPlayers[index].vs)} VS, ${_f2.format(allPlayers[index].nerdStats.app)} APP, ${_f2.format(allPlayers[index].nerdStats.vsapm)} VS/APM" : "${_f4.format(allPlayers[index].getStatByEnum(_sortBy))} ${chartsShortTitles[_sortBy]}"),
+                                subtitle: Text(_sortBy == Stats.tr ? "${f2.format(allPlayers[index].apm)} APM, ${f2.format(allPlayers[index].pps)} PPS, ${f2.format(allPlayers[index].vs)} VS, ${f2.format(allPlayers[index].nerdStats.app)} APP, ${f2.format(allPlayers[index].nerdStats.vsapm)} VS/APM" : "${_f4.format(allPlayers[index].getStatByEnum(_sortBy))} ${chartsShortTitles[_sortBy]}"),
                                 trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text("${_f2.format(allPlayers[index].rating)} TR", style: bigScreen ? const TextStyle(fontSize: 28) : null),
+                                    Text("${f2.format(allPlayers[index].rating)} TR", style: bigScreen ? const TextStyle(fontSize: 28) : null),
                                     Image.asset("res/tetrio_tl_alpha_ranks/${allPlayers[index].rank}.png", height: bigScreen ? 48 : 16),
                                   ],
                                 ),

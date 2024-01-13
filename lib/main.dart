@@ -18,7 +18,7 @@ import 'package:go_router/go_router.dart';
 
 late final PackageInfo packageInfo;
 late SharedPreferences prefs;
-ColorScheme sheme = ColorScheme.dark(primary: Colors.cyanAccent, secondary: Colors.white);
+ColorScheme sheme = const ColorScheme.dark(primary: Colors.cyanAccent, secondary: Colors.white);
 
 void setAccentColor(Color color){
     sheme = ColorScheme.dark(primary: color, secondary: Colors.white);

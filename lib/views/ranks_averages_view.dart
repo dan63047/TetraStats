@@ -8,7 +8,7 @@ import 'package:window_manager/window_manager.dart';
 import 'main_view.dart'; // lol
 
 class RankAveragesView extends StatefulWidget {
-  const RankAveragesView({Key? key}) : super(key: key);
+  const RankAveragesView({super.key});
 
   @override
   State<StatefulWidget> createState() => RanksAverages();

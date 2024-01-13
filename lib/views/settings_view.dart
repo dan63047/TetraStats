@@ -15,7 +15,7 @@ import 'package:window_manager/window_manager.dart';
 late String oldWindowTitle;
 
 class SettingsView extends StatefulWidget {
-  const SettingsView({Key? key}) : super(key: key);
+  const SettingsView({super.key});
 
   @override
   State<StatefulWidget> createState() => SettingsState();
@@ -236,9 +236,9 @@ class SettingsState extends State<SettingsView> {
                 },
               ),
           ),
-          ListTile(title: Text("Customization"),
-          subtitle: Text("I don't want to implement this"),
-          trailing: Icon(Icons.arrow_right),
+          ListTile(title: const Text("Customization"),
+          subtitle: const Text("I don't want to implement this"),
+          trailing: const Icon(Icons.arrow_right),
           onTap: () {
             Navigator.pushNamed(context, "/customization");
           },),

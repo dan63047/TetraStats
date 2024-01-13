@@ -37,7 +37,7 @@ class StatCellNum extends StatelessWidget {
         RichText(
           text: TextSpan(text: intf.format(integer),
           children: [
-            TextSpan(text: fractionf.format(fraction).substring(1), style: TextStyle(fontSize: 16))
+            TextSpan(text: fractionf.format(fraction).substring(1), style: const TextStyle(fontSize: 16))
           ],
           style: TextStyle(
             fontFamily: "Eurostile Round Extended",

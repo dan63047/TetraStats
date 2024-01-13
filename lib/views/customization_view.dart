@@ -12,7 +12,7 @@ Color pickerColor = Colors.cyanAccent;
 Color currentColor = Colors.cyanAccent;
 
 class CustomizationView extends StatefulWidget {
-  const CustomizationView({Key? key}) : super(key: key);
+  const CustomizationView({super.key});
 
   @override
   State<StatefulWidget> createState() => CustomizationState();
@@ -67,7 +67,7 @@ class CustomizationState extends State<CustomizationView> {
           child: ListView(
         children: [
           ListTile(
-              title: Text("Accent Color"),
+              title: const Text("Accent Color"),
               trailing: ColorIndicator(HSVColor.fromColor(Theme.of(context).colorScheme.primary)),
               onTap: () {
                 showDialog(
@@ -111,11 +111,11 @@ class CustomizationState extends State<CustomizationView> {
                               ),
                             ]));
               }),
-          ListTile(
+          const ListTile(
             title: Text("Font"),
             subtitle: Text("Not implemented"),
           ),
-          ListTile(
+          const ListTile(
             title: Text("Stats Table in TL mathes list"),
             subtitle: Text("Not implemented"),
           ),
