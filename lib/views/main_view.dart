@@ -312,13 +312,13 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                     onRefresh: () {
                       return Future(() => changePlayer(snapshot.data![0].userId));
                     },
-                    notificationPredicate: (notification) {
-                      // with NestedScrollView local(depth == 2) OverscrollNotification are not sent
-                      if (!kIsWeb && (notification is OverscrollNotification || Platform.isIOS)) {
-                        return notification.depth == 2;
-                      }
-                      return notification.depth == 0;
-                    },
+                    // notificationPredicate: (notification) {
+                    //   // with NestedScrollView local(depth == 2) OverscrollNotification are not sent
+                    //   if (!kIsWeb && (notification is OverscrollNotification || Platform.isIOS)) {
+                    //     return notification.depth == 2;
+                    //   }
+                    //   return notification.depth == 0;
+                    // },
                     child: NestedScrollView(
                       controller: _scrollController,
                       physics: const AlwaysScrollableScrollPhysics(),
@@ -617,7 +617,9 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
   late double minX;
   late double maxX;
   late double minY;
+  late double actualMinY;
   late double maxY;
+  late double actualMaxY;
 
   @override
   void initState(){
@@ -640,11 +642,25 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
         return element;
       }
     }).y;
+    actualMaxY = maxY;
+    actualMinY = minY;
+  }
+
+  @override
+  void dispose(){
+    super.dispose();
+    actualMinY = 0;
+    minY = 0;
+    
   }
 
   @override
   Widget build(BuildContext context) {
+    GlobalKey graphKey = GlobalKey();
     double xScale = maxX - minX;
+    double yScale = maxY - minY;
+    double scaleFactor = 5e2;
+    double dragFactor = 7e2;
     double xInterval = widget.bigScreen ? max(1, xScale / 6) : max(1, xScale / 3);
     EdgeInsets padding = widget.bigScreen ? const EdgeInsets.fromLTRB(40, 30, 40, 30) : const EdgeInsets.fromLTRB(0, 40, 16, 48);
     double graphStartX = padding.left+widget.leftSpace;
@@ -653,35 +669,48 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height - 104,
       child: Listener(
+        behavior: HitTestBehavior.translucent,
         onPointerSignal: (signal) {
         if (signal is PointerScrollEvent) {
+          RenderBox graphBox = graphKey.currentContext?.findRenderObject() as RenderBox;
+          Offset graphPosition = graphBox.localToGlobal(Offset.zero); 
           double scrollPosRelativeX = (signal.position.dx - graphStartX) / (graphEndX - graphStartX);
-          double newMinX, newMaxX;
-          newMinX = minX - (xScale / 5e2) * signal.scrollDelta.dy * scrollPosRelativeX;
-          newMaxX = maxX + (xScale / 5e2) * signal.scrollDelta.dy * (1-scrollPosRelativeX);
+          double scrollPosRelativeY = (signal.position.dy - graphPosition.dy) / (graphBox.size.height - 30); // size - bottom titles height
+          double newMinX, newMaxX, newMinY, newMaxY;
+          newMinX = minX - (xScale / scaleFactor) * signal.scrollDelta.dy * scrollPosRelativeX;
+          newMaxX = maxX + (xScale / scaleFactor) * signal.scrollDelta.dy * (1-scrollPosRelativeX);
+          newMinY = minY - (yScale / scaleFactor) * signal.scrollDelta.dy * (1-scrollPosRelativeY);
+          newMaxY = maxY + (yScale / scaleFactor) * signal.scrollDelta.dy * scrollPosRelativeY; 
           if ((newMaxX - newMinX).isNegative) return;
+          if ((newMaxY - newMinY).isNegative) return;
           setState(() {
             minX = max(newMinX, widget.data.first.x);
             maxX = min(newMaxX, widget.data.last.x);
-            _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+            minY = max(newMinY, actualMinY);
+            maxY = min(newMaxY, actualMaxY);
+            _scrollController.jumpTo(_scrollController.position.maxScrollExtent - signal.scrollDelta.dy);
           });
         }
       },
         child:
           GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onDoubleTap: () {
               setState(() {
                 minX = widget.data.first.x;
                 maxX = widget.data.last.x;
+                minY = actualMinY;
+                maxY = actualMaxY;
               });
             },
-            onHorizontalDragUpdate: (dragUpdDet) {
-                var horizontalDistance = dragUpdDet.primaryDelta ?? 0;
-                if (horizontalDistance == 0) return;
-
+            onPanUpdate: (dragUpdDet) {
+                print(dragUpdDet);
+                
                 setState(() {
-                  minX -= (xScale / 7e2) * horizontalDistance;
-                  maxX -= (xScale / 7e2) * horizontalDistance;
+                  minX -= (xScale / dragFactor) * dragUpdDet.delta.dx;
+                  maxX -= (xScale / dragFactor) * dragUpdDet.delta.dx;
+                  minY += (yScale / dragFactor) * dragUpdDet.delta.dy;
+                  maxY += (yScale / dragFactor) * dragUpdDet.delta.dy;
 
                   if (minX < widget.data.first.x) {
                     minX = widget.data.first.x;
@@ -693,33 +722,38 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
                   }
                 });
             },
-            child: Padding( padding: padding,
-            child: LineChart(
-              LineChartData(
-                lineBarsData: [LineChartBarData(spots: widget.data)],
-                clipData: const FlClipData.all(),
-                borderData: FlBorderData(show: false),
-                gridData: FlGridData(verticalInterval: xInterval),
-                minX: minX,
-                maxX: maxX,
-                titlesData: FlTitlesData(topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                bottomTitles: AxisTitles(sideTitles: SideTitles(interval: xInterval, showTitles: true, reservedSize: 30, getTitlesWidget: (double value, TitleMeta meta){
-                  return value != meta.min && value != meta.max ? SideTitleWidget(
-                    axisSide: meta.axisSide,
-                    child: Text(DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).format(DateTime.fromMillisecondsSinceEpoch(value.floor()))),
-                  ) : Container();
-                })),
-                leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: widget.leftSpace, getTitlesWidget: (double value, TitleMeta meta){
-                  return value != meta.min && value != meta.max ? SideTitleWidget(
-                    axisSide: meta.axisSide,
-                    child: Text(widget.yFormat.format(value)),
-                  ) : Container();
-                }))),
-                lineTouchData: LineTouchData(touchTooltipData: LineTouchTooltipData( fitInsideHorizontally: true, fitInsideVertically: true, getTooltipItems: (touchedSpots) {
-                  return [for (var v in touchedSpots) LineTooltipItem("${_f4.format(v.y)} ${widget.yAxisTitle} \n", const TextStyle(), children: [TextSpan(text: _dateFormat.format(DateTime.fromMillisecondsSinceEpoch(v.x.floor())))])];
-                },))
-                )
+            child: AbsorbPointer(
+              child: Padding( padding: padding,
+              child: LineChart(
+                key: graphKey,
+                LineChartData(
+                  lineBarsData: [LineChartBarData(spots: widget.data)],
+                  clipData: const FlClipData.all(),
+                  borderData: FlBorderData(show: false),
+                  gridData: FlGridData(verticalInterval: xInterval),
+                  minX: minX,
+                  maxX: maxX,
+                  minY: minY,
+                  maxY: maxY,
+                  titlesData: FlTitlesData(topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  bottomTitles: AxisTitles(sideTitles: SideTitles(interval: xInterval, showTitles: true, reservedSize: 30, getTitlesWidget: (double value, TitleMeta meta){
+                    return value != meta.min && value != meta.max ? SideTitleWidget(
+                      axisSide: meta.axisSide,
+                      child: Text(DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).format(DateTime.fromMillisecondsSinceEpoch(value.floor()))),
+                    ) : Container();
+                  })),
+                  leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: widget.leftSpace, getTitlesWidget: (double value, TitleMeta meta){
+                    return value != meta.min && value != meta.max ? SideTitleWidget(
+                      axisSide: meta.axisSide,
+                      child: Text(widget.yFormat.format(value)),
+                    ) : Container();
+                  }))),
+                  lineTouchData: LineTouchData(touchTooltipData: LineTouchTooltipData( fitInsideHorizontally: true, fitInsideVertically: true, getTooltipItems: (touchedSpots) {
+                    return [for (var v in touchedSpots) LineTooltipItem("${_f4.format(v.y)} ${widget.yAxisTitle} \n", const TextStyle(), children: [TextSpan(text: _dateFormat.format(DateTime.fromMillisecondsSinceEpoch(v.x.floor())))])];
+                  },))
+                  )
+                ),
               ),
             ),
           ),
@@ -810,12 +844,12 @@ class _RecordThingy extends StatelessWidget {
                                 fractionDigits: 2,
                                 isScreenBig: bigScreen,
                                   higherIsBetter: true,),
-                            StatCellNum(
-                                playerStat: record!.endContext!.finesse.faults,
+                            if (record!.endContext!.finesse != null) StatCellNum(
+                                playerStat: record!.endContext!.finesse!.faults,
                                 playerStatLabel: t.statCellNum.finesseFaults,
                                 isScreenBig: bigScreen,
                                   higherIsBetter: false,),
-                            StatCellNum(
+                            if (record!.endContext!.finesse != null) StatCellNum(
                                 playerStat:
                                     record!.endContext!.finessePercentage * 100,
                                 playerStatLabel: t.statCellNum.finessePercentage,

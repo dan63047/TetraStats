@@ -548,13 +548,13 @@ class EndContextSingle {
   late Duration finalTime;
   late int tSpins;
   late Clears clears;
-  late Finesse finesse;
+  late Finesse? finesse;
 
   double get pps => piecesPlaced / (finalTime.inMicroseconds / 1000000);
   double get kpp => inputs / piecesPlaced;
   double get spp => score / piecesPlaced;
   double get kps => inputs / (finalTime.inMicroseconds / 1000000);
-  double get finessePercentage => finesse.perfectPieces / piecesPlaced;
+  double get finessePercentage => finesse != null ? finesse!.perfectPieces / piecesPlaced : 0;
 
   EndContextSingle(
       {required this.gameType,
@@ -585,7 +585,7 @@ class EndContextSingle {
     tSpins = json['tspins'];
     piecesPlaced = json['piecesplaced'];
     clears = Clears.fromJson(json['clears']);
-    finesse = Finesse.fromJson(json['finesse']);
+    finesse = json.containsKey("finesse") ? Finesse.fromJson(json['finesse']) : null;
     gameType = json['gametype'];
   }
 
@@ -602,7 +602,7 @@ class EndContextSingle {
     data['tspins'] = tSpins;
     data['piecesplaced'] = piecesPlaced;
     data['clears'] = clears.toJson();
-    data['finesse'] = finesse.toJson();
+    if (finesse != null) data['finesse'] = finesse!.toJson();
     data['finalTime'] = finalTime;
     data['gametype'] = gameType;
     return data;
