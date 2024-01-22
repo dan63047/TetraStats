@@ -57,7 +57,7 @@ const String createTetrioTLReplayStats = '''
         CREATE TABLE IF NOT EXISTS "tetrioTLReplayStats" (
           "id"	TEXT NOT NULL,
           "data"	TEXT NOT NULL,
-          "freyhoe"	TEXT NOT NULL,
+          "freyhoe"	TEXT,
           PRIMARY KEY("id")
         )
 ''';
@@ -193,11 +193,12 @@ class TetrioService extends DB {
     return replayFile.path;
   }
 
-  Future<ReplayData> analyzeReplay(String replayID) async{
+  Future<ReplayData> analyzeReplay(String replayID, bool isAvailable) async{
     await ensureDbIsOpen();
     final db = getDatabaseOrThrow();
     final results = await db.query(tetrioTLReplayStatsTable, where: '$idCol = ?', whereArgs: [replayID]);
     if (results.isNotEmpty) return ReplayData.fromJson(jsonDecode(results.first["data"].toString())); 
+    if (!isAvailable) throw ReplayNotAvalable();
     Map<String, dynamic> toAnalyze = jsonDecode((await szyGetReplay(replayID))[0]);
     ReplayData data = ReplayData.fromJson(toAnalyze);
     saveReplayStats(data);

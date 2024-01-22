@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 1004 (502 per locale)
+/// Strings: 1008 (504 per locale)
 ///
-/// Built on 2024-01-22 at 17:10 UTC
+/// Built on 2024-01-22 at 19:27 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -254,6 +254,8 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get statsFor => 'Stats for';
 	String get matchLength => 'Match Length';
 	String get roundLength => 'Round Length';
+	String get replayIssue => 'Can\'t process replay';
+	String get matchIsTooOld => 'Replay is not available';
 	String get winner => 'Winner';
 	String get registred => 'Registred';
 	String get playedTL => 'Played Tetra League';
@@ -840,6 +842,8 @@ class _StringsRu implements Translations {
 	@override String get statsFor => 'Статистика за';
 	@override String get matchLength => 'Продолжительность матча';
 	@override String get roundLength => 'Продолжительность раунда';
+	@override String get replayIssue => 'Ошибка обработки повтора';
+	@override String get matchIsTooOld => 'Информация о повторе недоступна';
 	@override String get winner => 'Победитель';
 	@override String get registred => 'Зарегистрирован';
 	@override String get playedTL => 'Играл в Тетра Лигу';
@@ -1418,6 +1422,8 @@ extension on Translations {
 			case 'statsFor': return 'Stats for';
 			case 'matchLength': return 'Match Length';
 			case 'roundLength': return 'Round Length';
+			case 'replayIssue': return 'Can\'t process replay';
+			case 'matchIsTooOld': return 'Replay is not available';
 			case 'winner': return 'Winner';
 			case 'registred': return 'Registred';
 			case 'playedTL': return 'Played Tetra League';
@@ -1930,6 +1936,8 @@ extension on _StringsRu {
 			case 'statsFor': return 'Статистика за';
 			case 'matchLength': return 'Продолжительность матча';
 			case 'roundLength': return 'Продолжительность раунда';
+			case 'replayIssue': return 'Ошибка обработки повтора';
+			case 'matchIsTooOld': return 'Информация о повторе недоступна';
 			case 'winner': return 'Победитель';
 			case 'registred': return 'Зарегистрирован';
 			case 'playedTL': return 'Играл в Тетра Лигу';

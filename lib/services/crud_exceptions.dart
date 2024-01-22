@@ -30,6 +30,8 @@ class SzyForbidden implements Exception {}
 
 class SzyNotFound implements Exception {}
 
+class ReplayNotAvalable implements Exception {}
+
 class TetrioReplayAlreadyExist implements Exception {}
 
 class P1nkl0bst3rInternalProblem implements Exception {}

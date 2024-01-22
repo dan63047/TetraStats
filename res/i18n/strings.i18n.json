@@ -119,6 +119,8 @@
     "statsFor": "Stats for",
     "matchLength": "Match Length",
     "roundLength": "Round Length",
+    "replayIssue": "Can't process replay",
+    "matchIsTooOld": "Replay is not available",
     "winner": "Winner",
     "registred": "Registred",
     "playedTL": "Played Tetra League",

@@ -44,7 +44,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
     _scrollController = ScrollController();
     rounds = [DropdownMenuItem(value: -1, child: Text(t.match))];
     rounds.addAll([for (int i = 0; i < widget.record.endContext.first.secondaryTracking.length; i++) DropdownMenuItem(value: i, child: Text(t.roundNumber(n: i+1)))]);
-    replayData = teto.analyzeReplay(widget.record.replayId);
+    replayData = teto.analyzeReplay(widget.record.replayId, widget.record.replayAvalable);
     if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS){
       windowManager.getTitle().then((value) => oldWindowTitle = value);
       windowManager.setTitle("Tetra Stats: ${widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).username.toUpperCase()} ${t.vs} ${widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).username.toUpperCase()} ${t.inTLmatch} ${dateFormat.format(widget.record.timestamp)}");
@@ -211,7 +211,25 @@ class TlMatchResultState extends State<TlMatchResultView> {
                       return Center(child: Text("${t.roundLength}: ${time.inMinutes}:${secs.format(time.inMicroseconds /1000000 % 60)}\n${t.winner}: ${snapshot.data!.roundWinners[roundSelector][1]}", textAlign: TextAlign.center,));
                     }
                   }else{
-                    return Text("${snapshot.error.toString()}\n${snapshot.stackTrace}", textAlign: TextAlign.center);
+                    String reason;
+                    switch (snapshot.error.runtimeType){
+                      case ReplayNotAvalable:
+                        reason = t.matchIsTooOld;
+                        break;
+                      case SzyNotFound:
+                        reason = t.matchIsTooOld;
+                        break;
+                      case SzyForbidden:
+                        reason = t.errors.replayRejected;
+                        break;
+                      case SzyTooManyRequests:
+                        reason = t.errors.tooManyRequests;
+                        break;
+                      default:
+                        reason = snapshot.error.toString();
+                        break;
+                    }
+                    return Text("${t.replayIssue}: $reason", textAlign: TextAlign.center);
                   }
                     
                 }
