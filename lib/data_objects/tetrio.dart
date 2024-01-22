@@ -661,7 +661,7 @@ class NerdStats {
     dsp = ((_vs / 100) - (_apm / 60)) / _pps;
     appdsp = app + dsp;
     cheese = (dsp * 150) + ((vsapm - 2) * 50) + (0.6 - app) * 125;
-    gbe = ((app * dss) / _pps) * 2;
+    gbe = app * dsp * 2;
     nyaapp = app - 5 * tan(radians((cheese / -30) + 1));
     area = _apm * 1 + _pps * 45 + _vs * 0.444 + app * 185 + dss * 175 + dsp * 450 + gbe * 315;
   }

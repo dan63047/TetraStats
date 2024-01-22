@@ -591,7 +591,7 @@ class _History extends StatelessWidget{
                   update();
                 }
               ),
-          if(chartsData[_chartsIndex].value!.length > 1) _HistoryChartThigy(data: chartsData[_chartsIndex].value!, title: "ss", yAxisTitle: _historyShortTitles[_chartsIndex], bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? _f2 : NumberFormat.compact(),)
+          if(chartsData[_chartsIndex].value!.length > 1) _HistoryChartThigy(data: chartsData[_chartsIndex].value!, yAxisTitle: _historyShortTitles[_chartsIndex], bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? _f2 : NumberFormat.compact(),)
           else Center(child: Text(t.notEnoughData, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)))
         ],
       )
@@ -601,49 +601,43 @@ class _History extends StatelessWidget{
 
 class _HistoryChartThigy extends StatefulWidget{
   final List<FlSpot> data;
-  final String title;
   final String yAxisTitle;
   final bool bigScreen;
   final double leftSpace;
   final NumberFormat yFormat;
 
-  const _HistoryChartThigy({required this.data, required this.title, required this.yAxisTitle, required this.bigScreen, required this.leftSpace, required this.yFormat});
+  const _HistoryChartThigy({required this.data, required this.yAxisTitle, required this.bigScreen, required this.leftSpace, required this.yFormat});
 
   @override
   State<_HistoryChartThigy> createState() => _HistoryChartThigyState();
 }
 
 class _HistoryChartThigyState extends State<_HistoryChartThigy> {
+  late String previousAxisTitle;
   late double minX;
   late double maxX;
   late double minY;
   late double actualMinY;
   late double maxY;
   late double actualMaxY;
+  late double xScale;
+  late double yScale;
+  String headerTooltip = t.pseudoTooltipHeaderInit;
+  String footerTooltip = t.pseudoTooltipFooterInit;
+  int hoveredPointId = -1;
+  double scaleFactor = 5e2;
+  double dragFactor = 7e2;
 
   @override
   void initState(){
     super.initState();
     minX = widget.data.first.x;
     maxX = widget.data.last.x;
-    minY = widget.data.reduce((value, element){
-      num n = min(value.y, element.y);
-      if (value.y == n) {
-        return value;
-      } else {
-        return element;
-      }
-    }).y;
-    maxY = widget.data.reduce((value, element){
-      num n = max(value.y, element.y);
-      if (value.y == n) {
-        return value;
-      } else {
-        return element;
-      }
-    }).y;
+    setMinMaxY();
+    previousAxisTitle = widget.yAxisTitle;
     actualMaxY = maxY;
     actualMinY = minY;
+    recalculateScales();
   }
 
   @override
@@ -651,20 +645,93 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
     super.dispose();
     actualMinY = 0;
     minY = 0;
-    
+}
+
+  void setMinMaxY(){
+    actualMinY = widget.data.reduce((value, element){
+      num n = min(value.y, element.y);
+      if (value.y == n) {
+        return value;
+      } else {
+        return element;
+      }
+    }).y;
+    actualMaxY = widget.data.reduce((value, element){
+      num n = max(value.y, element.y);
+      if (value.y == n) {
+        return value;
+      } else {
+        return element;
+      }
+    }).y;
+    minY = actualMinY;
+    maxY = actualMaxY;
+  }
+
+  void recalculateScales(){
+    xScale = maxX - minX;
+    yScale = maxY - minY;
+  }
+
+  void dragHandler(DragUpdateDetails dragUpdDet){
+    setState(() {
+      minX -= (xScale / dragFactor) * dragUpdDet.delta.dx;
+      maxX -= (xScale / dragFactor) * dragUpdDet.delta.dx;
+      minY += (yScale / dragFactor) * dragUpdDet.delta.dy;
+      maxY += (yScale / dragFactor) * dragUpdDet.delta.dy;
+
+      if (minX < widget.data.first.x) {
+        minX = widget.data.first.x;
+        maxX = widget.data.first.x + xScale;
+      }
+      if (maxX > widget.data.last.x) {
+        maxX = widget.data.last.x;
+        minX = maxX - xScale;
+      }
+      if(minY < actualMinY){
+        minY = actualMinY;
+        maxY = actualMinY + yScale;
+      }
+      if(maxY > actualMaxY){
+        maxY = actualMaxY;
+        minY = actualMaxY - yScale;
+      }
+    });
+  }
+
+  void scaleHandler(ScaleUpdateDetails details, GlobalKey<State<StatefulWidget>> graphKey, double graphStartX, double graphEndX){
+    RenderBox graphBox = graphKey.currentContext?.findRenderObject() as RenderBox;
+    Offset graphPosition = graphBox.localToGlobal(Offset.zero); 
+    double scrollPosRelativeX = (details.focalPoint.dx - graphStartX) / (graphEndX - graphStartX);
+    double scrollPosRelativeY = (details.focalPoint.dy - graphPosition.dy) / (graphBox.size.height - 30); // size - bottom titles height
+    double newMinX, newMaxX, newMinY, newMaxY;
+    newMinX = minX - (xScale / scaleFactor) * (details.horizontalScale-1) * scrollPosRelativeX;
+    newMaxX = maxX + (xScale / scaleFactor) * (details.horizontalScale-1) * (1-scrollPosRelativeX);
+    newMinY = minY - (yScale / scaleFactor) * (details.horizontalScale-1) * (1-scrollPosRelativeY);
+    newMaxY = maxY + (yScale / scaleFactor) * (details.horizontalScale-1) * scrollPosRelativeY; 
+    if ((newMaxX - newMinX).isNegative) return;
+    if ((newMaxY - newMinY).isNegative) return;
+    setState(() {
+      minX = max(newMinX, widget.data.first.x);
+      maxX = min(newMaxX, widget.data.last.x);
+      minY = max(newMinY, actualMinY);
+      maxY = min(newMaxY, actualMaxY);
+      recalculateScales();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     GlobalKey graphKey = GlobalKey();
-    double xScale = maxX - minX;
-    double yScale = maxY - minY;
-    double scaleFactor = 5e2;
-    double dragFactor = 7e2;
     double xInterval = widget.bigScreen ? max(1, xScale / 6) : max(1, xScale / 3);
     EdgeInsets padding = widget.bigScreen ? const EdgeInsets.fromLTRB(40, 30, 40, 30) : const EdgeInsets.fromLTRB(0, 40, 16, 48);
     double graphStartX = padding.left+widget.leftSpace;
     double graphEndX = MediaQuery.sizeOf(context).width - padding.right;
+    if (previousAxisTitle != widget.yAxisTitle) {
+      setMinMaxY();
+      recalculateScales();
+      previousAxisTitle = widget.yAxisTitle;
+    }
     return SizedBox(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height - 104,
@@ -688,73 +755,90 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
             maxX = min(newMaxX, widget.data.last.x);
             minY = max(newMinY, actualMinY);
             maxY = min(newMaxY, actualMaxY);
-            _scrollController.jumpTo(_scrollController.position.maxScrollExtent - signal.scrollDelta.dy);
+            recalculateScales();
+            _scrollController.jumpTo(_scrollController.position.maxScrollExtent - signal.scrollDelta.dy); // TODO: find a better way to stop scrolling in NestedScrollView
           });
         }
       },
         child:
           GestureDetector(
-            behavior: HitTestBehavior.opaque,
+            behavior: HitTestBehavior.translucent,
             onDoubleTap: () {
               setState(() {
                 minX = widget.data.first.x;
                 maxX = widget.data.last.x;
                 minY = actualMinY;
                 maxY = actualMaxY;
+                recalculateScales();
               });
             },
-            onPanUpdate: (dragUpdDet) {
-                print(dragUpdDet);
-                
-                setState(() {
-                  minX -= (xScale / dragFactor) * dragUpdDet.delta.dx;
-                  maxX -= (xScale / dragFactor) * dragUpdDet.delta.dx;
-                  minY += (yScale / dragFactor) * dragUpdDet.delta.dy;
-                  maxY += (yScale / dragFactor) * dragUpdDet.delta.dy;
-
-                  if (minX < widget.data.first.x) {
-                    minX = widget.data.first.x;
-                    maxX = widget.data.first.x + xScale;
-                  }
-                  if (maxX > widget.data.last.x) {
-                    maxX = widget.data.last.x;
-                    minX = maxX - xScale;
-                  }
-                });
-            },
-            child: AbsorbPointer(
-              child: Padding( padding: padding,
-              child: LineChart(
-                key: graphKey,
-                LineChartData(
-                  lineBarsData: [LineChartBarData(spots: widget.data)],
-                  clipData: const FlClipData.all(),
-                  borderData: FlBorderData(show: false),
-                  gridData: FlGridData(verticalInterval: xInterval),
-                  minX: minX,
-                  maxX: maxX,
-                  minY: minY,
-                  maxY: maxY,
-                  titlesData: FlTitlesData(topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  bottomTitles: AxisTitles(sideTitles: SideTitles(interval: xInterval, showTitles: true, reservedSize: 30, getTitlesWidget: (double value, TitleMeta meta){
-                    return value != meta.min && value != meta.max ? SideTitleWidget(
-                      axisSide: meta.axisSide,
-                      child: Text(DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).format(DateTime.fromMillisecondsSinceEpoch(value.floor()))),
-                    ) : Container();
-                  })),
-                  leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: widget.leftSpace, getTitlesWidget: (double value, TitleMeta meta){
-                    return value != meta.min && value != meta.max ? SideTitleWidget(
-                      axisSide: meta.axisSide,
-                      child: Text(widget.yFormat.format(value)),
-                    ) : Container();
-                  }))),
-                  lineTouchData: LineTouchData(touchTooltipData: LineTouchTooltipData( fitInsideHorizontally: true, fitInsideVertically: true, getTooltipItems: (touchedSpots) {
-                    return [for (var v in touchedSpots) LineTooltipItem("${_f4.format(v.y)} ${widget.yAxisTitle} \n", const TextStyle(), children: [TextSpan(text: _dateFormat.format(DateTime.fromMillisecondsSinceEpoch(v.x.floor())))])];
-                  },))
+            // TODO: onScaleUpdate:(details) => scaleHandler(details, graphKey, graphStartX, graphEndX),
+            // TODO: Figure out wtf is going on with gestures
+            // TODO: Somehow highlight touched spot (handleBuiltInTouches breaks getTooltipItems and getTouchedSpotIndicator)
+            child: Padding( padding: padding,
+            child: Stack(
+              children: [
+                LineChart(
+                  key: graphKey,
+                  LineChartData(
+                    lineBarsData: [LineChartBarData(spots: widget.data)],
+                    clipData: const FlClipData.all(),
+                    borderData: FlBorderData(show: false),
+                    gridData: FlGridData(verticalInterval: xInterval),
+                    minX: minX,
+                    maxX: maxX,
+                    minY: minY,
+                    maxY: maxY,
+                    titlesData: FlTitlesData(topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    bottomTitles: AxisTitles(sideTitles: SideTitles(interval: xInterval, showTitles: true, reservedSize: 30, getTitlesWidget: (double value, TitleMeta meta){
+                      return value != meta.min && value != meta.max ? SideTitleWidget(
+                        axisSide: meta.axisSide,
+                        child: Text(DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).format(DateTime.fromMillisecondsSinceEpoch(value.floor()))),
+                      ) : Container();
+                    })),
+                    leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: widget.leftSpace, getTitlesWidget: (double value, TitleMeta meta){
+                      return value != meta.min && value != meta.max ? SideTitleWidget(
+                        axisSide: meta.axisSide,
+                        child: Text(widget.yFormat.format(value)),
+                      ) : Container();
+                    }))),
+                    lineTouchData: LineTouchData(
+                      handleBuiltInTouches: false,
+                      touchCallback:(touchEvent, touchResponse) {
+                        if (touchEvent is FlPanUpdateEvent){
+                            dragHandler(touchEvent.details);
+                            return;
+                          }
+                        if (touchEvent is FlPointerHoverEvent){
+                          setState(() {
+                          if (touchResponse?.lineBarSpots?.first == null) {
+                            hoveredPointId = -1;
+                          } else {
+                            hoveredPointId = touchResponse!.lineBarSpots!.first.spotIndex;
+                            headerTooltip = "${_f4.format(touchResponse.lineBarSpots!.first.y)} ${widget.yAxisTitle}";
+                            footerTooltip = _dateFormat.format(DateTime.fromMillisecondsSinceEpoch(touchResponse.lineBarSpots!.first.x.floor()));
+                          }
+                          });
+                        }
+                        if (touchEvent is FlPointerExitEvent){
+                          setState(() {hoveredPointId = -1;});
+                        }
+                      },
+                      )
+                    )
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: widget.leftSpace),
+                    child: Column(
+                      children: [
+                        AnimatedDefaultTextStyle(style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 24, color: Color.fromARGB(hoveredPointId == -1 ? 100 : 255, 255, 255, 255), shadows: hoveredPointId != -1 ? textShadow : null), duration: Durations.medium1, curve: Curves.elasticInOut, child: Text(headerTooltip)),
+                        AnimatedDefaultTextStyle(style: TextStyle(fontFamily: "Eurostile Round", color: Color.fromARGB(hoveredPointId == -1 ? 100 : 255, 255, 255, 255), shadows: hoveredPointId != -1 ? textShadow : null), duration: Durations.medium1, curve: Curves.elasticInOut, child: Text(footerTooltip)),
+                      ],
+                    ),
                   )
-                ),
-              ),
+              ],
+            ),
             ),
           ),
       )
@@ -1031,7 +1115,7 @@ class _OtherThingy extends StatelessWidget {
           )));
           break;
         default:
-          result.add(TextSpan(text: " $shit", style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)));
+          result.add(TextSpan(text: " $shit", style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)));
       }
     }
     return result;
@@ -1055,7 +1139,7 @@ class _OtherThingy extends StatelessWidget {
         return ListTile(
           title: RichText(
             text: TextSpan(
-              style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16),
+              style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16, color: Colors.white),
               text: t.newsParts.leaderboardStart,
               children: [
                 TextSpan(text: "№${news.data["rank"]} ", style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -1070,7 +1154,7 @@ class _OtherThingy extends StatelessWidget {
       return ListTile(
           title: RichText(
             text: TextSpan(
-              style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16),
+              style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16, color: Colors.white),
               text: t.newsParts.personalbest,
               children: [
                 TextSpan(text: "${gametypes[news.data["gametype"]]} ", style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -1093,7 +1177,7 @@ class _OtherThingy extends StatelessWidget {
         return ListTile(
           title: RichText(
             text: TextSpan(
-              style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16),
+              style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16, color: Colors.white),
               text: t.newsParts.badgeStart,
               children: [
                 TextSpan(text: "${news.data["label"]} ", style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -1115,7 +1199,7 @@ class _OtherThingy extends StatelessWidget {
         return ListTile(
           title: RichText(
             text: TextSpan(
-              style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16),
+              style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16, color: Colors.white),
               text: t.newsParts.rankupStart,
               children: [
                 TextSpan(text: t.newsParts.rankupMiddle(r: news.data["rank"].toString().toUpperCase()), style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -1137,7 +1221,7 @@ class _OtherThingy extends StatelessWidget {
         return ListTile(
           title: RichText(
             text: TextSpan(
-              style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16),
+              style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16, color: Colors.white),
               text: t.newsParts.supporterStart,
               children: [
                 TextSpan(text: t.newsParts.tetoSupporter, style: const TextStyle(fontWeight: FontWeight.bold))
@@ -1158,7 +1242,7 @@ class _OtherThingy extends StatelessWidget {
         return ListTile(
           title: RichText(
             text: TextSpan(
-              style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16),
+              style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16, color: Colors.white),
               text: t.newsParts.supporterGiftStart,
               children: [
                 TextSpan(text: t.newsParts.tetoSupporter, style: const TextStyle(fontWeight: FontWeight.bold))

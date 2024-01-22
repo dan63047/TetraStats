@@ -40,37 +40,37 @@ jobs:
           tag: Auto-${{ github.run_number }}
           body: Builded with GitHub Action workflow
           token: ${{ secrets.TOKEN }}
-  build-and-release-linux:
-    name: Build Linux App
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: subosito/flutter-action@v1
-      - uses: ashutoshvarma/setup-ninja@master
-        with:
-          channel: 'stable'
-          flutter-version: '3.16.5'
-      - name: Install project dependencies
-        run: flutter pub get
-      - name: Build artifacts
-        run: flutter build linux --release
-      - name: Archive Release
-        uses: thedoctor0/zip-release@master
-        with:
-          type: 'zip'
-          filename: TetraStats-${{github.ref_name}}-windows.zip
-          directory: build/linux/x64/runner/Release/bundle
-      - name: Push to Releases
-        uses: ncipollo/release-action@v1
-        with:
-          prerelease: true
-          allowUpdates: true
-          replacesArtifacts: false
-          discussionCategory: autobuilded-releases
-          artifacts: "build/linux/x64/runner/Release/bundle/TetraStats-${{github.ref_name}}-linux.zip"
-          tag: Auto-${{ github.run_number }}
-          body: Builded with GitHub Action workflow
-          token: ${{ secrets.TOKEN }}
+  # build-and-release-linux:
+  #   name: Build Linux App
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: subosito/flutter-action@v1
+  #     - uses: ashutoshvarma/setup-ninja@master
+  #       with:
+  #         channel: 'stable'
+  #         flutter-version: '3.16.5'
+  #     - name: Install project dependencies
+  #       run: flutter pub get
+  #     - name: Build artifacts
+  #       run: flutter build linux --release
+  #     - name: Archive Release
+  #       uses: thedoctor0/zip-release@master
+  #       with:
+  #         type: 'zip'
+  #         filename: TetraStats-${{github.ref_name}}-windows.zip
+  #         directory: build/linux/x64/runner/Release/bundle
+  #     - name: Push to Releases
+  #       uses: ncipollo/release-action@v1
+  #       with:
+  #         prerelease: true
+  #         allowUpdates: true
+  #         replacesArtifacts: false
+  #         discussionCategory: autobuilded-releases
+  #         artifacts: "build/linux/x64/runner/Release/bundle/TetraStats-${{github.ref_name}}-linux.zip"
+  #         tag: Auto-${{ github.run_number }}
+  #         body: Builded with GitHub Action workflow
+  #         token: ${{ secrets.TOKEN }}
   build-and-release-android:
     name: Build Android App
     runs-on: ubuntu-latest

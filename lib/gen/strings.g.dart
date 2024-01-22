@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 994 (497 per locale)
+/// Strings: 1004 (502 per locale)
 ///
-/// Built on 2024-01-05 at 16:51 UTC
+/// Built on 2024-01-22 at 17:10 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -182,6 +182,8 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get anonRecord => 'Guests are not allowed to set records';
 	String get notEnoughData => 'Not enough data';
 	String get noHistorySaved => 'No history saved';
+	String get pseudoTooltipHeaderInit => 'Hover over point';
+	String get pseudoTooltipFooterInit => 'to see detailed data';
 	String obtainDate({required Object date}) => 'Obtained ${date}';
 	String fetchDate({required Object date}) => 'Fetched ${date}';
 	String get exactGametime => 'Exact gametime';
@@ -250,6 +252,9 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get match => 'Match';
 	String roundNumber({required Object n}) => 'Round ${n}';
 	String get statsFor => 'Stats for';
+	String get matchLength => 'Match Length';
+	String get roundLength => 'Round Length';
+	String get winner => 'Winner';
 	String get registred => 'Registred';
 	String get playedTL => 'Played Tetra League';
 	String get winChance => 'Win Chance';
@@ -763,6 +768,8 @@ class _StringsRu implements Translations {
 	@override String get anonRecord => 'Гостям нельзя ставить рекорды';
 	@override String get notEnoughData => 'Недостаточно данных';
 	@override String get noHistorySaved => 'Нет сохранённой истории';
+	@override String get pseudoTooltipHeaderInit => 'Наведите курсор на точку';
+	@override String get pseudoTooltipFooterInit => 'чтобы узнать подробности';
 	@override String obtainDate({required Object date}) => 'Получено ${date}';
 	@override String fetchDate({required Object date}) => 'На момент ${date}';
 	@override String get exactGametime => 'Время, проведённое в игре';
@@ -831,6 +838,9 @@ class _StringsRu implements Translations {
 	@override String get match => 'Матч';
 	@override String roundNumber({required Object n}) => 'Раунд ${n}';
 	@override String get statsFor => 'Статистика за';
+	@override String get matchLength => 'Продолжительность матча';
+	@override String get roundLength => 'Продолжительность раунда';
+	@override String get winner => 'Победитель';
 	@override String get registred => 'Зарегистрирован';
 	@override String get playedTL => 'Играл в Тетра Лигу';
 	@override String get winChance => 'Шансы на победу';
@@ -1336,6 +1346,8 @@ extension on Translations {
 			case 'anonRecord': return 'Guests are not allowed to set records';
 			case 'notEnoughData': return 'Not enough data';
 			case 'noHistorySaved': return 'No history saved';
+			case 'pseudoTooltipHeaderInit': return 'Hover over point';
+			case 'pseudoTooltipFooterInit': return 'to see detailed data';
 			case 'obtainDate': return ({required Object date}) => 'Obtained ${date}';
 			case 'fetchDate': return ({required Object date}) => 'Fetched ${date}';
 			case 'exactGametime': return 'Exact gametime';
@@ -1404,6 +1416,9 @@ extension on Translations {
 			case 'match': return 'Match';
 			case 'roundNumber': return ({required Object n}) => 'Round ${n}';
 			case 'statsFor': return 'Stats for';
+			case 'matchLength': return 'Match Length';
+			case 'roundLength': return 'Round Length';
+			case 'winner': return 'Winner';
 			case 'registred': return 'Registred';
 			case 'playedTL': return 'Played Tetra League';
 			case 'winChance': return 'Win Chance';
@@ -1843,6 +1858,8 @@ extension on _StringsRu {
 			case 'anonRecord': return 'Гостям нельзя ставить рекорды';
 			case 'notEnoughData': return 'Недостаточно данных';
 			case 'noHistorySaved': return 'Нет сохранённой истории';
+			case 'pseudoTooltipHeaderInit': return 'Наведите курсор на точку';
+			case 'pseudoTooltipFooterInit': return 'чтобы узнать подробности';
 			case 'obtainDate': return ({required Object date}) => 'Получено ${date}';
 			case 'fetchDate': return ({required Object date}) => 'На момент ${date}';
 			case 'exactGametime': return 'Время, проведённое в игре';
@@ -1911,6 +1928,9 @@ extension on _StringsRu {
 			case 'match': return 'Матч';
 			case 'roundNumber': return ({required Object n}) => 'Раунд ${n}';
 			case 'statsFor': return 'Статистика за';
+			case 'matchLength': return 'Продолжительность матча';
+			case 'roundLength': return 'Продолжительность раунда';
+			case 'winner': return 'Победитель';
 			case 'registred': return 'Зарегистрирован';
 			case 'playedTL': return 'Играл в Тетра Лигу';
 			case 'winChance': return 'Шансы на победу';

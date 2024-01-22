@@ -12,7 +12,7 @@ class StatCellNum extends StatelessWidget {
       this.fractionDigits,
       this.oldPlayerStat,
       required this.higherIsBetter,
-      this.okText});
+      this.okText, this.alertTitle});
 
   final num playerStat;
   final num? oldPlayerStat;
@@ -20,6 +20,7 @@ class StatCellNum extends StatelessWidget {
   final String playerStatLabel;
   final String? okText;
   final bool isScreenBig;
+  final String? alertTitle;
   final List<Widget>? alertWidgets;
   final int? fractionDigits;
 
@@ -43,6 +44,7 @@ class StatCellNum extends StatelessWidget {
             fontFamily: "Eurostile Round Extended",
             //fontWeight: FontWeight.bold,
             fontSize: isScreenBig ? 32 : 24,
+            color: Colors.white
             )
           )
         ),
@@ -66,7 +68,7 @@ class StatCellNum extends StatelessWidget {
                   showDialog(
                       context: context,
                       builder: (BuildContext context) => AlertDialog(
-                            title: Text(playerStatLabel.replaceAll(RegExp(r'\n'), " "),
+                            title: Text(alertTitle??playerStatLabel.replaceAll(RegExp(r'\n'), " "),
                                 style: const TextStyle(
                                     fontFamily: "Eurostile Round Extended")),
                             content: SingleChildScrollView(

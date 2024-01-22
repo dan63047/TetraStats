@@ -57,6 +57,7 @@ const String createTetrioTLReplayStats = '''
         CREATE TABLE IF NOT EXISTS "tetrioTLReplayStats" (
           "id"	TEXT NOT NULL,
           "data"	TEXT NOT NULL,
+          "freyhoe"	TEXT NOT NULL,
           PRIMARY KEY("id")
         )
 ''';
@@ -70,8 +71,8 @@ class TetrioService extends DB {
   final Map<String, List<News>> _newsCache = {};
   final Map<String, Map<String, double?>> _topTRcache = {};
   final Map<String, TetraLeagueAlphaStream> _tlStreamsCache = {}; // i'm trying to respect oskware api It should look something like {"cached_until": TetrioPlayer}
-  //final client = UserAgentClient("Tetra Stats v${packageInfo.version} (dm @dan63047 if someone abuse that software)", http.Client());
-  final client = UserAgentClient("Kagari-chan loves osk (Tetra Stats dev build)", http.Client());
+  final client = UserAgentClient("Tetra Stats v${packageInfo.version} (dm @dan63047 if someone abuse that software)", http.Client());
+  //final client = UserAgentClient("Kagari-chan loves osk (Tetra Stats dev build)", http.Client());
   static final TetrioService _shared = TetrioService._sharedInstance();
   factory TetrioService() => _shared;
   late final StreamController<Map<String, List<TetrioPlayer>>> _tetrioStreamController;
@@ -129,16 +130,28 @@ class TetrioService extends DB {
 
   Future<List<dynamic>> szyGetReplay(String replayID) async {
     try{
+      // read from cache
       var cached = _replaysCache.entries.firstWhere((element) => element.key == replayID);
       return cached.value;
     }catch (e){
       // actually going to obtain
     }
-    Uri url = Uri.https('inoue.szy.lol', '/api/replay/$replayID');
-    var downloadPath = await getDownloadsDirectory();
-    downloadPath ??= Platform.isAndroid ? Directory("/storage/emulated/0/Download") : await getApplicationDocumentsDirectory();
-    var replayFile = File("${downloadPath.path}/$replayID.ttrm");
-    if (replayFile.existsSync()) return [replayFile.readAsStringSync(), replayFile.readAsBytesSync()];
+
+    Uri url;
+    if (kIsWeb) {
+      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "tetrioReplay", "replayid": replayID});
+    } else {
+      url = Uri.https('inoue.szy.lol', '/api/replay/$replayID');
+    }
+
+    // trying to obtain replay from download directory first
+    if (!kIsWeb){ // can't obtain download directory on web
+      var downloadPath = await getDownloadsDirectory();
+      downloadPath ??= Platform.isAndroid ? Directory("/storage/emulated/0/Download") : await getApplicationDocumentsDirectory();
+      var replayFile = File("${downloadPath.path}/$replayID.ttrm");
+      if (replayFile.existsSync()) return [replayFile.readAsStringSync(), replayFile.readAsBytesSync()];
+    }
+
     try{
       final response = await client.get(url);
 
@@ -533,10 +546,12 @@ class TetrioService extends DB {
   Future<void> deleteTLMatch(String matchID) async {
     await ensureDbIsOpen();
     final db = getDatabaseOrThrow();
+    final rID = (await db.query(tetraLeagueMatchesTable, where: '$idCol = ?', whereArgs: [matchID])).first[replayID];
     final results = await db.delete(tetraLeagueMatchesTable, where: '$idCol = ?', whereArgs: [matchID]);
     if (results != 1) {
       throw CouldNotDeleteMatch();
     }
+    await db.delete(tetrioTLReplayStatsTable, where: '$idCol = ?', whereArgs: [rID]);
   }
 
   Future<Map<String, dynamic>> fetchRecords(String userID) async {

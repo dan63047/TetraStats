@@ -345,7 +345,7 @@ class _TLThingyState extends State<TLThingy> {
                                     oldPlayerStat: oldTl?.nerdStats?.cheese,),
                                 StatCellNum(playerStat: currentTl.nerdStats!.gbe, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.gbe,
                                 alertWidgets: [Text(t.statCellNum.gbeDescription),
-                                    Text("${t.formula}: ((APP * DS/S) / PPS) * 2"),
+                                    Text("${t.formula}: APP * DS/P * 2"),
                                     Text("${t.exactValue}: ${currentTl.nerdStats!.gbe}"),],
                                     okText: t.popupActions.ok,
                                     higherIsBetter: true,

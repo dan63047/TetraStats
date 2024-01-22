@@ -23,6 +23,11 @@ Future<void> copyToClipboard(String text) async {
   await Clipboard.setData(ClipboardData(text: text));
 }
 
+List<Shadow> textShadow = const <Shadow>[
+  Shadow(offset: Offset(0.0, 0.0), blurRadius: 3.0, color: Colors.black),
+  Shadow(offset: Offset(0.0, 0.0), blurRadius: 8.0, color: Colors.black),
+];
+
 class UserThingy extends StatelessWidget {
   final TetrioPlayer player;
   final bool showStateTimestamp;
@@ -109,18 +114,7 @@ class UserThingy extends StatelessWidget {
                                   style: TextStyle(
                                     fontFamily: "Eurostile Round Extended",
                                     fontSize: bigScreen ? 42 : 28,
-                                    shadows: const <Shadow>[
-                                      Shadow(
-                                        offset: Offset(0.0, 0.0),
-                                        blurRadius: 3.0,
-                                        color: Colors.black,
-                                      ),
-                                      Shadow(
-                                        offset: Offset(0.0, 0.0),
-                                        blurRadius: 8.0,
-                                        color: Colors.black,
-                                      ),
-                                    ],
+                                    shadows: textShadow,
                                     )),
                                   TextButton(
                                     child: Text(player.userId, style: const TextStyle(fontFamily: "Eurostile Round Condensed", fontSize: 14)),
@@ -280,7 +274,8 @@ class UserThingy extends StatelessWidget {
                     playerStat: player.gameTime.inHours,
                     playerStatLabel: t.statCellNum.hoursPlayed,
                     isScreenBig: bigScreen,
-                    alertWidgets: [Text("${t.exactGametime}: ${player.gameTime.toString()}")],
+                    alertTitle: t.exactGametime,
+                    alertWidgets: [Text(player.gameTime.toString(), style: TextStyle(fontFamily: "Eurostile Round Extended"),)],
                     higherIsBetter: true,),
                 if (player.gamesPlayed >= 0) 
                   StatCellNum(

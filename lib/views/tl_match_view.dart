@@ -197,24 +197,24 @@ class TlMatchResultState extends State<TlMatchResultView> {
               ),
               SliverToBoxAdapter(child: FutureBuilder(future: replayData, builder: (context, snapshot) {
                 switch(snapshot.connectionState){
-                          case ConnectionState.none:
-                          case ConnectionState.waiting:
-                          case ConnectionState.active:
-                            return const LinearProgressIndicator();
-                          case ConnectionState.done:
-                          if (!snapshot.hasError){
-                            if (roundSelector.isNegative){
-                              var time = framesToTime(snapshot.data!.totalLength);
-                              return Center(child: Text("Match Length: ${time.inMinutes}:${secs.format(time.inMicroseconds /1000000 % 60)}", textAlign: TextAlign.center));
-                            }else{
-                              var time = framesToTime(snapshot.data!.roundLengths[roundSelector]);
-                              return Center(child: Text("Round Length: ${time.inMinutes}:${secs.format(time.inMicroseconds /1000000 % 60)}\nWinner: ${snapshot.data!.roundWinners[roundSelector][1]}", textAlign: TextAlign.center,));
-                            }
-                          }else{
-                            return const Text("skill issue", textAlign: TextAlign.center);
-                          }
-                            
-                        }
+                  case ConnectionState.none:
+                  case ConnectionState.waiting:
+                  case ConnectionState.active:
+                    return const LinearProgressIndicator();
+                  case ConnectionState.done:
+                  if (!snapshot.hasError){
+                    if (roundSelector.isNegative){
+                      var time = framesToTime(snapshot.data!.totalLength);
+                      return Center(child: Text("${t.matchLength}: ${time.inMinutes}:${secs.format(time.inMicroseconds /1000000 % 60)}", textAlign: TextAlign.center));
+                    }else{
+                      var time = framesToTime(snapshot.data!.roundLengths[roundSelector]);
+                      return Center(child: Text("${t.roundLength}: ${time.inMinutes}:${secs.format(time.inMicroseconds /1000000 % 60)}\n${t.winner}: ${snapshot.data!.roundWinners[roundSelector][1]}", textAlign: TextAlign.center,));
+                    }
+                  }else{
+                    return Text("${snapshot.error.toString()}\n${snapshot.stackTrace}", textAlign: TextAlign.center);
+                  }
+                    
+                }
               },),),
               const SliverToBoxAdapter(
                 child: Divider(),
@@ -480,7 +480,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
                           CompareBoolThingy(
                             greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.safeLock,
                             redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.safeLock,
-                            label: "safeLock",
+                            label: "Safe HD",
                             trueIsBetter: true)
                         ],
                       )
