@@ -26,22 +26,31 @@ import 'package:window_manager/window_manager.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:go_router/go_router.dart';
 
-Future<List> me = Future.delayed(const Duration(seconds: 60), () => [null, null, null, null, null, null]);
-String _searchFor = "6098518e3d5155e6ec429cdc";
+Future<List> me = Future.delayed(const Duration(seconds: 60), () => [null, null, null, null, null, null]); // I love lists shut up
+String _searchFor = "6098518e3d5155e6ec429cdc"; // who we looking for
 String _titleNickname = "dan63047";
-final TetrioService teto = TetrioService();
+final TetrioService teto = TetrioService(); // thing, that manadge our local DB
+/// Each dropdown menu item contains list of dots for the graph
 var chartsData = <DropdownMenuItem<List<FlSpot>>>[];
-List _historyShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR"];
 int _chartsIndex = 0;
+List _historyShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR", "Opener", "Plonk", "Inf. DS", "Stride"];
 late ScrollController _scrollController;
 final NumberFormat _timeInSec = NumberFormat("#,###.###s.");
 final NumberFormat secs = NumberFormat("00.###");
 final NumberFormat _f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
 final NumberFormat _f4 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 4);
 final DateFormat _dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
+final List<Shadow> textShadow = <Shadow>[ // man i love this shadow
+  const Shadow(offset: Offset(0.0, 0.0), blurRadius: 3.0, color: Colors.black),
+  const Shadow(offset: Offset(0.0, 0.0), blurRadius: 8.0, color: Colors.black),
+];
+
 
 class MainView extends StatefulWidget {
   final String? player;
+  /// The very first view, that user see when he launch this programm.
+  /// By default it loads my or defined in preferences user stats, but
+  /// if [player] username or id provided, it loads his stats. Also it hides menu drawer and three dots menu.
   const MainView({super.key, this.player});
 
   String get title => "Tetra Stats: $_titleNickname";
@@ -54,13 +63,14 @@ Future<void> copyToClipboard(String text) async {
   await Clipboard.setData(ClipboardData(text: text));
 }
 
+/// Takes number of [microseconds] and returns readable 40 lines time
 String get40lTime(int microseconds){
   return microseconds > 60000000 ? "${(microseconds/1000000/60).floor()}:${(secs.format(microseconds /1000000 % 60))}" : _timeInSec.format(microseconds / 1000000);
   }
 
 class _MainState extends State<MainView> with TickerProviderStateMixin {
   final bodyGlobalKey = GlobalKey();
-  bool _searchBoolean = false;
+  bool _showSearchBar = false;
   late TabController _tabController;
   late bool fixedScroll;
 
@@ -70,20 +80,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       autocorrect: false,
       enableSuggestions: false,
       decoration: const InputDecoration(counter: Offstage()),
-      style: const TextStyle(
-        shadows: <Shadow>[
-          Shadow(
-            offset: Offset(0.0, 0.0),
-            blurRadius: 3.0,
-            color: Colors.black,
-          ),
-          Shadow(
-            offset: Offset(0.0, 0.0),
-            blurRadius: 8.0,
-            color: Colors.black,
-          ),
-        ],
-      ),
+      style: TextStyle(shadows: textShadow),
       onSubmitted: (String value) {
         changePlayer(value);
       },
@@ -95,11 +92,13 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     initDB();
     _scrollController = ScrollController();
     _tabController = TabController(length: 6, vsync: this);
-    if (widget.player != null){
-      changePlayer(widget.player!);
+    
+    // We need to show something
+    if (widget.player != null){ // if we have user input,
+      changePlayer(widget.player!); // it's gonna be user input
     }else{
-      _getPreferences()
-        .then((value) => changePlayer(prefs.getString("player") ?? "dan63047"));
+      _getPreferences() // otherwise, checking for preferences
+        .then((value) => changePlayer(prefs.getString("player") ?? "dan63047")); // no preferences - loading me
     }
     super.initState();
   }
@@ -115,6 +114,8 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     prefs = await SharedPreferences.getInstance();
   }
 
+  /// That function initiate search of data about [player]. If [fetchHistory] is true,
+  /// also attempting to retrieve players history. Can trow an Exception if fails
   void changePlayer(String player, {bool fetchHistory = false}) {
     setState(() {
       _searchFor = player;
@@ -125,67 +126,82 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   void initDB() async{
     await teto.open();
   }
-
+  
+  /// Retrieves data from 3 different Tetra Channel API endpoints + 1 endpoint from p1nkl0bst3r's API
+  /// using [nickOrID] of player. If [fetchHistory] is true, also retrieves players history from p1nkl0bst3r's API.
+  /// 
+  /// Returns list which contains players object, his TL records, previous states, TL matches, previos TL state, if player tracked (bool), news entries and topTR.
+  /// 
+  /// If at least one request to some endpoint fails, whole function will throw an exception.
+  /// TODO: Change this behavior
   Future<List> fetch(String nickOrID, {bool fetchHistory = false}) async {
     TetrioPlayer me;
+    
+    // If user trying to search with discord id
     if (nickOrID.startsWith("ds:")){
-      me = await teto.fetchPlayer(nickOrID.substring(3), isItDiscordID: true);
+      me = await teto.fetchPlayer(nickOrID.substring(3), isItDiscordID: true); // we trying to get him with that 
     }else{
-      me = await teto.fetchPlayer(nickOrID);
+      me = await teto.fetchPlayer(nickOrID); // Otherwise it's probably a user id or username
     }
-    _searchFor = me.userId;
-    setState((){_titleNickname = me.username;});
+    _searchFor = me.userId; // gonna use user id for next requests
+
+    // Change view title and window title if avaliable
+    setState((){_titleNickname = me.username;}); 
     if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) await windowManager.setTitle(widget.title);
+
+    // Requesting Tetra League (alpha), records, news and top TR of player
     late List<dynamic> requests;
     late TetraLeagueAlphaStream tlStream;
     late Map<String, dynamic> records;
     late List<News> news;
     late double? topTR;
-    if (me.tlSeason1.gamesPlayed > 9) {
-      requests = await Future.wait([teto.getTLStream(_searchFor), teto.fetchRecords(_searchFor), teto.fetchNews(_searchFor), teto.fetchTopTR(_searchFor)]);
-      tlStream = requests[0] as TetraLeagueAlphaStream;
-      records = requests[1] as Map<String, dynamic>;
-      news = requests[2] as List<News>;
-      topTR = requests[3] as double?;
-    }else{
-      requests = await Future.wait([teto.getTLStream(_searchFor), teto.fetchRecords(_searchFor), teto.fetchNews(_searchFor)]);
-      tlStream = requests[0] as TetraLeagueAlphaStream;
-      records = requests[1] as Map<String, dynamic>;
-      news = requests[2] as List<News>;
-      topTR = null;
-    }
+    requests = await Future.wait([ // all at once
+      teto.getTLStream(_searchFor),
+      teto.fetchRecords(_searchFor),
+      teto.fetchNews(_searchFor),
+      if (me.tlSeason1.gamesPlayed > 9) teto.fetchTopTR(_searchFor) // can retrieve this only if player has TR
+    ]);
+    tlStream = requests[0] as TetraLeagueAlphaStream;
+    records = requests[1] as Map<String, dynamic>;
+    news = requests[2] as List<News>;
+    topTR = requests.elementAtOrNull(3) as double?; // No TR - no Top TR
+
+    // Making list of Tetra League matches
     List<TetraLeagueAlphaRecord> tlMatches = [];
     bool isTracking = await teto.isPlayerTracking(me.userId);
     List<TetrioPlayer> states = [];
     TetraLeagueAlpha? compareWith;
-    var uniqueTL = <dynamic>{};
+    Set<TetraLeagueAlpha> uniqueTL = {};
     tlMatches = tlStream.records;
-    if (isTracking){
+    if (isTracking){ // if tracked - save data to local DB
       await teto.storeState(me);
       await teto.saveTLMatchesFromStream(tlStream);
-    var storedRecords = await teto.getTLMatchesbyPlayerID(me.userId);
+    var storedRecords = await teto.getTLMatchesbyPlayerID(me.userId); // get old matches
     for (var match in storedRecords) {
+      // add stored match to list only if it missing from retrived ones
       if (!tlMatches.contains(match)) tlMatches.add(match);
     }
-    tlMatches.sort((a, b) {
+    tlMatches.sort((a, b) { // Newest matches gonna be shown at the top of the list
       if(a.timestamp.isBefore(b.timestamp)) return 1;
       if(a.timestamp.isAtSameMomentAs(b.timestamp)) return 0;
       if(a.timestamp.isAfter(b.timestamp)) return -1;
       return 0;
       });
     }
-    if(fetchHistory) await teto.fetchAndsaveTLHistory(_searchFor);
+
+    // Handling history
+    if(fetchHistory) await teto.fetchAndsaveTLHistory(_searchFor); // Retrieve if needed
     states.addAll(await teto.getPlayer(me.userId));
-    for (var element in states) {
-        if (uniqueTL.isNotEmpty && uniqueTL.last != element.tlSeason1) uniqueTL.add(element.tlSeason1);
-        if (uniqueTL.isEmpty) uniqueTL.add(element.tlSeason1);
-        }
-        try{
-          compareWith = uniqueTL.toList()[uniqueTL.length - 2];
-        }on RangeError {
-          compareWith = null;
-        }
-      chartsData = <DropdownMenuItem<List<FlSpot>>>[
+    for (var element in states) { // For graphs I need only unique entries
+      if (uniqueTL.isNotEmpty && uniqueTL.last != element.tlSeason1) uniqueTL.add(element.tlSeason1);
+      if (uniqueTL.isEmpty) uniqueTL.add(element.tlSeason1);
+    }
+    try{
+      compareWith = uniqueTL.toList()[uniqueTL.length - 2]; // Also i need previous Tetra League State for comparison
+    }on RangeError {
+      compareWith = null; // If can't acess it - ok then
+    }
+      chartsData = <DropdownMenuItem<List<FlSpot>>>[ // Dumping charts data into dropdown menu items, while cheking if every entry is valid
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.rating)], child: Text(t.statCellNum.tr)),
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.glicko!)], child: const Text("Glicko")),
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.rd!)], child: const Text("Rating Deviation")),
@@ -203,10 +219,15 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.area)], child: Text(t.statCellNum.area.replaceAll(RegExp(r'\n'), " "))),
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.estTr != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.estTr!.esttr)], child: Text(t.statCellNum.estOfTR.replaceAll(RegExp(r'\n'), " "))),
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.esttracc != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.esttracc!)], child: Text(t.statCellNum.accOfEst.replaceAll(RegExp(r'\n'), " "))),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.playstyle!.opener)], child: const Text("Opener")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.playstyle!.plonk)], child: const Text("Plonk")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.playstyle!.infds)], child: const Text("Inf. DS")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.playstyle!.stride)], child: const Text("Stride")),
     ];
     return [me, records, states, tlMatches, compareWith, isTracking, news, topTR];
   }
 
+  /// Triggers widgets rebuild
   void _justUpdate() {
     setState(() {});
   }
@@ -215,49 +236,31 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final t = Translations.of(context);
     return Scaffold(
-      drawer: widget.player == null ? NavDrawer(changePlayer) : null,
-      drawerEdgeDragWidth: MediaQuery.of(context).size.width * 0.2,
+      drawer: widget.player == null ? NavDrawer(changePlayer) : null, // Side menu hidden if player provided
+      drawerEdgeDragWidth: MediaQuery.of(context).size.width * 0.2, // 20% of left side of the screen used of Drawer gesture
       appBar: AppBar(
-        title: !_searchBoolean
-            ? Text(
-                widget.title,
-                style: const TextStyle(
-                  shadows: <Shadow>[
-                    Shadow(
-                      offset: Offset(0.0, 0.0),
-                      blurRadius: 3.0,
-                      color: Colors.black,
-                    ),
-                    Shadow(
-                      offset: Offset(0.0, 0.0),
-                      blurRadius: 8.0,
-                      color: Colors.black,
-                    ),
-                  ],
-                ),
-              )
-            : _searchTextField(),
+        title: _showSearchBar ? _searchTextField() : Text(widget.title, style: TextStyle(shadows: textShadow)), 
         backgroundColor: Colors.black,
-        actions: widget.player == null ? [ 
-          !_searchBoolean
-              ? IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _searchBoolean = true;
-                    });
-                  },
-                  icon: const Icon(Icons.search),
-                  tooltip: t.openSearch,
-                )
-              : IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _searchBoolean = false;
-                    });
-                  },
-                  icon: const Icon(Icons.clear),
-                  tooltip: t.closeSearch,
-                ),
+        actions: widget.player == null ? [ // search bar and PopupMenuButton hidden if player provided TODO: Subject to change
+          _showSearchBar
+            ? IconButton(
+                onPressed: () {
+                  setState(() {
+                    _showSearchBar = false;
+                  });
+                },
+                icon: const Icon(Icons.clear),
+                tooltip: t.closeSearch,
+              )
+            : IconButton(
+                onPressed: () {
+                  setState(() {
+                    _showSearchBar = true;
+                  });
+                },
+                icon: const Icon(Icons.search),
+                tooltip: t.openSearch,
+              ),
           PopupMenuButton(
             itemBuilder: (BuildContext context) => <PopupMenuEntry>[
               PopupMenuItem(
@@ -308,6 +311,8 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
               case ConnectionState.done:
                 //bool bigScreen = MediaQuery.of(context).size.width > 1024;
                 if (snapshot.hasData) {
+                  List<RecordSingle> sprintRuns = snapshot.data![1]['sprint'];
+                  List<RecordSingle> blitzRuns = snapshot.data![1]['blitz'];
                   return RefreshIndicator(
                     onRefresh: () {
                       return Future(() => changePlayer(snapshot.data![0].userId));
@@ -353,8 +358,8 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                           TLThingy(tl: snapshot.data![0].tlSeason1, userID: snapshot.data![0].userId, states: snapshot.data![2], topTR: snapshot.data![7], bot: snapshot.data![0].role == "bot", guest: snapshot.data![0].role == "anon"),
                           _TLRecords(userID: snapshot.data![0].userId, data: snapshot.data![3]),
                           _History(states: snapshot.data![2], update: _justUpdate),
-                          _RecordThingy(record: (snapshot.data![1]['sprint'].isNotEmpty) ? snapshot.data![1]['sprint'][0] : null),
-                          _RecordThingy(record: (snapshot.data![1]['blitz'].isNotEmpty) ? snapshot.data![1]['blitz'][0] : null),
+                          _RecordThingy(record: sprintRuns.elementAtOrNull(0)),
+                          _RecordThingy(record: blitzRuns.elementAtOrNull(0)),
                           _OtherThingy(zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6],)
                         ],
                       ),
@@ -415,6 +420,8 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
 class NavDrawer extends StatefulWidget {
   final Function changePlayer;
 
+  /// Thing, that shows from the left side of the view.
+  /// Requires [changePlayer] function in order to be able to change players on main view
   const NavDrawer(this.changePlayer, {super.key});
 
   @override
@@ -434,12 +441,15 @@ class _NavDrawerState extends State<NavDrawer> {
     super.dispose();
   }
 
-  Future<void> _setHomePlayerNickname(String? n) async {
-    if (n != null) {
+  /// Sets username for home button in NavDrawer.
+  /// Accepts [id] or username. If it's not provided, sets my nickname.
+  /// Otherwise, sets username or [id] if failed to find
+  Future<void> _setHomePlayerNickname(String? id) async {
+    if (id != null) {
       try {
-        homePlayerNickname = await teto.getNicknameByID(n);
+        homePlayerNickname = await teto.getNicknameByID(id);
       } on TetrioPlayerNotExist {
-        homePlayerNickname = n;
+        homePlayerNickname = id;
       }
     } else {
       homePlayerNickname = "dan63047";
@@ -469,18 +479,17 @@ class _NavDrawerState extends State<NavDrawer> {
                               child: Text(t.playersYouTrack, style: const TextStyle(color: Colors.white, fontSize: 25),
                       ))),
                       SliverToBoxAdapter(
-                        child: ListTile(
+                        child: ListTile( // Home button
                           leading: const Icon(Icons.home),
                           title: Text(homePlayerNickname),
                           onTap: () {
-                            widget.changePlayer(
-                                prefs.getString("player") ?? "dan63047");
-                            Navigator.of(context).pop();
+                            widget.changePlayer(prefs.getString("player") ?? "dan63047"); // changes player on main view to the one from preferences
+                            Navigator.of(context).pop(); // and then NavDrawer closes itself.
                           },
                         ),
                       ),
                       SliverToBoxAdapter(
-                        child: ListTile(
+                        child: ListTile( // Leaderboard button
                           leading: const Icon(Icons.leaderboard),
                           title: Text(t.tlLeaderboard),
                           onTap: () {
@@ -494,7 +503,7 @@ class _NavDrawerState extends State<NavDrawer> {
                         ),
                       ),
                       SliverToBoxAdapter(
-                        child: ListTile(
+                        child: ListTile( // Rank averages button
                           leading: const Icon(Icons.compress),
                           title: Text(t.rankAveragesViewTitle),
                           onTap: () {
@@ -510,20 +519,20 @@ class _NavDrawerState extends State<NavDrawer> {
                       const SliverToBoxAdapter(child: Divider())
                     ];
                   },
-                  body: ListView.builder(
+                  body: ListView.builder( // Builds list of tracked players.
                       itemCount: allPlayers.length,
                       itemBuilder: (context, index) {
+                        var i = allPlayers.length-1-index; // Last players in this map are most recent ones, they are gonna be shown at the top.
                         return ListTile(
-                          title: Text(
-                              allPlayers[keys[allPlayers.length-1-index]]?.last.username as String),
+                          title: Text(allPlayers[keys[i]]?.last.username as String), // Takes last known username from list of states
                           onTap: () {
-                            widget.changePlayer(keys[allPlayers.length-1-index]);
-                            Navigator.of(context).pop();
+                            widget.changePlayer(keys[i]); // changes to chosen player
+                            Navigator.of(context).pop(); // and closes itself.
                           },
                         );
                       }));
             case ConnectionState.done:
-              return const Center(child: Text('done case of StreamBuilder'));
+              return const Center(child: Text('done case of StreamBuilder')); // what if that thing breaks?
           }
         },
       ),
@@ -534,6 +543,9 @@ class _NavDrawerState extends State<NavDrawer> {
 class _TLRecords extends StatelessWidget {
   final String userID;
   final List<TetraLeagueAlphaRecord> data;
+
+  /// Widget, that displays Tetra League records.
+  /// Accepts list of TL records ([data]) and [userID] of player from the view
   const _TLRecords({required this.userID, required this.data});
 
   @override
@@ -575,6 +587,9 @@ class _TLRecords extends StatelessWidget {
 class _History extends StatelessWidget{
   final List<TetrioPlayer> states;
   final Function update;
+
+  /// Widget, that can show history of some stat of the player on the graph.
+  /// Requires player [states], which is list of states and function [update], which rebuild widgets
   const _History({required this.states, required this.update});
   
   @override
@@ -605,7 +620,10 @@ class _HistoryChartThigy extends StatefulWidget{
   final bool bigScreen;
   final double leftSpace;
   final NumberFormat yFormat;
-
+  
+  /// Implements graph for the _History widget. Requires [data] which is a list of dots for the graph. [yAxisTitle] used to keep track of changes.
+  /// [bigScreen] tells if screen wide enough, [leftSpace] sets size, reserved for titles on the left from the graph and [yFormat] sets numer format
+  /// for left titles
   const _HistoryChartThigy({required this.data, required this.yAxisTitle, required this.bigScreen, required this.leftSpace, required this.yFormat});
 
   @override
@@ -647,6 +665,7 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
     minY = 0;
 }
 
+  /// Calculates and assignes maximum and minimum values in list of dots
   void setMinMaxY(){
     actualMinY = widget.data.reduce((value, element){
       num n = min(value.y, element.y);
@@ -668,18 +687,22 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
     maxY = actualMaxY;
   }
 
+  /// Calculates and assignes scales, which is difference between maximum and minimum visible axis value
   void recalculateScales(){
     xScale = maxX - minX;
     yScale = maxY - minY;
   }
 
+  /// Accepts [dragUpdDet] and changes minX, maxX, minY, maxY based on that
   void dragHandler(DragUpdateDetails dragUpdDet){
     setState(() {
+      // Changing min and max values according to drag delta and considering scales
       minX -= (xScale / dragFactor) * dragUpdDet.delta.dx;
       maxX -= (xScale / dragFactor) * dragUpdDet.delta.dx;
       minY += (yScale / dragFactor) * dragUpdDet.delta.dy;
       maxY += (yScale / dragFactor) * dragUpdDet.delta.dy;
 
+      // If values are out of bounds - putting them back
       if (minX < widget.data.first.x) {
         minX = widget.data.first.x;
         maxX = widget.data.first.x + xScale;
@@ -699,18 +722,30 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
     });
   }
 
+  /// Accepts scale [details] and changes minX, maxX, minY, maxY in a way to change xScale and yScale.
+  /// [graphKey] required for sizes calculations, as well, as [graphStartX] and [graphEndX].
+  /// Not used yet, because GestureDetector works like shit
   void scaleHandler(ScaleUpdateDetails details, GlobalKey<State<StatefulWidget>> graphKey, double graphStartX, double graphEndX){
     RenderBox graphBox = graphKey.currentContext?.findRenderObject() as RenderBox;
-    Offset graphPosition = graphBox.localToGlobal(Offset.zero); 
-    double scrollPosRelativeX = (details.focalPoint.dx - graphStartX) / (graphEndX - graphStartX);
-    double scrollPosRelativeY = (details.focalPoint.dy - graphPosition.dy) / (graphBox.size.height - 30); // size - bottom titles height
-    double newMinX, newMaxX, newMinY, newMaxY;
-    newMinX = minX - (xScale / scaleFactor) * (details.horizontalScale-1) * scrollPosRelativeX;
-    newMaxX = maxX + (xScale / scaleFactor) * (details.horizontalScale-1) * (1-scrollPosRelativeX);
-    newMinY = minY - (yScale / scaleFactor) * (details.horizontalScale-1) * (1-scrollPosRelativeY);
-    newMaxY = maxY + (yScale / scaleFactor) * (details.horizontalScale-1) * scrollPosRelativeY; 
-    if ((newMaxX - newMinX).isNegative) return;
+
+    // calculating relative position of scale gesture
+    Offset graphPosition = graphBox.localToGlobal(Offset.zero);
+    // 0 - very left position of graph; 1 - very right position of graph
+    double gesturePosRelativeX = (details.focalPoint.dx - graphStartX) / (graphEndX - graphStartX);
+    // 0 - very top position of graph; 1 - very bottom position of graph
+    double gesturePosRelativeY = (details.focalPoint.dy - graphPosition.dy) / (graphBox.size.height - 30); // size - bottom titles height
+
+    double newMinX, newMaxX, newMinY, newMaxY; // calcutating new values based on gesture and considering scales
+    newMinX = minX - (xScale / scaleFactor) * (details.horizontalScale-1) * gesturePosRelativeX;
+    newMaxX = maxX + (xScale / scaleFactor) * (details.horizontalScale-1) * (1-gesturePosRelativeX);
+    newMinY = minY - (yScale / scaleFactor) * (details.horizontalScale-1) * (1-gesturePosRelativeY);
+    newMaxY = maxY + (yScale / scaleFactor) * (details.horizontalScale-1) * gesturePosRelativeY;
+
+    // cancel changes if minimum is more, than maximun 
+    if ((newMaxX - newMinX).isNegative) return; 
     if ((newMaxY - newMinY).isNegative) return;
+
+    // apply changes if everything ok + can't go past boundaries
     setState(() {
       minX = max(newMinX, widget.data.first.x);
       maxX = min(newMaxX, widget.data.last.x);
@@ -723,7 +758,7 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
   @override
   Widget build(BuildContext context) {
     GlobalKey graphKey = GlobalKey();
-    double xInterval = widget.bigScreen ? max(1, xScale / 6) : max(1, xScale / 3);
+    double xInterval = widget.bigScreen ? max(1, xScale / 6) : max(1, xScale / 3); // how far away xTitles should be between each other
     EdgeInsets padding = widget.bigScreen ? const EdgeInsets.fromLTRB(40, 30, 40, 30) : const EdgeInsets.fromLTRB(0, 40, 16, 48);
     double graphStartX = padding.left+widget.leftSpace;
     double graphEndX = MediaQuery.sizeOf(context).width - padding.right;
@@ -740,16 +775,25 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
         onPointerSignal: (signal) {
         if (signal is PointerScrollEvent) {
           RenderBox graphBox = graphKey.currentContext?.findRenderObject() as RenderBox;
+
+          // calculating relative position of pointer
           Offset graphPosition = graphBox.localToGlobal(Offset.zero); 
+          // 0 - very left position of graph; 1 - very right position of graph
           double scrollPosRelativeX = (signal.position.dx - graphStartX) / (graphEndX - graphStartX);
+          // 0 - very top position of graph; 1 - very bottom position of graph
           double scrollPosRelativeY = (signal.position.dy - graphPosition.dy) / (graphBox.size.height - 30); // size - bottom titles height
-          double newMinX, newMaxX, newMinY, newMaxY;
+
+          double newMinX, newMaxX, newMinY, newMaxY; // calcutating new values based on pointer position and considering scales
           newMinX = minX - (xScale / scaleFactor) * signal.scrollDelta.dy * scrollPosRelativeX;
           newMaxX = maxX + (xScale / scaleFactor) * signal.scrollDelta.dy * (1-scrollPosRelativeX);
           newMinY = minY - (yScale / scaleFactor) * signal.scrollDelta.dy * (1-scrollPosRelativeY);
           newMaxY = maxY + (yScale / scaleFactor) * signal.scrollDelta.dy * scrollPosRelativeY; 
+
+          // cancel changes if minimum is more, than maximun 
           if ((newMaxX - newMinX).isNegative) return;
           if ((newMaxY - newMinY).isNegative) return;
+
+          // apply changes if everything ok + can't go past boundaries
           setState(() {
             minX = max(newMinX, widget.data.first.x);
             maxX = min(newMaxX, widget.data.last.x);
@@ -813,7 +857,7 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
                         if (touchEvent is FlPointerHoverEvent){
                           setState(() {
                           if (touchResponse?.lineBarSpots?.first == null) {
-                            hoveredPointId = -1;
+                            hoveredPointId = -1; // not hovering over any point
                           } else {
                             hoveredPointId = touchResponse!.lineBarSpots!.first.spotIndex;
                             headerTooltip = "${_f4.format(touchResponse.lineBarSpots!.first.y)} ${widget.yAxisTitle}";
@@ -848,6 +892,8 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
 
 class _RecordThingy extends StatelessWidget {
   final RecordSingle? record;
+
+  /// Widget that displays data from [record]
   const _RecordThingy({required this.record});
 
   @override
@@ -859,229 +905,161 @@ class _RecordThingy extends StatelessWidget {
           itemCount: 1,
           itemBuilder: (BuildContext context, int index) {
             return Column(
-              children: (record != null)
-                  ? [
-                      if (record!.stream.contains("40l"))
-                        Text(t.sprint,
-                            style: TextStyle(
-                                fontFamily: "Eurostile Round Extended",
-                                fontSize: bigScreen ? 42 : 28))
-                      else if (record!.stream.contains("blitz"))
-                        Text(t.blitz,
-                            style: TextStyle(
-                                fontFamily: "Eurostile Round Extended",
-                                fontSize: bigScreen ? 42 : 28)),
-                      if (record!.stream.contains("40l"))
-                        Text(get40lTime(record!.endContext!.finalTime.inMicroseconds),
-                            style: TextStyle(
-                                fontFamily: "Eurostile Round Extended",
-                                fontSize: bigScreen ? 42 : 28))
-                      else if (record!.stream.contains("blitz"))
-                        Text(
-                            NumberFormat.decimalPattern()
-                                .format(record!.endContext!.score),
-                            style: TextStyle(
-                                fontFamily: "Eurostile Round Extended",
-                                fontSize: bigScreen ? 42 : 28)),
-                      if (record!.rank != null)
-                        StatCellNum(
-                            playerStat: record!.rank!,
-                            playerStatLabel: "Leaderboard Placement",
-                            isScreenBig: bigScreen,
-                            higherIsBetter: false),
-                      Text(t.obtainDate(date: _dateFormat.format(record!.timestamp!)),
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontFamily: "Eurostile Round",
-                            fontSize: 16,
-                          )),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 48, 0, 48),
-                        child: Wrap(
-                          direction: Axis.horizontal,
-                          alignment: WrapAlignment.spaceAround,
-                          crossAxisAlignment: WrapCrossAlignment.start,
-                          clipBehavior: Clip.hardEdge,
-                          spacing: 25,
+              children: (record != null) ? [
+                // show mode title
+                if (record!.stream.contains("40l")) Text(t.sprint, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
+                else if (record!.stream.contains("blitz")) Text(t.blitz, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                
+                // show main metric
+                if (record!.stream.contains("40l")) Text(get40lTime(record!.endContext!.finalTime.inMicroseconds), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
+                else if (record!.stream.contains("blitz")) Text(NumberFormat.decimalPattern().format(record!.endContext!.score), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                
+                // Show rank if presented
+                if (record!.rank != null) StatCellNum(playerStat: record!.rank!, playerStatLabel: "Leaderboard Placement", isScreenBig: bigScreen, higherIsBetter: false),
+                
+                // Show when this record was obtained
+                Text(t.obtainDate(date: _dateFormat.format(record!.timestamp!)), textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 16)),
+                
+                // Show metrics
+                Padding(padding: const EdgeInsets.fromLTRB(0, 48, 0, 48),
+                  child: Wrap(
+                    direction: Axis.horizontal,
+                    alignment: WrapAlignment.spaceAround,
+                    crossAxisAlignment: WrapCrossAlignment.start,
+                    clipBehavior: Clip.hardEdge,
+                    spacing: 25,
+                    children: [
+                      if (record!.stream.contains("blitz")) StatCellNum(playerStat: record!.endContext!.level, playerStatLabel: t.statCellNum.level, isScreenBig: bigScreen, higherIsBetter: true),
+                      if (record!.stream.contains("blitz")) StatCellNum(playerStat: record!.endContext!.spp, playerStatLabel: t.statCellNum.spp, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true),
+                      StatCellNum(playerStat: record!.endContext!.piecesPlaced, playerStatLabel: t.statCellNum.pieces, isScreenBig: bigScreen, higherIsBetter: true),
+                      StatCellNum(playerStat: record!.endContext!.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true),
+                      if (record!.endContext!.finesse != null) StatCellNum(playerStat: record!.endContext!.finesse!.faults, playerStatLabel: t.statCellNum.finesseFaults, isScreenBig: bigScreen, higherIsBetter: false),
+                      if (record!.endContext!.finesse != null) StatCellNum(playerStat: record!.endContext!.finessePercentage * 100, playerStatLabel: t.statCellNum.finessePercentage, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true),
+                      StatCellNum(playerStat: record!.endContext!.inputs, playerStatLabel: t.statCellNum.keys, isScreenBig: bigScreen, higherIsBetter: false),
+                      StatCellNum(playerStat: record!.endContext!.kpp, playerStatLabel: t.statCellNum.kpp, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: false),
+                      StatCellNum(playerStat: record!.endContext!.kps, playerStatLabel: t.statCellNum.kps, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true,),
+                    ],
+                  ),
+                ),
+
+                // List of actions
+                Padding(padding: const EdgeInsets.fromLTRB(0, 16, 0, 48),
+                  child: SizedBox(width: bigScreen ? MediaQuery.of(context).size.width * 0.4 : MediaQuery.of(context).size.width * 0.85,
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            if (record!.stream.contains("blitz"))
-                              StatCellNum(
-                                  playerStat: record!.endContext!.level,
-                                  playerStatLabel: t.statCellNum.level,
-                                  isScreenBig: bigScreen,
-                                  higherIsBetter: true,),
-                            if (record!.stream.contains("blitz"))
-                              StatCellNum(
-                                  playerStat: record!.endContext!.spp,
-                                  playerStatLabel: t.statCellNum.spp,
-                                  fractionDigits: 2,
-                                  isScreenBig: bigScreen,
-                                  higherIsBetter: true,),
-                            StatCellNum(
-                                playerStat: record!.endContext!.piecesPlaced,
-                                playerStatLabel: t.statCellNum.pieces,
-                                isScreenBig: bigScreen,
-                                  higherIsBetter: true,),
-                            StatCellNum(
-                                playerStat: record!.endContext!.pps,
-                                playerStatLabel: t.statCellNum.pps,
-                                fractionDigits: 2,
-                                isScreenBig: bigScreen,
-                                  higherIsBetter: true,),
-                            if (record!.endContext!.finesse != null) StatCellNum(
-                                playerStat: record!.endContext!.finesse!.faults,
-                                playerStatLabel: t.statCellNum.finesseFaults,
-                                isScreenBig: bigScreen,
-                                  higherIsBetter: false,),
-                            if (record!.endContext!.finesse != null) StatCellNum(
-                                playerStat:
-                                    record!.endContext!.finessePercentage * 100,
-                                playerStatLabel: t.statCellNum.finessePercentage,
-                                fractionDigits: 2,
-                                isScreenBig: bigScreen,
-                                  higherIsBetter: true,),
-                            StatCellNum(
-                                playerStat: record!.endContext!.inputs,
-                                playerStatLabel: t.statCellNum.keys,
-                                isScreenBig: bigScreen,
-                                  higherIsBetter: false,),
-                            StatCellNum(
-                                playerStat: record!.endContext!.kpp,
-                                playerStatLabel: t.statCellNum.kpp,
-                                fractionDigits: 2,
-                                isScreenBig: bigScreen,
-                                  higherIsBetter: false,),
-                            StatCellNum(
-                                playerStat: record!.endContext!.kps,
-                                playerStatLabel: t.statCellNum.kps,
-                                fractionDigits: 2,
-                                isScreenBig: bigScreen,
-                                  higherIsBetter: true,),
+                            Text("${t.numOfGameActions.pc}:", style: const TextStyle(fontSize: 24)),
+                            Text(record!.endContext!.clears.allClears.toString(), style: const TextStyle(fontSize: 24)),
                           ],
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 16, 0, 48),
-                        child: SizedBox(
-                          width: bigScreen
-                              ? MediaQuery.of(context).size.width * 0.4
-                              : MediaQuery.of(context).size.width * 0.85,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("${t.numOfGameActions.pc}:", style: const TextStyle(fontSize: 24)),
-                                  Text(record!.endContext!.clears.allClears.toString(), style: const TextStyle(fontSize: 24)),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("${t.numOfGameActions.hold}:", style: const TextStyle(fontSize: 24)),
-                                  Text(record!.endContext!.holds.toString(), style: const TextStyle(fontSize: 24)),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("${t.numOfGameActions.tspinsTotal}:", style: const TextStyle(fontSize: 24)),
-                                  Text(record!.endContext!.tSpins.toString(), style: const TextStyle(fontSize: 24)),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(" - T-spin zero:", style: TextStyle(fontSize: 18)),
-                                  Text(record!.endContext!.clears.tSpinZeros.toString(), style: const TextStyle(fontSize: 18)),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(" - T-spin singles:", style: TextStyle(fontSize: 18)),
-                                  Text(record!.endContext!.clears.tSpinSingles.toString(), style: const TextStyle(fontSize: 18)),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(" - T-spin doubles:", style: TextStyle(fontSize: 18)),
-                                  Text(record!.endContext!.clears.tSpinDoubles.toString(), style: const TextStyle(fontSize: 18)),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(" - T-spin triples:", style: TextStyle(fontSize: 18)),
-                                  Text(record!.endContext!.clears.tSpinTriples.toString(), style: const TextStyle(fontSize: 18)),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(" - T-spin mini zero:", style: TextStyle(fontSize: 18)),
-                                  Text(record!.endContext!.clears.tSpinMiniZeros.toString(), style: const TextStyle(fontSize: 18)),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(" - T-spin mini singles:", style: TextStyle(fontSize: 18)),
-                                  Text(record!.endContext!.clears.tSpinMiniSingles.toString(), style: const TextStyle(fontSize: 18)),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(" - T-spin mini doubles:", style: TextStyle(fontSize: 18)),
-                                  Text(record!.endContext!.clears.tSpinMiniDoubles.toString(), style: const TextStyle(fontSize: 18)),
-                                ],
-                              ),
-                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("${t.numOfGameActions.lineClears}:", style: const TextStyle(fontSize: 24)),
-                                  Text(record!.endContext!.lines.toString(), style: const TextStyle(fontSize: 24)),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(" - Singles:", style: TextStyle(fontSize: 18)),
-                                  Text(record!.endContext!.clears.singles.toString(), style: const TextStyle(fontSize: 18)),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(" - Doubles:", style: TextStyle(fontSize: 18)),
-                                  Text(record!.endContext!.clears.doubles.toString(), style: const TextStyle(fontSize: 18)),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(" - Triples:", style: TextStyle(fontSize: 18)),
-                                  Text(record!.endContext!.clears.triples.toString(), style: const TextStyle(fontSize: 18)),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(" - Quads:", style: TextStyle(fontSize: 18)),
-                                  Text(record!.endContext!.clears.quads.toString(), style: const TextStyle(fontSize: 18)),
-                                ],
-                              ),
-                            ],
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("${t.numOfGameActions.hold}:", style: const TextStyle(fontSize: 24)),
+                            Text(record!.endContext!.holds.toString(), style: const TextStyle(fontSize: 24)),
+                          ],
                         ),
-                      ),
-                    ]
-                  : [
-                      Text(t.noRecord, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28))
-                    ],
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("${t.numOfGameActions.tspinsTotal}:", style: const TextStyle(fontSize: 24)),
+                            Text(record!.endContext!.tSpins.toString(), style: const TextStyle(fontSize: 24)),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(" - T-spin zero:", style: TextStyle(fontSize: 18)),
+                            Text(record!.endContext!.clears.tSpinZeros.toString(), style: const TextStyle(fontSize: 18)),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(" - T-spin singles:", style: TextStyle(fontSize: 18)),
+                            Text(record!.endContext!.clears.tSpinSingles.toString(), style: const TextStyle(fontSize: 18)),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(" - T-spin doubles:", style: TextStyle(fontSize: 18)),
+                            Text(record!.endContext!.clears.tSpinDoubles.toString(), style: const TextStyle(fontSize: 18)),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(" - T-spin triples:", style: TextStyle(fontSize: 18)),
+                            Text(record!.endContext!.clears.tSpinTriples.toString(), style: const TextStyle(fontSize: 18)),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(" - T-spin mini zero:", style: TextStyle(fontSize: 18)),
+                            Text(record!.endContext!.clears.tSpinMiniZeros.toString(), style: const TextStyle(fontSize: 18)),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(" - T-spin mini singles:", style: TextStyle(fontSize: 18)),
+                            Text(record!.endContext!.clears.tSpinMiniSingles.toString(), style: const TextStyle(fontSize: 18)),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(" - T-spin mini doubles:", style: TextStyle(fontSize: 18)),
+                            Text(record!.endContext!.clears.tSpinMiniDoubles.toString(), style: const TextStyle(fontSize: 18)),
+                          ],
+                        ),
+                        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("${t.numOfGameActions.lineClears}:", style: const TextStyle(fontSize: 24)),
+                            Text(record!.endContext!.lines.toString(), style: const TextStyle(fontSize: 24)),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(" - Singles:", style: TextStyle(fontSize: 18)),
+                            Text(record!.endContext!.clears.singles.toString(), style: const TextStyle(fontSize: 18)),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(" - Doubles:", style: TextStyle(fontSize: 18)),
+                            Text(record!.endContext!.clears.doubles.toString(), style: const TextStyle(fontSize: 18)),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(" - Triples:", style: TextStyle(fontSize: 18)),
+                            Text(record!.endContext!.clears.triples.toString(), style: const TextStyle(fontSize: 18)),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(" - Quads:", style: TextStyle(fontSize: 18)),
+                            Text(record!.endContext!.clears.quads.toString(), style: const TextStyle(fontSize: 18)),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ]
+            : [ // If no record, show this
+                Text(t.noRecord, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28))
+              ],
             );
           });
     });
@@ -1093,15 +1071,23 @@ class _OtherThingy extends StatelessWidget {
   final String? bio;
   final Distinguishment? distinguishment;
   final List<News>? newsletter;
+
+  /// Widget, that shows players [distinguishment], [bio], [zen] and [newsletter]
   const _OtherThingy({required this.zen, required this.bio, required this.distinguishment, this.newsletter});
 
+  /// Distinguishment title is not very predictable thing.
+  /// Receives [text], which is header and returns sets of widgets for RichText widget
   List<InlineSpan> getDistinguishmentTitle(String? text) {
+    // TWC champions don't have header in their distinguishments
     if (distinguishment?.type == "twc") return [const TextSpan(text: "TETR.IO World Champion", style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.yellowAccent))];
+    // In case if it missing for some other reason, return this 
     if (text == null) return [const TextSpan(text: "Header is missing", style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.redAccent))];
-    var exploded = text.split(" ");
+    
+    // Handling placeholders for logos
+    var exploded = text.split(" "); // wtf PHP reference?
     List<InlineSpan> result = [];
     for (String shit in exploded){
-      switch (shit) {
+      switch (shit) { // if %% thingy was found, insert svg of icon
         case "%osk%":
           result.add(WidgetSpan(child: Padding(
             padding: const EdgeInsets.only(left: 8),
@@ -1114,19 +1100,25 @@ class _OtherThingy extends StatelessWidget {
             child: SvgPicture.asset("res/icons/tetrio-logo.svg", height: 28),
           )));
           break;
-        default:
+        default: // if not, insert text span
           result.add(TextSpan(text: " $shit", style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)));
       }
     }
     return result;
   }
 
+  /// Distinguishment title is barely predictable thing.
+  /// Receives [text], which is footer and returns sets of widgets for RichText widget
   String getDistinguishmentSubtitle(String? text){
+    // TWC champions don't have footer in their distinguishments
     if (distinguishment?.type == "twc") return "${distinguishment?.detail} TETR.IO World Championship";
+    // In case if it missing for some other reason, return this 
     if (text == null) return "Footer is missing";
+    // If everything ok, return as it is
     return text;
   }
 
+  /// Handles [news] entry and returns widget that contains this entry
   ListTile getNewsTile(News news){
     Map<String, String> gametypes = {
       "40l": t.sprint,
@@ -1134,6 +1126,7 @@ class _OtherThingy extends StatelessWidget {
       "5mblast": "5,000,000 Blast"
     };
 
+    // Individuly handle each entry type
     switch (news.type) {
       case "leaderboard":
         return ListTile(
@@ -1259,7 +1252,7 @@ class _OtherThingy extends StatelessWidget {
             },
           ),
         );
-      default:
+      default: // if type is unknown
       return ListTile(
         title: Text(t.newsParts.unknownNews(type: news.type)),
         subtitle: Text(_dateFormat.format(news.timestamp)),

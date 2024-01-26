@@ -20,8 +20,8 @@ late final PackageInfo packageInfo;
 late SharedPreferences prefs;
 ColorScheme sheme = const ColorScheme.dark(primary: Colors.cyanAccent, secondary: Colors.white);
 
-void setAccentColor(Color color){
-    sheme = ColorScheme.dark(primary: color, secondary: Colors.white);
+void setAccentColor(Color color){ // does this thing work??? yes??? no???
+  sheme = ColorScheme.dark(primary: color, secondary: Colors.white);
 }
 
 final router = GoRouter(
@@ -49,7 +49,7 @@ final router = GoRouter(
         ),
       ]
     ),
-    GoRoute(
+    GoRoute( // that one intended for Android users, that can open https://ch.tetr.io/u/ links
       path: "/u/:userId",
       builder: (_, __) => MainView(player: __.pathParameters['userId'])
     )
@@ -57,6 +57,7 @@ final router = GoRouter(
 );
 
 void main() async {
+  // Initializing sqflite
   if (kIsWeb) {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfiWeb;
@@ -64,21 +65,27 @@ void main() async {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
   }
+
+  // Initializing funny things
   WidgetsFlutterBinding.ensureInitialized();
-  if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS){
-    await WindowManager.instance.ensureInitialized();
+  if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS){ // we can't control windows manager in web and mobile 
+    await WindowManager.instance.ensureInitialized(); // Initializing windows manager
     windowManager.waitUntilReadyToShow().then((_) async {
-     await windowManager.setTitle('Tetra Stats');
+     await windowManager.setTitle('Tetra Stats'); // And setting the windows title
     });
   }
+
   packageInfo = await PackageInfo.fromPlatform();
   prefs = await SharedPreferences.getInstance();
+
+  // Choosing the locale
   String? locale = prefs.getString("locale");
   if (locale == null){
     LocaleSettings.useDeviceLocale();
   }else{
     LocaleSettings.setLocaleRaw(locale);
   }
+  
   runApp(TranslationProvider(
     child: const MyApp(),
   ));
@@ -90,19 +97,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-        title: "Tetra Stats", 
-        routerConfig: router,
-        scrollBehavior: const MaterialScrollBehavior().copyWith(
+      title: "Tetra Stats", 
+      routerConfig: router,
+      scrollBehavior: const MaterialScrollBehavior().copyWith(
         dragDevices: {PointerDeviceKind.mouse, PointerDeviceKind.touch, PointerDeviceKind.stylus, PointerDeviceKind.unknown},
-        ),
-        locale: TranslationProvider.of(context).flutterLocale,
-        supportedLocales: AppLocaleUtils.supportedLocales,
-        localizationsDelegates: GlobalMaterialLocalizations.delegates,
-        theme: ThemeData(
-            fontFamily: 'Eurostile Round',
-            colorScheme: sheme,
-            scaffoldBackgroundColor: Colors.black
-            )
-          );
+      ),
+      locale: TranslationProvider.of(context).flutterLocale,
+      supportedLocales: AppLocaleUtils.supportedLocales,
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      theme: ThemeData(
+        fontFamily: 'Eurostile Round',
+        colorScheme: sheme,
+        scaffoldBackgroundColor: Colors.black
+      )
+    );
   }
 }

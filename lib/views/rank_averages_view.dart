@@ -7,8 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
-import 'package:tetra_stats/views/main_view.dart' show MainView;
-import 'package:tetra_stats/widgets/user_thingy.dart' show textShadow;
+import 'package:tetra_stats/views/main_view.dart' show MainView, textShadow;
 import 'package:window_manager/window_manager.dart';
 
 var _chartsShortTitlesDropdowns = <DropdownMenuItem>[for (MapEntry e in chartsShortTitles.entries) DropdownMenuItem(value: e.key, child: Text(e.value),)];
@@ -162,8 +161,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
       recalculateBoundaries();
       resetScale();
       previousAxisTitles = _chartsX.toString()+_chartsY.toString();
-      print(padding);
-    };
+    }
     final t = Translations.of(context);
     List<TetrioPlayerFromLeaderboard> they = TetrioPlayersLeaderboard("lol", []).getStatRanking(widget.rank[1]["entries"]!, _sortBy, reversed: _reversed, country: _country);
     return Scaffold(
