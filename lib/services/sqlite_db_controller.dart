@@ -9,15 +9,19 @@ import 'package:path/path.dart' show join;
 
 const String dbName = "TetraStats.db";
 
+/// Base class for CRUD services. Contains basic functions
 class DB {
   Database? _db;
+
+  /// Handles opening of DB and creates tables if they not exist
   Future<void> open() async {
     if (_db != null) {
+      // in order to not open DB multiple times
       throw DatabaseAlreadyOpen();
     }
     try {
       String dbPath;
-      if (kIsWeb) {
+      if (kIsWeb) { // i hate web
         dbPath = dbName;
       } else {
         final docsPath = await getApplicationDocumentsDirectory();
@@ -34,6 +38,7 @@ class DB {
     }
   }
 
+  /// Handles closing of DB
   Future<void> close() async {
     final db = _db;
     if (db == null) {
@@ -44,6 +49,7 @@ class DB {
     }
   }
 
+  /// if we need instance of our DB, it will return it.
   Database getDatabaseOrThrow() {
     final db = _db;
     if (db == null) {
@@ -53,6 +59,7 @@ class DB {
     }
   }
 
+  /// You can never be too sure. Although we can be 100% sure, that DB is open after executing that function
   Future<void> ensureDbIsOpen() async {
     try {
       await open();
@@ -61,6 +68,7 @@ class DB {
     }
   }
 
+  /// Executes VACUUM command for our DB and returns number of bytes, that was saved with this operation 
   Future<int> compressDB() async{
     await ensureDbIsOpen();
     final db = getDatabaseOrThrow();

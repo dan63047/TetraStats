@@ -27,6 +27,7 @@ const String endContext2 = "endContext2";
 const String statesCol = "jsonStates";
 const String player1id = "player1id";
 const String player2id = "player2id";
+/// Table, that store players data, their stats and some moments of time
 const String createTetrioUsersTable = '''
         CREATE TABLE IF NOT EXISTS "tetrioUsers" (
           "id"	TEXT UNIQUE,
@@ -34,12 +35,14 @@ const String createTetrioUsersTable = '''
           "jsonStates"	TEXT,
           PRIMARY KEY("id")
         );''';
+/// Table, that store ids of players we need keep track of
 const String createTetrioUsersToTrack = '''
         CREATE TABLE IF NOT EXISTS "tetrioUsersToTrack" (
           "id"	TEXT NOT NULL UNIQUE,
           PRIMARY KEY("ID")
         )
 ''';
+/// Table of Tetra League matches. Each match corresponds with their own players and end contexts
 const String createTetrioTLRecordsTable = '''
         CREATE TABLE IF NOT EXISTS "tetrioAlphaLeagueMathces" (
           "id"	TEXT NOT NULL UNIQUE,
@@ -52,7 +55,7 @@ const String createTetrioTLRecordsTable = '''
           PRIMARY KEY("id")
         )
 ''';
-
+/// Table, that contains results of replay analysis in order to not analyze it more, than one time.
 const String createTetrioTLReplayStats = '''
         CREATE TABLE IF NOT EXISTS "tetrioTLReplayStats" (
           "id"	TEXT NOT NULL,
@@ -64,15 +67,19 @@ const String createTetrioTLReplayStats = '''
 
 class TetrioService extends DB {
   Map<String, List<TetrioPlayer>> _players = {};
+
+  // I'm trying to send as less requests, as possible, so i'm caching the results of those requests.
+  // Usually those maps looks like this: {"cached_until_unix_milliseconds": Object}
   final Map<String, TetrioPlayer> _playersCache = {};
   final Map<String, Map<String, dynamic>> _recordsCache = {};
-  final Map<String, dynamic> _replaysCache = {};
+  final Map<String, dynamic> _replaysCache = {}; // the only one is different: {"replayID": [replayString, replayBytes]}
   final Map<String, TetrioPlayersLeaderboard> _leaderboardsCache = {};
   final Map<String, List<News>> _newsCache = {};
   final Map<String, Map<String, double?>> _topTRcache = {};
-  final Map<String, TetraLeagueAlphaStream> _tlStreamsCache = {}; // i'm trying to respect oskware api It should look something like {"cached_until": TetrioPlayer}
-  final client = UserAgentClient("Tetra Stats v${packageInfo.version} (dm @dan63047 if someone abuse that software)", http.Client());
-  //final client = UserAgentClient("Kagari-chan loves osk (Tetra Stats dev build)", http.Client());
+  final Map<String, TetraLeagueAlphaStream> _tlStreamsCache = {};
+  /// Thing, that sends every request to the API endpoints
+  final client = kDebugMode ? UserAgentClient("Kagari-chan loves osk (Tetra Stats dev build)", http.Client()) : UserAgentClient("Tetra Stats v${packageInfo.version} (dm @dan63047 if someone abuse that software)", http.Client());
+  /// We should have only one instanse of this service
   static final TetrioService _shared = TetrioService._sharedInstance();
   factory TetrioService() => _shared;
   late final StreamController<Map<String, List<TetrioPlayer>>> _tetrioStreamController;
@@ -90,6 +97,7 @@ class TetrioService extends DB {
 
   Stream<Map<String, List<TetrioPlayer>>> get allPlayers => _tetrioStreamController.stream;
 
+  /// Loading and sending to the stream everyone.
   Future<void> _loadPlayers() async {
     final allPlayers = await getAllPlayers();
     try{
@@ -101,6 +109,8 @@ class TetrioService extends DB {
     _tetrioStreamController.add(_players);
   }
 
+  /// Removes player entry from tetrioUsersTable with given [id].
+  /// Can throw an error is player with this id is not exist
   Future<void> deletePlayer(String id) async {
     await ensureDbIsOpen();
     final db = getDatabaseOrThrow();
@@ -113,8 +123,10 @@ class TetrioService extends DB {
     }
   }
 
+  /// Gets nickname from database or requests it from API if missing.
+  /// Throws an exception if user not exist or request failed.
   Future<String> getNicknameByID(String id) async {
-    if (id.length <= 16) return id;
+    if (id.length <= 16) return id; // nicknames can be up to 16 symbols in length, that's how i'm differentiate nickname from ids
     try{
       return await getPlayer(id).then((value) => value.last.username);
     } catch (e){
@@ -122,15 +134,18 @@ class TetrioService extends DB {
     }
   }
 
+  /// Puts results of replay analysis into a tetrioTLReplayStatsTable
   Future<void> saveReplayStats(ReplayData replay) async {
     await ensureDbIsOpen();
     final db = getDatabaseOrThrow();
     db.insert(tetrioTLReplayStatsTable, {idCol: replay.id, "data": jsonEncode(replay.toJson())});
   }
 
+  /// Downloads replay from inoue (szy API). Requiers [replayID]. If request have
+  /// different from 200 statusCode, it will throw an excepction. Returns list, that contains same replay
+  /// as string and as binary.
   Future<List<dynamic>> szyGetReplay(String replayID) async {
-    try{
-      // read from cache
+    try{ // read from cache
       var cached = _replaysCache.entries.firstWhere((element) => element.key == replayID);
       return cached.value;
     }catch (e){
@@ -138,13 +153,13 @@ class TetrioService extends DB {
     }
 
     Uri url;
-    if (kIsWeb) {
+    if (kIsWeb) { // Web version sends every request through my php script at the same domain, where Tetra Stats located because of CORS
       url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "tetrioReplay", "replayid": replayID});
-    } else {
+    } else { // Actually going to hit inoue
       url = Uri.https('inoue.szy.lol', '/api/replay/$replayID');
     }
 
-    // trying to obtain replay from download directory first
+    // Trying to obtain replay from download directory first
     if (!kIsWeb){ // can't obtain download directory on web
       var downloadPath = await getDownloadsDirectory();
       downloadPath ??= Platform.isAndroid ? Directory("/storage/emulated/0/Download") : await getApplicationDocumentsDirectory();
@@ -158,7 +173,7 @@ class TetrioService extends DB {
       switch (response.statusCode) {
         case 200:
           developer.log("szyDownload: Replay downloaded", name: "services/tetrio_crud", error: response.statusCode);
-          _replaysCache[replayID] = [response.body, response.bodyBytes];
+          _replaysCache[replayID] = [response.body, response.bodyBytes]; // Puts results into the cache 
           return [response.body, response.bodyBytes];
         case 404:
           throw SzyNotFound();
@@ -829,7 +844,6 @@ class TetrioService extends DB {
     final db = getDatabaseOrThrow();
     final players = await db.query(tetrioUsersTable);
     Map<String, List<TetrioPlayer>> data = {};
-    //developer.log("getAllPlayers: $players", name: "services/tetrio_crud");
     return players.map((row) {
       // what the fuck am i doing here?
       var test = json.decode(row['jsonStates'] as String);

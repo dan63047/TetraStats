@@ -271,7 +271,7 @@ class UserThingy extends StatelessWidget {
                     playerStatLabel: t.statCellNum.hoursPlayed,
                     isScreenBig: bigScreen,
                     alertTitle: t.exactGametime,
-                    alertWidgets: [Text(player.gameTime.toString(), style: TextStyle(fontFamily: "Eurostile Round Extended"),)],
+                    alertWidgets: [Text(player.gameTime.toString(), style: const TextStyle(fontFamily: "Eurostile Round Extended"),)],
                     higherIsBetter: true,),
                 if (player.gamesPlayed >= 0) 
                   StatCellNum(

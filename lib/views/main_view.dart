@@ -196,12 +196,10 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       if (uniqueTL.isNotEmpty && uniqueTL.last != element.tlSeason1) uniqueTL.add(element.tlSeason1);
       if (uniqueTL.isEmpty) uniqueTL.add(element.tlSeason1);
     }
-    try{
-      compareWith = uniqueTL.toList()[uniqueTL.length - 2]; // Also i need previous Tetra League State for comparison
-    }on RangeError {
-      compareWith = null; // If can't acess it - ok then
-    }
-      chartsData = <DropdownMenuItem<List<FlSpot>>>[ // Dumping charts data into dropdown menu items, while cheking if every entry is valid
+    // Also i need previous Tetra League State for comparison if avaliable
+    compareWith = uniqueTL.length >= 2 ? uniqueTL.toList().elementAtOrNull(uniqueTL.length - 2) : null; 
+
+    chartsData = <DropdownMenuItem<List<FlSpot>>>[ // Dumping charts data into dropdown menu items, while cheking if every entry is valid
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.rating)], child: Text(t.statCellNum.tr)),
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.glicko!)], child: const Text("Glicko")),
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.rd!)], child: const Text("Rating Deviation")),
@@ -311,8 +309,8 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
               case ConnectionState.done:
                 //bool bigScreen = MediaQuery.of(context).size.width > 1024;
                 if (snapshot.hasData) {
-                  List<RecordSingle> sprintRuns = snapshot.data![1]['sprint'];
-                  List<RecordSingle> blitzRuns = snapshot.data![1]['blitz'];
+                  List<dynamic> sprintRuns = snapshot.data![1]['sprint'];
+                  List<dynamic> blitzRuns = snapshot.data![1]['blitz'];
                   return RefreshIndicator(
                     onRefresh: () {
                       return Future(() => changePlayer(snapshot.data![0].userId));
