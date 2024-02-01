@@ -173,10 +173,13 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     TetraLeagueAlpha? compareWith;
     Set<TetraLeagueAlpha> uniqueTL = {};
     tlMatches = tlStream.records;
+    var storedRecords = await teto.getTLMatchesbyPlayerID(me.userId); // get old matches
     if (isTracking){ // if tracked - save data to local DB
       await teto.storeState(me);
       await teto.saveTLMatchesFromStream(tlStream);
-    var storedRecords = await teto.getTLMatchesbyPlayerID(me.userId); // get old matches
+    }
+
+    // building list of TL matches
     for (var match in storedRecords) {
       // add stored match to list only if it missing from retrived ones
       if (!tlMatches.contains(match)) tlMatches.add(match);
@@ -186,8 +189,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       if(a.timestamp.isAtSameMomentAs(b.timestamp)) return 0;
       if(a.timestamp.isAfter(b.timestamp)) return -1;
       return 0;
-      });
-    }
+    });
 
     // Handling history
     if(fetchHistory) await teto.fetchAndsaveTLHistory(_searchFor); // Retrieve if needed

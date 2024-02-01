@@ -228,7 +228,8 @@ class TetrioService extends DB {
     saveReplayStats(data); // saving to DB for later
     return data;
   }
-  /// Gets and returns Top TR as a double for a player with given [id]. May return null if player top tr is unknown
+
+  /// Gets and returns Top TR for a player with given [id]. May return null if player top tr is unknown
   /// or api is unavaliable (404). May throw an exception, if something else happens.
   Future<double?> fetchTopTR(String id) async {
     try{ // read from cache
@@ -287,7 +288,7 @@ class TetrioService extends DB {
   // so i'm going to document only unique differences between them
 
   /// Retrieves Tetra League history from p1nkl0bst3r api for a player with given [id]. Returns a list of states
-  /// (state = instance of player stats at some point of time). Can throw an exception if fails to retrieve data.
+  /// (state = instance of [TetrioPlayer] at some point of time). Can throw an exception if fails to retrieve data.
   Future<List<TetrioPlayer>> fetchAndsaveTLHistory(String id) async {
     Uri url;
     if (kIsWeb) {
@@ -834,7 +835,6 @@ class TetrioService extends DB {
       return states;
     }
   }
-
 
   /// Retrieves general stats of [user] (nickname or id) from Tetra Channel api. Returns [TetrioPlayer] object of this user.
   /// If [isItDiscordID] is true, function expects [user] to be a discord user id. Throws an exception if fails to retrieve.
