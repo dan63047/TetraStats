@@ -13,21 +13,27 @@ import 'package:tetra_stats/services/tetrio_crud.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   DartPluginRegistrant.ensureInitialized();
-  if (kIsWeb) {
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfiWeb;
-  } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
-  }
+  late TetrioService teto;
+  setUp(() {
+    if (kIsWeb) {
+      sqfliteFfiInit();
+      databaseFactory = databaseFactoryFfiWeb;
+    } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      sqfliteFfiInit();
+      databaseFactory = databaseFactoryFfi;
+    }
+    teto = TetrioService();
+  });
+  
   test("Initialize TetrioServise", () async {
-    await TetrioService().open();
-  }, skip: true); // a fucking MissingPluginException how does that even happening?
+    teto.open();
+  }); // a fucking MissingPluginException how does that even happening?
   // i guess i will be unable to test iteractions with DB
 
   group("Test fetchPlayer with different players", () {
+    // those tests exist in order to detect a tiny little change in Tetra Channel API in case of some update. 
     test("dan63047 (user who have activity in tetra league)", () async {
-      TetrioPlayer dan63047 = await TetrioService().fetchPlayer("6098518e3d5155e6ec429cdc");
+      TetrioPlayer dan63047 = await teto.fetchPlayer("6098518e3d5155e6ec429cdc");
       expect(dan63047.userId, "6098518e3d5155e6ec429cdc");
       expect(dan63047.registrationTime != null, true);
       expect(dan63047.avatarRevision != null, true);
@@ -51,7 +57,7 @@ void main() {
       expect(dan63047.tlSeason1.playstyle != null, true);
     });
     test("osk (sysop who have activity in tetra league)", () async {
-      TetrioPlayer osk = await TetrioService().fetchPlayer("5e32fc85ab319c2ab1beb07c");
+      TetrioPlayer osk = await teto.fetchPlayer("5e32fc85ab319c2ab1beb07c");
       expect(osk.userId, "5e32fc85ab319c2ab1beb07c");
       expect(osk.registrationTime, null);
       expect(osk.country, "XM");
@@ -79,7 +85,7 @@ void main() {
       expect(osk.tlSeason1.playstyle != null, true);
     });
     test("kagari (sysop who have zero activity)", () async {
-      TetrioPlayer kagari = await TetrioService().fetchPlayer("5e331c3ce24a5a3e258f7a1b");
+      TetrioPlayer kagari = await teto.fetchPlayer("5e331c3ce24a5a3e258f7a1b");
       expect(kagari.userId, "5e331c3ce24a5a3e258f7a1b");
       expect(kagari.registrationTime, null);
       expect(kagari.country, "XM");
@@ -112,7 +118,7 @@ void main() {
       expect(kagari.tlSeason1.playstyle, null);
     });
     test("furry (banned account)", () async {
-      TetrioPlayer furry = await TetrioService().fetchPlayer("5eea0ff69a1ba76c20347086");
+      TetrioPlayer furry = await teto.fetchPlayer("5eea0ff69a1ba76c20347086");
       expect(furry.userId, "5eea0ff69a1ba76c20347086");
       expect(furry.registrationTime, DateTime.parse("2020-06-17T12:43:34.790Z"));
       expect(furry.role, "banned");
@@ -143,7 +149,7 @@ void main() {
       expect(furry.tlSeason1.playstyle, null);
     });
     test("oskwarefan (anon account)", () async {
-      TetrioPlayer oskwarefan = await TetrioService().fetchPlayer("646cb8273e887a054d64febe");
+      TetrioPlayer oskwarefan = await teto.fetchPlayer("646cb8273e887a054d64febe");
       expect(oskwarefan.userId, "646cb8273e887a054d64febe");
       expect(oskwarefan.registrationTime, DateTime.parse("2023-05-23T12:57:11.481Z"));
       expect(oskwarefan.role, "anon");
@@ -174,7 +180,7 @@ void main() {
     });
 
     test("not existing account", () async {
-      var future = TetrioService().fetchPlayer("hasdbashdbs");
+      var future = teto.fetchPlayer("hasdbashdbs");
       await expectLater(future, throwsA(isA<TetrioPlayerNotExist>()));
     });
   });
