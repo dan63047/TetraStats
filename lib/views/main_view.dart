@@ -156,7 +156,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     late List<News> news;
     late double? topTR;
     requests = await Future.wait([ // all at once
-      teto.getTLStream(_searchFor),
+      teto.fetchTLStream(_searchFor),
       teto.fetchRecords(_searchFor),
       teto.fetchNews(_searchFor),
       if (me.tlSeason1.gamesPlayed > 9) teto.fetchTopTR(_searchFor) // can retrieve this only if player has TR
@@ -173,10 +173,13 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     TetraLeagueAlpha? compareWith;
     Set<TetraLeagueAlpha> uniqueTL = {};
     tlMatches = tlStream.records;
+    var storedRecords = await teto.getTLMatchesbyPlayerID(me.userId); // get old matches
     if (isTracking){ // if tracked - save data to local DB
       await teto.storeState(me);
       await teto.saveTLMatchesFromStream(tlStream);
-    var storedRecords = await teto.getTLMatchesbyPlayerID(me.userId); // get old matches
+    }
+
+    // building list of TL matches
     for (var match in storedRecords) {
       // add stored match to list only if it missing from retrived ones
       if (!tlMatches.contains(match)) tlMatches.add(match);
@@ -186,8 +189,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       if(a.timestamp.isAtSameMomentAs(b.timestamp)) return 0;
       if(a.timestamp.isAfter(b.timestamp)) return -1;
       return 0;
-      });
-    }
+    });
 
     // Handling history
     if(fetchHistory) await teto.fetchAndsaveTLHistory(_searchFor); // Retrieve if needed
@@ -309,8 +311,6 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
               case ConnectionState.done:
                 //bool bigScreen = MediaQuery.of(context).size.width > 1024;
                 if (snapshot.hasData) {
-                  List<dynamic> sprintRuns = snapshot.data![1]['sprint'];
-                  List<dynamic> blitzRuns = snapshot.data![1]['blitz'];
                   return RefreshIndicator(
                     onRefresh: () {
                       return Future(() => changePlayer(snapshot.data![0].userId));
@@ -356,8 +356,8 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                           TLThingy(tl: snapshot.data![0].tlSeason1, userID: snapshot.data![0].userId, states: snapshot.data![2], topTR: snapshot.data![7], bot: snapshot.data![0].role == "bot", guest: snapshot.data![0].role == "anon"),
                           _TLRecords(userID: snapshot.data![0].userId, data: snapshot.data![3]),
                           _History(states: snapshot.data![2], update: _justUpdate),
-                          _RecordThingy(record: sprintRuns.elementAtOrNull(0)),
-                          _RecordThingy(record: blitzRuns.elementAtOrNull(0)),
+                          _RecordThingy(record: snapshot.data![1]['sprint']),
+                          _RecordThingy(record: snapshot.data![1]['blitz']),
                           _OtherThingy(zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6],)
                         ],
                       ),
