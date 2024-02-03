@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 1008 (504 per locale)
+/// Strings: 1016 (508 per locale)
 ///
-/// Built on 2024-01-22 at 19:27 UTC
+/// Built on 2024-02-03 at 12:49 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -167,6 +167,9 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get closeSearch => 'Close search';
 	String get refresh => 'Refresh';
 	String get fetchAndsaveTLHistory => 'Get player history';
+	String get fetchAndSaveOldTLmatches => 'Get Tetra League matches history';
+	String fetchAndsaveTLHistoryResult({required Object number}) => '${number} states was found';
+	String fetchAndSaveOldTLmatchesResult({required Object number}) => '${number} matches was found';
 	String get showStoredData => 'Show stored data';
 	String get statsCalc => 'Stats Calculator';
 	String get settings => 'Settings';
@@ -697,6 +700,7 @@ class _StringsErrorsEn {
 	String connection({required Object code, required Object message}) => 'Some issue with connection: ${code} ${message}';
 	String get noSuchUser => 'No such user';
 	String get history => 'History for that player is missing';
+	String get p1nkl0bst3rTLmatches => 'No Tetra League matches was found';
 	String get clientException => 'No internet connection';
 	String get forbidden => 'Your IP address is blocked.\nChange IP address or reach out to osk';
 	String get tooManyRequests => 'You have been rate limited. Try again later';
@@ -755,6 +759,9 @@ class _StringsRu implements Translations {
 	@override String get closeSearch => 'Закрыть поиск';
 	@override String get refresh => 'Обновить';
 	@override String get fetchAndsaveTLHistory => 'Получить историю игрока';
+	@override String get fetchAndSaveOldTLmatches => 'Получить старые матчи Тетра Лиги';
+	@override String fetchAndsaveTLHistoryResult({required Object number}) => '${number} состояний было найдено';
+	@override String fetchAndSaveOldTLmatchesResult({required Object number}) => '${number} старых матчей было найдено';
 	@override String get showStoredData => 'Показать сохранённые данные';
 	@override String get statsCalc => 'Калькулятор статистики';
 	@override String get settings => 'Настройки';
@@ -1285,6 +1292,7 @@ class _StringsErrorsRu implements _StringsErrorsEn {
 	@override String connection({required Object code, required Object message}) => 'Проблема с подключением: ${code} ${message}';
 	@override String get noSuchUser => 'Нет такого пользователя';
 	@override String get history => 'История данного игрока отсутствует';
+	@override String get p1nkl0bst3rTLmatches => 'Старых матчей Тетра Лиги не было найдено';
 	@override String get clientException => 'Нет соединения с интернетом';
 	@override String get forbidden => 'Ваш IP адрес заблокирован.\nСмените IP адрес или свяжитесь с osk-ом';
 	@override String get tooManyRequests => 'Слишком много запросов. Попробуйте позже';
@@ -1335,6 +1343,9 @@ extension on Translations {
 			case 'closeSearch': return 'Close search';
 			case 'refresh': return 'Refresh';
 			case 'fetchAndsaveTLHistory': return 'Get player history';
+			case 'fetchAndSaveOldTLmatches': return 'Get Tetra League matches history';
+			case 'fetchAndsaveTLHistoryResult': return ({required Object number}) => '${number} states was found';
+			case 'fetchAndSaveOldTLmatchesResult': return ({required Object number}) => '${number} matches was found';
 			case 'showStoredData': return 'Show stored data';
 			case 'statsCalc': return 'Stats Calculator';
 			case 'settings': return 'Settings';
@@ -1540,6 +1551,7 @@ extension on Translations {
 			case 'errors.connection': return ({required Object code, required Object message}) => 'Some issue with connection: ${code} ${message}';
 			case 'errors.noSuchUser': return 'No such user';
 			case 'errors.history': return 'History for that player is missing';
+			case 'errors.p1nkl0bst3rTLmatches': return 'No Tetra League matches was found';
 			case 'errors.clientException': return 'No internet connection';
 			case 'errors.forbidden': return 'Your IP address is blocked.\nChange IP address or reach out to osk';
 			case 'errors.tooManyRequests': return 'You have been rate limited. Try again later';
@@ -1849,6 +1861,9 @@ extension on _StringsRu {
 			case 'closeSearch': return 'Закрыть поиск';
 			case 'refresh': return 'Обновить';
 			case 'fetchAndsaveTLHistory': return 'Получить историю игрока';
+			case 'fetchAndSaveOldTLmatches': return 'Получить старые матчи Тетра Лиги';
+			case 'fetchAndsaveTLHistoryResult': return ({required Object number}) => '${number} состояний было найдено';
+			case 'fetchAndSaveOldTLmatchesResult': return ({required Object number}) => '${number} старых матчей было найдено';
 			case 'showStoredData': return 'Показать сохранённые данные';
 			case 'statsCalc': return 'Калькулятор статистики';
 			case 'settings': return 'Настройки';
@@ -2054,6 +2069,7 @@ extension on _StringsRu {
 			case 'errors.connection': return ({required Object code, required Object message}) => 'Проблема с подключением: ${code} ${message}';
 			case 'errors.noSuchUser': return 'Нет такого пользователя';
 			case 'errors.history': return 'История данного игрока отсутствует';
+			case 'errors.p1nkl0bst3rTLmatches': return 'Старых матчей Тетра Лиги не было найдено';
 			case 'errors.clientException': return 'Нет соединения с интернетом';
 			case 'errors.forbidden': return 'Ваш IP адрес заблокирован.\nСмените IP адрес или свяжитесь с osk-ом';
 			case 'errors.tooManyRequests': return 'Слишком много запросов. Попробуйте позже';

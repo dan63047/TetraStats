@@ -393,6 +393,100 @@ class TetrioService extends DB {
     }
   }
 
+  /// Docs later
+  Future<List<TetraLeagueAlphaRecord>> fetchAndSaveOldTLmatches(String userID) async {
+    Uri url;
+    if (kIsWeb) {
+      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLMatches", "user": userID});
+    } else {
+      url = Uri.https('api.p1nkl0bst3r.xyz', 'tlmatches/$userID');
+    }
+
+    try{
+      final response = await client.get(url);
+
+      switch (response.statusCode) {
+        case 200:
+          // that one api returns csv instead of json
+          List<List<dynamic>> csv = const CsvToListConverter().convert(response.body)..removeAt(0);
+          List<TetraLeagueAlphaRecord> matches = [];
+
+          // parsing data into TetraLeagueAlphaRecord objects
+          for (var entry in csv){
+            TetraLeagueAlphaRecord match = TetraLeagueAlphaRecord(
+              replayId: entry[0],
+              ownId: entry[0], // i gonna disting p1nkl0bst3r entries with it
+              timestamp: DateTime.parse(entry[1]),
+              endContext: [
+                EndContextMulti(
+                  userId: entry[2],
+                  username: entry[3].toString(),
+                  naturalOrder: 0,
+                  inputs: -1,
+                  piecesPlaced: -1,
+                  handling: Handling(arr: -1, das: -1, sdf: -1, dcd: 0, cancel: true, safeLock: true),
+                  points: entry[4],
+                  wins: entry[4],
+                  secondary: entry[6],
+                  secondaryTracking: [],
+                  tertiary: entry[5],
+                  tertiaryTracking: [],
+                  extra: entry[7],
+                  extraTracking: [],
+                  success: true
+                ),
+                EndContextMulti(
+                  userId: entry[8],
+                  username: entry[9].toString(),
+                  naturalOrder: 1,
+                  inputs: -1,
+                  piecesPlaced: -1,
+                  handling: Handling(arr: -1, das: -1, sdf: -1, dcd: 0, cancel: true, safeLock: true),
+                  points: entry[10],
+                  wins: entry[10],
+                  secondary: entry[12],
+                  secondaryTracking: [],
+                  tertiary: entry[11],
+                  tertiaryTracking: [],
+                  extra: entry[13],
+                  extraTracking: [],
+                  success: false
+                )
+              ],
+              replayAvalable: false
+            );
+            matches.add(match);
+          }
+          
+          // trying to dump it to local DB
+          TetraLeagueAlphaStream fakeStream = TetraLeagueAlphaStream(userId: userID, records: matches);
+          saveTLMatchesFromStream(fakeStream);
+
+          return matches;
+        case 404:
+          developer.log("fetchAndSaveOldTLmatches: Probably, history doesn't exist", name: "services/tetrio_crud", error: response.statusCode);
+          throw TetrioHistoryNotExist();
+        case 403:
+          throw P1nkl0bst3rForbidden();
+        case 429:
+          throw P1nkl0bst3rTooManyRequests();
+        case 418:
+          throw TetrioOskwareBridgeProblem();
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+          throw P1nkl0bst3rInternalProblem();
+        default:
+          developer.log("fetchAndSaveOldTLmatches: Failed to fetch history", name: "services/tetrio_crud", error: response.statusCode);
+          throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
+      }
+    } on http.ClientException catch (e, s) {
+      developer.log("$e, $s");
+      throw http.ClientException(e.message, e.uri);
+    }
+  }
+
   /// Retrieves full Tetra League leaderboard from Tetra Channel api. Returns a leaderboard object. Throws an exception if fails to retrieve.
   Future<TetrioPlayersLeaderboard> fetchTLLeaderboard() async {
     try{

@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
@@ -70,8 +68,7 @@ class CompareState extends State<CompareView> {
           theRedSide = [null, null, average];
           return setState(() {});
         }on Exception {
-          ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(t.compareViewWrongValue(value: user))));
+          if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.compareViewWrongValue(value: user))));
           return;
         }
       }
@@ -126,8 +123,7 @@ class CompareState extends State<CompareView> {
       }
       theRedSide = [player, dStates, player.tlSeason1];
     } on Exception {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(t.compareViewWrongValue(value: user))));
+      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.compareViewWrongValue(value: user))));
     }
     _justUpdate();
   }
@@ -146,8 +142,7 @@ class CompareState extends State<CompareView> {
           theGreenSide = [null, null, average];
           return setState(() {});
         }on Exception {
-          ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Falied to assign $user")));
+          if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Falied to assign $user")));
           return;
         }
       }
@@ -202,8 +197,7 @@ class CompareState extends State<CompareView> {
       }
       theGreenSide = [player, dStates, player.tlSeason1];
     } on Exception {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Falied to assign $user")));
+      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Falied to assign $user")));
     }
     _justUpdate();
   }
@@ -213,19 +207,16 @@ class CompareState extends State<CompareView> {
     theGreenSide[2] = user.tlSeason1;});
   }
 
-  double getWinrateByTR(double yourGlicko, double yourRD, double notyourGlicko,
-      double notyourRD) {
+  double getWinrateByTR(double yourGlicko, double yourRD, double notyourGlicko,double notyourRD) {
     return ((1 /
-        (1 +
-            pow(
-                10,
-                (notyourGlicko - yourGlicko) /
-                    (400 *
-                        sqrt(1 +
-                            (3 *
-                                pow(0.0057564273, 2) *
-                                (pow(yourRD, 2) + pow(notyourRD, 2)) /
-                                pow(pi, 2))))))));
+      (1 + pow(10,
+        (notyourGlicko - yourGlicko) /
+          (400 * sqrt(1 + (3 * pow(0.0057564273, 2) *
+            (pow(yourRD, 2) + pow(notyourRD, 2)) / pow(pi, 2)
+          )))
+        )
+      )
+    ));
   }
 
   void _justUpdate() {
