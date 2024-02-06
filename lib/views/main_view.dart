@@ -494,8 +494,9 @@ class _NavDrawerState extends State<NavDrawer> {
             case ConnectionState.waiting:
             case ConnectionState.active:
               final allPlayers = (snapshot.data != null)
-                  ? snapshot.data as Map<String, List<TetrioPlayer>>
-                  : <String, List<TetrioPlayer>>{};
+                  ? snapshot.data as Map<String, String>
+                  : <String, String>{};
+              allPlayers.remove(prefs.getString("player") ?? "6098518e3d5155e6ec429cdc"); // player from the home button will be delisted
               List<String> keys = allPlayers.keys.toList();
               return NestedScrollView(
                   headerSliverBuilder: (context, value) {
@@ -550,7 +551,7 @@ class _NavDrawerState extends State<NavDrawer> {
                       itemBuilder: (context, index) {
                         var i = allPlayers.length-1-index; // Last players in this map are most recent ones, they are gonna be shown at the top.
                         return ListTile(
-                          title: Text(allPlayers[keys[i]]?.last.username as String), // Takes last known username from list of states
+                          title: Text(allPlayers[keys[i]]??keys[i]), // Takes last known username from list of states
                           onTap: () {
                             widget.changePlayer(keys[i]); // changes to chosen player
                             Navigator.of(context).pop(); // and closes itself.

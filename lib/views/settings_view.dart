@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/main.dart' show packageInfo;
 import 'package:file_selector/file_selector.dart';
 import 'package:file_picker/file_picker.dart';
@@ -64,6 +65,11 @@ class SettingsState extends State<SettingsView> {
   Future<void> _setPlayer(String player) async {
     await prefs.setString('player', player);
     await _setDefaultNickname(player);
+  }
+
+  Future<void> _removePlayer() async {
+    await prefs.remove('player');
+    await _setDefaultNickname("dan63047");
   }
 
   @override
@@ -212,9 +218,21 @@ class SettingsState extends State<SettingsView> {
                         ),
                         TextButton(
                           child: Text(t.popupActions.submit),
-                          onPressed: () {
-                            _setPlayer(_playertext.text.toLowerCase().trim());
-                            Navigator.of(context).pop();
+                          onPressed: () async {
+                            if (_playertext.text.isEmpty) {
+                              _removePlayer();
+                              Navigator.of(context).pop();
+                              return;
+                            }
+                            late TetrioPlayer user;
+                            try{
+                              user = await teto.fetchPlayer(_playertext.text.toLowerCase().trim());
+                            }on Exception{
+                              if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.noSuchUser)));
+                              return;
+                            }                          
+                            _setPlayer(user.userId);
+                            if (context.mounted)  Navigator.of(context).pop();
                             setState(() {});
                           },
                         )

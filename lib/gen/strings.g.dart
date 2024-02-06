@@ -6,7 +6,7 @@
 /// Locales: 2
 /// Strings: 1016 (508 per locale)
 ///
-/// Built on 2024-02-03 at 12:49 UTC
+/// Built on 2024-02-06 at 20:25 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -224,8 +224,8 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get importCancelled => 'Operation was cancelled';
 	String get importSuccess => 'Import successful';
 	String get yourID => 'Your TETR.IO account';
-	String get yourIDAlertTitle => 'Your TETR.IO account nickname or ID';
-	String get yourIDText => 'Every time when app loads, stats of that player will be fetched. Please prefer ID over nickname because nickname can be changed.';
+	String get yourIDAlertTitle => 'Your nickname in TETR.IO';
+	String get yourIDText => 'When app loads, it will retrieve data for this account';
 	String get language => 'Language';
 	String get aboutApp => 'About app';
 	String aboutAppText({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Version ${version} Build ${buildNumber}\n\nDeveloped by dan63047\nFormulas provided by kerrmunism\nHistory provided by p1nkl0bst3r\nTETR.IO replay grabber API by szy';
@@ -816,8 +816,8 @@ class _StringsRu implements Translations {
 	@override String get importCancelled => 'Операция была отменена';
 	@override String get importSuccess => 'Успешно импортировано';
 	@override String get yourID => 'Ваш аккаунт в TETR.IO';
-	@override String get yourIDAlertTitle => 'Никнейм или ID вашего аккаунта в TETR.IO';
-	@override String get yourIDText => 'Каждый раз, когда приложение запускается, приложение будет получать статистику этого игрока. Пожалуйста, отдайте предпочтение ID, так как никнейм можно изменить.';
+	@override String get yourIDAlertTitle => 'Ваш ник в TETR.IO';
+	@override String get yourIDText => 'При запуске приложения оно будет получать статистику этого игрока.';
 	@override String get language => 'Язык (Language)';
 	@override String get aboutApp => 'О приложении';
 	@override String aboutAppText({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Версия ${version} Сборка ${buildNumber}\n\nРазработал dan63047\nФормулы предоставил kerrmunism\nИсторию предоставляет p1nkl0bst3r\nВозможность скачивать повторы из TETR.IO предоставляет szy';
@@ -1400,8 +1400,8 @@ extension on Translations {
 			case 'importCancelled': return 'Operation was cancelled';
 			case 'importSuccess': return 'Import successful';
 			case 'yourID': return 'Your TETR.IO account';
-			case 'yourIDAlertTitle': return 'Your TETR.IO account nickname or ID';
-			case 'yourIDText': return 'Every time when app loads, stats of that player will be fetched. Please prefer ID over nickname because nickname can be changed.';
+			case 'yourIDAlertTitle': return 'Your nickname in TETR.IO';
+			case 'yourIDText': return 'When app loads, it will retrieve data for this account';
 			case 'language': return 'Language';
 			case 'aboutApp': return 'About app';
 			case 'aboutAppText': return ({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Version ${version} Build ${buildNumber}\n\nDeveloped by dan63047\nFormulas provided by kerrmunism\nHistory provided by p1nkl0bst3r\nTETR.IO replay grabber API by szy';
@@ -1918,8 +1918,8 @@ extension on _StringsRu {
 			case 'importCancelled': return 'Операция была отменена';
 			case 'importSuccess': return 'Успешно импортировано';
 			case 'yourID': return 'Ваш аккаунт в TETR.IO';
-			case 'yourIDAlertTitle': return 'Никнейм или ID вашего аккаунта в TETR.IO';
-			case 'yourIDText': return 'Каждый раз, когда приложение запускается, приложение будет получать статистику этого игрока. Пожалуйста, отдайте предпочтение ID, так как никнейм можно изменить.';
+			case 'yourIDAlertTitle': return 'Ваш ник в TETR.IO';
+			case 'yourIDText': return 'При запуске приложения оно будет получать статистику этого игрока.';
 			case 'language': return 'Язык (Language)';
 			case 'aboutApp': return 'О приложении';
 			case 'aboutAppText': return ({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Версия ${version} Сборка ${buildNumber}\n\nРазработал dan63047\nФормулы предоставил kerrmunism\nИсторию предоставляет p1nkl0bst3r\nВозможность скачивать повторы из TETR.IO предоставляет szy';
