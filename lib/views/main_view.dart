@@ -16,9 +16,11 @@ import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:tetra_stats/main.dart' show prefs;
 import 'package:tetra_stats/services/crud_exceptions.dart';
+import 'package:tetra_stats/utils/text_shadow.dart';
 import 'package:tetra_stats/views/ranks_averages_view.dart' show RankAveragesView;
 import 'package:tetra_stats/views/tl_leaderboard_view.dart' show TLLeaderboardView;
 import 'package:tetra_stats/views/tl_match_view.dart' show TlMatchResultView;
+import 'package:tetra_stats/widgets/search_box.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
 import 'package:tetra_stats/widgets/tl_thingy.dart';
 import 'package:tetra_stats/widgets/user_thingy.dart';
@@ -40,10 +42,6 @@ final NumberFormat secs = NumberFormat("00.###");
 final NumberFormat _f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
 final NumberFormat _f4 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 4);
 final DateFormat _dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
-final List<Shadow> textShadow = <Shadow>[ // man i love this shadow
-  const Shadow(offset: Offset(0.0, 0.0), blurRadius: 3.0, color: Colors.black),
-  const Shadow(offset: Offset(0.0, 0.0), blurRadius: 8.0, color: Colors.black),
-];
 
 
 class MainView extends StatefulWidget {
@@ -73,19 +71,6 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   bool _showSearchBar = false;
   late TabController _tabController;
   late bool fixedScroll;
-
-  Widget _searchTextField() {
-    return TextField(
-      maxLength: 25,
-      autocorrect: false,
-      enableSuggestions: false,
-      decoration: const InputDecoration(counter: Offstage()),
-      style: TextStyle(shadows: textShadow),
-      onSubmitted: (String value) {
-        changePlayer(value);
-      },
-    );
-  }
 
   @override
   void initState() {
@@ -265,11 +250,12 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);
+    bool bigScreen = MediaQuery.of(context).size.width > 768;
     return Scaffold(
       drawer: widget.player == null ? NavDrawer(changePlayer) : null, // Side menu hidden if player provided
       drawerEdgeDragWidth: MediaQuery.of(context).size.width * 0.2, // 20% of left side of the screen used of Drawer gesture
       appBar: AppBar(
-        title: _showSearchBar ? _searchTextField() : Text(widget.title, style: TextStyle(shadows: textShadow)), 
+        title: _showSearchBar ? SearchBox(onSubmit: changePlayer, bigScreen: bigScreen) : Text(widget.title, style: const TextStyle(shadows: textShadow)), 
         backgroundColor: Colors.black,
         actions: widget.player == null ? [ // search bar and PopupMenuButton hidden if player provided TODO: Subject to change
           _showSearchBar
@@ -346,7 +332,6 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
               case ConnectionState.active:
                 return const Center(child: CircularProgressIndicator(color: Colors.white));
               case ConnectionState.done:
-                //bool bigScreen = MediaQuery.of(context).size.width > 1024;
                 if (snapshot.hasData) {
                   return RefreshIndicator(
                     onRefresh: () {
@@ -577,31 +562,40 @@ class _TLRecords extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool bigScreen = MediaQuery.of(context).size.width > 768;
     if (data.isEmpty) return Center(child: Text(t.noRecords, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)));
+    bool bigScreen = MediaQuery.of(context).size.width > 768;
     return ListView.builder(
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: data.length,
       itemBuilder: (BuildContext context, int index) {
-      return ListTile(
-        leading: Text("${data[index].endContext.firstWhere((element) => element.userId == userID).points} : ${data[index].endContext.firstWhere((element) => element.userId != userID).points}",
-        style: bigScreen ? const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28) :
-        const TextStyle(fontSize: 28)),
-        title: Text("vs. ${data[index].endContext.firstWhere((element) => element.userId != userID).username}"),
-        subtitle: Text(_dateFormat.format(data[index].timestamp)),
-        trailing: Table(defaultColumnWidth: const IntrinsicColumnWidth(),
-        defaultVerticalAlignment: TableCellVerticalAlignment.baseline,
-        textBaseline: TextBaseline.alphabetic,
-        columnWidths: const {
-          0: FixedColumnWidth(50),
-          2: FixedColumnWidth(50),
-        },
-          children: [
-          TableRow(children: [Text(_f2.format(data[index].endContext.firstWhere((element) => element.userId == userID).secondary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(_f2.format(data[index].endContext.firstWhere((element) => element.userId != userID).secondary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" APM", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
-          TableRow(children: [Text(_f2.format(data[index].endContext.firstWhere((element) => element.userId == userID).tertiary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(_f2.format(data[index].endContext.firstWhere((element) => element.userId != userID).tertiary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" PPS", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
-          TableRow(children: [Text(_f2.format(data[index].endContext.firstWhere((element) => element.userId == userID).extra), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(_f2.format(data[index].endContext.firstWhere((element) => element.userId != userID).extra), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" VS", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
-        ],),
-        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => TlMatchResultView(record: data[index], initPlayerId: userID))),
+        var accentColor = data[index].endContext.firstWhere((element) => element.userId == userID).success ? Colors.green : Colors.red;
+      return Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            stops: const [0, 0.05],
+            colors: [accentColor, Colors.transparent]
+          )
+        ),
+        child: ListTile(
+          // tileColor: data[index].endContext.firstWhere((element) => element.userId == userID).success ? Colors.green[900] : Colors.red[900],
+          leading: Text("${data[index].endContext.firstWhere((element) => element.userId == userID).points} : ${data[index].endContext.firstWhere((element) => element.userId != userID).points}",
+          style: bigScreen ? const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, shadows: textShadow) : const TextStyle(fontSize: 28, shadows: textShadow)),
+          title: Text("vs. ${data[index].endContext.firstWhere((element) => element.userId != userID).username}"),
+          subtitle: Text(_dateFormat.format(data[index].timestamp)),
+          trailing: Table(defaultColumnWidth: const IntrinsicColumnWidth(),
+          defaultVerticalAlignment: TableCellVerticalAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          columnWidths: const {
+            0: FixedColumnWidth(50),
+            2: FixedColumnWidth(50),
+          },
+            children: [
+            TableRow(children: [Text(_f2.format(data[index].endContext.firstWhere((element) => element.userId == userID).secondary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(_f2.format(data[index].endContext.firstWhere((element) => element.userId != userID).secondary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" APM", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
+            TableRow(children: [Text(_f2.format(data[index].endContext.firstWhere((element) => element.userId == userID).tertiary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(_f2.format(data[index].endContext.firstWhere((element) => element.userId != userID).tertiary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" PPS", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
+            TableRow(children: [Text(_f2.format(data[index].endContext.firstWhere((element) => element.userId == userID).extra), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(_f2.format(data[index].endContext.firstWhere((element) => element.userId != userID).extra), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" VS", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
+          ],),
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => TlMatchResultView(record: data[index], initPlayerId: userID))),
+        ),
       );
     });
   }
@@ -645,7 +639,7 @@ class _HistoryChartThigy extends StatefulWidget{
   final NumberFormat yFormat;
   
   /// Implements graph for the _History widget. Requires [data] which is a list of dots for the graph. [yAxisTitle] used to keep track of changes.
-  /// [bigScreen] tells if screen wide enough, [leftSpace] sets size, reserved for titles on the left from the graph and [yFormat] sets numer format
+  /// [bigScreen] tells if screen wide enough, [leftSpace] sets size, reserved for titles on the left from the graph and [yFormat] sets number format
   /// for left titles
   const _HistoryChartThigy({required this.data, required this.yAxisTitle, required this.bigScreen, required this.leftSpace, required this.yFormat});
 
@@ -921,6 +915,7 @@ class _RecordThingy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (record == null) return Center(child: Text(t.noRecord, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)));
     return LayoutBuilder(builder: (context, constraints) {
       bool bigScreen = constraints.maxWidth > 768;
       return ListView.builder(
@@ -928,7 +923,7 @@ class _RecordThingy extends StatelessWidget {
           itemCount: 1,
           itemBuilder: (BuildContext context, int index) {
             return Column(
-              children: (record != null) ? [
+              children: [
                 // show mode title
                 if (record!.stream.contains("40l")) Text(t.sprint, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
                 else if (record!.stream.contains("blitz")) Text(t.blitz, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
@@ -1080,9 +1075,6 @@ class _RecordThingy extends StatelessWidget {
                   ),
                 ),
               ]
-            : [ // If no record, show this
-                Text(t.noRecord, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28))
-              ],
             );
           });
     });

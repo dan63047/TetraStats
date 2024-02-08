@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 1016 (508 per locale)
+/// Strings: 1018 (509 per locale)
 ///
-/// Built on 2024-02-06 at 20:25 UTC
+/// Built on 2024-02-08 at 20:30 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -165,6 +165,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	late final _StringsNewsPartsEn newsParts = _StringsNewsPartsEn._(_root);
 	String get openSearch => 'Search player';
 	String get closeSearch => 'Close search';
+	String get searchHint => 'Nickname, ID or Discord userID (with "ds:" prefix)';
 	String get refresh => 'Refresh';
 	String get fetchAndsaveTLHistory => 'Get player history';
 	String get fetchAndSaveOldTLmatches => 'Get Tetra League matches history';
@@ -265,7 +266,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get winChance => 'Win Chance';
 	String get byGlicko => 'By Glicko';
 	String get byEstTR => 'By Est. TR';
-	String compareViewNoValues({required Object avgR}) => 'Please, enter username, user ID, APM-PPS-VS values (divider doesn\'t matter, only order matter) or ${avgR} (where R is rank) to both of fields';
+	String compareViewNoValues({required Object avgR}) => 'Please, enter username, user ID, APM-PPS-VS values (divider doesn\'t matter, only order matter) or ${avgR} (where R is rank) to both fields';
 	String compareViewWrongValue({required Object value}) => 'Falied to assign ${value}';
 	String get mostRecentOne => 'Most recent one';
 	String get yes => 'Yes';
@@ -757,6 +758,7 @@ class _StringsRu implements Translations {
 	@override late final _StringsNewsPartsRu newsParts = _StringsNewsPartsRu._(_root);
 	@override String get openSearch => 'Искать игрока';
 	@override String get closeSearch => 'Закрыть поиск';
+	@override String get searchHint => 'Ник, ID или ID в Discord (с префиксом "ds:")';
 	@override String get refresh => 'Обновить';
 	@override String get fetchAndsaveTLHistory => 'Получить историю игрока';
 	@override String get fetchAndSaveOldTLmatches => 'Получить старые матчи Тетра Лиги';
@@ -1341,6 +1343,7 @@ extension on Translations {
 			case 'newsParts.unknownNews': return ({required Object type}) => 'Unknown news of type ${type}';
 			case 'openSearch': return 'Search player';
 			case 'closeSearch': return 'Close search';
+			case 'searchHint': return 'Nickname, ID or Discord userID (with "ds:" prefix)';
 			case 'refresh': return 'Refresh';
 			case 'fetchAndsaveTLHistory': return 'Get player history';
 			case 'fetchAndSaveOldTLmatches': return 'Get Tetra League matches history';
@@ -1441,7 +1444,7 @@ extension on Translations {
 			case 'winChance': return 'Win Chance';
 			case 'byGlicko': return 'By Glicko';
 			case 'byEstTR': return 'By Est. TR';
-			case 'compareViewNoValues': return ({required Object avgR}) => 'Please, enter username, user ID, APM-PPS-VS values (divider doesn\'t matter, only order matter) or ${avgR} (where R is rank) to both of fields';
+			case 'compareViewNoValues': return ({required Object avgR}) => 'Please, enter username, user ID, APM-PPS-VS values (divider doesn\'t matter, only order matter) or ${avgR} (where R is rank) to both fields';
 			case 'compareViewWrongValue': return ({required Object value}) => 'Falied to assign ${value}';
 			case 'mostRecentOne': return 'Most recent one';
 			case 'yes': return 'Yes';
@@ -1859,6 +1862,7 @@ extension on _StringsRu {
 			case 'newsParts.unknownNews': return ({required Object type}) => 'Неизвестная новость типа ${type}';
 			case 'openSearch': return 'Искать игрока';
 			case 'closeSearch': return 'Закрыть поиск';
+			case 'searchHint': return 'Ник, ID или ID в Discord (с префиксом "ds:")';
 			case 'refresh': return 'Обновить';
 			case 'fetchAndsaveTLHistory': return 'Получить историю игрока';
 			case 'fetchAndSaveOldTLmatches': return 'Получить старые матчи Тетра Лиги';

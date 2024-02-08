@@ -5,7 +5,7 @@ import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/views/compare_view.dart';
 import 'package:intl/intl.dart';
-import 'package:tetra_stats/views/main_view.dart' show textShadow;
+import 'package:tetra_stats/utils/text_shadow.dart';
 import 'dart:developer' as developer;
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
 

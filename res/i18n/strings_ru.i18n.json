@@ -30,6 +30,7 @@
     },
     "openSearch": "Искать игрока",
     "closeSearch": "Закрыть поиск",
+    "searchHint": "Ник, ID или ID в Discord (с префиксом \"ds:\")",
     "refresh": "Обновить",
     "fetchAndsaveTLHistory": "Получить историю игрока",
     "fetchAndSaveOldTLmatches": "Получить старые матчи Тетра Лиги",
