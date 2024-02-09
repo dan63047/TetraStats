@@ -195,6 +195,9 @@ class TlMatchResultState extends State<TlMatchResultView> {
                   ),
                 ),
               ),
+              if (widget.record.ownId == widget.record.replayId) SliverToBoxAdapter(
+                child: Center(child: Text(t.p1nkl0bst3rAlert, textAlign: TextAlign.center)),
+              ),
               SliverToBoxAdapter(child: FutureBuilder(future: replayData, builder: (context, snapshot) {
                 switch(snapshot.connectionState){
                   case ConnectionState.none:
@@ -470,8 +473,8 @@ class TlMatchResultState extends State<TlMatchResultView> {
                           )
                         ],
                       ),
-                      const Divider(),
-                      Column(
+                      if (widget.record.ownId != widget.record.replayId) const Divider(),
+                      if (widget.record.ownId != widget.record.replayId) Column(
                         children: [
                           Padding(
                             padding: const EdgeInsets.only(bottom: 16),

@@ -16,9 +16,11 @@ import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:tetra_stats/main.dart' show prefs;
 import 'package:tetra_stats/services/crud_exceptions.dart';
+import 'package:tetra_stats/utils/text_shadow.dart';
 import 'package:tetra_stats/views/ranks_averages_view.dart' show RankAveragesView;
 import 'package:tetra_stats/views/tl_leaderboard_view.dart' show TLLeaderboardView;
 import 'package:tetra_stats/views/tl_match_view.dart' show TlMatchResultView;
+import 'package:tetra_stats/widgets/search_box.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
 import 'package:tetra_stats/widgets/tl_thingy.dart';
 import 'package:tetra_stats/widgets/user_thingy.dart';
@@ -40,10 +42,6 @@ final NumberFormat secs = NumberFormat("00.###");
 final NumberFormat _f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
 final NumberFormat _f4 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 4);
 final DateFormat _dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
-final List<Shadow> textShadow = <Shadow>[ // man i love this shadow
-  const Shadow(offset: Offset(0.0, 0.0), blurRadius: 3.0, color: Colors.black),
-  const Shadow(offset: Offset(0.0, 0.0), blurRadius: 8.0, color: Colors.black),
-];
 
 
 class MainView extends StatefulWidget {
@@ -74,19 +72,6 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   late TabController _tabController;
   late bool fixedScroll;
 
-  Widget _searchTextField() {
-    return TextField(
-      maxLength: 25,
-      autocorrect: false,
-      enableSuggestions: false,
-      decoration: const InputDecoration(counter: Offstage()),
-      style: TextStyle(shadows: textShadow),
-      onSubmitted: (String value) {
-        changePlayer(value);
-      },
-    );
-  }
-
   @override
   void initState() {
     initDB();
@@ -116,10 +101,10 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
 
   /// That function initiate search of data about [player]. If [fetchHistory] is true,
   /// also attempting to retrieve players history. Can trow an Exception if fails
-  void changePlayer(String player, {bool fetchHistory = false}) {
+  void changePlayer(String player, {bool fetchHistory = false, bool fetchTLmatches = false}) {
     setState(() {
       _searchFor = player;
-      me = fetch(_searchFor, fetchHistory: fetchHistory);
+      me = fetch(_searchFor, fetchHistory: fetchHistory, fetchTLmatches: fetchTLmatches);
     });
   }
 
@@ -128,13 +113,14 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   }
   
   /// Retrieves data from 3 different Tetra Channel API endpoints + 1 endpoint from p1nkl0bst3r's API
-  /// using [nickOrID] of player. If [fetchHistory] is true, also retrieves players history from p1nkl0bst3r's API.
+  /// using [nickOrID] of player.
   /// 
-  /// Returns list which contains players object, his TL records, previous states, TL matches, previos TL state, if player tracked (bool), news entries and topTR.
+  /// If [fetchHistory] is true, also retrieves players history from p1nkl0bst3r's API. If [fetchTLmatches] is true, also retrieves players old Tetra League
+  /// matches from p1nkl0bst3r's API. Returns list which contains [TetrioPlayer], his records, previous states, TL matches, previous TL state,
+  /// if player tracked (bool), news entries and topTR.
   /// 
-  /// If at least one request to some endpoint fails, whole function will throw an exception.
-  /// TODO: Change this behavior
-  Future<List> fetch(String nickOrID, {bool fetchHistory = false}) async {
+  /// If at least one request to Tetra Channel API fails, whole function will throw an exception.
+  Future<List> fetch(String nickOrID, {bool fetchHistory = false, bool fetchTLmatches = false}) async {
     TetrioPlayer me;
     
     // If user trying to search with discord id
@@ -173,13 +159,28 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     TetraLeagueAlpha? compareWith;
     Set<TetraLeagueAlpha> uniqueTL = {};
     tlMatches = tlStream.records;
-    var storedRecords = await teto.getTLMatchesbyPlayerID(me.userId); // get old matches
+    List<TetraLeagueAlphaRecord> storedRecords = await teto.getTLMatchesbyPlayerID(me.userId); // get old matches
     if (isTracking){ // if tracked - save data to local DB
       await teto.storeState(me);
       await teto.saveTLMatchesFromStream(tlStream);
     }
 
     // building list of TL matches
+    if(fetchTLmatches) {
+      try{
+        List<TetraLeagueAlphaRecord> oldMatches = await teto.fetchAndSaveOldTLmatches(_searchFor);
+        storedRecords.addAll(oldMatches);
+        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.fetchAndSaveOldTLmatchesResult(number: oldMatches.length))));
+      }on TetrioHistoryNotExist{
+        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.p1nkl0bst3rTLmatches)));
+      }on P1nkl0bst3rForbidden {
+        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.p1nkl0bst3rForbidden)));
+      }on P1nkl0bst3rInternalProblem {
+        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.p1nkl0bst3rinternal)));
+      }on P1nkl0bst3rTooManyRequests{
+        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.p1nkl0bst3rTooManyRequests)));
+      }
+    } 
     for (var match in storedRecords) {
       // add stored match to list only if it missing from retrived ones
       if (!tlMatches.contains(match)) tlMatches.add(match);
@@ -192,7 +193,21 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     });
 
     // Handling history
-    if(fetchHistory) await teto.fetchAndsaveTLHistory(_searchFor); // Retrieve if needed
+    if(fetchHistory){
+      try{
+        var history = await teto.fetchAndsaveTLHistory(_searchFor); // Retrieve if needed
+        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.fetchAndsaveTLHistoryResult(number: history.length))));
+      }on TetrioHistoryNotExist{
+        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.noHistorySaved)));
+      }on P1nkl0bst3rForbidden {
+        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.p1nkl0bst3rForbidden)));
+      }on P1nkl0bst3rInternalProblem {
+        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.p1nkl0bst3rinternal)));
+      }on P1nkl0bst3rTooManyRequests{
+        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.p1nkl0bst3rTooManyRequests)));
+      }
+    } 
+
     states.addAll(await teto.getPlayer(me.userId));
     for (var element in states) { // For graphs I need only unique entries
       if (uniqueTL.isNotEmpty && uniqueTL.last != element.tlSeason1) uniqueTL.add(element.tlSeason1);
@@ -235,11 +250,12 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);
+    bool bigScreen = MediaQuery.of(context).size.width > 768;
     return Scaffold(
       drawer: widget.player == null ? NavDrawer(changePlayer) : null, // Side menu hidden if player provided
       drawerEdgeDragWidth: MediaQuery.of(context).size.width * 0.2, // 20% of left side of the screen used of Drawer gesture
       appBar: AppBar(
-        title: _showSearchBar ? _searchTextField() : Text(widget.title, style: TextStyle(shadows: textShadow)), 
+        title: _showSearchBar ? SearchBox(onSubmit: changePlayer, bigScreen: bigScreen) : Text(widget.title, style: const TextStyle(shadows: textShadow)), 
         backgroundColor: Colors.black,
         actions: widget.player == null ? [ // search bar and PopupMenuButton hidden if player provided TODO: Subject to change
           _showSearchBar
@@ -272,6 +288,10 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                 child: Text(t.fetchAndsaveTLHistory),
               ),
               PopupMenuItem(
+                value: "TLmatches",
+                child: Text(t.fetchAndSaveOldTLmatches),
+              ),
+              PopupMenuItem(
                 value: "/states",
                 child: Text(t.showStoredData),
               ),
@@ -292,6 +312,9 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                 case "history":
                   changePlayer(_searchFor, fetchHistory: true);
                   break;
+                case "TLmatches":
+                  changePlayer(_searchFor, fetchTLmatches: true);
+                  break;
                 default:
                   context.go(value);
               }
@@ -309,7 +332,6 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
               case ConnectionState.active:
                 return const Center(child: CircularProgressIndicator(color: Colors.white));
               case ConnectionState.done:
-                //bool bigScreen = MediaQuery.of(context).size.width > 1024;
                 if (snapshot.hasData) {
                   return RefreshIndicator(
                     onRefresh: () {
@@ -372,15 +394,6 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                     case ConnectionIssue:
                     var err = snapshot.error as ConnectionIssue;
                     errText = t.errors.connection(code: err.code, message: err.message);
-                    break;
-                    case P1nkl0bst3rForbidden:
-                    errText = t.errors.p1nkl0bst3rForbidden;
-                    break;
-                    case P1nkl0bst3rTooManyRequests:
-                    errText = t.errors.p1nkl0bst3rTooManyRequests;
-                    break;
-                    case P1nkl0bst3rInternalProblem:
-                    errText = kIsWeb ? t.errors.p1nkl0bst3rinternalWebVersion : t.errors.p1nkl0bst3rinternal;
                     break;
                     case TetrioHistoryNotExist:
                     errText = t.errors.history;
@@ -466,8 +479,9 @@ class _NavDrawerState extends State<NavDrawer> {
             case ConnectionState.waiting:
             case ConnectionState.active:
               final allPlayers = (snapshot.data != null)
-                  ? snapshot.data as Map<String, List<TetrioPlayer>>
-                  : <String, List<TetrioPlayer>>{};
+                  ? snapshot.data as Map<String, String>
+                  : <String, String>{};
+              allPlayers.remove(prefs.getString("player") ?? "6098518e3d5155e6ec429cdc"); // player from the home button will be delisted
               List<String> keys = allPlayers.keys.toList();
               return NestedScrollView(
                   headerSliverBuilder: (context, value) {
@@ -522,7 +536,7 @@ class _NavDrawerState extends State<NavDrawer> {
                       itemBuilder: (context, index) {
                         var i = allPlayers.length-1-index; // Last players in this map are most recent ones, they are gonna be shown at the top.
                         return ListTile(
-                          title: Text(allPlayers[keys[i]]?.last.username as String), // Takes last known username from list of states
+                          title: Text(allPlayers[keys[i]]??keys[i]), // Takes last known username from list of states
                           onTap: () {
                             widget.changePlayer(keys[i]); // changes to chosen player
                             Navigator.of(context).pop(); // and closes itself.
@@ -548,37 +562,42 @@ class _TLRecords extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-      bool bigScreen = MediaQuery.of(context).size.width > 768;
-      return ListView( // TODO: Redo using ListView.builder()
-        physics: const AlwaysScrollableScrollPhysics(),
-        children: (data.isNotEmpty)
-            ? [for (var value in data) ListTile(
-              leading: Text("${value.endContext.firstWhere((element) => element.userId == userID).points} : ${value.endContext.firstWhere((element) => element.userId != userID).points}",
-              style: bigScreen ? const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28) :
-              const TextStyle(fontSize: 28)),
-              title: Text("vs. ${value.endContext.firstWhere((element) => element.userId != userID).username}"),
-              subtitle: Text(_dateFormat.format(value.timestamp)),
-              trailing: Table(defaultColumnWidth: const IntrinsicColumnWidth(),
-              defaultVerticalAlignment: TableCellVerticalAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              columnWidths: const {
-                0: FixedColumnWidth(50),
-                2: FixedColumnWidth(50),
-              },
-                children: [
-                TableRow(children: [Text(_f2.format(value.endContext.firstWhere((element) => element.userId == userID).secondary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(_f2.format(value.endContext.firstWhere((element) => element.userId != userID).secondary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" APM", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
-                TableRow(children: [Text(_f2.format(value.endContext.firstWhere((element) => element.userId == userID).tertiary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(_f2.format(value.endContext.firstWhere((element) => element.userId != userID).tertiary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" PPS", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
-                TableRow(children: [Text(_f2.format(value.endContext.firstWhere((element) => element.userId == userID).extra), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(_f2.format(value.endContext.firstWhere((element) => element.userId != userID).extra), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" VS", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
-              ],),
-              onTap: (){Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TlMatchResultView(record: value, initPlayerId: userID),
-                    ),
-                  );},
-            )]
-            : [Center(child: Text(t.noRecords, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)))],
+    if (data.isEmpty) return Center(child: Text(t.noRecords, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)));
+    bool bigScreen = MediaQuery.of(context).size.width > 768;
+    return ListView.builder(
+      physics: const AlwaysScrollableScrollPhysics(),
+      itemCount: data.length,
+      itemBuilder: (BuildContext context, int index) {
+        var accentColor = data[index].endContext.firstWhere((element) => element.userId == userID).success ? Colors.green : Colors.red;
+      return Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            stops: const [0, 0.05],
+            colors: [accentColor, Colors.transparent]
+          )
+        ),
+        child: ListTile(
+          // tileColor: data[index].endContext.firstWhere((element) => element.userId == userID).success ? Colors.green[900] : Colors.red[900],
+          leading: Text("${data[index].endContext.firstWhere((element) => element.userId == userID).points} : ${data[index].endContext.firstWhere((element) => element.userId != userID).points}",
+          style: bigScreen ? const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, shadows: textShadow) : const TextStyle(fontSize: 28, shadows: textShadow)),
+          title: Text("vs. ${data[index].endContext.firstWhere((element) => element.userId != userID).username}"),
+          subtitle: Text(_dateFormat.format(data[index].timestamp)),
+          trailing: Table(defaultColumnWidth: const IntrinsicColumnWidth(),
+          defaultVerticalAlignment: TableCellVerticalAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          columnWidths: const {
+            0: FixedColumnWidth(50),
+            2: FixedColumnWidth(50),
+          },
+            children: [
+            TableRow(children: [Text(_f2.format(data[index].endContext.firstWhere((element) => element.userId == userID).secondary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(_f2.format(data[index].endContext.firstWhere((element) => element.userId != userID).secondary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" APM", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
+            TableRow(children: [Text(_f2.format(data[index].endContext.firstWhere((element) => element.userId == userID).tertiary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(_f2.format(data[index].endContext.firstWhere((element) => element.userId != userID).tertiary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" PPS", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
+            TableRow(children: [Text(_f2.format(data[index].endContext.firstWhere((element) => element.userId == userID).extra), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(_f2.format(data[index].endContext.firstWhere((element) => element.userId != userID).extra), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" VS", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
+          ],),
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => TlMatchResultView(record: data[index], initPlayerId: userID))),
+        ),
       );
+    });
   }
 }
 
@@ -620,7 +639,7 @@ class _HistoryChartThigy extends StatefulWidget{
   final NumberFormat yFormat;
   
   /// Implements graph for the _History widget. Requires [data] which is a list of dots for the graph. [yAxisTitle] used to keep track of changes.
-  /// [bigScreen] tells if screen wide enough, [leftSpace] sets size, reserved for titles on the left from the graph and [yFormat] sets numer format
+  /// [bigScreen] tells if screen wide enough, [leftSpace] sets size, reserved for titles on the left from the graph and [yFormat] sets number format
   /// for left titles
   const _HistoryChartThigy({required this.data, required this.yAxisTitle, required this.bigScreen, required this.leftSpace, required this.yFormat});
 
@@ -896,6 +915,7 @@ class _RecordThingy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (record == null) return Center(child: Text(t.noRecord, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)));
     return LayoutBuilder(builder: (context, constraints) {
       bool bigScreen = constraints.maxWidth > 768;
       return ListView.builder(
@@ -903,7 +923,7 @@ class _RecordThingy extends StatelessWidget {
           itemCount: 1,
           itemBuilder: (BuildContext context, int index) {
             return Column(
-              children: (record != null) ? [
+              children: [
                 // show mode title
                 if (record!.stream.contains("40l")) Text(t.sprint, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
                 else if (record!.stream.contains("blitz")) Text(t.blitz, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
@@ -1055,9 +1075,6 @@ class _RecordThingy extends StatelessWidget {
                   ),
                 ),
               ]
-            : [ // If no record, show this
-                Text(t.noRecord, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28))
-              ],
             );
           });
     });

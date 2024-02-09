@@ -4,7 +4,7 @@ Track your and other players stats in TETR.IO
 
 You can [download an app](https://github.com/dan63047/TetraStats/releases), or [use web version](https://ts.dan63.by).
 
-![Screenshot of the app 1](https://imgur.com/CKGYyBg.png)
+![Screenshot of the app 1](https://imgur.com/e8CYvj3.png)
 
 # Available functionality
 - Advanced stats for players
@@ -15,6 +15,7 @@ You can [download an app](https://github.com/dan63047/TetraStats/releases), or [
 - Comparison to players, rank averages, and player stats from the past
 - Stats Calculator
 - Player history in charts
+- Tetra League matches history
 
 # Special thanks
 - **kerrmunism** — formulas

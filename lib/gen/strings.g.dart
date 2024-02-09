@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 1008 (504 per locale)
+/// Strings: 1018 (509 per locale)
 ///
-/// Built on 2024-01-22 at 19:27 UTC
+/// Built on 2024-02-08 at 20:30 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -165,8 +165,12 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	late final _StringsNewsPartsEn newsParts = _StringsNewsPartsEn._(_root);
 	String get openSearch => 'Search player';
 	String get closeSearch => 'Close search';
+	String get searchHint => 'Nickname, ID or Discord userID (with "ds:" prefix)';
 	String get refresh => 'Refresh';
 	String get fetchAndsaveTLHistory => 'Get player history';
+	String get fetchAndSaveOldTLmatches => 'Get Tetra League matches history';
+	String fetchAndsaveTLHistoryResult({required Object number}) => '${number} states was found';
+	String fetchAndSaveOldTLmatchesResult({required Object number}) => '${number} matches was found';
 	String get showStoredData => 'Show stored data';
 	String get statsCalc => 'Stats Calculator';
 	String get settings => 'Settings';
@@ -221,8 +225,8 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get importCancelled => 'Operation was cancelled';
 	String get importSuccess => 'Import successful';
 	String get yourID => 'Your TETR.IO account';
-	String get yourIDAlertTitle => 'Your TETR.IO account nickname or ID';
-	String get yourIDText => 'Every time when app loads, stats of that player will be fetched. Please prefer ID over nickname because nickname can be changed.';
+	String get yourIDAlertTitle => 'Your nickname in TETR.IO';
+	String get yourIDText => 'When app loads, it will retrieve data for this account';
 	String get language => 'Language';
 	String get aboutApp => 'About app';
 	String aboutAppText({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Version ${version} Build ${buildNumber}\n\nDeveloped by dan63047\nFormulas provided by kerrmunism\nHistory provided by p1nkl0bst3r\nTETR.IO replay grabber API by szy';
@@ -262,7 +266,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get winChance => 'Win Chance';
 	String get byGlicko => 'By Glicko';
 	String get byEstTR => 'By Est. TR';
-	String compareViewNoValues({required Object avgR}) => 'Please, enter username, user ID, APM-PPS-VS values (divider doesn\'t matter, only order matter) or ${avgR} (where R is rank) to both of fields';
+	String compareViewNoValues({required Object avgR}) => 'Please, enter username, user ID, APM-PPS-VS values (divider doesn\'t matter, only order matter) or ${avgR} (where R is rank) to both fields';
 	String compareViewWrongValue({required Object value}) => 'Falied to assign ${value}';
 	String get mostRecentOne => 'Most recent one';
 	String get yes => 'Yes';
@@ -697,6 +701,7 @@ class _StringsErrorsEn {
 	String connection({required Object code, required Object message}) => 'Some issue with connection: ${code} ${message}';
 	String get noSuchUser => 'No such user';
 	String get history => 'History for that player is missing';
+	String get p1nkl0bst3rTLmatches => 'No Tetra League matches was found';
 	String get clientException => 'No internet connection';
 	String get forbidden => 'Your IP address is blocked.\nChange IP address or reach out to osk';
 	String get tooManyRequests => 'You have been rate limited. Try again later';
@@ -753,8 +758,12 @@ class _StringsRu implements Translations {
 	@override late final _StringsNewsPartsRu newsParts = _StringsNewsPartsRu._(_root);
 	@override String get openSearch => 'Искать игрока';
 	@override String get closeSearch => 'Закрыть поиск';
+	@override String get searchHint => 'Ник, ID или ID в Discord (с префиксом "ds:")';
 	@override String get refresh => 'Обновить';
 	@override String get fetchAndsaveTLHistory => 'Получить историю игрока';
+	@override String get fetchAndSaveOldTLmatches => 'Получить старые матчи Тетра Лиги';
+	@override String fetchAndsaveTLHistoryResult({required Object number}) => '${number} состояний было найдено';
+	@override String fetchAndSaveOldTLmatchesResult({required Object number}) => '${number} старых матчей было найдено';
 	@override String get showStoredData => 'Показать сохранённые данные';
 	@override String get statsCalc => 'Калькулятор статистики';
 	@override String get settings => 'Настройки';
@@ -809,8 +818,8 @@ class _StringsRu implements Translations {
 	@override String get importCancelled => 'Операция была отменена';
 	@override String get importSuccess => 'Успешно импортировано';
 	@override String get yourID => 'Ваш аккаунт в TETR.IO';
-	@override String get yourIDAlertTitle => 'Никнейм или ID вашего аккаунта в TETR.IO';
-	@override String get yourIDText => 'Каждый раз, когда приложение запускается, приложение будет получать статистику этого игрока. Пожалуйста, отдайте предпочтение ID, так как никнейм можно изменить.';
+	@override String get yourIDAlertTitle => 'Ваш ник в TETR.IO';
+	@override String get yourIDText => 'При запуске приложения оно будет получать статистику этого игрока.';
 	@override String get language => 'Язык (Language)';
 	@override String get aboutApp => 'О приложении';
 	@override String aboutAppText({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Версия ${version} Сборка ${buildNumber}\n\nРазработал dan63047\nФормулы предоставил kerrmunism\nИсторию предоставляет p1nkl0bst3r\nВозможность скачивать повторы из TETR.IO предоставляет szy';
@@ -1285,6 +1294,7 @@ class _StringsErrorsRu implements _StringsErrorsEn {
 	@override String connection({required Object code, required Object message}) => 'Проблема с подключением: ${code} ${message}';
 	@override String get noSuchUser => 'Нет такого пользователя';
 	@override String get history => 'История данного игрока отсутствует';
+	@override String get p1nkl0bst3rTLmatches => 'Старых матчей Тетра Лиги не было найдено';
 	@override String get clientException => 'Нет соединения с интернетом';
 	@override String get forbidden => 'Ваш IP адрес заблокирован.\nСмените IP адрес или свяжитесь с osk-ом';
 	@override String get tooManyRequests => 'Слишком много запросов. Попробуйте позже';
@@ -1333,8 +1343,12 @@ extension on Translations {
 			case 'newsParts.unknownNews': return ({required Object type}) => 'Unknown news of type ${type}';
 			case 'openSearch': return 'Search player';
 			case 'closeSearch': return 'Close search';
+			case 'searchHint': return 'Nickname, ID or Discord userID (with "ds:" prefix)';
 			case 'refresh': return 'Refresh';
 			case 'fetchAndsaveTLHistory': return 'Get player history';
+			case 'fetchAndSaveOldTLmatches': return 'Get Tetra League matches history';
+			case 'fetchAndsaveTLHistoryResult': return ({required Object number}) => '${number} states was found';
+			case 'fetchAndSaveOldTLmatchesResult': return ({required Object number}) => '${number} matches was found';
 			case 'showStoredData': return 'Show stored data';
 			case 'statsCalc': return 'Stats Calculator';
 			case 'settings': return 'Settings';
@@ -1389,8 +1403,8 @@ extension on Translations {
 			case 'importCancelled': return 'Operation was cancelled';
 			case 'importSuccess': return 'Import successful';
 			case 'yourID': return 'Your TETR.IO account';
-			case 'yourIDAlertTitle': return 'Your TETR.IO account nickname or ID';
-			case 'yourIDText': return 'Every time when app loads, stats of that player will be fetched. Please prefer ID over nickname because nickname can be changed.';
+			case 'yourIDAlertTitle': return 'Your nickname in TETR.IO';
+			case 'yourIDText': return 'When app loads, it will retrieve data for this account';
 			case 'language': return 'Language';
 			case 'aboutApp': return 'About app';
 			case 'aboutAppText': return ({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Version ${version} Build ${buildNumber}\n\nDeveloped by dan63047\nFormulas provided by kerrmunism\nHistory provided by p1nkl0bst3r\nTETR.IO replay grabber API by szy';
@@ -1430,7 +1444,7 @@ extension on Translations {
 			case 'winChance': return 'Win Chance';
 			case 'byGlicko': return 'By Glicko';
 			case 'byEstTR': return 'By Est. TR';
-			case 'compareViewNoValues': return ({required Object avgR}) => 'Please, enter username, user ID, APM-PPS-VS values (divider doesn\'t matter, only order matter) or ${avgR} (where R is rank) to both of fields';
+			case 'compareViewNoValues': return ({required Object avgR}) => 'Please, enter username, user ID, APM-PPS-VS values (divider doesn\'t matter, only order matter) or ${avgR} (where R is rank) to both fields';
 			case 'compareViewWrongValue': return ({required Object value}) => 'Falied to assign ${value}';
 			case 'mostRecentOne': return 'Most recent one';
 			case 'yes': return 'Yes';
@@ -1540,6 +1554,7 @@ extension on Translations {
 			case 'errors.connection': return ({required Object code, required Object message}) => 'Some issue with connection: ${code} ${message}';
 			case 'errors.noSuchUser': return 'No such user';
 			case 'errors.history': return 'History for that player is missing';
+			case 'errors.p1nkl0bst3rTLmatches': return 'No Tetra League matches was found';
 			case 'errors.clientException': return 'No internet connection';
 			case 'errors.forbidden': return 'Your IP address is blocked.\nChange IP address or reach out to osk';
 			case 'errors.tooManyRequests': return 'You have been rate limited. Try again later';
@@ -1847,8 +1862,12 @@ extension on _StringsRu {
 			case 'newsParts.unknownNews': return ({required Object type}) => 'Неизвестная новость типа ${type}';
 			case 'openSearch': return 'Искать игрока';
 			case 'closeSearch': return 'Закрыть поиск';
+			case 'searchHint': return 'Ник, ID или ID в Discord (с префиксом "ds:")';
 			case 'refresh': return 'Обновить';
 			case 'fetchAndsaveTLHistory': return 'Получить историю игрока';
+			case 'fetchAndSaveOldTLmatches': return 'Получить старые матчи Тетра Лиги';
+			case 'fetchAndsaveTLHistoryResult': return ({required Object number}) => '${number} состояний было найдено';
+			case 'fetchAndSaveOldTLmatchesResult': return ({required Object number}) => '${number} старых матчей было найдено';
 			case 'showStoredData': return 'Показать сохранённые данные';
 			case 'statsCalc': return 'Калькулятор статистики';
 			case 'settings': return 'Настройки';
@@ -1903,8 +1922,8 @@ extension on _StringsRu {
 			case 'importCancelled': return 'Операция была отменена';
 			case 'importSuccess': return 'Успешно импортировано';
 			case 'yourID': return 'Ваш аккаунт в TETR.IO';
-			case 'yourIDAlertTitle': return 'Никнейм или ID вашего аккаунта в TETR.IO';
-			case 'yourIDText': return 'Каждый раз, когда приложение запускается, приложение будет получать статистику этого игрока. Пожалуйста, отдайте предпочтение ID, так как никнейм можно изменить.';
+			case 'yourIDAlertTitle': return 'Ваш ник в TETR.IO';
+			case 'yourIDText': return 'При запуске приложения оно будет получать статистику этого игрока.';
 			case 'language': return 'Язык (Language)';
 			case 'aboutApp': return 'О приложении';
 			case 'aboutAppText': return ({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Версия ${version} Сборка ${buildNumber}\n\nРазработал dan63047\nФормулы предоставил kerrmunism\nИсторию предоставляет p1nkl0bst3r\nВозможность скачивать повторы из TETR.IO предоставляет szy';
@@ -2054,6 +2073,7 @@ extension on _StringsRu {
 			case 'errors.connection': return ({required Object code, required Object message}) => 'Проблема с подключением: ${code} ${message}';
 			case 'errors.noSuchUser': return 'Нет такого пользователя';
 			case 'errors.history': return 'История данного игрока отсутствует';
+			case 'errors.p1nkl0bst3rTLmatches': return 'Старых матчей Тетра Лиги не было найдено';
 			case 'errors.clientException': return 'Нет соединения с интернетом';
 			case 'errors.forbidden': return 'Ваш IP адрес заблокирован.\nСмените IP адрес или свяжитесь с osk-ом';
 			case 'errors.tooManyRequests': return 'Слишком много запросов. Попробуйте позже';

@@ -830,7 +830,14 @@ class EndContextMulti {
       required this.tertiaryTracking,
       required this.extra,
       required this.extraTracking,
-      required this.success});
+      required this.success}){
+        nerdStats = NerdStats(secondary, tertiary, extra);
+        nerdStatsTracking = [for (int i = 0; i < secondaryTracking.length; i++) NerdStats(secondaryTracking[i], tertiaryTracking[i], extraTracking[i])];
+        estTr = EstTr(secondary, tertiary, extra, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
+        estTrTracking = [for (int i = 0; i < secondaryTracking.length; i++) EstTr(secondaryTracking[i], tertiaryTracking[i], extraTracking[i], nerdStatsTracking[i].app, nerdStatsTracking[i].dss, nerdStatsTracking[i].dsp, nerdStatsTracking[i].gbe)];
+        playstyle = Playstyle(secondary, tertiary, nerdStats.app, nerdStats.vsapm, nerdStats.dsp, nerdStats.gbe, estTr.srarea, estTr.statrank);
+        playstyleTracking = [for (int i = 0; i < secondaryTracking.length; i++) Playstyle(secondaryTracking[i], tertiaryTracking[i], nerdStatsTracking[i].app, nerdStatsTracking[i].vsapm, nerdStatsTracking[i].dsp, nerdStatsTracking[i].gbe, estTrTracking[i].srarea, estTrTracking[i].statrank)];
+      }
 
   EndContextMulti.fromJson(Map<String, dynamic> json) {
     userId = json['id'] ?? json['user']['_id'];

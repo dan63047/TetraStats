@@ -70,14 +70,15 @@ class TrackedPlayersState extends State<TrackedPlayersView> {
       ),
       backgroundColor: Colors.black,
       body: SafeArea(
-          child: StreamBuilder(
-              stream: teto.allPlayers,
+          child: FutureBuilder(
+              future: teto.getAllPlayers(),
               builder: (context, snapshot) {
                 switch (snapshot.connectionState) {
                   case ConnectionState.none:
-                    return const Center(child: Text('none case of StreamBuilder'));
                   case ConnectionState.waiting:
                   case ConnectionState.active:
+                    return const Center(child: CircularProgressIndicator(color: Colors.white));
+                  case ConnectionState.done:
                     final allPlayers = (snapshot.data != null) ? snapshot.data as Map<String, List<TetrioPlayer>> : <String, List<TetrioPlayer>>{};
                     List<String> keys = allPlayers.keys.toList();
                     return NestedScrollView(
@@ -114,7 +115,7 @@ class TrackedPlayersState extends State<TrackedPlayersView> {
                                   icon: const Icon(Icons.delete_forever),
                                   onPressed: () {
                                     String nn = allPlayers[keys[index]]!.last.username;
-                                    teto.deletePlayer(keys[index]);
+                                    setState(() {teto.deletePlayer(keys[index]);});
                                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.trackedPlayersStatesDeleted(nickname: nn))));
                                   },
                                 ),
@@ -128,10 +129,6 @@ class TrackedPlayersState extends State<TrackedPlayersView> {
                                 },
                               );
                             }));
-                  case ConnectionState.done:
-                    return const Center(
-                        child: Text('done case of StreamBuilder',
-                            style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42), textAlign: TextAlign.center));
                 }
               })),
     );

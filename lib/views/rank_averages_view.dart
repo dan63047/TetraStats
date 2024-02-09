@@ -7,7 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
-import 'package:tetra_stats/views/main_view.dart' show MainView, textShadow;
+import 'package:tetra_stats/views/main_view.dart' show MainView;
+import 'package:tetra_stats/utils/text_shadow.dart';
 import 'package:window_manager/window_manager.dart';
 
 var _chartsShortTitlesDropdowns = <DropdownMenuItem>[for (MapEntry e in chartsShortTitles.entries) DropdownMenuItem(value: e.key, child: Text(e.value),)];
