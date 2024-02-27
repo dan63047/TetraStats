@@ -1,4 +1,6 @@
 import 'dart:math';
+import 'package:vector_math/vector_math_64.dart';
+
 import 'tetrio.dart';
 
 // I want to implement those fancy TWC stats
@@ -212,3 +214,156 @@ class ReplayData{
     return data;
   }
 }
+
+// can't belive i have to implement that difficult shit
+
+class Event{
+  int id;
+  int frame;
+  String type;
+  //dynamic data;
+
+  Event(this.id, this.frame, this.type);
+}
+
+class Keypress{
+  String key;
+  double subframe;
+
+  Keypress(this.key, this.subframe);
+}
+
+class EventKeyPress extends Event{
+  Keypress data;
+
+  EventKeyPress(super.id, super.frame, super.type, this.data);
+}
+
+class IGE{
+  int id;
+  int frame;
+  String type;
+  int amount;
+
+  IGE(this.id, this.frame, this.type, this.amount);
+}
+
+class EventIGE extends Event{
+  IGE data;
+
+  EventIGE(super.id, super.frame, super.type, this.data);
+}
+
+class TetrioRNG{
+  late double _t;
+
+  TetrioRNG(int seed){
+    _t = seed % 2147483647;
+		if (_t <= 0) _t += 2147483646;
+  }
+
+  int next(){
+    _t = 16807 * _t % 2147483647;
+		return _t.toInt();
+  }
+
+  double nextFloat(){
+		return (next() - 1) / 2147483646;
+	}
+
+  List<Tetromino> shuffleList(List<Tetromino> array){
+		int length = array.length;
+		if (length == 0) return [];
+
+		for (; --length > 0;){
+			int swapIndex = ((nextFloat()) * (length + 1)).toInt();
+      Tetromino tmp = array[length];
+			array[length] = array[swapIndex];
+      array[swapIndex] = tmp;
+		}
+    return array;
+	}
+}
+
+enum Tetromino{
+  Z,
+  L,
+  O,
+  S,
+  I,
+  J,
+  T,
+  garbage,
+  empty
+}
+
+List<Tetromino> tetrominoes = [Tetromino.Z, Tetromino.L, Tetromino.O, Tetromino.S, Tetromino.I, Tetromino.J, Tetromino.T];
+List<List<List<Vector2>>> shapes = [
+  [ // Z
+    [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(2, 1)],
+    [Vector2(2, 0), Vector2(1, 1), Vector2(2, 1), Vector2(1, 2)],
+    [Vector2(0, 1), Vector2(1, 1), Vector2(1, 2), Vector2(2, 2)],
+    [Vector2(1, 0), Vector2(0, 1), Vector2(1, 1), Vector2(0, 2)]
+  ],
+  [ // L
+    [Vector2(2, 0), Vector2(0, 1), Vector2(1, 1), Vector2(2, 1)],
+    [Vector2(1, 0), Vector2(1, 1), Vector2(1, 2), Vector2(2, 2)],
+    [Vector2(0, 1), Vector2(1, 1), Vector2(2, 1), Vector2(0, 2)],
+    [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(1, 2)]
+  ],
+  [ // O
+    [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(1, 1)],
+    [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(1, 1)],
+    [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(1, 1)],
+    [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(1, 1)]
+  ],
+  [ // S
+    [Vector2(1, 0), Vector2(2, 0), Vector2(0, 1), Vector2(1, 1)],
+    [Vector2(1, 0), Vector2(1, 1), Vector2(2, 1), Vector2(2, 2)],
+    [Vector2(1, 1), Vector2(2, 1), Vector2(0, 2), Vector2(1, 2)],
+    [Vector2(0, 0), Vector2(0, 1), Vector2(1, 1), Vector2(1, 2)]
+  ],
+  [ // I
+    [Vector2(0, 1), Vector2(1, 1), Vector2(2, 1), Vector2(3, 1)],
+		[Vector2(2, 0), Vector2(2, 1), Vector2(2, 2), Vector2(2, 3)],
+		[Vector2(0, 2), Vector2(1, 2), Vector2(2, 2), Vector2(3, 2)],
+		[Vector2(1, 0), Vector2(1, 1), Vector2(1, 2), Vector2(1, 3)]
+  ],
+  [ // J
+    [Vector2(0, 0), Vector2(0, 1), Vector2(1, 1), Vector2(2, 1)],
+    [Vector2(1, 0), Vector2(2, 0), Vector2(1, 1), Vector2(1, 2)],
+    [Vector2(0, 1), Vector2(1, 1), Vector2(2, 1), Vector2(2, 2)],
+    [Vector2(1, 0), Vector2(1, 1), Vector2(0, 2), Vector2(1, 2)]
+  ],
+  [ // T
+    [Vector2(1, 0), Vector2(0, 1), Vector2(1, 1), Vector2(2, 1)],
+    [Vector2(1, 0), Vector2(1, 1), Vector2(2, 1), Vector2(1, 2)],
+    [Vector2(0, 1), Vector2(1, 1), Vector2(2, 1), Vector2(1, 2)],
+    [Vector2(1, 0), Vector2(0, 1), Vector2(1, 1), Vector2(1, 2)]
+  ]
+];
+List<Vector2> spawnPositionFixes = [Vector2(1, 1), Vector2(1, 1), Vector2(0, 1), Vector2(1, 1), Vector2(1, 1), Vector2(1, 1), Vector2(1, 1)];
+
+const Map<String, double> garbage = {
+  "single": 0,
+  "double": 1,
+  "triple": 2,
+  "quad": 4,
+  "penta": 5,
+  "t-spin": 0,
+  "t-spin single": 2,
+  "t-spin double": 4,
+  "t-spin triple": 6,
+  "t-spin quad": 10,
+  "t-spin penta": 12,
+  "t-spin mini": 0,
+  "t-spin mini single": 0,
+  "t-spin mini double": 1,
+  "allclear": 10
+};
+int btbBonus = 1;
+double btbLog = 0.8;
+double comboBonus = 0.25;
+int comboMinifier = 1;
+double comboMinifierLog = 1.25;
+List<int> comboTable = [0, 1, 1, 2, 2, 3, 3, 4, 4, 4, 5];
