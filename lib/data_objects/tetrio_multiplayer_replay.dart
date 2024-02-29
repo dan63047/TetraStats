@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 import 'package:vector_math/vector_math_64.dart';
 
@@ -217,20 +218,97 @@ class ReplayData{
 
 // can't belive i have to implement that difficult shit
 
+List<Event> readEventList(Map<dynamic, dynamic> json){
+  List<Event> events = [];
+  int id = 0;
+  for (var event in json['data'][0]['replays'][0]['events']){
+    int frame = event["frame"];
+    EventType type = EventType.values.byName(event['type']);
+    switch (type) {
+      case EventType.start:
+        events.add(Event(id, frame, type));
+        break;
+      case EventType.full:
+        events.add(EventFull(id, frame, type, DataFull.fromJson(event["data"])));
+        break;
+      case EventType.targets:
+        // TODO
+        break;
+      case EventType.keydown:
+        events.add(EventKeyPress(id, frame, type, 
+          Keypress(
+            KeyType.values.byName(event['data']['key']),
+            event['data']['subframe'],
+            false)
+        ));
+        break;
+      case EventType.keyup:
+        events.add(EventKeyPress(id, frame, type,
+        Keypress(
+          KeyType.values.byName(event['data']['key']),
+          event['data']['subframe'],
+          true)
+        ));
+        break;
+      case EventType.end:
+        // TODO: Handle this case.
+      case EventType.ige:
+        // TODO: Handle this case.
+      case EventType.exit:
+        // TODO: Handle this case.
+    }
+    id++;
+  }
+  return [];
+}
+
+enum EventType
+{
+	start,
+	end,
+	full,
+	keydown,
+	keyup,
+	targets,
+	ige,
+	exit
+}
+
+enum KeyType
+{
+	moveLeft,
+	moveRight,
+	softDrop,
+	rotateCCW,
+	rotateCW,
+	rotate180,
+	hardDrop,
+	hold,
+	chat,
+	exit,
+	retry
+}
+
 class Event{
   int id;
   int frame;
-  String type;
+  EventType type;
   //dynamic data;
 
   Event(this.id, this.frame, this.type);
+
+  @override
+  String toString(){
+    return "E#$id f#$frame: $type";
+  }
 }
 
 class Keypress{
-  String key;
+  KeyType key;
   double subframe;
+  bool released;
 
-  Keypress(this.key, this.subframe);
+  Keypress(this.key, this.subframe, this.released);
 }
 
 class EventKeyPress extends Event{
@@ -252,6 +330,175 @@ class EventIGE extends Event{
   IGE data;
 
   EventIGE(super.id, super.frame, super.type, this.data);
+}
+
+class Hold
+{
+	String? piece;
+	bool locked;
+
+  Hold(this.piece, this.locked);
+}
+
+class DataFullOptions{
+  int? version;
+  bool? seedRandom;
+  int? seed;
+  double? g;
+  int? stock;
+  int? gMargin;
+  double? gIncrease;
+  double? garbageMultiplier;
+  int? garbageMargin;
+  double? garbageIncrease;
+  int? garbageCap;
+  double? garbageCapIncrease;
+  int? garbageCapMax;
+  int? garbageHoleSize;
+  String? garbageBlocking; // TODO: enum
+  bool? hasGarbage;
+  int? locktime;
+  int? garbageSpeed;
+  int? forfeitTime;
+  int? are;
+  int? areLineclear;
+  bool? infiniteMovement;
+  int? lockresets;
+  bool? allow180;
+  bool? btbChaining;
+  bool? allclears;
+  bool? clutch;
+  bool? noLockout;
+  String? passthrough;
+  int? boardwidth;
+  int? boardheight;
+  Handling? handling;
+  int? boardbuffer;
+
+  DataFullOptions.fromJson(Map<String, dynamic> json){
+    version = json["version"];
+    seedRandom = json["seed_random"];
+    seed = json["seed"];
+    g = json["g"];
+    stock = json["stock"];
+    gMargin = json["gmargin"];
+    gIncrease = json["gincrease"];
+    garbageMultiplier = json["garbagemultiplier"];
+    garbageCapIncrease = json["garbagecapincrease"];
+    garbageCapMax = json["garbagecapmax"];
+    garbageHoleSize = json["garbageholesize"];
+    garbageBlocking = json["garbageblocking"];
+    hasGarbage = json["hasgarbage"];
+    locktime = json["locktime"];
+    garbageSpeed = json["garbagespeed"];
+    forfeitTime = json["forfeit_time"];
+    are = json["are"];
+    areLineclear = json["lineclear_are"];
+    infiniteMovement = json["infinitemovement"];
+    lockresets = json["lockresets"];
+    allow180 = json["allow180"];
+    btbChaining = json["b2bchaining"];
+    allclears = json["allclears"];
+    clutch = json["clutch"];
+    noLockout = json["nolockout"];
+    passthrough = json["passthrough"];
+    boardwidth = json["boardwidth"];
+    boardheight = json["boardheight"];
+    handling = Handling.fromJson(json["handling"]);
+    boardbuffer = json["boardbuffer"];
+  }
+}
+
+class DataFullStats
+	{
+		double? seed;
+		int? lines;
+		int? levelLines;
+		int? levelLinesNeeded;
+		int? inputs;
+		int? holds;
+		int? score;
+		int? zenLevel;
+		int? zenProgress;
+		int? level;
+		int? combo;
+		int? currentComboPower;
+		int? topCombo;
+		int? btb;
+		int? topbtb;
+		int? tspins;
+		int? piecesPlaced;
+    Clears? clears;
+    Garbage? garbage;
+		int? kills;
+    Finesse? finesse;
+
+    DataFullStats.fromJson(Map<String, dynamic> json){
+      seed = json["seed"];
+      lines = json["lines"];
+      levelLines = json["level_lines"];
+      levelLinesNeeded = json["level_lines_needed"];
+      inputs = json["inputs"];
+      holds = json["holds"];
+      score = json["score"];
+      zenLevel = json["zenlevel"];
+      zenProgress = json["zenprogress"];
+      level = json["level"];
+      combo = json["combo"];
+      currentComboPower = json["currentcombopower"];
+      topCombo = json["topcombo"];
+      btb = json["btb"];
+      topbtb = json["topbtb"];
+      tspins = json["tspins"];
+      piecesPlaced = json["piecesplaced"];
+      clears = Clears.fromJson(json["clears"]);
+      garbage = Garbage.fromJson(json["garbage"]);
+      kills = json["kills"];
+      finesse = Finesse.fromJson(json["finesse"]);
+    }
+	}
+
+class DataFullGame
+	{
+		List<List<String?>>? board;
+		List<String>? bag;
+		double? g;
+		bool? playing;
+		Hold? hold;
+		String? piece;
+		Handling? handling;
+
+    DataFullGame.fromJson(Map<String, dynamic> json){
+      board = json["board"];
+      bag = json["bag"];
+      hold = Hold(json["hold"]["piece"], json["hold"]["locked"]);
+      g = json["g"];
+      handling = Handling.fromJson(json["handling"]);
+    }
+	}
+
+class DataFull{
+  bool? successful;
+  String? gameOverReason;
+  int? fire;
+  DataFullOptions? options;
+  DataFullStats? stats;
+  DataFullGame? game;
+
+  DataFull.fromJson(Map<String, dynamic> json){
+    successful = json["successful"];
+    gameOverReason = json["gameoverreason"];
+    fire = json["fire"];
+    options = DataFullOptions.fromJson(json["options"]);
+    stats = DataFullStats.fromJson(json["stats"]);
+    game = DataFullGame.fromJson(json["game"]);
+  }
+}
+
+class EventFull extends Event{
+  DataFull data;
+
+  EventFull(super.id, super.frame, super.type, this.data);
 }
 
 class TetrioRNG{
