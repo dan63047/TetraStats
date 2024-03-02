@@ -1,9 +1,11 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:io';
+import 'dart:math';
 import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/views/compare_view.dart' show CompareThingy, CompareBoolThingy;
+import 'package:tetra_stats/widgets/list_tile_trailing_stats.dart';
 import 'package:tetra_stats/widgets/vs_graphs.dart';
 import 'main_view.dart' show teto, secs;
 import 'package:flutter/foundation.dart';
@@ -36,12 +38,10 @@ class TlMatchResultView extends StatefulWidget {
 }
 
 class TlMatchResultState extends State<TlMatchResultView> {
-  late ScrollController _scrollController;
   late Future<ReplayData?> replayData;
 
   @override
   void initState(){
-    _scrollController = ScrollController();
     rounds = [DropdownMenuItem(value: -1, child: Text(t.match))];
     rounds.addAll([for (int i = 0; i < widget.record.endContext.first.secondaryTracking.length; i++) DropdownMenuItem(value: i, child: Text(t.roundNumber(n: i+1)))]);
     replayData = teto.analyzeReplay(widget.record.replayId, widget.record.replayAvalable);
@@ -59,10 +59,628 @@ class TlMatchResultState extends State<TlMatchResultView> {
     super.dispose();
   }
 
+  Widget buildComparison(bool bigScreen, bool showMobileSelector){
+    return NestedScrollView(
+      headerSliverBuilder: (context, value) {
+        return [
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                        colors: const [Colors.green, Colors.transparent],
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        stops: [0.0, widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).success ? 0.4 : 0.0],
+                      )),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                        child: Column(children: [
+                          Text(widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).username, style: bigScreen ? const TextStyle(
+                        fontFamily: "Eurostile Round Extended",
+                        fontSize: 28) : const TextStyle()),
+                          Text(widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).points.toString(), style: const TextStyle(
+                        fontFamily: "Eurostile Round Extended",
+                        fontSize: 42))
+                        ]),
+                      ),
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(top: 16),
+                    child: Text("VS"),
+                  ),
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                        colors: const [Colors.red, Colors.transparent],
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        stops: [0.0, widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).success ? 0.4 : 0.0],
+                      )),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                        child: Column(children: [
+                          Text(widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).username, style:  bigScreen ? const TextStyle(
+                        fontFamily: "Eurostile Round Extended",
+                        fontSize: 28) : const TextStyle()),
+                          Text(widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).points.toString(), style: const TextStyle(
+                        fontFamily: "Eurostile Round Extended",
+                        fontSize: 42))
+                        ]),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (showMobileSelector) SliverToBoxAdapter(
+            child: Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text("${t.statsFor}: ",
+                  style: const TextStyle(color: Colors.white, fontSize: 25)),
+                  DropdownButton(items: rounds, value: roundSelector, onChanged: ((value) {
+                    roundSelector = value;
+                    setState(() {});
+                  }),),
+                ],
+              ),
+            ),
+          ),
+          if (widget.record.ownId == widget.record.replayId && showMobileSelector) SliverToBoxAdapter(
+            child: Center(child: Text(t.p1nkl0bst3rAlert, textAlign: TextAlign.center)),
+          ),
+          if (showMobileSelector) SliverToBoxAdapter(child: FutureBuilder(future: replayData, builder: (context, snapshot) {
+            switch(snapshot.connectionState){
+              case ConnectionState.none:
+              case ConnectionState.waiting:
+              case ConnectionState.active:
+                return const LinearProgressIndicator();
+              case ConnectionState.done:
+              if (!snapshot.hasError){
+                if (roundSelector.isNegative){
+                  var time = framesToTime(snapshot.data!.totalLength);
+                  return Center(child: Text("${t.matchLength}: ${time.inMinutes}:${secs.format(time.inMicroseconds /1000000 % 60)}", textAlign: TextAlign.center));
+                }else{
+                  var time = framesToTime(snapshot.data!.roundLengths[roundSelector]);
+                  return Center(child: Text("${t.roundLength}: ${time.inMinutes}:${secs.format(time.inMicroseconds /1000000 % 60)}\n${t.winner}: ${snapshot.data!.roundWinners[roundSelector][1]}", textAlign: TextAlign.center,));
+                }
+              }else{
+                String reason;
+                switch (snapshot.error.runtimeType){
+                  case ReplayNotAvalable:
+                    reason = t.matchIsTooOld;
+                    break;
+                  case SzyNotFound:
+                    reason = t.matchIsTooOld;
+                    break;
+                  case SzyForbidden:
+                    reason = t.errors.replayRejected;
+                    break;
+                  case SzyTooManyRequests:
+                    reason = t.errors.tooManyRequests;
+                    break;
+                  default:
+                    reason = snapshot.error.toString();
+                    break;
+                }
+                return Text("${t.replayIssue}: $reason", textAlign: TextAlign.center);
+              }
+                
+            }
+          },),),
+          const SliverToBoxAdapter(
+            child: Divider(),
+          )
+        ];
+      },
+      body: ListView(
+        children: [
+          Column(
+            children: [
+                CompareThingy(
+                  label: "APM",
+                  greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).secondary : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).secondaryTracking[roundSelector],
+                  redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).secondary : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).secondaryTracking[roundSelector],
+                  fractionDigits: 2,
+                  higherIsBetter: true,
+                ),
+                CompareThingy(
+                  label: "PPS",
+                  greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).tertiary : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).tertiaryTracking[roundSelector],
+                  redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).tertiary : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).tertiaryTracking[roundSelector],
+                  fractionDigits: 2,
+                  higherIsBetter: true,
+                ),
+                CompareThingy(
+                  label: "VS",
+                  greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).extra : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).extraTracking[roundSelector],
+                  redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).extra : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).extraTracking[roundSelector],
+                  fractionDigits: 2,
+                  higherIsBetter: true,
+                ),
+                FutureBuilder(future: replayData, builder: (BuildContext context, AsyncSnapshot<ReplayData?> snapshot){
+                  switch(snapshot.connectionState){
+                    case ConnectionState.none:
+                    case ConnectionState.waiting:
+                    case ConnectionState.active:
+                      return const LinearProgressIndicator();
+                    case ConnectionState.done:
+                    if (!snapshot.hasError){
+                      var greenSidePlayer = snapshot.data!.endcontext.indexWhere((element) => element.userId == widget.initPlayerId);
+                      var redSidePlayer = snapshot.data!.endcontext.indexWhere((element) => element.userId != widget.initPlayerId);
+                      return Column(children: [
+                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].inputs : snapshot.data!.stats[roundSelector][greenSidePlayer].inputs,
+                          redSide: roundSelector.isNegative ?  snapshot.data!.totalStats[redSidePlayer].inputs : snapshot.data!.stats[roundSelector][redSidePlayer].inputs,
+                          label: "Inputs", higherIsBetter: true),
+                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].piecesPlaced : snapshot.data!.stats[roundSelector][greenSidePlayer].piecesPlaced,
+                          redSide: roundSelector.isNegative ?  snapshot.data!.totalStats[redSidePlayer].piecesPlaced : snapshot.data!.stats[roundSelector][redSidePlayer].piecesPlaced,
+                          label: "Pieces Placed", higherIsBetter: true),
+                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].kpp : snapshot.data!.stats[roundSelector][greenSidePlayer].kpp,
+                          redSide: roundSelector.isNegative ?  snapshot.data!.totalStats[redSidePlayer].kpp : snapshot.data!.stats[roundSelector][redSidePlayer].kpp,
+                          label: "KpP", higherIsBetter: false, fractionDigits: 2,),
+                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].kps : snapshot.data!.stats[roundSelector][greenSidePlayer].kps,
+                          redSide: roundSelector.isNegative ?  snapshot.data!.totalStats[redSidePlayer].kps : snapshot.data!.stats[roundSelector][redSidePlayer].kps,
+                          label: "KpS", higherIsBetter: true, fractionDigits: 2,),
+                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].linesCleared : snapshot.data!.stats[roundSelector][greenSidePlayer].linesCleared,
+                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].linesCleared : snapshot.data!.stats[roundSelector][redSidePlayer].linesCleared,
+                          label: "Lines Cleared", higherIsBetter: true),
+                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].score : snapshot.data!.stats[roundSelector][greenSidePlayer].score,
+                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].score : snapshot.data!.stats[roundSelector][redSidePlayer].score,
+                          label: "Score", higherIsBetter: true),
+                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].spp : snapshot.data!.stats[roundSelector][greenSidePlayer].spp,
+                          redSide: roundSelector.isNegative ?  snapshot.data!.totalStats[redSidePlayer].spp : snapshot.data!.stats[roundSelector][redSidePlayer].spp,
+                          label: "SpP", higherIsBetter: true, fractionDigits: 2,),  
+                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].finessePercentage * 100 : snapshot.data!.stats[roundSelector][greenSidePlayer].finessePercentage * 100,
+                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].finessePercentage * 100 : snapshot.data!.stats[roundSelector][redSidePlayer].finessePercentage * 100,
+                          label: "Finnese", postfix: "%", fractionDigits: 2, higherIsBetter: true),
+                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].topSpike : snapshot.data!.stats[roundSelector][greenSidePlayer].topSpike,
+                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].topSpike : snapshot.data!.stats[roundSelector][redSidePlayer].topSpike,
+                          label: "Best Spike", higherIsBetter: true),
+                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].topCombo : snapshot.data!.stats[roundSelector][greenSidePlayer].topCombo,
+                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].topCombo : snapshot.data!.stats[roundSelector][redSidePlayer].topCombo,
+                          label: "Best Combo", higherIsBetter: true),
+                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].topBtB : snapshot.data!.stats[roundSelector][greenSidePlayer].topBtB,
+                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].topBtB : snapshot.data!.stats[roundSelector][redSidePlayer].topBtB,
+                          label: "Best BtB", higherIsBetter: true),
+                        const Divider(),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: Text("Garbage", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                        ),
+                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].garbage.sent : snapshot.data!.stats[roundSelector][greenSidePlayer].garbage.sent,
+                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].garbage.sent : snapshot.data!.stats[roundSelector][redSidePlayer].garbage.sent,
+                          label: "Sent", higherIsBetter: true),
+                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].garbage.recived : snapshot.data!.stats[roundSelector][greenSidePlayer].garbage.recived,
+                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].garbage.recived : snapshot.data!.stats[roundSelector][redSidePlayer].garbage.recived,
+                          label: "Recived", higherIsBetter: true),
+                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].garbage.attack : snapshot.data!.stats[roundSelector][greenSidePlayer].garbage.attack,
+                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].garbage.attack : snapshot.data!.stats[roundSelector][redSidePlayer].garbage.attack,
+                          label: "Attack", higherIsBetter: true),
+                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].garbage.cleared : snapshot.data!.stats[roundSelector][greenSidePlayer].garbage.cleared,
+                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].garbage.cleared : snapshot.data!.stats[roundSelector][redSidePlayer].garbage.cleared,
+                          label: "Cleared", higherIsBetter: true),
+                        const Divider(),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: Text("Line Clears", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                        ),
+                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].clears.allClears : snapshot.data!.stats[roundSelector][greenSidePlayer].clears.allClears,
+                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].clears.allClears : snapshot.data!.stats[roundSelector][redSidePlayer].clears.allClears,
+                          label: "PC", higherIsBetter: true),
+                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].tspins : snapshot.data!.stats[roundSelector][greenSidePlayer].tspins,
+                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].tspins : snapshot.data!.stats[roundSelector][redSidePlayer].tspins,
+                          label: "T-spins", higherIsBetter: true),
+                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].clears.quads : snapshot.data!.stats[roundSelector][greenSidePlayer].clears.quads,
+                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].clears.quads : snapshot.data!.stats[roundSelector][redSidePlayer].clears.quads,
+                          label: "Quads", higherIsBetter: true),
+                      ],);
+                    }else{
+                      return Container();
+                    }
+                      
+                  }
+                })
+                ],
+                ),
+                const Divider(),
+                  Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: Text(t.nerdStats,
+                            style: TextStyle(
+                                fontFamily: "Eurostile Round Extended",
+                                fontSize: bigScreen ? 42 : 28)),
+                      ),
+                      CompareThingy(
+                        label: "APP",
+                        greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.app : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].app,
+                        redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.app : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].app,
+                        fractionDigits: 3,
+                        higherIsBetter: true,
+                      ),
+                      CompareThingy(
+                        label: "VS/APM",
+                        greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.vsapm : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].vsapm,
+                        redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.vsapm : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].vsapm,
+                        fractionDigits: 3,
+                        higherIsBetter: true,
+                      ),
+                      CompareThingy(
+                        label: "DS/S",
+                        greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.dss : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].dss,
+                        redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.dss : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].dss,
+                        fractionDigits: 3,
+                        higherIsBetter: true,
+                      ),
+                      CompareThingy(
+                        label: "DS/P",
+                        greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.dsp : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].dsp,
+                        redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.dsp : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].dsp,
+                        fractionDigits: 3,
+                        higherIsBetter: true,
+                      ),
+                      CompareThingy(
+                        label: "APP + DS/P",
+                        greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.appdsp : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].appdsp,
+                        redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.appdsp : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].appdsp,
+                        fractionDigits: 3,
+                        higherIsBetter: true,
+                      ),
+                      CompareThingy(
+                        label: t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "),
+                        greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.cheese : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].cheese,
+                        redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.cheese : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].cheese,
+                        fractionDigits: 2,
+                        higherIsBetter: true,
+                      ),
+                      CompareThingy(
+                        label: "Gb Eff.",
+                        greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.gbe : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].gbe,
+                        redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.gbe : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].gbe,
+                        fractionDigits: 3,
+                        higherIsBetter: true,
+                      ),
+                      CompareThingy(
+                        label: "wAPP",
+                        greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.nyaapp : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].nyaapp,
+                        redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.nyaapp : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].nyaapp,
+                        fractionDigits: 3,
+                        higherIsBetter: true,
+                      ),
+                      CompareThingy(
+                        label: "Area",
+                        greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.area : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].area,
+                        redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.area : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].area,
+                        fractionDigits: 2,
+                        higherIsBetter: true,
+                      ),
+                      CompareThingy(
+                        label: t.statCellNum.estOfTRShort,
+                        greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).estTr.esttr : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).estTrTracking[roundSelector].esttr,
+                        redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).estTr.esttr : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).estTrTracking[roundSelector].esttr,
+                        fractionDigits: 2,
+                        higherIsBetter: true,
+                      ),
+                      CompareThingy(
+                        label: "Opener",
+                        greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle.opener : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyleTracking[roundSelector].opener,
+                        redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle.opener : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyleTracking[roundSelector].opener,
+                        fractionDigits: 3,
+                        higherIsBetter: true,
+                      ),
+                      CompareThingy(
+                        label: "Plonk",
+                        greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle.plonk : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyleTracking[roundSelector].plonk,
+                        redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle.plonk : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyleTracking[roundSelector].plonk,
+                        fractionDigits: 3,
+                        higherIsBetter: true,
+                      ),
+                      CompareThingy(
+                        label: "Stride",
+                        greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle.stride : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyleTracking[roundSelector].stride,
+                        redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle.stride : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyleTracking[roundSelector].stride,
+                        fractionDigits: 3,
+                        higherIsBetter: true,
+                      ),
+                      CompareThingy(
+                        label: "Inf. DS",
+                        greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle.infds : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyleTracking[roundSelector].infds,
+                        redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle.infds : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyleTracking[roundSelector].infds,
+                        fractionDigits: 3,
+                        higherIsBetter: true,
+                      ),
+                      VsGraphs(
+                        roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).secondary : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).secondaryTracking[roundSelector],
+                        roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).tertiary : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).tertiaryTracking[roundSelector],
+                        roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).extra : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).extraTracking[roundSelector],
+                        roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector],
+                        roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyleTracking[roundSelector],
+                        roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).secondary : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).secondaryTracking[roundSelector],
+                        roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).tertiary : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).tertiaryTracking[roundSelector],
+                        roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).extra : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).extraTracking[roundSelector],
+                        roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector],
+                        roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyleTracking[roundSelector]
+                      )
+                    ],
+                  ),
+                  if (widget.record.ownId != widget.record.replayId) const Divider(),
+                  if (widget.record.ownId != widget.record.replayId) Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: Text("Handling",
+                            style: TextStyle(
+                                fontFamily: "Eurostile Round Extended",
+                                fontSize: bigScreen ? 42 : 28)),
+                      ),
+                      CompareThingy(
+                        greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.das,
+                        redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.das,
+                        label: "DAS", fractionDigits: 1, postfix: "F",
+                        higherIsBetter: false),
+                      CompareThingy(
+                        greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.arr,
+                        redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.arr,
+                        label: "ARR", fractionDigits: 1, postfix: "F",
+                        higherIsBetter: false),
+                      CompareThingy(
+                        greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.sdf,
+                        redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.sdf,
+                        label: "SDF", prefix: "x",
+                        higherIsBetter: true),
+                      CompareBoolThingy(
+                        greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.safeLock,
+                        redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.safeLock,
+                        label: "Safe HD",
+                        trueIsBetter: true)
+                    ],
+                  )
+              ],
+            )
+    );
+  }
+
+  Widget buildRoundSelector(double width){
+    return Padding(
+      padding: EdgeInsets.all(8.0000000),
+      child: SizedBox(
+        width: width,
+        child: NestedScrollView(
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) { 
+            return [
+              SliverToBoxAdapter(child: 
+                Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  children: [
+                    FutureBuilder(future: replayData, builder: (context, snapshot) {
+                      switch(snapshot.connectionState){
+                        case ConnectionState.none:
+                        case ConnectionState.waiting:
+                        case ConnectionState.active:
+                          return const CircularProgressIndicator();
+                        case ConnectionState.done:
+                        if (!snapshot.hasError){
+                          var time = framesToTime(snapshot.data!.totalLength);
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                            Text(t.matchLength),
+                            RichText(
+                              text: TextSpan(
+                                text: "${time.inMinutes}:${NumberFormat("00", LocaleSettings.currentLocale.languageCode).format(time.inSeconds%60)}",
+                                style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, fontWeight: FontWeight.w500),
+                                children: [TextSpan(text: ".${NumberFormat("000", LocaleSettings.currentLocale.languageCode).format(time.inMilliseconds%1000)}", style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
+                                ),
+                              )
+                          ],);
+                        }else{
+                          String reason;
+                          switch (snapshot.error.runtimeType){
+                            case ReplayNotAvalable:
+                              reason = t.matchIsTooOld;
+                              break;
+                            case SzyNotFound:
+                              reason = t.matchIsTooOld;
+                              break;
+                            case SzyForbidden:
+                              reason = t.errors.replayRejected;
+                              break;
+                            case SzyTooManyRequests:
+                              reason = t.errors.tooManyRequests;
+                              break;
+                            default:
+                              reason = snapshot.error.toString();
+                              break;
+                          }
+                          return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                              if (widget.record.ownId != widget.record.replayId) Text("${t.replayIssue}: $reason"),
+                              if (widget.record.ownId == widget.record.replayId) Center(child: Text(t.p1nkl0bst3rAlert, textAlign: TextAlign.center)),
+                              if (widget.record.ownId != widget.record.replayId) RichText(
+                                text: TextSpan(
+                                  text: "-:--",
+                                  style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.grey),
+                                  children: [TextSpan(text: ".---", style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
+                                  ),
+                                )
+                            ],);
+                        }
+                          
+                      }
+                    },),
+                     if (widget.record.ownId != widget.record.replayId) Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                      Text("Number of rounds"),
+                      RichText(
+                        text: TextSpan(
+                          text: widget.record.endContext.first.secondaryTracking.length > 0 ? widget.record.endContext.first.secondaryTracking.length.toString() : "---",
+                          style: TextStyle(
+                            fontFamily: "Eurostile Round Extended",
+                            fontSize: 28,
+                            fontWeight: FontWeight.w500,
+                            color: widget.record.endContext.first.secondaryTracking.length == 0 ? Colors.grey : null
+                            ),
+                          ),
+                        )
+                    ],),
+                    Column(children: [
+                      OverflowBar(
+                        alignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          TextButton( child: const Text('Match stats'),
+                          style: roundSelector == -1 ? ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.grey.shade900)) : null,
+                          onPressed: () {
+                            roundSelector = -1;
+                            setState(() {});
+                          }),
+                          TextButton( child: const Text('Time-weighted match stats'), onPressed: () {
+                            roundSelector = -1;
+                            setState(() {});
+                          }),
+                          //TextButton( child: const Text('Button 3'), onPressed: () {}),
+                        ],
+                      )
+                    ]),
+                    // Column(
+                    //   children: [
+                    //     ListTile(
+                    //       leading: Text("Round time"),
+                    //       title: Text("Winner", textAlign: TextAlign.center,),
+                    //       trailing: Text("Round stats"),
+                    //     )
+                    //   ],
+                    // )
+                  ],
+                )
+              )
+            ];
+           },
+          body: ListView.builder(itemCount: widget.record.endContext.first.secondaryTracking.length,
+            itemBuilder: (BuildContext context, int index) {
+              return FutureBuilder(future: replayData, builder: (context, snapshot) {
+                switch(snapshot.connectionState){
+                  case ConnectionState.none:
+                  case ConnectionState.waiting:
+                  case ConnectionState.active:
+                    return const LinearProgressIndicator();
+                  case ConnectionState.done:
+                  if (!snapshot.hasError){
+                    var time = framesToTime(snapshot.data!.roundLengths[index]);
+                    var accentColor = snapshot.data!.roundWinners[index][0] == widget.initPlayerId ? Colors.green : Colors.red;
+                    var bgColor = roundSelector == index ? Colors.grey.shade900 : Colors.transparent;
+                    return Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          stops: const [0, 0.05],
+                          colors: [accentColor, bgColor]
+                        )
+                      ),
+                      child: ListTile(
+                        leading:RichText(
+                          text: TextSpan(
+                            text: "${time.inMinutes}:${NumberFormat("00", LocaleSettings.currentLocale.languageCode).format(time.inSeconds%60)}",
+                            style: TextStyle(fontFamily: "Eurostile Round", fontSize: 22, fontWeight: FontWeight.w500),
+                            children: [TextSpan(text: ".${NumberFormat("000", LocaleSettings.currentLocale.languageCode).format(time.inMilliseconds%1000)}", style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
+                          ), 
+                        ),
+                        title: Text(snapshot.data!.roundWinners[index][1], textAlign: TextAlign.center),
+                        trailing: TrailingStats(
+                          widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).secondaryTracking[index],
+                          widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).tertiaryTracking[index],
+                          widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).extraTracking[index],
+                          widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).secondaryTracking[index],
+                          widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).tertiaryTracking[index],
+                          widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).extraTracking[index]
+                        ),
+                        onTap:(){
+                          roundSelector = index;
+                          setState(() {});
+                        },
+                      ),
+                    );
+                  }else{
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: roundSelector == index ? Colors.grey.shade900 : Colors.transparent
+                      ),
+                      child: ListTile(
+                        leading: RichText(
+                        text: TextSpan(
+                          text: "-:--",
+                          style: TextStyle(fontFamily: "Eurostile Round", fontSize: 22, fontWeight: FontWeight.w500, color: Colors.grey),
+                          children: [TextSpan(text: ".---", style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
+                          ),
+                        ),
+                        title: Text("---", style: TextStyle(color: Colors.grey), textAlign: TextAlign.center),
+                        trailing: TrailingStats(
+                          widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).secondaryTracking[index],
+                          widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).tertiaryTracking[index],
+                          widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).extraTracking[index],
+                          widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).secondaryTracking[index],
+                          widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).tertiaryTracking[index],
+                          widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).extraTracking[index]
+                        ),
+                        onTap:(){
+                          roundSelector = index;
+                          setState(() {});
+                        },
+                      ),
+                    );
+                  }
+                }
+              }
+            );
+          })
+        ),
+      ),
+    );
+  }
+  
+  Widget getMainWidget(double viewportWidth) {
+    if (viewportWidth <= 1024) {
+      return Center(
+        child: Container(
+          constraints: BoxConstraints(maxWidth: 768),
+          child: buildComparison(viewportWidth > 768, true)
+        ),
+      );
+    } else {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        //mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 768,
+            child: buildComparison(true, false)
+          ),
+          Container(
+            constraints: BoxConstraints(maxWidth: 768),
+            child: buildRoundSelector(max(viewportWidth-768-16, 200)),
+          )
+        ],
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);
-    bool bigScreen = MediaQuery.of(context).size.width > 768;
     return Scaffold(
       appBar: AppBar(
         title: Text("${widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).username.toUpperCase()} ${t.vs} ${widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).username.toUpperCase()} ${t.inTLmatch} ${dateFormat.format(widget.record.timestamp)}"),
@@ -114,401 +732,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
         ]
       ),
       backgroundColor: Colors.black,
-      body: SafeArea(
-        child: NestedScrollView(
-          controller: _scrollController,
-          headerSliverBuilder: (context, value) {
-            return [
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                            colors: const [Colors.green, Colors.transparent],
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                            stops: [0.0, widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).success ? 0.4 : 0.0],
-                          )),
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                            child: Column(children: [
-                              Text(widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).username, style: bigScreen ? const TextStyle(
-                            fontFamily: "Eurostile Round Extended",
-                            fontSize: 28) : const TextStyle()),
-                              Text(widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).points.toString(), style: const TextStyle(
-                            fontFamily: "Eurostile Round Extended",
-                            fontSize: 42))
-                            ]),
-                          ),
-                        ),
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.only(top: 16),
-                        child: Text("VS"),
-                      ),
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                            colors: const [Colors.red, Colors.transparent],
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                            stops: [0.0, widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).success ? 0.4 : 0.0],
-                          )),
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                            child: Column(children: [
-                              Text(widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).username, style:  bigScreen ? const TextStyle(
-                            fontFamily: "Eurostile Round Extended",
-                            fontSize: 28) : const TextStyle()),
-                              Text(widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).points.toString(), style: const TextStyle(
-                            fontFamily: "Eurostile Round Extended",
-                            fontSize: 42))
-                            ]),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: Center(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
-                    children: [
-                      Text("${t.statsFor}: ",
-                      style: const TextStyle(color: Colors.white, fontSize: 25)),
-                      DropdownButton(items: rounds, value: roundSelector, onChanged: ((value) {
-                        roundSelector = value;
-                        setState(() {});
-                      }),),
-                    ],
-                  ),
-                ),
-              ),
-              if (widget.record.ownId == widget.record.replayId) SliverToBoxAdapter(
-                child: Center(child: Text(t.p1nkl0bst3rAlert, textAlign: TextAlign.center)),
-              ),
-              SliverToBoxAdapter(child: FutureBuilder(future: replayData, builder: (context, snapshot) {
-                switch(snapshot.connectionState){
-                  case ConnectionState.none:
-                  case ConnectionState.waiting:
-                  case ConnectionState.active:
-                    return const LinearProgressIndicator();
-                  case ConnectionState.done:
-                  if (!snapshot.hasError){
-                    if (roundSelector.isNegative){
-                      var time = framesToTime(snapshot.data!.totalLength);
-                      return Center(child: Text("${t.matchLength}: ${time.inMinutes}:${secs.format(time.inMicroseconds /1000000 % 60)}", textAlign: TextAlign.center));
-                    }else{
-                      var time = framesToTime(snapshot.data!.roundLengths[roundSelector]);
-                      return Center(child: Text("${t.roundLength}: ${time.inMinutes}:${secs.format(time.inMicroseconds /1000000 % 60)}\n${t.winner}: ${snapshot.data!.roundWinners[roundSelector][1]}", textAlign: TextAlign.center,));
-                    }
-                  }else{
-                    String reason;
-                    switch (snapshot.error.runtimeType){
-                      case ReplayNotAvalable:
-                        reason = t.matchIsTooOld;
-                        break;
-                      case SzyNotFound:
-                        reason = t.matchIsTooOld;
-                        break;
-                      case SzyForbidden:
-                        reason = t.errors.replayRejected;
-                        break;
-                      case SzyTooManyRequests:
-                        reason = t.errors.tooManyRequests;
-                        break;
-                      default:
-                        reason = snapshot.error.toString();
-                        break;
-                    }
-                    return Text("${t.replayIssue}: $reason", textAlign: TextAlign.center);
-                  }
-                    
-                }
-              },),),
-              const SliverToBoxAdapter(
-                child: Divider(),
-              )
-            ];
-          },
-          body: ListView(
-                  children: [
-                    Column(
-                            children: [
-                                CompareThingy(
-                                  label: "APM",
-                                  greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).secondary : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).secondaryTracking[roundSelector],
-                                  redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).secondary : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).secondaryTracking[roundSelector],
-                                  fractionDigits: 2,
-                                  higherIsBetter: true,
-                                ),
-                                CompareThingy(
-                                  label: "PPS",
-                                  greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).tertiary : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).tertiaryTracking[roundSelector],
-                                  redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).tertiary : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).tertiaryTracking[roundSelector],
-                                  fractionDigits: 2,
-                                  higherIsBetter: true,
-                                ),
-                                CompareThingy(
-                                  label: "VS",
-                                  greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).extra : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).extraTracking[roundSelector],
-                                  redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).extra : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).extraTracking[roundSelector],
-                                  fractionDigits: 2,
-                                  higherIsBetter: true,
-                                ),
-                                FutureBuilder(future: replayData, builder: (BuildContext context, AsyncSnapshot<ReplayData?> snapshot){
-                                  switch(snapshot.connectionState){
-                                    case ConnectionState.none:
-                                    case ConnectionState.waiting:
-                                    case ConnectionState.active:
-                                      return const LinearProgressIndicator();
-                                    case ConnectionState.done:
-                                    if (!snapshot.hasError){
-                                      var greenSidePlayer = snapshot.data!.endcontext.indexWhere((element) => element.userId == widget.initPlayerId);
-                                      var redSidePlayer = snapshot.data!.endcontext.indexWhere((element) => element.userId != widget.initPlayerId);
-                                      return Column(children: [
-                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].inputs : snapshot.data!.stats[roundSelector][greenSidePlayer].inputs,
-                                          redSide: roundSelector.isNegative ?  snapshot.data!.totalStats[redSidePlayer].inputs : snapshot.data!.stats[roundSelector][redSidePlayer].inputs,
-                                          label: "Inputs", higherIsBetter: true),
-                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].piecesPlaced : snapshot.data!.stats[roundSelector][greenSidePlayer].piecesPlaced,
-                                          redSide: roundSelector.isNegative ?  snapshot.data!.totalStats[redSidePlayer].piecesPlaced : snapshot.data!.stats[roundSelector][redSidePlayer].piecesPlaced,
-                                          label: "Pieces Placed", higherIsBetter: true),
-                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].kpp : snapshot.data!.stats[roundSelector][greenSidePlayer].kpp,
-                                          redSide: roundSelector.isNegative ?  snapshot.data!.totalStats[redSidePlayer].kpp : snapshot.data!.stats[roundSelector][redSidePlayer].kpp,
-                                          label: "KpP", higherIsBetter: false, fractionDigits: 2,),
-                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].kps : snapshot.data!.stats[roundSelector][greenSidePlayer].kps,
-                                          redSide: roundSelector.isNegative ?  snapshot.data!.totalStats[redSidePlayer].kps : snapshot.data!.stats[roundSelector][redSidePlayer].kps,
-                                          label: "KpS", higherIsBetter: true, fractionDigits: 2,),
-                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].linesCleared : snapshot.data!.stats[roundSelector][greenSidePlayer].linesCleared,
-                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].linesCleared : snapshot.data!.stats[roundSelector][redSidePlayer].linesCleared,
-                                          label: "Lines Cleared", higherIsBetter: true),
-                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].score : snapshot.data!.stats[roundSelector][greenSidePlayer].score,
-                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].score : snapshot.data!.stats[roundSelector][redSidePlayer].score,
-                                          label: "Score", higherIsBetter: true),
-                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].spp : snapshot.data!.stats[roundSelector][greenSidePlayer].spp,
-                                          redSide: roundSelector.isNegative ?  snapshot.data!.totalStats[redSidePlayer].spp : snapshot.data!.stats[roundSelector][redSidePlayer].spp,
-                                          label: "SpP", higherIsBetter: true, fractionDigits: 2,),  
-                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].finessePercentage * 100 : snapshot.data!.stats[roundSelector][greenSidePlayer].finessePercentage * 100,
-                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].finessePercentage * 100 : snapshot.data!.stats[roundSelector][redSidePlayer].finessePercentage * 100,
-                                          label: "Finnese", postfix: "%", fractionDigits: 2, higherIsBetter: true),
-                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].topSpike : snapshot.data!.stats[roundSelector][greenSidePlayer].topSpike,
-                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].topSpike : snapshot.data!.stats[roundSelector][redSidePlayer].topSpike,
-                                          label: "Best Spike", higherIsBetter: true),
-                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].topCombo : snapshot.data!.stats[roundSelector][greenSidePlayer].topCombo,
-                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].topCombo : snapshot.data!.stats[roundSelector][redSidePlayer].topCombo,
-                                          label: "Best Combo", higherIsBetter: true),
-                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].topBtB : snapshot.data!.stats[roundSelector][greenSidePlayer].topBtB,
-                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].topBtB : snapshot.data!.stats[roundSelector][redSidePlayer].topBtB,
-                                          label: "Best BtB", higherIsBetter: true),
-                                        const Divider(),
-                                        Padding(
-                                          padding: const EdgeInsets.only(bottom: 16),
-                                          child: Text("Garbage", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                                        ),
-                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].garbage.sent : snapshot.data!.stats[roundSelector][greenSidePlayer].garbage.sent,
-                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].garbage.sent : snapshot.data!.stats[roundSelector][redSidePlayer].garbage.sent,
-                                          label: "Sent", higherIsBetter: true),
-                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].garbage.recived : snapshot.data!.stats[roundSelector][greenSidePlayer].garbage.recived,
-                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].garbage.recived : snapshot.data!.stats[roundSelector][redSidePlayer].garbage.recived,
-                                          label: "Recived", higherIsBetter: true),
-                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].garbage.attack : snapshot.data!.stats[roundSelector][greenSidePlayer].garbage.attack,
-                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].garbage.attack : snapshot.data!.stats[roundSelector][redSidePlayer].garbage.attack,
-                                          label: "Attack", higherIsBetter: true),
-                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].garbage.cleared : snapshot.data!.stats[roundSelector][greenSidePlayer].garbage.cleared,
-                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].garbage.cleared : snapshot.data!.stats[roundSelector][redSidePlayer].garbage.cleared,
-                                          label: "Cleared", higherIsBetter: true),
-                                        const Divider(),
-                                        Padding(
-                                          padding: const EdgeInsets.only(bottom: 16),
-                                          child: Text("Line Clears", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                                        ),
-                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].clears.allClears : snapshot.data!.stats[roundSelector][greenSidePlayer].clears.allClears,
-                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].clears.allClears : snapshot.data!.stats[roundSelector][redSidePlayer].clears.allClears,
-                                          label: "PC", higherIsBetter: true),
-                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].tspins : snapshot.data!.stats[roundSelector][greenSidePlayer].tspins,
-                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].tspins : snapshot.data!.stats[roundSelector][redSidePlayer].tspins,
-                                          label: "T-spins", higherIsBetter: true),
-                                        CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].clears.quads : snapshot.data!.stats[roundSelector][greenSidePlayer].clears.quads,
-                                          redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].clears.quads : snapshot.data!.stats[roundSelector][redSidePlayer].clears.quads,
-                                          label: "Quads", higherIsBetter: true),
-                                      ],);
-                                    }else{
-                                      return Container();
-                                    }
-                                      
-                                  }
-                                })
-                            ],
-                          ),
-                    const Divider(),
-                      Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: Text(t.nerdStats,
-                                style: TextStyle(
-                                    fontFamily: "Eurostile Round Extended",
-                                    fontSize: bigScreen ? 42 : 28)),
-                          ),
-                          CompareThingy(
-                            label: "APP",
-                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.app : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].app,
-                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.app : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].app,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: "VS/APM",
-                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.vsapm : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].vsapm,
-                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.vsapm : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].vsapm,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: "DS/S",
-                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.dss : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].dss,
-                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.dss : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].dss,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: "DS/P",
-                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.dsp : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].dsp,
-                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.dsp : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].dsp,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: "APP + DS/P",
-                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.appdsp : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].appdsp,
-                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.appdsp : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].appdsp,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "),
-                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.cheese : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].cheese,
-                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.cheese : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].cheese,
-                            fractionDigits: 2,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: "Gb Eff.",
-                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.gbe : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].gbe,
-                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.gbe : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].gbe,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: "wAPP",
-                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.nyaapp : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].nyaapp,
-                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.nyaapp : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].nyaapp,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: "Area",
-                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.area : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].area,
-                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.area : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].area,
-                            fractionDigits: 2,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: t.statCellNum.estOfTRShort,
-                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).estTr.esttr : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).estTrTracking[roundSelector].esttr,
-                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).estTr.esttr : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).estTrTracking[roundSelector].esttr,
-                            fractionDigits: 2,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: "Opener",
-                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle.opener : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyleTracking[roundSelector].opener,
-                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle.opener : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyleTracking[roundSelector].opener,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: "Plonk",
-                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle.plonk : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyleTracking[roundSelector].plonk,
-                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle.plonk : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyleTracking[roundSelector].plonk,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: "Stride",
-                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle.stride : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyleTracking[roundSelector].stride,
-                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle.stride : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyleTracking[roundSelector].stride,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: "Inf. DS",
-                            greenSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle.infds : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyleTracking[roundSelector].infds,
-                            redSide: roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle.infds : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyleTracking[roundSelector].infds,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          VsGraphs(
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).secondary : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).secondaryTracking[roundSelector],
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).tertiary : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).tertiaryTracking[roundSelector],
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).extra : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).extraTracking[roundSelector],
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector],
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyleTracking[roundSelector],
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).secondary : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).secondaryTracking[roundSelector],
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).tertiary : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).tertiaryTracking[roundSelector],
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).extra : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).extraTracking[roundSelector],
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector],
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyleTracking[roundSelector]
-                          )
-                        ],
-                      ),
-                      if (widget.record.ownId != widget.record.replayId) const Divider(),
-                      if (widget.record.ownId != widget.record.replayId) Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: Text("Handling",
-                                style: TextStyle(
-                                    fontFamily: "Eurostile Round Extended",
-                                    fontSize: bigScreen ? 42 : 28)),
-                          ),
-                          CompareThingy(
-                            greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.das,
-                            redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.das,
-                            label: "DAS", fractionDigits: 1, postfix: "F",
-                            higherIsBetter: false),
-                          CompareThingy(
-                            greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.arr,
-                            redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.arr,
-                            label: "ARR", fractionDigits: 1, postfix: "F",
-                            higherIsBetter: false),
-                          CompareThingy(
-                            greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.sdf,
-                            redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.sdf,
-                            label: "SDF", prefix: "x",
-                            higherIsBetter: true),
-                          CompareBoolThingy(
-                            greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.safeLock,
-                            redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.safeLock,
-                            label: "Safe HD",
-                            trueIsBetter: true)
-                        ],
-                      )
-                  ],
-                )
-        ),
-      ),
-    );
+      body: getMainWidget(MediaQuery.of(context).size.width),
+      );
   }
 }

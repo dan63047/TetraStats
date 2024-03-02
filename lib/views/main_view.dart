@@ -20,6 +20,7 @@ import 'package:tetra_stats/utils/text_shadow.dart';
 import 'package:tetra_stats/views/ranks_averages_view.dart' show RankAveragesView;
 import 'package:tetra_stats/views/tl_leaderboard_view.dart' show TLLeaderboardView;
 import 'package:tetra_stats/views/tl_match_view.dart' show TlMatchResultView;
+import 'package:tetra_stats/widgets/list_tile_trailing_stats.dart';
 import 'package:tetra_stats/widgets/search_box.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
 import 'package:tetra_stats/widgets/tl_thingy.dart';
@@ -582,18 +583,14 @@ class _TLRecords extends StatelessWidget {
           style: bigScreen ? const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, shadows: textShadow) : const TextStyle(fontSize: 28, shadows: textShadow)),
           title: Text("vs. ${data[index].endContext.firstWhere((element) => element.userId != userID).username}"),
           subtitle: Text(_dateFormat.format(data[index].timestamp)),
-          trailing: Table(defaultColumnWidth: const IntrinsicColumnWidth(),
-          defaultVerticalAlignment: TableCellVerticalAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
-          columnWidths: const {
-            0: FixedColumnWidth(50),
-            2: FixedColumnWidth(50),
-          },
-            children: [
-            TableRow(children: [Text(_f2.format(data[index].endContext.firstWhere((element) => element.userId == userID).secondary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(_f2.format(data[index].endContext.firstWhere((element) => element.userId != userID).secondary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" APM", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
-            TableRow(children: [Text(_f2.format(data[index].endContext.firstWhere((element) => element.userId == userID).tertiary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(_f2.format(data[index].endContext.firstWhere((element) => element.userId != userID).tertiary), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" PPS", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
-            TableRow(children: [Text(_f2.format(data[index].endContext.firstWhere((element) => element.userId == userID).extra), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(_f2.format(data[index].endContext.firstWhere((element) => element.userId != userID).extra), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" VS", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
-          ],),
+          trailing: TrailingStats(
+            data[index].endContext.firstWhere((element) => element.userId == userID).secondary,
+            data[index].endContext.firstWhere((element) => element.userId == userID).tertiary,
+            data[index].endContext.firstWhere((element) => element.userId == userID).extra,
+            data[index].endContext.firstWhere((element) => element.userId != userID).secondary,
+            data[index].endContext.firstWhere((element) => element.userId != userID).tertiary,
+            data[index].endContext.firstWhere((element) => element.userId != userID).extra
+            ),
           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => TlMatchResultView(record: data[index], initPlayerId: userID))),
         ),
       );
