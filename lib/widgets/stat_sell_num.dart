@@ -50,8 +50,8 @@ class StatCellNum extends StatelessWidget {
         ),
         if (oldPlayerStat != null) Text(comparef.format(playerStat - oldPlayerStat!), style: TextStyle(
           color: higherIsBetter ?
-          oldPlayerStat! > playerStat ? Colors.red : Colors.green :
-          oldPlayerStat! < playerStat ? Colors.red : Colors.green
+          oldPlayerStat! > playerStat ? Colors.redAccent : Colors.greenAccent :
+          oldPlayerStat! < playerStat ? Colors.redAccent : Colors.greenAccent
         ),),
         alertWidgets == null
             ? Text(

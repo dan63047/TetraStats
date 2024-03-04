@@ -241,8 +241,8 @@ class _TLThingyState extends State<TLThingy> {
                                 },), verticalAlignment: GaugeAlignment.far, positionFactor: 0.05,),
                                 if (oldTl != null && oldTl!.gamesPlayed > 0) GaugeAnnotation(widget: Text(fDiff.format(currentTl.nerdStats!.app - oldTl!.nerdStats!.app), style: TextStyle(
                                     color: currentTl.nerdStats!.app - oldTl!.nerdStats!.app < 0 ?
-                                    Colors.red :
-                                    Colors.green
+                                    Colors.redAccent :
+                                    Colors.greenAccent
                                   ),), positionFactor: 0.05,)],
                                 )],),
                             ),
@@ -303,8 +303,8 @@ class _TLThingyState extends State<TLThingy> {
                                 },), verticalAlignment: GaugeAlignment.far, positionFactor: 0.05),
                                 if (oldTl != null && oldTl!.gamesPlayed > 0) GaugeAnnotation(widget: Text(fDiff.format(currentTl.nerdStats!.vsapm - oldTl!.nerdStats!.vsapm), style: TextStyle(
                                     color: currentTl.nerdStats!.vsapm - oldTl!.nerdStats!.vsapm < 0 ?
-                                    Colors.red :
-                                    Colors.green
+                                    Colors.redAccent :
+                                    Colors.greenAccent
                                   ),), positionFactor: 0.05,)],
                                 )],),
                             ),]),

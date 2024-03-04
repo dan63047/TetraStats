@@ -15,6 +15,7 @@ class TrailingStats extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     final NumberFormat f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
+    const TextStyle style = TextStyle(height: 1.1, fontWeight: FontWeight.w100);
     return Table(
       defaultColumnWidth: const IntrinsicColumnWidth(),
       defaultVerticalAlignment: TableCellVerticalAlignment.baseline,
@@ -24,9 +25,9 @@ class TrailingStats extends StatelessWidget{
         2: FixedColumnWidth(42),
       },
         children: [
-        TableRow(children: [Text(f2.format(yourAPM), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(f2.format(notyourAPM), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" APM", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
-        TableRow(children: [Text(f2.format(yourPPS), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(f2.format(notyourPPS), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" PPS", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
-        TableRow(children: [Text(f2.format(yourVS), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" :", style: TextStyle(height: 1.1)), Text(f2.format(notyourVS), textAlign: TextAlign.right, style: const TextStyle(height: 1.1)), const Text(" VS", textAlign: TextAlign.right, style: TextStyle(height: 1.1))]),
+        TableRow(children: [Text(f2.format(yourAPM), textAlign: TextAlign.right, style: style), const Text(" :", style: style), Text(f2.format(notyourAPM), textAlign: TextAlign.right, style: style), const Text(" APM", textAlign: TextAlign.right, style: style)]),
+        TableRow(children: [Text(f2.format(yourPPS), textAlign: TextAlign.right, style: style), const Text(" :", style: style), Text(f2.format(notyourPPS), textAlign: TextAlign.right, style: style), const Text(" PPS", textAlign: TextAlign.right, style: style)]),
+        TableRow(children: [Text(f2.format(yourVS), textAlign: TextAlign.right, style: style), const Text(" :", style: style), Text(f2.format(notyourVS), textAlign: TextAlign.right, style: style), const Text(" VS", textAlign: TextAlign.right, style: style)]),
       ],
     );
   }

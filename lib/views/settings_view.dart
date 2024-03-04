@@ -26,6 +26,7 @@ class SettingsState extends State<SettingsView> {
   late SharedPreferences prefs;
   final TetrioService teto = TetrioService();
   String defaultNickname = "Checking...";
+  late bool loadLeaderboard;
   final TextEditingController _playertext = TextEditingController();
 
   @override
@@ -46,6 +47,11 @@ class SettingsState extends State<SettingsView> {
 
   Future<void> _getPreferences() async {
     prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool("loadLeaderboard") != null) {
+      loadLeaderboard = prefs.getBool("loadLeaderboard")!;
+    } else {
+      loadLeaderboard = false;
+    }
     _setDefaultNickname(prefs.getString("player"));
   }
 
@@ -260,6 +266,14 @@ class SettingsState extends State<SettingsView> {
           onTap: () {
             Navigator.pushNamed(context, "/customization");
           },),
+          ListTile(title: Text("Load leaderboard on startup"),
+          subtitle: Text("That will allow app to show additional stats, like..."),
+          trailing: Switch(value: loadLeaderboard, onChanged: (bool value){
+            prefs.setBool("loadLeaderboard", value);
+            setState(() {
+              loadLeaderboard = value;
+            });
+          }),),
           const Divider(),
           ListTile(
             onTap: (){

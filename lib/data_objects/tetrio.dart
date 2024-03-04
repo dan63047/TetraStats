@@ -117,6 +117,48 @@ const Map<String, Color> rankColors = { // thanks osk for const rankColors at ht
 	'z': Color(0xFF375433)
 };
 
+const Map<String, Duration> sprintAverages = { // based on https://discord.com/channels/673303546107658242/917098364787650590/1214231970259673098 
+	'x': Duration(seconds: 25, milliseconds: 413),
+	'u': Duration(seconds: 34, milliseconds: 549),
+	'ss': Duration(seconds: 43, milliseconds: 373),
+	's+': Duration(seconds: 54, milliseconds: 027),
+	's': Duration(seconds: 60, milliseconds: 412),
+	's-': Duration(seconds: 67, milliseconds: 381),
+	'a+': Duration(seconds: 73, milliseconds: 694),
+	'a': Duration(seconds: 81, milliseconds: 166),
+	'a-': Duration(seconds: 88, milliseconds: 334),
+	'b+': Duration(seconds: 93, milliseconds: 741),
+	'b': Duration(seconds: 98, milliseconds: 354),
+	'b-': Duration(seconds: 109, milliseconds: 610),
+	'c+': Duration(seconds: 124, milliseconds: 641),
+	'c': Duration(seconds: 126, milliseconds: 104),
+	'c-': Duration(seconds: 145, milliseconds: 865),
+	'd+': Duration(seconds: 154, milliseconds: 338),
+	'd': Duration(seconds: 162, milliseconds: 063),
+	//'z': Duration(seconds: 66, milliseconds: 802)
+};
+
+const Map<String, int> blitzAverages = {
+  'x': 626494,
+	'u': 406059,
+	'ss': 243166,
+	's+': 168636,
+	's': 121594,
+	's-': 107845,
+	'a+': 87142,
+	'a': 73413,
+	'a-': 60799,
+	'b+': 55417,
+	'b': 47608,
+	'b-': 40534,
+	'c+': 34200,
+	'c': 32535,
+	'c-': 25808,
+	'd+': 23345,
+	'd': 23063,
+	//'z': 72084
+};
+
 String getStatNameByEnum(Stats stat){
   return t[stat.name];
 }

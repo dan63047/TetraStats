@@ -535,6 +535,12 @@ class TetrioService extends DB {
     }
   }
 
+  TetrioPlayersLeaderboard? getCachedLeaderboard(){
+    return _leaderboardsCache.entries.firstOrNull?.value;
+    // That function will break if i decide to recive other leaderboards
+    // TODO: Think about better solution
+  }
+
   /// Retrieves and returns 100 latest news entries from Tetra Channel api for given [userID]. Throws an exception if fails to retrieve.
   Future<List<News>> fetchNews(String userID) async{
     try{

@@ -30,6 +30,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:go_router/go_router.dart';
 
 Future<List> me = Future.delayed(const Duration(seconds: 60), () => [null, null, null, null, null, null]); // I love lists shut up
+TetrioPlayersLeaderboard? everyone;
 String _searchFor = "6098518e3d5155e6ec429cdc"; // who we looking for
 String _titleNickname = "dan63047";
 final TetrioService teto = TetrioService(); // thing, that manadge our local DB
@@ -38,8 +39,8 @@ var chartsData = <DropdownMenuItem<List<FlSpot>>>[];
 int _chartsIndex = 0;
 List _historyShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR", "Opener", "Plonk", "Inf. DS", "Stride"];
 late ScrollController _scrollController;
-final NumberFormat _timeInSec = NumberFormat("#,###.###s.");
-final NumberFormat secs = NumberFormat("00.###");
+final NumberFormat _timeInSec = NumberFormat("#,###.###s.", LocaleSettings.currentLocale.languageCode);
+final NumberFormat secs = NumberFormat("00.###", LocaleSettings.currentLocale.languageCode);
 final NumberFormat _f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
 final NumberFormat _f4 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 4);
 final DateFormat _dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
@@ -66,6 +67,20 @@ Future<void> copyToClipboard(String text) async {
 String get40lTime(int microseconds){
   return microseconds > 60000000 ? "${(microseconds/1000000/60).floor()}:${(secs.format(microseconds /1000000 % 60))}" : _timeInSec.format(microseconds / 1000000);
   }
+
+/// Readable [a] - [b], without sign
+String readableTimeDifference(Duration a, Duration b){
+  Duration result = a - b;
+  
+  return "${NumberFormat("0.000s;0.000s", LocaleSettings.currentLocale.languageCode).format(result.inMilliseconds/1000)}";
+}
+
+/// Readable [a] - [b], without sign
+String readableIntDifference(int a, int b){
+  int result = a - b;
+
+  return "${NumberFormat("#,###;#,###", LocaleSettings.currentLocale.languageCode).format(result)}";
+}
 
 class _MainState extends State<MainView> with TickerProviderStateMixin {
   final bodyGlobalKey = GlobalKey();
@@ -152,6 +167,9 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     records = requests[1] as Map<String, dynamic>;
     news = requests[2] as List<News>;
     topTR = requests.elementAtOrNull(3) as double?; // No TR - no Top TR
+
+    // Get tetra League leaderboard if needed
+    // if(prefs.getBool("loadLeaderboard") == true) everyone = await teto.fetchTLLeaderboard();
 
     // Making list of Tetra League matches
     List<TetraLeagueAlphaRecord> tlMatches = [];
@@ -379,8 +397,8 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                           TLThingy(tl: snapshot.data![0].tlSeason1, userID: snapshot.data![0].userId, states: snapshot.data![2], topTR: snapshot.data![7], bot: snapshot.data![0].role == "bot", guest: snapshot.data![0].role == "anon"),
                           _TLRecords(userID: snapshot.data![0].userId, data: snapshot.data![3]),
                           _History(states: snapshot.data![2], update: _justUpdate),
-                          _RecordThingy(record: snapshot.data![1]['sprint']),
-                          _RecordThingy(record: snapshot.data![1]['blitz']),
+                          _RecordThingy(record: snapshot.data![1]['sprint'], rank: snapshot.data![0].tlSeason1.percentileRank),
+                          _RecordThingy(record: snapshot.data![1]['blitz'], rank: snapshot.data![0].tlSeason1.percentileRank),
                           _OtherThingy(zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6],)
                         ],
                       ),
@@ -906,13 +924,27 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
 
 class _RecordThingy extends StatelessWidget {
   final RecordSingle? record;
+  final String? rank;
 
   /// Widget that displays data from [record]
-  const _RecordThingy({required this.record});
+  const _RecordThingy({required this.record, this.rank});
 
   @override
   Widget build(BuildContext context) {
     if (record == null) return Center(child: Text(t.noRecord, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)));
+    late MapEntry closestAverageBlitz;
+    late bool blitzBetterThanClosestAverage;
+    bool? blitzBetterThanRankAverage = (rank != null && rank != "z") ? record!.endContext!.score > blitzAverages[rank]! : null;
+    late MapEntry closestAverageSprint;
+    late bool sprintBetterThanClosestAverage;
+    bool? sprintBetterThanRankAverage = (rank != null && rank != "z") ? record!.endContext!.finalTime < sprintAverages[rank]! : null;
+    if (record!.stream.contains("40l")) {
+      closestAverageSprint = sprintAverages.entries.singleWhere((element) => element.value == sprintAverages.values.reduce((a, b) => (a-record!.endContext!.finalTime).abs() < (b -record!.endContext!.finalTime).abs() ? a : b));
+      sprintBetterThanClosestAverage = record!.endContext!.finalTime < closestAverageSprint.value;
+    }else if (record!.stream.contains("blitz")){
+      closestAverageBlitz = blitzAverages.entries.singleWhere((element) => element.value == blitzAverages.values.reduce((a, b) => (a-record!.endContext!.score).abs() < (b -record!.endContext!.score).abs() ? a : b));
+      blitzBetterThanClosestAverage = record!.endContext!.score > closestAverageBlitz.value;
+    }
     return LayoutBuilder(builder: (context, constraints) {
       bool bigScreen = constraints.maxWidth > 768;
       return ListView.builder(
@@ -926,8 +958,71 @@ class _RecordThingy extends StatelessWidget {
                 else if (record!.stream.contains("blitz")) Text(t.blitz, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
                 
                 // show main metric
-                if (record!.stream.contains("40l")) Text(get40lTime(record!.endContext!.finalTime.inMicroseconds), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
-                else if (record!.stream.contains("blitz")) Text(NumberFormat.decimalPattern().format(record!.endContext!.score), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                Wrap(
+                  direction: Axis.horizontal,
+                  alignment: WrapAlignment.spaceAround,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  clipBehavior: Clip.hardEdge,
+                  children: [
+                    // Show grade based on closest rank average
+                    if (record!.stream.contains("40l")) Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageSprint.key}.png", height: 96)
+                    else if (record!.stream.contains("blitz")) Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageBlitz.key}.png", height: 96),
+                    
+                    // TODO: I'm not sure abour that element. Maybe, it could be done differenly
+                    Column(
+                      children: [
+                        // Show result
+                        if (record!.stream.contains("40l")) Text(get40lTime(record!.endContext!.finalTime.inMicroseconds), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
+                        else if (record!.stream.contains("blitz")) Text(NumberFormat.decimalPattern().format(record!.endContext!.score), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                        
+                        // Show difference between rank average
+                        if (record!.stream.contains("40l") && (rank != null && rank != "z")) Text(
+                          "${readableTimeDifference(record!.endContext!.finalTime, sprintAverages[rank]!)} ${sprintBetterThanRankAverage??false ? "better" : "worse"} than ${rank!.toUpperCase()} rank average",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: sprintBetterThanRankAverage??false ?
+                            Colors.greenAccent :
+                            Colors.redAccent
+                          )
+                        )
+                        else if (record!.stream.contains("40l") && (rank == null || rank == "z")) Text(
+                          "${readableTimeDifference(record!.endContext!.finalTime, closestAverageSprint.value)} ${sprintBetterThanClosestAverage ? "better" : "worse"} than ${closestAverageSprint.key!.toUpperCase()} rank average",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: sprintBetterThanClosestAverage ?
+                            Colors.greenAccent :
+                            Colors.redAccent
+                          )
+                        )
+                        else if (record!.stream.contains("blitz") && (rank != null && rank != "z")) Text(
+                          "${readableIntDifference(record!.endContext!.score, blitzAverages[rank]!)} ${blitzBetterThanRankAverage??false ? "better" : "worse"} than ${rank!.toUpperCase()} rank average",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: blitzBetterThanRankAverage??false ?
+                            Colors.greenAccent :
+                            Colors.redAccent
+                          )
+                        )
+                        else if (record!.stream.contains("blitz") && (rank == null || rank == "z")) Text(
+                          "${readableIntDifference(record!.endContext!.score, closestAverageBlitz.value)} ${blitzBetterThanClosestAverage ? "better" : "worse"} than ${closestAverageBlitz.key!.toUpperCase()} rank average",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: blitzBetterThanClosestAverage ?
+                            Colors.greenAccent :
+                            Colors.redAccent
+                          )
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                // if (record!.stream.contains("40l")) Text(get40lTime(record!.endContext!.finalTime.inMicroseconds), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
+                // else if (record!.stream.contains("blitz")) Text(NumberFormat.decimalPattern().format(record!.endContext!.score), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                
+                // // Compare with averages
+                // if (record!.stream.contains("40l") && rank != null) RichText(text: TextSpan(text: "${readableTimeDifference(record!.endContext!.finalTime, sprintAverages[rank]!)} ${sprintBetterThanRankAverage??false ? "better" : "worse"} than ${rank!.toUpperCase()} rank average", style: TextStyle(fontFamily: "Eurostile Round", color: sprintBetterThanRankAverage??false ? Colors.green : Colors.red)))
+                // //Text("${record!.endContext!.finalTime - sprintAverages[rank]!}; ${sprintAverages[rank]}; ${get40lTime((record!.endContext!.finalTime - sprintAverages[rank]!).inMicroseconds)}")
+                // else if (record!.stream.contains("blitz")) Text("${closestAverageBlitz}; ${blitzAverages[rank]}"),
                 
                 // Show rank if presented
                 if (record!.rank != null) StatCellNum(playerStat: record!.rank!, playerStatLabel: "Leaderboard Placement", isScreenBig: bigScreen, higherIsBetter: false),
