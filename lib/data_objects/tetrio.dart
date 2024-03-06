@@ -1139,6 +1139,73 @@ class News {
   }
 }
 
+class PlayerLeaderboardPosition{
+  late LeaderboardPosition apm;
+  late LeaderboardPosition pps;
+  late LeaderboardPosition vs;
+  late LeaderboardPosition gamesPlayed;
+  late LeaderboardPosition gamesWon;
+  late LeaderboardPosition winrate;
+  late LeaderboardPosition app;
+  late LeaderboardPosition vsapm;
+  late LeaderboardPosition dss;
+  late LeaderboardPosition dsp;
+  late LeaderboardPosition appdsp;
+  late LeaderboardPosition cheese;
+  late LeaderboardPosition gbe;
+  late LeaderboardPosition nyaapp;
+  late LeaderboardPosition area;
+  late LeaderboardPosition estTr;
+  late LeaderboardPosition accOfEst;
+
+  PlayerLeaderboardPosition({
+    required this.apm,
+    required this.pps,
+    required this.vs,
+    required this.gamesPlayed,
+    required this.gamesWon,
+    required this.winrate,
+    required this.app,
+    required this.vsapm,
+    required this.dss,
+    required this.dsp,
+    required this.appdsp,
+    required this.cheese,
+    required this.gbe,
+    required this.nyaapp,
+    required this.area,
+    required this.estTr,
+    required this.accOfEst
+  });
+  
+  PlayerLeaderboardPosition.fromSearchResults(List<LeaderboardPosition> results){
+    apm = results[0];
+    pps = results[1];
+    vs = results[2];
+    gamesPlayed = results[3];
+    gamesWon = results[4];
+    winrate = results[5];
+    app = results[6];
+    vsapm = results[7];
+    dss = results[8];
+    dsp = results[9];
+    appdsp = results[10];
+    cheese = results[11];
+    gbe = results[12];
+    nyaapp = results[13];
+    area = results[14];
+    estTr = results[15];
+    accOfEst = results[16];
+  }
+}
+
+class LeaderboardPosition{
+  int position;
+  double percentage;
+
+  LeaderboardPosition(this.position, this.percentage);
+}
+
 class TetrioPlayersLeaderboard {
   late String type;
   late DateTime timestamp;
@@ -1158,6 +1225,20 @@ class TetrioPlayersLeaderboard {
         return 0;
       }else{
         return reversed ? -1 : 1;
+      }
+    }));
+    return lb;
+  }
+
+  List<TetrioPlayerFromLeaderboard> getStatRankingSequel(Stats stat){
+    List<TetrioPlayerFromLeaderboard> lb = List.from(leaderboard);
+    lb.sort(((a, b) {
+      if (a.getStatByEnum(stat) > b.getStatByEnum(stat)){
+        return -1;
+      }else if (a.getStatByEnum(stat) == b.getStatByEnum(stat)){
+        return 0;
+      }else{
+        return 1;
       }
     }));
     return lb;
@@ -1751,6 +1832,19 @@ class TetrioPlayersLeaderboard {
       return [TetraLeagueAlpha(timestamp: DateTime.now(), apm: 0, pps: 0, vs: 0, glicko: 0, rd: noTrRd, gamesPlayed: 0, gamesWon: 0, bestRank: rank, decaying: false, rating: 0, rank: rank, percentileRank: rank, percentile: rankCutoffs[rank]!, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1),
       {"players": filtredLeaderboard.length, "lowestTR": 0, "toEnterTR": 0}];
     }
+  }
+
+  PlayerLeaderboardPosition? getLeaderboardPosition(String userID) {
+    if (leaderboard.indexWhere((element) => element.userId == userID) == -1) return null;
+    List<Stats> stats = [Stats.apm, Stats.pps, Stats.vs, Stats.gp, Stats.gw, Stats.wr,
+    Stats.app, Stats.vsapm, Stats.dss, Stats.dsp, Stats.appdsp, Stats.cheese, Stats.gbe, Stats.nyaapp, Stats.area, Stats.eTR, Stats.acceTR];
+    List<LeaderboardPosition> results = [];
+    for (Stats stat in stats) {
+      List<TetrioPlayerFromLeaderboard> sortedLeaderboard = getStatRanking(leaderboard, stat, reversed: false);
+      int position = sortedLeaderboard.indexWhere((element) => element.userId == userID) + 1;
+      results.add(LeaderboardPosition(position, position / sortedLeaderboard.length));
+    }
+    return PlayerLeaderboardPosition.fromSearchResults(results);
   }
 
   Map<String, List<dynamic>> get averages => {

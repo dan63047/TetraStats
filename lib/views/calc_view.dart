@@ -13,7 +13,6 @@ double? vs;
 NerdStats? nerdStats;
 EstTr? estTr;
 Playstyle? playstyle;
-final NumberFormat f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
 late String oldWindowTitle;
 
 class CalcView extends StatefulWidget {

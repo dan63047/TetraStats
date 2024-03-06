@@ -31,6 +31,7 @@ import 'package:go_router/go_router.dart';
 
 Future<List> me = Future.delayed(const Duration(seconds: 60), () => [null, null, null, null, null, null]); // I love lists shut up
 TetrioPlayersLeaderboard? everyone;
+PlayerLeaderboardPosition? meAmongEveryone;
 String _searchFor = "6098518e3d5155e6ec429cdc"; // who we looking for
 String _titleNickname = "dan63047";
 final TetrioService teto = TetrioService(); // thing, that manadge our local DB
@@ -168,8 +169,14 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     news = requests[2] as List<News>;
     topTR = requests.elementAtOrNull(3) as double?; // No TR - no Top TR
 
-    // Get tetra League leaderboard if needed
-    // if(prefs.getBool("loadLeaderboard") == true) everyone = await teto.fetchTLLeaderboard();
+    meAmongEveryone = teto.getCachedLeaderboardPositions(me.userId);
+    if (meAmongEveryone == null && prefs.getBool("showPositions") == true){
+      // Get tetra League leaderboard
+      everyone = teto.getCachedLeaderboard();
+      everyone ??= await teto.fetchTLLeaderboard();
+      meAmongEveryone = await compute(everyone!.getLeaderboardPosition, me.userId);
+      if (meAmongEveryone != null) teto.cacheLeaderboardPositions(me.userId, meAmongEveryone!);
+    }
 
     // Making list of Tetra League matches
     List<TetraLeagueAlphaRecord> tlMatches = [];
@@ -394,7 +401,15 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                       body: TabBarView(
                         controller: _tabController,
                         children: [
-                          TLThingy(tl: snapshot.data![0].tlSeason1, userID: snapshot.data![0].userId, states: snapshot.data![2], topTR: snapshot.data![7], bot: snapshot.data![0].role == "bot", guest: snapshot.data![0].role == "anon"),
+                          TLThingy(
+                            tl: snapshot.data![0].tlSeason1,
+                            userID: snapshot.data![0].userId,
+                            states: snapshot.data![2],
+                            topTR: snapshot.data![7],
+                            bot: snapshot.data![0].role == "bot",
+                            guest: snapshot.data![0].role == "anon",
+                            lbPositions: meAmongEveryone
+                          ),
                           _TLRecords(userID: snapshot.data![0].userId, data: snapshot.data![3]),
                           _History(states: snapshot.data![2], update: _justUpdate),
                           _RecordThingy(record: snapshot.data![1]['sprint'], rank: snapshot.data![0].tlSeason1.percentileRank),
@@ -958,71 +973,58 @@ class _RecordThingy extends StatelessWidget {
                 else if (record!.stream.contains("blitz")) Text(t.blitz, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
                 
                 // show main metric
-                Wrap(
-                  direction: Axis.horizontal,
-                  alignment: WrapAlignment.spaceAround,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  clipBehavior: Clip.hardEdge,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  textBaseline: TextBaseline.alphabetic,
                   children: [
                     // Show grade based on closest rank average
-                    if (record!.stream.contains("40l")) Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageSprint.key}.png", height: 96)
-                    else if (record!.stream.contains("blitz")) Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageBlitz.key}.png", height: 96),
+                    if (record!.stream.contains("40l")) Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageSprint.key}.png", height: 48)
+                    else if (record!.stream.contains("blitz")) Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageBlitz.key}.png", height: 48),
                     
-                    // TODO: I'm not sure abour that element. Maybe, it could be done differenly
-                    Column(
-                      children: [
-                        // Show result
-                        if (record!.stream.contains("40l")) Text(get40lTime(record!.endContext!.finalTime.inMicroseconds), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
-                        else if (record!.stream.contains("blitz")) Text(NumberFormat.decimalPattern().format(record!.endContext!.score), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                        
-                        // Show difference between rank average
-                        if (record!.stream.contains("40l") && (rank != null && rank != "z")) Text(
-                          "${readableTimeDifference(record!.endContext!.finalTime, sprintAverages[rank]!)} ${sprintBetterThanRankAverage??false ? "better" : "worse"} than ${rank!.toUpperCase()} rank average",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: sprintBetterThanRankAverage??false ?
-                            Colors.greenAccent :
-                            Colors.redAccent
-                          )
-                        )
-                        else if (record!.stream.contains("40l") && (rank == null || rank == "z")) Text(
-                          "${readableTimeDifference(record!.endContext!.finalTime, closestAverageSprint.value)} ${sprintBetterThanClosestAverage ? "better" : "worse"} than ${closestAverageSprint.key!.toUpperCase()} rank average",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: sprintBetterThanClosestAverage ?
-                            Colors.greenAccent :
-                            Colors.redAccent
-                          )
-                        )
-                        else if (record!.stream.contains("blitz") && (rank != null && rank != "z")) Text(
-                          "${readableIntDifference(record!.endContext!.score, blitzAverages[rank]!)} ${blitzBetterThanRankAverage??false ? "better" : "worse"} than ${rank!.toUpperCase()} rank average",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: blitzBetterThanRankAverage??false ?
-                            Colors.greenAccent :
-                            Colors.redAccent
-                          )
-                        )
-                        else if (record!.stream.contains("blitz") && (rank == null || rank == "z")) Text(
-                          "${readableIntDifference(record!.endContext!.score, closestAverageBlitz.value)} ${blitzBetterThanClosestAverage ? "better" : "worse"} than ${closestAverageBlitz.key!.toUpperCase()} rank average",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: blitzBetterThanClosestAverage ?
-                            Colors.greenAccent :
-                            Colors.redAccent
-                          )
-                        ),
-                      ],
-                    ),
+                    // Show result
+                    if (record!.stream.contains("40l")) Text(get40lTime(record!.endContext!.finalTime.inMicroseconds), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
+                    else if (record!.stream.contains("blitz")) Text(NumberFormat.decimalPattern().format(record!.endContext!.score), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
                   ],
                 ),
-                // if (record!.stream.contains("40l")) Text(get40lTime(record!.endContext!.finalTime.inMicroseconds), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
-                // else if (record!.stream.contains("blitz")) Text(NumberFormat.decimalPattern().format(record!.endContext!.score), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
                 
-                // // Compare with averages
-                // if (record!.stream.contains("40l") && rank != null) RichText(text: TextSpan(text: "${readableTimeDifference(record!.endContext!.finalTime, sprintAverages[rank]!)} ${sprintBetterThanRankAverage??false ? "better" : "worse"} than ${rank!.toUpperCase()} rank average", style: TextStyle(fontFamily: "Eurostile Round", color: sprintBetterThanRankAverage??false ? Colors.green : Colors.red)))
-                // //Text("${record!.endContext!.finalTime - sprintAverages[rank]!}; ${sprintAverages[rank]}; ${get40lTime((record!.endContext!.finalTime - sprintAverages[rank]!).inMicroseconds)}")
-                // else if (record!.stream.contains("blitz")) Text("${closestAverageBlitz}; ${blitzAverages[rank]}"),
+                // Show difference between rank average
+                if (record!.stream.contains("40l") && (rank != null && rank != "z")) Text(
+                  "${readableTimeDifference(record!.endContext!.finalTime, sprintAverages[rank]!)} ${sprintBetterThanRankAverage??false ? "better" : "worse"} than ${rank!.toUpperCase()} rank average",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: sprintBetterThanRankAverage??false ?
+                    Colors.greenAccent :
+                    Colors.redAccent
+                  )
+                )
+                else if (record!.stream.contains("40l") && (rank == null || rank == "z")) Text(
+                  "${readableTimeDifference(record!.endContext!.finalTime, closestAverageSprint.value)} ${sprintBetterThanClosestAverage ? "better" : "worse"} than ${closestAverageSprint.key!.toUpperCase()} rank average",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: sprintBetterThanClosestAverage ?
+                    Colors.greenAccent :
+                    Colors.redAccent
+                  )
+                )
+                else if (record!.stream.contains("blitz") && (rank != null && rank != "z")) Text(
+                  "${readableIntDifference(record!.endContext!.score, blitzAverages[rank]!)} ${blitzBetterThanRankAverage??false ? "better" : "worse"} than ${rank!.toUpperCase()} rank average",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: blitzBetterThanRankAverage??false ?
+                    Colors.greenAccent :
+                    Colors.redAccent
+                  )
+                )
+                else if (record!.stream.contains("blitz") && (rank == null || rank == "z")) Text(
+                  "${readableIntDifference(record!.endContext!.score, closestAverageBlitz.value)} ${blitzBetterThanClosestAverage ? "better" : "worse"} than ${closestAverageBlitz.key!.toUpperCase()} rank average",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: blitzBetterThanClosestAverage ?
+                    Colors.greenAccent :
+                    Colors.redAccent
+                  )
+                ),
                 
                 // Show rank if presented
                 if (record!.rank != null) StatCellNum(playerStat: record!.rank!, playerStatLabel: "Leaderboard Placement", isScreenBig: bigScreen, higherIsBetter: false),
@@ -1054,7 +1056,8 @@ class _RecordThingy extends StatelessWidget {
 
                 // List of actions
                 Padding(padding: const EdgeInsets.fromLTRB(0, 16, 0, 48),
-                  child: SizedBox(width: bigScreen ? MediaQuery.of(context).size.width * 0.4 : MediaQuery.of(context).size.width * 0.85,
+                  child: Container(width: bigScreen ? MediaQuery.of(context).size.width * 0.4 : MediaQuery.of(context).size.width * 0.85,
+                  constraints: BoxConstraints(maxWidth: 452),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(

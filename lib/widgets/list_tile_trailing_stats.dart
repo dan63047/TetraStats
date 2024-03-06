@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:tetra_stats/utils/numers_formats.dart';
 
 class TrailingStats extends StatelessWidget{
   final double yourAPM;
@@ -14,7 +13,6 @@ class TrailingStats extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    final NumberFormat f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
     const TextStyle style = TextStyle(height: 1.1, fontWeight: FontWeight.w100);
     return Table(
       defaultColumnWidth: const IntrinsicColumnWidth(),

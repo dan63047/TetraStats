@@ -3,13 +3,14 @@ import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:tetra_stats/utils/numers_formats.dart';
+import 'package:tetra_stats/widgets/gauget_num.dart';
 import 'package:tetra_stats/widgets/graphs.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
 
 var fDiff = NumberFormat("+#,###.###;-#,###.###");
+var intFDiff = NumberFormat("+#,###;-#,###");
 final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
-final NumberFormat f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
-final NumberFormat f3 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 3);
 late RangeValues _currentRangeValues;
 TetraLeagueAlpha? oldTl;
 late TetraLeagueAlpha currentTl;
@@ -23,7 +24,8 @@ class TLThingy extends StatefulWidget {
   final bool bot;
   final bool guest;
   final double? topTR;
-  const TLThingy({super.key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.bot=false, this.guest=false, this.topTR});
+  final PlayerLeaderboardPosition? lbPositions;
+  const TLThingy({super.key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.bot=false, this.guest=false, this.topTR, this.lbPositions});
 
   @override
   State<TLThingy> createState() => _TLThingyState();
@@ -47,6 +49,8 @@ class _TLThingyState extends State<TLThingy> {
   @override
   Widget build(BuildContext context) { 
   final t = Translations.of(context);
+  NumberFormat fractionfEstTR = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2)..maximumIntegerDigits = 0;
+  NumberFormat fractionfEstTRAcc = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 3)..maximumIntegerDigits = 0;
     if (currentTl.gamesPlayed == 0) return Center(child: Text(widget.guest ? t.anonTL : widget.bot ? t.botTL : t.neverPlayedTL, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28), textAlign: TextAlign.center,));
     return LayoutBuilder(builder: (context, constraints) {
     bool bigScreen = constraints.maxWidth > 768;
@@ -159,13 +163,13 @@ class _TLThingyState extends State<TLThingy> {
                   crossAxisAlignment: WrapCrossAlignment.start,
                   clipBehavior: Clip.hardEdge,
                   children: [
-                    if (currentTl.apm != null) StatCellNum(playerStat: currentTl.apm!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.apm, higherIsBetter: true, oldPlayerStat: oldTl?.apm),
-                    if (currentTl.pps != null) StatCellNum(playerStat: currentTl.pps!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.pps, higherIsBetter: true, oldPlayerStat: oldTl?.pps),
-                    if (currentTl.vs != null) StatCellNum(playerStat: currentTl.vs!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.vs, higherIsBetter: true, oldPlayerStat: oldTl?.vs),
+                    if (currentTl.apm != null) StatCellNum(playerStat: currentTl.apm!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.apm, higherIsBetter: true, oldPlayerStat: oldTl?.apm, pos: widget.lbPositions?.apm),
+                    if (currentTl.pps != null) StatCellNum(playerStat: currentTl.pps!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.pps, higherIsBetter: true, oldPlayerStat: oldTl?.pps, pos: widget.lbPositions?.pps),
+                    if (currentTl.vs != null) StatCellNum(playerStat: currentTl.vs!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.vs, higherIsBetter: true, oldPlayerStat: oldTl?.vs, pos: widget.lbPositions?.vs),
                     if (currentTl.standingLocal > 0) StatCellNum(playerStat: currentTl.standingLocal, isScreenBig: bigScreen, playerStatLabel: t.statCellNum.lbpc, higherIsBetter: false, oldPlayerStat: oldTl?.standingLocal),
-                    StatCellNum(playerStat: currentTl.gamesPlayed, isScreenBig: bigScreen, playerStatLabel: t.statCellNum.gamesPlayed, higherIsBetter: true, oldPlayerStat: oldTl?.gamesPlayed),
-                    StatCellNum(playerStat: currentTl.gamesWon, isScreenBig: bigScreen, playerStatLabel: t.statCellNum.gamesWonTL, higherIsBetter: true, oldPlayerStat: oldTl?.gamesWon),
-                    StatCellNum(playerStat: currentTl.winrate * 100, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.winrate, higherIsBetter: true, oldPlayerStat: oldTl != null ? oldTl!.winrate*100 : null),
+                    StatCellNum(playerStat: currentTl.gamesPlayed, isScreenBig: bigScreen, playerStatLabel: t.statCellNum.gamesPlayed, higherIsBetter: true, oldPlayerStat: oldTl?.gamesPlayed, pos: widget.lbPositions?.gamesPlayed),
+                    StatCellNum(playerStat: currentTl.gamesWon, isScreenBig: bigScreen, playerStatLabel: t.statCellNum.gamesWonTL, higherIsBetter: true, oldPlayerStat: oldTl?.gamesWon, pos: widget.lbPositions?.gamesWon),
+                    StatCellNum(playerStat: currentTl.winrate * 100, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.winrate, higherIsBetter: true, oldPlayerStat: oldTl != null ? oldTl!.winrate*100 : null, pos: widget.lbPositions?.winrate),
                   ],
                 ),
               ),
@@ -176,138 +180,31 @@ class _TLThingyState extends State<TLThingy> {
                     Padding(
                       padding: const EdgeInsets.fromLTRB(0, 40, 0, 0),
                       child: Wrap(
-                          direction: Axis.horizontal,
-                          alignment: WrapAlignment.center,
-                          spacing: 35,
-                          crossAxisAlignment: WrapCrossAlignment.start,
-                          clipBehavior: Clip.hardEdge,
-                          children: [
-                            SizedBox(
-                              width: 200,
-                              height: 120,
-                              child: SfRadialGauge(
-                                title: GaugeTitle(text: t.statCellNum.app),
-                                axes: [RadialAxis(
-                                startAngle: 180,
-                                endAngle: 360,
-                                showLabels: false,
-                                showTicks: false,
-                                radiusFactor: 2.1,
-                                centerY: 0.5,
-                                minimum: 0,
-                                maximum: 1,
-                                ranges: [
-                                  GaugeRange(startValue: 0, endValue: 0.2, color: Colors.red),
-                                  GaugeRange(startValue: 0.2, endValue: 0.4, color: Colors.yellow),
-                                  GaugeRange(startValue: 0.4, endValue: 0.6, color: Colors.green),
-                                  GaugeRange(startValue: 0.6, endValue: 0.8, color: Colors.blue),
-                                  GaugeRange(startValue: 0.8, endValue: 1, color: Colors.purple),
-                                ],
-                                pointers: [
-                                  NeedlePointer(
-                                    value: currentTl.nerdStats!.app,
-                                    enableAnimation: true,
-                                    needleLength: 0.9,
-                                    needleStartWidth: 2,
-                                    needleEndWidth: 15,
-                                    knobStyle: const KnobStyle(color: Colors.transparent),
-                                    gradient: const LinearGradient(colors: [Colors.transparent, Colors.white], begin: Alignment.bottomCenter, end: Alignment.topCenter, stops: [0.5, 1]),)
-                                  ],
-                                annotations: [GaugeAnnotation(
-                                  widget: TextButton(child: Text(f3.format(currentTl.nerdStats!.app),
-                                  style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, color: Colors.white)),
-                                  onPressed: (){
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) => AlertDialog(
-                                        title: Text(t.statCellNum.app,
-                                            style: const TextStyle(
-                                                fontFamily: "Eurostile Round Extended")),
-                                        content:  SingleChildScrollView(
-                                          child: ListBody(children: [
-                                            Text(t.statCellNum.appDescription),
-                                            Text("${t.exactValue}: ${currentTl.nerdStats!.app}")
-                                          ]),
-                                        ),
-                                        actions: <Widget>[
-                                          TextButton(
-                                            child: Text(t.popupActions.ok),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                          )
-                                        ],
-                                      ));
-                                },), verticalAlignment: GaugeAlignment.far, positionFactor: 0.05,),
-                                if (oldTl != null && oldTl!.gamesPlayed > 0) GaugeAnnotation(widget: Text(fDiff.format(currentTl.nerdStats!.app - oldTl!.nerdStats!.app), style: TextStyle(
-                                    color: currentTl.nerdStats!.app - oldTl!.nerdStats!.app < 0 ?
-                                    Colors.redAccent :
-                                    Colors.greenAccent
-                                  ),), positionFactor: 0.05,)],
-                                )],),
-                            ),
-                            SizedBox(
-                              width: 200,
-                              height: 120,
-                              child: SfRadialGauge(
-                                title: const GaugeTitle(text: "VS / APM"),
-                                axes: [RadialAxis(
-                                startAngle: 180,
-                                endAngle: 360,
-                                showTicks: false,
-                                showLabels: false,
-                                radiusFactor: 2.1,
-                                centerY: 0.5,
-                                minimum: 1.8,
-                                maximum: 2.4,
-                                ranges: [
-                                  GaugeRange(startValue: 1.8, endValue: 2.0, color: Colors.green),
-                                  GaugeRange(startValue: 2.0, endValue: 2.2, color: Colors.blue),
-                                  GaugeRange(startValue: 2.2, endValue: 2.4, color: Colors.purple),
-                                ],
-                                pointers: [
-                                  NeedlePointer(
-                                    value: currentTl.nerdStats!.vsapm,
-                                    enableAnimation: true,
-                                    needleLength: 0.9,
-                                    needleStartWidth: 2,
-                                    needleEndWidth: 15,
-                                    knobStyle: const KnobStyle(color: Colors.transparent),
-                                    gradient: const LinearGradient(colors: [Colors.transparent, Colors.white], begin: Alignment.bottomCenter, end: Alignment.topCenter, stops: [0.5, 1]),)
-                                  ],
-                                annotations: [GaugeAnnotation(
-                                  widget: TextButton(child: Text(f3.format(currentTl.nerdStats!.vsapm),
-                                  style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, color: Colors.white)),
-                                  onPressed: (){
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) => AlertDialog(
-                                        title: const Text("VS / APM",
-                                            style: TextStyle(
-                                                fontFamily: "Eurostile Round Extended")),
-                                        content: SingleChildScrollView(
-                                          child: ListBody(children: [
-                                            Text(t.statCellNum.vsapmDescription),
-                                            Text("${t.exactValue}: ${currentTl.nerdStats!.vsapm}")
-                                          ]),
-                                        ),
-                                        actions: <Widget>[
-                                          TextButton(
-                                            child: Text(t.popupActions.ok),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                          )
-                                        ],
-                                      ));
-                                },), verticalAlignment: GaugeAlignment.far, positionFactor: 0.05),
-                                if (oldTl != null && oldTl!.gamesPlayed > 0) GaugeAnnotation(widget: Text(fDiff.format(currentTl.nerdStats!.vsapm - oldTl!.nerdStats!.vsapm), style: TextStyle(
-                                    color: currentTl.nerdStats!.vsapm - oldTl!.nerdStats!.vsapm < 0 ?
-                                    Colors.redAccent :
-                                    Colors.greenAccent
-                                  ),), positionFactor: 0.05,)],
-                                )],),
-                            ),]),
+                        direction: Axis.horizontal,
+                        alignment: WrapAlignment.center,
+                        spacing: 35,
+                        crossAxisAlignment: WrapCrossAlignment.start,
+                        clipBehavior: Clip.hardEdge,
+                        children: [
+                          GaugetNum(playerStat: currentTl.nerdStats!.app, playerStatLabel: t.statCellNum.app, higherIsBetter: true, minimum: 0, maximum: 1, ranges: [
+                            GaugeRange(startValue: 0, endValue: 0.2, color: Colors.red),
+                            GaugeRange(startValue: 0.2, endValue: 0.4, color: Colors.yellow),
+                            GaugeRange(startValue: 0.4, endValue: 0.6, color: Colors.green),
+                            GaugeRange(startValue: 0.6, endValue: 0.8, color: Colors.blue),
+                            GaugeRange(startValue: 0.8, endValue: 1, color: Colors.purple),
+                          ], alertWidgets: [
+                            Text(t.statCellNum.appDescription),
+                            Text("${t.exactValue}: ${currentTl.nerdStats!.app}")
+                          ], oldPlayerStat: oldTl?.nerdStats?.app, pos: widget.lbPositions?.app),
+                          GaugetNum(playerStat: currentTl.nerdStats!.vsapm, playerStatLabel: "VS / APM", higherIsBetter: true, minimum: 1.8, maximum: 2.4, ranges: [
+                            GaugeRange(startValue: 1.8, endValue: 2.0, color: Colors.green),
+                            GaugeRange(startValue: 2.0, endValue: 2.2, color: Colors.blue),
+                            GaugeRange(startValue: 2.2, endValue: 2.4, color: Colors.purple),
+                          ], alertWidgets: [
+                            Text(t.statCellNum.vsapmDescription),
+                            Text("${t.exactValue}: ${currentTl.nerdStats!.vsapm}")
+                          ], oldPlayerStat: oldTl?.nerdStats?.vsapm, pos: widget.lbPositions?.vsapm)
+                      ]),
                     ),
                     Wrap(
                         direction: Axis.horizontal,
@@ -317,6 +214,7 @@ class _TLThingyState extends State<TLThingy> {
                         clipBehavior: Clip.hardEdge,
                         children: [
                           StatCellNum(playerStat: currentTl.nerdStats!.dss, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.dss,
+                          pos: widget.lbPositions?.dss, 
                           alertWidgets: [Text(t.statCellNum.dssDescription),
                               Text("${t.formula}: (VS / 100) - (APM / 60)"),
                               Text("${t.exactValue}: ${currentTl.nerdStats!.dss}"),],
@@ -324,6 +222,7 @@ class _TLThingyState extends State<TLThingy> {
                               higherIsBetter: true,
                               oldPlayerStat: oldTl?.nerdStats?.dss,),
                           StatCellNum(playerStat: currentTl.nerdStats!.dsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.dsp,
+                          pos: widget.lbPositions?.dsp, 
                           alertWidgets: [Text(t.statCellNum.dspDescription),
                               Text("${t.formula}: DS/S / PPS"),
                               Text("${t.exactValue}: ${currentTl.nerdStats!.dsp}"),],
@@ -331,6 +230,7 @@ class _TLThingyState extends State<TLThingy> {
                               higherIsBetter: true,
                               oldPlayerStat: oldTl?.nerdStats?.dsp,),
                           StatCellNum(playerStat: currentTl.nerdStats!.appdsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.appdsp,
+                          pos: widget.lbPositions?.appdsp, 
                           alertWidgets: [Text(t.statCellNum.appdspDescription),
                               Text("${t.formula}: APP + DS/P"),
                               Text("${t.exactValue}: ${currentTl.nerdStats!.appdsp}"),],
@@ -338,6 +238,7 @@ class _TLThingyState extends State<TLThingy> {
                               higherIsBetter: true,
                               oldPlayerStat: oldTl?.nerdStats?.appdsp,),
                           StatCellNum(playerStat: currentTl.nerdStats!.cheese, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.cheese,
+                          pos: widget.lbPositions?.cheese, 
                           alertWidgets: [Text(t.statCellNum.cheeseDescription),
                               Text("${t.formula}: (DS/P * 150) + ((VS/APM - 2) * 50) + (0.6 - APP) * 125"),
                               Text("${t.exactValue}: ${currentTl.nerdStats!.cheese}"),],
@@ -345,6 +246,7 @@ class _TLThingyState extends State<TLThingy> {
                               higherIsBetter: true,
                               oldPlayerStat: oldTl?.nerdStats?.cheese,),
                           StatCellNum(playerStat: currentTl.nerdStats!.gbe, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.gbe,
+                          pos: widget.lbPositions?.gbe, 
                           alertWidgets: [Text(t.statCellNum.gbeDescription),
                               Text("${t.formula}: APP * DS/P * 2"),
                               Text("${t.exactValue}: ${currentTl.nerdStats!.gbe}"),],
@@ -352,6 +254,7 @@ class _TLThingyState extends State<TLThingy> {
                               higherIsBetter: true,
                               oldPlayerStat: oldTl?.nerdStats?.gbe,),
                           StatCellNum(playerStat: currentTl.nerdStats!.nyaapp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.nyaapp,
+                          pos: widget.lbPositions?.nyaapp, 
                           alertWidgets: [Text(t.statCellNum.nyaappDescription),
                               Text("${t.formula}: APP - 5 * tan(radians((Cheese Index / -30) + 1))"),
                               Text("${t.exactValue}:  ${currentTl.nerdStats!.nyaapp}"),],
@@ -359,6 +262,7 @@ class _TLThingyState extends State<TLThingy> {
                               higherIsBetter: true,
                               oldPlayerStat: oldTl?.nerdStats?.nyaapp,),
                           StatCellNum(playerStat: currentTl.nerdStats!.area, isScreenBig: bigScreen, fractionDigits: 1, playerStatLabel: t.statCellNum.area,
+                          pos: widget.lbPositions?.area, 
                           alertWidgets: [Text(t.statCellNum.areaDescription),
                               Text("${t.formula}: APM * 1 + PPS * 45 + VS * 0.444 + APP * 185 + DS/S * 175 + DS/P * 450 + Garbage Effi * 315"),
                               Text("${t.exactValue}:  ${currentTl.nerdStats!.area}"),],
@@ -370,42 +274,104 @@ class _TLThingyState extends State<TLThingy> {
                 ),
               if (currentTl.estTr != null)
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 16, 0, 48),
-                  child: SizedBox(
+                  padding: const EdgeInsets.fromLTRB(0, 48, 0, 48),
+                  child: Container(
+                    //alignment: Alignment.center,
                     width: bigScreen ? MediaQuery.of(context).size.width * 0.4 : MediaQuery.of(context).size.width * 0.85,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    constraints: BoxConstraints(maxWidth: 768),
+                    child: Wrap(
+                      alignment: WrapAlignment.spaceBetween,
+                      spacing: 20,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              "${bigScreen ? t.statCellNum.estOfTR : t.statCellNum.estOfTRShort}:",
-                              style: const TextStyle(fontSize: 24),
+                          Text(t.statCellNum.estOfTR, style: TextStyle(height: 0.1),),
+                          RichText(
+                            text: TextSpan(
+                              text: intf.format(currentTl.estTr!.esttr.truncate()),
+                              style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: FontWeight.w500),
+                              children: [TextSpan(text: fractionfEstTR.format(currentTl.estTr!.esttr - currentTl.estTr!.esttr.truncate()).substring(1), style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
+                              ),
                             ),
-                            Text(
-                              f2.format(currentTl.estTr!.esttr),
-                              style: const TextStyle(fontSize: 24),
+                            if (oldTl?.estTr?.esttr != null || widget.lbPositions != null) RichText(text: TextSpan(
+                              text: "",
+                              style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey, height: 0.5),
+                              children: [
+                                if (oldTl?.estTr?.esttr != null) TextSpan(text: comparef.format(currentTl.estTr!.esttr - oldTl!.estTr!.esttr), style: TextStyle(
+                                  color: oldTl!.estTr!.esttr > currentTl.estTr!.esttr ? Colors.redAccent : Colors.greenAccent
+                                ),),
+                                if (oldTl?.estTr?.esttr != null && widget.lbPositions?.estTr != null) const TextSpan(text: " • "),
+                                if (widget.lbPositions?.estTr != null) TextSpan(text: widget.lbPositions!.estTr.position >= 1000 ? "Top ${f2.format(widget.lbPositions!.estTr.percentage*100)}%" : "№${widget.lbPositions!.estTr.position}")
+                              ]
+                              ),
                             ),
-                          ],
-                        ),
-                        if (currentTl.rating >= 0)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        ],),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                          Text(t.statCellNum.accOfEst, style: const TextStyle(height: 0.1),),
+                          RichText(
+                            text: TextSpan(
+                              text: (currentTl.esttracc != null) ? intFDiff.format(currentTl.esttracc!.truncate()) : "-",
+                              style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: FontWeight.w500),
+                              children: [
+                                TextSpan(text: (currentTl.esttracc != null) ? fractionfEstTRAcc.format(currentTl.esttracc!.isNegative ? 1 - (currentTl.esttracc! - currentTl.esttracc!.truncate()) : (currentTl.esttracc! - currentTl.esttracc!.truncate())).substring(1) : ".---", style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))
+                              ]
+                              ),
+                            ),
+                          if (oldTl?.esttracc != null || widget.lbPositions != null) RichText(text: TextSpan(
+                            text: "",
+                            style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey, height: 0.5),
                             children: [
-                              Text(
-                                "${bigScreen ? t.statCellNum.accOfEst : t.statCellNum.accOfEstShort}:",
-                                style: const TextStyle(fontSize: 24),
-                              ),
-                              Text(
-                                fDiff.format(currentTl.esttracc!),
-                                style: const TextStyle(fontSize: 24),
-                              ),
-                            ],
+                              if (oldTl?.esttracc != null) TextSpan(text: comparef.format(currentTl.esttracc! - oldTl!.esttracc!), style: TextStyle(
+                                color: oldTl!.esttracc! > currentTl.esttracc! ? Colors.redAccent : Colors.greenAccent
+                              ),),
+                              if (oldTl?.esttracc != null && widget.lbPositions?.accOfEst != null) const TextSpan(text: " • "),
+                              if (widget.lbPositions?.accOfEst != null) TextSpan(text: widget.lbPositions!.accOfEst.position >= 1000 ? "Top ${f2.format(widget.lbPositions!.accOfEst.percentage*100)}%" : "№${widget.lbPositions!.accOfEst.position}")
+                            ]
+                            ),
                           ),
+                        ],)
                       ],
                     ),
-                  ),
+                  )
+                  // child: Container(
+                  //   width: bigScreen ? MediaQuery.of(context).size.width * 0.4 : MediaQuery.of(context).size.width * 0.85,
+                  //   constraints: BoxConstraints(maxWidth: 452),
+                  //   child: Column(
+                  //     crossAxisAlignment: CrossAxisAlignment.start,
+                  //     children: [
+                  //       Row(
+                  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //         children: [
+                  //           Text(
+                  //             "${bigScreen ? t.statCellNum.estOfTR : t.statCellNum.estOfTRShort}:",
+                  //             style: const TextStyle(fontSize: 24),
+                  //           ),
+                  //           Text(
+                  //             f2.format(currentTl.estTr!.esttr),
+                  //             style: const TextStyle(fontSize: 24),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //       if (currentTl.rating >= 0)
+                  //         Row(
+                  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //           children: [
+                  //             Text(
+                  //               "${bigScreen ? t.statCellNum.accOfEst : t.statCellNum.accOfEstShort}:",
+                  //               style: const TextStyle(fontSize: 24),
+                  //             ),
+                  //             Text(
+                  //               fDiff.format(currentTl.esttracc!),
+                  //               style: const TextStyle(fontSize: 24),
+                  //             ),
+                  //           ],
+                  //         ),
+                  //     ],
+                  //   ),
+                  // ),
                 ),
               if (currentTl.nerdStats != null) Graphs(currentTl.apm!, currentTl.pps!, currentTl.vs!, currentTl.nerdStats!, currentTl.playstyle!)
             ]

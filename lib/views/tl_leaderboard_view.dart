@@ -71,7 +71,7 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
                   case ConnectionState.none:
                   case ConnectionState.waiting:
                   case ConnectionState.active:
-                  return const Center(child: Text('Fetching...'));
+                  return const Center(child: CircularProgressIndicator());
                   case ConnectionState.done:
                     final allPlayers = snapshot.data?.getStatRanking(snapshot.data!.leaderboard, _sortBy, reversed: reversed, country: _country);
                     if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) windowManager.setTitle("Tetra Stats: ${t.tlLeaderboard} - ${t.players(n: allPlayers!.length)}");

@@ -8,7 +8,6 @@ import 'package:tetra_stats/views/tl_match_view.dart';
 import 'package:window_manager/window_manager.dart';
 
 final TetrioService teto = TetrioService();
-final NumberFormat f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
 late String oldWindowTitle;
 
 class MatchesView extends StatefulWidget {

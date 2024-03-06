@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/views/rank_averages_view.dart';
 import 'package:window_manager/window_manager.dart';
 import 'main_view.dart'; // lol
@@ -40,7 +40,6 @@ class RanksAverages extends State<RankAveragesView> {
 
   @override
   Widget build(BuildContext context) {
-    final NumberFormat f2 = NumberFormat.decimalPattern(LocaleSettings.currentLocale.languageCode)..maximumFractionDigits = 2;
     return Scaffold(
       appBar: AppBar(
         title: Text(t.rankAveragesViewTitle),

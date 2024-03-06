@@ -74,6 +74,7 @@ class TetrioService extends DB {
   final Map<String, Map<String, dynamic>> _recordsCache = {};
   final Map<String, dynamic> _replaysCache = {}; // the only one is different: {"replayID": [replayString, replayBytes]}
   final Map<String, TetrioPlayersLeaderboard> _leaderboardsCache = {};
+  final Map<String, PlayerLeaderboardPosition> _lbPositions = {};
   final Map<String, List<News>> _newsCache = {};
   final Map<String, Map<String, double?>> _topTRcache = {};
   final Map<String, TetraLeagueAlphaStream> _tlStreamsCache = {};
@@ -140,6 +141,14 @@ class TetrioService extends DB {
     await ensureDbIsOpen();
     final db = getDatabaseOrThrow();
     db.insert(tetrioTLReplayStatsTable, {idCol: replay.id, "data": jsonEncode(replay.toJson())});
+  }
+
+  void cacheLeaderboardPositions(String userID, PlayerLeaderboardPosition positions){
+    _lbPositions[userID] = positions;
+  }
+
+  PlayerLeaderboardPosition? getCachedLeaderboardPositions(String userID){
+    return _lbPositions[userID];
   }
 
   /// Downloads replay from inoue (szy API). Requiers [replayID]. If request have
@@ -504,6 +513,7 @@ class TetrioService extends DB {
 
       switch (response.statusCode) {
         case 200:
+          _lbPositions.clear();
           var rawJson = jsonDecode(response.body);
           if (rawJson['success']) { // if api confirmed that everything ok
             TetrioPlayersLeaderboard leaderboard = TetrioPlayersLeaderboard.fromJson(rawJson['data']['users'], "league", DateTime.fromMillisecondsSinceEpoch(rawJson['cache']['cached_at']));
