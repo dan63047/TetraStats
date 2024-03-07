@@ -174,7 +174,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       // Get tetra League leaderboard
       everyone = teto.getCachedLeaderboard();
       everyone ??= await teto.fetchTLLeaderboard();
-      meAmongEveryone = await compute(everyone!.getLeaderboardPosition, me.userId);
+      meAmongEveryone = await compute(everyone!.getLeaderboardPosition, me);
       if (meAmongEveryone != null) teto.cacheLeaderboardPositions(me.userId, meAmongEveryone!);
     }
 

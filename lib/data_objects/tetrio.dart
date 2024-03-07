@@ -313,6 +313,10 @@ class TetrioPlayer {
     return tlSeason1.lessStrictCheck(other.tlSeason1);
   }
 
+  TetrioPlayerFromLeaderboard convertToPlayerFromLeaderboard() => TetrioPlayerFromLeaderboard(
+    userId, username, role, xp, country, supporterTier > 0, verified, state, gamesPlayed, gamesWon,
+    tlSeason1.rating, tlSeason1.glicko??0, tlSeason1.rd??noTrRd, tlSeason1.rank, tlSeason1.bestRank, tlSeason1.apm??0, tlSeason1.pps??0, tlSeason1.vs??0, tlSeason1.decaying);
+
   @override
   String toString() {
     return "$username ($state)";
@@ -1140,23 +1144,23 @@ class News {
 }
 
 class PlayerLeaderboardPosition{
-  late LeaderboardPosition apm;
-  late LeaderboardPosition pps;
-  late LeaderboardPosition vs;
-  late LeaderboardPosition gamesPlayed;
-  late LeaderboardPosition gamesWon;
-  late LeaderboardPosition winrate;
-  late LeaderboardPosition app;
-  late LeaderboardPosition vsapm;
-  late LeaderboardPosition dss;
-  late LeaderboardPosition dsp;
-  late LeaderboardPosition appdsp;
-  late LeaderboardPosition cheese;
-  late LeaderboardPosition gbe;
-  late LeaderboardPosition nyaapp;
-  late LeaderboardPosition area;
-  late LeaderboardPosition estTr;
-  late LeaderboardPosition accOfEst;
+  late LeaderboardPosition? apm;
+  late LeaderboardPosition? pps;
+  late LeaderboardPosition? vs;
+  late LeaderboardPosition? gamesPlayed;
+  late LeaderboardPosition? gamesWon;
+  late LeaderboardPosition? winrate;
+  late LeaderboardPosition? app;
+  late LeaderboardPosition? vsapm;
+  late LeaderboardPosition? dss;
+  late LeaderboardPosition? dsp;
+  late LeaderboardPosition? appdsp;
+  late LeaderboardPosition? cheese;
+  late LeaderboardPosition? gbe;
+  late LeaderboardPosition? nyaapp;
+  late LeaderboardPosition? area;
+  late LeaderboardPosition? estTr;
+  late LeaderboardPosition? accOfEst;
 
   PlayerLeaderboardPosition({
     required this.apm,
@@ -1178,7 +1182,7 @@ class PlayerLeaderboardPosition{
     required this.accOfEst
   });
   
-  PlayerLeaderboardPosition.fromSearchResults(List<LeaderboardPosition> results){
+  PlayerLeaderboardPosition.fromSearchResults(List<LeaderboardPosition?> results){
     apm = results[0];
     pps = results[1];
     vs = results[2];
@@ -1834,15 +1838,26 @@ class TetrioPlayersLeaderboard {
     }
   }
 
-  PlayerLeaderboardPosition? getLeaderboardPosition(String userID) {
-    if (leaderboard.indexWhere((element) => element.userId == userID) == -1) return null;
+  PlayerLeaderboardPosition? getLeaderboardPosition(TetrioPlayer user) {
+    if (user.tlSeason1.gamesPlayed == 0) return null;
+    bool fakePositions = false;
+    late List<TetrioPlayerFromLeaderboard> copyOfLeaderboard;
+    if (leaderboard.indexWhere((element) => element.userId == user.userId) == -1){
+      fakePositions =true;
+      copyOfLeaderboard = List.of(leaderboard);
+      copyOfLeaderboard.add(user.convertToPlayerFromLeaderboard());
+    } 
     List<Stats> stats = [Stats.apm, Stats.pps, Stats.vs, Stats.gp, Stats.gw, Stats.wr,
     Stats.app, Stats.vsapm, Stats.dss, Stats.dsp, Stats.appdsp, Stats.cheese, Stats.gbe, Stats.nyaapp, Stats.area, Stats.eTR, Stats.acceTR];
-    List<LeaderboardPosition> results = [];
+    List<LeaderboardPosition?> results = [];
     for (Stats stat in stats) {
-      List<TetrioPlayerFromLeaderboard> sortedLeaderboard = getStatRanking(leaderboard, stat, reversed: false);
-      int position = sortedLeaderboard.indexWhere((element) => element.userId == userID) + 1;
-      results.add(LeaderboardPosition(position, position / sortedLeaderboard.length));
+      List<TetrioPlayerFromLeaderboard> sortedLeaderboard = getStatRanking(fakePositions ? copyOfLeaderboard : leaderboard, stat, reversed: false);
+      int position = sortedLeaderboard.indexWhere((element) => element.userId == user.userId) + 1;
+      if (position == 0) {
+        results.add(null);
+      } else {
+        results.add(LeaderboardPosition(fakePositions ? 1001 : position, position / sortedLeaderboard.length));
+      }
     }
     return PlayerLeaderboardPosition.fromSearchResults(results);
   }
@@ -1921,7 +1936,11 @@ class TetrioPlayerFromLeaderboard {
     this.apm,
     this.pps,
     this.vs,
-    this.decaying);
+    this.decaying){
+      nerdStats =  NerdStats(apm, pps, vs);
+      estTr = EstTr(apm, pps, vs, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
+      playstyle = Playstyle(apm, pps, nerdStats.app, nerdStats.vsapm, nerdStats.dsp, nerdStats.gbe, estTr.srarea, estTr.statrank);
+    }
 
   double get winrate => gamesWon / gamesPlayed;
   double get esttracc => estTr.esttr - rating;

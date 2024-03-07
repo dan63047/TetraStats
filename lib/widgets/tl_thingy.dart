@@ -302,7 +302,7 @@ class _TLThingyState extends State<TLThingy> {
                                   color: oldTl!.estTr!.esttr > currentTl.estTr!.esttr ? Colors.redAccent : Colors.greenAccent
                                 ),),
                                 if (oldTl?.estTr?.esttr != null && widget.lbPositions?.estTr != null) const TextSpan(text: " • "),
-                                if (widget.lbPositions?.estTr != null) TextSpan(text: widget.lbPositions!.estTr.position >= 1000 ? "Top ${f2.format(widget.lbPositions!.estTr.percentage*100)}%" : "№${widget.lbPositions!.estTr.position}")
+                                if (widget.lbPositions?.estTr != null) TextSpan(text: widget.lbPositions!.estTr!.position >= 1000 ? "Top ${f2.format(widget.lbPositions!.estTr!.percentage*100)}%" : "№${widget.lbPositions!.estTr!.position}")
                               ]
                               ),
                             ),
@@ -328,7 +328,7 @@ class _TLThingyState extends State<TLThingy> {
                                 color: oldTl!.esttracc! > currentTl.esttracc! ? Colors.redAccent : Colors.greenAccent
                               ),),
                               if (oldTl?.esttracc != null && widget.lbPositions?.accOfEst != null) const TextSpan(text: " • "),
-                              if (widget.lbPositions?.accOfEst != null) TextSpan(text: widget.lbPositions!.accOfEst.position >= 1000 ? "Top ${f2.format(widget.lbPositions!.accOfEst.percentage*100)}%" : "№${widget.lbPositions!.accOfEst.position}")
+                              if (widget.lbPositions?.accOfEst != null) TextSpan(text: widget.lbPositions!.accOfEst!.position >= 1000 ? "Top ${f2.format(widget.lbPositions!.accOfEst!.percentage*100)}%" : "№${widget.lbPositions!.accOfEst!.position}")
                             ]
                             ),
                           ),
