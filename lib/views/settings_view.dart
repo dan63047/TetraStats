@@ -266,8 +266,8 @@ class SettingsState extends State<SettingsView> {
           onTap: () {
             Navigator.pushNamed(context, "/customization");
           },),
-          ListTile(title: Text("Show LB position for each stat"),
-          subtitle: Text("That will impact on app performance..."),
+          ListTile(title: Text("Show leaderboard based stats"),
+          subtitle: Text("That will impact on loading times, but will allow you to see position on LB by stats and comparison with average values"),
           trailing: Switch(value: showPositions, onChanged: (bool value){
             prefs.setBool("showPositions", value);
             setState(() {

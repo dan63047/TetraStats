@@ -10,11 +10,12 @@ class StatCellNum extends StatelessWidget {
       required this.playerStat,
       required this.playerStatLabel,
       required this.isScreenBig,
+      this.smallDecimal = true,
       this.alertWidgets,
       this.fractionDigits,
       this.oldPlayerStat,
       required this.higherIsBetter,
-      this.okText, this.alertTitle, this.pos});
+      this.okText, this.alertTitle, this.pos, this.averageStat});
 
   final num playerStat;
   final num? oldPlayerStat;
@@ -22,10 +23,22 @@ class StatCellNum extends StatelessWidget {
   final String playerStatLabel;
   final String? okText;
   final bool isScreenBig;
+  final bool smallDecimal;
   final String? alertTitle;
   final List<Widget>? alertWidgets;
   final int? fractionDigits;
   final LeaderboardPosition? pos;
+  final num? averageStat;
+
+  Color getStatColor(){
+    if (averageStat == null) return Colors.white;
+    num percentile = (higherIsBetter ? playerStat / averageStat! : averageStat! / playerStat).abs();
+    if      (percentile > 1.50) return Colors.purpleAccent;
+    else if (percentile > 1.20) return Colors.blueAccent;
+    else if (percentile > 0.90) return Colors.greenAccent;
+    else if (percentile > 0.70) return Colors.yellowAccent;
+    else return Colors.redAccent;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,20 +46,17 @@ class StatCellNum extends StatelessWidget {
     NumberFormat fractionf = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: fractionDigits ?? 0)..maximumIntegerDigits = 0;
     num fraction = playerStat.isNegative ? 1 - (playerStat - playerStat.floor()) : playerStat - playerStat.floor();
     int integer = playerStat.isNegative ? (playerStat + fraction).toInt() : (playerStat - fraction).toInt();
-    // String valueAsString = fractionDigits == null ? f.format(playerStat.floor()) : f.format(playerStat);
-    // var exploded = valueAsString.split(".");
     return Column(
       children: [
         RichText(
           text: TextSpan(text: intf.format(integer),
           children: [
-            TextSpan(text: fractionf.format(fraction).substring(1), style: const TextStyle(fontSize: 16))
+            TextSpan(text: fractionf.format(fraction).substring(1), style: smallDecimal ? const TextStyle(fontSize: 16) : null)
           ],
           style: TextStyle(
             fontFamily: "Eurostile Round Extended",
-            //fontWeight: FontWeight.bold,
             fontSize: isScreenBig ? 32 : 24,
-            color: Colors.white
+            color: getStatColor()
             )
           )
         ),

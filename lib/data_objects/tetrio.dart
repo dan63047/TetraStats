@@ -1851,7 +1851,7 @@ class TetrioPlayersLeaderboard {
     Stats.app, Stats.vsapm, Stats.dss, Stats.dsp, Stats.appdsp, Stats.cheese, Stats.gbe, Stats.nyaapp, Stats.area, Stats.eTR, Stats.acceTR];
     List<LeaderboardPosition?> results = [];
     for (Stats stat in stats) {
-      List<TetrioPlayerFromLeaderboard> sortedLeaderboard = getStatRanking(fakePositions ? copyOfLeaderboard : leaderboard, stat, reversed: false);
+      List<TetrioPlayerFromLeaderboard> sortedLeaderboard = getStatRanking(fakePositions ? copyOfLeaderboard : leaderboard, stat, reversed: stat == Stats.cheese ? true : false);
       int position = sortedLeaderboard.indexWhere((element) => element.userId == user.userId) + 1;
       if (position == 0) {
         results.add(null);

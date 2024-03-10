@@ -32,6 +32,7 @@ import 'package:go_router/go_router.dart';
 Future<List> me = Future.delayed(const Duration(seconds: 60), () => [null, null, null, null, null, null]); // I love lists shut up
 TetrioPlayersLeaderboard? everyone;
 PlayerLeaderboardPosition? meAmongEveryone;
+TetraLeagueAlpha? rankAverages;
 String _searchFor = "6098518e3d5155e6ec429cdc"; // who we looking for
 String _titleNickname = "dan63047";
 final TetrioService teto = TetrioService(); // thing, that manadge our local DB
@@ -73,14 +74,14 @@ String get40lTime(int microseconds){
 String readableTimeDifference(Duration a, Duration b){
   Duration result = a - b;
   
-  return "${NumberFormat("0.000s;0.000s", LocaleSettings.currentLocale.languageCode).format(result.inMilliseconds/1000)}";
+  return NumberFormat("0.000s;0.000s", LocaleSettings.currentLocale.languageCode).format(result.inMilliseconds/1000);
 }
 
 /// Readable [a] - [b], without sign
 String readableIntDifference(int a, int b){
   int result = a - b;
 
-  return "${NumberFormat("#,###;#,###", LocaleSettings.currentLocale.languageCode).format(result)}";
+  return NumberFormat("#,###;#,###", LocaleSettings.currentLocale.languageCode).format(result);
 }
 
 class _MainState extends State<MainView> with TickerProviderStateMixin {
@@ -177,6 +178,8 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       meAmongEveryone = await compute(everyone!.getLeaderboardPosition, me);
       if (meAmongEveryone != null) teto.cacheLeaderboardPositions(me.userId, meAmongEveryone!);
     }
+
+    if (everyone != null && me.tlSeason1.gamesPlayed > 9) rankAverages = everyone?.averages[me.tlSeason1.percentileRank]?[0];
 
     // Making list of Tetra League matches
     List<TetraLeagueAlphaRecord> tlMatches = [];

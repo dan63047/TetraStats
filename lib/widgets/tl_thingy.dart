@@ -4,6 +4,7 @@ import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
+import 'package:tetra_stats/views/main_view.dart';
 import 'package:tetra_stats/widgets/gauget_num.dart';
 import 'package:tetra_stats/widgets/graphs.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
@@ -25,7 +26,8 @@ class TLThingy extends StatefulWidget {
   final bool guest;
   final double? topTR;
   final PlayerLeaderboardPosition? lbPositions;
-  const TLThingy({super.key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.bot=false, this.guest=false, this.topTR, this.lbPositions});
+  final TetraLeagueAlpha? averages;
+  const TLThingy({super.key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.bot=false, this.guest=false, this.topTR, this.lbPositions, this.averages});
 
   @override
   State<TLThingy> createState() => _TLThingyState();
@@ -150,7 +152,7 @@ class _TLThingyState extends State<TLThingy> {
                     softWrap: true,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontFamily: "Eurostile Round Extended",
+                      fontFamily: "Eurostile Round",
                       fontSize: bigScreen ? 42 : 28,
                       overflow: TextOverflow.visible,
                     )),
@@ -163,13 +165,13 @@ class _TLThingyState extends State<TLThingy> {
                   crossAxisAlignment: WrapCrossAlignment.start,
                   clipBehavior: Clip.hardEdge,
                   children: [
-                    if (currentTl.apm != null) StatCellNum(playerStat: currentTl.apm!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.apm, higherIsBetter: true, oldPlayerStat: oldTl?.apm, pos: widget.lbPositions?.apm),
-                    if (currentTl.pps != null) StatCellNum(playerStat: currentTl.pps!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.pps, higherIsBetter: true, oldPlayerStat: oldTl?.pps, pos: widget.lbPositions?.pps),
-                    if (currentTl.vs != null) StatCellNum(playerStat: currentTl.vs!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.vs, higherIsBetter: true, oldPlayerStat: oldTl?.vs, pos: widget.lbPositions?.vs),
+                    if (currentTl.apm != null) StatCellNum(playerStat: currentTl.apm!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.apm, higherIsBetter: true, oldPlayerStat: oldTl?.apm, pos: widget.lbPositions?.apm, averageStat: rankAverages?.apm),
+                    if (currentTl.pps != null) StatCellNum(playerStat: currentTl.pps!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.pps, higherIsBetter: true, oldPlayerStat: oldTl?.pps, pos: widget.lbPositions?.pps, averageStat: rankAverages?.pps, smallDecimal: false),
+                    if (currentTl.vs != null) StatCellNum(playerStat: currentTl.vs!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.vs, higherIsBetter: true, oldPlayerStat: oldTl?.vs, pos: widget.lbPositions?.vs, averageStat: rankAverages?.vs),
                     if (currentTl.standingLocal > 0) StatCellNum(playerStat: currentTl.standingLocal, isScreenBig: bigScreen, playerStatLabel: t.statCellNum.lbpc, higherIsBetter: false, oldPlayerStat: oldTl?.standingLocal),
                     StatCellNum(playerStat: currentTl.gamesPlayed, isScreenBig: bigScreen, playerStatLabel: t.statCellNum.gamesPlayed, higherIsBetter: true, oldPlayerStat: oldTl?.gamesPlayed, pos: widget.lbPositions?.gamesPlayed),
                     StatCellNum(playerStat: currentTl.gamesWon, isScreenBig: bigScreen, playerStatLabel: t.statCellNum.gamesWonTL, higherIsBetter: true, oldPlayerStat: oldTl?.gamesWon, pos: widget.lbPositions?.gamesWon),
-                    StatCellNum(playerStat: currentTl.winrate * 100, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.winrate, higherIsBetter: true, oldPlayerStat: oldTl != null ? oldTl!.winrate*100 : null, pos: widget.lbPositions?.winrate),
+                    StatCellNum(playerStat: currentTl.winrate * 100, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.winrate, higherIsBetter: true, oldPlayerStat: oldTl != null ? oldTl!.winrate*100 : null, pos: widget.lbPositions?.winrate, averageStat: rankAverages != null ?  rankAverages!.winrate * 100 : null),
                   ],
                 ),
               ),
@@ -214,7 +216,8 @@ class _TLThingyState extends State<TLThingy> {
                         clipBehavior: Clip.hardEdge,
                         children: [
                           StatCellNum(playerStat: currentTl.nerdStats!.dss, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.dss,
-                          pos: widget.lbPositions?.dss, 
+                          pos: widget.lbPositions?.dss,
+                          averageStat: rankAverages?.nerdStats?.dss, smallDecimal: false,
                           alertWidgets: [Text(t.statCellNum.dssDescription),
                               Text("${t.formula}: (VS / 100) - (APM / 60)"),
                               Text("${t.exactValue}: ${currentTl.nerdStats!.dss}"),],
@@ -222,7 +225,8 @@ class _TLThingyState extends State<TLThingy> {
                               higherIsBetter: true,
                               oldPlayerStat: oldTl?.nerdStats?.dss,),
                           StatCellNum(playerStat: currentTl.nerdStats!.dsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.dsp,
-                          pos: widget.lbPositions?.dsp, 
+                          pos: widget.lbPositions?.dsp,
+                          averageStat: rankAverages?.nerdStats?.dsp, smallDecimal: false, 
                           alertWidgets: [Text(t.statCellNum.dspDescription),
                               Text("${t.formula}: DS/S / PPS"),
                               Text("${t.exactValue}: ${currentTl.nerdStats!.dsp}"),],
@@ -230,7 +234,8 @@ class _TLThingyState extends State<TLThingy> {
                               higherIsBetter: true,
                               oldPlayerStat: oldTl?.nerdStats?.dsp,),
                           StatCellNum(playerStat: currentTl.nerdStats!.appdsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.appdsp,
-                          pos: widget.lbPositions?.appdsp, 
+                          pos: widget.lbPositions?.appdsp,
+                          averageStat: rankAverages?.nerdStats?.appdsp, smallDecimal: false,
                           alertWidgets: [Text(t.statCellNum.appdspDescription),
                               Text("${t.formula}: APP + DS/P"),
                               Text("${t.exactValue}: ${currentTl.nerdStats!.appdsp}"),],
@@ -238,15 +243,17 @@ class _TLThingyState extends State<TLThingy> {
                               higherIsBetter: true,
                               oldPlayerStat: oldTl?.nerdStats?.appdsp,),
                           StatCellNum(playerStat: currentTl.nerdStats!.cheese, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.cheese,
-                          pos: widget.lbPositions?.cheese, 
+                          pos: widget.lbPositions?.cheese,
+                          averageStat: rankAverages?.nerdStats?.cheese,
                           alertWidgets: [Text(t.statCellNum.cheeseDescription),
                               Text("${t.formula}: (DS/P * 150) + ((VS/APM - 2) * 50) + (0.6 - APP) * 125"),
                               Text("${t.exactValue}: ${currentTl.nerdStats!.cheese}"),],
                               okText: t.popupActions.ok,
-                              higherIsBetter: true,
+                              higherIsBetter: false,
                               oldPlayerStat: oldTl?.nerdStats?.cheese,),
                           StatCellNum(playerStat: currentTl.nerdStats!.gbe, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.gbe,
-                          pos: widget.lbPositions?.gbe, 
+                          pos: widget.lbPositions?.gbe,
+                          averageStat: rankAverages?.nerdStats?.gbe, smallDecimal: false,
                           alertWidgets: [Text(t.statCellNum.gbeDescription),
                               Text("${t.formula}: APP * DS/P * 2"),
                               Text("${t.exactValue}: ${currentTl.nerdStats!.gbe}"),],
@@ -254,7 +261,8 @@ class _TLThingyState extends State<TLThingy> {
                               higherIsBetter: true,
                               oldPlayerStat: oldTl?.nerdStats?.gbe,),
                           StatCellNum(playerStat: currentTl.nerdStats!.nyaapp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.nyaapp,
-                          pos: widget.lbPositions?.nyaapp, 
+                          pos: widget.lbPositions?.nyaapp,
+                          averageStat: rankAverages?.nerdStats?.nyaapp, smallDecimal: false,
                           alertWidgets: [Text(t.statCellNum.nyaappDescription),
                               Text("${t.formula}: APP - 5 * tan(radians((Cheese Index / -30) + 1))"),
                               Text("${t.exactValue}:  ${currentTl.nerdStats!.nyaapp}"),],
@@ -262,7 +270,8 @@ class _TLThingyState extends State<TLThingy> {
                               higherIsBetter: true,
                               oldPlayerStat: oldTl?.nerdStats?.nyaapp,),
                           StatCellNum(playerStat: currentTl.nerdStats!.area, isScreenBig: bigScreen, fractionDigits: 1, playerStatLabel: t.statCellNum.area,
-                          pos: widget.lbPositions?.area, 
+                          pos: widget.lbPositions?.area,
+                          averageStat: rankAverages?.nerdStats?.area,
                           alertWidgets: [Text(t.statCellNum.areaDescription),
                               Text("${t.formula}: APM * 1 + PPS * 45 + VS * 0.444 + APP * 185 + DS/S * 175 + DS/P * 450 + Garbage Effi * 315"),
                               Text("${t.exactValue}:  ${currentTl.nerdStats!.area}"),],
@@ -314,7 +323,7 @@ class _TLThingyState extends State<TLThingy> {
                           RichText(
                             text: TextSpan(
                               text: (currentTl.esttracc != null) ? intFDiff.format(currentTl.esttracc!.truncate()) : "-",
-                              style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: FontWeight.w500),
+                              style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 36, fontWeight: FontWeight.w500),
                               children: [
                                 TextSpan(text: (currentTl.esttracc != null) ? fractionfEstTRAcc.format(currentTl.esttracc!.isNegative ? 1 - (currentTl.esttracc! - currentTl.esttracc!.truncate()) : (currentTl.esttracc! - currentTl.esttracc!.truncate())).substring(1) : ".---", style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))
                               ]
