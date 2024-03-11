@@ -197,7 +197,8 @@ class _TLThingyState extends State<TLThingy> {
                           ], alertWidgets: [
                             Text(t.statCellNum.appDescription),
                             Text("${t.exactValue}: ${currentTl.nerdStats!.app}")
-                          ], oldPlayerStat: oldTl?.nerdStats?.app, pos: widget.lbPositions?.app),
+                          ], oldPlayerStat: oldTl?.nerdStats?.app, pos: widget.lbPositions?.app,
+                          averageStat: rankAverages?.nerdStats?.app),
                           GaugetNum(playerStat: currentTl.nerdStats!.vsapm, playerStatLabel: "VS / APM", higherIsBetter: true, minimum: 1.8, maximum: 2.4, ranges: [
                             GaugeRange(startValue: 1.8, endValue: 2.0, color: Colors.green),
                             GaugeRange(startValue: 2.0, endValue: 2.2, color: Colors.blue),
@@ -205,7 +206,8 @@ class _TLThingyState extends State<TLThingy> {
                           ], alertWidgets: [
                             Text(t.statCellNum.vsapmDescription),
                             Text("${t.exactValue}: ${currentTl.nerdStats!.vsapm}")
-                          ], oldPlayerStat: oldTl?.nerdStats?.vsapm, pos: widget.lbPositions?.vsapm)
+                          ], oldPlayerStat: oldTl?.nerdStats?.vsapm, pos: widget.lbPositions?.vsapm,
+                          averageStat: rankAverages?.nerdStats?.vsapm)
                       ]),
                     ),
                     Wrap(
@@ -244,7 +246,7 @@ class _TLThingyState extends State<TLThingy> {
                               oldPlayerStat: oldTl?.nerdStats?.appdsp,),
                           StatCellNum(playerStat: currentTl.nerdStats!.cheese, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.cheese,
                           pos: widget.lbPositions?.cheese,
-                          averageStat: rankAverages?.nerdStats?.cheese,
+                          //averageStat: rankAverages?.nerdStats?.cheese, TODO: questonable
                           alertWidgets: [Text(t.statCellNum.cheeseDescription),
                               Text("${t.formula}: (DS/P * 150) + ((VS/APM - 2) * 50) + (0.6 - APP) * 125"),
                               Text("${t.exactValue}: ${currentTl.nerdStats!.cheese}"),],

@@ -17,6 +17,7 @@ class GaugetNum extends StatelessWidget {
   final String? alertTitle;
   final List<Widget>? alertWidgets;
   final LeaderboardPosition? pos;
+  final num? averageStat;
 
   const GaugetNum(
       {super.key,
@@ -28,7 +29,17 @@ class GaugetNum extends StatelessWidget {
       required this.minimum,
       required this.maximum,
       required this.ranges,
-      this.okText, this.alertTitle, this.pos});
+      this.okText, this.alertTitle, this.pos, this.averageStat});
+
+  Color getStatColor(){
+    if (averageStat == null) return Colors.white;
+    num percentile = (higherIsBetter ? playerStat / averageStat! : averageStat! / playerStat).abs();
+    if      (percentile > 1.50) return Colors.purpleAccent;
+    else if (percentile > 1.20) return Colors.blueAccent;
+    else if (percentile > 0.90) return Colors.greenAccent;
+    else if (percentile > 0.70) return Colors.yellowAccent;
+    else return Colors.redAccent;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +70,7 @@ class GaugetNum extends StatelessWidget {
           ],
         annotations: [GaugeAnnotation(
           widget: TextButton(child: Text(f3.format(playerStat),
-          style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, color: Colors.white)),
+          style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, color: getStatColor())),
           onPressed: (){
             showDialog(
               context: context,

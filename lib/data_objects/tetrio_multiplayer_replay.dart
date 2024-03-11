@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:math';
 import 'package:vector_math/vector_math_64.dart';
 
@@ -151,10 +150,29 @@ class ReplayStats{
   }
 }
 
+class AggregateStats{
+  double apm;
+  double pps;
+  double vs;
+  late NerdStats nerdStats;
+  late EstTr estTr;
+  late Playstyle playstyle;
+  double spp;
+  double kpp;
+  double kps;
+
+  AggregateStats(this.apm, this.pps, this.vs, this.spp, this.kpp, this.kps){
+    nerdStats = NerdStats(apm, pps, vs);
+    estTr = EstTr(apm, pps, vs, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
+    playstyle = Playstyle(apm, pps, nerdStats.app, nerdStats.vsapm, nerdStats.dsp, nerdStats.gbe, estTr.srarea, estTr.statrank);
+  }
+}
+
 class ReplayData{
   late String id;
   late Map<dynamic, dynamic> rawJson;
   late List<EndContextMulti> endcontext;
+  late List<AggregateStats> timeWeightedStats;
   late List<List<ReplayStats>> stats;
   late List<ReplayStats> totalStats;
   late List<List<String>> roundWinners;
@@ -181,20 +199,45 @@ class ReplayData{
     totalLength = 0;
     stats = [];
     roundWinners = [];
+    int roundID = 0;
+    List<double> APMmultipliedByWeights = [0, 0];
+    List<double> PPSmultipliedByWeights = [0, 0];
+    List<double> VSmultipliedByWeights = [0, 0];
+    List<double> SPPmultipliedByWeights = [0, 0];
+    List<double> KPPmultipliedByWeights = [0, 0];
+    List<double> KPSmultipliedByWeights = [0, 0];
     totalStats = [ReplayStats.createEmpty(), ReplayStats.createEmpty()];
     for(var round in json['data']) {
       int firstInEndContext = round['replays'][0]["events"].last['data']['export']['options']['gameid'].startsWith(endcontext[0].userId) ? 0 : 1;
       int secondInEndContext = round['replays'][1]["events"].last['data']['export']['options']['gameid'].startsWith(endcontext[1].userId) ? 1 : 0;
-      roundLengths.add(max(round['replays'][0]['frames'], round['replays'][1]['frames']));
+      int roundLength = max(round['replays'][0]['frames'], round['replays'][1]['frames']);
+      roundLengths.add(roundLength);
       totalLength = totalLength + max(round['replays'][0]['frames'], round['replays'][1]['frames']);
+      APMmultipliedByWeights[0] += endcontext[0].secondaryTracking[roundID]*roundLength;
+      APMmultipliedByWeights[1] += endcontext[1].secondaryTracking[roundID]*roundLength;
+      PPSmultipliedByWeights[0] += endcontext[0].tertiaryTracking[roundID]*roundLength;
+      PPSmultipliedByWeights[1] += endcontext[1].tertiaryTracking[roundID]*roundLength;
+      VSmultipliedByWeights[0] += endcontext[0].extraTracking[roundID]*roundLength;
+      VSmultipliedByWeights[1] += endcontext[1].extraTracking[roundID]*roundLength;
       int winner = round['board'].indexWhere((element) => element['success'] == true);
       roundWinners.add([round['board'][winner]['id'], round['board'][winner]['username']]);
       ReplayStats playerOne = ReplayStats.fromJson(round['replays'][firstInEndContext]['events'].last['data']['export']['stats'], biggestSpikeFromReplay(round['replays'][secondInEndContext]['events']), round['replays'][firstInEndContext]['frames']); // (events contain recived attacks)
       ReplayStats playerTwo = ReplayStats.fromJson(round['replays'][secondInEndContext]['events'].last['data']['export']['stats'], biggestSpikeFromReplay(round['replays'][firstInEndContext]['events']), round['replays'][secondInEndContext]['frames']);
+      SPPmultipliedByWeights[0] += playerOne.spp*roundLength;
+      SPPmultipliedByWeights[1] += playerTwo.spp*roundLength;
+      KPPmultipliedByWeights[0] += playerOne.kpp*roundLength;
+      KPPmultipliedByWeights[1] += playerTwo.kpp*roundLength;
+      KPSmultipliedByWeights[0] += playerOne.kps*roundLength;
+      KPSmultipliedByWeights[1] += playerTwo.kps*roundLength;
       stats.add([playerOne, playerTwo]);
       totalStats[0] = totalStats[0] + playerOne;
       totalStats[1] = totalStats[1] + playerTwo;
+      roundID ++;
     }
+    timeWeightedStats = [
+      AggregateStats(APMmultipliedByWeights[0]/totalLength, PPSmultipliedByWeights[0]/totalLength, VSmultipliedByWeights[0]/totalLength, SPPmultipliedByWeights[0]/totalLength, KPPmultipliedByWeights[0]/totalLength, KPSmultipliedByWeights[0]/totalLength),
+      AggregateStats(APMmultipliedByWeights[1]/totalLength, PPSmultipliedByWeights[1]/totalLength, VSmultipliedByWeights[1]/totalLength, SPPmultipliedByWeights[1]/totalLength, KPPmultipliedByWeights[1]/totalLength, KPSmultipliedByWeights[1]/totalLength)
+    ];
   }
 
   Map<String, dynamic> toJson(){
