@@ -27,7 +27,11 @@ class TLThingy extends StatefulWidget {
   final double? topTR;
   final PlayerLeaderboardPosition? lbPositions;
   final TetraLeagueAlpha? averages;
-  const TLThingy({super.key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.bot=false, this.guest=false, this.topTR, this.lbPositions, this.averages});
+  final double? thatRankCutoff;
+  final double? thatRankTarget;
+  final double? nextRankCutoff;
+  final double? nextRankTarget;
+  const TLThingy({super.key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.bot=false, this.guest=false, this.topTR, this.lbPositions, this.averages, this.nextRankCutoff = 25000, this.thatRankCutoff = 0, this.nextRankTarget = 25000, this.thatRankTarget = 0});
 
   @override
   State<TLThingy> createState() => _TLThingyState();
@@ -55,7 +59,7 @@ class _TLThingyState extends State<TLThingy> {
   NumberFormat fractionfEstTRAcc = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 3)..maximumIntegerDigits = 0;
     if (currentTl.gamesPlayed == 0) return Center(child: Text(widget.guest ? t.anonTL : widget.bot ? t.botTL : t.neverPlayedTL, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28), textAlign: TextAlign.center,));
     return LayoutBuilder(builder: (context, constraints) {
-    bool bigScreen = constraints.maxWidth > 768;
+    bool bigScreen = constraints.maxWidth >= 768;
       return ListView.builder(
         physics: const ClampingScrollPhysics(),
         itemCount: 1,
@@ -313,7 +317,9 @@ class _TLThingyState extends State<TLThingy> {
                                   color: oldTl!.estTr!.esttr > currentTl.estTr!.esttr ? Colors.redAccent : Colors.greenAccent
                                 ),),
                                 if (oldTl?.estTr?.esttr != null && widget.lbPositions?.estTr != null) const TextSpan(text: " • "),
-                                if (widget.lbPositions?.estTr != null) TextSpan(text: widget.lbPositions!.estTr!.position >= 1000 ? "Top ${f2.format(widget.lbPositions!.estTr!.percentage*100)}%" : "№${widget.lbPositions!.estTr!.position}")
+                                if (widget.lbPositions?.estTr != null) TextSpan(text: widget.lbPositions!.estTr!.position >= 1000 ? "Top ${f2.format(widget.lbPositions!.estTr!.percentage*100)}%" : "№${widget.lbPositions!.estTr!.position}"),
+                                if (widget.lbPositions?.estTr != null) const TextSpan(text: " • "),
+                                TextSpan(text: "Glicko: ${f2.format(currentTl.estTr!.estglicko)}")
                               ]
                               ),
                             ),

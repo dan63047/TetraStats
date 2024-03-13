@@ -38,6 +38,25 @@ const Map<String, double> rankCutoffs = {
   "z": -1,
   "": 0.5
 };
+const Map<String, double> rankTargets = {
+  "x": 24008,
+  "u": 23038,
+  "ss": 21583,
+  "s+": 20128,
+  "s": 18673,
+  "s-": 16975,
+  "a+": 15035,
+  "a": 13095,
+  "a-": 11155,
+  "b+": 9215,
+  "b": 7275,
+  "b-": 5335,
+  "c+": 3880,
+  "c": 2425,
+  "c-": 1213,
+  "d+": 606,
+  "d": 0,
+};
 enum Stats {
   tr,
   glicko,
@@ -1881,6 +1900,26 @@ class TetrioPlayersLeaderboard {
     'd+': getAverageOfRank("d+"),
     'd': getAverageOfRank("d"),
     'z': getAverageOfRank("z")
+    };
+
+  Map<String, double> get cutoffs => {
+    'x': getAverageOfRank("x")[1]["toEnterTR"],
+    'u': getAverageOfRank("u")[1]["toEnterTR"],
+    'ss': getAverageOfRank("ss")[1]["toEnterTR"],
+    's+': getAverageOfRank("s+")[1]["toEnterTR"],
+    's': getAverageOfRank("s")[1]["toEnterTR"],
+    's-': getAverageOfRank("s-")[1]["toEnterTR"],
+    'a+': getAverageOfRank("a+")[1]["toEnterTR"],
+    'a': getAverageOfRank("a")[1]["toEnterTR"],
+    'a-': getAverageOfRank("a-")[1]["toEnterTR"],
+    'b+': getAverageOfRank("b+")[1]["toEnterTR"],
+    'b': getAverageOfRank("b")[1]["toEnterTR"],
+    'b-': getAverageOfRank("b-")[1]["toEnterTR"],
+    'c+': getAverageOfRank("c+")[1]["toEnterTR"],
+    'c': getAverageOfRank("c")[1]["toEnterTR"],
+    'c-': getAverageOfRank("c-")[1]["toEnterTR"],
+    'd+': getAverageOfRank("d+")[1]["toEnterTR"],
+    'd': getAverageOfRank("d")[1]["toEnterTR"]
     };
 
   TetrioPlayersLeaderboard.fromJson(List<dynamic> json, String t, DateTime ts) {

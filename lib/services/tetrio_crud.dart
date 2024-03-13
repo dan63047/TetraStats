@@ -728,6 +728,14 @@ class TetrioService extends DB {
     return matches;
   }
 
+  /// Gets and returns an amount of stored Tetra League mathes between [ourPlayerID] and [enemyPlayerID].
+  Future<int> getNumberOfTLMatchesBetweenPlayers(String ourPlayerID, String enemyPlayerID) async {
+    await ensureDbIsOpen();
+    final db = getDatabaseOrThrow();
+    final results = await db.rawQuery("SELECT COUNT(*) from tetrioAlphaLeagueMathces WHERE (player1id = $ourPlayerID AND player2id = $enemyPlayerID) OR (player1id = $enemyPlayerID AND player2id = $ourPlayerID)");
+    return results.first.values.first as int;
+  }
+
   /// Deletes match and stats of that match with given [matchID] from local DB. Throws an exception if fails.
   Future<void> deleteTLMatch(String matchID) async {
     await ensureDbIsOpen();

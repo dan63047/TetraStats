@@ -88,6 +88,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   final bodyGlobalKey = GlobalKey();
   bool _showSearchBar = false;
   late TabController _tabController;
+  late TabController _wideScreenTabController;
   late bool fixedScroll;
 
   @override
@@ -95,6 +96,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     initDB();
     _scrollController = ScrollController();
     _tabController = TabController(length: 6, vsync: this);
+    _wideScreenTabController = TabController(length: 4, vsync: this);
     
     // We need to show something
     if (widget.player != null){ // if we have user input,
@@ -279,12 +281,12 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);
-    bool bigScreen = MediaQuery.of(context).size.width > 768;
+    bool bigScreen = MediaQuery.of(context).size.width > 1024;
     return Scaffold(
       drawer: widget.player == null ? NavDrawer(changePlayer) : null, // Side menu hidden if player provided
       drawerEdgeDragWidth: MediaQuery.of(context).size.width * 0.2, // 20% of left side of the screen used of Drawer gesture
       appBar: AppBar(
-        title: _showSearchBar ? SearchBox(onSubmit: changePlayer, bigScreen: bigScreen) : Text(widget.title, style: const TextStyle(shadows: textShadow)), 
+        title: _showSearchBar ? SearchBox(onSubmit: changePlayer, bigScreen: MediaQuery.of(context).size.width > 768) : Text(widget.title, style: const TextStyle(shadows: textShadow)), 
         backgroundColor: Colors.black,
         actions: widget.player == null ? [ // search bar and PopupMenuButton hidden if player provided TODO: Subject to change
           _showSearchBar
@@ -374,8 +376,9 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                       return notification.depth == 0;
                     },
                     child: NestedScrollView(
-                      controller: _scrollController,
                       physics: const AlwaysScrollableScrollPhysics(),
+                      controller: _scrollController,
+                      scrollBehavior: const MaterialScrollBehavior(),
                       headerSliverBuilder: (context, value) {
                         return [
                           SliverToBoxAdapter(
@@ -386,10 +389,15 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                           )),
                           SliverToBoxAdapter(
                             child: TabBar(
-                              controller: _tabController,
+                              controller: bigScreen ? _wideScreenTabController : _tabController,
                               padding: const EdgeInsets.all(0.0),
                               isScrollable: true,
-                              tabs: [
+                              tabs: bigScreen ? [
+                                Tab(text: t.tetraLeague,),
+                                Tab(text: t.history),
+                                Tab(text: "${t.sprint} & ${t.blitz}"),
+                                Tab(text: t.other),
+                              ] : [
                                 Tab(text: t.tetraLeague),
                                 Tab(text: t.tlRecords),
                                 Tab(text: t.history),
@@ -402,8 +410,44 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                         ];
                       },
                       body: TabBarView(
-                        controller: _tabController,
-                        children: [
+                        controller: bigScreen ? _wideScreenTabController : _tabController,
+                        children: bigScreen ? [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                            Container(
+                              width: MediaQuery.of(context).size.width-450,
+                              constraints: BoxConstraints(maxWidth: 1024),
+                              child: TLThingy(
+                                tl: snapshot.data![0].tlSeason1,
+                                userID: snapshot.data![0].userId,
+                                states: snapshot.data![2],
+                                topTR: snapshot.data![7],
+                                bot: snapshot.data![0].role == "bot",
+                                guest: snapshot.data![0].role == "anon",
+                                lbPositions: meAmongEveryone
+                              ),
+                            ),
+                            SizedBox(
+                              width: 450,
+                              child: _TLRecords(userID: snapshot.data![0].userId, data: snapshot.data![3])
+                            ),
+                          ],),
+                          _History(states: snapshot.data![2], update: _justUpdate),
+                          Row(children: [
+                            Container(
+                              width: MediaQuery.of(context).size.width/2,
+                              padding: EdgeInsets.only(right: 8),
+                              child: _RecordThingy(record: snapshot.data![1]['sprint'], rank: snapshot.data![0].tlSeason1.percentileRank)
+                            ),
+                            Container(
+                              width: MediaQuery.of(context).size.width/2,
+                              padding: EdgeInsets.only(left: 8),
+                              child: _RecordThingy(record: snapshot.data![1]['blitz'], rank: snapshot.data![0].tlSeason1.percentileRank)
+                            ),
+                          ],),
+                          _OtherThingy(zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6],)
+                        ] : [
                           TLThingy(
                             tl: snapshot.data![0].tlSeason1,
                             userID: snapshot.data![0].userId,
@@ -600,9 +644,10 @@ class _TLRecords extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (data.isEmpty) return Center(child: Text(t.noRecords, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)));
-    bool bigScreen = MediaQuery.of(context).size.width > 768;
+    bool bigScreen = MediaQuery.of(context).size.width >= 768;
     return ListView.builder(
       physics: const AlwaysScrollableScrollPhysics(),
+      controller: ScrollController(),
       itemCount: data.length,
       itemBuilder: (BuildContext context, int index) {
         var accentColor = data[index].endContext.firstWhere((element) => element.userId == userID).success ? Colors.green : Colors.red;
