@@ -78,6 +78,7 @@ enum Stats {
   area,
   eTR,
   acceTR,
+  acceTRabs,
   opener,
   plonk,
   infDS,
@@ -107,6 +108,7 @@ const Map<Stats, String> chartsShortTitles = {
   Stats.area: "Area",
   Stats.eTR: "eTR",
   Stats.acceTR: "±eTR",
+  Stats.acceTRabs: "+eTR absolute",
   Stats.opener: "Opener",
   Stats.plonk: "Plonk",
   Stats.infDS: "Inf. DS",
@@ -383,6 +385,8 @@ class TetrioPlayer {
         return tlSeason1.estTr?.esttr;
       case Stats.acceTR:
         return tlSeason1.esttracc;
+      case Stats.acceTRabs:
+        return tlSeason1.esttracc?.abs();
       case Stats.opener:
         return tlSeason1.playstyle?.opener;
       case Stats.plonk:
@@ -2051,6 +2055,8 @@ class TetrioPlayerFromLeaderboard {
         return estTr.esttr;
       case Stats.acceTR:
         return esttracc;
+      case Stats.acceTRabs:
+        return esttracc.abs();
       case Stats.opener:
         return playstyle.opener;
       case Stats.plonk:

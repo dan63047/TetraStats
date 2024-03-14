@@ -16,6 +16,7 @@ import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:tetra_stats/main.dart' show prefs;
 import 'package:tetra_stats/services/crud_exceptions.dart';
+import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
 import 'package:tetra_stats/views/ranks_averages_view.dart' show RankAveragesView;
 import 'package:tetra_stats/views/tl_leaderboard_view.dart' show TLLeaderboardView;
@@ -29,22 +30,12 @@ import 'package:window_manager/window_manager.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:go_router/go_router.dart';
 
-Future<List> me = Future.delayed(const Duration(seconds: 60), () => [null, null, null, null, null, null]); // I love lists shut up
-TetrioPlayersLeaderboard? everyone;
-PlayerLeaderboardPosition? meAmongEveryone;
-TetraLeagueAlpha? rankAverages;
-String _searchFor = "6098518e3d5155e6ec429cdc"; // who we looking for
-String _titleNickname = "dan63047";
 final TetrioService teto = TetrioService(); // thing, that manadge our local DB
-/// Each dropdown menu item contains list of dots for the graph
-var chartsData = <DropdownMenuItem<List<FlSpot>>>[];
 int _chartsIndex = 0;
 List _historyShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR", "Opener", "Plonk", "Inf. DS", "Stride"];
 late ScrollController _scrollController;
 final NumberFormat _timeInSec = NumberFormat("#,###.###s.", LocaleSettings.currentLocale.languageCode);
 final NumberFormat secs = NumberFormat("00.###", LocaleSettings.currentLocale.languageCode);
-final NumberFormat _f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
-final NumberFormat _f4 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 4);
 final DateFormat _dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
 
 
@@ -54,8 +45,6 @@ class MainView extends StatefulWidget {
   /// By default it loads my or defined in preferences user stats, but
   /// if [player] username or id provided, it loads his stats. Also it hides menu drawer and three dots menu.
   const MainView({super.key, this.player});
-
-  String get title => "Tetra Stats: $_titleNickname";
 
   @override
   State<MainView> createState() => _MainState();
@@ -85,11 +74,21 @@ String readableIntDifference(int a, int b){
 }
 
 class _MainState extends State<MainView> with TickerProviderStateMixin {
+  Future<List> me = Future.delayed(const Duration(seconds: 60), () => [null, null, null, null, null, null]); // I love lists shut up
+  TetrioPlayersLeaderboard? everyone;
+  PlayerLeaderboardPosition? meAmongEveryone;
+  TetraLeagueAlpha? rankAverages;
+  String _searchFor = "6098518e3d5155e6ec429cdc"; // who we looking for
+  String _titleNickname = "dan63047";
+    /// Each dropdown menu item contains list of dots for the graph
+  var chartsData = <DropdownMenuItem<List<FlSpot>>>[];
   final bodyGlobalKey = GlobalKey();
   bool _showSearchBar = false;
   late TabController _tabController;
   late TabController _wideScreenTabController;
   late bool fixedScroll;
+
+  String get title => "Tetra Stats: $_titleNickname";
 
   @override
   void initState() {
@@ -153,7 +152,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
 
     // Change view title and window title if avaliable
     setState((){_titleNickname = me.username;}); 
-    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) await windowManager.setTitle(widget.title);
+    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) await windowManager.setTitle(title);
 
     // Requesting Tetra League (alpha), records, news and top TR of player
     late List<dynamic> requests;
@@ -245,9 +244,9 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       if (uniqueTL.isEmpty) uniqueTL.add(element.tlSeason1);
     }
     // Also i need previous Tetra League State for comparison if avaliable
-    compareWith = uniqueTL.length >= 2 ? uniqueTL.toList().elementAtOrNull(uniqueTL.length - 2) : null; 
-
-    chartsData = <DropdownMenuItem<List<FlSpot>>>[ // Dumping charts data into dropdown menu items, while cheking if every entry is valid
+    if (uniqueTL.length >= 2){
+      compareWith = uniqueTL.toList().elementAtOrNull(uniqueTL.length - 2);
+      chartsData = <DropdownMenuItem<List<FlSpot>>>[ // Dumping charts data into dropdown menu items, while cheking if every entry is valid
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.rating)], child: Text(t.statCellNum.tr)),
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.glicko!)], child: const Text("Glicko")),
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.rd!)], child: const Text("Rating Deviation")),
@@ -270,6 +269,10 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.playstyle!.infds)], child: const Text("Inf. DS")),
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.playstyle!.stride)], child: const Text("Stride")),
     ];
+    }else{
+      compareWith = null;
+      chartsData = [];
+    }
     return [me, records, states, tlMatches, compareWith, isTracking, news, topTR];
   }
 
@@ -286,7 +289,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       drawer: widget.player == null ? NavDrawer(changePlayer) : null, // Side menu hidden if player provided
       drawerEdgeDragWidth: MediaQuery.of(context).size.width * 0.2, // 20% of left side of the screen used of Drawer gesture
       appBar: AppBar(
-        title: _showSearchBar ? SearchBox(onSubmit: changePlayer, bigScreen: MediaQuery.of(context).size.width > 768) : Text(widget.title, style: const TextStyle(shadows: textShadow)), 
+        title: _showSearchBar ? SearchBox(onSubmit: changePlayer, bigScreen: MediaQuery.of(context).size.width > 768) : Text(title, style: const TextStyle(shadows: textShadow)), 
         backgroundColor: Colors.black,
         actions: widget.player == null ? [ // search bar and PopupMenuButton hidden if player provided TODO: Subject to change
           _showSearchBar
@@ -425,6 +428,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                                 topTR: snapshot.data![7],
                                 bot: snapshot.data![0].role == "bot",
                                 guest: snapshot.data![0].role == "anon",
+                                averages: rankAverages,
                                 lbPositions: meAmongEveryone
                               ),
                             ),
@@ -433,7 +437,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                               child: _TLRecords(userID: snapshot.data![0].userId, data: snapshot.data![3])
                             ),
                           ],),
-                          _History(states: snapshot.data![2], update: _justUpdate),
+                          _History(chartsData: chartsData, update: _justUpdate),
                           Row(children: [
                             Container(
                               width: MediaQuery.of(context).size.width/2,
@@ -455,10 +459,11 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                             topTR: snapshot.data![7],
                             bot: snapshot.data![0].role == "bot",
                             guest: snapshot.data![0].role == "anon",
+                            averages: rankAverages,
                             lbPositions: meAmongEveryone
                           ),
                           _TLRecords(userID: snapshot.data![0].userId, data: snapshot.data![3]),
-                          _History(states: snapshot.data![2], update: _justUpdate),
+                          _History(chartsData: chartsData, update: _justUpdate),
                           _RecordThingy(record: snapshot.data![1]['sprint'], rank: snapshot.data![0].tlSeason1.percentileRank),
                           _RecordThingy(record: snapshot.data![1]['blitz'], rank: snapshot.data![0].tlSeason1.percentileRank),
                           _OtherThingy(zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6],)
@@ -680,17 +685,17 @@ class _TLRecords extends StatelessWidget {
 }
 
 class _History extends StatelessWidget{
-  final List<TetrioPlayer> states;
+  final List<DropdownMenuItem<List<FlSpot>>> chartsData;
   final Function update;
 
   /// Widget, that can show history of some stat of the player on the graph.
   /// Requires player [states], which is list of states and function [update], which rebuild widgets
-  const _History({required this.states, required this.update});
+  const _History({required this.chartsData, required this.update});
   
   @override
   Widget build(BuildContext context) {
     bool bigScreen = MediaQuery.of(context).size.width > 768;
-    return states.isNotEmpty ? 
+    return chartsData.isNotEmpty ? 
       Column(
         children: [
           DropdownButton(
@@ -701,7 +706,7 @@ class _History extends StatelessWidget{
                   update();
                 }
               ),
-          if(chartsData[_chartsIndex].value!.length > 1) _HistoryChartThigy(data: chartsData[_chartsIndex].value!, yAxisTitle: _historyShortTitles[_chartsIndex], bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? _f2 : NumberFormat.compact(),)
+          if(chartsData[_chartsIndex].value!.length > 1) _HistoryChartThigy(data: chartsData[_chartsIndex].value!, yAxisTitle: _historyShortTitles[_chartsIndex], bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? f2 : NumberFormat.compact(),)
           else Center(child: Text(t.notEnoughData, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)))
         ],
       )
@@ -955,7 +960,7 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
                             hoveredPointId = -1; // not hovering over any point
                           } else {
                             hoveredPointId = touchResponse!.lineBarSpots!.first.spotIndex;
-                            headerTooltip = "${_f4.format(touchResponse.lineBarSpots!.first.y)} ${widget.yAxisTitle}";
+                            headerTooltip = "${f4.format(touchResponse.lineBarSpots!.first.y)} ${widget.yAxisTitle}";
                             footerTooltip = _dateFormat.format(DateTime.fromMillisecondsSinceEpoch(touchResponse.lineBarSpots!.first.x.floor()));
                           }
                           });
