@@ -328,13 +328,29 @@ class UserThingy extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(
-                child: Text(
-                    "${player.country != null ? "${t.countries[player.country]} • " : ""}${t.playerRole[player.role]}${t.playerRoleAccount}${player.registrationTime == null ? t.wasFromBeginning : '${t.created} ${dateFormat.format(player.registrationTime!)}'}${player.botmaster != null ? " ${t.botCreatedBy} ${player.botmaster}" : ""} • ${player.supporterTier == 0 ? t.notSupporter : t.supporter(tier: player.supporterTier)}",
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontFamily: "Eurostile Round",
-                      fontSize: 16,
-                    )),
+                child: RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(text: "", style: const TextStyle(
+                    fontFamily: "Eurostile Round",
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                  children: [
+                    if (player.country != null) TextSpan(text: "${t.countries[player.country]} • "),
+                    TextSpan(text: "${t.playerRole[player.role]}${t.playerRoleAccount}${player.registrationTime == null ? t.wasFromBeginning : '${t.created} ${dateFormat.format(player.registrationTime!)}'}"),
+                    if (player.supporterTier > 0) TextSpan(text: " • "),
+                    if (player.supporterTier > 0) WidgetSpan(child: Icon(player.supporterTier > 1 ? Icons.star : Icons.star_border, color: player.supporterTier > 1 ? Colors.yellowAccent : Colors.white), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic),
+                    if (player.supporterTier > 0) TextSpan(text: player.supporterTier.toString(), style: TextStyle(color: player.supporterTier > 1 ? Colors.yellowAccent : Colors.white))
+                  ]
+                  )
+                ),
+                // Text(
+                //     "${player.country != null ? "${t.countries[player.country]} • " : ""}${t.playerRole[player.role]}${t.playerRoleAccount}${player.registrationTime == null ? t.wasFromBeginning : '${t.created} ${dateFormat.format(player.registrationTime!)}'}${player.botmaster != null ? " ${t.botCreatedBy} ${player.botmaster}" : ""} • ${player.supporterTier == 0 ? t.notSupporter : t.supporter(tier: player.supporterTier)}",
+                //     textAlign: TextAlign.center,
+                //     style: const TextStyle(
+                //       fontFamily: "Eurostile Round",
+                //       fontSize: 16,
+                //     )),
               )
             ],
           ),

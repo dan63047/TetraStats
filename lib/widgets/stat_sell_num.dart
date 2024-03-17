@@ -33,11 +33,11 @@ class StatCellNum extends StatelessWidget {
   Color getStatColor(){
     if (averageStat == null) return Colors.white;
     num percentile = (higherIsBetter ? playerStat / averageStat! : averageStat! / playerStat).abs();
-    if      (percentile > 1.50) return Colors.purpleAccent;
-    else if (percentile > 1.20) return Colors.blueAccent;
-    else if (percentile > 0.90) return Colors.greenAccent;
-    else if (percentile > 0.70) return Colors.yellowAccent;
-    else return Colors.redAccent;
+    if (percentile > 1.50) return Colors.purpleAccent;
+    if (percentile > 1.20) return Colors.blueAccent;
+    if (percentile > 0.90) return Colors.greenAccent;
+    if (percentile > 0.70) return Colors.yellowAccent;
+    return Colors.redAccent;
   }
 
   @override

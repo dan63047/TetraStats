@@ -434,22 +434,23 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                             ),
                             SizedBox(
                               width: 450,
-                              child: _TLRecords(userID: snapshot.data![0].userId, data: snapshot.data![3])
+                              child: _TLRecords(userID: snapshot.data![0].userId, changePlayer: changePlayer, data: snapshot.data![3], wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0)
                             ),
                           ],),
-                          _History(chartsData: chartsData, update: _justUpdate),
-                          Row(children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width/2,
-                              padding: EdgeInsets.only(right: 8),
-                              child: _RecordThingy(record: snapshot.data![1]['sprint'], rank: snapshot.data![0].tlSeason1.percentileRank)
-                            ),
-                            Container(
-                              width: MediaQuery.of(context).size.width/2,
-                              padding: EdgeInsets.only(left: 8),
-                              child: _RecordThingy(record: snapshot.data![1]['blitz'], rank: snapshot.data![0].tlSeason1.percentileRank)
-                            ),
-                          ],),
+                          _History(chartsData: chartsData, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
+                          _TwoRecordsThingy(sprint: snapshot.data![1]['sprint'], blitz: snapshot.data![1]['blitz'], rank: snapshot.data![0].tlSeason1.percentileRank,),
+                          // Row(children: [
+                          //   Container(
+                          //     width: MediaQuery.of(context).size.width/2,
+                          //     padding: EdgeInsets.only(right: 8),
+                          //     child: _RecordThingy(record: snapshot.data![1]['sprint'], rank: snapshot.data![0].tlSeason1.percentileRank)
+                          //   ),
+                          //   Container(
+                          //     width: MediaQuery.of(context).size.width/2,
+                          //     padding: EdgeInsets.only(left: 8),
+                          //     child: _RecordThingy(record: snapshot.data![1]['blitz'], rank: snapshot.data![0].tlSeason1.percentileRank)
+                          //   ),
+                          // ],),
                           _OtherThingy(zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6],)
                         ] : [
                           TLThingy(
@@ -462,8 +463,8 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                             averages: rankAverages,
                             lbPositions: meAmongEveryone
                           ),
-                          _TLRecords(userID: snapshot.data![0].userId, data: snapshot.data![3]),
-                          _History(chartsData: chartsData, update: _justUpdate),
+                          _TLRecords(userID: snapshot.data![0].userId, changePlayer: changePlayer, data: snapshot.data![3], wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
+                          _History(chartsData: chartsData, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
                           _RecordThingy(record: snapshot.data![1]['sprint'], rank: snapshot.data![0].tlSeason1.percentileRank),
                           _RecordThingy(record: snapshot.data![1]['blitz'], rank: snapshot.data![0].tlSeason1.percentileRank),
                           _OtherThingy(zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6],)
@@ -640,15 +641,24 @@ class _NavDrawerState extends State<NavDrawer> {
 
 class _TLRecords extends StatelessWidget {
   final String userID;
+  final Function changePlayer;
   final List<TetraLeagueAlphaRecord> data;
+  final bool wasActiveInTL;
 
   /// Widget, that displays Tetra League records.
   /// Accepts list of TL records ([data]) and [userID] of player from the view
-  const _TLRecords({required this.userID, required this.data});
+  const _TLRecords({required this.userID, required this.changePlayer, required this.data, required this.wasActiveInTL});
 
   @override
   Widget build(BuildContext context) {
-    if (data.isEmpty) return Center(child: Text(t.noRecords, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)));
+    if (data.isEmpty) return Center(child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(t.noRecords, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
+        if (wasActiveInTL) Text("Perhaps, you want to"),
+        if (wasActiveInTL) TextButton(onPressed: (){changePlayer(userID, fetchTLmatches: true);}, child: Text(t.fetchAndSaveOldTLmatches))
+      ],
+    ));
     bool bigScreen = MediaQuery.of(context).size.width >= 768;
     return ListView.builder(
       physics: const AlwaysScrollableScrollPhysics(),
@@ -686,11 +696,14 @@ class _TLRecords extends StatelessWidget {
 
 class _History extends StatelessWidget{
   final List<DropdownMenuItem<List<FlSpot>>> chartsData;
+  final String userID;
   final Function update;
+  final Function changePlayer;
+  final bool wasActiveInTL;
 
   /// Widget, that can show history of some stat of the player on the graph.
   /// Requires player [states], which is list of states and function [update], which rebuild widgets
-  const _History({required this.chartsData, required this.update});
+  const _History({required this.chartsData, required this.userID, required this.changePlayer, required this.update, required this.wasActiveInTL});
   
   @override
   Widget build(BuildContext context) {
@@ -707,10 +720,24 @@ class _History extends StatelessWidget{
                 }
               ),
           if(chartsData[_chartsIndex].value!.length > 1) _HistoryChartThigy(data: chartsData[_chartsIndex].value!, yAxisTitle: _historyShortTitles[_chartsIndex], bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? f2 : NumberFormat.compact(),)
-          else Center(child: Text(t.notEnoughData, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)))
+          else Center(child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(t.notEnoughData, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
+              if (wasActiveInTL) Text("Perhaps, you want"),
+              if (wasActiveInTL)TextButton(onPressed: (){changePlayer(userID, fetchHistory: true);}, child: Text(t.fetchAndsaveTLHistory))
+            ],
+          ))
         ],
       )
-     : Center(child: Text(t.noHistorySaved, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)));
+     : Center(child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(t.noHistorySaved, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
+          if (wasActiveInTL) Text("Perhaps, you want"),
+          if (wasActiveInTL)TextButton(onPressed: (){changePlayer(userID, fetchHistory: true);}, child: Text(t.fetchAndsaveTLHistory))
+        ],
+      ));
   }
 }
 
@@ -987,6 +1014,152 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
           ),
       )
     );
+  }
+}
+
+class _TwoRecordsThingy extends StatelessWidget {
+  final RecordSingle? sprint;
+  final RecordSingle? blitz;
+  final String? rank;
+
+  const _TwoRecordsThingy({required this.sprint, required this.blitz, this.rank});
+
+  Color getColorOfRank(int rank){
+    if (rank == 1) return Colors.yellowAccent;
+    if (rank == 2) return Colors.blueGrey;
+    if (rank == 3) return Colors.brown[400]!;
+    if (rank <= 9) return Colors.blueAccent;
+    if (rank <= 99) return Colors.greenAccent;
+    return Colors.grey;
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    //if (record == null) return Center(child: Text(t.noRecord, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)));
+    late MapEntry closestAverageBlitz;
+    late bool blitzBetterThanClosestAverage;
+    bool? blitzBetterThanRankAverage = (rank != null && rank != "z" && blitz != null) ? blitz!.endContext!.score > blitzAverages[rank]! : null;
+    late MapEntry closestAverageSprint;
+    late bool sprintBetterThanClosestAverage;
+    bool? sprintBetterThanRankAverage = (rank != null && rank != "z" && sprint != null) ? sprint!.endContext!.finalTime < sprintAverages[rank]! : null;
+    if (sprint != null) {
+      closestAverageSprint = sprintAverages.entries.singleWhere((element) => element.value == sprintAverages.values.reduce((a, b) => (a-sprint!.endContext!.finalTime).abs() < (b -sprint!.endContext!.finalTime).abs() ? a : b));
+      sprintBetterThanClosestAverage = sprint!.endContext!.finalTime < closestAverageSprint.value;
+    }
+    if (blitz != null){
+      closestAverageBlitz = blitzAverages.entries.singleWhere((element) => element.value == blitzAverages.values.reduce((a, b) => (a-blitz!.endContext!.score).abs() < (b -blitz!.endContext!.score).abs() ? a : b));
+      blitzBetterThanClosestAverage = blitz!.endContext!.score > closestAverageBlitz.value;
+    }
+    return SingleChildScrollView(child: Padding(
+      padding: const EdgeInsets.only(top: 20.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(padding: EdgeInsets.only(right: 8.0),
+                  child: sprint != null ? Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageSprint.key}.png", height: 96) : Image.asset("res/tetrio_tl_alpha_ranks/z.png", height: 96)
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                    Text(t.sprint, style: TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
+                    RichText(text: TextSpan(
+                        text: sprint != null ? get40lTime(sprint!.endContext!.finalTime.inMicroseconds) : "---",
+                        style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: FontWeight.w500, color: sprint != null ? Colors.white : Colors.grey),
+                        //children: [TextSpan(text: get40lTime(record!.endContext!.finalTime.inMicroseconds), style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
+                        ),
+                      ),
+                    if (sprint != null) RichText(text: TextSpan(
+                      text: "",
+                      style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
+                      children: [
+                        if (rank != null && rank != "z") TextSpan(text: "${readableTimeDifference(sprint!.endContext!.finalTime, sprintAverages[rank]!)} ${sprintBetterThanRankAverage??false ? "better" : "worse"} than ${rank!.toUpperCase()} rank average\n", style: TextStyle(
+                          color: sprintBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
+                        )),
+                        if (sprint!.rank != null) TextSpan(text: "№${sprint!.rank}", style: TextStyle(color: getColorOfRank(sprint!.rank!))),
+                        if (sprint!.rank != null) const TextSpan(text: " • "),
+                        TextSpan(text: _dateFormat.format(sprint!.timestamp!)),
+                      ]
+                      ),
+                    ),
+                  ],),
+                ],
+              ),
+              if (sprint != null) Wrap(
+                  //mainAxisSize: MainAxisSize.max,
+                  alignment: WrapAlignment.spaceBetween,
+                  spacing: 20,
+                  children: [
+                    StatCellNum(playerStat: sprint!.endContext!.piecesPlaced, playerStatLabel: t.statCellNum.pieces, isScreenBig: true, higherIsBetter: true),
+                    StatCellNum(playerStat: sprint!.endContext!.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: true, higherIsBetter: true),
+                    StatCellNum(playerStat: sprint!.endContext!.kps, playerStatLabel: t.statCellNum.kps, fractionDigits: 2, isScreenBig: true, higherIsBetter: true,)
+                  ],
+              ),
+            ]
+          ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                  Text(t.blitz, style: const TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
+                  RichText(
+                    text: TextSpan(
+                      text: "",
+                      style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: FontWeight.w500),
+                      children: [
+                        TextSpan(text: blitz != null ? NumberFormat.decimalPattern().format(blitz!.endContext!.score) : "---"),
+                        //WidgetSpan(child: Image.asset("res/icons/kagari.png", height: 48))
+                      ]
+                      ),
+                    ),
+                  if (blitz != null) RichText(
+                    textAlign: TextAlign.end,
+                    text: TextSpan(
+                    text: "",
+                    style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
+                    children: [
+                      if (rank != null && rank != "z") TextSpan(text: "${readableIntDifference(blitz!.endContext!.score, blitzAverages[rank]!)} ${blitzBetterThanRankAverage??false ? "better" : "worse"} than ${rank!.toUpperCase()} rank average\n", style: TextStyle(
+                        color: blitzBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
+                      )),
+                      TextSpan(text: _dateFormat.format(blitz!.timestamp!)),
+                      if (blitz!.rank != null)  const TextSpan(text: " • "),
+                      if (blitz!.rank != null)  TextSpan(text: "№${blitz!.rank}", style: TextStyle(color: getColorOfRank(blitz!.rank!))),
+                    ]
+                    ),
+                  ),
+                ],),
+                Padding(padding: EdgeInsets.only(left: 8.0),
+                child: blitz != null ? Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageBlitz.key}.png", height: 96) : Image.asset("res/tetrio_tl_alpha_ranks/z.png", height: 96)), 
+              ],
+            ),
+            if (blitz != null) Wrap(
+                //mainAxisSize: MainAxisSize.max,
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.start,
+                spacing: 20,
+                children: [
+                  StatCellNum(playerStat: blitz!.endContext!.level, playerStatLabel: t.statCellNum.level, isScreenBig: true, higherIsBetter: true),
+                  StatCellNum(playerStat: blitz!.endContext!.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: true, higherIsBetter: true),
+                  StatCellNum(playerStat: blitz!.endContext!.spp, playerStatLabel: t.statCellNum.spp, fractionDigits: 2, isScreenBig: true, higherIsBetter: true,)
+                ],
+            ),
+            ],
+          ),
+        ]),
+    ));
   }
 }
 
@@ -1423,60 +1596,80 @@ class _OtherThingy extends StatelessWidget {
     }
   }
 
+  Widget getShit(BuildContext context, bool bigScreen, bool showNewsTitle){
+    return Column(
+      children: [
+        if (distinguishment != null)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 48),
+            child: Column(
+              children: [
+                Text(t.distinguishment, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28), textAlign: TextAlign.center),
+                RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    style: DefaultTextStyle.of(context).style,
+                    children: getDistinguishmentTitle(distinguishment?.header),
+                  ),
+                ),
+                Text(getDistinguishmentSubtitle(distinguishment?.footer), style: const TextStyle(fontSize: 18), textAlign: TextAlign.center),
+              ],
+            ),
+          ),
+        if (bio != null)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 0, 8, 48),
+            child: Column(
+              children: [
+                Text(t.bio, style: TextStyle(fontFamily: "Eurostile Round Extended",fontSize: bigScreen ? 42 : 28)),
+                MarkdownBody(data: bio!, styleSheet: MarkdownStyleSheet(textScaleFactor: 1.5, textAlign: WrapAlignment.center)) // Text(bio!, style: const TextStyle(fontSize: 18)),
+              ],
+            ),
+          ),
+        if (zen != null)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 48),
+            child: Column(
+              children: [
+                Text(t.zen, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                Text("${t.statCellNum.level} ${NumberFormat.decimalPattern().format(zen!.level)}", style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+                Text("${t.statCellNum.score} ${NumberFormat.decimalPattern().format(zen!.score)}", style: const TextStyle(fontSize: 18)),
+              ],
+            ),
+          ),
+        if (newsletter != null && newsletter!.isNotEmpty && showNewsTitle)
+          Text(t.news, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
       bool bigScreen = constraints.maxWidth > 768;
-      return ListView.builder(
+      if (constraints.maxWidth >= 1024){
+        return Row(
+          children: [
+            SizedBox(width: 450, child: getShit(context, true, false)),
+            SizedBox(width: constraints.maxWidth - 450, child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              itemCount: newsletter!.length+1,
+              itemBuilder: (BuildContext context, int index) {
+                return index == 0 ? Center(child: Text(t.news, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42))) : getNewsTile(newsletter![index-1]);
+              }
+            ))
+          ]
+        );
+      }
+      else {
+        return ListView.builder(
         physics: const AlwaysScrollableScrollPhysics(),
         itemCount: newsletter!.length+1,
         itemBuilder: (BuildContext context, int index) {
-          return index == 0 ? Column(
-            children: [
-              if (distinguishment != null)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 48),
-                  child: Column(
-                    children: [
-                      Text(t.distinguishment, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28), textAlign: TextAlign.center),
-                      RichText(
-                        textAlign: TextAlign.center,
-                        text: TextSpan(
-                          style: DefaultTextStyle.of(context).style,
-                          children: getDistinguishmentTitle(distinguishment?.header),
-                        ),
-                      ),
-                      Text(getDistinguishmentSubtitle(distinguishment?.footer), style: const TextStyle(fontSize: 18), textAlign: TextAlign.center),
-                    ],
-                  ),
-                ),
-              if (bio != null)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 48),
-                  child: Column(
-                    children: [
-                      Text(t.bio, style: TextStyle(fontFamily: "Eurostile Round Extended",fontSize: bigScreen ? 42 : 28)),
-                      MarkdownBody(data: bio!, styleSheet: MarkdownStyleSheet(textScaleFactor: 1.5, textAlign: WrapAlignment.center)) // Text(bio!, style: const TextStyle(fontSize: 18)),
-                    ],
-                  ),
-                ),
-              if (zen != null)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 48),
-                  child: Column(
-                    children: [
-                      Text(t.zen, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                      Text("${t.statCellNum.level} ${NumberFormat.decimalPattern().format(zen!.level)}", style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-                      Text("${t.statCellNum.score} ${NumberFormat.decimalPattern().format(zen!.score)}", style: const TextStyle(fontSize: 18)),
-                    ],
-                  ),
-                ),
-              if (newsletter != null && newsletter!.isNotEmpty)
-                Text(t.news, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-            ],
-          ) : getNewsTile(newsletter![index-1]);          
+          return index == 0 ? getShit(context, bigScreen, true) : getNewsTile(newsletter![index-1]);          
         },
       );
+      }
     });
   }
 }
