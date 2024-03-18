@@ -308,7 +308,7 @@ class _TLThingyState extends State<TLThingy> {
                           RichText(
                             text: TextSpan(
                               text: intf.format(currentTl.estTr!.esttr.truncate()),
-                              style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: FontWeight.w500),
+                              style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: FontWeight.w500, color: Colors.white),
                               children: [TextSpan(text: fractionfEstTR.format(currentTl.estTr!.esttr - currentTl.estTr!.esttr.truncate()).substring(1), style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
                               ),
                             ),
@@ -334,7 +334,7 @@ class _TLThingyState extends State<TLThingy> {
                           RichText(
                             text: TextSpan(
                               text: (currentTl.esttracc != null && currentTl.bestRank != "z") ? intFDiff.format(currentTl.esttracc!.truncate()) : "---",
-                              style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 36, fontWeight: FontWeight.w500),
+                              style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 36, fontWeight: FontWeight.w500, color: Colors.white),
                               children: [
                                 TextSpan(text: (currentTl.esttracc != null && currentTl.bestRank != "z") ? fractionfEstTRAcc.format(currentTl.esttracc!.isNegative ? 1 - (currentTl.esttracc! - currentTl.esttracc!.truncate()) : (currentTl.esttracc! - currentTl.esttracc!.truncate())).substring(1) : ".---", style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))
                               ]

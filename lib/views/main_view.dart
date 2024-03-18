@@ -21,6 +21,8 @@ import 'package:tetra_stats/utils/text_shadow.dart';
 import 'package:tetra_stats/views/ranks_averages_view.dart' show RankAveragesView;
 import 'package:tetra_stats/views/tl_leaderboard_view.dart' show TLLeaderboardView;
 import 'package:tetra_stats/views/tl_match_view.dart' show TlMatchResultView;
+import 'package:tetra_stats/widgets/finesse_thingy.dart';
+import 'package:tetra_stats/widgets/lineclears_thingy.dart';
 import 'package:tetra_stats/widgets/list_tile_trailing_stats.dart';
 import 'package:tetra_stats/widgets/search_box.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
@@ -437,7 +439,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                               child: _TLRecords(userID: snapshot.data![0].userId, changePlayer: changePlayer, data: snapshot.data![3], wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0)
                             ),
                           ],),
-                          _History(chartsData: chartsData, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
+                          _History(chartsData: chartsData, states: snapshot.data![2], changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
                           _TwoRecordsThingy(sprint: snapshot.data![1]['sprint'], blitz: snapshot.data![1]['blitz'], rank: snapshot.data![0].tlSeason1.percentileRank,),
                           // Row(children: [
                           //   Container(
@@ -464,7 +466,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                             lbPositions: meAmongEveryone
                           ),
                           _TLRecords(userID: snapshot.data![0].userId, changePlayer: changePlayer, data: snapshot.data![3], wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
-                          _History(chartsData: chartsData, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
+                          _History(chartsData: chartsData, states: snapshot.data![2], changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
                           _RecordThingy(record: snapshot.data![1]['sprint'], rank: snapshot.data![0].tlSeason1.percentileRank),
                           _RecordThingy(record: snapshot.data![1]['blitz'], rank: snapshot.data![0].tlSeason1.percentileRank),
                           _OtherThingy(zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6],)
@@ -696,6 +698,7 @@ class _TLRecords extends StatelessWidget {
 
 class _History extends StatelessWidget{
   final List<DropdownMenuItem<List<FlSpot>>> chartsData;
+  final List<TetrioPlayer> states;
   final String userID;
   final Function update;
   final Function changePlayer;
@@ -703,7 +706,7 @@ class _History extends StatelessWidget{
 
   /// Widget, that can show history of some stat of the player on the graph.
   /// Requires player [states], which is list of states and function [update], which rebuild widgets
-  const _History({required this.chartsData, required this.userID, required this.changePlayer, required this.update, required this.wasActiveInTL});
+  const _History({required this.chartsData, required this.states, required this.userID, required this.changePlayer, required this.update, required this.wasActiveInTL});
   
   @override
   Widget build(BuildContext context) {
@@ -1017,6 +1020,23 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
   }
 }
 
+class _HistoryTableThingy extends StatelessWidget{
+  final List<TetrioPlayer> states;
+
+  const _HistoryTableThingy(this.states);
+  // :tf:
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (context, constraints){
+      return SingleChildScrollView(child: Table(
+        children: [
+          TableRow(children: [Text("Date & Time"), Text("Tr")]),
+        ],
+      ));
+    });
+  }
+}
+
 class _TwoRecordsThingy extends StatelessWidget {
   final RecordSingle? sprint;
   final RecordSingle? blitz;
@@ -1081,6 +1101,9 @@ class _TwoRecordsThingy extends StatelessWidget {
                       children: [
                         if (rank != null && rank != "z") TextSpan(text: "${readableTimeDifference(sprint!.endContext!.finalTime, sprintAverages[rank]!)} ${sprintBetterThanRankAverage??false ? "better" : "worse"} than ${rank!.toUpperCase()} rank average\n", style: TextStyle(
                           color: sprintBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
+                        ))
+                        else TextSpan(text: "${readableTimeDifference(sprint!.endContext!.finalTime, closestAverageSprint.value)} ${sprintBetterThanClosestAverage ? "better" : "worse"} than ${closestAverageSprint.key.toUpperCase()} rank average\n", style: TextStyle(
+                          color: sprintBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
                         )),
                         if (sprint!.rank != null) TextSpan(text: "№${sprint!.rank}", style: TextStyle(color: getColorOfRank(sprint!.rank!))),
                         if (sprint!.rank != null) const TextSpan(text: " • "),
@@ -1096,17 +1119,20 @@ class _TwoRecordsThingy extends StatelessWidget {
                   alignment: WrapAlignment.spaceBetween,
                   spacing: 20,
                   children: [
-                    StatCellNum(playerStat: sprint!.endContext!.piecesPlaced, playerStatLabel: t.statCellNum.pieces, isScreenBig: true, higherIsBetter: true),
-                    StatCellNum(playerStat: sprint!.endContext!.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: true, higherIsBetter: true),
-                    StatCellNum(playerStat: sprint!.endContext!.kps, playerStatLabel: t.statCellNum.kps, fractionDigits: 2, isScreenBig: true, higherIsBetter: true,)
+                    StatCellNum(playerStat: sprint!.endContext!.piecesPlaced, playerStatLabel: t.statCellNum.pieces, isScreenBig: true, higherIsBetter: true, smallDecimal: false),
+                    StatCellNum(playerStat: sprint!.endContext!.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: true, higherIsBetter: true, smallDecimal: false),
+                    StatCellNum(playerStat: sprint!.endContext!.kpp, playerStatLabel: t.statCellNum.kpp, fractionDigits: 2, isScreenBig: true, higherIsBetter: true, smallDecimal: false),
                   ],
               ),
+              if (sprint != null) FinesseThingy(sprint?.endContext?.finesse, sprint?.endContext?.finessePercentage),
+              if (sprint != null) LineclearsThingy(sprint!.endContext!.clears, sprint!.endContext!.lines, sprint!.endContext!.holds, sprint!.endContext!.tSpins),
+              if (sprint != null) Text("${sprint!.endContext!.inputs} KP • ${f2.format(sprint!.endContext!.kps)} KpS")
             ]
           ),
           Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Row(
               mainAxisSize: MainAxisSize.min,
@@ -1133,6 +1159,9 @@ class _TwoRecordsThingy extends StatelessWidget {
                     children: [
                       if (rank != null && rank != "z") TextSpan(text: "${readableIntDifference(blitz!.endContext!.score, blitzAverages[rank]!)} ${blitzBetterThanRankAverage??false ? "better" : "worse"} than ${rank!.toUpperCase()} rank average\n", style: TextStyle(
                         color: blitzBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
+                      ))
+                      else TextSpan(text: "${readableIntDifference(blitz!.endContext!.score, closestAverageBlitz.value)} ${blitzBetterThanClosestAverage ? "better" : "worse"} than ${closestAverageBlitz.key!.toUpperCase()} rank average\n", style: TextStyle(
+                        color: blitzBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
                       )),
                       TextSpan(text: _dateFormat.format(blitz!.timestamp!)),
                       if (blitz!.rank != null)  const TextSpan(text: " • "),
@@ -1151,11 +1180,14 @@ class _TwoRecordsThingy extends StatelessWidget {
                 crossAxisAlignment: WrapCrossAlignment.start,
                 spacing: 20,
                 children: [
-                  StatCellNum(playerStat: blitz!.endContext!.level, playerStatLabel: t.statCellNum.level, isScreenBig: true, higherIsBetter: true),
-                  StatCellNum(playerStat: blitz!.endContext!.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: true, higherIsBetter: true),
-                  StatCellNum(playerStat: blitz!.endContext!.spp, playerStatLabel: t.statCellNum.spp, fractionDigits: 2, isScreenBig: true, higherIsBetter: true,)
+                  StatCellNum(playerStat: blitz!.endContext!.level, playerStatLabel: t.statCellNum.level, isScreenBig: true, higherIsBetter: true, smallDecimal: false),
+                  StatCellNum(playerStat: blitz!.endContext!.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: true, higherIsBetter: true, smallDecimal: false),
+                  StatCellNum(playerStat: blitz!.endContext!.spp, playerStatLabel: t.statCellNum.spp, fractionDigits: 2, isScreenBig: true, higherIsBetter: true)
                 ],
             ),
+            if (blitz != null) FinesseThingy(blitz?.endContext?.finesse, blitz?.endContext?.finessePercentage),
+            if (blitz != null) LineclearsThingy(blitz!.endContext!.clears, blitz!.endContext!.lines, blitz!.endContext!.holds, blitz!.endContext!.tSpins),
+            if (blitz != null) Text("${blitz!.endContext!.piecesPlaced} P • ${blitz!.endContext!.inputs} KP • ${f2.format(blitz!.endContext!.kpp)} KpP • ${f2.format(blitz!.endContext!.kps)} KpS")
             ],
           ),
         ]),
@@ -1169,6 +1201,15 @@ class _RecordThingy extends StatelessWidget {
 
   /// Widget that displays data from [record]
   const _RecordThingy({required this.record, this.rank});
+
+  Color getColorOfRank(int rank){
+    if (rank == 1) return Colors.yellowAccent;
+    if (rank == 2) return Colors.blueGrey;
+    if (rank == 3) return Colors.brown[400]!;
+    if (rank <= 9) return Colors.blueAccent;
+    if (rank <= 99) return Colors.greenAccent;
+    return Colors.grey;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1186,219 +1227,89 @@ class _RecordThingy extends StatelessWidget {
       closestAverageBlitz = blitzAverages.entries.singleWhere((element) => element.value == blitzAverages.values.reduce((a, b) => (a-record!.endContext!.score).abs() < (b -record!.endContext!.score).abs() ? a : b));
       blitzBetterThanClosestAverage = record!.endContext!.score > closestAverageBlitz.value;
     }
-    return LayoutBuilder(builder: (context, constraints) {
-      bool bigScreen = constraints.maxWidth > 768;
-      return ListView.builder(
-          physics: const AlwaysScrollableScrollPhysics(),
-          itemCount: 1,
-          itemBuilder: (BuildContext context, int index) {
-            return Column(
+    
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        bool bigScreen = constraints.maxWidth > 768;
+        return SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                // show mode title
-                if (record!.stream.contains("40l")) Text(t.sprint, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
-                else if (record!.stream.contains("blitz")) Text(t.blitz, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                
-                // show main metric
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  textBaseline: TextBaseline.alphabetic,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Show grade based on closest rank average
-                    if (record!.stream.contains("40l")) Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageSprint.key}.png", height: 48)
-                    else if (record!.stream.contains("blitz")) Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageBlitz.key}.png", height: 48),
-                    
-                    // Show result
-                    if (record!.stream.contains("40l")) Text(get40lTime(record!.endContext!.finalTime.inMicroseconds), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
-                    else if (record!.stream.contains("blitz")) Text(NumberFormat.decimalPattern().format(record!.endContext!.score), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                    if (record!.stream.contains("40l")) Padding(padding: EdgeInsets.only(right: 8.0),
+                    child: Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageSprint.key}.png", height: 96)
+                    ),
+                    if (record!.stream.contains("blitz")) Padding(padding: EdgeInsets.only(right: 8.0),
+                    child: Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageBlitz.key}.png", height: 96)
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                      if (record!.stream.contains("40l")) Text(t.sprint, style: TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
+                      if (record!.stream.contains("blitz")) Text(t.blitz, style: TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
+                      RichText(text: TextSpan(
+                          text: record!.stream.contains("40l") ? get40lTime(record!.endContext!.finalTime.inMicroseconds) : NumberFormat.decimalPattern().format(record!.endContext!.score),
+                          style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 36 : 32, fontWeight: FontWeight.w500, color: Colors.white),
+                          ),
+                        ),
+                      RichText(text: TextSpan(
+                        text: "",
+                        style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
+                        children: [
+                          if (record!.stream.contains("40l") && (rank != null && rank != "z")) TextSpan(text: "${readableTimeDifference(record!.endContext!.finalTime, sprintAverages[rank]!)} ${sprintBetterThanRankAverage??false ? "better" : "worse"} than ${rank!.toUpperCase()} rank average\n", style: TextStyle(
+                            color: sprintBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
+                          ))
+                          else if (record!.stream.contains("40l") && (rank == null || rank == "z")) TextSpan(text: "${readableTimeDifference(record!.endContext!.finalTime, closestAverageSprint.value)} ${sprintBetterThanClosestAverage ? "better" : "worse"} than ${closestAverageSprint.key.toUpperCase()} rank average\n", style: TextStyle(
+                            color: sprintBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
+                          ))
+                          else if (record!.stream.contains("blitz") && (rank != null && rank != "z")) TextSpan(text: "${readableIntDifference(record!.endContext!.score, blitzAverages[rank]!)} ${blitzBetterThanRankAverage??false ? "better" : "worse"} than ${rank!.toUpperCase()} rank average\n", style: TextStyle(
+                            color: blitzBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
+                          ))
+                          else if (record!.stream.contains("blitz") && (rank == null || rank == "z")) TextSpan(text: "${readableIntDifference(record!.endContext!.score, closestAverageBlitz.value)} ${blitzBetterThanClosestAverage ? "better" : "worse"} than ${closestAverageBlitz.key!.toUpperCase()} rank average\n", style: TextStyle(
+                            color: blitzBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
+                          )),
+                          if (record!.rank != null) TextSpan(text: "№${record!.rank}", style: TextStyle(color: getColorOfRank(record!.rank!))),
+                          if (record!.rank != null) const TextSpan(text: " • "),
+                          TextSpan(text: _dateFormat.format(record!.timestamp!)),
+                        ]
+                        ),
+                      )
+                    ],),
                   ],
                 ),
-                
-                // Show difference between rank average
-                if (record!.stream.contains("40l") && (rank != null && rank != "z")) Text(
-                  "${readableTimeDifference(record!.endContext!.finalTime, sprintAverages[rank]!)} ${sprintBetterThanRankAverage??false ? "better" : "worse"} than ${rank!.toUpperCase()} rank average",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: sprintBetterThanRankAverage??false ?
-                    Colors.greenAccent :
-                    Colors.redAccent
-                  )
-                )
-                else if (record!.stream.contains("40l") && (rank == null || rank == "z")) Text(
-                  "${readableTimeDifference(record!.endContext!.finalTime, closestAverageSprint.value)} ${sprintBetterThanClosestAverage ? "better" : "worse"} than ${closestAverageSprint.key!.toUpperCase()} rank average",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: sprintBetterThanClosestAverage ?
-                    Colors.greenAccent :
-                    Colors.redAccent
-                  )
-                )
-                else if (record!.stream.contains("blitz") && (rank != null && rank != "z")) Text(
-                  "${readableIntDifference(record!.endContext!.score, blitzAverages[rank]!)} ${blitzBetterThanRankAverage??false ? "better" : "worse"} than ${rank!.toUpperCase()} rank average",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: blitzBetterThanRankAverage??false ?
-                    Colors.greenAccent :
-                    Colors.redAccent
-                  )
-                )
-                else if (record!.stream.contains("blitz") && (rank == null || rank == "z")) Text(
-                  "${readableIntDifference(record!.endContext!.score, closestAverageBlitz.value)} ${blitzBetterThanClosestAverage ? "better" : "worse"} than ${closestAverageBlitz.key!.toUpperCase()} rank average",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: blitzBetterThanClosestAverage ?
-                    Colors.greenAccent :
-                    Colors.redAccent
-                  )
-                ),
-                
-                // Show rank if presented
-                if (record!.rank != null) StatCellNum(playerStat: record!.rank!, playerStatLabel: "Leaderboard Placement", isScreenBig: bigScreen, higherIsBetter: false),
-                
-                // Show when this record was obtained
-                Text(t.obtainDate(date: _dateFormat.format(record!.timestamp!)), textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 16)),
-                
-                // Show metrics
-                Padding(padding: const EdgeInsets.fromLTRB(0, 48, 0, 48),
-                  child: Wrap(
-                    direction: Axis.horizontal,
-                    alignment: WrapAlignment.spaceAround,
-                    crossAxisAlignment: WrapCrossAlignment.start,
-                    clipBehavior: Clip.hardEdge,
-                    spacing: 25,
+                if (record!.stream.contains("40l")) Wrap(
+                    alignment: WrapAlignment.spaceBetween,
+                    spacing: 20,
                     children: [
-                      if (record!.stream.contains("blitz")) StatCellNum(playerStat: record!.endContext!.level, playerStatLabel: t.statCellNum.level, isScreenBig: bigScreen, higherIsBetter: true),
-                      if (record!.stream.contains("blitz")) StatCellNum(playerStat: record!.endContext!.spp, playerStatLabel: t.statCellNum.spp, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true),
-                      StatCellNum(playerStat: record!.endContext!.piecesPlaced, playerStatLabel: t.statCellNum.pieces, isScreenBig: bigScreen, higherIsBetter: true),
-                      StatCellNum(playerStat: record!.endContext!.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true),
-                      if (record!.endContext!.finesse != null) StatCellNum(playerStat: record!.endContext!.finesse!.faults, playerStatLabel: t.statCellNum.finesseFaults, isScreenBig: bigScreen, higherIsBetter: false),
-                      if (record!.endContext!.finesse != null) StatCellNum(playerStat: record!.endContext!.finessePercentage * 100, playerStatLabel: t.statCellNum.finessePercentage, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true),
-                      StatCellNum(playerStat: record!.endContext!.inputs, playerStatLabel: t.statCellNum.keys, isScreenBig: bigScreen, higherIsBetter: false),
-                      StatCellNum(playerStat: record!.endContext!.kpp, playerStatLabel: t.statCellNum.kpp, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: false),
-                      StatCellNum(playerStat: record!.endContext!.kps, playerStatLabel: t.statCellNum.kps, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true,),
+                      StatCellNum(playerStat: record!.endContext!.piecesPlaced, playerStatLabel: t.statCellNum.pieces, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
+                      StatCellNum(playerStat: record!.endContext!.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
+                      StatCellNum(playerStat: record!.endContext!.kpp, playerStatLabel: t.statCellNum.kpp, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
                     ],
-                  ),
                 ),
-
-                // List of actions
-                Padding(padding: const EdgeInsets.fromLTRB(0, 16, 0, 48),
-                  child: Container(width: bigScreen ? MediaQuery.of(context).size.width * 0.4 : MediaQuery.of(context).size.width * 0.85,
-                  constraints: BoxConstraints(maxWidth: 452),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("${t.numOfGameActions.pc}:", style: const TextStyle(fontSize: 24)),
-                            Text(record!.endContext!.clears.allClears.toString(), style: const TextStyle(fontSize: 24)),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("${t.numOfGameActions.hold}:", style: const TextStyle(fontSize: 24)),
-                            Text(record!.endContext!.holds.toString(), style: const TextStyle(fontSize: 24)),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("${t.numOfGameActions.tspinsTotal}:", style: const TextStyle(fontSize: 24)),
-                            Text(record!.endContext!.tSpins.toString(), style: const TextStyle(fontSize: 24)),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(" - T-spin zero:", style: TextStyle(fontSize: 18)),
-                            Text(record!.endContext!.clears.tSpinZeros.toString(), style: const TextStyle(fontSize: 18)),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(" - T-spin singles:", style: TextStyle(fontSize: 18)),
-                            Text(record!.endContext!.clears.tSpinSingles.toString(), style: const TextStyle(fontSize: 18)),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(" - T-spin doubles:", style: TextStyle(fontSize: 18)),
-                            Text(record!.endContext!.clears.tSpinDoubles.toString(), style: const TextStyle(fontSize: 18)),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(" - T-spin triples:", style: TextStyle(fontSize: 18)),
-                            Text(record!.endContext!.clears.tSpinTriples.toString(), style: const TextStyle(fontSize: 18)),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(" - T-spin mini zero:", style: TextStyle(fontSize: 18)),
-                            Text(record!.endContext!.clears.tSpinMiniZeros.toString(), style: const TextStyle(fontSize: 18)),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(" - T-spin mini singles:", style: TextStyle(fontSize: 18)),
-                            Text(record!.endContext!.clears.tSpinMiniSingles.toString(), style: const TextStyle(fontSize: 18)),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(" - T-spin mini doubles:", style: TextStyle(fontSize: 18)),
-                            Text(record!.endContext!.clears.tSpinMiniDoubles.toString(), style: const TextStyle(fontSize: 18)),
-                          ],
-                        ),
-                        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("${t.numOfGameActions.lineClears}:", style: const TextStyle(fontSize: 24)),
-                            Text(record!.endContext!.lines.toString(), style: const TextStyle(fontSize: 24)),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(" - Singles:", style: TextStyle(fontSize: 18)),
-                            Text(record!.endContext!.clears.singles.toString(), style: const TextStyle(fontSize: 18)),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(" - Doubles:", style: TextStyle(fontSize: 18)),
-                            Text(record!.endContext!.clears.doubles.toString(), style: const TextStyle(fontSize: 18)),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(" - Triples:", style: TextStyle(fontSize: 18)),
-                            Text(record!.endContext!.clears.triples.toString(), style: const TextStyle(fontSize: 18)),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(" - Quads:", style: TextStyle(fontSize: 18)),
-                            Text(record!.endContext!.clears.quads.toString(), style: const TextStyle(fontSize: 18)),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
+                if (record!.stream.contains("blitz")) Wrap(
+                    alignment: WrapAlignment.spaceBetween,
+                    crossAxisAlignment: WrapCrossAlignment.start,
+                    spacing: 20,
+                    children: [
+                      StatCellNum(playerStat: record!.endContext!.level, playerStatLabel: t.statCellNum.level, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
+                      StatCellNum(playerStat: record!.endContext!.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
+                      StatCellNum(playerStat: record!.endContext!.spp, playerStatLabel: t.statCellNum.spp, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true)
+                    ],
                 ),
+                FinesseThingy(record?.endContext?.finesse, record?.endContext?.finessePercentage),
+                LineclearsThingy(record!.endContext!.clears, record!.endContext!.lines, record!.endContext!.holds, record!.endContext!.tSpins),
+                if (record!.stream.contains("40l")) Text("${record!.endContext!.inputs} KP • ${f2.format(record!.endContext!.kps)} KpS"),
+                if (record!.stream.contains("blitz")) Text("${record!.endContext!.piecesPlaced} P • ${record!.endContext!.inputs} KP • ${f2.format(record!.endContext!.kpp)} KpP • ${f2.format(record!.endContext!.kps)} KpS")
               ]
-            );
-          });
-    });
+            ),
+          ),
+        );
+      }
+    );
   }
 }
 

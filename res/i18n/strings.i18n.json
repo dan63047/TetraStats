@@ -238,8 +238,30 @@
     "numOfGameActions":{
         "pc": "All Clears",
         "hold": "Holds",
-        "tspinsTotal": "T-spins total",
-        "lineClears": "Line clears"
+        "inputs": {
+            "zero": "$n key presses",
+            "one": "$n key press",
+            "two": "$n key presses",
+            "few": "$n key presses",
+            "many": "$n key presses",
+            "other": "$n key presses"
+        },
+        "tspinsTotal": {
+            "zero": "$n T-spins total",
+            "one": "$n T-spin total",
+            "two": "$n T-spins total",
+            "few": "$n T-spins total",
+            "many": "$n T-spins total",
+            "other": "$n T-spins total"
+        },
+        "lineClears": {
+            "zero": "$n lines cleared",
+            "one": "$n line cleared",
+            "two": "$n lines cleared",
+            "few": "$n lines cleared",
+            "many": "$n lines cleared",
+            "other": "$n lines cleared"
+        }
     },
     "popupActions":{
         "cancel": "Cancel",

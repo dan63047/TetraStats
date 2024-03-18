@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 1018 (509 per locale)
+/// Strings: 1050 (525 per locale)
 ///
-/// Built on 2024-02-08 at 20:30 UTC
+/// Built on 2024-03-18 at 17:41 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -675,8 +675,30 @@ class _StringsNumOfGameActionsEn {
 	// Translations
 	String get pc => 'All Clears';
 	String get hold => 'Holds';
-	String get tspinsTotal => 'T-spins total';
-	String get lineClears => 'Line clears';
+	String inputs({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		zero: '${n} key presses',
+		one: '${n} key press',
+		two: '${n} key presses',
+		few: '${n} key presses',
+		many: '${n} key presses',
+		other: '${n} key presses',
+	);
+	String tspinsTotal({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		zero: '${n} T-spins total',
+		one: '${n} T-spin total',
+		two: '${n} T-spins total',
+		few: '${n} T-spins total',
+		many: '${n} T-spins total',
+		other: '${n} T-spins total',
+	);
+	String lineClears({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		zero: '${n} lines cleared',
+		one: '${n} line cleared',
+		two: '${n} lines cleared',
+		few: '${n} lines cleared',
+		many: '${n} lines cleared',
+		other: '${n} lines cleared',
+	);
 }
 
 // Path: popupActions
@@ -1268,8 +1290,30 @@ class _StringsNumOfGameActionsRu implements _StringsNumOfGameActionsEn {
 	// Translations
 	@override String get pc => 'Все чисто';
 	@override String get hold => 'В запас';
-	@override String get tspinsTotal => 'T-spins всего';
-	@override String get lineClears => 'Линий очищено';
+	@override String inputs({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
+		zero: '${n} нажатий клавиш',
+		one: '${n} нажатие на клавишу',
+		two: '${n} нажатия на клавишы',
+		few: '${n} нажатия на клавишы',
+		many: '${n} нажатий на клавиш',
+		other: '${n} нажатий на клавиш',
+	);
+	@override String tspinsTotal({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
+		zero: '${n} T-спинов всего',
+		one: 'всего ${n} T-спин',
+		two: '${n} T-спина всего',
+		few: '${n} T-спина всего',
+		many: '${n} T-спинов всего',
+		other: '${n} T-спинов всего',
+	);
+	@override String lineClears({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
+		zero: '${n} линий очищено',
+		one: '${n} линия очищена',
+		two: '${n} линии очищено',
+		few: '${n} линии очищено',
+		many: '${n} линий очищено',
+		other: '${n} линий очищено',
+	);
 }
 
 // Path: popupActions
@@ -1546,8 +1590,30 @@ extension on Translations {
 			case 'playerRole.anon': return 'Anonymous';
 			case 'numOfGameActions.pc': return 'All Clears';
 			case 'numOfGameActions.hold': return 'Holds';
-			case 'numOfGameActions.tspinsTotal': return 'T-spins total';
-			case 'numOfGameActions.lineClears': return 'Line clears';
+			case 'numOfGameActions.inputs': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+				zero: '${n} key presses',
+				one: '${n} key press',
+				two: '${n} key presses',
+				few: '${n} key presses',
+				many: '${n} key presses',
+				other: '${n} key presses',
+			);
+			case 'numOfGameActions.tspinsTotal': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+				zero: '${n} T-spins total',
+				one: '${n} T-spin total',
+				two: '${n} T-spins total',
+				few: '${n} T-spins total',
+				many: '${n} T-spins total',
+				other: '${n} T-spins total',
+			);
+			case 'numOfGameActions.lineClears': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+				zero: '${n} lines cleared',
+				one: '${n} line cleared',
+				two: '${n} lines cleared',
+				few: '${n} lines cleared',
+				many: '${n} lines cleared',
+				other: '${n} lines cleared',
+			);
 			case 'popupActions.cancel': return 'Cancel';
 			case 'popupActions.submit': return 'Submit';
 			case 'popupActions.ok': return 'OK';
@@ -2065,8 +2131,30 @@ extension on _StringsRu {
 			case 'playerRole.anon': return 'Аноним';
 			case 'numOfGameActions.pc': return 'Все чисто';
 			case 'numOfGameActions.hold': return 'В запас';
-			case 'numOfGameActions.tspinsTotal': return 'T-spins всего';
-			case 'numOfGameActions.lineClears': return 'Линий очищено';
+			case 'numOfGameActions.inputs': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
+				zero: '${n} нажатий клавиш',
+				one: '${n} нажатие на клавишу',
+				two: '${n} нажатия на клавишы',
+				few: '${n} нажатия на клавишы',
+				many: '${n} нажатий на клавиш',
+				other: '${n} нажатий на клавиш',
+			);
+			case 'numOfGameActions.tspinsTotal': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
+				zero: '${n} T-спинов всего',
+				one: 'всего ${n} T-спин',
+				two: '${n} T-спина всего',
+				few: '${n} T-спина всего',
+				many: '${n} T-спинов всего',
+				other: '${n} T-спинов всего',
+			);
+			case 'numOfGameActions.lineClears': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
+				zero: '${n} линий очищено',
+				one: '${n} линия очищена',
+				two: '${n} линии очищено',
+				few: '${n} линии очищено',
+				many: '${n} линий очищено',
+				other: '${n} линий очищено',
+			);
 			case 'popupActions.cancel': return 'Отменить';
 			case 'popupActions.submit': return 'Подтвердить';
 			case 'popupActions.ok': return 'OK';
