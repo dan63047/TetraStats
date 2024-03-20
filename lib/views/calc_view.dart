@@ -69,7 +69,7 @@ class CalcState extends State<CalcView> {
       body: SafeArea(
         child: Center(
           child: Container(
-            constraints: BoxConstraints(maxWidth: 768),
+            constraints: const BoxConstraints(maxWidth: 768),
             child: NestedScrollView(
                 controller: _scrollController,
                 headerSliverBuilder: (context, value) {

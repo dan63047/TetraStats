@@ -34,6 +34,7 @@ import 'package:go_router/go_router.dart';
 
 final TetrioService teto = TetrioService(); // thing, that manadge our local DB
 int _chartsIndex = 0;
+bool _showHistoryAsTable = false;
 List _historyShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR", "Opener", "Plonk", "Inf. DS", "Stride"];
 late ScrollController _scrollController;
 final NumberFormat _timeInSec = NumberFormat("#,###.###s.", LocaleSettings.currentLocale.languageCode);
@@ -84,8 +85,10 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   String _titleNickname = "dan63047";
     /// Each dropdown menu item contains list of dots for the graph
   var chartsData = <DropdownMenuItem<List<FlSpot>>>[];
+  //var tableData = <TableRow>[];
   final bodyGlobalKey = GlobalKey();
   bool _showSearchBar = false;
+  bool _TLHistoryWasFetched = false;
   late TabController _tabController;
   late TabController _wideScreenTabController;
   late bool fixedScroll;
@@ -143,6 +146,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   /// If at least one request to Tetra Channel API fails, whole function will throw an exception.
   Future<List> fetch(String nickOrID, {bool fetchHistory = false, bool fetchTLmatches = false}) async {
     TetrioPlayer me;
+    _TLHistoryWasFetched = false;
     
     // If user trying to search with discord id
     if (nickOrID.startsWith("ds:")){
@@ -211,8 +215,11 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
         if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.p1nkl0bst3rinternal)));
       }on P1nkl0bst3rTooManyRequests{
         if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.p1nkl0bst3rTooManyRequests)));
+      }finally{
+        _TLHistoryWasFetched = true;
       }
-    } 
+    }
+    if (storedRecords.isNotEmpty) _TLHistoryWasFetched = true;
     for (var match in storedRecords) {
       // add stored match to list only if it missing from retrived ones
       if (!tlMatches.contains(match)) tlMatches.add(match);
@@ -246,6 +253,11 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       if (uniqueTL.isEmpty) uniqueTL.add(element.tlSeason1);
     }
     // Also i need previous Tetra League State for comparison if avaliable
+    // tableData = [
+    //     TableRow(children: [                          Text("Date & Time"),                                Text("Tr"),                              Text("Glicko"),                          Text("RD"),                          Text("GP"),                                   Text("GW"),                                Text("APM"),                          Text("PPS"),                          Text("VS"),                          Text("APP"),                                     Text("VS/APM"),                                    Text("DS/S"),                                    Text("DS/P"),                                    Text("APP+DS/P"),                                 Text("Cheese"),                                     Text("GbE"),                                     Text("wAPP"),                                       Text("Area"),                                     Text("eTR"),                                   Text("±eTR"),                              Text("Opener"),                                     Text("Plonk"),                                     Text("Inf. DS"),                                   Text("Stride")],
+    //     decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white)))),
+    //     for (var state in states) TableRow(children: [Text(dateFormat.format(state.tlSeason1.timestamp)), Text(f4.format(state.tlSeason1.rating)), Text(f4.format(state.tlSeason1.glicko)), Text(f4.format(state.tlSeason1.rd)), Text(f0.format(state.tlSeason1.gamesPlayed)), Text(f0.format(state.tlSeason1.gamesWon)), Text(f2.format(state.tlSeason1.apm)), Text(f2.format(state.tlSeason1.pps)), Text(state.tlSeason1.vs != null ? f2.format(state.tlSeason1.vs) : "---"), Text(state.tlSeason1.nerdStats != null ? f4.format(state.tlSeason1.nerdStats?.app) : "---"), Text(state.tlSeason1.nerdStats != null ? f4.format(state.tlSeason1.nerdStats?.vsapm) : "---"), Text(state.tlSeason1.nerdStats != null ? f4.format(state.tlSeason1.nerdStats?.dss) : "---"), Text(state.tlSeason1.nerdStats != null ? f4.format(state.tlSeason1.nerdStats?.dsp) : "---"), Text(state.tlSeason1.nerdStats != null ? f4.format(state.tlSeason1.nerdStats?.appdsp) : "---"), Text(state.tlSeason1.nerdStats != null ? f4.format(state.tlSeason1.nerdStats?.cheese) : "---"), Text(state.tlSeason1.nerdStats != null ? f4.format(state.tlSeason1.nerdStats?.gbe) : "---"), Text(state.tlSeason1.nerdStats != null ? f4.format(state.tlSeason1.nerdStats?.nyaapp) : "---"), Text(state.tlSeason1.nerdStats != null ? f4.format(state.tlSeason1.nerdStats?.area) : "---"), Text(state.tlSeason1.estTr != null ? f4.format(state.tlSeason1.estTr?.esttr) : "---"), Text(state.tlSeason1.esttracc != null ? f4.format(state.tlSeason1.esttracc) : "---"), Text(state.tlSeason1.playstyle != null ? f4.format(state.tlSeason1.playstyle?.opener) : "---"), Text(state.tlSeason1.playstyle != null ? f4.format(state.tlSeason1.playstyle?.plonk) : "---"), Text(state.tlSeason1.playstyle != null ? f4.format(state.tlSeason1.playstyle?.infds) : "---"), Text(state.tlSeason1.playstyle != null ? f4.format(state.tlSeason1.playstyle?.stride) : "---")]),
+    //   ];
     if (uniqueTL.length >= 2){
       compareWith = uniqueTL.toList().elementAtOrNull(uniqueTL.length - 2);
       chartsData = <DropdownMenuItem<List<FlSpot>>>[ // Dumping charts data into dropdown menu items, while cheking if every entry is valid
@@ -381,9 +393,9 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                       return notification.depth == 0;
                     },
                     child: NestedScrollView(
+                      scrollBehavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
                       physics: const AlwaysScrollableScrollPhysics(),
                       controller: _scrollController,
-                      scrollBehavior: const MaterialScrollBehavior(),
                       headerSliverBuilder: (context, value) {
                         return [
                           SliverToBoxAdapter(
@@ -422,7 +434,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                             children: [
                             Container(
                               width: MediaQuery.of(context).size.width-450,
-                              constraints: BoxConstraints(maxWidth: 1024),
+                              constraints: const BoxConstraints(maxWidth: 1024),
                               child: TLThingy(
                                 tl: snapshot.data![0].tlSeason1,
                                 userID: snapshot.data![0].userId,
@@ -436,23 +448,11 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                             ),
                             SizedBox(
                               width: 450,
-                              child: _TLRecords(userID: snapshot.data![0].userId, changePlayer: changePlayer, data: snapshot.data![3], wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0)
+                              child: _TLRecords(userID: snapshot.data![0].userId, changePlayer: changePlayer, data: snapshot.data![3], wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0, oldMathcesHere: _TLHistoryWasFetched)
                             ),
                           ],),
-                          _History(chartsData: chartsData, states: snapshot.data![2], changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
+                          _History(chartsData: chartsData, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
                           _TwoRecordsThingy(sprint: snapshot.data![1]['sprint'], blitz: snapshot.data![1]['blitz'], rank: snapshot.data![0].tlSeason1.percentileRank,),
-                          // Row(children: [
-                          //   Container(
-                          //     width: MediaQuery.of(context).size.width/2,
-                          //     padding: EdgeInsets.only(right: 8),
-                          //     child: _RecordThingy(record: snapshot.data![1]['sprint'], rank: snapshot.data![0].tlSeason1.percentileRank)
-                          //   ),
-                          //   Container(
-                          //     width: MediaQuery.of(context).size.width/2,
-                          //     padding: EdgeInsets.only(left: 8),
-                          //     child: _RecordThingy(record: snapshot.data![1]['blitz'], rank: snapshot.data![0].tlSeason1.percentileRank)
-                          //   ),
-                          // ],),
                           _OtherThingy(zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6],)
                         ] : [
                           TLThingy(
@@ -465,8 +465,8 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                             averages: rankAverages,
                             lbPositions: meAmongEveryone
                           ),
-                          _TLRecords(userID: snapshot.data![0].userId, changePlayer: changePlayer, data: snapshot.data![3], wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
-                          _History(chartsData: chartsData, states: snapshot.data![2], changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
+                          _TLRecords(userID: snapshot.data![0].userId, changePlayer: changePlayer, data: snapshot.data![3], wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0, oldMathcesHere: _TLHistoryWasFetched),
+                          _History(chartsData: chartsData, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
                           _RecordThingy(record: snapshot.data![1]['sprint'], rank: snapshot.data![0].tlSeason1.percentileRank),
                           _RecordThingy(record: snapshot.data![1]['blitz'], rank: snapshot.data![0].tlSeason1.percentileRank),
                           _OtherThingy(zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6],)
@@ -476,28 +476,34 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                   );
                 } else if (snapshot.hasError) {
                   String errText = "";
+                  String? subText;
                   switch (snapshot.error.runtimeType){
                     case TetrioPlayerNotExist:
                     errText = t.errors.noSuchUser;
+                    subText = t.errors.noSuchUserSub;
                     break;
+                    case TetrioDiscordNotExist:
+                    errText = t.errors.discordNotAssigned;
+                    subText = t.errors.discordNotAssignedSub;
                     case ConnectionIssue:
                     var err = snapshot.error as ConnectionIssue;
                     errText = t.errors.connection(code: err.code, message: err.message);
                     break;
-                    case TetrioHistoryNotExist:
-                    errText = t.errors.history;
-                    break;
                     case TetrioForbidden:
                     errText = t.errors.forbidden;
+                    subText = t.errors.forbiddenSub(nickname: 'osk');
                     break;
                     case TetrioTooManyRequests:
                     errText = t.errors.tooManyRequests;
+                    subText = t.errors.tooManyRequestsSub;
                     break;
                     case TetrioOskwareBridgeProblem:
                     errText = t.errors.oskwareBridge;
+                    subText = t.errors.oskwareBridgeSub;
                     break;
                     case TetrioInternalProblem:
                     errText = kIsWeb ? t.errors.internalWebVersion : t.errors.internal;
+                    subText = kIsWeb ? t.errors.internalWebVersionSub : t.errors.internalSub;
                     break;
                     case ClientException:
                     errText = t.errors.clientException;
@@ -505,7 +511,18 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                     default:
                     errText = snapshot.error.toString();
                   }
-                  return Center(child: Text(errText, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center));
+                  return Center(child: 
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(errText, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                        if (subText != null) Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(subText, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 18)),
+                        ),
+                      ],
+                    )
+                  );
                 }
                 break;
             }
@@ -646,27 +663,42 @@ class _TLRecords extends StatelessWidget {
   final Function changePlayer;
   final List<TetraLeagueAlphaRecord> data;
   final bool wasActiveInTL;
+  final bool oldMathcesHere;
 
   /// Widget, that displays Tetra League records.
   /// Accepts list of TL records ([data]) and [userID] of player from the view
-  const _TLRecords({required this.userID, required this.changePlayer, required this.data, required this.wasActiveInTL});
+  const _TLRecords({required this.userID, required this.changePlayer, required this.data, required this.wasActiveInTL, required this.oldMathcesHere});
 
   @override
   Widget build(BuildContext context) {
-    if (data.isEmpty) return Center(child: Column(
+    if (data.isEmpty) {
+      return Center(child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(t.noRecords, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
-        if (wasActiveInTL) Text("Perhaps, you want to"),
+        if (wasActiveInTL) Text(t.errors.actionSuggestion),
         if (wasActiveInTL) TextButton(onPressed: (){changePlayer(userID, fetchTLmatches: true);}, child: Text(t.fetchAndSaveOldTLmatches))
       ],
     ));
+    }
     bool bigScreen = MediaQuery.of(context).size.width >= 768;
+    int length = data.length;
     return ListView.builder(
       physics: const AlwaysScrollableScrollPhysics(),
       controller: ScrollController(),
-      itemCount: data.length,
+      itemCount: oldMathcesHere ? length : length + 1,
       itemBuilder: (BuildContext context, int index) {
+        if (index == length) {
+          return Center(child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(t.noOldRecords(n: length), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
+            if (wasActiveInTL) Text(t.errors.actionSuggestion),
+            if (wasActiveInTL) TextButton(onPressed: (){changePlayer(userID, fetchTLmatches: true);}, child: Text(t.fetchAndSaveOldTLmatches))
+          ],
+        ));
+        }
+
         var accentColor = data[index].endContext.firstWhere((element) => element.userId == userID).success ? Colors.green : Colors.red;
       return Container(
         decoration: BoxDecoration(
@@ -698,7 +730,6 @@ class _TLRecords extends StatelessWidget {
 
 class _History extends StatelessWidget{
   final List<DropdownMenuItem<List<FlSpot>>> chartsData;
-  final List<TetrioPlayer> states;
   final String userID;
   final Function update;
   final Function changePlayer;
@@ -706,41 +737,67 @@ class _History extends StatelessWidget{
 
   /// Widget, that can show history of some stat of the player on the graph.
   /// Requires player [states], which is list of states and function [update], which rebuild widgets
-  const _History({required this.chartsData, required this.states, required this.userID, required this.changePlayer, required this.update, required this.wasActiveInTL});
+  const _History({required this.chartsData, required this.userID, required this.changePlayer, required this.update, required this.wasActiveInTL});
   
   @override
   Widget build(BuildContext context) {
-    bool bigScreen = MediaQuery.of(context).size.width > 768;
-    return chartsData.isNotEmpty ? 
-      Column(
-        children: [
-          DropdownButton(
-                items: chartsData,
-                value: chartsData[_chartsIndex].value,
-                onChanged: (value) {
-                  _chartsIndex = chartsData.indexWhere((element) => element.value == value);
-                  update();
-                }
-              ),
-          if(chartsData[_chartsIndex].value!.length > 1) _HistoryChartThigy(data: chartsData[_chartsIndex].value!, yAxisTitle: _historyShortTitles[_chartsIndex], bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? f2 : NumberFormat.compact(),)
-          else Center(child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(t.notEnoughData, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
-              if (wasActiveInTL) Text("Perhaps, you want"),
-              if (wasActiveInTL)TextButton(onPressed: (){changePlayer(userID, fetchHistory: true);}, child: Text(t.fetchAndsaveTLHistory))
-            ],
-          ))
-        ],
-      )
-     : Center(child: Column(
+    if (chartsData.isEmpty) {
+      return Center(child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(t.noHistorySaved, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
-          if (wasActiveInTL) Text("Perhaps, you want"),
-          if (wasActiveInTL)TextButton(onPressed: (){changePlayer(userID, fetchHistory: true);}, child: Text(t.fetchAndsaveTLHistory))
+          if (wasActiveInTL) Text(t.errors.actionSuggestion),
+          if (wasActiveInTL) TextButton(onPressed: (){changePlayer(userID, fetchHistory: true);}, child: Text(t.fetchAndsaveTLHistory))
         ],
       ));
+    }
+    bool bigScreen = MediaQuery.of(context).size.width > 768;
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        primary: true,
+        child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Wrap(
+                spacing: 20,
+                children: [
+                  // DropdownButton(
+                  //       items: [DropdownMenuItem(child: Text("Chart"), value: false), DropdownMenuItem(child: Text("Table"), value: true)],
+                  //       value: _showHistoryAsTable,
+                  //       onChanged: (value) {
+                  //         _showHistoryAsTable = value!;
+                  //         update();
+                  //       }
+                  //     ),
+                  DropdownButton(
+                        items: chartsData,
+                        value: chartsData[_chartsIndex].value,
+                        onChanged: (value) {
+                          _chartsIndex = chartsData.indexWhere((element) => element.value == value);
+                          update();
+                        }
+                      ),
+                ],
+              ),
+              if(chartsData[_chartsIndex].value!.length > 1 && !_showHistoryAsTable) _HistoryChartThigy(data: chartsData[_chartsIndex].value!, yAxisTitle: _historyShortTitles[_chartsIndex], bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? f2 : NumberFormat.compact(),)
+              else if (chartsData[_chartsIndex].value!.length <= 1 && !_showHistoryAsTable) Center(child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(t.notEnoughData, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
+                  if (wasActiveInTL) Text(t.errors.actionSuggestion),
+                  if (wasActiveInTL) TextButton(onPressed: (){changePlayer(userID, fetchHistory: true);}, child: Text(t.fetchAndsaveTLHistory))
+                ],
+              ))
+              // else if (_showHistoryAsTable) Padding(
+              //   padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
+              //   child: _HistoryTableThingy(tableData),
+              // )
+            ],
+          ),
+      ),
+    );
   }
 }
 
@@ -1020,22 +1077,28 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
   }
 }
 
-class _HistoryTableThingy extends StatelessWidget{
-  final List<TetrioPlayer> states;
+// class _HistoryTableThingy extends StatelessWidget{
+//   final List<TableRow> tableData;
 
-  const _HistoryTableThingy(this.states);
-  // :tf:
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints){
-      return SingleChildScrollView(child: Table(
-        children: [
-          TableRow(children: [Text("Date & Time"), Text("Tr")]),
-        ],
-      ));
-    });
-  }
-}
+//   const _HistoryTableThingy(this.tableData);
+//   // :tf:
+//   @override
+//   Widget build(BuildContext context) {
+//     return LayoutBuilder(builder: (context, constraints){
+//       return Table(
+//         defaultColumnWidth: FixedColumnWidth(75),
+//         columnWidths: {
+//           0: FixedColumnWidth(170),
+//           1: FixedColumnWidth(100),
+//           2: FixedColumnWidth(90),
+//           18: FixedColumnWidth(100),
+//           19: FixedColumnWidth(90),
+//         },
+//       children: tableData,
+//     );
+//     });
+//   }
+// }
 
 class _TwoRecordsThingy extends StatelessWidget {
   final RecordSingle? sprint;
@@ -1082,13 +1145,13 @@ class _TwoRecordsThingy extends StatelessWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Padding(padding: EdgeInsets.only(right: 8.0),
+                  Padding(padding: const EdgeInsets.only(right: 8.0),
                   child: sprint != null ? Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageSprint.key}.png", height: 96) : Image.asset("res/tetrio_tl_alpha_ranks/z.png", height: 96)
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                    Text(t.sprint, style: TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
+                    Text(t.sprint, style: const TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
                     RichText(text: TextSpan(
                         text: sprint != null ? get40lTime(sprint!.endContext!.finalTime.inMicroseconds) : "---",
                         style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: FontWeight.w500, color: sprint != null ? Colors.white : Colors.grey),
@@ -1099,11 +1162,11 @@ class _TwoRecordsThingy extends StatelessWidget {
                       text: "",
                       style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
                       children: [
-                        if (rank != null && rank != "z") TextSpan(text: "${readableTimeDifference(sprint!.endContext!.finalTime, sprintAverages[rank]!)} ${sprintBetterThanRankAverage??false ? "better" : "worse"} than ${rank!.toUpperCase()} rank average\n", style: TextStyle(
+                        if (rank != null && rank != "z") TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(sprint!.endContext!.finalTime, sprintAverages[rank]!), verdict: sprintBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
                           color: sprintBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
                         ))
-                        else TextSpan(text: "${readableTimeDifference(sprint!.endContext!.finalTime, closestAverageSprint.value)} ${sprintBetterThanClosestAverage ? "better" : "worse"} than ${closestAverageSprint.key.toUpperCase()} rank average\n", style: TextStyle(
-                          color: sprintBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
+                        else TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(sprint!.endContext!.finalTime, closestAverageSprint.value), verdict: sprintBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageSprint.key.toUpperCase())}\n", style: TextStyle(
+                          color: sprintBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
                         )),
                         if (sprint!.rank != null) TextSpan(text: "№${sprint!.rank}", style: TextStyle(color: getColorOfRank(sprint!.rank!))),
                         if (sprint!.rank != null) const TextSpan(text: " • "),
@@ -1157,10 +1220,10 @@ class _TwoRecordsThingy extends StatelessWidget {
                     text: "",
                     style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
                     children: [
-                      if (rank != null && rank != "z") TextSpan(text: "${readableIntDifference(blitz!.endContext!.score, blitzAverages[rank]!)} ${blitzBetterThanRankAverage??false ? "better" : "worse"} than ${rank!.toUpperCase()} rank average\n", style: TextStyle(
+                      if (rank != null && rank != "z") TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(blitz!.endContext!.score, blitzAverages[rank]!), verdict: blitzBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
                         color: blitzBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
                       ))
-                      else TextSpan(text: "${readableIntDifference(blitz!.endContext!.score, closestAverageBlitz.value)} ${blitzBetterThanClosestAverage ? "better" : "worse"} than ${closestAverageBlitz.key!.toUpperCase()} rank average\n", style: TextStyle(
+                      else TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(blitz!.endContext!.score, closestAverageBlitz.value), verdict: blitzBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageBlitz.key.toUpperCase())}\n", style: TextStyle(
                         color: blitzBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
                       )),
                       TextSpan(text: _dateFormat.format(blitz!.timestamp!)),
@@ -1170,7 +1233,7 @@ class _TwoRecordsThingy extends StatelessWidget {
                     ),
                   ),
                 ],),
-                Padding(padding: EdgeInsets.only(left: 8.0),
+                Padding(padding: const EdgeInsets.only(left: 8.0),
                 child: blitz != null ? Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageBlitz.key}.png", height: 96) : Image.asset("res/tetrio_tl_alpha_ranks/z.png", height: 96)), 
               ],
             ),
@@ -1240,17 +1303,17 @@ class _RecordThingy extends StatelessWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (record!.stream.contains("40l")) Padding(padding: EdgeInsets.only(right: 8.0),
+                    if (record!.stream.contains("40l")) Padding(padding: const EdgeInsets.only(right: 8.0),
                     child: Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageSprint.key}.png", height: 96)
                     ),
-                    if (record!.stream.contains("blitz")) Padding(padding: EdgeInsets.only(right: 8.0),
+                    if (record!.stream.contains("blitz")) Padding(padding: const EdgeInsets.only(right: 8.0),
                     child: Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageBlitz.key}.png", height: 96)
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                      if (record!.stream.contains("40l")) Text(t.sprint, style: TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
-                      if (record!.stream.contains("blitz")) Text(t.blitz, style: TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
+                      if (record!.stream.contains("40l")) Text(t.sprint, style: const TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
+                      if (record!.stream.contains("blitz")) Text(t.blitz, style: const TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
                       RichText(text: TextSpan(
                           text: record!.stream.contains("40l") ? get40lTime(record!.endContext!.finalTime.inMicroseconds) : NumberFormat.decimalPattern().format(record!.endContext!.score),
                           style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 36 : 32, fontWeight: FontWeight.w500, color: Colors.white),
@@ -1260,16 +1323,16 @@ class _RecordThingy extends StatelessWidget {
                         text: "",
                         style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
                         children: [
-                          if (record!.stream.contains("40l") && (rank != null && rank != "z")) TextSpan(text: "${readableTimeDifference(record!.endContext!.finalTime, sprintAverages[rank]!)} ${sprintBetterThanRankAverage??false ? "better" : "worse"} than ${rank!.toUpperCase()} rank average\n", style: TextStyle(
+                          if (record!.stream.contains("40l") && (rank != null && rank != "z")) TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(record!.endContext!.finalTime, sprintAverages[rank]!), verdict: sprintBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
                             color: sprintBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
                           ))
-                          else if (record!.stream.contains("40l") && (rank == null || rank == "z")) TextSpan(text: "${readableTimeDifference(record!.endContext!.finalTime, closestAverageSprint.value)} ${sprintBetterThanClosestAverage ? "better" : "worse"} than ${closestAverageSprint.key.toUpperCase()} rank average\n", style: TextStyle(
-                            color: sprintBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
+                          else if (record!.stream.contains("40l") && (rank == null || rank == "z")) TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(record!.endContext!.finalTime, closestAverageSprint.value), verdict: sprintBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageSprint.key.toUpperCase())}\n", style: TextStyle(
+                            color: sprintBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
                           ))
-                          else if (record!.stream.contains("blitz") && (rank != null && rank != "z")) TextSpan(text: "${readableIntDifference(record!.endContext!.score, blitzAverages[rank]!)} ${blitzBetterThanRankAverage??false ? "better" : "worse"} than ${rank!.toUpperCase()} rank average\n", style: TextStyle(
+                          else if (record!.stream.contains("blitz") && (rank != null && rank != "z")) TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(record!.endContext!.score, blitzAverages[rank]!), verdict: blitzBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
                             color: blitzBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
                           ))
-                          else if (record!.stream.contains("blitz") && (rank == null || rank == "z")) TextSpan(text: "${readableIntDifference(record!.endContext!.score, closestAverageBlitz.value)} ${blitzBetterThanClosestAverage ? "better" : "worse"} than ${closestAverageBlitz.key!.toUpperCase()} rank average\n", style: TextStyle(
+                          else if (record!.stream.contains("blitz") && (rank == null || rank == "z")) TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(record!.endContext!.score, closestAverageBlitz.value), verdict: blitzBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageBlitz.key.toUpperCase())}\n", style: TextStyle(
                             color: blitzBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
                           )),
                           if (record!.rank != null) TextSpan(text: "№${record!.rank}", style: TextStyle(color: getColorOfRank(record!.rank!))),
@@ -1566,7 +1629,7 @@ class _OtherThingy extends StatelessWidget {
               physics: const AlwaysScrollableScrollPhysics(),
               itemCount: newsletter!.length+1,
               itemBuilder: (BuildContext context, int index) {
-                return index == 0 ? Center(child: Text(t.news, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42))) : getNewsTile(newsletter![index-1]);
+                return index == 0 ? Center(child: Text(t.news, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42))) : getNewsTile(newsletter![index-1]);
               }
             ))
           ]

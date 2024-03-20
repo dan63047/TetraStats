@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:go_router/go_router.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/main.dart' show packageInfo;
 import 'package:file_selector/file_selector.dart';
@@ -260,14 +261,14 @@ class SettingsState extends State<SettingsView> {
                 },
               ),
           ),
-          ListTile(title: const Text("Customization"),
-          subtitle: const Text("I don't want to implement this"),
+          ListTile(title: Text(t.customization),
+          subtitle: Text(t.customizationDescription),
           trailing: const Icon(Icons.arrow_right),
           onTap: () {
-            Navigator.pushNamed(context, "/customization");
+            context.go("/customization");
           },),
-          ListTile(title: Text("Show leaderboard based stats"),
-          subtitle: Text("That will impact on loading times, but will allow you to see position on LB by stats and comparison with average values"),
+          ListTile(title: Text(t.lbStats),
+          subtitle: Text(t.lbStatsDescription),
           trailing: Switch(value: showPositions, onChanged: (bool value){
             prefs.setBool("showPositions", value);
             setState(() {
@@ -281,6 +282,7 @@ class SettingsState extends State<SettingsView> {
             },
             title: Text(t.aboutApp),
             subtitle: Text(t.aboutAppText(appName: packageInfo.appName, packageName: packageInfo.packageName, version: packageInfo.version, buildNumber: packageInfo.buildNumber)),
+            trailing: const Icon(Icons.arrow_right)
           ),
         ],
       )),

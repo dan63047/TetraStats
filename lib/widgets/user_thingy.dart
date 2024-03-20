@@ -91,6 +91,7 @@ class UserThingy extends StatelessWidget {
                                         ? Image.asset("res/avatars/tetrio_banned.png", fit: BoxFit.fitHeight, height: pfpHeight,)
                                         : player.avatarRevision != null
                                           ? Image.network("https://tetr.io/user-content/avatars/${player.userId}.jpg?rv=${player.avatarRevision}",
+                                              // TODO: osk banner can cause memory leak
                                               fit: BoxFit.fitHeight, height: 128, errorBuilder: (context, error, stackTrace) {
                                                 developer.log("Error with building profile picture", name: "main_view", error: error, stackTrace: stackTrace);
                                                   return Image.asset("res/avatars/tetrio_anon.png", fit: BoxFit.fitHeight, height: pfpHeight);

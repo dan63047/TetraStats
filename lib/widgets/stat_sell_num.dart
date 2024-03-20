@@ -70,7 +70,7 @@ class StatCellNum extends StatelessWidget {
               oldPlayerStat! < playerStat ? Colors.redAccent : Colors.greenAccent
             ),),
             if (oldPlayerStat != null && pos != null) const TextSpan(text: " • "),
-            if (pos != null) TextSpan(text: pos!.position >= 1000 ? "Top ${f2.format(pos!.percentage*100)}%" : "№${pos!.position}")
+            if (pos != null) TextSpan(text: pos!.position >= 1000 ? "${t.top} ${f2.format(pos!.percentage*100)}%" : "№${pos!.position}")
           ]
           ),
         ), 

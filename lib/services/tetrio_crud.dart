@@ -974,7 +974,7 @@ class TetrioService extends DB {
               user = json['data']['user']['_id'];
             } else { // fail - throw an exception
               developer.log("fetchPlayer User dosen't exist", name: "services/tetrio_crud", error: response.body);
-              throw TetrioPlayerNotExist();
+              throw TetrioDiscordNotExist();
             }
             break;
           // more exceptions to god of exceptions

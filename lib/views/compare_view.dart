@@ -258,7 +258,7 @@ class CompareState extends State<CompareView> {
       body: SafeArea(
         child: Center(
           child: Container(
-            constraints: BoxConstraints(maxWidth: 768),
+            constraints: const BoxConstraints(maxWidth: 768),
             child: NestedScrollView(
               controller: _scrollController,
               headerSliverBuilder: (context, value) {
@@ -327,7 +327,7 @@ class CompareState extends State<CompareView> {
               },
               body: Center(
                 child: Container(
-                  constraints: BoxConstraints(maxWidth: 768),
+                  constraints: const BoxConstraints(maxWidth: 768),
                   child: ListView(
                           children: !listEquals(theGreenSide, [null, null, null]) && !listEquals(theRedSide, [null, null, null])? [
                             if (theGreenSide[0] != null &&

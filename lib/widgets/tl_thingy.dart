@@ -3,8 +3,8 @@ import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
-import 'package:tetra_stats/views/main_view.dart';
 import 'package:tetra_stats/widgets/gauget_num.dart';
 import 'package:tetra_stats/widgets/graphs.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
@@ -38,11 +38,13 @@ class TLThingy extends StatefulWidget {
 }
 
 class _TLThingyState extends State<TLThingy> {
+  late bool oskKagariGimmick;
   
 @override
   void initState() {
     _currentRangeValues = const RangeValues(0, 1);
     sortedStates = widget.states.reversed.toList();
+    oskKagariGimmick = prefs.getBool("oskKagariGimmick")??true;
     try{
       oldTl = sortedStates[1].tlSeason1;
     }on RangeError{
@@ -97,7 +99,7 @@ class _TLThingyState extends State<TLThingy> {
                   crossAxisAlignment: WrapCrossAlignment.center,
                   clipBehavior: Clip.hardEdge,
                   children: [
-                    widget.userID == "5e32fc85ab319c2ab1beb07c" // he love her so much, you can't even imagine
+                    (widget.userID == "5e32fc85ab319c2ab1beb07c" && oskKagariGimmick) // he love her so much, you can't even imagine
                         ? Image.asset("res/icons/kagari.png", height: 128) // Btw why she wearing Kazamatsuri high school uniform?
                         : Image.asset("res/tetrio_tl_alpha_ranks/${currentTl.rank}.png", height: 128),
                     Column(
@@ -292,27 +294,28 @@ class _TLThingyState extends State<TLThingy> {
                 ),
               if (currentTl.estTr != null)
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 48, 0, 48),
+                  padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
                   child: Container(
                     //alignment: Alignment.center,
                     width: bigScreen ? MediaQuery.of(context).size.width * 0.4 : MediaQuery.of(context).size.width * 0.85,
+                    height: 70,
                     constraints: BoxConstraints(maxWidth: 768),
-                    child: Wrap(
-                      alignment: WrapAlignment.spaceBetween,
-                      spacing: 20,
+                    child: Stack(
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                          Text(t.statCellNum.estOfTR, style: TextStyle(height: 0.1),),
-                          RichText(
-                            text: TextSpan(
-                              text: intf.format(currentTl.estTr!.esttr.truncate()),
-                              style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: FontWeight.w500, color: Colors.white),
-                              children: [TextSpan(text: fractionfEstTR.format(currentTl.estTr!.esttr - currentTl.estTr!.esttr.truncate()).substring(1), style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
+                        Positioned(
+                          left: 0,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                            Text(t.statCellNum.estOfTR, style: TextStyle(height: 0.1),),
+                            RichText(
+                              text: TextSpan(
+                                text: intf.format(currentTl.estTr!.esttr.truncate()),
+                                style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 36 : 30, fontWeight: FontWeight.w500, color: Colors.white),
+                                children: [TextSpan(text: fractionfEstTR.format(currentTl.estTr!.esttr - currentTl.estTr!.esttr.truncate()).substring(1), style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
+                                ),
                               ),
-                            ),
-                            if (oldTl?.estTr?.esttr != null || widget.lbPositions != null) RichText(text: TextSpan(
+                            RichText(text: TextSpan(
                               text: "",
                               style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey, height: 0.5),
                               children: [
@@ -320,78 +323,46 @@ class _TLThingyState extends State<TLThingy> {
                                   color: oldTl!.estTr!.esttr > currentTl.estTr!.esttr ? Colors.redAccent : Colors.greenAccent
                                 ),),
                                 if (oldTl?.estTr?.esttr != null && widget.lbPositions?.estTr != null) const TextSpan(text: " • "),
-                                if (widget.lbPositions?.estTr != null) TextSpan(text: widget.lbPositions!.estTr!.position >= 1000 ? "Top ${f2.format(widget.lbPositions!.estTr!.percentage*100)}%" : "№${widget.lbPositions!.estTr!.position}"),
+                                if (widget.lbPositions?.estTr != null) TextSpan(text: widget.lbPositions!.estTr!.position >= 1000 ? "${t.top} ${f2.format(widget.lbPositions!.estTr!.percentage*100)}%" : "№${widget.lbPositions!.estTr!.position}"),
                                 if (widget.lbPositions?.estTr != null) const TextSpan(text: " • "),
                                 TextSpan(text: "Glicko: ${f2.format(currentTl.estTr!.estglicko)}")
                               ]
                               ),
                             ),
-                        ],),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                          Text(t.statCellNum.accOfEst, style: const TextStyle(height: 0.1),),
-                          RichText(
-                            text: TextSpan(
-                              text: (currentTl.esttracc != null && currentTl.bestRank != "z") ? intFDiff.format(currentTl.esttracc!.truncate()) : "---",
-                              style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 36, fontWeight: FontWeight.w500, color: Colors.white),
+                          ],),
+                        ),
+                        Positioned(
+                          right: 0,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                            Text(t.statCellNum.accOfEst, style: const TextStyle(height: 0.1),),
+                            RichText(
+                              text: TextSpan(
+                                text: (currentTl.esttracc != null && currentTl.bestRank != "z") ? intFDiff.format(currentTl.esttracc!.truncate()) : "---",
+                                style: TextStyle(fontFamily: "Eurostile Round", fontSize: bigScreen ? 36 : 30, fontWeight: FontWeight.w500, color: Colors.white),
+                                children: [
+                                  TextSpan(text: (currentTl.esttracc != null && currentTl.bestRank != "z") ? fractionfEstTRAcc.format(currentTl.esttracc!.isNegative ? 1 - (currentTl.esttracc! - currentTl.esttracc!.truncate()) : (currentTl.esttracc! - currentTl.esttracc!.truncate())).substring(1) : ".---", style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))
+                                ]
+                                ),
+                              ),
+                            if ((oldTl?.esttracc != null || widget.lbPositions != null) && currentTl.bestRank != "z") RichText(text: TextSpan(
+                              text: "",
+                              style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey, height: 0.5),
                               children: [
-                                TextSpan(text: (currentTl.esttracc != null && currentTl.bestRank != "z") ? fractionfEstTRAcc.format(currentTl.esttracc!.isNegative ? 1 - (currentTl.esttracc! - currentTl.esttracc!.truncate()) : (currentTl.esttracc! - currentTl.esttracc!.truncate())).substring(1) : ".---", style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))
+                                if (oldTl?.esttracc != null) TextSpan(text: comparef.format(currentTl.esttracc! - oldTl!.esttracc!), style: TextStyle(
+                                  color: oldTl!.esttracc! > currentTl.esttracc! ? Colors.redAccent : Colors.greenAccent
+                                ),),
+                                if (oldTl?.esttracc != null && widget.lbPositions?.accOfEst != null) const TextSpan(text: " • "),
+                                if (widget.lbPositions?.accOfEst != null) TextSpan(text: widget.lbPositions!.accOfEst!.position >= 1000 ? "${t.top} ${f2.format(widget.lbPositions!.accOfEst!.percentage*100)}%" : "№${widget.lbPositions!.accOfEst!.position}")
                               ]
                               ),
                             ),
-                          if ((oldTl?.esttracc != null || widget.lbPositions != null) && currentTl.bestRank != "z") RichText(text: TextSpan(
-                            text: "",
-                            style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey, height: 0.5),
-                            children: [
-                              if (oldTl?.esttracc != null) TextSpan(text: comparef.format(currentTl.esttracc! - oldTl!.esttracc!), style: TextStyle(
-                                color: oldTl!.esttracc! > currentTl.esttracc! ? Colors.redAccent : Colors.greenAccent
-                              ),),
-                              if (oldTl?.esttracc != null && widget.lbPositions?.accOfEst != null) const TextSpan(text: " • "),
-                              if (widget.lbPositions?.accOfEst != null) TextSpan(text: widget.lbPositions!.accOfEst!.position >= 1000 ? "Top ${f2.format(widget.lbPositions!.accOfEst!.percentage*100)}%" : "№${widget.lbPositions!.accOfEst!.position}")
-                            ]
-                            ),
-                          ),
-                        ],)
+                          ],),
+                        )
                       ],
                     ),
                   )
-                  // child: Container(
-                  //   width: bigScreen ? MediaQuery.of(context).size.width * 0.4 : MediaQuery.of(context).size.width * 0.85,
-                  //   constraints: BoxConstraints(maxWidth: 452),
-                  //   child: Column(
-                  //     crossAxisAlignment: CrossAxisAlignment.start,
-                  //     children: [
-                  //       Row(
-                  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //         children: [
-                  //           Text(
-                  //             "${bigScreen ? t.statCellNum.estOfTR : t.statCellNum.estOfTRShort}:",
-                  //             style: const TextStyle(fontSize: 24),
-                  //           ),
-                  //           Text(
-                  //             f2.format(currentTl.estTr!.esttr),
-                  //             style: const TextStyle(fontSize: 24),
-                  //           ),
-                  //         ],
-                  //       ),
-                  //       if (currentTl.rating >= 0)
-                  //         Row(
-                  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //           children: [
-                  //             Text(
-                  //               "${bigScreen ? t.statCellNum.accOfEst : t.statCellNum.accOfEstShort}:",
-                  //               style: const TextStyle(fontSize: 24),
-                  //             ),
-                  //             Text(
-                  //               fDiff.format(currentTl.esttracc!),
-                  //               style: const TextStyle(fontSize: 24),
-                  //             ),
-                  //           ],
-                  //         ),
-                  //     ],
-                  //   ),
-                  // ),
                 ),
               if (currentTl.nerdStats != null) Graphs(currentTl.apm!, currentTl.pps!, currentTl.vs!, currentTl.nerdStats!, currentTl.playstyle!)
             ]

@@ -14,6 +14,8 @@ class TetrioPlayerAlreadyExist implements Exception {}
 
 class TetrioPlayerNotExist implements Exception {}
 
+class TetrioDiscordNotExist implements Exception {}
+
 class TetrioHistoryNotExist implements Exception {}
 
 class TetrioTooManyRequests implements Exception {}
