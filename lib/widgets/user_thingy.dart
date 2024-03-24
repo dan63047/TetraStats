@@ -339,7 +339,7 @@ class UserThingy extends StatelessWidget {
                   children: [
                     if (player.country != null) TextSpan(text: "${t.countries[player.country]} • "),
                     TextSpan(text: "${t.playerRole[player.role]}${t.playerRoleAccount}${player.registrationTime == null ? t.wasFromBeginning : '${t.created} ${dateFormat.format(player.registrationTime!)}'}"),
-                    if (player.supporterTier > 0) TextSpan(text: " • "),
+                    if (player.supporterTier > 0) const TextSpan(text: " • "),
                     if (player.supporterTier > 0) WidgetSpan(child: Icon(player.supporterTier > 1 ? Icons.star : Icons.star_border, color: player.supporterTier > 1 ? Colors.yellowAccent : Colors.white), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic),
                     if (player.supporterTier > 0) TextSpan(text: player.supporterTier.toString(), style: TextStyle(color: player.supporterTier > 1 ? Colors.yellowAccent : Colors.white))
                   ]

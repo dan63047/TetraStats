@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 1098 (549 per locale)
+/// Strings: 1120 (560 per locale)
 ///
-/// Built on 2024-03-20 at 22:41 UTC
+/// Built on 2024-03-24 at 14:28 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -183,11 +183,11 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get noRecords => 'No records';
 	String noOldRecords({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
 		zero: 'No records',
-		one: '${n} record',
-		two: '${n} records',
-		few: '${n} records',
-		many: '${n} records',
-		other: '${n} records',
+		one: 'Only ${n} record',
+		two: 'Only ${n} records',
+		few: 'Only ${n} records',
+		many: 'Only ${n} records',
+		other: 'Only ${n} records',
 	);
 	String get noRecord => 'No record';
 	String get botRecord => 'Bots are not allowed to set records';
@@ -212,7 +212,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String supporter({required Object tier}) => 'Supporter tier ${tier}';
 	String comparingWith({required Object newDate, required Object oldDate}) => 'Data from ${newDate} comparing with ${oldDate}';
 	String get top => 'Top';
-	String get topRank => 'Top Rank';
+	String get topRank => 'Top rank';
 	String verdictGeneral({required Object n, required Object verdict, required Object rank}) => '${n} ${verdict} than ${rank} rank average';
 	String get verdictBetter => 'better';
 	String get verdictWorse => 'worse';
@@ -271,10 +271,14 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get openReplay => 'Open replay in TETR.IO';
 	String replaySaved({required Object path}) => 'Replay saved to ${path}';
 	String get match => 'Match';
+	String get timeWeightedmatch => 'Match (time-weighted)';
 	String roundNumber({required Object n}) => 'Round ${n}';
 	String get statsFor => 'Stats for';
+	String get numberOfRounds => 'Number of rounds';
 	String get matchLength => 'Match Length';
 	String get roundLength => 'Round Length';
+	String get matchStats => 'Match stats';
+	String get timeWeightedmatchStats => 'Time-weighted match stats';
 	String get replayIssue => 'Can\'t process replay';
 	String get matchIsTooOld => 'Replay is not available';
 	String get winner => 'Winner';
@@ -311,6 +315,15 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 		many: '${n} players',
 		other: '${n} players',
 	);
+	String games({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		zero: '${n} games',
+		one: '${n} game',
+		two: '${n} games',
+		few: '${n} games',
+		many: '${n} games',
+		other: '${n} games',
+	);
+	String gamesPlayed({required Object games}) => '${games} played';
 	String get chart => 'Chart';
 	String get entries => 'Entries';
 	String get minimums => 'Minimums';
@@ -853,7 +866,7 @@ class _StringsRu implements Translations {
 	@override String get assignedManualy => 'Этот значок был присвоен вручную администрацией TETR.IO';
 	@override String comparingWith({required Object newDate, required Object oldDate}) => 'Данные от ${newDate} в сравнении с данными от ${oldDate}';
 	@override String get top => 'Топ';
-	@override String get topRank => 'Топ Ранг';
+	@override String get topRank => 'Топ ранг';
 	@override String verdictGeneral({required Object verdict, required Object rank, required Object n}) => '${verdict} среднего ${rank} ранга на ${n}';
 	@override String get verdictBetter => 'Лучше';
 	@override String get verdictWorse => 'Хуже';
@@ -912,10 +925,14 @@ class _StringsRu implements Translations {
 	@override String get openReplay => 'Открыть повтор в TETR.IO';
 	@override String replaySaved({required Object path}) => 'Повтор сохранён по пути ${path}';
 	@override String get match => 'Матч';
+	@override String get timeWeightedmatch => 'Матч (взвешенная по времени)';
 	@override String roundNumber({required Object n}) => 'Раунд ${n}';
 	@override String get statsFor => 'Статистика за';
+	@override String get numberOfRounds => 'Количество раундов';
 	@override String get matchLength => 'Продолжительность матча';
 	@override String get roundLength => 'Продолжительность раунда';
+	@override String get matchStats => 'Статистика матча';
+	@override String get timeWeightedmatchStats => 'Взвешенная по времени cтатистика матча';
 	@override String get replayIssue => 'Ошибка обработки повтора';
 	@override String get matchIsTooOld => 'Информация о повторе недоступна';
 	@override String get winner => 'Победитель';
@@ -952,6 +969,15 @@ class _StringsRu implements Translations {
 		many: '${n} игроков',
 		other: '${n} игроков',
 	);
+	@override String games({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
+		zero: '${n} игр',
+		one: '${n} игра',
+		two: '${n} игры',
+		few: '${n} игры',
+		many: '${n} игр',
+		other: '${n} игр',
+	);
+	@override String gamesPlayed({required Object games}) => '${games} сыграно';
 	@override String get chart => 'График';
 	@override String get entries => 'Список';
 	@override String get minimums => 'Минимумы';
@@ -1457,11 +1483,11 @@ extension on Translations {
 			case 'noRecords': return 'No records';
 			case 'noOldRecords': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
 				zero: 'No records',
-				one: '${n} record',
-				two: '${n} records',
-				few: '${n} records',
-				many: '${n} records',
-				other: '${n} records',
+				one: 'Only ${n} record',
+				two: 'Only ${n} records',
+				few: 'Only ${n} records',
+				many: 'Only ${n} records',
+				other: 'Only ${n} records',
 			);
 			case 'noRecord': return 'No record';
 			case 'botRecord': return 'Bots are not allowed to set records';
@@ -1486,7 +1512,7 @@ extension on Translations {
 			case 'supporter': return ({required Object tier}) => 'Supporter tier ${tier}';
 			case 'comparingWith': return ({required Object newDate, required Object oldDate}) => 'Data from ${newDate} comparing with ${oldDate}';
 			case 'top': return 'Top';
-			case 'topRank': return 'Top Rank';
+			case 'topRank': return 'Top rank';
 			case 'verdictGeneral': return ({required Object n, required Object verdict, required Object rank}) => '${n} ${verdict} than ${rank} rank average';
 			case 'verdictBetter': return 'better';
 			case 'verdictWorse': return 'worse';
@@ -1545,10 +1571,14 @@ extension on Translations {
 			case 'openReplay': return 'Open replay in TETR.IO';
 			case 'replaySaved': return ({required Object path}) => 'Replay saved to ${path}';
 			case 'match': return 'Match';
+			case 'timeWeightedmatch': return 'Match (time-weighted)';
 			case 'roundNumber': return ({required Object n}) => 'Round ${n}';
 			case 'statsFor': return 'Stats for';
+			case 'numberOfRounds': return 'Number of rounds';
 			case 'matchLength': return 'Match Length';
 			case 'roundLength': return 'Round Length';
+			case 'matchStats': return 'Match stats';
+			case 'timeWeightedmatchStats': return 'Time-weighted match stats';
 			case 'replayIssue': return 'Can\'t process replay';
 			case 'matchIsTooOld': return 'Replay is not available';
 			case 'winner': return 'Winner';
@@ -1585,6 +1615,15 @@ extension on Translations {
 				many: '${n} players',
 				other: '${n} players',
 			);
+			case 'games': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+				zero: '${n} games',
+				one: '${n} game',
+				two: '${n} games',
+				few: '${n} games',
+				many: '${n} games',
+				other: '${n} games',
+			);
+			case 'gamesPlayed': return ({required Object games}) => '${games} played';
 			case 'chart': return 'Chart';
 			case 'entries': return 'Entries';
 			case 'minimums': return 'Minimums';
@@ -2053,7 +2092,7 @@ extension on _StringsRu {
 			case 'assignedManualy': return 'Этот значок был присвоен вручную администрацией TETR.IO';
 			case 'comparingWith': return ({required Object newDate, required Object oldDate}) => 'Данные от ${newDate} в сравнении с данными от ${oldDate}';
 			case 'top': return 'Топ';
-			case 'topRank': return 'Топ Ранг';
+			case 'topRank': return 'Топ ранг';
 			case 'verdictGeneral': return ({required Object verdict, required Object rank, required Object n}) => '${verdict} среднего ${rank} ранга на ${n}';
 			case 'verdictBetter': return 'Лучше';
 			case 'verdictWorse': return 'Хуже';
@@ -2112,10 +2151,14 @@ extension on _StringsRu {
 			case 'openReplay': return 'Открыть повтор в TETR.IO';
 			case 'replaySaved': return ({required Object path}) => 'Повтор сохранён по пути ${path}';
 			case 'match': return 'Матч';
+			case 'timeWeightedmatch': return 'Матч (взвешенная по времени)';
 			case 'roundNumber': return ({required Object n}) => 'Раунд ${n}';
 			case 'statsFor': return 'Статистика за';
+			case 'numberOfRounds': return 'Количество раундов';
 			case 'matchLength': return 'Продолжительность матча';
 			case 'roundLength': return 'Продолжительность раунда';
+			case 'matchStats': return 'Статистика матча';
+			case 'timeWeightedmatchStats': return 'Взвешенная по времени cтатистика матча';
 			case 'replayIssue': return 'Ошибка обработки повтора';
 			case 'matchIsTooOld': return 'Информация о повторе недоступна';
 			case 'winner': return 'Победитель';
@@ -2152,6 +2195,15 @@ extension on _StringsRu {
 				many: '${n} игроков',
 				other: '${n} игроков',
 			);
+			case 'games': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
+				zero: '${n} игр',
+				one: '${n} игра',
+				two: '${n} игры',
+				few: '${n} игры',
+				many: '${n} игр',
+				other: '${n} игр',
+			);
+			case 'gamesPlayed': return ({required Object games}) => '${games} сыграно';
 			case 'chart': return 'График';
 			case 'entries': return 'Список';
 			case 'minimums': return 'Минимумы';

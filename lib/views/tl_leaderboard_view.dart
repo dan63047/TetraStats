@@ -175,7 +175,8 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
                               return ListTile(
                                 leading: Text((index+1).toString(), style: bigScreen ? const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28) : null),
                                 title: Text(allPlayers[index].username, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
-                                subtitle: Text(_sortBy == Stats.tr ? "${f2.format(allPlayers[index].apm)} APM, ${f2.format(allPlayers[index].pps)} PPS, ${f2.format(allPlayers[index].vs)} VS, ${f2.format(allPlayers[index].nerdStats.app)} APP, ${f2.format(allPlayers[index].nerdStats.vsapm)} VS/APM" : "${_f4.format(allPlayers[index].getStatByEnum(_sortBy))} ${chartsShortTitles[_sortBy]}"),
+                                subtitle: Text(_sortBy == Stats.tr ? "${f2.format(allPlayers[index].apm)} APM, ${f2.format(allPlayers[index].pps)} PPS, ${f2.format(allPlayers[index].vs)} VS, ${f2.format(allPlayers[index].nerdStats.app)} APP, ${f2.format(allPlayers[index].nerdStats.vsapm)} VS/APM" : "${_f4.format(allPlayers[index].getStatByEnum(_sortBy))} ${chartsShortTitles[_sortBy]}",
+                                style: TextStyle(fontFamily: "Eurostile Round Condensed", color: _sortBy == Stats.tr ? Colors.grey : null)),
                                 trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [

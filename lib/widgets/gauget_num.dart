@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:tetra_stats/utils/colors_functions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/widgets/tl_thingy.dart';
 
@@ -98,7 +99,7 @@ class GaugetNum extends StatelessWidget {
                     oldPlayerStat! < playerStat ? Colors.redAccent : Colors.greenAccent
                   ),),
                   if ((oldTl != null && oldTl!.gamesPlayed > 0) && pos != null) const TextSpan(text: " • "),
-                  if (pos != null) TextSpan(text: pos!.position >= 1000 ? "${t.top} ${f2.format(pos!.percentage*100)}%" : "№${pos!.position}")
+                  if (pos != null) TextSpan(text: pos!.position >= 1000 ? "${t.top} ${f2.format(pos!.percentage*100)}%" : "№${pos!.position}", style: TextStyle(color: getColorOfRank(pos!.position)))
                 ]
                 ),
               ),

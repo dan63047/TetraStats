@@ -15,7 +15,7 @@ class LineclearsThingy extends StatelessWidget{
     return Wrap(
       spacing: 20,
       children: [
-        Container(
+        SizedBox(
           width: 150,
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -30,7 +30,7 @@ class LineclearsThingy extends StatelessWidget{
             ],
           ),
         ),
-        Container(
+        SizedBox(
           width: 150,
           child: Column(
             mainAxisSize: MainAxisSize.min,

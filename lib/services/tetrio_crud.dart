@@ -415,12 +415,12 @@ class TetrioService extends DB {
           // parsing data into TetraLeagueAlphaRecord objects
           for (var entry in csv){
             TetraLeagueAlphaRecord match = TetraLeagueAlphaRecord(
-              replayId: entry[0],
-              ownId: entry[0], // i gonna disting p1nkl0bst3r entries with it
+              replayId: entry[0].toString(),
+              ownId: entry[0].toString(), // i gonna disting p1nkl0bst3r entries with it
               timestamp: DateTime.parse(entry[1]),
               endContext: [
                 EndContextMulti(
-                  userId: entry[2],
+                  userId: entry[2].toString(),
                   username: entry[3].toString(),
                   naturalOrder: 0,
                   inputs: -1,
@@ -437,7 +437,7 @@ class TetrioService extends DB {
                   success: true
                 ),
                 EndContextMulti(
-                  userId: entry[8],
+                  userId: entry[8].toString(),
                   username: entry[9].toString(),
                   naturalOrder: 1,
                   inputs: -1,

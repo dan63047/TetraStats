@@ -1,10 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
-import 'package:tetra_stats/gen/strings.g.dart';
-
-final NumberFormat _f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
+import 'package:tetra_stats/utils/numers_formats.dart';
 
 class Graphs extends StatelessWidget{
   const Graphs(
@@ -125,13 +122,13 @@ class Graphs extends StatelessWidget{
                 getTitle: (index, angle) {
                   switch (index) {
                     case 0:
-                      return RadarChartTitle(text: 'Opener\n${_f2.format(playstyle.opener)}', angle: 0, positionPercentageOffset: 0.05);
+                      return RadarChartTitle(text: 'Opener\n${percentage.format(playstyle.opener)}', angle: 0, positionPercentageOffset: 0.05);
                     case 1:
-                      return RadarChartTitle(text: 'Stride\n${_f2.format(playstyle.stride)}', angle: 0, positionPercentageOffset: 0.05);
+                      return RadarChartTitle(text: 'Stride\n${percentage.format(playstyle.stride)}', angle: 0, positionPercentageOffset: 0.05);
                     case 2:
-                      return RadarChartTitle(text: 'Inf Ds\n${_f2.format(playstyle.infds)}', angle: angle + 180, positionPercentageOffset: 0.05);
+                      return RadarChartTitle(text: 'Inf Ds\n${percentage.format(playstyle.infds)}', angle: angle + 180, positionPercentageOffset: 0.05);
                     case 3:
-                      return RadarChartTitle(text: 'Plonk\n${_f2.format(playstyle.plonk)}', angle: 0, positionPercentageOffset: 0.05);
+                      return RadarChartTitle(text: 'Plonk\n${percentage.format(playstyle.plonk)}', angle: 0, positionPercentageOffset: 0.05);
                     default:
                       return const RadarChartTitle(text: '');
                   }

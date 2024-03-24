@@ -70,7 +70,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
       timeWeightedStatsAvaliable = true;
       if (snapshot.connectionState != ConnectionState.done) return const LinearProgressIndicator();
       if (!snapshot.hasError){
-        if (rounds.indexWhere((element) => element.value == -2) == -1) rounds.insert(1, const DropdownMenuItem(value: -2, child: Text("timeWeightedStats")));
+        if (rounds.indexWhere((element) => element.value == -2) == -1) rounds.insert(1, DropdownMenuItem(value: -2, child: Text(t.timeWeightedmatch)));
         greenSidePlayer = snapshot.data!.endcontext.indexWhere((element) => element.userId == widget.initPlayerId);
         redSidePlayer = snapshot.data!.endcontext.indexWhere((element) => element.userId != widget.initPlayerId);
         if (roundSelector.isNegative){
@@ -81,7 +81,6 @@ class TlMatchResultState extends State<TlMatchResultView> {
           readableTime = "${t.roundLength}: ${time.inMinutes}:${secs.format(time.inMicroseconds /1000000 % 60)}\n${t.winner}: ${snapshot.data!.roundWinners[roundSelector][1]}";
         }
       }else{
-        timeWeightedStatsAvaliable = false;
         switch (snapshot.error.runtimeType){
           case ReplayNotAvalable:
             reason = t.matchIsTooOld;
@@ -509,7 +508,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
                             RichText(
                               text: TextSpan(
                                 text: "${time.inMinutes}:${NumberFormat("00", LocaleSettings.currentLocale.languageCode).format(time.inSeconds%60)}",
-                                style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, fontWeight: FontWeight.w500),
+                                style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white),
                                 children: [TextSpan(text: ".${NumberFormat("000", LocaleSettings.currentLocale.languageCode).format(time.inMilliseconds%1000)}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
                                 ),
                               )
@@ -533,6 +532,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
                               reason = snapshot.error.toString();
                               break;
                           }
+                          timeWeightedStatsAvaliable = false;
                           return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -553,15 +553,15 @@ class TlMatchResultState extends State<TlMatchResultView> {
                      if (widget.record.ownId != widget.record.replayId) Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                      const Text("Number of rounds"),
+                      Text(t.numberOfRounds),
                       RichText(
                         text: TextSpan(
-                          text: widget.record.endContext.first.secondaryTracking.length > 0 ? widget.record.endContext.first.secondaryTracking.length.toString() : "---",
+                          text: widget.record.endContext.first.secondaryTracking.isNotEmpty ? widget.record.endContext.first.secondaryTracking.length.toString() : "---",
                           style: TextStyle(
                             fontFamily: "Eurostile Round Extended",
                             fontSize: 28,
                             fontWeight: FontWeight.w500,
-                            color: widget.record.endContext.first.secondaryTracking.length == 0 ? Colors.grey : null
+                            color: widget.record.endContext.first.secondaryTracking.isEmpty ? Colors.grey : Colors.white
                             ),
                           ),
                         )
@@ -570,18 +570,16 @@ class TlMatchResultState extends State<TlMatchResultView> {
                       OverflowBar(
                         alignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
-                          TextButton( child: const Text('Match stats'),
-                          style: roundSelector == -1 ? ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.grey.shade900)) : null,
+                          TextButton( style: roundSelector == -1 ? ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.grey.shade900)) : null,
                           onPressed: () {
                             roundSelector = -1;
                             setState(() {});
-                          }),
-                          TextButton( child: const Text('Time-weighted match stats'),
-                          style: roundSelector == -2 ? ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.grey.shade900)) : null,
+                          }, child: Text(t.matchStats)),
+                          TextButton( style: roundSelector == -2 ? ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.grey.shade900)) : null,
                           onPressed: timeWeightedStatsAvaliable ? () {
                             roundSelector = -2;
                             setState(() {});
-                          } : null) ,
+                          } : null, child: Text(t.timeWeightedmatchStats)) ,
                           //TextButton( child: const Text('Button 3'), onPressed: () {}),
                         ],
                       )
@@ -624,7 +622,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
                         leading:RichText(
                           text: TextSpan(
                             text: "${time.inMinutes}:${NumberFormat("00", LocaleSettings.currentLocale.languageCode).format(time.inSeconds%60)}",
-                            style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 22, fontWeight: FontWeight.w500),
+                            style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 22, fontWeight: FontWeight.w500, color: Colors.white),
                             children: [TextSpan(text: ".${NumberFormat("000", LocaleSettings.currentLocale.languageCode).format(time.inMilliseconds%1000)}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
                           ), 
                         ),
@@ -682,7 +680,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
   }
   
   Widget getMainWidget(double viewportWidth) {
-    if (viewportWidth <= 1024) {
+    if (viewportWidth <= 1200) {
       return Center(
         child: Container(
           constraints: const BoxConstraints(maxWidth: 768),
@@ -692,9 +690,8 @@ class TlMatchResultState extends State<TlMatchResultView> {
     } else {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        //mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
+          SizedBox(
             width: 768,
             child: buildComparison(true, false)
           ),
@@ -729,28 +726,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
             onSelected: (value) async {
               switch (value) {
                 case 1:
-                  if (kIsWeb){
-                    // final _base64 = base64Encode([1,2,3,4,5]);
-                    // final anchor = AnchorElement(href: 'data:application/octet-stream;base64,$_base64')..target = 'blank';
-                    //final anchor = AnchorElement(href: 'https://inoue.szy.lol/api/replay/${widget.record.replayId}')..target = 'blank';
-                    //anchor.download = "${widget.record.replayId}.ttrm";
-                    //document.body!.append(anchor);
-                    //anchor.click();
-                    //anchor.remove();
-                  } else{
-                    try{
-                      String path = await teto.saveReplay(widget.record.replayId);
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.replaySaved(path: path))));
-                    } on TetrioReplayAlreadyExist{
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.replayAlreadySaved)));
-                    } on SzyNotFound {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.replayExpired)));
-                    } on SzyForbidden {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.replayRejected)));
-                    } on SzyTooManyRequests {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.tooManyRequests)));
-                    }
-                  }
+                  await launchInBrowser(Uri.parse("https://inoue.szy.lol/api/replay/${widget.record.replayId}"));
                   break;
                 case 2:
                   await launchInBrowser(Uri.parse("https://tetr.io/#r:${widget.record.replayId}"));

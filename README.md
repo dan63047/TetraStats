@@ -16,6 +16,7 @@ You can [download an app](https://github.com/dan63047/TetraStats/releases), or [
 - Stats Calculator
 - Player history in charts
 - Tetra League matches history
+- Time-weighted stats in Tetra League matches 
 
 # Special thanks
 - **kerrmunism** — formulas

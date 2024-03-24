@@ -4,6 +4,7 @@ import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart';
+import 'package:tetra_stats/utils/colors_functions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/widgets/gauget_num.dart';
 import 'package:tetra_stats/widgets/graphs.dart';
@@ -299,7 +300,7 @@ class _TLThingyState extends State<TLThingy> {
                     //alignment: Alignment.center,
                     width: bigScreen ? MediaQuery.of(context).size.width * 0.4 : MediaQuery.of(context).size.width * 0.85,
                     height: 70,
-                    constraints: BoxConstraints(maxWidth: 768),
+                    constraints: const BoxConstraints(maxWidth: 768),
                     child: Stack(
                       children: [
                         Positioned(
@@ -307,12 +308,12 @@ class _TLThingyState extends State<TLThingy> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                            Text(t.statCellNum.estOfTR, style: TextStyle(height: 0.1),),
+                            Text(t.statCellNum.estOfTR, style: const TextStyle(height: 0.1),),
                             RichText(
                               text: TextSpan(
                                 text: intf.format(currentTl.estTr!.esttr.truncate()),
                                 style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 36 : 30, fontWeight: FontWeight.w500, color: Colors.white),
-                                children: [TextSpan(text: fractionfEstTR.format(currentTl.estTr!.esttr - currentTl.estTr!.esttr.truncate()).substring(1), style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
+                                children: [TextSpan(text: fractionfEstTR.format(currentTl.estTr!.esttr - currentTl.estTr!.esttr.truncate()).substring(1), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
                                 ),
                               ),
                             RichText(text: TextSpan(
@@ -323,7 +324,7 @@ class _TLThingyState extends State<TLThingy> {
                                   color: oldTl!.estTr!.esttr > currentTl.estTr!.esttr ? Colors.redAccent : Colors.greenAccent
                                 ),),
                                 if (oldTl?.estTr?.esttr != null && widget.lbPositions?.estTr != null) const TextSpan(text: " • "),
-                                if (widget.lbPositions?.estTr != null) TextSpan(text: widget.lbPositions!.estTr!.position >= 1000 ? "${t.top} ${f2.format(widget.lbPositions!.estTr!.percentage*100)}%" : "№${widget.lbPositions!.estTr!.position}"),
+                                if (widget.lbPositions?.estTr != null) TextSpan(text: widget.lbPositions!.estTr!.position >= 1000 ? "${t.top} ${f2.format(widget.lbPositions!.estTr!.percentage*100)}%" : "№${widget.lbPositions!.estTr!.position}", style: TextStyle(color: getColorOfRank(widget.lbPositions!.estTr!.position))),
                                 if (widget.lbPositions?.estTr != null) const TextSpan(text: " • "),
                                 TextSpan(text: "Glicko: ${f2.format(currentTl.estTr!.estglicko)}")
                               ]
@@ -342,7 +343,7 @@ class _TLThingyState extends State<TLThingy> {
                                 text: (currentTl.esttracc != null && currentTl.bestRank != "z") ? intFDiff.format(currentTl.esttracc!.truncate()) : "---",
                                 style: TextStyle(fontFamily: "Eurostile Round", fontSize: bigScreen ? 36 : 30, fontWeight: FontWeight.w500, color: Colors.white),
                                 children: [
-                                  TextSpan(text: (currentTl.esttracc != null && currentTl.bestRank != "z") ? fractionfEstTRAcc.format(currentTl.esttracc!.isNegative ? 1 - (currentTl.esttracc! - currentTl.esttracc!.truncate()) : (currentTl.esttracc! - currentTl.esttracc!.truncate())).substring(1) : ".---", style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))
+                                  TextSpan(text: (currentTl.esttracc != null && currentTl.bestRank != "z") ? fractionfEstTRAcc.format(currentTl.esttracc!.isNegative ? 1 - (currentTl.esttracc! - currentTl.esttracc!.truncate()) : (currentTl.esttracc! - currentTl.esttracc!.truncate())).substring(1) : ".---", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))
                                 ]
                                 ),
                               ),
@@ -354,7 +355,7 @@ class _TLThingyState extends State<TLThingy> {
                                   color: oldTl!.esttracc! > currentTl.esttracc! ? Colors.redAccent : Colors.greenAccent
                                 ),),
                                 if (oldTl?.esttracc != null && widget.lbPositions?.accOfEst != null) const TextSpan(text: " • "),
-                                if (widget.lbPositions?.accOfEst != null) TextSpan(text: widget.lbPositions!.accOfEst!.position >= 1000 ? "${t.top} ${f2.format(widget.lbPositions!.accOfEst!.percentage*100)}%" : "№${widget.lbPositions!.accOfEst!.position}")
+                                if (widget.lbPositions?.accOfEst != null) TextSpan(text: widget.lbPositions!.accOfEst!.position >= 1000 ? "${t.top} ${f2.format(widget.lbPositions!.accOfEst!.percentage*100)}%" : "№${widget.lbPositions!.accOfEst!.position}", style: TextStyle(color: getColorOfRank(widget.lbPositions!.accOfEst!.position)))
                               ]
                               ),
                             ),

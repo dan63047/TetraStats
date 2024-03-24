@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:tetra_stats/utils/colors_functions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 
 class StatCellNum extends StatelessWidget {
@@ -70,7 +71,7 @@ class StatCellNum extends StatelessWidget {
               oldPlayerStat! < playerStat ? Colors.redAccent : Colors.greenAccent
             ),),
             if (oldPlayerStat != null && pos != null) const TextSpan(text: " • "),
-            if (pos != null) TextSpan(text: pos!.position >= 1000 ? "${t.top} ${f2.format(pos!.percentage*100)}%" : "№${pos!.position}")
+            if (pos != null) TextSpan(text: pos!.position >= 1000 ? "${t.top} ${f2.format(pos!.percentage*100)}%" : "№${pos!.position}", style: TextStyle(color: getColorOfRank(pos!.position)))
           ]
           ),
         ), 

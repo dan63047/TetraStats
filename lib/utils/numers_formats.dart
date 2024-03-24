@@ -8,3 +8,4 @@ final NumberFormat f3 = NumberFormat.decimalPatternDigits(locale: LocaleSettings
 final NumberFormat f2 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2);
 final NumberFormat f2l = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2)..minimumFractionDigits = 0;
 final NumberFormat f0 = NumberFormat.decimalPattern(LocaleSettings.currentLocale.languageCode);
+final NumberFormat percentage = NumberFormat.percentPattern(LocaleSettings.currentLocale.languageCode)..maximumFractionDigits = 2;

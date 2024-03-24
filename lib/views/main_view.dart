@@ -34,7 +34,7 @@ import 'package:go_router/go_router.dart';
 
 final TetrioService teto = TetrioService(); // thing, that manadge our local DB
 int _chartsIndex = 0;
-bool _showHistoryAsTable = false;
+bool _gamesPlayedInsteadOfDateAndTime = false;
 List _historyShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR", "Opener", "Plonk", "Inf. DS", "Stride"];
 late ScrollController _scrollController;
 final NumberFormat _timeInSec = NumberFormat("#,###.###s.", LocaleSettings.currentLocale.languageCode);
@@ -85,6 +85,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   String _titleNickname = "dan63047";
     /// Each dropdown menu item contains list of dots for the graph
   var chartsData = <DropdownMenuItem<List<FlSpot>>>[];
+  var chartsDataGamesPlayed = <DropdownMenuItem<List<FlSpot>>>[];
   //var tableData = <TableRow>[];
   final bodyGlobalKey = GlobalKey();
   bool _showSearchBar = false;
@@ -283,6 +284,29 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.playstyle!.infds)], child: const Text("Inf. DS")),
       DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.playstyle!.stride)], child: const Text("Stride")),
     ];
+    chartsDataGamesPlayed = <DropdownMenuItem<List<FlSpot>>>[ // Dumping charts data into dropdown menu items, while cheking if every entry is valid
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.gamesPlayed.toDouble(), tl.rating)], child: Text(t.statCellNum.tr)),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.gamesPlayed.toDouble(), tl.glicko!)], child: const Text("Glicko")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.gamesPlayed.toDouble(), tl.rd!)], child: const Text("Rating Deviation")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.apm != null) FlSpot(tl.gamesPlayed.toDouble(), tl.apm!)], child: Text(t.statCellNum.apm.replaceAll(RegExp(r'\n'), " "))),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.pps != null) FlSpot(tl.gamesPlayed.toDouble(), tl.pps!)], child: Text(t.statCellNum.pps.replaceAll(RegExp(r'\n'), " "))),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.vs != null) FlSpot(tl.gamesPlayed.toDouble(), tl.vs!)], child: Text(t.statCellNum.vs.replaceAll(RegExp(r'\n'), " "))),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.app)], child: Text(t.statCellNum.app.replaceAll(RegExp(r'\n'), " "))),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.dss)], child: Text(t.statCellNum.dss.replaceAll(RegExp(r'\n'), " "))),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.dsp)], child: Text(t.statCellNum.dsp.replaceAll(RegExp(r'\n'), " "))),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.appdsp)], child: const Text("APP + DS/P")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.vsapm)], child: const Text("VS/APM")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.cheese)], child: Text(t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "))),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.gbe)], child: Text(t.statCellNum.gbe.replaceAll(RegExp(r'\n'), " "))),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.nyaapp)], child: Text(t.statCellNum.nyaapp.replaceAll(RegExp(r'\n'), " "))),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.area)], child: Text(t.statCellNum.area.replaceAll(RegExp(r'\n'), " "))),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.estTr != null) FlSpot(tl.gamesPlayed.toDouble(), tl.estTr!.esttr)], child: Text(t.statCellNum.estOfTR.replaceAll(RegExp(r'\n'), " "))),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.esttracc != null) FlSpot(tl.gamesPlayed.toDouble(), tl.esttracc!)], child: Text(t.statCellNum.accOfEst.replaceAll(RegExp(r'\n'), " "))),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.gamesPlayed.toDouble(), tl.playstyle!.opener)], child: const Text("Opener")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.gamesPlayed.toDouble(), tl.playstyle!.plonk)], child: const Text("Plonk")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.gamesPlayed.toDouble(), tl.playstyle!.infds)], child: const Text("Inf. DS")),
+      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.gamesPlayed.toDouble(), tl.playstyle!.stride)], child: const Text("Stride")),
+    ];
     }else{
       compareWith = null;
       chartsData = [];
@@ -393,8 +417,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                       return notification.depth == 0;
                     },
                     child: NestedScrollView(
-                      scrollBehavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-                      physics: const AlwaysScrollableScrollPhysics(),
+                      scrollBehavior: ScrollConfiguration.of(context).copyWith(scrollbars: false, physics: const AlwaysScrollableScrollPhysics()),
                       controller: _scrollController,
                       headerSliverBuilder: (context, value) {
                         return [
@@ -448,10 +471,10 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                             ),
                             SizedBox(
                               width: 450,
-                              child: _TLRecords(userID: snapshot.data![0].userId, changePlayer: changePlayer, data: snapshot.data![3], wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0, oldMathcesHere: _TLHistoryWasFetched)
+                              child: _TLRecords(userID: snapshot.data![0].userId, changePlayer: changePlayer, data: snapshot.data![3], wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0, oldMathcesHere: _TLHistoryWasFetched, separateScrollController: true,)
                             ),
                           ],),
-                          _History(chartsData: chartsData, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
+                          _History(chartsData: chartsData, chartsDataGamesPlayed: chartsDataGamesPlayed, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
                           _TwoRecordsThingy(sprint: snapshot.data![1]['sprint'], blitz: snapshot.data![1]['blitz'], rank: snapshot.data![0].tlSeason1.percentileRank,),
                           _OtherThingy(zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6],)
                         ] : [
@@ -466,7 +489,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                             lbPositions: meAmongEveryone
                           ),
                           _TLRecords(userID: snapshot.data![0].userId, changePlayer: changePlayer, data: snapshot.data![3], wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0, oldMathcesHere: _TLHistoryWasFetched),
-                          _History(chartsData: chartsData, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
+                          _History(chartsData: chartsData, chartsDataGamesPlayed: chartsDataGamesPlayed, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
                           _RecordThingy(record: snapshot.data![1]['sprint'], rank: snapshot.data![0].tlSeason1.percentileRank),
                           _RecordThingy(record: snapshot.data![1]['blitz'], rank: snapshot.data![0].tlSeason1.percentileRank),
                           _OtherThingy(zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6],)
@@ -664,10 +687,11 @@ class _TLRecords extends StatelessWidget {
   final List<TetraLeagueAlphaRecord> data;
   final bool wasActiveInTL;
   final bool oldMathcesHere;
+  final bool separateScrollController;
 
   /// Widget, that displays Tetra League records.
   /// Accepts list of TL records ([data]) and [userID] of player from the view
-  const _TLRecords({required this.userID, required this.changePlayer, required this.data, required this.wasActiveInTL, required this.oldMathcesHere});
+  const _TLRecords({required this.userID, required this.changePlayer, required this.data, required this.wasActiveInTL, required this.oldMathcesHere, this.separateScrollController = false});
 
   @override
   Widget build(BuildContext context) {
@@ -685,7 +709,7 @@ class _TLRecords extends StatelessWidget {
     int length = data.length;
     return ListView.builder(
       physics: const AlwaysScrollableScrollPhysics(),
-      controller: ScrollController(),
+      controller: separateScrollController ? ScrollController() : null,
       itemCount: oldMathcesHere ? length : length + 1,
       itemBuilder: (BuildContext context, int index) {
         if (index == length) {
@@ -708,7 +732,6 @@ class _TLRecords extends StatelessWidget {
           )
         ),
         child: ListTile(
-          // tileColor: data[index].endContext.firstWhere((element) => element.userId == userID).success ? Colors.green[900] : Colors.red[900],
           leading: Text("${data[index].endContext.firstWhere((element) => element.userId == userID).points} : ${data[index].endContext.firstWhere((element) => element.userId != userID).points}",
           style: bigScreen ? const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, shadows: textShadow) : const TextStyle(fontSize: 28, shadows: textShadow)),
           title: Text("vs. ${data[index].endContext.firstWhere((element) => element.userId != userID).username}"),
@@ -730,6 +753,7 @@ class _TLRecords extends StatelessWidget {
 
 class _History extends StatelessWidget{
   final List<DropdownMenuItem<List<FlSpot>>> chartsData;
+  final List<DropdownMenuItem<List<FlSpot>>> chartsDataGamesPlayed;
   final String userID;
   final Function update;
   final Function changePlayer;
@@ -737,7 +761,7 @@ class _History extends StatelessWidget{
 
   /// Widget, that can show history of some stat of the player on the graph.
   /// Requires player [states], which is list of states and function [update], which rebuild widgets
-  const _History({required this.chartsData, required this.userID, required this.changePlayer, required this.update, required this.wasActiveInTL});
+  const _History({required this.chartsData, required this.chartsDataGamesPlayed, required this.userID, required this.changePlayer, required this.update, required this.wasActiveInTL});
   
   @override
   Widget build(BuildContext context) {
@@ -763,15 +787,25 @@ class _History extends StatelessWidget{
               Wrap(
                 spacing: 20,
                 children: [
-                  // DropdownButton(
-                  //       items: [DropdownMenuItem(child: Text("Chart"), value: false), DropdownMenuItem(child: Text("Table"), value: true)],
-                  //       value: _showHistoryAsTable,
-                  //       onChanged: (value) {
-                  //         _showHistoryAsTable = value!;
-                  //         update();
-                  //       }
-                  //     ),
-                  DropdownButton(
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Padding(padding: EdgeInsets.all(8.0), child: Text("X:", style: TextStyle(fontSize: 22))),
+                      DropdownButton(
+                        items: const [DropdownMenuItem(value: false, child: Text("Date & Time")), DropdownMenuItem(value: true, child: Text("Games Played"))],
+                        value: _gamesPlayedInsteadOfDateAndTime,
+                        onChanged: (value) {
+                          _gamesPlayedInsteadOfDateAndTime = value!;
+                          update();
+                        }
+                      ),
+                      ],
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Padding(padding: EdgeInsets.all(8.0), child: Text("Y:", style: TextStyle(fontSize: 22))),
+                      DropdownButton(
                         items: chartsData,
                         value: chartsData[_chartsIndex].value,
                         onChanged: (value) {
@@ -779,10 +813,12 @@ class _History extends StatelessWidget{
                           update();
                         }
                       ),
+                    ],
+                  ),
                 ],
               ),
-              if(chartsData[_chartsIndex].value!.length > 1 && !_showHistoryAsTable) _HistoryChartThigy(data: chartsData[_chartsIndex].value!, yAxisTitle: _historyShortTitles[_chartsIndex], bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? f2 : NumberFormat.compact(),)
-              else if (chartsData[_chartsIndex].value!.length <= 1 && !_showHistoryAsTable) Center(child: Column(
+              if(chartsData[_chartsIndex].value!.length > 1) _HistoryChartThigy(data: _gamesPlayedInsteadOfDateAndTime ? chartsDataGamesPlayed[_chartsIndex].value! : chartsData[_chartsIndex].value!, yAxisTitle: _historyShortTitles[_chartsIndex], bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? f2 : NumberFormat.compact(), xFormat: NumberFormat.compact())
+              else if (chartsData[_chartsIndex].value!.length <= 1) Center(child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(t.notEnoughData, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
@@ -790,10 +826,6 @@ class _History extends StatelessWidget{
                   if (wasActiveInTL) TextButton(onPressed: (){changePlayer(userID, fetchHistory: true);}, child: Text(t.fetchAndsaveTLHistory))
                 ],
               ))
-              // else if (_showHistoryAsTable) Padding(
-              //   padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
-              //   child: _HistoryTableThingy(tableData),
-              // )
             ],
           ),
       ),
@@ -807,11 +839,12 @@ class _HistoryChartThigy extends StatefulWidget{
   final bool bigScreen;
   final double leftSpace;
   final NumberFormat yFormat;
+  final NumberFormat? xFormat;
   
   /// Implements graph for the _History widget. Requires [data] which is a list of dots for the graph. [yAxisTitle] used to keep track of changes.
   /// [bigScreen] tells if screen wide enough, [leftSpace] sets size, reserved for titles on the left from the graph and [yFormat] sets number format
   /// for left titles
-  const _HistoryChartThigy({required this.data, required this.yAxisTitle, required this.bigScreen, required this.leftSpace, required this.yFormat});
+  const _HistoryChartThigy({required this.data, required this.yAxisTitle, required this.bigScreen, required this.leftSpace, required this.yFormat, this.xFormat});
 
   @override
   State<_HistoryChartThigy> createState() => _HistoryChartThigyState();
@@ -819,6 +852,7 @@ class _HistoryChartThigy extends StatefulWidget{
 
 class _HistoryChartThigyState extends State<_HistoryChartThigy> {
   late String previousAxisTitle;
+  late bool previousGamesPlayedInsteadOfDateAndTime;
   late double minX;
   late double maxX;
   late double minY;
@@ -840,6 +874,7 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
     maxX = widget.data.last.x;
     setMinMaxY();
     previousAxisTitle = widget.yAxisTitle;
+    previousGamesPlayedInsteadOfDateAndTime = _gamesPlayedInsteadOfDateAndTime;
     actualMaxY = maxY;
     actualMinY = minY;
     recalculateScales();
@@ -945,15 +980,19 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
   @override
   Widget build(BuildContext context) {
     GlobalKey graphKey = GlobalKey();
-    double xInterval = widget.bigScreen ? max(1, xScale / 6) : max(1, xScale / 3); // how far away xTitles should be between each other
+    if ((previousAxisTitle != widget.yAxisTitle) || (previousGamesPlayedInsteadOfDateAndTime != _gamesPlayedInsteadOfDateAndTime)) {
+      minX = widget.data.first.x;
+      maxX = widget.data.last.x;
+      recalculateScales();
+      setMinMaxY();
+      previousAxisTitle = widget.yAxisTitle;
+      previousGamesPlayedInsteadOfDateAndTime = _gamesPlayedInsteadOfDateAndTime;
+      setState((){});
+    }
+    double xInterval = widget.bigScreen ? max(1, xScale / 8) : max(1, xScale / 4); // how far away xTitles should be between each other
     EdgeInsets padding = widget.bigScreen ? const EdgeInsets.fromLTRB(40, 30, 40, 30) : const EdgeInsets.fromLTRB(0, 40, 16, 48);
     double graphStartX = padding.left+widget.leftSpace;
     double graphEndX = MediaQuery.sizeOf(context).width - padding.right;
-    if (previousAxisTitle != widget.yAxisTitle) {
-      setMinMaxY();
-      recalculateScales();
-      previousAxisTitle = widget.yAxisTitle;
-    }
     return SizedBox(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height - 104,
@@ -1025,7 +1064,7 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
                     bottomTitles: AxisTitles(sideTitles: SideTitles(interval: xInterval, showTitles: true, reservedSize: 30, getTitlesWidget: (double value, TitleMeta meta){
                       return value != meta.min && value != meta.max ? SideTitleWidget(
                         axisSide: meta.axisSide,
-                        child: Text(DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).format(DateTime.fromMillisecondsSinceEpoch(value.floor()))),
+                        child: Text(widget.xFormat != null && _gamesPlayedInsteadOfDateAndTime ? widget.xFormat!.format(value.round()) : DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).format(DateTime.fromMillisecondsSinceEpoch(value.floor()))),
                       ) : Container();
                     })),
                     leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: widget.leftSpace, getTitlesWidget: (double value, TitleMeta meta){
@@ -1048,7 +1087,7 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
                           } else {
                             hoveredPointId = touchResponse!.lineBarSpots!.first.spotIndex;
                             headerTooltip = "${f4.format(touchResponse.lineBarSpots!.first.y)} ${widget.yAxisTitle}";
-                            footerTooltip = _dateFormat.format(DateTime.fromMillisecondsSinceEpoch(touchResponse.lineBarSpots!.first.x.floor()));
+                            footerTooltip = _gamesPlayedInsteadOfDateAndTime ? "${f0.format(touchResponse.lineBarSpots!.first.x)} games played" : _dateFormat.format(DateTime.fromMillisecondsSinceEpoch(touchResponse.lineBarSpots!.first.x.floor()));
                           }
                           });
                         }
@@ -1207,7 +1246,7 @@ class _TwoRecordsThingy extends StatelessWidget {
                   RichText(
                     text: TextSpan(
                       text: "",
-                      style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: FontWeight.w500),
+                      style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: FontWeight.w500, color: Colors.white),
                       children: [
                         TextSpan(text: blitz != null ? NumberFormat.decimalPattern().format(blitz!.endContext!.score) : "---"),
                         //WidgetSpan(child: Image.asset("res/icons/kagari.png", height: 48))
@@ -1295,6 +1334,7 @@ class _RecordThingy extends StatelessWidget {
       builder: (context, constraints) {
         bool bigScreen = constraints.maxWidth > 768;
         return SingleChildScrollView(
+          controller: _scrollController,
           child: Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Column(

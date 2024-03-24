@@ -1,12 +1,12 @@
 //import 'dart:convert';
-import 'dart:io';
+//import 'dart:io';
 
 //import 'package:path_provider/path_provider.dart';
 
 //import 'tetrio_multiplayer_replay.dart';
 
 /// That thing allows me to test my new staff i'm trying to implement
-void main() async {
+//void main() async {
   // List<Tetromino> queue = List.from(tetrominoes);
   // TetrioRNG rng = TetrioRNG(0);
   // queue = rng.shuffleList(queue);
@@ -21,5 +21,5 @@ void main() async {
   // print(replay.rawJson);
 
   //print("");
-  exit(0);
-}
+//  exit(0);
+//}

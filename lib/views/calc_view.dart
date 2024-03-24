@@ -66,76 +66,65 @@ class CalcState extends State<CalcView> {
         title: Text(t.statsCalc),
       ),
       backgroundColor: Colors.black,
-      body: SafeArea(
+      body: SingleChildScrollView(
         child: Center(
           child: Container(
             constraints: const BoxConstraints(maxWidth: 768),
-            child: NestedScrollView(
-                controller: _scrollController,
-                headerSliverBuilder: (context, value) {
-                  return [
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(14, 16, 16, 32),
-                        child: Row(
-                          children: [
-                            Expanded(
-                                child: Padding(
-                              padding: const EdgeInsets.only(right: 12),
-                              child: TextField(
-                                onSubmitted: (value) => calc(),
-                                controller: apmController,
-                                keyboardType: TextInputType.number,
-                                decoration: const InputDecoration(label: Text("APM"), alignLabelWithHint: true),
-                              ),
-                            )),
-                            Expanded(
-                                child: TextField(
-                              onSubmitted: (value) => calc(),
-                              controller: ppsController,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(label: Text("PPS"), alignLabelWithHint: true),
-                            )),
-                            Expanded(
-                                child: Padding(
-                              padding: const EdgeInsets.only(left: 12),
-                              child: TextField(
-                                onSubmitted: (value) => calc(),
-                                controller: vsController,
-                                keyboardType: TextInputType.number,
-                                decoration: const InputDecoration(label: Text("VS"), alignLabelWithHint: true),
-                              ),
-                            )),
-                            TextButton(
-                              onPressed: () => calc(),
-                              child: Text(t.calc),
-                            ),
-                          ],
-                        ),
+            child: Column(children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 16, 16, 32),
+                child: Row(
+                  children: [
+                    Expanded(
+                        child: Padding(
+                      padding: const EdgeInsets.only(right: 12),
+                      child: TextField(
+                        onSubmitted: (value) => calc(),
+                        controller: apmController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(label: Text("APM"), alignLabelWithHint: true),
                       ),
+                    )),
+                    Expanded(
+                        child: TextField(
+                      onSubmitted: (value) => calc(),
+                      controller: ppsController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(label: Text("PPS"), alignLabelWithHint: true),
+                    )),
+                    Expanded(
+                        child: Padding(
+                      padding: const EdgeInsets.only(left: 12),
+                      child: TextField(
+                        onSubmitted: (value) => calc(),
+                        controller: vsController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(label: Text("VS"), alignLabelWithHint: true),
+                      ),
+                    )),
+                    TextButton(
+                      onPressed: () => calc(),
+                      child: Text(t.calc),
                     ),
-                    const SliverToBoxAdapter(
-                      child: Divider(),
-                    )
-                  ];
-                },
-                body: nerdStats == null
-                    ? Text(t.calcViewNoValues)
-                    : ListView(
-                        children: [
-                          _ListEntry(value: nerdStats!.app, label: t.statCellNum.app.replaceAll(RegExp(r'\n'), " "), fractionDigits: 3),
-                          _ListEntry(value: nerdStats!.vsapm, label: "VS/APM", fractionDigits: 3),
-                          _ListEntry(value: nerdStats!.dss, label: t.statCellNum.dss.replaceAll(RegExp(r'\n'), " "), fractionDigits: 3),
-                          _ListEntry(value: nerdStats!.dsp, label: t.statCellNum.dsp.replaceAll(RegExp(r'\n'), " "), fractionDigits: 3),
-                          _ListEntry(value: nerdStats!.appdsp, label: "APP + DS/P", fractionDigits: 3),
-                          _ListEntry(value: nerdStats!.cheese, label: t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "), fractionDigits: 3),
-                          _ListEntry(value: nerdStats!.gbe, label: t.statCellNum.gbe.replaceAll(RegExp(r'\n'), " "), fractionDigits: 3),
-                          _ListEntry(value: nerdStats!.nyaapp, label: t.statCellNum.nyaapp.replaceAll(RegExp(r'\n'), " "), fractionDigits: 3),
-                          _ListEntry(value: nerdStats!.area, label: t.statCellNum.area.replaceAll(RegExp(r'\n'), " "), fractionDigits: 3),
-                          _ListEntry(value: estTr!.esttr, label: t.statCellNum.estOfTR, fractionDigits: 3),
-                          Graphs(apm!, pps!, vs!, nerdStats!, playstyle!),
-                        ],
-                      )),
+                  ],
+                ),
+              ),
+              Divider(),
+              if (nerdStats == null) Text(t.calcViewNoValues)
+              else Column(children: [
+                _ListEntry(value: nerdStats!.app, label: t.statCellNum.app.replaceAll(RegExp(r'\n'), " "), fractionDigits: 3),
+                _ListEntry(value: nerdStats!.vsapm, label: "VS/APM", fractionDigits: 3),
+                _ListEntry(value: nerdStats!.dss, label: t.statCellNum.dss.replaceAll(RegExp(r'\n'), " "), fractionDigits: 3),
+                _ListEntry(value: nerdStats!.dsp, label: t.statCellNum.dsp.replaceAll(RegExp(r'\n'), " "), fractionDigits: 3),
+                _ListEntry(value: nerdStats!.appdsp, label: "APP + DS/P", fractionDigits: 3),
+                _ListEntry(value: nerdStats!.cheese, label: t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "), fractionDigits: 3),
+                _ListEntry(value: nerdStats!.gbe, label: t.statCellNum.gbe.replaceAll(RegExp(r'\n'), " "), fractionDigits: 3),
+                _ListEntry(value: nerdStats!.nyaapp, label: t.statCellNum.nyaapp.replaceAll(RegExp(r'\n'), " "), fractionDigits: 3),
+                _ListEntry(value: nerdStats!.area, label: t.statCellNum.area.replaceAll(RegExp(r'\n'), " "), fractionDigits: 3),
+                _ListEntry(value: estTr!.esttr, label: t.statCellNum.estOfTR, fractionDigits: 3),
+                Graphs(apm!, pps!, vs!, nerdStats!, playstyle!)
+              ],)
+            ],),
           ),
         ),
       ),
