@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/views/rank_averages_view.dart';
 import 'package:window_manager/window_manager.dart';
 import 'main_view.dart'; // lol
@@ -40,7 +40,6 @@ class RanksAverages extends State<RankAveragesView> {
 
   @override
   Widget build(BuildContext context) {
-    final NumberFormat f2 = NumberFormat.decimalPattern(LocaleSettings.currentLocale.languageCode)..maximumFractionDigits = 2;
     return Scaffold(
       appBar: AppBar(
         title: Text(t.rankAveragesViewTitle),
@@ -55,7 +54,8 @@ class RanksAverages extends State<RankAveragesView> {
               return ListTile(
                 leading: Image.asset("res/tetrio_tl_alpha_ranks/${keys[index]}.png", height: 48),
                 title: Text(t.players(n: averages[keys[index]]?[1]["players"]), style: const TextStyle(fontFamily: "Eurostile Round Extended")),
-                subtitle: Text("${f2.format(averages[keys[index]]?[0].apm)} APM, ${f2.format(averages[keys[index]]?[0].pps)} PPS, ${f2.format(averages[keys[index]]?[0].vs)} VS, ${f2.format(averages[keys[index]]?[0].nerdStats.app)} APP, ${f2.format(averages[keys[index]]?[0].nerdStats.vsapm)} VS/APM"),
+                subtitle: Text("${f2.format(averages[keys[index]]?[0].apm)} APM, ${f2.format(averages[keys[index]]?[0].pps)} PPS, ${f2.format(averages[keys[index]]?[0].vs)} VS, ${f2.format(averages[keys[index]]?[0].nerdStats.app)} APP, ${f2.format(averages[keys[index]]?[0].nerdStats.vsapm)} VS/APM",
+                  style: TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
                 trailing: Text("${f2.format(averages[keys[index]]?[1]["toEnterTR"])} TR", style: bigScreen ? const TextStyle(fontSize: 28) : null),
                 onTap: (){
                   if (averages[keys[index]]?[1]["players"] > 0) {

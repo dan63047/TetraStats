@@ -74,6 +74,7 @@ class TetrioService extends DB {
   final Map<String, Map<String, dynamic>> _recordsCache = {};
   final Map<String, dynamic> _replaysCache = {}; // the only one is different: {"replayID": [replayString, replayBytes]}
   final Map<String, TetrioPlayersLeaderboard> _leaderboardsCache = {};
+  final Map<String, PlayerLeaderboardPosition> _lbPositions = {};
   final Map<String, List<News>> _newsCache = {};
   final Map<String, Map<String, double?>> _topTRcache = {};
   final Map<String, TetraLeagueAlphaStream> _tlStreamsCache = {};
@@ -140,6 +141,14 @@ class TetrioService extends DB {
     await ensureDbIsOpen();
     final db = getDatabaseOrThrow();
     db.insert(tetrioTLReplayStatsTable, {idCol: replay.id, "data": jsonEncode(replay.toJson())});
+  }
+
+  void cacheLeaderboardPositions(String userID, PlayerLeaderboardPosition positions){
+    _lbPositions[userID] = positions;
+  }
+
+  PlayerLeaderboardPosition? getCachedLeaderboardPositions(String userID){
+    return _lbPositions[userID];
   }
 
   /// Downloads replay from inoue (szy API). Requiers [replayID]. If request have
@@ -406,12 +415,12 @@ class TetrioService extends DB {
           // parsing data into TetraLeagueAlphaRecord objects
           for (var entry in csv){
             TetraLeagueAlphaRecord match = TetraLeagueAlphaRecord(
-              replayId: entry[0],
-              ownId: entry[0], // i gonna disting p1nkl0bst3r entries with it
+              replayId: entry[0].toString(),
+              ownId: entry[0].toString(), // i gonna disting p1nkl0bst3r entries with it
               timestamp: DateTime.parse(entry[1]),
               endContext: [
                 EndContextMulti(
-                  userId: entry[2],
+                  userId: entry[2].toString(),
                   username: entry[3].toString(),
                   naturalOrder: 0,
                   inputs: -1,
@@ -428,7 +437,7 @@ class TetrioService extends DB {
                   success: true
                 ),
                 EndContextMulti(
-                  userId: entry[8],
+                  userId: entry[8].toString(),
                   username: entry[9].toString(),
                   naturalOrder: 1,
                   inputs: -1,
@@ -504,6 +513,7 @@ class TetrioService extends DB {
 
       switch (response.statusCode) {
         case 200:
+          _lbPositions.clear();
           var rawJson = jsonDecode(response.body);
           if (rawJson['success']) { // if api confirmed that everything ok
             TetrioPlayersLeaderboard leaderboard = TetrioPlayersLeaderboard.fromJson(rawJson['data']['users'], "league", DateTime.fromMillisecondsSinceEpoch(rawJson['cache']['cached_at']));
@@ -533,6 +543,12 @@ class TetrioService extends DB {
       developer.log("$e, $s");
       throw http.ClientException(e.message, e.uri);
     }
+  }
+
+  TetrioPlayersLeaderboard? getCachedLeaderboard(){
+    return _leaderboardsCache.entries.firstOrNull?.value;
+    // That function will break if i decide to recive other leaderboards
+    // TODO: Think about better solution
   }
 
   /// Retrieves and returns 100 latest news entries from Tetra Channel api for given [userID]. Throws an exception if fails to retrieve.
@@ -710,6 +726,14 @@ class TetrioService extends DB {
       ));
     }
     return matches;
+  }
+
+  /// Gets and returns an amount of stored Tetra League mathes between [ourPlayerID] and [enemyPlayerID].
+  Future<int> getNumberOfTLMatchesBetweenPlayers(String ourPlayerID, String enemyPlayerID) async {
+    await ensureDbIsOpen();
+    final db = getDatabaseOrThrow();
+    final results = await db.rawQuery("SELECT COUNT(*) from tetrioAlphaLeagueMathces WHERE (player1id = $ourPlayerID AND player2id = $enemyPlayerID) OR (player1id = $enemyPlayerID AND player2id = $ourPlayerID)");
+    return results.first.values.first as int;
   }
 
   /// Deletes match and stats of that match with given [matchID] from local DB. Throws an exception if fails.
@@ -950,7 +974,7 @@ class TetrioService extends DB {
               user = json['data']['user']['_id'];
             } else { // fail - throw an exception
               developer.log("fetchPlayer User dosen't exist", name: "services/tetrio_crud", error: response.body);
-              throw TetrioPlayerNotExist();
+              throw TetrioDiscordNotExist();
             }
             break;
           // more exceptions to god of exceptions

@@ -38,6 +38,25 @@ const Map<String, double> rankCutoffs = {
   "z": -1,
   "": 0.5
 };
+const Map<String, double> rankTargets = {
+  "x": 24008,
+  "u": 23038,
+  "ss": 21583,
+  "s+": 20128,
+  "s": 18673,
+  "s-": 16975,
+  "a+": 15035,
+  "a": 13095,
+  "a-": 11155,
+  "b+": 9215,
+  "b": 7275,
+  "b-": 5335,
+  "c+": 3880,
+  "c": 2425,
+  "c-": 1213,
+  "d+": 606,
+  "d": 0,
+};
 enum Stats {
   tr,
   glicko,
@@ -59,6 +78,7 @@ enum Stats {
   area,
   eTR,
   acceTR,
+  acceTRabs,
   opener,
   plonk,
   infDS,
@@ -88,6 +108,7 @@ const Map<Stats, String> chartsShortTitles = {
   Stats.area: "Area",
   Stats.eTR: "eTR",
   Stats.acceTR: "±eTR",
+  Stats.acceTRabs: "+eTR absolute",
   Stats.opener: "Opener",
   Stats.plonk: "Plonk",
   Stats.infDS: "Inf. DS",
@@ -115,6 +136,48 @@ const Map<String, Color> rankColors = { // thanks osk for const rankColors at ht
 	'd+': Color(0xFF8E6091),
 	'd': Color(0xFF907591),
 	'z': Color(0xFF375433)
+};
+
+const Map<String, Duration> sprintAverages = { // based on https://discord.com/channels/673303546107658242/917098364787650590/1214231970259673098 
+	'x': Duration(seconds: 25, milliseconds: 413),
+	'u': Duration(seconds: 34, milliseconds: 549),
+	'ss': Duration(seconds: 43, milliseconds: 373),
+	's+': Duration(seconds: 54, milliseconds: 027),
+	's': Duration(seconds: 60, milliseconds: 412),
+	's-': Duration(seconds: 67, milliseconds: 381),
+	'a+': Duration(seconds: 73, milliseconds: 694),
+	'a': Duration(seconds: 81, milliseconds: 166),
+	'a-': Duration(seconds: 88, milliseconds: 334),
+	'b+': Duration(seconds: 93, milliseconds: 741),
+	'b': Duration(seconds: 98, milliseconds: 354),
+	'b-': Duration(seconds: 109, milliseconds: 610),
+	'c+': Duration(seconds: 124, milliseconds: 641),
+	'c': Duration(seconds: 126, milliseconds: 104),
+	'c-': Duration(seconds: 145, milliseconds: 865),
+	'd+': Duration(seconds: 154, milliseconds: 338),
+	'd': Duration(seconds: 162, milliseconds: 063),
+	//'z': Duration(seconds: 66, milliseconds: 802)
+};
+
+const Map<String, int> blitzAverages = {
+  'x': 626494,
+	'u': 406059,
+	'ss': 243166,
+	's+': 168636,
+	's': 121594,
+	's-': 107845,
+	'a+': 87142,
+	'a': 73413,
+	'a-': 60799,
+	'b+': 55417,
+	'b': 47608,
+	'b-': 40534,
+	'c+': 34200,
+	'c': 32535,
+	'c-': 25808,
+	'd+': 23345,
+	'd': 23063,
+	//'z': 72084
 };
 
 String getStatNameByEnum(Stats stat){
@@ -271,6 +334,10 @@ class TetrioPlayer {
     return tlSeason1.lessStrictCheck(other.tlSeason1);
   }
 
+  TetrioPlayerFromLeaderboard convertToPlayerFromLeaderboard() => TetrioPlayerFromLeaderboard(
+    userId, username, role, xp, country, supporterTier > 0, verified, state, gamesPlayed, gamesWon,
+    tlSeason1.rating, tlSeason1.glicko??0, tlSeason1.rd??noTrRd, tlSeason1.rank, tlSeason1.bestRank, tlSeason1.apm??0, tlSeason1.pps??0, tlSeason1.vs??0, tlSeason1.decaying);
+
   @override
   String toString() {
     return "$username ($state)";
@@ -318,6 +385,8 @@ class TetrioPlayer {
         return tlSeason1.estTr?.esttr;
       case Stats.acceTR:
         return tlSeason1.esttracc;
+      case Stats.acceTRabs:
+        return tlSeason1.esttracc?.abs();
       case Stats.opener:
         return tlSeason1.playstyle?.opener;
       case Stats.plonk:
@@ -1097,6 +1166,73 @@ class News {
   }
 }
 
+class PlayerLeaderboardPosition{
+  late LeaderboardPosition? apm;
+  late LeaderboardPosition? pps;
+  late LeaderboardPosition? vs;
+  late LeaderboardPosition? gamesPlayed;
+  late LeaderboardPosition? gamesWon;
+  late LeaderboardPosition? winrate;
+  late LeaderboardPosition? app;
+  late LeaderboardPosition? vsapm;
+  late LeaderboardPosition? dss;
+  late LeaderboardPosition? dsp;
+  late LeaderboardPosition? appdsp;
+  late LeaderboardPosition? cheese;
+  late LeaderboardPosition? gbe;
+  late LeaderboardPosition? nyaapp;
+  late LeaderboardPosition? area;
+  late LeaderboardPosition? estTr;
+  late LeaderboardPosition? accOfEst;
+
+  PlayerLeaderboardPosition({
+    required this.apm,
+    required this.pps,
+    required this.vs,
+    required this.gamesPlayed,
+    required this.gamesWon,
+    required this.winrate,
+    required this.app,
+    required this.vsapm,
+    required this.dss,
+    required this.dsp,
+    required this.appdsp,
+    required this.cheese,
+    required this.gbe,
+    required this.nyaapp,
+    required this.area,
+    required this.estTr,
+    required this.accOfEst
+  });
+  
+  PlayerLeaderboardPosition.fromSearchResults(List<LeaderboardPosition?> results){
+    apm = results[0];
+    pps = results[1];
+    vs = results[2];
+    gamesPlayed = results[3];
+    gamesWon = results[4];
+    winrate = results[5];
+    app = results[6];
+    vsapm = results[7];
+    dss = results[8];
+    dsp = results[9];
+    appdsp = results[10];
+    cheese = results[11];
+    gbe = results[12];
+    nyaapp = results[13];
+    area = results[14];
+    estTr = results[15];
+    accOfEst = results[16];
+  }
+}
+
+class LeaderboardPosition{
+  int position;
+  double percentage;
+
+  LeaderboardPosition(this.position, this.percentage);
+}
+
 class TetrioPlayersLeaderboard {
   late String type;
   late DateTime timestamp;
@@ -1116,6 +1252,20 @@ class TetrioPlayersLeaderboard {
         return 0;
       }else{
         return reversed ? -1 : 1;
+      }
+    }));
+    return lb;
+  }
+
+  List<TetrioPlayerFromLeaderboard> getStatRankingSequel(Stats stat){
+    List<TetrioPlayerFromLeaderboard> lb = List.from(leaderboard);
+    lb.sort(((a, b) {
+      if (a.getStatByEnum(stat) > b.getStatByEnum(stat)){
+        return -1;
+      }else if (a.getStatByEnum(stat) == b.getStatByEnum(stat)){
+        return 0;
+      }else{
+        return 1;
       }
     }));
     return lb;
@@ -1711,6 +1861,30 @@ class TetrioPlayersLeaderboard {
     }
   }
 
+  PlayerLeaderboardPosition? getLeaderboardPosition(TetrioPlayer user) {
+    if (user.tlSeason1.gamesPlayed == 0) return null;
+    bool fakePositions = false;
+    late List<TetrioPlayerFromLeaderboard> copyOfLeaderboard;
+    if (leaderboard.indexWhere((element) => element.userId == user.userId) == -1){
+      fakePositions =true;
+      copyOfLeaderboard = List.of(leaderboard);
+      copyOfLeaderboard.add(user.convertToPlayerFromLeaderboard());
+    } 
+    List<Stats> stats = [Stats.apm, Stats.pps, Stats.vs, Stats.gp, Stats.gw, Stats.wr,
+    Stats.app, Stats.vsapm, Stats.dss, Stats.dsp, Stats.appdsp, Stats.cheese, Stats.gbe, Stats.nyaapp, Stats.area, Stats.eTR, Stats.acceTR];
+    List<LeaderboardPosition?> results = [];
+    for (Stats stat in stats) {
+      List<TetrioPlayerFromLeaderboard> sortedLeaderboard = getStatRanking(fakePositions ? copyOfLeaderboard : leaderboard, stat, reversed: stat == Stats.cheese ? true : false);
+      int position = sortedLeaderboard.indexWhere((element) => element.userId == user.userId) + 1;
+      if (position == 0) {
+        results.add(null);
+      } else {
+        results.add(LeaderboardPosition(fakePositions ? 1001 : position, position / sortedLeaderboard.length));
+      }
+    }
+    return PlayerLeaderboardPosition.fromSearchResults(results);
+  }
+
   Map<String, List<dynamic>> get averages => {
     'x': getAverageOfRank("x"),
     'u': getAverageOfRank("u"),
@@ -1730,6 +1904,26 @@ class TetrioPlayersLeaderboard {
     'd+': getAverageOfRank("d+"),
     'd': getAverageOfRank("d"),
     'z': getAverageOfRank("z")
+    };
+
+  Map<String, double> get cutoffs => {
+    'x': getAverageOfRank("x")[1]["toEnterTR"],
+    'u': getAverageOfRank("u")[1]["toEnterTR"],
+    'ss': getAverageOfRank("ss")[1]["toEnterTR"],
+    's+': getAverageOfRank("s+")[1]["toEnterTR"],
+    's': getAverageOfRank("s")[1]["toEnterTR"],
+    's-': getAverageOfRank("s-")[1]["toEnterTR"],
+    'a+': getAverageOfRank("a+")[1]["toEnterTR"],
+    'a': getAverageOfRank("a")[1]["toEnterTR"],
+    'a-': getAverageOfRank("a-")[1]["toEnterTR"],
+    'b+': getAverageOfRank("b+")[1]["toEnterTR"],
+    'b': getAverageOfRank("b")[1]["toEnterTR"],
+    'b-': getAverageOfRank("b-")[1]["toEnterTR"],
+    'c+': getAverageOfRank("c+")[1]["toEnterTR"],
+    'c': getAverageOfRank("c")[1]["toEnterTR"],
+    'c-': getAverageOfRank("c-")[1]["toEnterTR"],
+    'd+': getAverageOfRank("d+")[1]["toEnterTR"],
+    'd': getAverageOfRank("d")[1]["toEnterTR"]
     };
 
   TetrioPlayersLeaderboard.fromJson(List<dynamic> json, String t, DateTime ts) {
@@ -1785,7 +1979,11 @@ class TetrioPlayerFromLeaderboard {
     this.apm,
     this.pps,
     this.vs,
-    this.decaying);
+    this.decaying){
+      nerdStats =  NerdStats(apm, pps, vs);
+      estTr = EstTr(apm, pps, vs, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
+      playstyle = Playstyle(apm, pps, nerdStats.app, nerdStats.vsapm, nerdStats.dsp, nerdStats.gbe, estTr.srarea, estTr.statrank);
+    }
 
   double get winrate => gamesWon / gamesPlayed;
   double get esttracc => estTr.esttr - rating;
@@ -1857,6 +2055,8 @@ class TetrioPlayerFromLeaderboard {
         return estTr.esttr;
       case Stats.acceTR:
         return esttracc;
+      case Stats.acceTRabs:
+        return esttracc.abs();
       case Stats.opener:
         return playstyle.opener;
       case Stats.plonk:

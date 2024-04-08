@@ -255,444 +255,435 @@ class CompareState extends State<CompareView> {
     return Scaffold(
       appBar: AppBar(title: Text("$titleGreenSide ${t.vs} $titleRedSide")),
       backgroundColor: Colors.black,
-      body: SafeArea(
-        child: NestedScrollView(
-          controller: _scrollController,
-          headerSliverBuilder: (context, value) {
-            return [
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Container(
-                          decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                            colors: [Colors.green, Colors.transparent],
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                            stops: [0.0, 0.4],
-                          )),
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                            child: PlayerSelector(
-                              data: theGreenSide,
-                              mode: greenSideMode,
-                              fetch: fetchGreenSide,
-                              change: changeGreenSide,
-                              updateState: _justUpdate,
-                            ),
+      body: SingleChildScrollView(
+        controller: _scrollController,
+        physics: AlwaysScrollableScrollPhysics(),
+        child: Center(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 768),
+            child: Column(children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                          colors: [Colors.green, Colors.transparent],
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          stops: [0.0, 0.4],
+                        )),
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                          child: PlayerSelector(
+                            data: theGreenSide,
+                            mode: greenSideMode,
+                            fetch: fetchGreenSide,
+                            change: changeGreenSide,
+                            updateState: _justUpdate,
                           ),
                         ),
                       ),
-                      const Padding(
-                        padding: EdgeInsets.only(top: 16),
-                        child: Text("VS"),
-                      ),
-                      Expanded(
-                        child: Container(
-                          decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                            colors: [Colors.red, Colors.transparent],
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                            stops: [0.0, 0.4],
-                          )),
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                            child: PlayerSelector(
-                              data: theRedSide,
-                              mode: redSideMode,
-                              fetch: fetchRedSide,
-                              change: changeRedSide,
-                              updateState: _justUpdate,
-                            ),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 16),
+                      child: Text("VS"),
+                    ),
+                    Expanded(
+                      child: Container(
+                        decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                          colors: [Colors.red, Colors.transparent],
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          stops: [0.0, 0.4],
+                        )),
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                          child: PlayerSelector(
+                            data: theRedSide,
+                            mode: redSideMode,
+                            fetch: fetchRedSide,
+                            change: changeRedSide,
+                            updateState: _justUpdate,
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-              const SliverToBoxAdapter(
-                child: Divider(),
-              )
-            ];
-          },
-          body: ListView(
-                  children: !listEquals(theGreenSide, [null, null, null]) && !listEquals(theRedSide, [null, null, null])? [
-                    if (theGreenSide[0] != null &&
-                        theRedSide[0] != null &&
-                        theGreenSide[0]!.role != "banned" &&
-                        theRedSide[0]!.role != "banned")
-                      Column(
-                        children: [
-                          CompareRegTimeThingy(
-                              greenSide: theGreenSide[0].registrationTime,
-                              redSide: theRedSide[0].registrationTime,
-                              label: t.registred),
-                          CompareThingy(
-                            label: t.statCellNum.level,
-                            greenSide: theGreenSide[0].level,
-                            redSide: theRedSide[0].level,
-                            higherIsBetter: true,
-                            fractionDigits: 2,
-                          ),
-                          if (!theGreenSide[0].gameTime.isNegative &&
-                              !theRedSide[0].gameTime.isNegative)
-                            CompareThingy(
-                              greenSide: theGreenSide[0].gameTime.inMicroseconds /
-                                  1000000 /
-                                  60 /
-                                  60,
-                              redSide: theRedSide[0].gameTime.inMicroseconds /
-                                  1000000 /
-                                  60 /
-                                  60,
-                              label: t.statCellNum.hoursPlayed.replaceAll(RegExp(r'\n'), " "),
-                              higherIsBetter: true,
-                              fractionDigits: 2,
-                            ),
-                          if (theGreenSide[0].gamesPlayed >= 0 &&
-                              theRedSide[0].gamesPlayed >= 0)
-                            CompareThingy(
-                              label: t.statCellNum.onlineGames.replaceAll(RegExp(r'\n'), " "),
-                              greenSide: theGreenSide[0].gamesPlayed,
-                              redSide: theRedSide[0].gamesPlayed,
-                              higherIsBetter: true,
-                            ),
-                          if (theGreenSide[0].gamesWon >= 0 &&
-                              theRedSide[0].gamesWon >= 0)
-                            CompareThingy(
-                              label: t.statCellNum.gamesWon.replaceAll(RegExp(r'\n'), " "),
-                              greenSide: theGreenSide[0].gamesWon,
-                              redSide: theRedSide[0].gamesWon,
-                              higherIsBetter: true,
-                            ),
-                          CompareThingy(
-                            label: t.statCellNum.friends,
-                            greenSide: theGreenSide[0].friendCount,
-                            redSide: theRedSide[0].friendCount,
-                            higherIsBetter: true,
-                          ),
-                          const Divider(),
-                        ],
+              Divider(),
+              if (!listEquals(theGreenSide, [null, null, null]) && !listEquals(theRedSide, [null, null, null])) Column(
+                children: [
+                  if (theGreenSide[0] != null && theRedSide[0] != null && theGreenSide[0]!.role != "banned" && theRedSide[0]!.role != "banned")
+                  Column(
+                    children: [
+                      CompareRegTimeThingy(
+                        greenSide: theGreenSide[0].registrationTime,
+                        redSide: theRedSide[0].registrationTime,
+                        label: t.registred),
+                      CompareThingy(
+                        label: t.statCellNum.level,
+                        greenSide: theGreenSide[0].level,
+                        redSide: theRedSide[0].level,
+                        higherIsBetter: true,
+                        fractionDigits: 2,
                       ),
-                    if (theGreenSide[0] != null &&
-                        theRedSide[0] != null &&
-                        (theGreenSide[0]!.role == "banned" ||
-                        theRedSide[0]!.role == "banned"))
-                      CompareBoolThingy(
-                          greenSide: theGreenSide[0].role == "banned",
-                          redSide: theRedSide[0].role == "banned",
-                          label: t.normalBanned,
-                          trueIsBetter: false),
-                    (theGreenSide[2].gamesPlayed > 0 || greenSideMode == Mode.stats) &&
-                    (theRedSide[2].gamesPlayed > 0 || redSideMode == Mode.stats)
-                        ? Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 16),
-                                child: Text(t.tetraLeague,
-                                    style: TextStyle(
-                                        fontFamily: "Eurostile Round Extended",
-                                        fontSize: bigScreen ? 42 : 28)),
-                              ),
-                              if (theGreenSide[2].gamesPlayed > 9 &&
-                                  theRedSide[2].gamesPlayed > 9 &&
-                                  greenSideMode != Mode.stats &&
-                                  redSideMode != Mode.stats)
-                                CompareThingy(
-                                  label: "TR",
-                                  greenSide: theGreenSide[2].rating,
-                                  redSide: theRedSide[2].rating,
-                                  fractionDigits: 2,
-                                  higherIsBetter: true,
-                                ),
-                              if (greenSideMode != Mode.stats &&
-                                  redSideMode != Mode.stats)
-                              CompareThingy(
-                                label: t.statCellNum.gamesPlayed.replaceAll(RegExp(r'\n'), " "),
-                                greenSide: theGreenSide[2].gamesPlayed,
-                                redSide: theRedSide[2].gamesPlayed,
-                                higherIsBetter: true,
-                              ),
-                              if (greenSideMode != Mode.stats &&
-                                  redSideMode != Mode.stats)
-                              CompareThingy(
-                                label: t.statCellNum.gamesWonTL.replaceAll(RegExp(r'\n'), " "),
-                                greenSide: theGreenSide[2].gamesWon,
-                                redSide: theRedSide[2].gamesWon,
-                                higherIsBetter: true,
-                              ),
-                              if (greenSideMode != Mode.stats &&
-                                  redSideMode != Mode.stats)
-                              CompareThingy(
-                                label: "WR %",
-                                greenSide:
-                                    theGreenSide[2].winrate * 100,
-                                redSide: theRedSide[2].winrate * 100,
-                                fractionDigits: 2,
-                                higherIsBetter: true,
-                              ),
-                              if (theGreenSide[2].gamesPlayed > 9 &&
-                                  theRedSide[2].gamesPlayed > 9 &&
-                                  greenSideMode != Mode.stats &&
-                                  redSideMode != Mode.stats)
-                                CompareThingy(
-                                  label: "Glicko",
-                                  greenSide: theGreenSide[2].glicko!,
-                                  redSide: theRedSide[2].glicko!,
-                                  fractionDigits: 2,
-                                  higherIsBetter: true,
-                                ),
-                              if (theGreenSide[2].gamesPlayed > 9 &&
-                                  theRedSide[2].gamesPlayed > 9 &&
-                                  greenSideMode != Mode.stats &&
-                                  redSideMode != Mode.stats)
-                                CompareThingy(
-                                  label: "RD",
-                                  greenSide: theGreenSide[2].rd!,
-                                  redSide: theRedSide[2].rd!,
-                                  fractionDigits: 3,
-                                  higherIsBetter: false,
-                                ),
-                              if (theGreenSide[2].standing > 0 &&
-                                  theRedSide[2].standing > 0 &&
-                                  greenSideMode == Mode.player &&
-                                  redSideMode == Mode.player)
-                                CompareThingy(
-                                  label: t.statCellNum.lbpShort,
-                                  greenSide: theGreenSide[2].standing,
-                                  redSide: theRedSide[2].standing,
-                                  higherIsBetter: false,
-                                ),
-                              if (theGreenSide[2].standingLocal > 0 &&
-                                  theRedSide[2].standingLocal > 0 &&
-                                  greenSideMode == Mode.player &&
-                                  redSideMode == Mode.player)
-                                CompareThingy(
-                                  label: t.statCellNum.lbpcShort,
-                                  greenSide:
-                                      theGreenSide[2].standingLocal,
-                                  redSide: theRedSide[2].standingLocal,
-                                  higherIsBetter: false,
-                                ),
-                              if (theGreenSide[2].apm != null &&
-                                  theRedSide[2].apm != null)
-                                CompareThingy(
-                                  label: "APM",
-                                  greenSide: theGreenSide[2].apm!,
-                                  redSide: theRedSide[2].apm!,
-                                  fractionDigits: 2,
-                                  higherIsBetter: true,
-                                ),
-                              if (theGreenSide[2].pps != null &&
-                                  theRedSide[2].pps != null)
-                                CompareThingy(
-                                  label: "PPS",
-                                  greenSide: theGreenSide[2].pps!,
-                                  redSide: theRedSide[2].pps!,
-                                  fractionDigits: 2,
-                                  higherIsBetter: true,
-                                ),
-                              if (theGreenSide[2].vs != null &&
-                                  theRedSide[2].vs != null)
-                                CompareThingy(
-                                  label: "VS",
-                                  greenSide: theGreenSide[2].vs!,
-                                  redSide: theRedSide[2].vs!,
-                                  fractionDigits: 2,
-                                  higherIsBetter: true,
-                                ),
-                            ],
-                          )
-                        : CompareBoolThingy(
-                            greenSide: theGreenSide[2].gamesPlayed > 0,
-                            redSide: theRedSide[2].gamesPlayed > 0,
-                            label: t.playedTL,
-                            trueIsBetter: false),
+                      if (!theGreenSide[0].gameTime.isNegative && !theRedSide[0].gameTime.isNegative)
+                        CompareThingy(
+                          greenSide: theGreenSide[0].gameTime.inMicroseconds /
+                              1000000 /
+                              60 /
+                              60,
+                          redSide: theRedSide[0].gameTime.inMicroseconds /
+                              1000000 /
+                              60 /
+                              60,
+                          label: t.statCellNum.hoursPlayed.replaceAll(RegExp(r'\n'), " "),
+                          higherIsBetter: true,
+                          fractionDigits: 2,
+                        ),
+                      if (theGreenSide[0].gamesPlayed >= 0 && theRedSide[0].gamesPlayed >= 0)
+                        CompareThingy(
+                          label: t.statCellNum.onlineGames.replaceAll(RegExp(r'\n'), " "),
+                          greenSide: theGreenSide[0].gamesPlayed,
+                          redSide: theRedSide[0].gamesPlayed,
+                          higherIsBetter: true,
+                        ),
+                      if (theGreenSide[0].gamesWon >= 0 && theRedSide[0].gamesWon >= 0)
+                        CompareThingy(
+                          label: t.statCellNum.gamesWon.replaceAll(RegExp(r'\n'), " "),
+                          greenSide: theGreenSide[0].gamesWon,
+                          redSide: theRedSide[0].gamesWon,
+                          higherIsBetter: true,
+                        ),
+                      CompareThingy(
+                        label: t.statCellNum.friends,
+                        greenSide: theGreenSide[0].friendCount,
+                        redSide: theRedSide[0].friendCount,
+                        higherIsBetter: true,
+                      ),
+                      const Divider(),
+                    ],
+                  ),
+                  if (theGreenSide[0] != null && theRedSide[0] != null && (theGreenSide[0]!.role == "banned" || theRedSide[0]!.role == "banned"))
+                    CompareBoolThingy(
+                      greenSide: theGreenSide[0].role == "banned",
+                      redSide: theRedSide[0].role == "banned",
+                      label: t.normalBanned,
+                      trueIsBetter: false
+                    ),
+                  (theGreenSide[2].gamesPlayed > 0 || greenSideMode == Mode.stats) && (theRedSide[2].gamesPlayed > 0 || redSideMode == Mode.stats)
+                  ? Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: Text(t.tetraLeague,
+                              style: TextStyle(
+                                  fontFamily: "Eurostile Round Extended",
+                                  fontSize: bigScreen ? 42 : 28)),
+                        ),
+                        if (theGreenSide[2].gamesPlayed > 9 &&
+                            theRedSide[2].gamesPlayed > 9 &&
+                            greenSideMode != Mode.stats &&
+                            redSideMode != Mode.stats)
+                          CompareThingy(
+                            label: "TR",
+                            greenSide: theGreenSide[2].rating,
+                            redSide: theRedSide[2].rating,
+                            fractionDigits: 2,
+                            higherIsBetter: true,
+                          ),
+                        if (greenSideMode != Mode.stats &&
+                            redSideMode != Mode.stats)
+                        CompareThingy(
+                          label: t.statCellNum.gamesPlayed.replaceAll(RegExp(r'\n'), " "),
+                          greenSide: theGreenSide[2].gamesPlayed,
+                          redSide: theRedSide[2].gamesPlayed,
+                          higherIsBetter: true,
+                        ),
+                        if (greenSideMode != Mode.stats &&
+                            redSideMode != Mode.stats)
+                        CompareThingy(
+                          label: t.statCellNum.gamesWonTL.replaceAll(RegExp(r'\n'), " "),
+                          greenSide: theGreenSide[2].gamesWon,
+                          redSide: theRedSide[2].gamesWon,
+                          higherIsBetter: true,
+                        ),
+                        if (greenSideMode != Mode.stats &&
+                            redSideMode != Mode.stats)
+                        CompareThingy(
+                          label: "WR %",
+                          greenSide:
+                              theGreenSide[2].winrate * 100,
+                          redSide: theRedSide[2].winrate * 100,
+                          fractionDigits: 2,
+                          higherIsBetter: true,
+                        ),
+                        if (theGreenSide[2].gamesPlayed > 9 &&
+                            theRedSide[2].gamesPlayed > 9 &&
+                            greenSideMode != Mode.stats &&
+                            redSideMode != Mode.stats)
+                          CompareThingy(
+                            label: "Glicko",
+                            greenSide: theGreenSide[2].glicko!,
+                            redSide: theRedSide[2].glicko!,
+                            fractionDigits: 2,
+                            higherIsBetter: true,
+                          ),
+                        if (theGreenSide[2].gamesPlayed > 9 &&
+                            theRedSide[2].gamesPlayed > 9 &&
+                            greenSideMode != Mode.stats &&
+                            redSideMode != Mode.stats)
+                          CompareThingy(
+                            label: "RD",
+                            greenSide: theGreenSide[2].rd!,
+                            redSide: theRedSide[2].rd!,
+                            fractionDigits: 3,
+                            higherIsBetter: false,
+                          ),
+                        if (theGreenSide[2].standing > 0 &&
+                            theRedSide[2].standing > 0 &&
+                            greenSideMode == Mode.player &&
+                            redSideMode == Mode.player)
+                          CompareThingy(
+                            label: t.statCellNum.lbpShort,
+                            greenSide: theGreenSide[2].standing,
+                            redSide: theRedSide[2].standing,
+                            higherIsBetter: false,
+                          ),
+                        if (theGreenSide[2].standingLocal > 0 &&
+                            theRedSide[2].standingLocal > 0 &&
+                            greenSideMode == Mode.player &&
+                            redSideMode == Mode.player)
+                          CompareThingy(
+                            label: t.statCellNum.lbpcShort,
+                            greenSide:
+                                theGreenSide[2].standingLocal,
+                            redSide: theRedSide[2].standingLocal,
+                            higherIsBetter: false,
+                          ),
+                        if (theGreenSide[2].apm != null &&
+                            theRedSide[2].apm != null)
+                          CompareThingy(
+                            label: "APM",
+                            greenSide: theGreenSide[2].apm!,
+                            redSide: theRedSide[2].apm!,
+                            fractionDigits: 2,
+                            higherIsBetter: true,
+                          ),
+                        if (theGreenSide[2].pps != null &&
+                            theRedSide[2].pps != null)
+                          CompareThingy(
+                            label: "PPS",
+                            greenSide: theGreenSide[2].pps!,
+                            redSide: theRedSide[2].pps!,
+                            fractionDigits: 2,
+                            higherIsBetter: true,
+                          ),
+                        if (theGreenSide[2].vs != null &&
+                            theRedSide[2].vs != null)
+                          CompareThingy(
+                            label: "VS",
+                            greenSide: theGreenSide[2].vs!,
+                            redSide: theRedSide[2].vs!,
+                            fractionDigits: 2,
+                            higherIsBetter: true,
+                          ),
+                      ],
+                    )
+                  : CompareBoolThingy(
+                      greenSide: theGreenSide[2].gamesPlayed > 0,
+                      redSide: theRedSide[2].gamesPlayed > 0,
+                      label: t.playedTL,
+                      trueIsBetter: false),
+              const Divider(),
+              if (theGreenSide[2].nerdStats != null &&
+                  theRedSide[2].nerdStats != null)
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Text(t.nerdStats,
+                          style: TextStyle(
+                              fontFamily: "Eurostile Round Extended",
+                              fontSize: bigScreen ? 42 : 28)),
+                    ),
+                    CompareThingy(
+                      label: "APP",
+                      greenSide: theGreenSide[2].nerdStats!.app,
+                      redSide: theRedSide[2].nerdStats!.app,
+                      fractionDigits: 3,
+                      higherIsBetter: true,
+                    ),
+                    CompareThingy(
+                      label: "VS/APM",
+                      greenSide: theGreenSide[2].nerdStats!.vsapm,
+                      redSide: theRedSide[2].nerdStats!.vsapm,
+                      fractionDigits: 3,
+                      higherIsBetter: true,
+                    ),
+                    CompareThingy(
+                      label: "DS/S",
+                      greenSide: theGreenSide[2].nerdStats!.dss,
+                      redSide: theRedSide[2].nerdStats!.dss,
+                      fractionDigits: 3,
+                      higherIsBetter: true,
+                    ),
+                    CompareThingy(
+                      label: "DS/P",
+                      greenSide: theGreenSide[2].nerdStats!.dsp,
+                      redSide: theRedSide[2].nerdStats!.dsp,
+                      fractionDigits: 3,
+                      higherIsBetter: true,
+                    ),
+                    CompareThingy(
+                      label: "APP + DS/P",
+                      greenSide:
+                          theGreenSide[2].nerdStats!.appdsp,
+                      redSide: theRedSide[2].nerdStats!.appdsp,
+                      fractionDigits: 3,
+                      higherIsBetter: true,
+                    ),
+                    CompareThingy(
+                      label: t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "),
+                      greenSide:
+                          theGreenSide[2].nerdStats!.cheese,
+                      redSide: theRedSide[2].nerdStats!.cheese,
+                      fractionDigits: 2,
+                      higherIsBetter: true,
+                    ),
+                    CompareThingy(
+                      label: "Gb Eff.",
+                      greenSide: theGreenSide[2].nerdStats!.gbe,
+                      redSide: theRedSide[2].nerdStats!.gbe,
+                      fractionDigits: 3,
+                      higherIsBetter: true,
+                    ),
+                    CompareThingy(
+                      label: "wAPP",
+                      greenSide:
+                          theGreenSide[2].nerdStats!.nyaapp,
+                      redSide: theRedSide[2].nerdStats!.nyaapp,
+                      fractionDigits: 3,
+                      higherIsBetter: true,
+                    ),
+                    CompareThingy(
+                      label: "Area",
+                      greenSide: theGreenSide[2].nerdStats!.area,
+                      redSide: theRedSide[2].nerdStats!.area,
+                      fractionDigits: 2,
+                      higherIsBetter: true,
+                    ),
+                    CompareThingy(
+                      label: t.statCellNum.estOfTRShort,
+                      greenSide: theGreenSide[2].estTr!.esttr,
+                      redSide: theRedSide[2].estTr!.esttr,
+                      fractionDigits: 2,
+                      higherIsBetter: true,
+                    ),
+                    if (theGreenSide[2].gamesPlayed > 9 &&
+                        theGreenSide[2].gamesPlayed > 9 &&
+                        greenSideMode != Mode.stats &&
+                        redSideMode != Mode.stats)
+                    CompareThingy(
+                      label: t.statCellNum.accOfEstShort,
+                      greenSide: theGreenSide[2].esttracc!,
+                      redSide: theRedSide[2].esttracc!,
+                      fractionDigits: 2,
+                      higherIsBetter: true,
+                    ),
+                    CompareThingy(
+                      label: "Opener",
+                      greenSide: theGreenSide[2].playstyle!.opener,
+                      redSide: theRedSide[2].playstyle!.opener,
+                      fractionDigits: 3,
+                      higherIsBetter: true,
+                    ),
+                    CompareThingy(
+                      label: "Plonk",
+                      greenSide: theGreenSide[2].playstyle!.plonk,
+                      redSide: theRedSide[2].playstyle!.plonk,
+                      fractionDigits: 3,
+                      higherIsBetter: true,
+                    ),
+                    CompareThingy(
+                      label: "Stride",
+                      greenSide: theGreenSide[2].playstyle!.stride,
+                      redSide: theRedSide[2].playstyle!.stride,
+                      fractionDigits: 3,
+                      higherIsBetter: true,
+                    ),
+                    CompareThingy(
+                      label: "Inf. DS",
+                      greenSide: theGreenSide[2].playstyle!.infds,
+                      redSide: theRedSide[2].playstyle!.infds,
+                      fractionDigits: 3,
+                      higherIsBetter: true,
+                    ),
+                    VsGraphs(theGreenSide[2].apm!, theGreenSide[2].pps!, theGreenSide[2].vs!, theGreenSide[2].nerdStats!, theGreenSide[2].playstyle!, theRedSide[2].apm!, theRedSide[2].pps!, theRedSide[2].vs!, theRedSide[2].nerdStats!, theRedSide[2].playstyle!),
                     const Divider(),
-                    if (theGreenSide[2].nerdStats != null &&
-                        theRedSide[2].nerdStats != null)
-                      Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: Text(t.nerdStats,
-                                style: TextStyle(
-                                    fontFamily: "Eurostile Round Extended",
-                                    fontSize: bigScreen ? 42 : 28)),
-                          ),
-                          CompareThingy(
-                            label: "APP",
-                            greenSide: theGreenSide[2].nerdStats!.app,
-                            redSide: theRedSide[2].nerdStats!.app,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: "VS/APM",
-                            greenSide: theGreenSide[2].nerdStats!.vsapm,
-                            redSide: theRedSide[2].nerdStats!.vsapm,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: "DS/S",
-                            greenSide: theGreenSide[2].nerdStats!.dss,
-                            redSide: theRedSide[2].nerdStats!.dss,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: "DS/P",
-                            greenSide: theGreenSide[2].nerdStats!.dsp,
-                            redSide: theRedSide[2].nerdStats!.dsp,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: "APP + DS/P",
-                            greenSide:
-                                theGreenSide[2].nerdStats!.appdsp,
-                            redSide: theRedSide[2].nerdStats!.appdsp,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "),
-                            greenSide:
-                                theGreenSide[2].nerdStats!.cheese,
-                            redSide: theRedSide[2].nerdStats!.cheese,
-                            fractionDigits: 2,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: "Gb Eff.",
-                            greenSide: theGreenSide[2].nerdStats!.gbe,
-                            redSide: theRedSide[2].nerdStats!.gbe,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: "wAPP",
-                            greenSide:
-                                theGreenSide[2].nerdStats!.nyaapp,
-                            redSide: theRedSide[2].nerdStats!.nyaapp,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: "Area",
-                            greenSide: theGreenSide[2].nerdStats!.area,
-                            redSide: theRedSide[2].nerdStats!.area,
-                            fractionDigits: 2,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: t.statCellNum.estOfTRShort,
-                            greenSide: theGreenSide[2].estTr!.esttr,
-                            redSide: theRedSide[2].estTr!.esttr,
-                            fractionDigits: 2,
-                            higherIsBetter: true,
-                          ),
-                          if (theGreenSide[2].gamesPlayed > 9 &&
-                              theGreenSide[2].gamesPlayed > 9 &&
-                              greenSideMode != Mode.stats &&
-                              redSideMode != Mode.stats)
-                          CompareThingy(
-                            label: t.statCellNum.accOfEstShort,
-                            greenSide: theGreenSide[2].esttracc!,
-                            redSide: theRedSide[2].esttracc!,
-                            fractionDigits: 2,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: "Opener",
-                            greenSide: theGreenSide[2].playstyle!.opener,
-                            redSide: theRedSide[2].playstyle!.opener,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: "Plonk",
-                            greenSide: theGreenSide[2].playstyle!.plonk,
-                            redSide: theRedSide[2].playstyle!.plonk,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: "Stride",
-                            greenSide: theGreenSide[2].playstyle!.stride,
-                            redSide: theRedSide[2].playstyle!.stride,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: "Inf. DS",
-                            greenSide: theGreenSide[2].playstyle!.infds,
-                            redSide: theRedSide[2].playstyle!.infds,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          VsGraphs(theGreenSide[2].apm!, theGreenSide[2].pps!, theGreenSide[2].vs!, theGreenSide[2].nerdStats!, theGreenSide[2].playstyle!, theRedSide[2].apm!, theRedSide[2].pps!, theRedSide[2].vs!, theRedSide[2].nerdStats!, theRedSide[2].playstyle!),
-                          const Divider(),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: Text(t.winChance,
-                                style: TextStyle(
-                                    fontFamily: "Eurostile Round Extended",
-                                    fontSize: bigScreen ? 42 : 28)),
-                          ),
-                          if (greenSideMode != Mode.stats && redSideMode != Mode.stats &&
-                          theGreenSide[2].gamesPlayed > 9 && theRedSide[2].gamesPlayed > 9)
-                          CompareThingy(
-                            label: t.byGlicko,
-                            greenSide: getWinrateByTR(
-                                    theGreenSide[2].glicko!,
-                                    theGreenSide[2].rd!,
-                                    theRedSide[2].glicko!,
-                                    theRedSide[2].rd!) *
-                                100,
-                            redSide: getWinrateByTR(
-                                    theRedSide[2].glicko!,
-                                    theRedSide[2].rd!,
-                                    theGreenSide[2].glicko!,
-                                    theGreenSide[2].rd!) *
-                                100,
-                            fractionDigits: 2,
-                            higherIsBetter: true,
-                            postfix: "%",
-                          ),
-                          CompareThingy(
-                            label: t.byEstTR,
-                            greenSide: getWinrateByTR(
-                                    theGreenSide[2].estTr!.estglicko,
-                                    theGreenSide[2].rd ?? noTrRd,
-                                    theRedSide[2].estTr!.estglicko,
-                                    theRedSide[2].rd ?? noTrRd) *
-                                100,
-                            redSide: getWinrateByTR(
-                                    theRedSide[2].estTr!.estglicko,
-                                    theRedSide[2].rd ?? noTrRd,
-                                    theGreenSide[2].estTr!.estglicko,
-                                    theGreenSide[2].rd ?? noTrRd) *
-                                100,
-                            fractionDigits: 2,
-                            higherIsBetter: true,
-                            postfix: "%",
-                          ),
-                        ],
-                      )
-                  ] : [Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(t.compareViewNoValues(avgR: "\$avgR"), textAlign: TextAlign.center),
-                  )], // This is so fucked up holy shit
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Text(t.winChance,
+                          style: TextStyle(
+                              fontFamily: "Eurostile Round Extended",
+                              fontSize: bigScreen ? 42 : 28)),
+                    ),
+                    if (greenSideMode != Mode.stats && redSideMode != Mode.stats &&
+                    theGreenSide[2].gamesPlayed > 9 && theRedSide[2].gamesPlayed > 9)
+                    CompareThingy(
+                      label: t.byGlicko,
+                      greenSide: getWinrateByTR(
+                              theGreenSide[2].glicko!,
+                              theGreenSide[2].rd!,
+                              theRedSide[2].glicko!,
+                              theRedSide[2].rd!) *
+                          100,
+                      redSide: getWinrateByTR(
+                              theRedSide[2].glicko!,
+                              theRedSide[2].rd!,
+                              theGreenSide[2].glicko!,
+                              theGreenSide[2].rd!) *
+                          100,
+                      fractionDigits: 2,
+                      higherIsBetter: true,
+                      postfix: "%",
+                    ),
+                    CompareThingy(
+                      label: t.byEstTR,
+                      greenSide: getWinrateByTR(
+                              theGreenSide[2].estTr!.estglicko,
+                              theGreenSide[2].rd ?? noTrRd,
+                              theRedSide[2].estTr!.estglicko,
+                              theRedSide[2].rd ?? noTrRd) *
+                          100,
+                      redSide: getWinrateByTR(
+                              theRedSide[2].estTr!.estglicko,
+                              theRedSide[2].rd ?? noTrRd,
+                              theGreenSide[2].estTr!.estglicko,
+                              theGreenSide[2].rd ?? noTrRd) *
+                          100,
+                      fractionDigits: 2,
+                      higherIsBetter: true,
+                      postfix: "%",
+                    ),
+                  ],
                 )
+              ],
+            )
+            else Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(t.compareViewNoValues(avgR: "\$avgR"), textAlign: TextAlign.center),
+            )
+            ],
+            ),
+          ),
         ),
       ),
     );
@@ -786,6 +777,8 @@ class PlayerSelector extends StatelessWidget {
   }
 }
 
+const TextStyle verdictStyle = TextStyle(fontSize: 14, fontFamily: "Eurostile Round Condensed", color: Colors.grey, height: 1.1);
+
 class CompareThingy extends StatelessWidget {
   final num greenSide;
   final num redSide;
@@ -868,7 +861,7 @@ class CompareThingy extends StatelessWidget {
               Text(
                 verdict(greenSide, redSide,
                     fractionDigits != null ? fractionDigits! + 2 : 0),
-                style: const TextStyle(fontSize: 16),
+                style: verdictStyle,
                 textAlign: TextAlign.center,
               )
             ],
@@ -981,11 +974,7 @@ class CompareBoolThingy extends StatelessWidget {
               style: const TextStyle(fontSize: 22),
               textAlign: TextAlign.center,
             ),
-            const Text(
-              "---",
-              style: TextStyle(fontSize: 16),
-              textAlign: TextAlign.center,
-            )
+            const Text("---", style: verdictStyle, textAlign: TextAlign.center)
           ],
         ),
         Expanded(
@@ -1085,10 +1074,7 @@ class CompareDurationThingy extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               Text(
-                verdict(greenSide, redSide).toString(),
-                style: const TextStyle(fontSize: 16),
-                textAlign: TextAlign.center,
-              )
+                verdict(greenSide, redSide).toString(), style: verdictStyle, textAlign: TextAlign.center)
             ],
           ),
           Expanded(
@@ -1176,11 +1162,7 @@ class CompareRegTimeThingy extends StatelessWidget {
                 style: const TextStyle(fontSize: 22),
                 textAlign: TextAlign.center,
               ),
-              Text(
-                verdict(greenSide, redSide),
-                style: const TextStyle(fontSize: 16),
-                textAlign: TextAlign.center,
-              )
+              Text(verdict(greenSide, redSide), style: verdictStyle, textAlign: TextAlign.center)
             ],
           ),
           Expanded(

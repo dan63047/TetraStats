@@ -20,6 +20,7 @@ class CustomizationView extends StatefulWidget {
 
 class CustomizationState extends State<CustomizationView> {
   late SharedPreferences prefs;
+  late bool oskKagariGimmick;
 
   void changeColor(Color color) {
   setState(() => pickerColor = color);
@@ -31,7 +32,7 @@ class CustomizationState extends State<CustomizationView> {
       windowManager.getTitle().then((value) => oldWindowTitle = value);
       windowManager.setTitle("Tetra Stats: ${t.settings}");
     }
-    _getPreferences();
+    _getPreferences().then((value) => setState((){}));
     super.initState();
   }
 
@@ -43,6 +44,11 @@ class CustomizationState extends State<CustomizationView> {
 
   Future<void> _getPreferences() async {
     prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool("oskKagariGimmick") != null) {
+      oskKagariGimmick = prefs.getBool("oskKagariGimmick")!;
+    } else {
+      oskKagariGimmick = true;
+    }
   }
 
   ThemeData getTheme(BuildContext context, Color color){
@@ -66,59 +72,48 @@ class CustomizationState extends State<CustomizationView> {
       body: SafeArea(
           child: ListView(
         children: [
-          ListTile(
-              title: const Text("Accent Color"),
-              trailing: ColorIndicator(HSVColor.fromColor(Theme.of(context).colorScheme.primary)),
-              onTap: () {
-                showDialog(
-                    context: context,
-                    builder: (BuildContext context) => AlertDialog(
-                            title: const Text('Pick a color!'),
-                            content: SingleChildScrollView(
-                              child: ColorPicker(
-                                pickerColor: pickerColor,
-                                onColorChanged: changeColor,
-                              ),
-                              // Use Material color picker:
-                              //
-                              // child: MaterialPicker(
-                              //   pickerColor: pickerColor,
-                              //   onColorChanged: changeColor,
-                              //   showLabel: true, // only on portrait mode
-                              // ),
-                              //
-                              // Use Block color picker:
-                              //
-                              // child: BlockPicker(
-                              //   pickerColor: currentColor,
-                              //   onColorChanged: changeColor,
-                              // ),
-                              //
-                              // child: MultipleChoiceBlockPicker(
-                              //   pickerColors: currentColors,
-                              //   onColorsChanged: changeColors,
-                              // ),
-                            ),
-                            actions: <Widget>[
-                              ElevatedButton(
-                                child: const Text('Got it'),
-                                onPressed: () {
-                                  setState(() {
-                                    setAccentColor(pickerColor);
-                                  });
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ]));
-              }),
-          const ListTile(
-            title: Text("Font"),
-            subtitle: Text("Not implemented"),
-          ),
-          const ListTile(
-            title: Text("Stats Table in TL mathes list"),
-            subtitle: Text("Not implemented"),
-          ),
+          // ListTile(
+          //     title: const Text("Accent color"),
+          //     trailing: ColorIndicator(HSVColor.fromColor(Theme.of(context).colorScheme.primary)),
+          //     onTap: () {
+          //       showDialog(
+          //           context: context,
+          //           builder: (BuildContext context) => AlertDialog(
+          //                   title: const Text('Pick an accent color'),
+          //                   content: SingleChildScrollView(
+          //                     child: ColorPicker(
+          //                       pickerColor: pickerColor,
+          //                       onColorChanged: changeColor,
+          //                     ),
+          //                   ),
+          //                   actions: <Widget>[
+          //                     ElevatedButton(
+          //                       child: const Text('Set'),
+          //                       onPressed: () {
+          //                         setState(() {
+          //                           setAccentColor(pickerColor);
+          //                         });
+          //                         Navigator.of(context).pop();
+          //                       },
+          //                     ),
+          //                   ]));
+          //     }),
+          // const ListTile(
+          //   title: Text("Font"),
+          //   subtitle: Text("Not implemented"),
+          // ),
+          // const ListTile(
+          //   title: Text("Stats Table in TL mathes list"),
+          //   subtitle: Text("Not implemented"),
+          // ),
+           ListTile(title: Text(t.oskKagari),
+          subtitle: Text(t.oskKagariDescription),
+          trailing: Switch(value: oskKagariGimmick, onChanged: (bool value){
+            prefs.setBool("oskKagariGimmick", value);
+            setState(() {
+              oskKagariGimmick = value;
+            });
+          }),)
         ],
       )),
     );

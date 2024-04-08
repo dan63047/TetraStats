@@ -16,6 +16,7 @@ Stats _chartsX = Stats.tr;
 Stats _chartsY = Stats.apm;
 List<DropdownMenuItem> _itemStats = [for (MapEntry e in chartsShortTitles.entries) DropdownMenuItem(value: e.key, child: Text(e.value))];
 Stats _sortBy = Stats.tr;
+late List<TetrioPlayerFromLeaderboard> they;
 bool _reversed = false;
 List<DropdownMenuItem> _itemCountries = [for (MapEntry e in t.countries.entries) DropdownMenuItem(value: e.key, child: Text(e.value))];
 String _country = "";
@@ -61,6 +62,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
     }
     super.initState();
     previousAxisTitles = _chartsX.toString()+_chartsY.toString();
+    they = TetrioPlayersLeaderboard("lol", []).getStatRanking(widget.rank[1]["entries"]!, _sortBy, reversed: _reversed, country: _country);
     recalculateBoundaries();
     resetScale();
   }
@@ -73,7 +75,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
       } else {
         return element;
       }
-    }).getStatByEnum(_chartsX) as double;
+    }).getStatByEnum(_chartsX).toDouble();
     actualMaxX = (widget.rank[1]["entries"] as List<TetrioPlayerFromLeaderboard>).reduce((value, element) {
       num n = max(value.getStatByEnum(_chartsX), element.getStatByEnum(_chartsX));
       if (value.getStatByEnum(_chartsX) == n) {
@@ -81,7 +83,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
       } else {
         return element;
       }
-    }).getStatByEnum(_chartsX) as double;
+    }).getStatByEnum(_chartsX).toDouble();
     actualMinY = (widget.rank[1]["entries"] as List<TetrioPlayerFromLeaderboard>).reduce((value, element) {
       num n = min(value.getStatByEnum(_chartsY), element.getStatByEnum(_chartsY));
       if (value.getStatByEnum(_chartsY) == n) {
@@ -89,7 +91,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
       } else {
         return element;
       }
-    }).getStatByEnum(_chartsY) as double;
+    }).getStatByEnum(_chartsY).toDouble();
     actualMaxY = (widget.rank[1]["entries"] as List<TetrioPlayerFromLeaderboard>).reduce((value, element) {
       num n = max(value.getStatByEnum(_chartsY), element.getStatByEnum(_chartsY));
       if (value.getStatByEnum(_chartsY) == n) {
@@ -97,7 +99,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
       } else {
         return element;
       }
-    }).getStatByEnum(_chartsY) as double;
+    }).getStatByEnum(_chartsY).toDouble();
   }
   
   void resetScale(){
@@ -164,7 +166,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
       previousAxisTitles = _chartsX.toString()+_chartsY.toString();
     }
     final t = Translations.of(context);
-    List<TetrioPlayerFromLeaderboard> they = TetrioPlayersLeaderboard("lol", []).getStatRanking(widget.rank[1]["entries"]!, _sortBy, reversed: _reversed, country: _country);
+    //they = TetrioPlayersLeaderboard("lol", []).getStatRanking(widget.rank[1]["entries"]!, _sortBy, reversed: _reversed, country: _country);
     return Scaffold(
         appBar: AppBar(
           title: Text(widget.rank[1]["everyone"] ? t.everyoneAverages : t.rankAverages(rank: widget.rank[0].rank.toUpperCase())),
@@ -327,8 +329,8 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                               for (TetrioPlayerFromLeaderboard entry in widget.rank[1]["entries"])
                                               if (entry.apm != 0.0 && entry.vs != 0.0) // prevents from ScatterChart "Offset argument contained a NaN value." exception
                                                 _MyScatterSpot(
-                                                    entry.getStatByEnum(_chartsX) as double,
-                                                    entry.getStatByEnum(_chartsY) as double,
+                                                    entry.getStatByEnum(_chartsX).toDouble(),
+                                                    entry.getStatByEnum(_chartsY).toDouble(),
                                                     entry.userId,
                                                     entry.username,
                                                     dotPainter: FlDotCirclePainter(color: rankColors[entry.rank]??Colors.white, radius: 3))
@@ -403,7 +405,9 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                     value: _sortBy,
                                     onChanged: ((value) {
                                       _sortBy = value;
-                                      setState(() {});
+                                      setState(() {
+                                        they = TetrioPlayersLeaderboard("lol", []).getStatRanking(widget.rank[1]["entries"]!, _sortBy, reversed: _reversed, country: _country);
+                                      });
                                     }),
                                   ),
                                 ],

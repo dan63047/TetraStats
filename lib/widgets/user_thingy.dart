@@ -91,6 +91,7 @@ class UserThingy extends StatelessWidget {
                                         ? Image.asset("res/avatars/tetrio_banned.png", fit: BoxFit.fitHeight, height: pfpHeight,)
                                         : player.avatarRevision != null
                                           ? Image.network("https://tetr.io/user-content/avatars/${player.userId}.jpg?rv=${player.avatarRevision}",
+                                              // TODO: osk banner can cause memory leak
                                               fit: BoxFit.fitHeight, height: 128, errorBuilder: (context, error, stackTrace) {
                                                 developer.log("Error with building profile picture", name: "main_view", error: error, stackTrace: stackTrace);
                                                   return Image.asset("res/avatars/tetrio_anon.png", fit: BoxFit.fitHeight, height: pfpHeight);
@@ -271,7 +272,7 @@ class UserThingy extends StatelessWidget {
                     playerStatLabel: t.statCellNum.hoursPlayed,
                     isScreenBig: bigScreen,
                     alertTitle: t.exactGametime,
-                    alertWidgets: [Text(player.gameTime.toString(), style: const TextStyle(fontFamily: "Eurostile Round Extended"),)],
+                    alertWidgets: [Text(player.gameTime.toString(), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 24),)],
                     higherIsBetter: true,),
                 if (player.gamesPlayed >= 0) 
                   StatCellNum(
@@ -328,13 +329,29 @@ class UserThingy extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(
-                child: Text(
-                    "${player.country != null ? "${t.countries[player.country]} • " : ""}${t.playerRole[player.role]}${t.playerRoleAccount}${player.registrationTime == null ? t.wasFromBeginning : '${t.created} ${dateFormat.format(player.registrationTime!)}'}${player.botmaster != null ? " ${t.botCreatedBy} ${player.botmaster}" : ""} • ${player.supporterTier == 0 ? t.notSupporter : t.supporter(tier: player.supporterTier)}",
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontFamily: "Eurostile Round",
-                      fontSize: 16,
-                    )),
+                child: RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(text: "", style: const TextStyle(
+                    fontFamily: "Eurostile Round",
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                  children: [
+                    if (player.country != null) TextSpan(text: "${t.countries[player.country]} • "),
+                    TextSpan(text: "${t.playerRole[player.role]}${t.playerRoleAccount}${player.registrationTime == null ? t.wasFromBeginning : '${t.created} ${dateFormat.format(player.registrationTime!)}'}"),
+                    if (player.supporterTier > 0) const TextSpan(text: " • "),
+                    if (player.supporterTier > 0) WidgetSpan(child: Icon(player.supporterTier > 1 ? Icons.star : Icons.star_border, color: player.supporterTier > 1 ? Colors.yellowAccent : Colors.white), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic),
+                    if (player.supporterTier > 0) TextSpan(text: player.supporterTier.toString(), style: TextStyle(color: player.supporterTier > 1 ? Colors.yellowAccent : Colors.white))
+                  ]
+                  )
+                ),
+                // Text(
+                //     "${player.country != null ? "${t.countries[player.country]} • " : ""}${t.playerRole[player.role]}${t.playerRoleAccount}${player.registrationTime == null ? t.wasFromBeginning : '${t.created} ${dateFormat.format(player.registrationTime!)}'}${player.botmaster != null ? " ${t.botCreatedBy} ${player.botmaster}" : ""} • ${player.supporterTier == 0 ? t.notSupporter : t.supporter(tier: player.supporterTier)}",
+                //     textAlign: TextAlign.center,
+                //     style: const TextStyle(
+                //       fontFamily: "Eurostile Round",
+                //       fontSize: 16,
+                //     )),
               )
             ],
           ),

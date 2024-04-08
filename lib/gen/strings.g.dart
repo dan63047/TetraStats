@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 1018 (509 per locale)
+/// Strings: 1120 (560 per locale)
 ///
-/// Built on 2024-02-08 at 20:30 UTC
+/// Built on 2024-03-24 at 14:28 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -181,6 +181,14 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get stoppedBeingTracked => 'Removed from tracking list!';
 	String get tlLeaderboard => 'Tetra League leaderboard';
 	String get noRecords => 'No records';
+	String noOldRecords({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		zero: 'No records',
+		one: 'Only ${n} record',
+		two: 'Only ${n} records',
+		few: 'Only ${n} records',
+		many: 'Only ${n} records',
+		other: 'Only ${n} records',
+	);
 	String get noRecord => 'No record';
 	String get botRecord => 'Bots are not allowed to set records';
 	String get anonRecord => 'Guests are not allowed to set records';
@@ -204,7 +212,10 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String supporter({required Object tier}) => 'Supporter tier ${tier}';
 	String comparingWith({required Object newDate, required Object oldDate}) => 'Data from ${newDate} comparing with ${oldDate}';
 	String get top => 'Top';
-	String get topRank => 'Top Rank';
+	String get topRank => 'Top rank';
+	String verdictGeneral({required Object n, required Object verdict, required Object rank}) => '${n} ${verdict} than ${rank} rank average';
+	String get verdictBetter => 'better';
+	String get verdictWorse => 'worse';
 	String gamesUntilRanked({required Object left}) => '${left} games until being ranked';
 	String get nerdStats => 'Nerd Stats';
 	String get playersYouTrack => 'Players you track';
@@ -228,8 +239,14 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get yourIDAlertTitle => 'Your nickname in TETR.IO';
 	String get yourIDText => 'When app loads, it will retrieve data for this account';
 	String get language => 'Language';
+	String get customization => 'Customization';
+	String get customizationDescription => 'There is only one toggle, planned to add more settings';
+	String get lbStats => 'Show leaderboard based stats';
+	String get lbStatsDescription => 'That will impact on loading times, but will allow you to see position on LB by stats and comparison with average values';
 	String get aboutApp => 'About app';
 	String aboutAppText({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Version ${version} Build ${buildNumber}\n\nDeveloped by dan63047\nFormulas provided by kerrmunism\nHistory provided by p1nkl0bst3r\nTETR.IO replay grabber API by szy';
+	String get oskKagari => 'Osk Kagari gimmick';
+	String get oskKagariDescription => 'If on, osk\'s rank on main view will be rendered as :kagari:';
 	String stateViewTitle({required Object nickname, required Object date}) => '${nickname} account on ${date}';
 	String statesViewTitle({required Object number, required Object nickname}) => '${number} states of ${nickname} account';
 	String matchesViewTitle({required Object nickname}) => '${nickname} TL matches';
@@ -254,10 +271,14 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get openReplay => 'Open replay in TETR.IO';
 	String replaySaved({required Object path}) => 'Replay saved to ${path}';
 	String get match => 'Match';
+	String get timeWeightedmatch => 'Match (time-weighted)';
 	String roundNumber({required Object n}) => 'Round ${n}';
 	String get statsFor => 'Stats for';
+	String get numberOfRounds => 'Number of rounds';
 	String get matchLength => 'Match Length';
 	String get roundLength => 'Round Length';
+	String get matchStats => 'Match stats';
+	String get timeWeightedmatchStats => 'Time-weighted match stats';
 	String get replayIssue => 'Can\'t process replay';
 	String get matchIsTooOld => 'Replay is not available';
 	String get winner => 'Winner';
@@ -294,6 +315,15 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 		many: '${n} players',
 		other: '${n} players',
 	);
+	String games({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		zero: '${n} games',
+		one: '${n} game',
+		two: '${n} games',
+		few: '${n} games',
+		many: '${n} games',
+		other: '${n} games',
+	);
+	String gamesPlayed({required Object games}) => '${games} played';
 	String get chart => 'Chart';
 	String get entries => 'Entries';
 	String get minimums => 'Minimums';
@@ -675,8 +705,30 @@ class _StringsNumOfGameActionsEn {
 	// Translations
 	String get pc => 'All Clears';
 	String get hold => 'Holds';
-	String get tspinsTotal => 'T-spins total';
-	String get lineClears => 'Line clears';
+	String inputs({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		zero: '${n} key presses',
+		one: '${n} key press',
+		two: '${n} key presses',
+		few: '${n} key presses',
+		many: '${n} key presses',
+		other: '${n} key presses',
+	);
+	String tspinsTotal({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		zero: '${n} T-spins total',
+		one: '${n} T-spin total',
+		two: '${n} T-spins total',
+		few: '${n} T-spins total',
+		many: '${n} T-spins total',
+		other: '${n} T-spins total',
+	);
+	String lineClears({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		zero: '${n} lines cleared',
+		one: '${n} line cleared',
+		two: '${n} lines cleared',
+		few: '${n} lines cleared',
+		many: '${n} lines cleared',
+		other: '${n} lines cleared',
+	);
 }
 
 // Path: popupActions
@@ -700,21 +752,30 @@ class _StringsErrorsEn {
 	// Translations
 	String connection({required Object code, required Object message}) => 'Some issue with connection: ${code} ${message}';
 	String get noSuchUser => 'No such user';
+	String get noSuchUserSub => 'Either you mistyped something, or the account no longer exists';
+	String get discordNotAssigned => 'No user assigned to given Discord ID';
+	String get discordNotAssignedSub => 'Make sure you provided valid ID';
 	String get history => 'History for that player is missing';
+	String get actionSuggestion => 'Perhaps, you want to';
 	String get p1nkl0bst3rTLmatches => 'No Tetra League matches was found';
 	String get clientException => 'No internet connection';
-	String get forbidden => 'Your IP address is blocked.\nChange IP address or reach out to osk';
-	String get tooManyRequests => 'You have been rate limited. Try again later';
+	String get forbidden => 'Your IP address is blocked';
+	String forbiddenSub({required Object nickname}) => 'If you are using VPN or Proxy, turn it off. If this does not help, reach out to ${nickname}';
+	String get tooManyRequests => 'You have been rate limited.';
+	String get tooManyRequestsSub => 'Wait a few moments and try again';
 	String get internal => 'Something happend on the tetr.io side';
+	String get internalSub => 'osk, probably, already aware about it';
 	String get internalWebVersion => 'Something happend on the tetr.io side (or on oskware_bridge, idk honestly)';
-	String get oskwareBridge => 'Something happend with oskware_bridge. Let dan63047 know';
-	String get p1nkl0bst3rForbidden => 'Third party API blocked your IP address.\nChange IP address or reach out to p1nkl0bst3r';
+	String get internalWebVersionSub => 'If osk status page says that everything is ok, let dan63047 know about this issue';
+	String get oskwareBridge => 'Something happend with oskware_bridge';
+	String get oskwareBridgeSub => 'Let dan63047 know';
+	String get p1nkl0bst3rForbidden => 'Third party API blocked your IP address';
 	String get p1nkl0bst3rTooManyRequests => 'Too many requests to third party API. Try again later';
 	String get p1nkl0bst3rinternal => 'Something happend on the p1nkl0bst3r side';
 	String get p1nkl0bst3rinternalWebVersion => 'Something happend on the p1nkl0bst3r side (or on oskware_bridge, idk honestly)';
 	String get replayAlreadySaved => 'Replay already saved';
 	String get replayExpired => 'Replay expired and not available anymore';
-	String get replayRejected => 'Third party API blocked your IP address.\nChange IP address or reach out to szy';
+	String get replayRejected => 'Third party API blocked your IP address';
 }
 
 // Path: <root>
@@ -774,6 +835,14 @@ class _StringsRu implements Translations {
 	@override String get compare => 'Сравнить';
 	@override String get tlLeaderboard => 'Рейтинговая таблица';
 	@override String get noRecords => 'Нет записей';
+	@override String noOldRecords({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
+		zero: 'Нет записей',
+		one: 'Всего один матч',
+		two: 'Всего ${n} матча',
+		few: 'Всего ${n} матча',
+		many: 'Всего ${n} матчей',
+		other: '${n} матчей',
+	);
 	@override String get noRecord => 'Нет рекорда';
 	@override String get botRecord => 'Ботам нельзя ставить рекорды';
 	@override String get anonRecord => 'Гостям нельзя ставить рекорды';
@@ -797,7 +866,10 @@ class _StringsRu implements Translations {
 	@override String get assignedManualy => 'Этот значок был присвоен вручную администрацией TETR.IO';
 	@override String comparingWith({required Object newDate, required Object oldDate}) => 'Данные от ${newDate} в сравнении с данными от ${oldDate}';
 	@override String get top => 'Топ';
-	@override String get topRank => 'Топ Ранг';
+	@override String get topRank => 'Топ ранг';
+	@override String verdictGeneral({required Object verdict, required Object rank, required Object n}) => '${verdict} среднего ${rank} ранга на ${n}';
+	@override String get verdictBetter => 'Лучше';
+	@override String get verdictWorse => 'Хуже';
 	@override String gamesUntilRanked({required Object left}) => '${left} матчей до получения рейтинга';
 	@override String get nerdStats => 'Для задротов';
 	@override String get playersYouTrack => 'Отслеживаемые игроки';
@@ -821,8 +893,14 @@ class _StringsRu implements Translations {
 	@override String get yourIDAlertTitle => 'Ваш ник в TETR.IO';
 	@override String get yourIDText => 'При запуске приложения оно будет получать статистику этого игрока.';
 	@override String get language => 'Язык (Language)';
+	@override String get customization => 'Кастомизация';
+	@override String get customizationDescription => 'Здесь только один переключатель, в планах добавить больше';
+	@override String get lbStats => 'Показывать статистику, основанную на рейтинговой таблице';
+	@override String get lbStatsDescription => 'Это повлияет на время загрузки, но позволит видеть положение в рейтинге и сравнение со средними значениями по рангу по каждой стате';
 	@override String get aboutApp => 'О приложении';
 	@override String aboutAppText({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Версия ${version} Сборка ${buildNumber}\n\nРазработал dan63047\nФормулы предоставил kerrmunism\nИсторию предоставляет p1nkl0bst3r\nВозможность скачивать повторы из TETR.IO предоставляет szy';
+	@override String get oskKagari => '"Оск Кагари" прикол';
+	@override String get oskKagariDescription => 'Если включено, вместо настоящего ранга оска будет рендерится :kagari:';
 	@override String stateViewTitle({required Object nickname, required Object date}) => 'Аккаунт ${nickname} ${date}';
 	@override String statesViewTitle({required Object number, required Object nickname}) => '${number} состояний аккаунта ${nickname}';
 	@override String matchesViewTitle({required Object nickname}) => 'Матчи аккаунта ${nickname}';
@@ -847,10 +925,14 @@ class _StringsRu implements Translations {
 	@override String get openReplay => 'Открыть повтор в TETR.IO';
 	@override String replaySaved({required Object path}) => 'Повтор сохранён по пути ${path}';
 	@override String get match => 'Матч';
+	@override String get timeWeightedmatch => 'Матч (взвешенная по времени)';
 	@override String roundNumber({required Object n}) => 'Раунд ${n}';
 	@override String get statsFor => 'Статистика за';
+	@override String get numberOfRounds => 'Количество раундов';
 	@override String get matchLength => 'Продолжительность матча';
 	@override String get roundLength => 'Продолжительность раунда';
+	@override String get matchStats => 'Статистика матча';
+	@override String get timeWeightedmatchStats => 'Взвешенная по времени cтатистика матча';
 	@override String get replayIssue => 'Ошибка обработки повтора';
 	@override String get matchIsTooOld => 'Информация о повторе недоступна';
 	@override String get winner => 'Победитель';
@@ -887,6 +969,15 @@ class _StringsRu implements Translations {
 		many: '${n} игроков',
 		other: '${n} игроков',
 	);
+	@override String games({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
+		zero: '${n} игр',
+		one: '${n} игра',
+		two: '${n} игры',
+		few: '${n} игры',
+		many: '${n} игр',
+		other: '${n} игр',
+	);
+	@override String gamesPlayed({required Object games}) => '${games} сыграно';
 	@override String get chart => 'График';
 	@override String get entries => 'Список';
 	@override String get minimums => 'Минимумы';
@@ -1268,8 +1359,30 @@ class _StringsNumOfGameActionsRu implements _StringsNumOfGameActionsEn {
 	// Translations
 	@override String get pc => 'Все чисто';
 	@override String get hold => 'В запас';
-	@override String get tspinsTotal => 'T-spins всего';
-	@override String get lineClears => 'Линий очищено';
+	@override String inputs({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
+		zero: '${n} нажатий клавиш',
+		one: '${n} нажатие на клавишу',
+		two: '${n} нажатия на клавишы',
+		few: '${n} нажатия на клавишы',
+		many: '${n} нажатий на клавиш',
+		other: '${n} нажатий на клавиш',
+	);
+	@override String tspinsTotal({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
+		zero: '${n} T-спинов всего',
+		one: 'Всего ${n} T-спин',
+		two: '${n} T-спина всего',
+		few: '${n} T-спина всего',
+		many: '${n} T-спинов всего',
+		other: '${n} T-спинов всего',
+	);
+	@override String lineClears({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
+		zero: '${n} линий очищено',
+		one: '${n} линия очищена',
+		two: '${n} линии очищено',
+		few: '${n} линии очищено',
+		many: '${n} линий очищено',
+		other: '${n} линий очищено',
+	);
 }
 
 // Path: popupActions
@@ -1293,21 +1406,30 @@ class _StringsErrorsRu implements _StringsErrorsEn {
 	// Translations
 	@override String connection({required Object code, required Object message}) => 'Проблема с подключением: ${code} ${message}';
 	@override String get noSuchUser => 'Нет такого пользователя';
+	@override String get noSuchUserSub => 'Либо вы ошиблись при вводе, либо аккаунта больше не существует';
+	@override String get discordNotAssigned => 'К данному Discord ID не привязан аккаунт';
+	@override String get discordNotAssignedSub => 'Убедитесь в том, что вы вставили правильный ID';
 	@override String get history => 'История данного игрока отсутствует';
+	@override String get actionSuggestion => 'Возможно, вы хотите';
 	@override String get p1nkl0bst3rTLmatches => 'Старых матчей Тетра Лиги не было найдено';
 	@override String get clientException => 'Нет соединения с интернетом';
-	@override String get forbidden => 'Ваш IP адрес заблокирован.\nСмените IP адрес или свяжитесь с osk-ом';
-	@override String get tooManyRequests => 'Слишком много запросов. Попробуйте позже';
+	@override String get forbidden => 'Ваш IP адрес заблокирован';
+	@override String forbiddenSub({required Object nickname}) => 'Если у вас работает VPN или прокси, выключите его. Если это не помогло, свяжитесь с ${nickname}';
+	@override String get tooManyRequests => 'Слишком много запросов';
+	@override String get tooManyRequestsSub => 'Подождите немного и попробуйте снова';
 	@override String get internal => 'Что-то случилось на стороне tetr.io';
+	@override String get internalSub => 'Скорее всего, osk уже в курсе об этом';
 	@override String get internalWebVersion => 'Что-то случилось на стороне tetr.io (или на стороне oskware_bridge, я хз если честно)';
-	@override String get oskwareBridge => 'Что-то случилось с oskware_bridge. Дайте dan63047 знать';
-	@override String get p1nkl0bst3rForbidden => 'Стороннее API заблокировало ваш IP адрес.\nСмените IP адрес или свяжитесь с p1nkl0bst3r-ом';
+	@override String get internalWebVersionSub => 'Если статус страница osk-а говорит, что всё ок - свяжитесь с dan63047';
+	@override String get oskwareBridge => 'Что-то случилось с oskware_bridge';
+	@override String get oskwareBridgeSub => 'Дайте dan63047 знать';
+	@override String get p1nkl0bst3rForbidden => 'Стороннее API заблокировало ваш IP адрес';
 	@override String get p1nkl0bst3rTooManyRequests => 'Слишком много запросов к стороннему API. Попробуйте позже';
 	@override String get p1nkl0bst3rinternal => 'Что-то случилось на стороне p1nkl0bst3r-а';
 	@override String get p1nkl0bst3rinternalWebVersion => 'Что-то случилось на стороне p1nkl0bst3r-а (или на стороне oskware_bridge, я хз если честно)';
 	@override String get replayAlreadySaved => 'Повтор уже сохранён';
 	@override String get replayExpired => 'Повтор истёк и больше недоступен';
-	@override String get replayRejected => 'Стороннее API заблокировало ваш IP адрес.\nСмените IP адрес или свяжитесь с szy';
+	@override String get replayRejected => 'Стороннее API заблокировало ваш IP адрес';
 }
 
 /// Flat map(s) containing all translations.
@@ -1359,6 +1481,14 @@ extension on Translations {
 			case 'stoppedBeingTracked': return 'Removed from tracking list!';
 			case 'tlLeaderboard': return 'Tetra League leaderboard';
 			case 'noRecords': return 'No records';
+			case 'noOldRecords': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+				zero: 'No records',
+				one: 'Only ${n} record',
+				two: 'Only ${n} records',
+				few: 'Only ${n} records',
+				many: 'Only ${n} records',
+				other: 'Only ${n} records',
+			);
 			case 'noRecord': return 'No record';
 			case 'botRecord': return 'Bots are not allowed to set records';
 			case 'anonRecord': return 'Guests are not allowed to set records';
@@ -1382,7 +1512,10 @@ extension on Translations {
 			case 'supporter': return ({required Object tier}) => 'Supporter tier ${tier}';
 			case 'comparingWith': return ({required Object newDate, required Object oldDate}) => 'Data from ${newDate} comparing with ${oldDate}';
 			case 'top': return 'Top';
-			case 'topRank': return 'Top Rank';
+			case 'topRank': return 'Top rank';
+			case 'verdictGeneral': return ({required Object n, required Object verdict, required Object rank}) => '${n} ${verdict} than ${rank} rank average';
+			case 'verdictBetter': return 'better';
+			case 'verdictWorse': return 'worse';
 			case 'gamesUntilRanked': return ({required Object left}) => '${left} games until being ranked';
 			case 'nerdStats': return 'Nerd Stats';
 			case 'playersYouTrack': return 'Players you track';
@@ -1406,8 +1539,14 @@ extension on Translations {
 			case 'yourIDAlertTitle': return 'Your nickname in TETR.IO';
 			case 'yourIDText': return 'When app loads, it will retrieve data for this account';
 			case 'language': return 'Language';
+			case 'customization': return 'Customization';
+			case 'customizationDescription': return 'There is only one toggle, planned to add more settings';
+			case 'lbStats': return 'Show leaderboard based stats';
+			case 'lbStatsDescription': return 'That will impact on loading times, but will allow you to see position on LB by stats and comparison with average values';
 			case 'aboutApp': return 'About app';
 			case 'aboutAppText': return ({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Version ${version} Build ${buildNumber}\n\nDeveloped by dan63047\nFormulas provided by kerrmunism\nHistory provided by p1nkl0bst3r\nTETR.IO replay grabber API by szy';
+			case 'oskKagari': return 'Osk Kagari gimmick';
+			case 'oskKagariDescription': return 'If on, osk\'s rank on main view will be rendered as :kagari:';
 			case 'stateViewTitle': return ({required Object nickname, required Object date}) => '${nickname} account on ${date}';
 			case 'statesViewTitle': return ({required Object number, required Object nickname}) => '${number} states of ${nickname} account';
 			case 'matchesViewTitle': return ({required Object nickname}) => '${nickname} TL matches';
@@ -1432,10 +1571,14 @@ extension on Translations {
 			case 'openReplay': return 'Open replay in TETR.IO';
 			case 'replaySaved': return ({required Object path}) => 'Replay saved to ${path}';
 			case 'match': return 'Match';
+			case 'timeWeightedmatch': return 'Match (time-weighted)';
 			case 'roundNumber': return ({required Object n}) => 'Round ${n}';
 			case 'statsFor': return 'Stats for';
+			case 'numberOfRounds': return 'Number of rounds';
 			case 'matchLength': return 'Match Length';
 			case 'roundLength': return 'Round Length';
+			case 'matchStats': return 'Match stats';
+			case 'timeWeightedmatchStats': return 'Time-weighted match stats';
 			case 'replayIssue': return 'Can\'t process replay';
 			case 'matchIsTooOld': return 'Replay is not available';
 			case 'winner': return 'Winner';
@@ -1472,6 +1615,15 @@ extension on Translations {
 				many: '${n} players',
 				other: '${n} players',
 			);
+			case 'games': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+				zero: '${n} games',
+				one: '${n} game',
+				two: '${n} games',
+				few: '${n} games',
+				many: '${n} games',
+				other: '${n} games',
+			);
+			case 'gamesPlayed': return ({required Object games}) => '${games} played';
 			case 'chart': return 'Chart';
 			case 'entries': return 'Entries';
 			case 'minimums': return 'Minimums';
@@ -1546,28 +1698,59 @@ extension on Translations {
 			case 'playerRole.anon': return 'Anonymous';
 			case 'numOfGameActions.pc': return 'All Clears';
 			case 'numOfGameActions.hold': return 'Holds';
-			case 'numOfGameActions.tspinsTotal': return 'T-spins total';
-			case 'numOfGameActions.lineClears': return 'Line clears';
+			case 'numOfGameActions.inputs': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+				zero: '${n} key presses',
+				one: '${n} key press',
+				two: '${n} key presses',
+				few: '${n} key presses',
+				many: '${n} key presses',
+				other: '${n} key presses',
+			);
+			case 'numOfGameActions.tspinsTotal': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+				zero: '${n} T-spins total',
+				one: '${n} T-spin total',
+				two: '${n} T-spins total',
+				few: '${n} T-spins total',
+				many: '${n} T-spins total',
+				other: '${n} T-spins total',
+			);
+			case 'numOfGameActions.lineClears': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+				zero: '${n} lines cleared',
+				one: '${n} line cleared',
+				two: '${n} lines cleared',
+				few: '${n} lines cleared',
+				many: '${n} lines cleared',
+				other: '${n} lines cleared',
+			);
 			case 'popupActions.cancel': return 'Cancel';
 			case 'popupActions.submit': return 'Submit';
 			case 'popupActions.ok': return 'OK';
 			case 'errors.connection': return ({required Object code, required Object message}) => 'Some issue with connection: ${code} ${message}';
 			case 'errors.noSuchUser': return 'No such user';
+			case 'errors.noSuchUserSub': return 'Either you mistyped something, or the account no longer exists';
+			case 'errors.discordNotAssigned': return 'No user assigned to given Discord ID';
+			case 'errors.discordNotAssignedSub': return 'Make sure you provided valid ID';
 			case 'errors.history': return 'History for that player is missing';
+			case 'errors.actionSuggestion': return 'Perhaps, you want to';
 			case 'errors.p1nkl0bst3rTLmatches': return 'No Tetra League matches was found';
 			case 'errors.clientException': return 'No internet connection';
-			case 'errors.forbidden': return 'Your IP address is blocked.\nChange IP address or reach out to osk';
-			case 'errors.tooManyRequests': return 'You have been rate limited. Try again later';
+			case 'errors.forbidden': return 'Your IP address is blocked';
+			case 'errors.forbiddenSub': return ({required Object nickname}) => 'If you are using VPN or Proxy, turn it off. If this does not help, reach out to ${nickname}';
+			case 'errors.tooManyRequests': return 'You have been rate limited.';
+			case 'errors.tooManyRequestsSub': return 'Wait a few moments and try again';
 			case 'errors.internal': return 'Something happend on the tetr.io side';
+			case 'errors.internalSub': return 'osk, probably, already aware about it';
 			case 'errors.internalWebVersion': return 'Something happend on the tetr.io side (or on oskware_bridge, idk honestly)';
-			case 'errors.oskwareBridge': return 'Something happend with oskware_bridge. Let dan63047 know';
-			case 'errors.p1nkl0bst3rForbidden': return 'Third party API blocked your IP address.\nChange IP address or reach out to p1nkl0bst3r';
+			case 'errors.internalWebVersionSub': return 'If osk status page says that everything is ok, let dan63047 know about this issue';
+			case 'errors.oskwareBridge': return 'Something happend with oskware_bridge';
+			case 'errors.oskwareBridgeSub': return 'Let dan63047 know';
+			case 'errors.p1nkl0bst3rForbidden': return 'Third party API blocked your IP address';
 			case 'errors.p1nkl0bst3rTooManyRequests': return 'Too many requests to third party API. Try again later';
 			case 'errors.p1nkl0bst3rinternal': return 'Something happend on the p1nkl0bst3r side';
 			case 'errors.p1nkl0bst3rinternalWebVersion': return 'Something happend on the p1nkl0bst3r side (or on oskware_bridge, idk honestly)';
 			case 'errors.replayAlreadySaved': return 'Replay already saved';
 			case 'errors.replayExpired': return 'Replay expired and not available anymore';
-			case 'errors.replayRejected': return 'Third party API blocked your IP address.\nChange IP address or reach out to szy';
+			case 'errors.replayRejected': return 'Third party API blocked your IP address';
 			case 'countries.': return 'Not selected';
 			case 'countries.AF': return 'Afghanistan';
 			case 'countries.AX': return 'Åland Islands';
@@ -1878,6 +2061,14 @@ extension on _StringsRu {
 			case 'compare': return 'Сравнить';
 			case 'tlLeaderboard': return 'Рейтинговая таблица';
 			case 'noRecords': return 'Нет записей';
+			case 'noOldRecords': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
+				zero: 'Нет записей',
+				one: 'Всего один матч',
+				two: 'Всего ${n} матча',
+				few: 'Всего ${n} матча',
+				many: 'Всего ${n} матчей',
+				other: '${n} матчей',
+			);
 			case 'noRecord': return 'Нет рекорда';
 			case 'botRecord': return 'Ботам нельзя ставить рекорды';
 			case 'anonRecord': return 'Гостям нельзя ставить рекорды';
@@ -1901,7 +2092,10 @@ extension on _StringsRu {
 			case 'assignedManualy': return 'Этот значок был присвоен вручную администрацией TETR.IO';
 			case 'comparingWith': return ({required Object newDate, required Object oldDate}) => 'Данные от ${newDate} в сравнении с данными от ${oldDate}';
 			case 'top': return 'Топ';
-			case 'topRank': return 'Топ Ранг';
+			case 'topRank': return 'Топ ранг';
+			case 'verdictGeneral': return ({required Object verdict, required Object rank, required Object n}) => '${verdict} среднего ${rank} ранга на ${n}';
+			case 'verdictBetter': return 'Лучше';
+			case 'verdictWorse': return 'Хуже';
 			case 'gamesUntilRanked': return ({required Object left}) => '${left} матчей до получения рейтинга';
 			case 'nerdStats': return 'Для задротов';
 			case 'playersYouTrack': return 'Отслеживаемые игроки';
@@ -1925,8 +2119,14 @@ extension on _StringsRu {
 			case 'yourIDAlertTitle': return 'Ваш ник в TETR.IO';
 			case 'yourIDText': return 'При запуске приложения оно будет получать статистику этого игрока.';
 			case 'language': return 'Язык (Language)';
+			case 'customization': return 'Кастомизация';
+			case 'customizationDescription': return 'Здесь только один переключатель, в планах добавить больше';
+			case 'lbStats': return 'Показывать статистику, основанную на рейтинговой таблице';
+			case 'lbStatsDescription': return 'Это повлияет на время загрузки, но позволит видеть положение в рейтинге и сравнение со средними значениями по рангу по каждой стате';
 			case 'aboutApp': return 'О приложении';
 			case 'aboutAppText': return ({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Версия ${version} Сборка ${buildNumber}\n\nРазработал dan63047\nФормулы предоставил kerrmunism\nИсторию предоставляет p1nkl0bst3r\nВозможность скачивать повторы из TETR.IO предоставляет szy';
+			case 'oskKagari': return '"Оск Кагари" прикол';
+			case 'oskKagariDescription': return 'Если включено, вместо настоящего ранга оска будет рендерится :kagari:';
 			case 'stateViewTitle': return ({required Object nickname, required Object date}) => 'Аккаунт ${nickname} ${date}';
 			case 'statesViewTitle': return ({required Object number, required Object nickname}) => '${number} состояний аккаунта ${nickname}';
 			case 'matchesViewTitle': return ({required Object nickname}) => 'Матчи аккаунта ${nickname}';
@@ -1951,10 +2151,14 @@ extension on _StringsRu {
 			case 'openReplay': return 'Открыть повтор в TETR.IO';
 			case 'replaySaved': return ({required Object path}) => 'Повтор сохранён по пути ${path}';
 			case 'match': return 'Матч';
+			case 'timeWeightedmatch': return 'Матч (взвешенная по времени)';
 			case 'roundNumber': return ({required Object n}) => 'Раунд ${n}';
 			case 'statsFor': return 'Статистика за';
+			case 'numberOfRounds': return 'Количество раундов';
 			case 'matchLength': return 'Продолжительность матча';
 			case 'roundLength': return 'Продолжительность раунда';
+			case 'matchStats': return 'Статистика матча';
+			case 'timeWeightedmatchStats': return 'Взвешенная по времени cтатистика матча';
 			case 'replayIssue': return 'Ошибка обработки повтора';
 			case 'matchIsTooOld': return 'Информация о повторе недоступна';
 			case 'winner': return 'Победитель';
@@ -1991,6 +2195,15 @@ extension on _StringsRu {
 				many: '${n} игроков',
 				other: '${n} игроков',
 			);
+			case 'games': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
+				zero: '${n} игр',
+				one: '${n} игра',
+				two: '${n} игры',
+				few: '${n} игры',
+				many: '${n} игр',
+				other: '${n} игр',
+			);
+			case 'gamesPlayed': return ({required Object games}) => '${games} сыграно';
 			case 'chart': return 'График';
 			case 'entries': return 'Список';
 			case 'minimums': return 'Минимумы';
@@ -2065,28 +2278,59 @@ extension on _StringsRu {
 			case 'playerRole.anon': return 'Аноним';
 			case 'numOfGameActions.pc': return 'Все чисто';
 			case 'numOfGameActions.hold': return 'В запас';
-			case 'numOfGameActions.tspinsTotal': return 'T-spins всего';
-			case 'numOfGameActions.lineClears': return 'Линий очищено';
+			case 'numOfGameActions.inputs': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
+				zero: '${n} нажатий клавиш',
+				one: '${n} нажатие на клавишу',
+				two: '${n} нажатия на клавишы',
+				few: '${n} нажатия на клавишы',
+				many: '${n} нажатий на клавиш',
+				other: '${n} нажатий на клавиш',
+			);
+			case 'numOfGameActions.tspinsTotal': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
+				zero: '${n} T-спинов всего',
+				one: 'Всего ${n} T-спин',
+				two: '${n} T-спина всего',
+				few: '${n} T-спина всего',
+				many: '${n} T-спинов всего',
+				other: '${n} T-спинов всего',
+			);
+			case 'numOfGameActions.lineClears': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
+				zero: '${n} линий очищено',
+				one: '${n} линия очищена',
+				two: '${n} линии очищено',
+				few: '${n} линии очищено',
+				many: '${n} линий очищено',
+				other: '${n} линий очищено',
+			);
 			case 'popupActions.cancel': return 'Отменить';
 			case 'popupActions.submit': return 'Подтвердить';
 			case 'popupActions.ok': return 'OK';
 			case 'errors.connection': return ({required Object code, required Object message}) => 'Проблема с подключением: ${code} ${message}';
 			case 'errors.noSuchUser': return 'Нет такого пользователя';
+			case 'errors.noSuchUserSub': return 'Либо вы ошиблись при вводе, либо аккаунта больше не существует';
+			case 'errors.discordNotAssigned': return 'К данному Discord ID не привязан аккаунт';
+			case 'errors.discordNotAssignedSub': return 'Убедитесь в том, что вы вставили правильный ID';
 			case 'errors.history': return 'История данного игрока отсутствует';
+			case 'errors.actionSuggestion': return 'Возможно, вы хотите';
 			case 'errors.p1nkl0bst3rTLmatches': return 'Старых матчей Тетра Лиги не было найдено';
 			case 'errors.clientException': return 'Нет соединения с интернетом';
-			case 'errors.forbidden': return 'Ваш IP адрес заблокирован.\nСмените IP адрес или свяжитесь с osk-ом';
-			case 'errors.tooManyRequests': return 'Слишком много запросов. Попробуйте позже';
+			case 'errors.forbidden': return 'Ваш IP адрес заблокирован';
+			case 'errors.forbiddenSub': return ({required Object nickname}) => 'Если у вас работает VPN или прокси, выключите его. Если это не помогло, свяжитесь с ${nickname}';
+			case 'errors.tooManyRequests': return 'Слишком много запросов';
+			case 'errors.tooManyRequestsSub': return 'Подождите немного и попробуйте снова';
 			case 'errors.internal': return 'Что-то случилось на стороне tetr.io';
+			case 'errors.internalSub': return 'Скорее всего, osk уже в курсе об этом';
 			case 'errors.internalWebVersion': return 'Что-то случилось на стороне tetr.io (или на стороне oskware_bridge, я хз если честно)';
-			case 'errors.oskwareBridge': return 'Что-то случилось с oskware_bridge. Дайте dan63047 знать';
-			case 'errors.p1nkl0bst3rForbidden': return 'Стороннее API заблокировало ваш IP адрес.\nСмените IP адрес или свяжитесь с p1nkl0bst3r-ом';
+			case 'errors.internalWebVersionSub': return 'Если статус страница osk-а говорит, что всё ок - свяжитесь с dan63047';
+			case 'errors.oskwareBridge': return 'Что-то случилось с oskware_bridge';
+			case 'errors.oskwareBridgeSub': return 'Дайте dan63047 знать';
+			case 'errors.p1nkl0bst3rForbidden': return 'Стороннее API заблокировало ваш IP адрес';
 			case 'errors.p1nkl0bst3rTooManyRequests': return 'Слишком много запросов к стороннему API. Попробуйте позже';
 			case 'errors.p1nkl0bst3rinternal': return 'Что-то случилось на стороне p1nkl0bst3r-а';
 			case 'errors.p1nkl0bst3rinternalWebVersion': return 'Что-то случилось на стороне p1nkl0bst3r-а (или на стороне oskware_bridge, я хз если честно)';
 			case 'errors.replayAlreadySaved': return 'Повтор уже сохранён';
 			case 'errors.replayExpired': return 'Повтор истёк и больше недоступен';
-			case 'errors.replayRejected': return 'Стороннее API заблокировало ваш IP адрес.\nСмените IP адрес или свяжитесь с szy';
+			case 'errors.replayRejected': return 'Стороннее API заблокировало ваш IP адрес';
 			case 'countries.': return 'Не выбрана';
 			case 'countries.AF': return 'Афганистан';
 			case 'countries.AX': return 'Аландские острова';
