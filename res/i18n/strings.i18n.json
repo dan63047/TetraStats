@@ -81,6 +81,7 @@
     "verdictGeneral": "$n $verdict than $rank rank average",
     "verdictBetter": "better",
     "verdictWorse": "worse",
+    "smooth": "Smooth",
     "gamesUntilRanked": "${left} games until being ranked",
     "nerdStats": "Nerd Stats",
     "playersYouTrack": "Players you track",

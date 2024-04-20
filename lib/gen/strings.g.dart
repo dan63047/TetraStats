@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 1120 (560 per locale)
+/// Strings: 1122 (561 per locale)
 ///
-/// Built on 2024-03-24 at 14:28 UTC
+/// Built on 2024-04-11 at 22:23 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -216,6 +216,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String verdictGeneral({required Object n, required Object verdict, required Object rank}) => '${n} ${verdict} than ${rank} rank average';
 	String get verdictBetter => 'better';
 	String get verdictWorse => 'worse';
+	String get smooth => 'Smooth';
 	String gamesUntilRanked({required Object left}) => '${left} games until being ranked';
 	String get nerdStats => 'Nerd Stats';
 	String get playersYouTrack => 'Players you track';
@@ -870,6 +871,7 @@ class _StringsRu implements Translations {
 	@override String verdictGeneral({required Object verdict, required Object rank, required Object n}) => '${verdict} среднего ${rank} ранга на ${n}';
 	@override String get verdictBetter => 'Лучше';
 	@override String get verdictWorse => 'Хуже';
+	@override String get smooth => 'Гладкий';
 	@override String gamesUntilRanked({required Object left}) => '${left} матчей до получения рейтинга';
 	@override String get nerdStats => 'Для задротов';
 	@override String get playersYouTrack => 'Отслеживаемые игроки';
@@ -1516,6 +1518,7 @@ extension on Translations {
 			case 'verdictGeneral': return ({required Object n, required Object verdict, required Object rank}) => '${n} ${verdict} than ${rank} rank average';
 			case 'verdictBetter': return 'better';
 			case 'verdictWorse': return 'worse';
+			case 'smooth': return 'Smooth';
 			case 'gamesUntilRanked': return ({required Object left}) => '${left} games until being ranked';
 			case 'nerdStats': return 'Nerd Stats';
 			case 'playersYouTrack': return 'Players you track';
@@ -2096,6 +2099,7 @@ extension on _StringsRu {
 			case 'verdictGeneral': return ({required Object verdict, required Object rank, required Object n}) => '${verdict} среднего ${rank} ранга на ${n}';
 			case 'verdictBetter': return 'Лучше';
 			case 'verdictWorse': return 'Хуже';
+			case 'smooth': return 'Гладкий';
 			case 'gamesUntilRanked': return ({required Object left}) => '${left} матчей до получения рейтинга';
 			case 'nerdStats': return 'Для задротов';
 			case 'playersYouTrack': return 'Отслеживаемые игроки';

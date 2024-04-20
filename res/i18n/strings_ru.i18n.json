@@ -81,6 +81,7 @@
     "verdictGeneral": "$verdict среднего $rank ранга на $n",
     "verdictBetter": "Лучше",
     "verdictWorse": "Хуже",
+    "smooth": "Гладкий",
     "gamesUntilRanked": "${left} матчей до получения рейтинга",
     "nerdStats": "Для задротов",
     "playersYouTrack": "Отслеживаемые игроки",

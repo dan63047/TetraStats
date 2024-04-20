@@ -20,6 +20,10 @@ class Graphs extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
+    double attack = apm / 60 * 0.4;
+    double speed = pps / 3.75;
+    double defense = nerdStats.dss * 1.15;
+    double cheese = nerdStats.cheese / 110;
     return Wrap(
       direction: Axis.horizontal,
       alignment: WrapAlignment.center,
@@ -27,7 +31,7 @@ class Graphs extends StatelessWidget{
       crossAxisAlignment: WrapCrossAlignment.start,
       clipBehavior: Clip.hardEdge,
       children: [
-        Padding(
+        if (true) Padding( // vs graph
           padding: const EdgeInsets.fromLTRB(18, 0, 18, 44),
           child: SizedBox(
             height: 310,
@@ -86,7 +90,7 @@ class Graphs extends StatelessWidget{
                     borderColor: Colors.transparent,
                     dataEntries: [
                       const RadarEntry(value: 0),
-                      const RadarEntry(value: 0),
+                      const RadarEntry(value: 180),
                       const RadarEntry(value: 0),
                       const RadarEntry(value: 0),
                       const RadarEntry(value: 0),
@@ -104,7 +108,60 @@ class Graphs extends StatelessWidget{
             ),
           ),
         ),
-        Padding(
+        Padding( // sq graph
+          padding: const EdgeInsets.fromLTRB(18, 0, 18, 44),
+          child: SizedBox(
+            height: 310,
+            width: 310,
+            child: RadarChart(
+              RadarChartData(
+                radarShape: RadarShape.polygon,
+                tickCount: 4,
+                ticksTextStyle: const TextStyle(color: Colors.white24, fontSize: 10),
+                radarBorderData: const BorderSide(color: Colors.transparent, width: 1),
+                gridBorderData: const BorderSide(color: Colors.white24, width: 1),
+                tickBorderData: const BorderSide(color: Colors.transparent, width: 1),
+                titleTextStyle: const TextStyle(height: 1.1),
+                radarTouchData: RadarTouchData(),
+                getTitle: (index, angle) {
+                  switch (index) {
+                    case 0:
+                      return RadarChartTitle(text: 'Attack\n${f2.format(apm)} APM', angle: 0, positionPercentageOffset: 0.05);
+                    case 1:
+                      return RadarChartTitle(text: 'Speed\n${f2.format(pps)} PPS', angle: 0, positionPercentageOffset: 0.05);
+                    case 2:
+                      return RadarChartTitle(text: 'Defense\n${f2.format(nerdStats.dss)} DS/S', angle: angle + 180, positionPercentageOffset: 0.05);
+                    case 3:
+                      return RadarChartTitle(text: 'Cheese\n${f3.format(nerdStats.cheese)}', angle: 0, positionPercentageOffset: 0.05);
+                    default:
+                      return const RadarChartTitle(text: '');
+                  }
+                },
+                dataSets: [
+                  RadarDataSet(
+                    dataEntries: [
+                      RadarEntry(value: attack),
+                      RadarEntry(value: speed),
+                      RadarEntry(value: defense),
+                      RadarEntry(value: cheese),
+                    ],
+                  ),
+                  RadarDataSet(
+                    fillColor: Colors.transparent,
+                    borderColor: Colors.transparent,
+                    dataEntries: [
+                      const RadarEntry(value: 0),
+                      const RadarEntry(value: 1.2),
+                      const RadarEntry(value: 0),
+                      const RadarEntry(value: 0),
+                    ],
+                  )
+                ],
+              )
+            )
+          )
+        ),
+        Padding( // psq graph
           padding: const EdgeInsets.fromLTRB(18, 0, 18, 44),
           child: SizedBox(
             height: 310,
@@ -126,7 +183,7 @@ class Graphs extends StatelessWidget{
                     case 1:
                       return RadarChartTitle(text: 'Stride\n${percentage.format(playstyle.stride)}', angle: 0, positionPercentageOffset: 0.05);
                     case 2:
-                      return RadarChartTitle(text: 'Inf Ds\n${percentage.format(playstyle.infds)}', angle: angle + 180, positionPercentageOffset: 0.05);
+                      return RadarChartTitle(text: 'Inf DS\n${percentage.format(playstyle.infds)}', angle: angle + 180, positionPercentageOffset: 0.05);
                     case 3:
                       return RadarChartTitle(text: 'Plonk\n${percentage.format(playstyle.plonk)}', angle: 0, positionPercentageOffset: 0.05);
                     default:
@@ -147,19 +204,9 @@ class Graphs extends StatelessWidget{
                     borderColor: Colors.transparent,
                     dataEntries: [
                       const RadarEntry(value: 0),
+                      const RadarEntry(value: 1),
                       const RadarEntry(value: 0),
                       const RadarEntry(value: 0),
-                      const RadarEntry(value: 0),
-                    ],
-                  ),
-                  RadarDataSet(
-                    fillColor: Colors.transparent,
-                    borderColor: Colors.transparent,
-                    dataEntries: [
-                      const RadarEntry(value: 1),
-                      const RadarEntry(value: 1),
-                      const RadarEntry(value: 1),
-                      const RadarEntry(value: 1),
                     ],
                   )
                 ],

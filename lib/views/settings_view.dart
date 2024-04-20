@@ -64,7 +64,7 @@ class SettingsState extends State<SettingsView> {
         defaultNickname = n;
       }
     } else {
-      defaultNickname = "dan63047";
+      defaultNickname = "6098518e3d5155e6ec429cdc";
     }
     setState(() {});
   }
@@ -76,7 +76,7 @@ class SettingsState extends State<SettingsView> {
 
   Future<void> _removePlayer() async {
     await prefs.remove('player');
-    await _setDefaultNickname("dan63047");
+    await _setDefaultNickname("6098518e3d5155e6ec429cdc");
   }
 
   @override

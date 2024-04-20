@@ -17,6 +17,9 @@ const double appdspWeight = 140;
 const double vsapmWeight = 60;
 const double cheeseWeight = 1.25;
 const double gbeWeight = 315;
+const List<String> ranks = [
+  "d", "d+", "c-", "c", "c+", "b-", "b", "b+", "a-", "a", "a+", "s-", "s", "s+", "ss", "u", "x"
+];
 const Map<String, double> rankCutoffs = {
   "x": 0.01,
   "u": 0.05,

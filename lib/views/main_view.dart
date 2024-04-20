@@ -1,5 +1,6 @@
 // ignore_for_file: type_literal_in_constant_pattern
 
+import 'dart:ffi';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -35,6 +36,7 @@ import 'package:go_router/go_router.dart';
 final TetrioService teto = TetrioService(); // thing, that manadge our local DB
 int _chartsIndex = 0;
 bool _gamesPlayedInsteadOfDateAndTime = false;
+bool _smooth = false;
 List _historyShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR", "Opener", "Plonk", "Inf. DS", "Stride"];
 late ScrollController _scrollController;
 final NumberFormat _timeInSec = NumberFormat("#,###.###s.", LocaleSettings.currentLocale.languageCode);
@@ -81,11 +83,15 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   TetrioPlayersLeaderboard? everyone;
   PlayerLeaderboardPosition? meAmongEveryone;
   TetraLeagueAlpha? rankAverages;
+  double? thatRankCutoff;
+  double? nextRankCutoff;
   String _searchFor = "6098518e3d5155e6ec429cdc"; // who we looking for
-  String _titleNickname = "dan63047";
+  String _titleNickname = "";
     /// Each dropdown menu item contains list of dots for the graph
-  var chartsData = <DropdownMenuItem<List<FlSpot>>>[];
-  var chartsDataGamesPlayed = <DropdownMenuItem<List<FlSpot>>>[];
+  List<DropdownMenuItem<List<FlSpot>>> chartsData = [];
+  List<DropdownMenuItem<List<FlSpot>>>? smoothChartsData;
+  List<DropdownMenuItem<List<FlSpot>>> chartsDataGamesPlayed = [];
+  List<DropdownMenuItem<List<FlSpot>>>? smoothChartsDataGamesPlayed;
   //var tableData = <TableRow>[];
   final bodyGlobalKey = GlobalKey();
   bool _showSearchBar = false;
@@ -108,7 +114,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       changePlayer(widget.player!); // it's gonna be user input
     }else{
       _getPreferences() // otherwise, checking for preferences
-        .then((value) => changePlayer(prefs.getString("player") ?? "dan63047")); // no preferences - loading me
+        .then((value) => changePlayer(prefs.getString("player") ?? "6098518e3d5155e6ec429cdc")); // no preferences - loading me
     }
     super.initState();
   }
@@ -185,6 +191,11 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       everyone ??= await teto.fetchTLLeaderboard();
       meAmongEveryone = await compute(everyone!.getLeaderboardPosition, me);
       if (meAmongEveryone != null) teto.cacheLeaderboardPositions(me.userId, meAmongEveryone!);
+      if (me.tlSeason1.rank != "z") {
+        thatRankCutoff = everyone!.cutoffs[me.tlSeason1.rank];
+        nextRankCutoff = everyone!.cutoffs[ranks.indexOf(me.tlSeason1.rank)+1];
+        nextRankCutoff = nextRankCutoff??25000;
+      }
     }
 
     if (everyone != null && me.tlSeason1.gamesPlayed > 9) rankAverages = everyone?.averages[me.tlSeason1.percentileRank]?[0];
@@ -262,51 +273,87 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     if (uniqueTL.length >= 2){
       compareWith = uniqueTL.toList().elementAtOrNull(uniqueTL.length - 2);
       chartsData = <DropdownMenuItem<List<FlSpot>>>[ // Dumping charts data into dropdown menu items, while cheking if every entry is valid
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.rating)], child: Text(t.statCellNum.tr)),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.glicko!)], child: const Text("Glicko")),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.rd!)], child: const Text("Rating Deviation")),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.apm != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.apm!)], child: Text(t.statCellNum.apm.replaceAll(RegExp(r'\n'), " "))),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.pps != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.pps!)], child: Text(t.statCellNum.pps.replaceAll(RegExp(r'\n'), " "))),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.vs != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.vs!)], child: Text(t.statCellNum.vs.replaceAll(RegExp(r'\n'), " "))),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.app)], child: Text(t.statCellNum.app.replaceAll(RegExp(r'\n'), " "))),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.dss)], child: Text(t.statCellNum.dss.replaceAll(RegExp(r'\n'), " "))),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.dsp)], child: Text(t.statCellNum.dsp.replaceAll(RegExp(r'\n'), " "))),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.appdsp)], child: const Text("APP + DS/P")),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.vsapm)], child: const Text("VS/APM")),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.cheese)], child: Text(t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "))),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.gbe)], child: Text(t.statCellNum.gbe.replaceAll(RegExp(r'\n'), " "))),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.nyaapp)], child: Text(t.statCellNum.nyaapp.replaceAll(RegExp(r'\n'), " "))),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.area)], child: Text(t.statCellNum.area.replaceAll(RegExp(r'\n'), " "))),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.estTr != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.estTr!.esttr)], child: Text(t.statCellNum.estOfTR.replaceAll(RegExp(r'\n'), " "))),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.esttracc != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.esttracc!)], child: Text(t.statCellNum.accOfEst.replaceAll(RegExp(r'\n'), " "))),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.playstyle!.opener)], child: const Text("Opener")),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.playstyle!.plonk)], child: const Text("Plonk")),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.playstyle!.infds)], child: const Text("Inf. DS")),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.playstyle!.stride)], child: const Text("Stride")),
-    ];
-    chartsDataGamesPlayed = <DropdownMenuItem<List<FlSpot>>>[ // Dumping charts data into dropdown menu items, while cheking if every entry is valid
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.gamesPlayed.toDouble(), tl.rating)], child: Text(t.statCellNum.tr)),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.gamesPlayed.toDouble(), tl.glicko!)], child: const Text("Glicko")),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.gamesPlayed.toDouble(), tl.rd!)], child: const Text("Rating Deviation")),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.apm != null) FlSpot(tl.gamesPlayed.toDouble(), tl.apm!)], child: Text(t.statCellNum.apm.replaceAll(RegExp(r'\n'), " "))),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.pps != null) FlSpot(tl.gamesPlayed.toDouble(), tl.pps!)], child: Text(t.statCellNum.pps.replaceAll(RegExp(r'\n'), " "))),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.vs != null) FlSpot(tl.gamesPlayed.toDouble(), tl.vs!)], child: Text(t.statCellNum.vs.replaceAll(RegExp(r'\n'), " "))),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.app)], child: Text(t.statCellNum.app.replaceAll(RegExp(r'\n'), " "))),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.dss)], child: Text(t.statCellNum.dss.replaceAll(RegExp(r'\n'), " "))),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.dsp)], child: Text(t.statCellNum.dsp.replaceAll(RegExp(r'\n'), " "))),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.appdsp)], child: const Text("APP + DS/P")),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.vsapm)], child: const Text("VS/APM")),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.cheese)], child: Text(t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "))),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.gbe)], child: Text(t.statCellNum.gbe.replaceAll(RegExp(r'\n'), " "))),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.nyaapp)], child: Text(t.statCellNum.nyaapp.replaceAll(RegExp(r'\n'), " "))),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.area)], child: Text(t.statCellNum.area.replaceAll(RegExp(r'\n'), " "))),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.estTr != null) FlSpot(tl.gamesPlayed.toDouble(), tl.estTr!.esttr)], child: Text(t.statCellNum.estOfTR.replaceAll(RegExp(r'\n'), " "))),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.esttracc != null) FlSpot(tl.gamesPlayed.toDouble(), tl.esttracc!)], child: Text(t.statCellNum.accOfEst.replaceAll(RegExp(r'\n'), " "))),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.gamesPlayed.toDouble(), tl.playstyle!.opener)], child: const Text("Opener")),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.gamesPlayed.toDouble(), tl.playstyle!.plonk)], child: const Text("Plonk")),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.gamesPlayed.toDouble(), tl.playstyle!.infds)], child: const Text("Inf. DS")),
-      DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.gamesPlayed.toDouble(), tl.playstyle!.stride)], child: const Text("Stride")),
-    ];
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.rating)], child: Text(t.statCellNum.tr)),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.glicko!)], child: const Text("Glicko")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.rd!)], child: const Text("Rating Deviation")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.apm != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.apm!)], child: Text(t.statCellNum.apm.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.pps != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.pps!)], child: Text(t.statCellNum.pps.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.vs != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.vs!)], child: Text(t.statCellNum.vs.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.app)], child: Text(t.statCellNum.app.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.dss)], child: Text(t.statCellNum.dss.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.dsp)], child: Text(t.statCellNum.dsp.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.appdsp)], child: const Text("APP + DS/P")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.vsapm)], child: const Text("VS/APM")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.cheese)], child: Text(t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.gbe)], child: Text(t.statCellNum.gbe.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.nyaapp)], child: Text(t.statCellNum.nyaapp.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.area)], child: Text(t.statCellNum.area.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.estTr != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.estTr!.esttr)], child: Text(t.statCellNum.estOfTR.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.esttracc != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.esttracc!)], child: Text(t.statCellNum.accOfEst.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.playstyle!.opener)], child: const Text("Opener")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.playstyle!.plonk)], child: const Text("Plonk")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.playstyle!.infds)], child: const Text("Inf. DS")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.playstyle!.stride)], child: const Text("Stride")),
+      ];
+      chartsDataGamesPlayed = <DropdownMenuItem<List<FlSpot>>>[ // Dumping charts data into dropdown menu items, while cheking if every entry is valid
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.gamesPlayed.toDouble(), tl.rating)], child: Text(t.statCellNum.tr)),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.gamesPlayed.toDouble(), tl.glicko!)], child: const Text("Glicko")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.gamesPlayed.toDouble(), tl.rd!)], child: const Text("Rating Deviation")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.apm != null) FlSpot(tl.gamesPlayed.toDouble(), tl.apm!)], child: Text(t.statCellNum.apm.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.pps != null) FlSpot(tl.gamesPlayed.toDouble(), tl.pps!)], child: Text(t.statCellNum.pps.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.vs != null) FlSpot(tl.gamesPlayed.toDouble(), tl.vs!)], child: Text(t.statCellNum.vs.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.app)], child: Text(t.statCellNum.app.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.dss)], child: Text(t.statCellNum.dss.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.dsp)], child: Text(t.statCellNum.dsp.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.appdsp)], child: const Text("APP + DS/P")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.vsapm)], child: const Text("VS/APM")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.cheese)], child: Text(t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.gbe)], child: Text(t.statCellNum.gbe.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.nyaapp)], child: Text(t.statCellNum.nyaapp.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.area)], child: Text(t.statCellNum.area.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.estTr != null) FlSpot(tl.gamesPlayed.toDouble(), tl.estTr!.esttr)], child: Text(t.statCellNum.estOfTR.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.esttracc != null) FlSpot(tl.gamesPlayed.toDouble(), tl.esttracc!)], child: Text(t.statCellNum.accOfEst.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.gamesPlayed.toDouble(), tl.playstyle!.opener)], child: const Text("Opener")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.gamesPlayed.toDouble(), tl.playstyle!.plonk)], child: const Text("Plonk")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.gamesPlayed.toDouble(), tl.playstyle!.infds)], child: const Text("Inf. DS")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.gamesPlayed.toDouble(), tl.playstyle!.stride)], child: const Text("Stride")),
+      ];
+      if (chartsData[0].value!.length > 200){
+        smoothChartsData = [];
+        smoothChartsDataGamesPlayed = [];
+        for (var chart in chartsData) {
+          int valuesPerDot = (chart.value!.length / 200).floor();
+          int lastDotEntries = chart.value!.length - (valuesPerDot * 199);
+          List<FlSpot> spots = [];
+          for (int i=0; i < 200; i++){
+            double avgX = 0, avgY = 0;
+            for (int k = i * valuesPerDot; k < (i == 199 ? chart.value!.length : i * valuesPerDot + valuesPerDot); k++) {
+              avgX += chart.value![k].x;
+              avgY += chart.value![k].y;
+            }
+            avgX /= i == 199 ? lastDotEntries : valuesPerDot;
+            avgY /= i == 199 ? lastDotEntries : valuesPerDot;
+            spots.add(FlSpot(avgX, avgY));
+          }
+          smoothChartsData!.add(DropdownMenuItem(value: spots, child: chart.child));
+        }
+        for (var chart in chartsDataGamesPlayed) {
+          int valuesPerDot = (chart.value!.length / 200).floor();
+          int lastDotEntries = chart.value!.length - (valuesPerDot * 199);
+          List<FlSpot> spots = [];
+          for (int i=0; i < 200; i++){
+            double avgX = 0, avgY = 0;
+            for (int k = i * valuesPerDot; k < (i == 199 ? chart.value!.length : i * valuesPerDot + valuesPerDot); k++) {
+              avgX += chart.value![k].x;
+              avgY += chart.value![k].y;
+            }
+            avgX /= i == 199 ? lastDotEntries : valuesPerDot;
+            avgY /= i == 199 ? lastDotEntries : valuesPerDot;
+            spots.add(FlSpot(avgX, avgY));
+          }
+          smoothChartsDataGamesPlayed!.add(DropdownMenuItem(value: spots, child: chart.child));
+        }
+      } 
     }else{
       compareWith = null;
       chartsData = [];
@@ -465,6 +512,10 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                                 topTR: snapshot.data![7],
                                 bot: snapshot.data![0].role == "bot",
                                 guest: snapshot.data![0].role == "anon",
+                                thatRankCutoff: thatRankCutoff,
+                                thatRankTarget: snapshot.data![0].tlSeason1.rank != "z" ? rankTargets[snapshot.data![0].tlSeason1.rank] : null,
+                                nextRankCutoff: nextRankCutoff,
+                                nextRankTarget: snapshot.data![0].tlSeason1.rank != "z" || snapshot.data![0].tlSeason1.rank != "x" ? rankTargets[ranks.indexOf(snapshot.data![0].tlSeason1.rank)+1] : null,
                                 averages: rankAverages,
                                 lbPositions: meAmongEveryone
                               ),
@@ -474,7 +525,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                               child: _TLRecords(userID: snapshot.data![0].userId, changePlayer: changePlayer, data: snapshot.data![3], wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0, oldMathcesHere: _TLHistoryWasFetched, separateScrollController: true,)
                             ),
                           ],),
-                          _History(chartsData: chartsData, chartsDataGamesPlayed: chartsDataGamesPlayed, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
+                          _History(chartsData: chartsData, chartsDataGamesPlayed: chartsDataGamesPlayed, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0, smoothChartsData: smoothChartsData, smoothChartsDataGamesPlayed: smoothChartsDataGamesPlayed),
                           _TwoRecordsThingy(sprint: snapshot.data![1]['sprint'], blitz: snapshot.data![1]['blitz'], rank: snapshot.data![0].tlSeason1.percentileRank,),
                           _OtherThingy(zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6],)
                         ] : [
@@ -489,7 +540,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                             lbPositions: meAmongEveryone
                           ),
                           _TLRecords(userID: snapshot.data![0].userId, changePlayer: changePlayer, data: snapshot.data![3], wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0, oldMathcesHere: _TLHistoryWasFetched),
-                          _History(chartsData: chartsData, chartsDataGamesPlayed: chartsDataGamesPlayed, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
+                          _History(chartsData: chartsData, chartsDataGamesPlayed: chartsDataGamesPlayed, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0, smoothChartsData: smoothChartsData, smoothChartsDataGamesPlayed: smoothChartsDataGamesPlayed),
                           _RecordThingy(record: snapshot.data![1]['sprint'], rank: snapshot.data![0].tlSeason1.percentileRank),
                           _RecordThingy(record: snapshot.data![1]['blitz'], rank: snapshot.data![0].tlSeason1.percentileRank),
                           _OtherThingy(zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6],)
@@ -592,7 +643,7 @@ class _NavDrawerState extends State<NavDrawer> {
         homePlayerNickname = id;
       }
     } else {
-      homePlayerNickname = "dan63047";
+      homePlayerNickname = "dan63";
     }
     setState(() {});
   }
@@ -624,7 +675,7 @@ class _NavDrawerState extends State<NavDrawer> {
                           leading: const Icon(Icons.home),
                           title: Text(homePlayerNickname),
                           onTap: () {
-                            widget.changePlayer(prefs.getString("player") ?? "dan63047"); // changes player on main view to the one from preferences
+                            widget.changePlayer(prefs.getString("player") ?? "6098518e3d5155e6ec429cdc"); // changes player on main view to the one from preferences
                             Navigator.of(context).pop(); // and then NavDrawer closes itself.
                           },
                         ),
@@ -753,7 +804,9 @@ class _TLRecords extends StatelessWidget {
 
 class _History extends StatelessWidget{
   final List<DropdownMenuItem<List<FlSpot>>> chartsData;
+  final List<DropdownMenuItem<List<FlSpot>>>? smoothChartsData;
   final List<DropdownMenuItem<List<FlSpot>>> chartsDataGamesPlayed;
+  final List<DropdownMenuItem<List<FlSpot>>>? smoothChartsDataGamesPlayed;
   final String userID;
   final Function update;
   final Function changePlayer;
@@ -761,7 +814,7 @@ class _History extends StatelessWidget{
 
   /// Widget, that can show history of some stat of the player on the graph.
   /// Requires player [states], which is list of states and function [update], which rebuild widgets
-  const _History({required this.chartsData, required this.chartsDataGamesPlayed, required this.userID, required this.changePlayer, required this.update, required this.wasActiveInTL});
+  const _History({required this.chartsData, required this.chartsDataGamesPlayed, required this.userID, required this.changePlayer, required this.update, required this.wasActiveInTL, this.smoothChartsData, this.smoothChartsDataGamesPlayed});
   
   @override
   Widget build(BuildContext context) {
@@ -776,6 +829,8 @@ class _History extends StatelessWidget{
       ));
     }
     bool bigScreen = MediaQuery.of(context).size.width > 768;
+    var selectedGraph = _gamesPlayedInsteadOfDateAndTime ? chartsDataGamesPlayed[_chartsIndex].value! : chartsData[_chartsIndex].value!;
+    var smoothSelectedGraph = _gamesPlayedInsteadOfDateAndTime ? (smoothChartsDataGamesPlayed?[_chartsIndex].value) : (smoothChartsData?[_chartsIndex].value);
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
       child: SingleChildScrollView(
@@ -786,6 +841,7 @@ class _History extends StatelessWidget{
             children: [
               Wrap(
                 spacing: 20,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Row(
                     mainAxisSize: MainAxisSize.min,
@@ -815,9 +871,21 @@ class _History extends StatelessWidget{
                       ),
                     ],
                   ),
+                  if (smoothSelectedGraph != null) Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Checkbox(value: _smooth,
+                        checkColor: Colors.black,
+                        onChanged: ((value) {
+                          _smooth = value!;
+                          update();
+                        })),
+                        Text(t.smooth, style: const TextStyle(color: Colors.white, fontSize: 22))
+                    ],
+                  )
                 ],
               ),
-              if(chartsData[_chartsIndex].value!.length > 1) _HistoryChartThigy(data: _gamesPlayedInsteadOfDateAndTime ? chartsDataGamesPlayed[_chartsIndex].value! : chartsData[_chartsIndex].value!, yAxisTitle: _historyShortTitles[_chartsIndex], bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? f2 : NumberFormat.compact(), xFormat: NumberFormat.compact())
+              if(chartsData[_chartsIndex].value!.length > 1) _HistoryChartThigy(data: selectedGraph, smoothData: smoothSelectedGraph, smooth: _smooth, yAxisTitle: _historyShortTitles[_chartsIndex], bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? f2 : NumberFormat.compact(), xFormat: NumberFormat.compact())
               else if (chartsData[_chartsIndex].value!.length <= 1) Center(child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -835,6 +903,8 @@ class _History extends StatelessWidget{
 
 class _HistoryChartThigy extends StatefulWidget{
   final List<FlSpot> data;
+  final List<FlSpot>? smoothData;
+  final bool smooth;
   final String yAxisTitle;
   final bool bigScreen;
   final double leftSpace;
@@ -844,7 +914,7 @@ class _HistoryChartThigy extends StatefulWidget{
   /// Implements graph for the _History widget. Requires [data] which is a list of dots for the graph. [yAxisTitle] used to keep track of changes.
   /// [bigScreen] tells if screen wide enough, [leftSpace] sets size, reserved for titles on the left from the graph and [yFormat] sets number format
   /// for left titles
-  const _HistoryChartThigy({required this.data, required this.yAxisTitle, required this.bigScreen, required this.leftSpace, required this.yFormat, this.xFormat});
+  const _HistoryChartThigy({required this.data, this.smoothData, required this.smooth, required this.yAxisTitle, required this.bigScreen, required this.leftSpace, required this.yFormat, this.xFormat});
 
   @override
   State<_HistoryChartThigy> createState() => _HistoryChartThigyState();
@@ -1050,8 +1120,26 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
               children: [
                 LineChart(
                   key: graphKey,
+                  curve: Curves.elasticInOut,
                   LineChartData(
-                    lineBarsData: [LineChartBarData(spots: widget.data)],
+                    lineBarsData: [
+                      LineChartBarData(
+                        show: !_smooth,
+                        spots: widget.data,
+                        dotData: FlDotData(show: false),
+                        isCurved: true,
+                        curveSmoothness: 0.35,
+                        preventCurveOverShooting: true
+                      ),
+                      if (widget.smoothData != null) LineChartBarData(
+                        show: _smooth,
+                        spots: widget.smoothData!,
+                        dotData: FlDotData(show: false),
+                        isCurved: true,
+                        curveSmoothness: 0.35,
+                        preventCurveOverShooting: true,
+                      )
+                    ],
                     clipData: const FlClipData.all(),
                     borderData: FlBorderData(show: false),
                     gridData: FlGridData(verticalInterval: xInterval),
@@ -1115,29 +1203,6 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
     );
   }
 }
-
-// class _HistoryTableThingy extends StatelessWidget{
-//   final List<TableRow> tableData;
-
-//   const _HistoryTableThingy(this.tableData);
-//   // :tf:
-//   @override
-//   Widget build(BuildContext context) {
-//     return LayoutBuilder(builder: (context, constraints){
-//       return Table(
-//         defaultColumnWidth: FixedColumnWidth(75),
-//         columnWidths: {
-//           0: FixedColumnWidth(170),
-//           1: FixedColumnWidth(100),
-//           2: FixedColumnWidth(90),
-//           18: FixedColumnWidth(100),
-//           19: FixedColumnWidth(90),
-//         },
-//       children: tableData,
-//     );
-//     });
-//   }
-// }
 
 class _TwoRecordsThingy extends StatelessWidget {
   final RecordSingle? sprint;

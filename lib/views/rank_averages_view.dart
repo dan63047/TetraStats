@@ -15,6 +15,7 @@ var _chartsShortTitlesDropdowns = <DropdownMenuItem>[for (MapEntry e in chartsSh
 Stats _chartsX = Stats.tr;
 Stats _chartsY = Stats.apm;
 List<DropdownMenuItem> _itemStats = [for (MapEntry e in chartsShortTitles.entries) DropdownMenuItem(value: e.key, child: Text(e.value))];
+List<_MyScatterSpot> _spots = [];
 Stats _sortBy = Stats.tr;
 late List<TetrioPlayerFromLeaderboard> they;
 bool _reversed = false;
@@ -63,6 +64,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
     super.initState();
     previousAxisTitles = _chartsX.toString()+_chartsY.toString();
     they = TetrioPlayersLeaderboard("lol", []).getStatRanking(widget.rank[1]["entries"]!, _sortBy, reversed: _reversed, country: _country);
+    createSpots();
     recalculateBoundaries();
     resetScale();
   }
@@ -100,6 +102,19 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
         return element;
       }
     }).getStatByEnum(_chartsY).toDouble();
+  }
+
+  void createSpots(){
+    _spots = [
+      for (TetrioPlayerFromLeaderboard entry in widget.rank[1]["entries"])
+      if (entry.apm != 0.0 && entry.vs != 0.0) // prevents from ScatterChart "Offset argument contained a NaN value." exception
+        _MyScatterSpot(
+            entry.getStatByEnum(_chartsX).toDouble(),
+            entry.getStatByEnum(_chartsY).toDouble(),
+            entry.userId,
+            entry.username,
+            dotPainter: FlDotCirclePainter(color: rankColors[entry.rank]??Colors.white, radius: 3))
+    ];
   }
   
   void resetScale(){
@@ -161,6 +176,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
     double graphStartX = padding.left;
     double graphEndX = MediaQuery.sizeOf(context).width - padding.right;
     if (previousAxisTitles != _chartsX.toString()+_chartsY.toString()){
+      createSpots();
       recalculateBoundaries();
       resetScale();
       previousAxisTitles = _chartsX.toString()+_chartsY.toString();
@@ -325,16 +341,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                             minY: minY,
                                             maxY: maxY,
                                             clipData: const FlClipData.all(),
-                                            scatterSpots: [
-                                              for (TetrioPlayerFromLeaderboard entry in widget.rank[1]["entries"])
-                                              if (entry.apm != 0.0 && entry.vs != 0.0) // prevents from ScatterChart "Offset argument contained a NaN value." exception
-                                                _MyScatterSpot(
-                                                    entry.getStatByEnum(_chartsX).toDouble(),
-                                                    entry.getStatByEnum(_chartsY).toDouble(),
-                                                    entry.userId,
-                                                    entry.username,
-                                                    dotPainter: FlDotCirclePainter(color: rankColors[entry.rank]??Colors.white, radius: 3))
-                                            ],
+                                            scatterSpots: _spots,
                                             scatterTouchData: ScatterTouchData(
                                               handleBuiltInTouches: false,
                                               touchCallback:(touchEvent, touchResponse) {

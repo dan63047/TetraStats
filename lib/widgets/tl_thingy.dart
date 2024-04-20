@@ -9,6 +9,7 @@ import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/widgets/gauget_num.dart';
 import 'package:tetra_stats/widgets/graphs.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
+import 'package:tetra_stats/widgets/tl_progress_bar.dart';
 
 var fDiff = NumberFormat("+#,###.###;-#,###.###");
 var intFDiff = NumberFormat("+#,###;-#,###");
@@ -139,20 +140,36 @@ class _TLThingyState extends State<TLThingy> {
                     ),
                   ],
                 ),
-              if (currentTl.gamesPlayed >= 10 && currentTl.rd! < 100 && currentTl.nextAt >=0 && currentTl.prevAt >= 0) Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SfLinearGauge(
-                  minimum: currentTl.nextAt.toDouble(),
-                  maximum: currentTl.prevAt.toDouble(),
-                  interval: currentTl.prevAt.toDouble() - currentTl.nextAt.toDouble(), 
-                  ranges: [LinearGaugeRange(startValue: currentTl.standing.toDouble() <= currentTl.prevAt.toDouble() ? currentTl.standing.toDouble() : currentTl.prevAt.toDouble(), endValue: currentTl.prevAt.toDouble(), color: Colors.cyanAccent,)],
-                  markerPointers: [LinearShapePointer(value: currentTl.standing.toDouble() <= currentTl.prevAt.toDouble() ? currentTl.standing.toDouble() : currentTl.prevAt.toDouble(), position: LinearElementPosition.inside, shapeType: LinearShapePointerType.triangle, color: Colors.white, height: 20),
-                  LinearWidgetPointer(offset: 4, position: LinearElementPosition.outside, value: currentTl.standing.toDouble() <= currentTl.prevAt.toDouble() ? currentTl.standing.toDouble() : currentTl.prevAt.toDouble(), child: Text(NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 0).format(currentTl.standing)))],
-                  isAxisInversed: true,
-                  isMirrored: true,
-                  showTicks: true,
-                  showLabels: true
-                  ),
+              if (currentTl.gamesPlayed >= 10 && currentTl.rd! < 100 && currentTl.nextAt >=0 && currentTl.prevAt >= 0) 
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: SfLinearGauge(
+              //     minimum: currentTl.nextAt.toDouble(),
+              //     maximum: currentTl.prevAt.toDouble(),
+              //     interval: currentTl.prevAt.toDouble() - currentTl.nextAt.toDouble(), 
+              //     ranges: [
+              //       LinearGaugeRange(startValue: currentTl.standing.toDouble() <= currentTl.prevAt.toDouble() ? currentTl.standing.toDouble() : currentTl.prevAt.toDouble(), endValue: currentTl.prevAt.toDouble(), color: Colors.cyanAccent, position: LinearElementPosition.cross,),
+              //       //LinearGaugeRange(startValue: currentTl.standing.toDouble() <= currentTl.prevAt.toDouble() ? currentTl.standing.toDouble() + 500.00 : currentTl.prevAt.toDouble(), endValue: currentTl.prevAt.toDouble(), color: Colors.amber, position: LinearElementPosition.inside,)
+              //     ],
+              //     markerPointers: [LinearShapePointer(value: currentTl.standing.toDouble() <= currentTl.prevAt.toDouble() ? currentTl.standing.toDouble() : currentTl.prevAt.toDouble(), position: LinearElementPosition.inside, shapeType: LinearShapePointerType.triangle, color: Colors.white, height: 20),
+              //     LinearWidgetPointer(offset: 4, position: LinearElementPosition.outside, value: currentTl.standing.toDouble() <= currentTl.prevAt.toDouble() ? currentTl.standing.toDouble() : currentTl.prevAt.toDouble(), child: Text(NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 0).format(currentTl.standing)))],
+              //     isAxisInversed: true,
+              //     isMirrored: true,
+              //     showTicks: true,
+              //     showLabels: true
+              //     ),
+              // ),
+              TLProgress(
+                tr: currentTl.rating,
+                rank: currentTl.rank,
+                position: currentTl.standing,
+                nextRankPosition: currentTl.nextAt,
+                previousRankPosition: currentTl.prevAt,
+                previousRankTRcutoff: widget.thatRankCutoff,
+                previousRankTRcutoffTarget: widget.thatRankTarget,
+                nextRankTRcutoff: widget.nextRankCutoff,
+                nextRankTRcutoffTarget: widget.nextRankTarget,
+                nextRank: widget.tl.nextRank
               ),
               if (currentTl.gamesPlayed < 10)
                 Text(t.gamesUntilRanked(left: 10 - currentTl.gamesPlayed),
@@ -323,7 +340,7 @@ class _TLThingyState extends State<TLThingy> {
                                 if (oldTl?.estTr?.esttr != null) TextSpan(text: comparef.format(currentTl.estTr!.esttr - oldTl!.estTr!.esttr), style: TextStyle(
                                   color: oldTl!.estTr!.esttr > currentTl.estTr!.esttr ? Colors.redAccent : Colors.greenAccent
                                 ),),
-                                if (oldTl?.estTr?.esttr != null && widget.lbPositions?.estTr != null) const TextSpan(text: " • "),
+                                if (oldTl?.estTr?.esttr != null || widget.lbPositions?.estTr != null) const TextSpan(text: " • "),
                                 if (widget.lbPositions?.estTr != null) TextSpan(text: widget.lbPositions!.estTr!.position >= 1000 ? "${t.top} ${f2.format(widget.lbPositions!.estTr!.percentage*100)}%" : "№${widget.lbPositions!.estTr!.position}", style: TextStyle(color: getColorOfRank(widget.lbPositions!.estTr!.position))),
                                 if (widget.lbPositions?.estTr != null) const TextSpan(text: " • "),
                                 TextSpan(text: "Glicko: ${f2.format(currentTl.estTr!.estglicko)}")
