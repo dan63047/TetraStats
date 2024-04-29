@@ -42,7 +42,7 @@ const Map<String, double> rankCutoffs = {
   "": 0.5
 };
 const Map<String, double> rankTargets = {
-  "x": 24008,
+  "x": 24503.75, // where that comes from?
   "u": 23038,
   "ss": 21583,
   "s+": 20128,

@@ -140,7 +140,8 @@ class _TLThingyState extends State<TLThingy> {
                     ),
                   ],
                 ),
-              if (currentTl.gamesPlayed >= 10 && currentTl.rd! < 100 && currentTl.nextAt >=0 && currentTl.prevAt >= 0) 
+              if (currentTl.gamesPlayed > 9)
+              // if (currentTl.gamesPlayed >= 10 && currentTl.rd! < 100 && currentTl.nextAt >=0 && currentTl.prevAt >= 0) 
               // Padding(
               //   padding: const EdgeInsets.all(8.0),
               //   child: SfLinearGauge(
@@ -161,7 +162,7 @@ class _TLThingyState extends State<TLThingy> {
               // ),
               TLProgress(
                 tr: currentTl.rating,
-                rank: currentTl.rank,
+                rank: currentTl.rank != "z" ? currentTl.rank : currentTl.percentileRank, 
                 position: currentTl.standing,
                 nextRankPosition: currentTl.nextAt,
                 previousRankPosition: currentTl.prevAt,

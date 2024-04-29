@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+import 'dart:ui';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -10,10 +11,13 @@ import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/views/main_view.dart' show MainView;
 import 'package:tetra_stats/utils/text_shadow.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:syncfusion_flutter_charts/sparkcharts.dart';
 
 var _chartsShortTitlesDropdowns = <DropdownMenuItem>[for (MapEntry e in chartsShortTitles.entries) DropdownMenuItem(value: e.key, child: Text(e.value),)];
 Stats _chartsX = Stats.tr;
 Stats _chartsY = Stats.apm;
+late TooltipBehavior _tooltipBehavior;
 List<DropdownMenuItem> _itemStats = [for (MapEntry e in chartsShortTitles.entries) DropdownMenuItem(value: e.key, child: Text(e.value))];
 List<_MyScatterSpot> _spots = [];
 Stats _sortBy = Stats.tr;
@@ -49,7 +53,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
   late double yScale;
   String headerTooltip = t.pseudoTooltipHeaderInit;
   String footerTooltip = t.pseudoTooltipFooterInit;
-  int hoveredPointId = -1;
+  ValueNotifier<int> hoveredPointId = ValueNotifier<int>(-1);
   double scaleFactor = 5e2;
   double dragFactor = 7e2;
 
@@ -57,6 +61,32 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
   void initState() {
     _scrollController = ScrollController();
     _tabController = TabController(length: 6, vsync: this);
+    _tooltipBehavior = TooltipBehavior(
+      enable: true,
+      animationDuration: 0,
+      builder: (dynamic data, dynamic point, dynamic series,
+        int pointIndex, int seriesIndex) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Text(
+                    "${data.nickname} (${data.rank.toUpperCase()})",
+                    style: TextStyle(color: Colors.black, fontFamily: "Eurostile Round Extended", fontSize: 20),
+                  ),
+                ),
+                Text(
+                  '${_f4.format(data.x)} ${chartsShortTitles[_chartsX]}\n${_f4.format(data.y)} ${chartsShortTitles[_chartsY]}',
+                  style: TextStyle(color: Colors.black),
+                ),
+              ],
+            ),
+          );
+      }
+    );
     if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS){
       windowManager.getTitle().then((value) => _oldWindowTitle = value);
       windowManager.setTitle("Tetra Stats: ${widget.rank[1]["everyone"] ? t.everyoneAverages : t.rankAverages(rank: widget.rank[0].rank.toUpperCase())}");
@@ -113,7 +143,9 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
             entry.getStatByEnum(_chartsY).toDouble(),
             entry.userId,
             entry.username,
-            dotPainter: FlDotCirclePainter(color: rankColors[entry.rank]??Colors.white, radius: 3))
+            entry.rank,
+            rankColors[entry.rank]??Colors.white
+        )
     ];
   }
   
@@ -328,60 +360,19 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                       recalculateScales();
                                     });
                                   },
-                                  // TODO: Figure out wtf is going on with gestures
                                   child: Padding(
                                     padding: bigScreen ? const EdgeInsets.fromLTRB(40, 40, 40, 48) : const EdgeInsets.fromLTRB(0, 40, 16, 48),
-                                    child: Stack(
-                                      children: [
-                                        ScatterChart(
-                                          key: graphKey,
-                                          ScatterChartData(
-                                            minX: minX,
-                                            maxX: maxX,
-                                            minY: minY,
-                                            maxY: maxY,
-                                            clipData: const FlClipData.all(),
-                                            scatterSpots: _spots,
-                                            scatterTouchData: ScatterTouchData(
-                                              handleBuiltInTouches: false,
-                                              touchCallback:(touchEvent, touchResponse) {
-                                                if (touchEvent is FlPanUpdateEvent){
-                                                    dragHandler(touchEvent.details);
-                                                    return;
-                                                  }
-                                                if (touchEvent is FlPointerHoverEvent){
-                                                  setState(() {
-                                                  if (touchResponse?.touchedSpot == null) {
-                                                    hoveredPointId = -1;
-                                                  } else {
-                                                    hoveredPointId = touchResponse!.touchedSpot!.spotIndex;
-                                                    _MyScatterSpot castedPoint = touchResponse.touchedSpot!.spot as _MyScatterSpot;
-                                                    headerTooltip = castedPoint.nickname;
-                                                    footerTooltip = "${_f4.format(castedPoint.x)} ${chartsShortTitles[_chartsX]}; ${_f4.format(castedPoint.y)} ${chartsShortTitles[_chartsY]}";
-                                                  }
-                                                  });
-                                                }
-                                                if (touchEvent is FlPointerExitEvent){
-                                                  setState(() {hoveredPointId = -1;});
-                                                }
-                                                if (touchEvent is FlTapUpEvent && touchResponse?.touchedSpot?.spot != null){
-                                                  _MyScatterSpot spot = touchResponse!.touchedSpot!.spot as _MyScatterSpot;
-                                                  Navigator.push(context, MaterialPageRoute(builder: (context) => MainView(player: spot.nickname), maintainState: false));
-                                                }
-                                              },
-                                            ),
-                                          ),
-                                          swapAnimationDuration: const Duration(milliseconds: 150), // Optional
-                                          swapAnimationCurve: Curves.linear, // Optional
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.fromLTRB(graphStartX+8, padding.top/2+8, 0, 0),
-                                          child: Column(
-                                            children: [
-                                              AnimatedDefaultTextStyle(style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 24, color: Color.fromARGB(hoveredPointId == -1 ? 100 : 255, 255, 255, 255), shadows: hoveredPointId != -1 ? textShadow : null), duration: Durations.medium1, curve: Curves.elasticInOut, child: Text(headerTooltip)),
-                                              AnimatedDefaultTextStyle(style: TextStyle(fontFamily: "Eurostile Round", color: Color.fromARGB(hoveredPointId == -1 ? 100 : 255, 255, 255, 255), shadows: hoveredPointId != -1 ? textShadow : null), duration: Durations.medium1, curve: Curves.elasticInOut, child: Text(footerTooltip)),
-                                            ],
-                                          ),
+                                    child: SfCartesianChart(
+                                      tooltipBehavior: _tooltipBehavior,
+                                      //primaryXAxis: CategoryAxis(),
+                                      series: [
+                                        ScatterSeries(
+                                          enableTooltip: true,
+                                          dataSource: _spots,
+                                          animationDuration: 0,
+                                          pointColorMapper: (data, _) => data.color,
+                                          xValueMapper: (data, _) => data.x,
+                                          yValueMapper: (data, _) => data.y
                                         )
                                       ],
                                     ),
@@ -642,10 +633,12 @@ class _ListEntry extends StatelessWidget {
   }
 }
 
-class _MyScatterSpot extends ScatterSpot {
+class _MyScatterSpot{
+  num x;
+  num y;
   String id;
   String nickname;
-  //Color color;
-  //FlDotPainter painter = FlDotCirclePainter(color: color, radius: 2);
-  _MyScatterSpot(super.x, super.y, this.id, this.nickname, {super.dotPainter});
+  String rank;
+  Color color;
+  _MyScatterSpot(this.x, this.y, this.id, this.nickname, this.rank, this.color);
 }

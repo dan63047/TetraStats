@@ -185,15 +185,17 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     topTR = requests.elementAtOrNull(3) as double?; // No TR - no Top TR
 
     meAmongEveryone = teto.getCachedLeaderboardPositions(me.userId);
-    if (meAmongEveryone == null && prefs.getBool("showPositions") == true){
+    if (prefs.getBool("showPositions") == true){
       // Get tetra League leaderboard
       everyone = teto.getCachedLeaderboard();
       everyone ??= await teto.fetchTLLeaderboard();
-      meAmongEveryone = await compute(everyone!.getLeaderboardPosition, me);
-      if (meAmongEveryone != null) teto.cacheLeaderboardPositions(me.userId, meAmongEveryone!);
-      if (me.tlSeason1.rank != "z") {
-        thatRankCutoff = everyone!.cutoffs[me.tlSeason1.rank];
-        nextRankCutoff = everyone!.cutoffs[ranks.indexOf(me.tlSeason1.rank)+1];
+      if (meAmongEveryone == null){
+        meAmongEveryone = await compute(everyone!.getLeaderboardPosition, me);
+        if (meAmongEveryone != null) teto.cacheLeaderboardPositions(me.userId, meAmongEveryone!); 
+      }
+      if (me.tlSeason1.gamesPlayed > 9) {
+        thatRankCutoff = everyone!.cutoffs[me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank];
+        nextRankCutoff = everyone!.cutoffs[ranks.elementAtOrNull(ranks.indexOf(me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank)+1)];
         nextRankCutoff = nextRankCutoff??25000;
       }
     }
@@ -515,7 +517,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                                 thatRankCutoff: thatRankCutoff,
                                 thatRankTarget: snapshot.data![0].tlSeason1.rank != "z" ? rankTargets[snapshot.data![0].tlSeason1.rank] : null,
                                 nextRankCutoff: nextRankCutoff,
-                                nextRankTarget: snapshot.data![0].tlSeason1.rank != "z" || snapshot.data![0].tlSeason1.rank != "x" ? rankTargets[ranks.indexOf(snapshot.data![0].tlSeason1.rank)+1] : null,
+                                nextRankTarget: snapshot.data![0].tlSeason1.rank != "z" || snapshot.data![0].tlSeason1.rank != "x" ? rankTargets[ranks.elementAtOrNull(ranks.indexOf(snapshot.data![0].tlSeason1.rank)+1)] : null,
                                 averages: rankAverages,
                                 lbPositions: meAmongEveryone
                               ),
