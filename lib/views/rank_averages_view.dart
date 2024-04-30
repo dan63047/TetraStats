@@ -1,7 +1,5 @@
 import 'dart:io';
 import 'dart:math';
-import 'dart:ui';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -12,12 +10,12 @@ import 'package:tetra_stats/views/main_view.dart' show MainView;
 import 'package:tetra_stats/utils/text_shadow.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:syncfusion_flutter_charts/sparkcharts.dart';
 
 var _chartsShortTitlesDropdowns = <DropdownMenuItem>[for (MapEntry e in chartsShortTitles.entries) DropdownMenuItem(value: e.key, child: Text(e.value),)];
 Stats _chartsX = Stats.tr;
 Stats _chartsY = Stats.apm;
 late TooltipBehavior _tooltipBehavior;
+late ZoomPanBehavior _zoomPanBehavior;
 List<DropdownMenuItem> _itemStats = [for (MapEntry e in chartsShortTitles.entries) DropdownMenuItem(value: e.key, child: Text(e.value))];
 List<_MyScatterSpot> _spots = [];
 Stats _sortBy = Stats.tr;
@@ -61,7 +59,15 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
   void initState() {
     _scrollController = ScrollController();
     _tabController = TabController(length: 6, vsync: this);
+    _zoomPanBehavior = ZoomPanBehavior(
+      enablePinching: true,
+      enableSelectionZooming: true,
+      enableMouseWheelZooming : true,
+      enablePanning: true,
+    );
     _tooltipBehavior = TooltipBehavior(
+      color: Colors.black,
+      borderColor: Colors.white,
       enable: true,
       animationDuration: 0,
       builder: (dynamic data, dynamic point, dynamic series,
@@ -75,13 +81,10 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                   padding: const EdgeInsets.only(bottom: 8.0),
                   child: Text(
                     "${data.nickname} (${data.rank.toUpperCase()})",
-                    style: TextStyle(color: Colors.black, fontFamily: "Eurostile Round Extended", fontSize: 20),
+                    style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 20),
                   ),
                 ),
-                Text(
-                  '${_f4.format(data.x)} ${chartsShortTitles[_chartsX]}\n${_f4.format(data.y)} ${chartsShortTitles[_chartsY]}',
-                  style: TextStyle(color: Colors.black),
-                ),
+                Text('${_f4.format(data.x)} ${chartsShortTitles[_chartsX]}\n${_f4.format(data.y)} ${chartsShortTitles[_chartsY]}')
               ],
             ),
           );
@@ -95,43 +98,6 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
     previousAxisTitles = _chartsX.toString()+_chartsY.toString();
     they = TetrioPlayersLeaderboard("lol", []).getStatRanking(widget.rank[1]["entries"]!, _sortBy, reversed: _reversed, country: _country);
     createSpots();
-    recalculateBoundaries();
-    resetScale();
-  }
-
-  void recalculateBoundaries(){
-    actualMinX = (widget.rank[1]["entries"] as List<TetrioPlayerFromLeaderboard>).reduce((value, element) {
-      num n = min(value.getStatByEnum(_chartsX), element.getStatByEnum(_chartsX));
-      if (value.getStatByEnum(_chartsX) == n) {
-        return value;
-      } else {
-        return element;
-      }
-    }).getStatByEnum(_chartsX).toDouble();
-    actualMaxX = (widget.rank[1]["entries"] as List<TetrioPlayerFromLeaderboard>).reduce((value, element) {
-      num n = max(value.getStatByEnum(_chartsX), element.getStatByEnum(_chartsX));
-      if (value.getStatByEnum(_chartsX) == n) {
-        return value;
-      } else {
-        return element;
-      }
-    }).getStatByEnum(_chartsX).toDouble();
-    actualMinY = (widget.rank[1]["entries"] as List<TetrioPlayerFromLeaderboard>).reduce((value, element) {
-      num n = min(value.getStatByEnum(_chartsY), element.getStatByEnum(_chartsY));
-      if (value.getStatByEnum(_chartsY) == n) {
-        return value;
-      } else {
-        return element;
-      }
-    }).getStatByEnum(_chartsY).toDouble();
-    actualMaxY = (widget.rank[1]["entries"] as List<TetrioPlayerFromLeaderboard>).reduce((value, element) {
-      num n = max(value.getStatByEnum(_chartsY), element.getStatByEnum(_chartsY));
-      if (value.getStatByEnum(_chartsY) == n) {
-        return value;
-      } else {
-        return element;
-      }
-    }).getStatByEnum(_chartsY).toDouble();
   }
 
   void createSpots(){
@@ -148,19 +114,6 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
         )
     ];
   }
-  
-  void resetScale(){
-    maxX = actualMaxX;
-    minX = actualMinX;
-    maxY = actualMaxY;
-    minY = actualMinY;
-    recalculateScales();
-  }
-
-  void recalculateScales(){
-    xScale = maxX - minX;
-    yScale = maxY - minY;
-  }
 
   @override
   void dispose() {
@@ -170,47 +123,15 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
-  void dragHandler(DragUpdateDetails dragUpdDet){
-    setState(() {
-      minX -= (xScale / dragFactor) * dragUpdDet.delta.dx;
-      maxX -= (xScale / dragFactor) * dragUpdDet.delta.dx;
-      minY += (yScale / dragFactor) * dragUpdDet.delta.dy;
-      maxY += (yScale / dragFactor) * dragUpdDet.delta.dy;
-
-      if (minX < actualMinX) {
-        minX = actualMinX;
-        maxX = actualMinX + xScale;
-      }
-      if (maxX > actualMaxX) {
-        maxX = actualMaxX;
-        minX = maxX - xScale;
-      }
-      if(minY < actualMinY){
-        minY = actualMinY;
-        maxY = actualMinY + yScale;
-      }
-      if(maxY > actualMaxY){
-        maxY = actualMaxY;
-        minY = actualMaxY - yScale;
-      }
-    });
-  }
-
   void _justUpdate() {
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    GlobalKey graphKey = GlobalKey();
     bool bigScreen = MediaQuery.of(context).size.width > 768;
-    EdgeInsets padding = bigScreen ? const EdgeInsets.fromLTRB(40, 40, 40, 48) : const EdgeInsets.fromLTRB(0, 40, 16, 48);
-    double graphStartX = padding.left;
-    double graphEndX = MediaQuery.sizeOf(context).width - padding.right;
     if (previousAxisTitles != _chartsX.toString()+_chartsY.toString()){
       createSpots();
-      recalculateBoundaries();
-      resetScale();
       previousAxisTitles = _chartsX.toString()+_chartsY.toString();
     }
     final t = Translations.of(context);
@@ -278,6 +199,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                         Wrap(
                           direction: Axis.horizontal,
                           alignment: WrapAlignment.center,
+                          crossAxisAlignment: WrapCrossAlignment.end,
                           spacing: 25,
                           children: [
                             Column(
@@ -319,63 +241,39 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                 ),
                               ],
                             ),
+                            IconButton(onPressed: () => _zoomPanBehavior.reset(), icon: Icon(Icons.refresh), alignment: Alignment.center,)
                           ],
                         ),
                         if (widget.rank[1]["entries"].length > 1)
                           SizedBox(
                               width: MediaQuery.of(context).size.width,
                               height: MediaQuery.of(context).size.height - 104,
-                              child: Listener(
-                                behavior: HitTestBehavior.translucent,
-                                onPointerSignal: (signal) {
-                                if (signal is PointerScrollEvent) {
-                                  RenderBox graphBox = graphKey.currentContext?.findRenderObject() as RenderBox;
-                                  Offset graphPosition = graphBox.localToGlobal(Offset.zero); 
-                                  double scrollPosRelativeX = (signal.position.dx - graphStartX) / (graphEndX - graphStartX);
-                                  double scrollPosRelativeY = (signal.position.dy - graphPosition.dy) / (graphBox.size.height - 30); // size - bottom titles height
-                                  double newMinX, newMaxX, newMinY, newMaxY;
-                                  newMinX = minX - (xScale / scaleFactor) * signal.scrollDelta.dy * scrollPosRelativeX;
-                                  newMaxX = maxX + (xScale / scaleFactor) * signal.scrollDelta.dy * (1-scrollPosRelativeX);
-                                  newMinY = minY - (yScale / scaleFactor) * signal.scrollDelta.dy * (1-scrollPosRelativeY);
-                                  newMaxY = maxY + (yScale / scaleFactor) * signal.scrollDelta.dy * scrollPosRelativeY; 
-                                  if ((newMaxX - newMinX).isNegative) return;
-                                  if ((newMaxY - newMinY).isNegative) return;
-                                  setState(() {
-                                    minX = max(newMinX, actualMinX);
-                                    maxX = min(newMaxX, actualMaxX);
-                                    minY = max(newMinY, actualMinY);
-                                    maxY = min(newMaxY, actualMaxY);
-                                    recalculateScales();
-                                    _scrollController.jumpTo(_scrollController.position.maxScrollExtent - signal.scrollDelta.dy);
-                                  });
-                                }},
-                                child: GestureDetector(
-                                  behavior: HitTestBehavior.opaque,
-                                  onDoubleTap: () {
+                              child: Padding(
+                                padding: bigScreen ? const EdgeInsets.fromLTRB(40, 10, 40, 20) : const EdgeInsets.fromLTRB(0, 10, 16, 20),
+                                child: Listener(
+                                  behavior: HitTestBehavior.translucent,
+                                  onPointerSignal: (signal) {
+                                  if (signal is PointerScrollEvent) {      
                                     setState(() {
-                                      minX = actualMinX;
-                                      maxX = actualMaxX;
-                                      minY = actualMinY;
-                                      maxY = actualMaxY;
-                                      recalculateScales();
+                                      _scrollController.jumpTo(_scrollController.position.maxScrollExtent - signal.scrollDelta.dy); // TODO: find a better way to stop scrolling in NestedScrollView
                                     });
-                                  },
-                                  child: Padding(
-                                    padding: bigScreen ? const EdgeInsets.fromLTRB(40, 40, 40, 48) : const EdgeInsets.fromLTRB(0, 40, 16, 48),
-                                    child: SfCartesianChart(
-                                      tooltipBehavior: _tooltipBehavior,
-                                      //primaryXAxis: CategoryAxis(),
-                                      series: [
-                                        ScatterSeries(
-                                          enableTooltip: true,
-                                          dataSource: _spots,
-                                          animationDuration: 0,
-                                          pointColorMapper: (data, _) => data.color,
-                                          xValueMapper: (data, _) => data.x,
-                                          yValueMapper: (data, _) => data.y
-                                        )
-                                      ],
-                                    ),
+                                  }
+                                },
+                                child: SfCartesianChart(
+                                    tooltipBehavior: _tooltipBehavior,
+                                    zoomPanBehavior: _zoomPanBehavior,
+                                    //primaryXAxis: CategoryAxis(),
+                                    series: [
+                                      ScatterSeries(
+                                        enableTooltip: true,
+                                        dataSource: _spots,
+                                        animationDuration: 0,
+                                        pointColorMapper: (data, _) => data.color,
+                                        xValueMapper: (data, _) => data.x,
+                                        yValueMapper: (data, _) => data.y,
+                                        onPointTap: (point) => Navigator.push(context, MaterialPageRoute(builder: (context) => MainView(player: _spots[point.pointIndex!].nickname), maintainState: false)),
+                                      )
+                                    ],
                                   ),
                                 ),
                               ))

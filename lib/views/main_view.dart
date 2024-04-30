@@ -9,9 +9,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'dart:math';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
@@ -36,6 +36,7 @@ import 'package:go_router/go_router.dart';
 final TetrioService teto = TetrioService(); // thing, that manadge our local DB
 int _chartsIndex = 0;
 bool _gamesPlayedInsteadOfDateAndTime = false;
+late ZoomPanBehavior _zoomPanBehavior;
 bool _smooth = false;
 List _historyShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR", "Opener", "Plonk", "Inf. DS", "Stride"];
 late ScrollController _scrollController;
@@ -88,10 +89,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   String _searchFor = "6098518e3d5155e6ec429cdc"; // who we looking for
   String _titleNickname = "";
     /// Each dropdown menu item contains list of dots for the graph
-  List<DropdownMenuItem<List<FlSpot>>> chartsData = [];
-  List<DropdownMenuItem<List<FlSpot>>>? smoothChartsData;
-  List<DropdownMenuItem<List<FlSpot>>> chartsDataGamesPlayed = [];
-  List<DropdownMenuItem<List<FlSpot>>>? smoothChartsDataGamesPlayed;
+  List<DropdownMenuItem<List<_HistoryChartSpot>>> chartsData = [];
   //var tableData = <TableRow>[];
   final bodyGlobalKey = GlobalKey();
   bool _showSearchBar = false;
@@ -108,7 +106,12 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     _scrollController = ScrollController();
     _tabController = TabController(length: 6, vsync: this);
     _wideScreenTabController = TabController(length: 4, vsync: this);
-    
+    _zoomPanBehavior = ZoomPanBehavior(
+      enablePinching: true,
+      enableSelectionZooming: true,
+      enableMouseWheelZooming : true,
+      enablePanning: true,
+    );
     // We need to show something
     if (widget.player != null){ // if we have user input,
       changePlayer(widget.player!); // it's gonna be user input
@@ -267,95 +270,32 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       if (uniqueTL.isEmpty) uniqueTL.add(element.tlSeason1);
     }
     // Also i need previous Tetra League State for comparison if avaliable
-    // tableData = [
-    //     TableRow(children: [                          Text("Date & Time"),                                Text("Tr"),                              Text("Glicko"),                          Text("RD"),                          Text("GP"),                                   Text("GW"),                                Text("APM"),                          Text("PPS"),                          Text("VS"),                          Text("APP"),                                     Text("VS/APM"),                                    Text("DS/S"),                                    Text("DS/P"),                                    Text("APP+DS/P"),                                 Text("Cheese"),                                     Text("GbE"),                                     Text("wAPP"),                                       Text("Area"),                                     Text("eTR"),                                   Text("±eTR"),                              Text("Opener"),                                     Text("Plonk"),                                     Text("Inf. DS"),                                   Text("Stride")],
-    //     decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white)))),
-    //     for (var state in states) TableRow(children: [Text(dateFormat.format(state.tlSeason1.timestamp)), Text(f4.format(state.tlSeason1.rating)), Text(f4.format(state.tlSeason1.glicko)), Text(f4.format(state.tlSeason1.rd)), Text(f0.format(state.tlSeason1.gamesPlayed)), Text(f0.format(state.tlSeason1.gamesWon)), Text(f2.format(state.tlSeason1.apm)), Text(f2.format(state.tlSeason1.pps)), Text(state.tlSeason1.vs != null ? f2.format(state.tlSeason1.vs) : "---"), Text(state.tlSeason1.nerdStats != null ? f4.format(state.tlSeason1.nerdStats?.app) : "---"), Text(state.tlSeason1.nerdStats != null ? f4.format(state.tlSeason1.nerdStats?.vsapm) : "---"), Text(state.tlSeason1.nerdStats != null ? f4.format(state.tlSeason1.nerdStats?.dss) : "---"), Text(state.tlSeason1.nerdStats != null ? f4.format(state.tlSeason1.nerdStats?.dsp) : "---"), Text(state.tlSeason1.nerdStats != null ? f4.format(state.tlSeason1.nerdStats?.appdsp) : "---"), Text(state.tlSeason1.nerdStats != null ? f4.format(state.tlSeason1.nerdStats?.cheese) : "---"), Text(state.tlSeason1.nerdStats != null ? f4.format(state.tlSeason1.nerdStats?.gbe) : "---"), Text(state.tlSeason1.nerdStats != null ? f4.format(state.tlSeason1.nerdStats?.nyaapp) : "---"), Text(state.tlSeason1.nerdStats != null ? f4.format(state.tlSeason1.nerdStats?.area) : "---"), Text(state.tlSeason1.estTr != null ? f4.format(state.tlSeason1.estTr?.esttr) : "---"), Text(state.tlSeason1.esttracc != null ? f4.format(state.tlSeason1.esttracc) : "---"), Text(state.tlSeason1.playstyle != null ? f4.format(state.tlSeason1.playstyle?.opener) : "---"), Text(state.tlSeason1.playstyle != null ? f4.format(state.tlSeason1.playstyle?.plonk) : "---"), Text(state.tlSeason1.playstyle != null ? f4.format(state.tlSeason1.playstyle?.infds) : "---"), Text(state.tlSeason1.playstyle != null ? f4.format(state.tlSeason1.playstyle?.stride) : "---")]),
-    //   ];
     if (uniqueTL.length >= 2){
       compareWith = uniqueTL.toList().elementAtOrNull(uniqueTL.length - 2);
-      chartsData = <DropdownMenuItem<List<FlSpot>>>[ // Dumping charts data into dropdown menu items, while cheking if every entry is valid
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.rating)], child: Text(t.statCellNum.tr)),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.glicko!)], child: const Text("Glicko")),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.rd!)], child: const Text("Rating Deviation")),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.apm != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.apm!)], child: Text(t.statCellNum.apm.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.pps != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.pps!)], child: Text(t.statCellNum.pps.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.vs != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.vs!)], child: Text(t.statCellNum.vs.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.app)], child: Text(t.statCellNum.app.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.dss)], child: Text(t.statCellNum.dss.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.dsp)], child: Text(t.statCellNum.dsp.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.appdsp)], child: const Text("APP + DS/P")),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.vsapm)], child: const Text("VS/APM")),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.cheese)], child: Text(t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.gbe)], child: Text(t.statCellNum.gbe.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.nyaapp)], child: Text(t.statCellNum.nyaapp.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.nerdStats!.area)], child: Text(t.statCellNum.area.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.estTr != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.estTr!.esttr)], child: Text(t.statCellNum.estOfTR.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.esttracc != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.esttracc!)], child: Text(t.statCellNum.accOfEst.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.playstyle!.opener)], child: const Text("Opener")),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.playstyle!.plonk)], child: const Text("Plonk")),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.playstyle!.infds)], child: const Text("Inf. DS")),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.timestamp.millisecondsSinceEpoch.toDouble(), tl.playstyle!.stride)], child: const Text("Stride")),
+      //chartsData = [for (var tl in uniqueTL) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, [tl.rating, tl.glicko, tl.rd, tl.apm, tl.pps, tl.vs, tl.nerdStats?.app, tl.nerdStats?.dss, tl.nerdStats?.dsp, tl.nerdStats?.appdsp, tl.nerdStats?.vsapm, tl.nerdStats?.cheese, tl.nerdStats?.gbe, tl.nerdStats?.nyaapp, tl.nerdStats?.area, tl.estTr?.esttr, tl.esttracc, tl.playstyle?.opener, tl.playstyle?.plonk, tl.playstyle?.infds, tl.playstyle?.stride])];
+      chartsData = <DropdownMenuItem<List<_HistoryChartSpot>>>[ // Dumping charts data into dropdown menu items, while cheking if every entry is valid
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.rating)], child: Text(t.statCellNum.tr)),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.glicko!)], child: const Text("Glicko")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.rd!)], child: const Text("Rating Deviation")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.apm != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.apm!)], child: Text(t.statCellNum.apm.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.pps != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.pps!)], child: Text(t.statCellNum.pps.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.vs != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.vs!)], child: Text(t.statCellNum.vs.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.app)], child: Text(t.statCellNum.app.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.dss)], child: Text(t.statCellNum.dss.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.dsp)], child: Text(t.statCellNum.dsp.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.appdsp)], child: const Text("APP + DS/P")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.vsapm)], child: const Text("VS/APM")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.cheese)], child: Text(t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.gbe)], child: Text(t.statCellNum.gbe.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.nyaapp)], child: Text(t.statCellNum.nyaapp.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.area)], child: Text(t.statCellNum.area.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.estTr != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.estTr!.esttr)], child: Text(t.statCellNum.estOfTR.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.esttracc != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.esttracc!)], child: Text(t.statCellNum.accOfEst.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.playstyle!.opener)], child: const Text("Opener")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.playstyle!.plonk)], child: const Text("Plonk")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.playstyle!.infds)], child: const Text("Inf. DS")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.playstyle!.stride)], child: const Text("Stride")),
       ];
-      chartsDataGamesPlayed = <DropdownMenuItem<List<FlSpot>>>[ // Dumping charts data into dropdown menu items, while cheking if every entry is valid
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.gamesPlayed.toDouble(), tl.rating)], child: Text(t.statCellNum.tr)),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.gamesPlayed.toDouble(), tl.glicko!)], child: const Text("Glicko")),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) FlSpot(tl.gamesPlayed.toDouble(), tl.rd!)], child: const Text("Rating Deviation")),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.apm != null) FlSpot(tl.gamesPlayed.toDouble(), tl.apm!)], child: Text(t.statCellNum.apm.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.pps != null) FlSpot(tl.gamesPlayed.toDouble(), tl.pps!)], child: Text(t.statCellNum.pps.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.vs != null) FlSpot(tl.gamesPlayed.toDouble(), tl.vs!)], child: Text(t.statCellNum.vs.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.app)], child: Text(t.statCellNum.app.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.dss)], child: Text(t.statCellNum.dss.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.dsp)], child: Text(t.statCellNum.dsp.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.appdsp)], child: const Text("APP + DS/P")),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.vsapm)], child: const Text("VS/APM")),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.cheese)], child: Text(t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.gbe)], child: Text(t.statCellNum.gbe.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.nyaapp)], child: Text(t.statCellNum.nyaapp.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) FlSpot(tl.gamesPlayed.toDouble(), tl.nerdStats!.area)], child: Text(t.statCellNum.area.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.estTr != null) FlSpot(tl.gamesPlayed.toDouble(), tl.estTr!.esttr)], child: Text(t.statCellNum.estOfTR.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.esttracc != null) FlSpot(tl.gamesPlayed.toDouble(), tl.esttracc!)], child: Text(t.statCellNum.accOfEst.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.gamesPlayed.toDouble(), tl.playstyle!.opener)], child: const Text("Opener")),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.gamesPlayed.toDouble(), tl.playstyle!.plonk)], child: const Text("Plonk")),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.gamesPlayed.toDouble(), tl.playstyle!.infds)], child: const Text("Inf. DS")),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) FlSpot(tl.gamesPlayed.toDouble(), tl.playstyle!.stride)], child: const Text("Stride")),
-      ];
-      if (chartsData[0].value!.length > 200){
-        smoothChartsData = [];
-        smoothChartsDataGamesPlayed = [];
-        for (var chart in chartsData) {
-          int valuesPerDot = (chart.value!.length / 200).floor();
-          int lastDotEntries = chart.value!.length - (valuesPerDot * 199);
-          List<FlSpot> spots = [];
-          for (int i=0; i < 200; i++){
-            double avgX = 0, avgY = 0;
-            for (int k = i * valuesPerDot; k < (i == 199 ? chart.value!.length : i * valuesPerDot + valuesPerDot); k++) {
-              avgX += chart.value![k].x;
-              avgY += chart.value![k].y;
-            }
-            avgX /= i == 199 ? lastDotEntries : valuesPerDot;
-            avgY /= i == 199 ? lastDotEntries : valuesPerDot;
-            spots.add(FlSpot(avgX, avgY));
-          }
-          smoothChartsData!.add(DropdownMenuItem(value: spots, child: chart.child));
-        }
-        for (var chart in chartsDataGamesPlayed) {
-          int valuesPerDot = (chart.value!.length / 200).floor();
-          int lastDotEntries = chart.value!.length - (valuesPerDot * 199);
-          List<FlSpot> spots = [];
-          for (int i=0; i < 200; i++){
-            double avgX = 0, avgY = 0;
-            for (int k = i * valuesPerDot; k < (i == 199 ? chart.value!.length : i * valuesPerDot + valuesPerDot); k++) {
-              avgX += chart.value![k].x;
-              avgY += chart.value![k].y;
-            }
-            avgX /= i == 199 ? lastDotEntries : valuesPerDot;
-            avgY /= i == 199 ? lastDotEntries : valuesPerDot;
-            spots.add(FlSpot(avgX, avgY));
-          }
-          smoothChartsDataGamesPlayed!.add(DropdownMenuItem(value: spots, child: chart.child));
-        }
-      } 
     }else{
       compareWith = null;
       chartsData = [];
@@ -527,7 +467,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                               child: _TLRecords(userID: snapshot.data![0].userId, changePlayer: changePlayer, data: snapshot.data![3], wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0, oldMathcesHere: _TLHistoryWasFetched, separateScrollController: true,)
                             ),
                           ],),
-                          _History(chartsData: chartsData, chartsDataGamesPlayed: chartsDataGamesPlayed, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0, smoothChartsData: smoothChartsData, smoothChartsDataGamesPlayed: smoothChartsDataGamesPlayed),
+                          _History(chartsData: chartsData, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
                           _TwoRecordsThingy(sprint: snapshot.data![1]['sprint'], blitz: snapshot.data![1]['blitz'], rank: snapshot.data![0].tlSeason1.percentileRank,),
                           _OtherThingy(zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6],)
                         ] : [
@@ -542,7 +482,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                             lbPositions: meAmongEveryone
                           ),
                           _TLRecords(userID: snapshot.data![0].userId, changePlayer: changePlayer, data: snapshot.data![3], wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0, oldMathcesHere: _TLHistoryWasFetched),
-                          _History(chartsData: chartsData, chartsDataGamesPlayed: chartsDataGamesPlayed, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0, smoothChartsData: smoothChartsData, smoothChartsDataGamesPlayed: smoothChartsDataGamesPlayed),
+                          _History(chartsData: chartsData, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
                           _RecordThingy(record: snapshot.data![1]['sprint'], rank: snapshot.data![0].tlSeason1.percentileRank),
                           _RecordThingy(record: snapshot.data![1]['blitz'], rank: snapshot.data![0].tlSeason1.percentileRank),
                           _OtherThingy(zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6],)
@@ -805,10 +745,7 @@ class _TLRecords extends StatelessWidget {
 }
 
 class _History extends StatelessWidget{
-  final List<DropdownMenuItem<List<FlSpot>>> chartsData;
-  final List<DropdownMenuItem<List<FlSpot>>>? smoothChartsData;
-  final List<DropdownMenuItem<List<FlSpot>>> chartsDataGamesPlayed;
-  final List<DropdownMenuItem<List<FlSpot>>>? smoothChartsDataGamesPlayed;
+  final List<DropdownMenuItem<List<_HistoryChartSpot>>> chartsData;
   final String userID;
   final Function update;
   final Function changePlayer;
@@ -816,7 +753,7 @@ class _History extends StatelessWidget{
 
   /// Widget, that can show history of some stat of the player on the graph.
   /// Requires player [states], which is list of states and function [update], which rebuild widgets
-  const _History({required this.chartsData, required this.chartsDataGamesPlayed, required this.userID, required this.changePlayer, required this.update, required this.wasActiveInTL, this.smoothChartsData, this.smoothChartsDataGamesPlayed});
+  const _History({required this.chartsData, required this.userID, required this.changePlayer, required this.update, required this.wasActiveInTL});
   
   @override
   Widget build(BuildContext context) {
@@ -831,8 +768,8 @@ class _History extends StatelessWidget{
       ));
     }
     bool bigScreen = MediaQuery.of(context).size.width > 768;
-    var selectedGraph = _gamesPlayedInsteadOfDateAndTime ? chartsDataGamesPlayed[_chartsIndex].value! : chartsData[_chartsIndex].value!;
-    var smoothSelectedGraph = _gamesPlayedInsteadOfDateAndTime ? (smoothChartsDataGamesPlayed?[_chartsIndex].value) : (smoothChartsData?[_chartsIndex].value);
+    //List<_HistoryChartSpot> selectedGraph = _gamesPlayedInsteadOfDateAndTime ? chartsDataGamesPlayed[_chartsIndex].value! : chartsData[_chartsIndex].value!;
+    List<_HistoryChartSpot> selectedGraph = chartsData[_chartsIndex].value!;
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
       child: SingleChildScrollView(
@@ -873,7 +810,7 @@ class _History extends StatelessWidget{
                       ),
                     ],
                   ),
-                  if (smoothSelectedGraph != null) Row(
+                  if (selectedGraph.length > 300) Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Checkbox(value: _smooth,
@@ -884,10 +821,11 @@ class _History extends StatelessWidget{
                         })),
                         Text(t.smooth, style: const TextStyle(color: Colors.white, fontSize: 22))
                     ],
-                  )
+                  ),
+                  IconButton(onPressed: () => _zoomPanBehavior.reset(), icon: Icon(Icons.refresh), alignment: Alignment.center,)
                 ],
               ),
-              if(chartsData[_chartsIndex].value!.length > 1) _HistoryChartThigy(data: selectedGraph, smoothData: smoothSelectedGraph, smooth: _smooth, yAxisTitle: _historyShortTitles[_chartsIndex], bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? f2 : NumberFormat.compact(), xFormat: NumberFormat.compact())
+              if(chartsData[_chartsIndex].value!.length > 1) _HistoryChartThigy(data: selectedGraph, smooth: _smooth, yAxisTitle: _historyShortTitles[_chartsIndex], bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? f2 : NumberFormat.compact(), xFormat: NumberFormat.compact())
               else if (chartsData[_chartsIndex].value!.length <= 1) Center(child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -903,9 +841,16 @@ class _History extends StatelessWidget{
   }
 }
 
+class _HistoryChartSpot{
+  final DateTime timestamp;
+  final int gamesPlayed;
+  final String rank;
+  final double stat;
+  const _HistoryChartSpot(this.timestamp, this.gamesPlayed, this.rank, this.stat);
+}
+
 class _HistoryChartThigy extends StatefulWidget{
-  final List<FlSpot> data;
-  final List<FlSpot>? smoothData;
+  final List<_HistoryChartSpot> data;
   final bool smooth;
   final String yAxisTitle;
   final bool bigScreen;
@@ -916,7 +861,7 @@ class _HistoryChartThigy extends StatefulWidget{
   /// Implements graph for the _History widget. Requires [data] which is a list of dots for the graph. [yAxisTitle] used to keep track of changes.
   /// [bigScreen] tells if screen wide enough, [leftSpace] sets size, reserved for titles on the left from the graph and [yFormat] sets number format
   /// for left titles
-  const _HistoryChartThigy({required this.data, this.smoothData, required this.smooth, required this.yAxisTitle, required this.bigScreen, required this.leftSpace, required this.yFormat, this.xFormat});
+  const _HistoryChartThigy({required this.data, required this.smooth, required this.yAxisTitle, required this.bigScreen, required this.leftSpace, required this.yFormat, this.xFormat});
 
   @override
   State<_HistoryChartThigy> createState() => _HistoryChartThigyState();
@@ -925,282 +870,94 @@ class _HistoryChartThigy extends StatefulWidget{
 class _HistoryChartThigyState extends State<_HistoryChartThigy> {
   late String previousAxisTitle;
   late bool previousGamesPlayedInsteadOfDateAndTime;
-  late double minX;
-  late double maxX;
-  late double minY;
-  late double actualMinY;
-  late double maxY;
-  late double actualMaxY;
-  late double xScale;
-  late double yScale;
-  String headerTooltip = t.pseudoTooltipHeaderInit;
-  String footerTooltip = t.pseudoTooltipFooterInit;
-  int hoveredPointId = -1;
-  double scaleFactor = 5e2;
-  double dragFactor = 7e2;
+  late TooltipBehavior _tooltipBehavior;
+  
 
   @override
   void initState(){
     super.initState();
-    minX = widget.data.first.x;
-    maxX = widget.data.last.x;
-    setMinMaxY();
+    _tooltipBehavior = TooltipBehavior(
+      color: Colors.black,
+      borderColor: Colors.white,
+      enable: true,
+      animationDuration: 0,
+      builder: (dynamic data, dynamic point, dynamic series,
+        int pointIndex, int seriesIndex) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Text(
+                    "${f4.format(data.stat)} ${widget.yAxisTitle}",
+                    style: TextStyle(fontFamily: "Eurostile Round", fontSize: 20),
+                  ),
+                ),
+                Text(_gamesPlayedInsteadOfDateAndTime ? "${f0.format(data.gamesPlayed)} games played" : _dateFormat.format(data.timestamp))
+              ],
+            ),
+          );
+      }
+    );
     previousAxisTitle = widget.yAxisTitle;
     previousGamesPlayedInsteadOfDateAndTime = _gamesPlayedInsteadOfDateAndTime;
-    actualMaxY = maxY;
-    actualMinY = minY;
-    recalculateScales();
   }
 
   @override
   void dispose(){
     super.dispose();
-    actualMinY = 0;
-    minY = 0;
 }
-
-  /// Calculates and assignes maximum and minimum values in list of dots
-  void setMinMaxY(){
-    actualMinY = widget.data.reduce((value, element){
-      num n = min(value.y, element.y);
-      if (value.y == n) {
-        return value;
-      } else {
-        return element;
-      }
-    }).y;
-    actualMaxY = widget.data.reduce((value, element){
-      num n = max(value.y, element.y);
-      if (value.y == n) {
-        return value;
-      } else {
-        return element;
-      }
-    }).y;
-    minY = actualMinY;
-    maxY = actualMaxY;
-  }
-
-  /// Calculates and assignes scales, which is difference between maximum and minimum visible axis value
-  void recalculateScales(){
-    xScale = maxX - minX;
-    yScale = maxY - minY;
-  }
-
-  /// Accepts [dragUpdDet] and changes minX, maxX, minY, maxY based on that
-  void dragHandler(DragUpdateDetails dragUpdDet){
-    setState(() {
-      // Changing min and max values according to drag delta and considering scales
-      minX -= (xScale / dragFactor) * dragUpdDet.delta.dx;
-      maxX -= (xScale / dragFactor) * dragUpdDet.delta.dx;
-      minY += (yScale / dragFactor) * dragUpdDet.delta.dy;
-      maxY += (yScale / dragFactor) * dragUpdDet.delta.dy;
-
-      // If values are out of bounds - putting them back
-      if (minX < widget.data.first.x) {
-        minX = widget.data.first.x;
-        maxX = widget.data.first.x + xScale;
-      }
-      if (maxX > widget.data.last.x) {
-        maxX = widget.data.last.x;
-        minX = maxX - xScale;
-      }
-      if(minY < actualMinY){
-        minY = actualMinY;
-        maxY = actualMinY + yScale;
-      }
-      if(maxY > actualMaxY){
-        maxY = actualMaxY;
-        minY = actualMaxY - yScale;
-      }
-    });
-  }
-
-  /// Accepts scale [details] and changes minX, maxX, minY, maxY in a way to change xScale and yScale.
-  /// [graphKey] required for sizes calculations, as well, as [graphStartX] and [graphEndX].
-  /// Not used yet, because GestureDetector works like shit
-  void scaleHandler(ScaleUpdateDetails details, GlobalKey<State<StatefulWidget>> graphKey, double graphStartX, double graphEndX){
-    RenderBox graphBox = graphKey.currentContext?.findRenderObject() as RenderBox;
-
-    // calculating relative position of scale gesture
-    Offset graphPosition = graphBox.localToGlobal(Offset.zero);
-    // 0 - very left position of graph; 1 - very right position of graph
-    double gesturePosRelativeX = (details.focalPoint.dx - graphStartX) / (graphEndX - graphStartX);
-    // 0 - very top position of graph; 1 - very bottom position of graph
-    double gesturePosRelativeY = (details.focalPoint.dy - graphPosition.dy) / (graphBox.size.height - 30); // size - bottom titles height
-
-    double newMinX, newMaxX, newMinY, newMaxY; // calcutating new values based on gesture and considering scales
-    newMinX = minX - (xScale / scaleFactor) * (details.horizontalScale-1) * gesturePosRelativeX;
-    newMaxX = maxX + (xScale / scaleFactor) * (details.horizontalScale-1) * (1-gesturePosRelativeX);
-    newMinY = minY - (yScale / scaleFactor) * (details.horizontalScale-1) * (1-gesturePosRelativeY);
-    newMaxY = maxY + (yScale / scaleFactor) * (details.horizontalScale-1) * gesturePosRelativeY;
-
-    // cancel changes if minimum is more, than maximun 
-    if ((newMaxX - newMinX).isNegative) return; 
-    if ((newMaxY - newMinY).isNegative) return;
-
-    // apply changes if everything ok + can't go past boundaries
-    setState(() {
-      minX = max(newMinX, widget.data.first.x);
-      maxX = min(newMaxX, widget.data.last.x);
-      minY = max(newMinY, actualMinY);
-      maxY = min(newMaxY, actualMaxY);
-      recalculateScales();
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
-    GlobalKey graphKey = GlobalKey();
     if ((previousAxisTitle != widget.yAxisTitle) || (previousGamesPlayedInsteadOfDateAndTime != _gamesPlayedInsteadOfDateAndTime)) {
-      minX = widget.data.first.x;
-      maxX = widget.data.last.x;
-      recalculateScales();
-      setMinMaxY();
       previousAxisTitle = widget.yAxisTitle;
       previousGamesPlayedInsteadOfDateAndTime = _gamesPlayedInsteadOfDateAndTime;
       setState((){});
     }
-    double xInterval = widget.bigScreen ? max(1, xScale / 8) : max(1, xScale / 4); // how far away xTitles should be between each other
     EdgeInsets padding = widget.bigScreen ? const EdgeInsets.fromLTRB(40, 30, 40, 30) : const EdgeInsets.fromLTRB(0, 40, 16, 48);
-    double graphStartX = padding.left+widget.leftSpace;
-    double graphEndX = MediaQuery.sizeOf(context).width - padding.right;
     return SizedBox(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height - 104,
+      child: Padding( padding: padding,
       child: Listener(
         behavior: HitTestBehavior.translucent,
         onPointerSignal: (signal) {
-        if (signal is PointerScrollEvent) {
-          RenderBox graphBox = graphKey.currentContext?.findRenderObject() as RenderBox;
-
-          // calculating relative position of pointer
-          Offset graphPosition = graphBox.localToGlobal(Offset.zero); 
-          // 0 - very left position of graph; 1 - very right position of graph
-          double scrollPosRelativeX = (signal.position.dx - graphStartX) / (graphEndX - graphStartX);
-          // 0 - very top position of graph; 1 - very bottom position of graph
-          double scrollPosRelativeY = (signal.position.dy - graphPosition.dy) / (graphBox.size.height - 30); // size - bottom titles height
-
-          double newMinX, newMaxX, newMinY, newMaxY; // calcutating new values based on pointer position and considering scales
-          newMinX = minX - (xScale / scaleFactor) * signal.scrollDelta.dy * scrollPosRelativeX;
-          newMaxX = maxX + (xScale / scaleFactor) * signal.scrollDelta.dy * (1-scrollPosRelativeX);
-          newMinY = minY - (yScale / scaleFactor) * signal.scrollDelta.dy * (1-scrollPosRelativeY);
-          newMaxY = maxY + (yScale / scaleFactor) * signal.scrollDelta.dy * scrollPosRelativeY; 
-
-          // cancel changes if minimum is more, than maximun 
-          if ((newMaxX - newMinX).isNegative) return;
-          if ((newMaxY - newMinY).isNegative) return;
-
-          // apply changes if everything ok + can't go past boundaries
+        if (signal is PointerScrollEvent) {      
           setState(() {
-            minX = max(newMinX, widget.data.first.x);
-            maxX = min(newMaxX, widget.data.last.x);
-            minY = max(newMinY, actualMinY);
-            maxY = min(newMaxY, actualMaxY);
-            recalculateScales();
             _scrollController.jumpTo(_scrollController.position.maxScrollExtent - signal.scrollDelta.dy); // TODO: find a better way to stop scrolling in NestedScrollView
           });
         }
       },
-        child:
-          GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onDoubleTap: () {
-              setState(() {
-                minX = widget.data.first.x;
-                maxX = widget.data.last.x;
-                minY = actualMinY;
-                maxY = actualMaxY;
-                recalculateScales();
-              });
-            },
-            // TODO: onScaleUpdate:(details) => scaleHandler(details, graphKey, graphStartX, graphEndX),
-            // TODO: Figure out wtf is going on with gestures
-            // TODO: Somehow highlight touched spot (handleBuiltInTouches breaks getTooltipItems and getTouchedSpotIndicator)
-            child: Padding( padding: padding,
-            child: Stack(
-              children: [
-                LineChart(
-                  key: graphKey,
-                  curve: Curves.elasticInOut,
-                  LineChartData(
-                    lineBarsData: [
-                      LineChartBarData(
-                        show: !_smooth,
-                        spots: widget.data,
-                        dotData: FlDotData(show: false),
-                        isCurved: true,
-                        curveSmoothness: 0.35,
-                        preventCurveOverShooting: true
-                      ),
-                      if (widget.smoothData != null) LineChartBarData(
-                        show: _smooth,
-                        spots: widget.smoothData!,
-                        dotData: FlDotData(show: false),
-                        isCurved: true,
-                        curveSmoothness: 0.35,
-                        preventCurveOverShooting: true,
-                      )
-                    ],
-                    clipData: const FlClipData.all(),
-                    borderData: FlBorderData(show: false),
-                    gridData: FlGridData(verticalInterval: xInterval),
-                    minX: minX,
-                    maxX: maxX,
-                    minY: minY,
-                    maxY: maxY,
-                    titlesData: FlTitlesData(topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    bottomTitles: AxisTitles(sideTitles: SideTitles(interval: xInterval, showTitles: true, reservedSize: 30, getTitlesWidget: (double value, TitleMeta meta){
-                      return value != meta.min && value != meta.max ? SideTitleWidget(
-                        axisSide: meta.axisSide,
-                        child: Text(widget.xFormat != null && _gamesPlayedInsteadOfDateAndTime ? widget.xFormat!.format(value.round()) : DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).format(DateTime.fromMillisecondsSinceEpoch(value.floor()))),
-                      ) : Container();
-                    })),
-                    leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: widget.leftSpace, getTitlesWidget: (double value, TitleMeta meta){
-                      return value != meta.min && value != meta.max ? SideTitleWidget(
-                        axisSide: meta.axisSide,
-                        child: Text(widget.yFormat.format(value)),
-                      ) : Container();
-                    }))),
-                    lineTouchData: LineTouchData(
-                      handleBuiltInTouches: false,
-                      touchCallback:(touchEvent, touchResponse) {
-                        if (touchEvent is FlPanUpdateEvent){
-                            dragHandler(touchEvent.details);
-                            return;
-                          }
-                        if (touchEvent is FlPointerHoverEvent){
-                          setState(() {
-                          if (touchResponse?.lineBarSpots?.first == null) {
-                            hoveredPointId = -1; // not hovering over any point
-                          } else {
-                            hoveredPointId = touchResponse!.lineBarSpots!.first.spotIndex;
-                            headerTooltip = "${f4.format(touchResponse.lineBarSpots!.first.y)} ${widget.yAxisTitle}";
-                            footerTooltip = _gamesPlayedInsteadOfDateAndTime ? "${f0.format(touchResponse.lineBarSpots!.first.x)} games played" : _dateFormat.format(DateTime.fromMillisecondsSinceEpoch(touchResponse.lineBarSpots!.first.x.floor()));
-                          }
-                          });
-                        }
-                        if (touchEvent is FlPointerExitEvent){
-                          setState(() {hoveredPointId = -1;});
-                        }
-                      },
-                      )
-                    )
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(left: widget.leftSpace),
-                    child: Column(
-                      children: [
-                        AnimatedDefaultTextStyle(style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 24, color: Color.fromARGB(hoveredPointId == -1 ? 100 : 255, 255, 255, 255), shadows: hoveredPointId != -1 ? textShadow : null), duration: Durations.medium1, curve: Curves.elasticInOut, child: Text(headerTooltip)),
-                        AnimatedDefaultTextStyle(style: TextStyle(fontFamily: "Eurostile Round", color: Color.fromARGB(hoveredPointId == -1 ? 100 : 255, 255, 255, 255), shadows: hoveredPointId != -1 ? textShadow : null), duration: Durations.medium1, curve: Curves.elasticInOut, child: Text(footerTooltip)),
-                      ],
-                    ),
-                  )
-              ],
-            ),
-            ),
+        child: SfCartesianChart(
+          tooltipBehavior: _tooltipBehavior,
+          zoomPanBehavior: _zoomPanBehavior,
+          primaryXAxis: DateTimeAxis(),
+          primaryYAxis: NumericAxis(
+            rangePadding: ChartRangePadding.additional,
           ),
+          series: <CartesianSeries>[
+            StepLineSeries<_HistoryChartSpot, DateTime>(
+              enableTooltip: true,
+              // splineType: SplineType.cardinal,
+              // cardinalSplineTension: 0.2,
+              dataSource: widget.data,
+              animationDuration: 0,
+              opacity: 1,
+              xValueMapper: (_HistoryChartSpot data, _) => data.timestamp,
+              yValueMapper: (_HistoryChartSpot data, _) => data.stat,
+              // trendlines:<Trendline>[
+              //   Trendline(
+              //     period: (widget.data.length/175).floor(),
+              //     type: TrendlineType.movingAverage,
+              //     color: Colors.blue)
+              // ],
+            ),
+          ],
+        ),
+      ),
       )
     );
   }
