@@ -98,7 +98,7 @@ class GaugetNum extends StatelessWidget {
                     oldPlayerStat! > playerStat ? Colors.redAccent : Colors.greenAccent :
                     oldPlayerStat! < playerStat ? Colors.redAccent : Colors.greenAccent
                   ),),
-                  if ((oldTl != null && oldTl!.gamesPlayed > 0) && pos != null) const TextSpan(text: " • "),
+                  if (oldPlayerStat != null && pos != null) const TextSpan(text: " • "),
                   if (pos != null) TextSpan(text: pos!.position >= 1000 ? "${t.top} ${f2.format(pos!.percentage*100)}%" : "№${pos!.position}", style: TextStyle(color: getColorOfRank(pos!.position)))
                 ]
                 ),

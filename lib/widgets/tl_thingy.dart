@@ -14,10 +14,6 @@ import 'package:tetra_stats/widgets/tl_progress_bar.dart';
 var fDiff = NumberFormat("+#,###.###;-#,###.###");
 var intFDiff = NumberFormat("+#,###;-#,###");
 final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
-late RangeValues _currentRangeValues;
-TetraLeagueAlpha? oldTl;
-late TetraLeagueAlpha currentTl;
-late List<TetrioPlayer> sortedStates;
 
 class TLThingy extends StatefulWidget {
   final TetraLeagueAlpha tl;
@@ -30,10 +26,12 @@ class TLThingy extends StatefulWidget {
   final PlayerLeaderboardPosition? lbPositions;
   final TetraLeagueAlpha? averages;
   final double? thatRankCutoff;
+  final double? thatRankCutoffGlicko;
   final double? thatRankTarget;
   final double? nextRankCutoff;
+  final double? nextRankCutoffGlicko;
   final double? nextRankTarget;
-  const TLThingy({super.key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.bot=false, this.guest=false, this.topTR, this.lbPositions, this.averages, this.nextRankCutoff = 25000, this.thatRankCutoff = 0, this.nextRankTarget = 25000, this.thatRankTarget = 0});
+  const TLThingy({super.key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.bot=false, this.guest=false, this.topTR, this.lbPositions, this.averages, this.nextRankCutoff = 25000, this.thatRankCutoff = 0, this.thatRankCutoffGlicko = 0, this.nextRankCutoffGlicko = double.infinity, this.nextRankTarget = 25000, this.thatRankTarget = 0});
 
   @override
   State<TLThingy> createState() => _TLThingyState();
@@ -41,6 +39,10 @@ class TLThingy extends StatefulWidget {
 
 class _TLThingyState extends State<TLThingy> {
   late bool oskKagariGimmick;
+  late TetraLeagueAlpha? oldTl;
+  late TetraLeagueAlpha currentTl;
+  late RangeValues _currentRangeValues;
+  late List<TetrioPlayer> sortedStates;
   
 @override
   void initState() {
@@ -161,14 +163,13 @@ class _TLThingyState extends State<TLThingy> {
               //     ),
               // ),
               TLProgress(
-                tr: currentTl.rating,
-                rank: currentTl.rank != "z" ? currentTl.rank : currentTl.percentileRank, 
-                position: currentTl.standing,
-                nextRankPosition: currentTl.nextAt,
-                previousRankPosition: currentTl.prevAt,
+                tlData: currentTl,
                 previousRankTRcutoff: widget.thatRankCutoff,
+                previousGlickoCutoff: widget.thatRankCutoffGlicko,
+                previousRank: widget.tl.prevRank,
                 previousRankTRcutoffTarget: widget.thatRankTarget,
                 nextRankTRcutoff: widget.nextRankCutoff,
+                nextRankGlickoCutoff: widget.nextRankCutoffGlicko,
                 nextRankTRcutoffTarget: widget.nextRankTarget,
                 nextRank: widget.tl.nextRank
               ),

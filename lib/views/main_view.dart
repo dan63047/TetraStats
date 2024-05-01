@@ -86,6 +86,8 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   TetraLeagueAlpha? rankAverages;
   double? thatRankCutoff;
   double? nextRankCutoff;
+  double? thatRankGlickoCutoff;
+  double? nextRankGlickoCutoff;
   String _searchFor = "6098518e3d5155e6ec429cdc"; // who we looking for
   String _titleNickname = "";
     /// Each dropdown menu item contains list of dots for the graph
@@ -198,8 +200,11 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       }
       if (me.tlSeason1.gamesPlayed > 9) {
         thatRankCutoff = everyone!.cutoffs[me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank];
+        thatRankGlickoCutoff = everyone!.cutoffsGlicko[me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank];
         nextRankCutoff = everyone!.cutoffs[ranks.elementAtOrNull(ranks.indexOf(me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank)+1)];
+        nextRankGlickoCutoff = everyone!.cutoffsGlicko[ranks.elementAtOrNull(ranks.indexOf(me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank)+1)];
         nextRankCutoff = nextRankCutoff??25000;
+        nextRankGlickoCutoff = nextRankGlickoCutoff??double.infinity;
       }
     }
 
@@ -272,7 +277,6 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     // Also i need previous Tetra League State for comparison if avaliable
     if (uniqueTL.length >= 2){
       compareWith = uniqueTL.toList().elementAtOrNull(uniqueTL.length - 2);
-      //chartsData = [for (var tl in uniqueTL) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, [tl.rating, tl.glicko, tl.rd, tl.apm, tl.pps, tl.vs, tl.nerdStats?.app, tl.nerdStats?.dss, tl.nerdStats?.dsp, tl.nerdStats?.appdsp, tl.nerdStats?.vsapm, tl.nerdStats?.cheese, tl.nerdStats?.gbe, tl.nerdStats?.nyaapp, tl.nerdStats?.area, tl.estTr?.esttr, tl.esttracc, tl.playstyle?.opener, tl.playstyle?.plonk, tl.playstyle?.infds, tl.playstyle?.stride])];
       chartsData = <DropdownMenuItem<List<_HistoryChartSpot>>>[ // Dumping charts data into dropdown menu items, while cheking if every entry is valid
         DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.rating)], child: Text(t.statCellNum.tr)),
         DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.glicko!)], child: const Text("Glicko")),
@@ -455,9 +459,11 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                                 bot: snapshot.data![0].role == "bot",
                                 guest: snapshot.data![0].role == "anon",
                                 thatRankCutoff: thatRankCutoff,
+                                thatRankCutoffGlicko: thatRankGlickoCutoff,
                                 thatRankTarget: snapshot.data![0].tlSeason1.rank != "z" ? rankTargets[snapshot.data![0].tlSeason1.rank] : null,
                                 nextRankCutoff: nextRankCutoff,
-                                nextRankTarget: snapshot.data![0].tlSeason1.rank != "z" || snapshot.data![0].tlSeason1.rank != "x" ? rankTargets[ranks.elementAtOrNull(ranks.indexOf(snapshot.data![0].tlSeason1.rank)+1)] : null,
+                                nextRankCutoffGlicko: nextRankGlickoCutoff,
+                                nextRankTarget: (snapshot.data![0].tlSeason1.rank != "z" && snapshot.data![0].tlSeason1.rank != "x") ? rankTargets[ranks.elementAtOrNull(ranks.indexOf(snapshot.data![0].tlSeason1.rank)+1)] : null,
                                 averages: rankAverages,
                                 lbPositions: meAmongEveryone
                               ),
@@ -934,26 +940,44 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
         child: SfCartesianChart(
           tooltipBehavior: _tooltipBehavior,
           zoomPanBehavior: _zoomPanBehavior,
-          primaryXAxis: DateTimeAxis(),
+          primaryXAxis: _gamesPlayedInsteadOfDateAndTime ? NumericAxis() : DateTimeAxis(),
           primaryYAxis: NumericAxis(
             rangePadding: ChartRangePadding.additional,
           ),
           series: <CartesianSeries>[
-            StepLineSeries<_HistoryChartSpot, DateTime>(
+            if (_gamesPlayedInsteadOfDateAndTime) StepLineSeries<_HistoryChartSpot, int>(
               enableTooltip: true,
               // splineType: SplineType.cardinal,
               // cardinalSplineTension: 0.2,
               dataSource: widget.data,
               animationDuration: 0,
-              opacity: 1,
+              opacity: _smooth ? 0 : 1,
+              xValueMapper: (_HistoryChartSpot data, _) => data.gamesPlayed,
+              yValueMapper: (_HistoryChartSpot data, _) => data.stat,
+              trendlines:<Trendline>[
+                Trendline(
+                  isVisible: _smooth,
+                  period: (widget.data.length/175).floor(),
+                  type: TrendlineType.movingAverage,
+                  color: Colors.blue)
+              ],
+            )
+            else StepLineSeries<_HistoryChartSpot, DateTime>(
+              enableTooltip: true,
+              // splineType: SplineType.cardinal,
+              // cardinalSplineTension: 0.2,
+              dataSource: widget.data,
+              animationDuration: 0,
+              opacity: _smooth ? 0 : 1,
               xValueMapper: (_HistoryChartSpot data, _) => data.timestamp,
               yValueMapper: (_HistoryChartSpot data, _) => data.stat,
-              // trendlines:<Trendline>[
-              //   Trendline(
-              //     period: (widget.data.length/175).floor(),
-              //     type: TrendlineType.movingAverage,
-              //     color: Colors.blue)
-              // ],
+              trendlines:<Trendline>[
+                Trendline(
+                  isVisible: _smooth,
+                  period: (widget.data.length/175).floor(),
+                  type: TrendlineType.movingAverage,
+                  color: Colors.blue)
+              ],
             ),
           ],
         ),

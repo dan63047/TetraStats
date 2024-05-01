@@ -1856,11 +1856,12 @@ class TetrioPlayersLeaderboard {
         "avgStride": avgStride,
         "avgInfDS": avgInfDS,
         "toEnterTR": rank.toLowerCase() != "z" ? leaderboard[(leaderboard.length * rankCutoffs[rank]!).floor()-1].rating : lowestTR,
+        "toEnterGlicko": rank.toLowerCase() != "z" ? leaderboard[(leaderboard.length * rankCutoffs[rank]!).floor()-1].glicko : 0,
         "entries": filtredLeaderboard
       }];
     }else{
       return [TetraLeagueAlpha(timestamp: DateTime.now(), apm: 0, pps: 0, vs: 0, glicko: 0, rd: noTrRd, gamesPlayed: 0, gamesWon: 0, bestRank: rank, decaying: false, rating: 0, rank: rank, percentileRank: rank, percentile: rankCutoffs[rank]!, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1),
-      {"players": filtredLeaderboard.length, "lowestTR": 0, "toEnterTR": 0}];
+      {"players": filtredLeaderboard.length, "lowestTR": 0, "toEnterTR": 0, "toEnterGlicko": 0}];
     }
   }
 
@@ -1927,6 +1928,26 @@ class TetrioPlayersLeaderboard {
     'c-': getAverageOfRank("c-")[1]["toEnterTR"],
     'd+': getAverageOfRank("d+")[1]["toEnterTR"],
     'd': getAverageOfRank("d")[1]["toEnterTR"]
+    };
+
+  Map<String, double> get cutoffsGlicko => {
+    'x': getAverageOfRank("x")[1]["toEnterGlicko"],
+    'u': getAverageOfRank("u")[1]["toEnterGlicko"],
+    'ss': getAverageOfRank("ss")[1]["toEnterGlicko"],
+    's+': getAverageOfRank("s+")[1]["toEnterGlicko"],
+    's': getAverageOfRank("s")[1]["toEnterGlicko"],
+    's-': getAverageOfRank("s-")[1]["toEnterGlicko"],
+    'a+': getAverageOfRank("a+")[1]["toEnterGlicko"],
+    'a': getAverageOfRank("a")[1]["toEnterGlicko"],
+    'a-': getAverageOfRank("a-")[1]["toEnterGlicko"],
+    'b+': getAverageOfRank("b+")[1]["toEnterGlicko"],
+    'b': getAverageOfRank("b")[1]["toEnterGlicko"],
+    'b-': getAverageOfRank("b-")[1]["toEnterGlicko"],
+    'c+': getAverageOfRank("c+")[1]["toEnterGlicko"],
+    'c': getAverageOfRank("c")[1]["toEnterGlicko"],
+    'c-': getAverageOfRank("c-")[1]["toEnterGlicko"],
+    'd+': getAverageOfRank("d+")[1]["toEnterGlicko"],
+    'd': getAverageOfRank("d")[1]["toEnterGlicko"]
     };
 
   TetrioPlayersLeaderboard.fromJson(List<dynamic> json, String t, DateTime ts) {

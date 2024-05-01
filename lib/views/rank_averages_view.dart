@@ -200,7 +200,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                           direction: Axis.horizontal,
                           alignment: WrapAlignment.center,
                           crossAxisAlignment: WrapCrossAlignment.end,
-                          spacing: 25,
+                          spacing: 20,
                           children: [
                             Column(
                               children: [
