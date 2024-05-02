@@ -182,12 +182,13 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       teto.fetchTLStream(_searchFor),
       teto.fetchRecords(_searchFor),
       teto.fetchNews(_searchFor),
+      prefs.getBool("showPositions") != true ? teto.fetchCutoffs() : Future.delayed(Duration.zero, ()=>[]),
       if (me.tlSeason1.gamesPlayed > 9) teto.fetchTopTR(_searchFor) // can retrieve this only if player has TR
     ]);
     tlStream = requests[0] as TetraLeagueAlphaStream;
     records = requests[1] as Map<String, dynamic>;
     news = requests[2] as List<News>;
-    topTR = requests.elementAtOrNull(3) as double?; // No TR - no Top TR
+    topTR = requests.elementAtOrNull(4) as double?; // No TR - no Top TR
 
     meAmongEveryone = teto.getCachedLeaderboardPositions(me.userId);
     if (prefs.getBool("showPositions") == true){
@@ -198,15 +199,17 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
         meAmongEveryone = await compute(everyone!.getLeaderboardPosition, me);
         if (meAmongEveryone != null) teto.cacheLeaderboardPositions(me.userId, meAmongEveryone!); 
       }
-      if (me.tlSeason1.gamesPlayed > 9) {
-        thatRankCutoff = everyone!.cutoffs[me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank];
-        thatRankGlickoCutoff = everyone!.cutoffsGlicko[me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank];
-        nextRankCutoff = everyone!.cutoffs[ranks.elementAtOrNull(ranks.indexOf(me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank)+1)];
-        nextRankGlickoCutoff = everyone!.cutoffsGlicko[ranks.elementAtOrNull(ranks.indexOf(me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank)+1)];
+    }
+    Map<String, double> cutoffs = prefs.getBool("showPositions") == true ? everyone!.cutoffs : requests[3][0];
+    Map<String, double> cutoffsGlicko = prefs.getBool("showPositions") == true ? everyone!.cutoffsGlicko : requests[3][1];
+    if (me.tlSeason1.gamesPlayed > 9) {
+        thatRankCutoff = cutoffs[me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank];
+        thatRankGlickoCutoff = cutoffsGlicko[me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank];
+        nextRankCutoff = cutoffs[ranks.elementAtOrNull(ranks.indexOf(me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank)+1)];
+        nextRankGlickoCutoff = cutoffsGlicko[ranks.elementAtOrNull(ranks.indexOf(me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank)+1)];
         nextRankCutoff = nextRankCutoff??25000;
         nextRankGlickoCutoff = nextRankGlickoCutoff??double.infinity;
       }
-    }
 
     if (everyone != null && me.tlSeason1.gamesPlayed > 9) rankAverages = everyone?.averages[me.tlSeason1.percentileRank]?[0];
 

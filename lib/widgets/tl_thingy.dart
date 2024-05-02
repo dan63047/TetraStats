@@ -31,7 +31,7 @@ class TLThingy extends StatefulWidget {
   final double? nextRankCutoff;
   final double? nextRankCutoffGlicko;
   final double? nextRankTarget;
-  const TLThingy({super.key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.bot=false, this.guest=false, this.topTR, this.lbPositions, this.averages, this.nextRankCutoff = 25000, this.thatRankCutoff = 0, this.thatRankCutoffGlicko = 0, this.nextRankCutoffGlicko = double.infinity, this.nextRankTarget = 25000, this.thatRankTarget = 0});
+  const TLThingy({super.key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.bot=false, this.guest=false, this.topTR, this.lbPositions, this.averages, this.nextRankCutoff, this.thatRankCutoff, this.thatRankCutoffGlicko, this.nextRankCutoffGlicko, this.nextRankTarget, this.thatRankTarget});
 
   @override
   State<TLThingy> createState() => _TLThingyState();
@@ -342,9 +342,9 @@ class _TLThingyState extends State<TLThingy> {
                                 if (oldTl?.estTr?.esttr != null) TextSpan(text: comparef.format(currentTl.estTr!.esttr - oldTl!.estTr!.esttr), style: TextStyle(
                                   color: oldTl!.estTr!.esttr > currentTl.estTr!.esttr ? Colors.redAccent : Colors.greenAccent
                                 ),),
-                                if (oldTl?.estTr?.esttr != null || widget.lbPositions?.estTr != null) const TextSpan(text: " • "),
+                                if (oldTl?.estTr?.esttr != null) const TextSpan(text: " • "),
                                 if (widget.lbPositions?.estTr != null) TextSpan(text: widget.lbPositions!.estTr!.position >= 1000 ? "${t.top} ${f2.format(widget.lbPositions!.estTr!.percentage*100)}%" : "№${widget.lbPositions!.estTr!.position}", style: TextStyle(color: getColorOfRank(widget.lbPositions!.estTr!.position))),
-                                if (widget.lbPositions?.estTr != null) const TextSpan(text: " • "),
+                                if (widget.lbPositions?.estTr != null || oldTl?.estTr?.esttr != null) const TextSpan(text: " • "),
                                 TextSpan(text: "Glicko: ${f2.format(currentTl.estTr!.estglicko)}")
                               ]
                               ),

@@ -33,10 +33,49 @@ class TLProgress extends StatelessWidget{
   Widget build(BuildContext context) {
     final glickoForWin = rate(tlData.glicko!, tlData.rd!, 0.06, [[tlData.glicko!, tlData.rd!, 1]], {})[0]-tlData.glicko!;
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: 48,
+            child: Stack(
+              alignment: AlignmentDirectional.bottomCenter,
+              fit: StackFit.expand,
+              children: [
+              Positioned(left: 0, 
+                child: RichText(
+                  textAlign: TextAlign.left,
+                  text: TextSpan(
+                    style: TextStyle(color: Colors.white, fontFamily: "Eurostile Round", fontSize: 12),
+                    children: [
+                      if (tlData.prevAt > 0) TextSpan(text: "№ ${f0.format(tlData.prevAt)}"),
+                      if (tlData.prevAt > 0 && previousRankTRcutoff != null) TextSpan(text: "\n"),
+                      if (previousRankTRcutoff != null) TextSpan(text: "${intf.format(previousRankTRcutoff)} (${comparef2.format(previousRankTRcutoff!-tlData.rating)}) TR"),
+                      if ((tlData.prevAt > 0 || previousRankTRcutoff != null) && previousGlickoCutoff != null) TextSpan(text: "\n"),
+                      if (previousGlickoCutoff != null) TextSpan(text: "~${f2.format((tlData.glicko!-previousGlickoCutoff!)/glickoForWin)} defeats")
+                    ]
+                  )
+                ),
+              ),
+              Positioned(right: 0,
+                child: RichText(
+                  textAlign: TextAlign.right,
+                  text: TextSpan(
+                    style: TextStyle(color: Colors.white, fontFamily: "Eurostile Round", fontSize: 12),
+                    children: [
+                      if (tlData.nextAt > 0) TextSpan(text: "№ ${f0.format(tlData.nextAt)}"),
+                      if (tlData.nextAt > 0 && nextRankTRcutoff != null) TextSpan(text: "\n"),
+                      if (nextRankTRcutoff != null) TextSpan(text: "${intf.format(nextRankTRcutoff)} (${comparef2.format(nextRankTRcutoff!-tlData.rating)}) TR"),
+                      if ((tlData.nextAt > 0 || nextRankTRcutoff != null) && nextRankGlickoCutoff != null) TextSpan(text: "\n"),
+                      if (nextRankGlickoCutoff != null) TextSpan(text: "~${f2.format((nextRankGlickoCutoff!-tlData.glicko!)/glickoForWin)} victories")
+                    ]
+                  )
+                ),
+              )
+            ],),
+          ),
           SfLinearGauge(
             minimum: 0,
             maximum: 1,
@@ -49,34 +88,22 @@ class TLProgress extends StatelessWidget{
             ],
             markerPointers: [
               LinearShapePointer(value: (previousRankTRcutoff != null && nextRankTRcutoff != null) ? getBarTR(tlData.rating)! : getBarPosition(), position: LinearElementPosition.cross, shapeType: LinearShapePointerType.diamond, color: Colors.white, height: 20),
-              LinearWidgetPointer(offset: 4, position: LinearElementPosition.outside, value: (previousRankTRcutoff != null && nextRankTRcutoff != null) ? getBarTR(tlData.rating)! : getBarPosition(), child: Text("№ ${NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 0).format(tlData.standing)}"))
+              if (tlData.standing != -1) LinearWidgetPointer(offset: 4, position: LinearElementPosition.outside, value: (previousRankTRcutoff != null && nextRankTRcutoff != null) ? getBarTR(tlData.rating)! : getBarPosition(), child: Text("№ ${NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 0).format(tlData.standing)}", style: TextStyle(fontSize: 14),))
             ],
             isMirrored: true,
             showTicks: true,
-            axisLabelStyle: TextStyle(),
-            onGenerateLabels: () => [
-              LinearAxisLabel(text: "${tlData.prevAt > 0 ? "№ ${f0.format(tlData.prevAt)}" : ""}\n ${intf.format(previousRankTRcutoff)} TR", value: 0),
-              LinearAxisLabel(text: "${tlData.nextAt > 0 ? "№ ${f0.format(tlData.nextAt)}" : ""}\n ${intf.format(nextRankTRcutoff)} TR", value: 1),
-            ],
+            // onGenerateLabels: () => [
+            //   LinearAxisLabel(text: "${tlData.prevAt > 0 ? "№ ${f0.format(tlData.prevAt)}" : ""}\n ${intf.format(previousRankTRcutoff)} TR", value: 0),
+            //   LinearAxisLabel(text: "${tlData.nextAt > 0 ? "№ ${f0.format(tlData.nextAt)}" : ""}\n ${intf.format(nextRankTRcutoff)} TR", value: 1),
+            // ],
             // labelFormatterCallback: (value) {
             //   if (value == "0") return "${f0.format(previousRankPosition)}\n 26,700 TR";
             //   else return f0.format(nextRankPosition);
             // },
-            showLabels: true
-          ),
-          Container(
-            width: MediaQuery.of(context).size.width,
-            height: 20,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-              Positioned(child: Text("${f2.format(tlData.rating-previousRankTRcutoff!)} (${f2.format((tlData.glicko!-previousGlickoCutoff!)/glickoForWin)} losses)"), left: 0,),
-              Positioned(child: Text("${f2.format(nextRankTRcutoff!-tlData.rating)} (${f2.format((nextRankGlickoCutoff!-tlData.glicko!)/glickoForWin)} wins)"), right: 0,)
-            ],),
+            showLabels: false
           )
-          
-        ],
-      )
+        ]
+      ),
     );        
   }
 }

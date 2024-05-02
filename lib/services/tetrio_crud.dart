@@ -77,6 +77,7 @@ class TetrioService extends DB {
   final Map<String, PlayerLeaderboardPosition> _lbPositions = {};
   final Map<String, List<News>> _newsCache = {};
   final Map<String, Map<String, double?>> _topTRcache = {};
+  final Map<String, List<Map<String, double>>> _cutoffsCache = {};
   final Map<String, TetraLeagueAlphaStream> _tlStreamsCache = {};
   /// Thing, that sends every request to the API endpoints
   final client = kDebugMode ? UserAgentClient("Kagari-chan loves osk (Tetra Stats dev build)", http.Client()) : UserAgentClient("Tetra Stats v${packageInfo.version} (dm @dan63047 if someone abuse that software)", http.Client());
@@ -296,6 +297,67 @@ class TetrioService extends DB {
 
   // Sidenote: as you can see, fetch functions looks and works pretty much same way, as described above,
   // so i'm going to document only unique differences between them
+
+  Future<List<Map<String, double>>> fetchCutoffs() async {
+    try{ 
+      var cached = _cutoffsCache.entries.first;
+    if (DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true).isAfter(DateTime.now())){ // if not expired
+      developer.log("fetchCutoffs: Cutoffs retrieved from cache, that expires ${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)}", name: "services/tetrio_crud");
+      return cached.value;
+    }else{ // if cache expired
+      _topTRcache.remove(cached.key);
+      developer.log("fetchCutoffs: Cutoffs expired (${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)})", name: "services/tetrio_crud");
+    }
+    }catch(e){ // actually going to obtain
+      developer.log("fetchCutoffs: Trying to retrieve Cutoffs", name: "services/tetrio_crud");
+    }
+
+    Uri url;
+    if (kIsWeb) {
+      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "PeakTR"});
+    } else {
+      url = Uri.https('api.p1nkl0bst3r.xyz', 'rankcutoff', {"users": null});
+    }
+
+    try{
+      final response = await client.get(url);
+
+      switch (response.statusCode) {
+        case 200:
+          Map<String, dynamic> rawData = jsonDecode(response.body);
+          Map<String, dynamic> data = rawData["cutoffs"] as Map<String, dynamic>;
+          Map<String, double> trCutoffs = {};
+          Map<String, double> glickoCutoffs = {};
+          for (String rank in data.keys){
+            trCutoffs[rank] = data[rank]["rating"];
+            glickoCutoffs[rank] = data[rank]["glicko"];
+          }
+          _cutoffsCache[(rawData["ts"] + 300000).toString()] = [trCutoffs, glickoCutoffs];
+          return [trCutoffs, glickoCutoffs];
+        case 404:
+          developer.log("fetchCutoffs: Cutoffs are gone", name: "services/tetrio_crud", error: response.statusCode);
+          return [];
+        // if not 200 or 404 - throw a unique for each code exception  
+        case 403:
+          throw P1nkl0bst3rForbidden();
+        case 429:
+          throw P1nkl0bst3rTooManyRequests();
+        case 418:
+          throw TetrioOskwareBridgeProblem();
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+          throw P1nkl0bst3rInternalProblem();
+        default:
+          developer.log("fetchCutoffs: Failed to fetch top Cutoffs", name: "services/tetrio_crud", error: response.statusCode);
+          throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
+      }
+    } on http.ClientException catch (e, s) { // If local http client fails
+      developer.log("$e, $s");
+      throw http.ClientException(e.message, e.uri); // just assuming, that our end user don't have acess to the internet
+    }
+  }
 
   /// Retrieves Tetra League history from p1nkl0bst3r api for a player with given [id]. Returns a list of states
   /// (state = instance of [TetrioPlayer] at some point of time). Can throw an exception if fails to retrieve data.

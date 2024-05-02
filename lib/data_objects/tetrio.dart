@@ -756,16 +756,15 @@ class EstTr {
     srarea = (_apm * 0) + (_pps * 135) + (_vs * 0) + (_app * 290) + (_dss * 0) + (_dsp * 700) + (_gbe * 0);
     statrank = 11.2 * atan((srarea - 93) / 130) + 1;
     if (statrank <= 0) statrank = 0.001;
-    estglicko = (4.0867 * srarea + 186.68);
+    //estglicko = (4.0867 * srarea + 186.68);
     double ntemp = _pps*(150+(((_vs/_apm) - 1.66)*35))+_app*290+_dsp*700;
+    estglicko = 0.000013*pow(ntemp, 3) - 0.0196 *pow(ntemp, 2) + (12.645*ntemp)-1005.4;
     esttr = 25000 / 
     (
       1 + pow(10, (
         (
           (
-            1500-(
-              0.000013*pow(ntemp, 3) - 0.0196 *pow(ntemp, 2) + (12.645*ntemp)-1005.4
-            )
+            1500-estglicko
           )*pi
         )/sqrt(
           (
