@@ -411,7 +411,7 @@ class UserThingy extends StatelessWidget {
                       errorBuilder: (context, error, stackTrace) {
                         developer.log("Error with building $badge", name: "main_view", error: error, stackTrace: stackTrace);
                         return Image.network(
-                          "https://tetr.io/res/badges/${badge.badgeId}.png",
+                          kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioBadge&badge=${badge.badgeId}" : "https://tetr.io/res/badges/${badge.badgeId}.png",
                           height: 32,
                           width: 32,
                           errorBuilder:(context, error, stackTrace) {

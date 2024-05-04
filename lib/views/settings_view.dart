@@ -48,11 +48,7 @@ class SettingsState extends State<SettingsView> {
 
   Future<void> _getPreferences() async {
     prefs = await SharedPreferences.getInstance();
-    if (prefs.getBool("showPositions") != null) {
-      showPositions = prefs.getBool("showPositions")!;
-    } else {
-      showPositions = false;
-    }
+    showPositions = prefs.getBool("showPositions") ?? false;
     _setDefaultNickname(prefs.getString("player"));
   }
 
@@ -64,7 +60,7 @@ class SettingsState extends State<SettingsView> {
         defaultNickname = n;
       }
     } else {
-      defaultNickname = "6098518e3d5155e6ec429cdc";
+      defaultNickname = "dan63047";
     }
     setState(() {});
   }

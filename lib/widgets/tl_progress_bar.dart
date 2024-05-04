@@ -70,7 +70,7 @@ class TLProgress extends StatelessWidget{
                       if (tlData.nextAt > 0 && nextRankTRcutoff != null) const TextSpan(text: "\n"),
                       if (nextRankTRcutoff != null) TextSpan(text: "${f2.format(nextRankTRcutoff)} (${comparef2.format(nextRankTRcutoff!-tlData.rating)}) TR"),
                       if ((tlData.nextAt > 0 || nextRankTRcutoff != null) && nextRankGlickoCutoff != null) const TextSpan(text: "\n"),
-                      if (nextRankGlickoCutoff != null) TextSpan(text: (tlData.standing < tlData.nextAt || (nextRankGlickoCutoff!-tlData.glicko!)/glickoForWin < 0.5) ? t.promotionOnNextWin : t.numOfVictories(wins: f2.format((nextRankGlickoCutoff!-tlData.glicko!)/glickoForWin)), style: TextStyle(color: (tlData.standing < tlData.nextAt || (nextRankGlickoCutoff!-tlData.glicko!)/glickoForWin < 0.5) ? Colors.greenAccent : null))
+                      if (nextRankGlickoCutoff != null) TextSpan(text: (tlData.standing < tlData.nextAt || ((nextRankGlickoCutoff!-tlData.glicko!)/glickoForWin < 0.5 && tlData.percentileRank != "x")) ? t.promotionOnNextWin : t.numOfVictories(wins: f2.format((nextRankGlickoCutoff!-tlData.glicko!)/glickoForWin)), style: TextStyle(color: (tlData.standing < tlData.nextAt || ((nextRankGlickoCutoff!-tlData.glicko!)/glickoForWin < 0.5 && tlData.percentileRank != "x")) ? Colors.greenAccent : null))
                     ]
                   )
                 ),

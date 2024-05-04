@@ -600,7 +600,7 @@ class _NavDrawerState extends State<NavDrawer> {
         homePlayerNickname = id;
       }
     } else {
-      homePlayerNickname = "dan63";
+      homePlayerNickname = "dan63047";
     }
     setState(() {});
   }
