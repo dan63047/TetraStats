@@ -1,9 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:io';
-import 'dart:math';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/widgets.dart';
 import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/views/compare_view.dart' show CompareThingy, CompareBoolThingy;
@@ -234,12 +231,12 @@ class TlMatchResultState extends State<TlMatchResultView> {
                         roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].kpp : snapshot.data!.stats[roundSelector][greenSidePlayer].kpp,
                         redSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].kpp :
                         roundSelector.isNegative ?  snapshot.data!.totalStats[redSidePlayer].kpp : snapshot.data!.stats[roundSelector][redSidePlayer].kpp,
-                        label: "KpP", higherIsBetter: false, fractionDigits: 2,),
+                        label: "KPP", higherIsBetter: false, fractionDigits: 2,),
                       CompareThingy(greenSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].kps : 
                         roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].kps : snapshot.data!.stats[roundSelector][greenSidePlayer].kps,
                         redSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].kps :
                         roundSelector.isNegative ?  snapshot.data!.totalStats[redSidePlayer].kps : snapshot.data!.stats[roundSelector][redSidePlayer].kps,
-                        label: "KpS", higherIsBetter: true, fractionDigits: 2,),
+                        label: "KPS", higherIsBetter: true, fractionDigits: 2,),
                       CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].linesCleared : snapshot.data!.stats[roundSelector][greenSidePlayer].linesCleared,
                         redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].linesCleared : snapshot.data!.stats[roundSelector][redSidePlayer].linesCleared,
                         label: "Lines Cleared", higherIsBetter: true),
@@ -250,7 +247,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
                         roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].spp : snapshot.data!.stats[roundSelector][greenSidePlayer].spp,
                         redSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].spp :
                         roundSelector.isNegative ?  snapshot.data!.totalStats[redSidePlayer].spp : snapshot.data!.stats[roundSelector][redSidePlayer].spp,
-                        label: "SpP", higherIsBetter: true, fractionDigits: 2,),  
+                        label: "SPP", higherIsBetter: true, fractionDigits: 2,),  
                       CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].finessePercentage * 100 : snapshot.data!.stats[roundSelector][greenSidePlayer].finessePercentage * 100,
                         redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].finessePercentage * 100 : snapshot.data!.stats[roundSelector][redSidePlayer].finessePercentage * 100,
                         label: "Finnese", postfix: "%", fractionDigits: 2, higherIsBetter: true),

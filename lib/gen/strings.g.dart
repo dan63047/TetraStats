@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 1122 (561 per locale)
+/// Strings: 1138 (569 per locale)
 ///
-/// Built on 2024-04-11 at 22:23 UTC
+/// Built on 2024-05-04 at 19:13 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -218,6 +218,10 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get verdictWorse => 'worse';
 	String get smooth => 'Smooth';
 	String gamesUntilRanked({required Object left}) => '${left} games until being ranked';
+	String numOfVictories({required Object wins}) => '~${wins} victories';
+	String get promotionOnNextWin => 'Promotion on next win';
+	String numOfdefeats({required Object losses}) => '~${losses} defeats';
+	String get demotionOnNextLoss => 'Demotion on next loss';
 	String get nerdStats => 'Nerd Stats';
 	String get playersYouTrack => 'Players you track';
 	String get formula => 'Formula';
@@ -336,6 +340,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String currentAxis({required Object axis}) => '${axis} axis:';
 	String get p1nkl0bst3rAlert => 'That data was retrived from third party API maintained by p1nkl0bst3r';
 	String get notForWeb => 'Function is not available for web version';
+	late final _StringsGraphsEn graphs = _StringsGraphsEn._(_root);
 	late final _StringsStatCellNumEn statCellNum = _StringsStatCellNumEn._(_root);
 	Map<String, String> get playerRole => {
 		'user': 'User',
@@ -635,6 +640,19 @@ class _StringsNewsPartsEn {
 	String unknownNews({required Object type}) => 'Unknown news of type ${type}';
 }
 
+// Path: graphs
+class _StringsGraphsEn {
+	_StringsGraphsEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get attack => 'Attack';
+	String get speed => 'Speed';
+	String get defense => 'Defense';
+	String get cheese => 'Cheese';
+}
+
 // Path: statCellNum
 class _StringsStatCellNumEn {
 	_StringsStatCellNumEn._(this._root);
@@ -873,6 +891,10 @@ class _StringsRu implements Translations {
 	@override String get verdictWorse => 'Хуже';
 	@override String get smooth => 'Гладкий';
 	@override String gamesUntilRanked({required Object left}) => '${left} матчей до получения рейтинга';
+	@override String numOfVictories({required Object wins}) => '~${wins} побед';
+	@override String get promotionOnNextWin => 'Повышение после следующей победы';
+	@override String numOfdefeats({required Object losses}) => '~${losses} поражений';
+	@override String get demotionOnNextLoss => 'Понижение после следующего поражения';
 	@override String get nerdStats => 'Для задротов';
 	@override String get playersYouTrack => 'Отслеживаемые игроки';
 	@override String get formula => 'Формула';
@@ -991,6 +1013,7 @@ class _StringsRu implements Translations {
 	@override String currentAxis({required Object axis}) => 'Ось ${axis}:';
 	@override String get p1nkl0bst3rAlert => 'Эти данные были получены из стороннего API, который поддерживается p1nkl0bst3r';
 	@override String get notForWeb => 'Функция недоступна для веб версии';
+	@override late final _StringsGraphsRu graphs = _StringsGraphsRu._(_root);
 	@override late final _StringsStatCellNumRu statCellNum = _StringsStatCellNumRu._(_root);
 	@override Map<String, String> get playerRole => {
 		'user': 'Пользователь',
@@ -1290,6 +1313,19 @@ class _StringsNewsPartsRu implements _StringsNewsPartsEn {
 	@override String unknownNews({required Object type}) => 'Неизвестная новость типа ${type}';
 }
 
+// Path: graphs
+class _StringsGraphsRu implements _StringsGraphsEn {
+	_StringsGraphsRu._(this._root);
+
+	@override final _StringsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get attack => 'Атака';
+	@override String get speed => 'Скорость';
+	@override String get defense => 'Защита';
+	@override String get cheese => 'Сыр';
+}
+
 // Path: statCellNum
 class _StringsStatCellNumRu implements _StringsStatCellNumEn {
 	_StringsStatCellNumRu._(this._root);
@@ -1520,6 +1556,10 @@ extension on Translations {
 			case 'verdictWorse': return 'worse';
 			case 'smooth': return 'Smooth';
 			case 'gamesUntilRanked': return ({required Object left}) => '${left} games until being ranked';
+			case 'numOfVictories': return ({required Object wins}) => '~${wins} victories';
+			case 'promotionOnNextWin': return 'Promotion on next win';
+			case 'numOfdefeats': return ({required Object losses}) => '~${losses} defeats';
+			case 'demotionOnNextLoss': return 'Demotion on next loss';
 			case 'nerdStats': return 'Nerd Stats';
 			case 'playersYouTrack': return 'Players you track';
 			case 'formula': return 'Formula';
@@ -1638,6 +1678,10 @@ extension on Translations {
 			case 'currentAxis': return ({required Object axis}) => '${axis} axis:';
 			case 'p1nkl0bst3rAlert': return 'That data was retrived from third party API maintained by p1nkl0bst3r';
 			case 'notForWeb': return 'Function is not available for web version';
+			case 'graphs.attack': return 'Attack';
+			case 'graphs.speed': return 'Speed';
+			case 'graphs.defense': return 'Defense';
+			case 'graphs.cheese': return 'Cheese';
 			case 'statCellNum.xpLevel': return 'XP Level';
 			case 'statCellNum.xpProgress': return 'Progress to next level';
 			case 'statCellNum.xpFrom0ToLevel': return ({required Object n}) => 'Progress from 0 XP to level ${n}';
@@ -2101,6 +2145,10 @@ extension on _StringsRu {
 			case 'verdictWorse': return 'Хуже';
 			case 'smooth': return 'Гладкий';
 			case 'gamesUntilRanked': return ({required Object left}) => '${left} матчей до получения рейтинга';
+			case 'numOfVictories': return ({required Object wins}) => '~${wins} побед';
+			case 'promotionOnNextWin': return 'Повышение после следующей победы';
+			case 'numOfdefeats': return ({required Object losses}) => '~${losses} поражений';
+			case 'demotionOnNextLoss': return 'Понижение после следующего поражения';
 			case 'nerdStats': return 'Для задротов';
 			case 'playersYouTrack': return 'Отслеживаемые игроки';
 			case 'formula': return 'Формула';
@@ -2219,6 +2267,10 @@ extension on _StringsRu {
 			case 'currentAxis': return ({required Object axis}) => 'Ось ${axis}:';
 			case 'p1nkl0bst3rAlert': return 'Эти данные были получены из стороннего API, который поддерживается p1nkl0bst3r';
 			case 'notForWeb': return 'Функция недоступна для веб версии';
+			case 'graphs.attack': return 'Атака';
+			case 'graphs.speed': return 'Скорость';
+			case 'graphs.defense': return 'Защита';
+			case 'graphs.cheese': return 'Сыр';
 			case 'statCellNum.xpLevel': return 'Уровень\nопыта';
 			case 'statCellNum.xpProgress': return 'Прогресс до следующего уровня';
 			case 'statCellNum.xpFrom0ToLevel': return ({required Object n}) => 'Прогресс от 0 XP до ${n} уровня';

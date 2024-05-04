@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/views/main_view.dart' show MainView;
-import 'package:tetra_stats/utils/text_shadow.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -81,7 +79,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                   padding: const EdgeInsets.only(bottom: 8.0),
                   child: Text(
                     "${data.nickname} (${data.rank.toUpperCase()})",
-                    style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 20),
+                    style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 20),
                   ),
                 ),
                 Text('${_f4.format(data.x)} ${chartsShortTitles[_chartsX]}\n${_f4.format(data.y)} ${chartsShortTitles[_chartsY]}')
@@ -241,7 +239,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                 ),
                               ],
                             ),
-                            IconButton(onPressed: () => _zoomPanBehavior.reset(), icon: Icon(Icons.refresh), alignment: Alignment.center,)
+                            IconButton(onPressed: () => _zoomPanBehavior.reset(), icon: const Icon(Icons.refresh), alignment: Alignment.center,)
                           ],
                         ),
                         if (widget.rank[1]["entries"].length > 1)
@@ -320,7 +318,9 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                       checkColor: Colors.black,
                                       onChanged: ((value) {
                                         _reversed = value!;
-                                        setState(() {});
+                                        setState(() {
+                                          they = TetrioPlayersLeaderboard("lol", []).getStatRanking(widget.rank[1]["entries"]!, _sortBy, reversed: _reversed, country: _country);
+                                        });
                                       }),
                                     ),
                                   ),
@@ -337,7 +337,9 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                     value: _country,
                                     onChanged: ((value) {
                                       _country = value;
-                                      setState(() {});
+                                      setState(() {
+                                        they = TetrioPlayersLeaderboard("lol", []).getStatRanking(widget.rank[1]["entries"]!, _sortBy, reversed: _reversed, country: _country);
+                                      });
                                     }),
                                   ),
                                 ],
@@ -352,7 +354,9 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                 bool bigScreen = MediaQuery.of(context).size.width > 768;
                                 return ListTile(
                                   title: Text(they[index].username, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
-                                  subtitle: Text(_sortBy == Stats.tr ? "${_f2.format(they[index].apm)} APM, ${_f2.format(they[index].pps)} PPS, ${_f2.format(they[index].vs)} VS, ${_f2.format(they[index].nerdStats.app)} APP, ${_f2.format(they[index].nerdStats.vsapm)} VS/APM" : "${_f4.format(they[index].getStatByEnum(_sortBy))} ${chartsShortTitles[_sortBy]}"),
+                                  subtitle: Text(
+                                    _sortBy == Stats.tr ? "${_f2.format(they[index].apm)} APM, ${_f2.format(they[index].pps)} PPS, ${_f2.format(they[index].vs)} VS, ${_f2.format(they[index].nerdStats.app)} APP, ${_f2.format(they[index].nerdStats.vsapm)} VS/APM" : "${_f4.format(they[index].getStatByEnum(_sortBy))} ${chartsShortTitles[_sortBy]}",
+                                    style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
                                   trailing: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [

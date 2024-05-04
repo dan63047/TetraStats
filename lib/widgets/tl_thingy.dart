@@ -49,11 +49,7 @@ class _TLThingyState extends State<TLThingy> {
     _currentRangeValues = const RangeValues(0, 1);
     sortedStates = widget.states.reversed.toList();
     oskKagariGimmick = prefs.getBool("oskKagariGimmick")??true;
-    try{
-      oldTl = sortedStates[1].tlSeason1;
-    }on RangeError{
-      oldTl = null;
-    }
+    oldTl = sortedStates.elementAtOrNull(1)?.tlSeason1;
     currentTl = widget.tl;
     super.initState();
   }
@@ -142,27 +138,7 @@ class _TLThingyState extends State<TLThingy> {
                     ),
                   ],
                 ),
-              if (currentTl.gamesPlayed > 9)
-              // if (currentTl.gamesPlayed >= 10 && currentTl.rd! < 100 && currentTl.nextAt >=0 && currentTl.prevAt >= 0) 
-              // Padding(
-              //   padding: const EdgeInsets.all(8.0),
-              //   child: SfLinearGauge(
-              //     minimum: currentTl.nextAt.toDouble(),
-              //     maximum: currentTl.prevAt.toDouble(),
-              //     interval: currentTl.prevAt.toDouble() - currentTl.nextAt.toDouble(), 
-              //     ranges: [
-              //       LinearGaugeRange(startValue: currentTl.standing.toDouble() <= currentTl.prevAt.toDouble() ? currentTl.standing.toDouble() : currentTl.prevAt.toDouble(), endValue: currentTl.prevAt.toDouble(), color: Colors.cyanAccent, position: LinearElementPosition.cross,),
-              //       //LinearGaugeRange(startValue: currentTl.standing.toDouble() <= currentTl.prevAt.toDouble() ? currentTl.standing.toDouble() + 500.00 : currentTl.prevAt.toDouble(), endValue: currentTl.prevAt.toDouble(), color: Colors.amber, position: LinearElementPosition.inside,)
-              //     ],
-              //     markerPointers: [LinearShapePointer(value: currentTl.standing.toDouble() <= currentTl.prevAt.toDouble() ? currentTl.standing.toDouble() : currentTl.prevAt.toDouble(), position: LinearElementPosition.inside, shapeType: LinearShapePointerType.triangle, color: Colors.white, height: 20),
-              //     LinearWidgetPointer(offset: 4, position: LinearElementPosition.outside, value: currentTl.standing.toDouble() <= currentTl.prevAt.toDouble() ? currentTl.standing.toDouble() : currentTl.prevAt.toDouble(), child: Text(NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 0).format(currentTl.standing)))],
-              //     isAxisInversed: true,
-              //     isMirrored: true,
-              //     showTicks: true,
-              //     showLabels: true
-              //     ),
-              // ),
-              TLProgress(
+              if (currentTl.gamesPlayed > 9) TLProgress(
                 tlData: currentTl,
                 previousRankTRcutoff: widget.thatRankCutoff,
                 previousGlickoCutoff: widget.thatRankCutoffGlicko,

@@ -257,7 +257,7 @@ class CompareState extends State<CompareView> {
       backgroundColor: Colors.black,
       body: SingleChildScrollView(
         controller: _scrollController,
-        physics: AlwaysScrollableScrollPhysics(),
+        physics: const AlwaysScrollableScrollPhysics(),
         child: Center(
           child: Container(
             constraints: const BoxConstraints(maxWidth: 768),
@@ -317,7 +317,7 @@ class CompareState extends State<CompareView> {
                   ],
                 ),
               ),
-              Divider(),
+              const Divider(),
               if (!listEquals(theGreenSide, [null, null, null]) && !listEquals(theRedSide, [null, null, null])) Column(
                 children: [
                   if (theGreenSide[0] != null && theRedSide[0] != null && theGreenSide[0]!.role != "banned" && theRedSide[0]!.role != "banned")
@@ -820,7 +820,7 @@ class CompareThingy extends StatelessWidget {
                 colors: const [Colors.green, Colors.transparent],
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
-                transform: GradientRotation(0.6),
+                transform: const GradientRotation(0.6),
                 stops: [
                   0.0,
                   higherIsBetter
@@ -881,7 +881,7 @@ class CompareThingy extends StatelessWidget {
               colors: const [Colors.red, Colors.transparent],
               begin: Alignment.centerRight,
               end: Alignment.centerLeft,
-              transform: GradientRotation(-0.6),
+              transform: const GradientRotation(-0.6),
               stops: [
                 0.0,
                 higherIsBetter

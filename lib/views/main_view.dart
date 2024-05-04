@@ -1,6 +1,5 @@
 // ignore_for_file: type_literal_in_constant_pattern
 
-import 'dart:ffi';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -8,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
-import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -177,18 +175,21 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     late TetraLeagueAlphaStream tlStream;
     late Map<String, dynamic> records;
     late List<News> news;
+    late TetrioPlayerFromLeaderboard? topOne;
     late double? topTR;
     requests = await Future.wait([ // all at once
       teto.fetchTLStream(_searchFor),
       teto.fetchRecords(_searchFor),
       teto.fetchNews(_searchFor),
-      prefs.getBool("showPositions") != true ? teto.fetchCutoffs() : Future.delayed(Duration.zero, ()=>[]),
+      prefs.getBool("showPositions") != true ? teto.fetchCutoffs() : Future.delayed(Duration.zero, ()=><Map<String, double>>[]),
+      (me.tlSeason1.rank != "z" ? me.tlSeason1.rank == "x" : me.tlSeason1.percentileRank == "x") ? teto.fetchTopOneFromTheLeaderboard() : Future.delayed(Duration.zero, ()=>null),
       if (me.tlSeason1.gamesPlayed > 9) teto.fetchTopTR(_searchFor) // can retrieve this only if player has TR
     ]);
     tlStream = requests[0] as TetraLeagueAlphaStream;
     records = requests[1] as Map<String, dynamic>;
     news = requests[2] as List<News>;
-    topTR = requests.elementAtOrNull(4) as double?; // No TR - no Top TR
+    topOne = requests[4] as TetrioPlayerFromLeaderboard?;
+    topTR = requests.elementAtOrNull(5) as double?; // No TR - no Top TR
 
     meAmongEveryone = teto.getCachedLeaderboardPositions(me.userId);
     if (prefs.getBool("showPositions") == true){
@@ -200,15 +201,14 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
         if (meAmongEveryone != null) teto.cacheLeaderboardPositions(me.userId, meAmongEveryone!); 
       }
     }
-    Map<String, double> cutoffs = prefs.getBool("showPositions") == true ? everyone!.cutoffs : requests[3][0];
-    Map<String, double> cutoffsGlicko = prefs.getBool("showPositions") == true ? everyone!.cutoffsGlicko : requests[3][1];
+    Map<String, double>? cutoffs = prefs.getBool("showPositions") == true ? everyone!.cutoffs : (requests[3] as List<Map<String, double>>).elementAtOrNull(0);
+    Map<String, double>? cutoffsGlicko = prefs.getBool("showPositions") == true ? everyone!.cutoffsGlicko : (requests[3] as List<Map<String, double>>).elementAtOrNull(1);
+    
     if (me.tlSeason1.gamesPlayed > 9) {
-        thatRankCutoff = cutoffs[me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank];
-        thatRankGlickoCutoff = cutoffsGlicko[me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank];
-        nextRankCutoff = cutoffs[ranks.elementAtOrNull(ranks.indexOf(me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank)+1)];
-        nextRankGlickoCutoff = cutoffsGlicko[ranks.elementAtOrNull(ranks.indexOf(me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank)+1)];
-        nextRankCutoff = nextRankCutoff??25000;
-        nextRankGlickoCutoff = nextRankGlickoCutoff??double.infinity;
+        thatRankCutoff = cutoffs?[me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank];
+        thatRankGlickoCutoff = cutoffsGlicko?[me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank];
+        nextRankCutoff = (me.tlSeason1.rank != "z" ? me.tlSeason1.rank == "x" : me.tlSeason1.percentileRank == "x") ? topOne?.rating??25000 : cutoffs?[ranks.elementAtOrNull(ranks.indexOf(me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank)+1)];
+        nextRankGlickoCutoff = (me.tlSeason1.rank != "z" ? me.tlSeason1.rank == "x" : me.tlSeason1.percentileRank == "x") ? topOne?.glicko??double.infinity : cutoffsGlicko?[ranks.elementAtOrNull(ranks.indexOf(me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank)+1)];
       }
 
     if (everyone != null && me.tlSeason1.gamesPlayed > 9) rankAverages = everyone?.averages[me.tlSeason1.percentileRank]?[0];
@@ -487,6 +487,12 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                             topTR: snapshot.data![7],
                             bot: snapshot.data![0].role == "bot",
                             guest: snapshot.data![0].role == "anon",
+                            thatRankCutoff: thatRankCutoff,
+                            thatRankCutoffGlicko: thatRankGlickoCutoff,
+                            thatRankTarget: snapshot.data![0].tlSeason1.rank != "z" ? rankTargets[snapshot.data![0].tlSeason1.rank] : null,
+                            nextRankCutoff: nextRankCutoff,
+                            nextRankCutoffGlicko: nextRankGlickoCutoff,
+                            nextRankTarget: (snapshot.data![0].tlSeason1.rank != "z" && snapshot.data![0].tlSeason1.rank != "x") ? rankTargets[ranks.elementAtOrNull(ranks.indexOf(snapshot.data![0].tlSeason1.rank)+1)] : null,
                             averages: rankAverages,
                             lbPositions: meAmongEveryone
                           ),
@@ -543,7 +549,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                         Text(errText, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
                         if (subText != null) Padding(
                           padding: const EdgeInsets.only(top: 8.0),
-                          child: Text(subText, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 18)),
+                          child: Text(subText, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 18), textAlign: TextAlign.center),
                         ),
                       ],
                     )
@@ -781,71 +787,67 @@ class _History extends StatelessWidget{
     List<_HistoryChartSpot> selectedGraph = chartsData[_chartsIndex].value!;
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        primary: true,
-        child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Wrap(
-                spacing: 20,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Padding(padding: EdgeInsets.all(8.0), child: Text("X:", style: TextStyle(fontSize: 22))),
-                      DropdownButton(
-                        items: const [DropdownMenuItem(value: false, child: Text("Date & Time")), DropdownMenuItem(value: true, child: Text("Games Played"))],
-                        value: _gamesPlayedInsteadOfDateAndTime,
-                        onChanged: (value) {
-                          _gamesPlayedInsteadOfDateAndTime = value!;
-                          update();
-                        }
-                      ),
-                      ],
-                  ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Padding(padding: EdgeInsets.all(8.0), child: Text("Y:", style: TextStyle(fontSize: 22))),
-                      DropdownButton(
-                        items: chartsData,
-                        value: chartsData[_chartsIndex].value,
-                        onChanged: (value) {
-                          _chartsIndex = chartsData.indexWhere((element) => element.value == value);
-                          update();
-                        }
-                      ),
+      child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Wrap(
+              spacing: 20,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Padding(padding: EdgeInsets.all(8.0), child: Text("X:", style: TextStyle(fontSize: 22))),
+                    DropdownButton(
+                      items: const [DropdownMenuItem(value: false, child: Text("Date & Time")), DropdownMenuItem(value: true, child: Text("Games Played"))],
+                      value: _gamesPlayedInsteadOfDateAndTime,
+                      onChanged: (value) {
+                        _gamesPlayedInsteadOfDateAndTime = value!;
+                        update();
+                      }
+                    ),
                     ],
-                  ),
-                  if (selectedGraph.length > 300) Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Checkbox(value: _smooth,
-                        checkColor: Colors.black,
-                        onChanged: ((value) {
-                          _smooth = value!;
-                          update();
-                        })),
-                        Text(t.smooth, style: const TextStyle(color: Colors.white, fontSize: 22))
-                    ],
-                  ),
-                  IconButton(onPressed: () => _zoomPanBehavior.reset(), icon: Icon(Icons.refresh), alignment: Alignment.center,)
-                ],
-              ),
-              if(chartsData[_chartsIndex].value!.length > 1) _HistoryChartThigy(data: selectedGraph, smooth: _smooth, yAxisTitle: _historyShortTitles[_chartsIndex], bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? f2 : NumberFormat.compact(), xFormat: NumberFormat.compact())
-              else if (chartsData[_chartsIndex].value!.length <= 1) Center(child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(t.notEnoughData, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
-                  if (wasActiveInTL) Text(t.errors.actionSuggestion),
-                  if (wasActiveInTL) TextButton(onPressed: (){changePlayer(userID, fetchHistory: true);}, child: Text(t.fetchAndsaveTLHistory))
-                ],
-              ))
-            ],
-          ),
-      ),
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Padding(padding: EdgeInsets.all(8.0), child: Text("Y:", style: TextStyle(fontSize: 22))),
+                    DropdownButton(
+                      items: chartsData,
+                      value: chartsData[_chartsIndex].value,
+                      onChanged: (value) {
+                        _chartsIndex = chartsData.indexWhere((element) => element.value == value);
+                        update();
+                      }
+                    ),
+                  ],
+                ),
+                if (selectedGraph.length > 300) Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Checkbox(value: _smooth,
+                      checkColor: Colors.black,
+                      onChanged: ((value) {
+                        _smooth = value!;
+                        update();
+                      })),
+                      Text(t.smooth, style: const TextStyle(color: Colors.white, fontSize: 22))
+                  ],
+                ),
+                IconButton(onPressed: () => _zoomPanBehavior.reset(), icon: const Icon(Icons.refresh), alignment: Alignment.center,)
+              ],
+            ),
+            if(chartsData[_chartsIndex].value!.length > 1) _HistoryChartThigy(data: selectedGraph, smooth: _smooth, yAxisTitle: _historyShortTitles[_chartsIndex], bigScreen: bigScreen, leftSpace: bigScreen? 80 : 45, yFormat: bigScreen? f2 : NumberFormat.compact(), xFormat: NumberFormat.compact())
+            else if (chartsData[_chartsIndex].value!.length <= 1) Center(child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(t.notEnoughData, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
+                if (wasActiveInTL) Text(t.errors.actionSuggestion),
+                if (wasActiveInTL) TextButton(onPressed: (){changePlayer(userID, fetchHistory: true);}, child: Text(t.fetchAndsaveTLHistory))
+              ],
+            ))
+          ],
+        ),
     );
   }
 }
@@ -901,10 +903,10 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
                   padding: const EdgeInsets.only(bottom: 8.0),
                   child: Text(
                     "${f4.format(data.stat)} ${widget.yAxisTitle}",
-                    style: TextStyle(fontFamily: "Eurostile Round", fontSize: 20),
+                    style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 20),
                   ),
                 ),
-                Text(_gamesPlayedInsteadOfDateAndTime ? "${f0.format(data.gamesPlayed)} games played" : _dateFormat.format(data.timestamp))
+                Text(_gamesPlayedInsteadOfDateAndTime ? t.gamesPlayed(games: t.games(n: data.gamesPlayed)) : _dateFormat.format(data.timestamp))
               ],
             ),
           );
@@ -943,8 +945,8 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
         child: SfCartesianChart(
           tooltipBehavior: _tooltipBehavior,
           zoomPanBehavior: _zoomPanBehavior,
-          primaryXAxis: _gamesPlayedInsteadOfDateAndTime ? NumericAxis() : DateTimeAxis(),
-          primaryYAxis: NumericAxis(
+          primaryXAxis: _gamesPlayedInsteadOfDateAndTime ? const NumericAxis() : const DateTimeAxis(),
+          primaryYAxis: const NumericAxis(
             rangePadding: ChartRangePadding.additional,
           ),
           series: <CartesianSeries>[
@@ -1079,7 +1081,7 @@ class _TwoRecordsThingy extends StatelessWidget {
               ),
               if (sprint != null) FinesseThingy(sprint?.endContext?.finesse, sprint?.endContext?.finessePercentage),
               if (sprint != null) LineclearsThingy(sprint!.endContext!.clears, sprint!.endContext!.lines, sprint!.endContext!.holds, sprint!.endContext!.tSpins),
-              if (sprint != null) Text("${sprint!.endContext!.inputs} KP • ${f2.format(sprint!.endContext!.kps)} KpS")
+              if (sprint != null) Text("${sprint!.endContext!.inputs} KP • ${f2.format(sprint!.endContext!.kps)} KPS")
             ]
           ),
           Column(
@@ -1140,7 +1142,7 @@ class _TwoRecordsThingy extends StatelessWidget {
             ),
             if (blitz != null) FinesseThingy(blitz?.endContext?.finesse, blitz?.endContext?.finessePercentage),
             if (blitz != null) LineclearsThingy(blitz!.endContext!.clears, blitz!.endContext!.lines, blitz!.endContext!.holds, blitz!.endContext!.tSpins),
-            if (blitz != null) Text("${blitz!.endContext!.piecesPlaced} P • ${blitz!.endContext!.inputs} KP • ${f2.format(blitz!.endContext!.kpp)} KpP • ${f2.format(blitz!.endContext!.kps)} KpS")
+            if (blitz != null) Text("${blitz!.endContext!.piecesPlaced} P • ${blitz!.endContext!.inputs} KP • ${f2.format(blitz!.endContext!.kpp)} KPP • ${f2.format(blitz!.endContext!.kps)} KPS")
             ],
           ),
         ]),
@@ -1256,8 +1258,8 @@ class _RecordThingy extends StatelessWidget {
                 ),
                 FinesseThingy(record?.endContext?.finesse, record?.endContext?.finessePercentage),
                 LineclearsThingy(record!.endContext!.clears, record!.endContext!.lines, record!.endContext!.holds, record!.endContext!.tSpins),
-                if (record!.stream.contains("40l")) Text("${record!.endContext!.inputs} KP • ${f2.format(record!.endContext!.kps)} KpS"),
-                if (record!.stream.contains("blitz")) Text("${record!.endContext!.piecesPlaced} P • ${record!.endContext!.inputs} KP • ${f2.format(record!.endContext!.kpp)} KpP • ${f2.format(record!.endContext!.kps)} KpS")
+                if (record!.stream.contains("40l")) Text("${record!.endContext!.inputs} KP • ${f2.format(record!.endContext!.kps)} KPS"),
+                if (record!.stream.contains("blitz")) Text("${record!.endContext!.piecesPlaced} P • ${record!.endContext!.inputs} KP • ${f2.format(record!.endContext!.kpp)} KPP • ${f2.format(record!.endContext!.kps)} KPS")
               ]
             ),
           ),

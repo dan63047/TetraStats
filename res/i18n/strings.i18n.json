@@ -83,6 +83,10 @@
     "verdictWorse": "worse",
     "smooth": "Smooth",
     "gamesUntilRanked": "${left} games until being ranked",
+    "numOfVictories": "~${wins} victories",
+    "promotionOnNextWin": "Promotion on next win",
+    "numOfdefeats": "~${losses} defeats",
+    "demotionOnNextLoss": "Demotion on next loss",
     "nerdStats": "Nerd Stats",
     "playersYouTrack": "Players you track",
     "formula": "Formula",
@@ -201,6 +205,12 @@
     "currentAxis": "$axis axis:",
     "p1nkl0bst3rAlert": "That data was retrived from third party API maintained by p1nkl0bst3r",
     "notForWeb": "Function is not available for web version",
+    "graphs": {
+        "attack": "Attack",
+        "speed": "Speed",
+        "defense": "Defense",
+        "cheese": "Cheese"
+    },
     "statCellNum":{
         "xpLevel": "XP Level",
         "xpProgress": "Progress to next level",

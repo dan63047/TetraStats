@@ -83,6 +83,10 @@
     "verdictWorse": "Хуже",
     "smooth": "Гладкий",
     "gamesUntilRanked": "${left} матчей до получения рейтинга",
+    "numOfVictories": "~${wins} побед",
+    "promotionOnNextWin": "Повышение после следующей победы",
+    "numOfdefeats": "~${losses} поражений",
+    "demotionOnNextLoss": "Понижение после следующего поражения",
     "nerdStats": "Для задротов",
     "playersYouTrack": "Отслеживаемые игроки",
     "formula": "Формула",
@@ -201,6 +205,12 @@
     "currentAxis": "Ось $axis:",
     "p1nkl0bst3rAlert": "Эти данные были получены из стороннего API, который поддерживается p1nkl0bst3r",
     "notForWeb": "Функция недоступна для веб версии",
+    "graphs": {
+        "attack": "Атака",
+        "speed": "Скорость",
+        "defense": "Защита",
+        "cheese": "Сыр"
+    },
     "statCellNum": {
         "xpLevel": "Уровень\nопыта",
         "xpProgress": "Прогресс до следующего уровня",

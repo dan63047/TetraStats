@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
@@ -52,7 +53,7 @@ class UserThingy extends StatelessWidget {
             alignment: Alignment.topCenter,
             children: [
               if (player.bannerRevision != null)
-                Image.network("https://tetr.io/user-content/banners/${player.userId}.jpg?rv=${player.bannerRevision}",
+                Image.network(kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioBanner&user=${player.userId}&rv=${player.bannerRevision}" : "https://tetr.io/user-content/banners/${player.userId}.jpg?rv=${player.bannerRevision}",
                   fit: BoxFit.cover,
                   height: bannerHeight,
                   errorBuilder: (context, error, stackTrace) {
@@ -90,7 +91,7 @@ class UserThingy extends StatelessWidget {
                                       child: player.role == "banned"
                                         ? Image.asset("res/avatars/tetrio_banned.png", fit: BoxFit.fitHeight, height: pfpHeight,)
                                         : player.avatarRevision != null
-                                          ? Image.network("https://tetr.io/user-content/avatars/${player.userId}.jpg?rv=${player.avatarRevision}",
+                                          ? Image.network(kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioProfilePicture&user=${player.userId}&rv=${player.avatarRevision}" : "https://tetr.io/user-content/avatars/${player.userId}.jpg?rv=${player.avatarRevision}",
                                               // TODO: osk banner can cause memory leak
                                               fit: BoxFit.fitHeight, height: 128, errorBuilder: (context, error, stackTrace) {
                                                 developer.log("Error with building profile picture", name: "main_view", error: error, stackTrace: stackTrace);

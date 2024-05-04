@@ -109,7 +109,7 @@ class CalcState extends State<CalcView> {
                   ],
                 ),
               ),
-              Divider(),
+              const Divider(),
               if (nerdStats == null) Text(t.calcViewNoValues)
               else Column(children: [
                 _ListEntry(value: nerdStats!.app, label: t.statCellNum.app.replaceAll(RegExp(r'\n'), " "), fractionDigits: 3),
