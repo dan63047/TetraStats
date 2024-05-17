@@ -1248,6 +1248,8 @@ class TetrioPlayersLeaderboard {
       lb.removeWhere((element) => element.country != country);
     }
     lb.sort(((a, b) {
+      if (a.getStatByEnum(stat).isNaN) return 1;
+      if (b.getStatByEnum(stat).isNaN) return -1;
       if (a.getStatByEnum(stat) > b.getStatByEnum(stat)){
         return reversed ? 1 : -1;
       }else if (a.getStatByEnum(stat) == b.getStatByEnum(stat)){
