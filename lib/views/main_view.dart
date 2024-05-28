@@ -18,6 +18,7 @@ import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
 import 'package:tetra_stats/views/ranks_averages_view.dart' show RankAveragesView;
+import 'package:tetra_stats/views/sprint_and_blitz_averages.dart';
 import 'package:tetra_stats/views/tl_leaderboard_view.dart' show TLLeaderboardView;
 import 'package:tetra_stats/views/tl_match_view.dart' show TlMatchResultView;
 import 'package:tetra_stats/widgets/finesse_thingy.dart';
@@ -660,6 +661,20 @@ class _NavDrawerState extends State<NavDrawer> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => const RankAveragesView(),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      SliverToBoxAdapter(
+                        child: ListTile( // Rank averages button
+                          leading: const Icon(Icons.bar_chart),
+                          title: Text(t.sprintAndBlitsViewTitle),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SprintAndBlitzView(),
                               ),
                             );
                           },

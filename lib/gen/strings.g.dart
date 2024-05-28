@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 1138 (569 per locale)
+/// Strings: 1144 (572 per locale)
 ///
-/// Built on 2024-05-04 at 19:13 UTC
+/// Built on 2024-05-28 at 20:38 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -303,6 +303,9 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get calc => 'Calc';
 	String get calcViewNoValues => 'Enter values to calculate the stats';
 	String get rankAveragesViewTitle => 'Ranks cutoff and average stats';
+	String get sprintAndBlitsViewTitle => '40 lines and Blitz averages';
+	String sprintAndBlitsRelevance({required Object date}) => 'Relevance: ${date}';
+	String get rank => 'Rank';
 	String get averages => 'Averages';
 	String get lbViewZeroEntrys => 'Empty list';
 	String get lbViewOneEntry => 'There is only one player';
@@ -709,7 +712,7 @@ class _StringsStatCellNumEn {
 	String get nyaappDescription => '(Abbreviated as wAPP) Essentially, a measure of your ability to send cheese while still maintaining a high APP.\nInvented by Wertj.';
 	String get area => 'Area';
 	String get areaDescription => 'How much space your shape takes up on the graph, if you exclude the cheese and vs/apm sections';
-	String get estOfTR => 'Est. of TR';
+	String get estOfTR => 'Estimated TR';
 	String get estOfTRShort => 'Est. TR';
 	String get accOfEst => 'Accuracy';
 	String get accOfEstShort => 'Acc.';
@@ -782,16 +785,16 @@ class _StringsErrorsEn {
 	String forbiddenSub({required Object nickname}) => 'If you are using VPN or Proxy, turn it off. If this does not help, reach out to ${nickname}';
 	String get tooManyRequests => 'You have been rate limited.';
 	String get tooManyRequestsSub => 'Wait a few moments and try again';
-	String get internal => 'Something happend on the tetr.io side';
+	String get internal => 'Something happened on the tetr.io side';
 	String get internalSub => 'osk, probably, already aware about it';
-	String get internalWebVersion => 'Something happend on the tetr.io side (or on oskware_bridge, idk honestly)';
+	String get internalWebVersion => 'Something happened on the tetr.io side (or on oskware_bridge, idk honestly)';
 	String get internalWebVersionSub => 'If osk status page says that everything is ok, let dan63047 know about this issue';
-	String get oskwareBridge => 'Something happend with oskware_bridge';
+	String get oskwareBridge => 'Something happened with oskware_bridge';
 	String get oskwareBridgeSub => 'Let dan63047 know';
 	String get p1nkl0bst3rForbidden => 'Third party API blocked your IP address';
 	String get p1nkl0bst3rTooManyRequests => 'Too many requests to third party API. Try again later';
-	String get p1nkl0bst3rinternal => 'Something happend on the p1nkl0bst3r side';
-	String get p1nkl0bst3rinternalWebVersion => 'Something happend on the p1nkl0bst3r side (or on oskware_bridge, idk honestly)';
+	String get p1nkl0bst3rinternal => 'Something happened on the p1nkl0bst3r side';
+	String get p1nkl0bst3rinternalWebVersion => 'Something happened on the p1nkl0bst3r side (or on oskware_bridge, idk honestly)';
 	String get replayAlreadySaved => 'Replay already saved';
 	String get replayExpired => 'Replay expired and not available anymore';
 	String get replayRejected => 'Third party API blocked your IP address';
@@ -976,6 +979,9 @@ class _StringsRu implements Translations {
 	@override String get calc => 'Считать';
 	@override String get calcViewNoValues => 'Введите значения, чтобы посчитать статистику';
 	@override String get rankAveragesViewTitle => 'Требования рангов и средние значения';
+	@override String get sprintAndBlitsViewTitle => 'Средние результаты 40 линий и блица';
+	@override String sprintAndBlitsRelevance({required Object date}) => 'Актуальность: ${date}';
+	@override String get rank => 'Ранг';
 	@override String get averages => 'Средние значения';
 	@override String get lbViewZeroEntrys => 'Рейтинговая таблица пуста';
 	@override String get lbViewOneEntry => 'В рейтинговой таблице всего один игрок';
@@ -1641,6 +1647,9 @@ extension on Translations {
 			case 'calc': return 'Calc';
 			case 'calcViewNoValues': return 'Enter values to calculate the stats';
 			case 'rankAveragesViewTitle': return 'Ranks cutoff and average stats';
+			case 'sprintAndBlitsViewTitle': return '40 lines and Blitz averages';
+			case 'sprintAndBlitsRelevance': return ({required Object date}) => 'Relevance: ${date}';
+			case 'rank': return 'Rank';
 			case 'averages': return 'Averages';
 			case 'lbViewZeroEntrys': return 'Empty list';
 			case 'lbViewOneEntry': return 'There is only one player';
@@ -1731,7 +1740,7 @@ extension on Translations {
 			case 'statCellNum.nyaappDescription': return '(Abbreviated as wAPP) Essentially, a measure of your ability to send cheese while still maintaining a high APP.\nInvented by Wertj.';
 			case 'statCellNum.area': return 'Area';
 			case 'statCellNum.areaDescription': return 'How much space your shape takes up on the graph, if you exclude the cheese and vs/apm sections';
-			case 'statCellNum.estOfTR': return 'Est. of TR';
+			case 'statCellNum.estOfTR': return 'Estimated TR';
 			case 'statCellNum.estOfTRShort': return 'Est. TR';
 			case 'statCellNum.accOfEst': return 'Accuracy';
 			case 'statCellNum.accOfEstShort': return 'Acc.';
@@ -1785,16 +1794,16 @@ extension on Translations {
 			case 'errors.forbiddenSub': return ({required Object nickname}) => 'If you are using VPN or Proxy, turn it off. If this does not help, reach out to ${nickname}';
 			case 'errors.tooManyRequests': return 'You have been rate limited.';
 			case 'errors.tooManyRequestsSub': return 'Wait a few moments and try again';
-			case 'errors.internal': return 'Something happend on the tetr.io side';
+			case 'errors.internal': return 'Something happened on the tetr.io side';
 			case 'errors.internalSub': return 'osk, probably, already aware about it';
-			case 'errors.internalWebVersion': return 'Something happend on the tetr.io side (or on oskware_bridge, idk honestly)';
+			case 'errors.internalWebVersion': return 'Something happened on the tetr.io side (or on oskware_bridge, idk honestly)';
 			case 'errors.internalWebVersionSub': return 'If osk status page says that everything is ok, let dan63047 know about this issue';
-			case 'errors.oskwareBridge': return 'Something happend with oskware_bridge';
+			case 'errors.oskwareBridge': return 'Something happened with oskware_bridge';
 			case 'errors.oskwareBridgeSub': return 'Let dan63047 know';
 			case 'errors.p1nkl0bst3rForbidden': return 'Third party API blocked your IP address';
 			case 'errors.p1nkl0bst3rTooManyRequests': return 'Too many requests to third party API. Try again later';
-			case 'errors.p1nkl0bst3rinternal': return 'Something happend on the p1nkl0bst3r side';
-			case 'errors.p1nkl0bst3rinternalWebVersion': return 'Something happend on the p1nkl0bst3r side (or on oskware_bridge, idk honestly)';
+			case 'errors.p1nkl0bst3rinternal': return 'Something happened on the p1nkl0bst3r side';
+			case 'errors.p1nkl0bst3rinternalWebVersion': return 'Something happened on the p1nkl0bst3r side (or on oskware_bridge, idk honestly)';
 			case 'errors.replayAlreadySaved': return 'Replay already saved';
 			case 'errors.replayExpired': return 'Replay expired and not available anymore';
 			case 'errors.replayRejected': return 'Third party API blocked your IP address';
@@ -2230,6 +2239,9 @@ extension on _StringsRu {
 			case 'calc': return 'Считать';
 			case 'calcViewNoValues': return 'Введите значения, чтобы посчитать статистику';
 			case 'rankAveragesViewTitle': return 'Требования рангов и средние значения';
+			case 'sprintAndBlitsViewTitle': return 'Средние результаты 40 линий и блица';
+			case 'sprintAndBlitsRelevance': return ({required Object date}) => 'Актуальность: ${date}';
+			case 'rank': return 'Ранг';
 			case 'averages': return 'Средние значения';
 			case 'lbViewZeroEntrys': return 'Рейтинговая таблица пуста';
 			case 'lbViewOneEntry': return 'В рейтинговой таблице всего один игрок';

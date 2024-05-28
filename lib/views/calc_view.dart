@@ -23,14 +23,12 @@ class CalcView extends StatefulWidget {
 }
 
 class CalcState extends State<CalcView> {
-  late ScrollController _scrollController;
   TextEditingController ppsController = TextEditingController();
   TextEditingController apmController = TextEditingController();
   TextEditingController vsController = TextEditingController();
 
   @override
   void initState() {
-    _scrollController = ScrollController();
     if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS){
       windowManager.getTitle().then((value) => oldWindowTitle = value);
       windowManager.setTitle("Tetra Stats: ${t.statsCalc}");

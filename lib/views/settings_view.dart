@@ -276,7 +276,7 @@ class SettingsState extends State<SettingsView> {
             onTap: (){
               launchInBrowser(Uri.https("github.com", "dan63047/TetraStats"));
             },
-            title: Text(t.aboutApp, style: TextStyle(fontWeight: FontWeight.w500),),
+            title: Text(t.aboutApp, style: const TextStyle(fontWeight: FontWeight.w500),),
             subtitle: Text(t.aboutAppText(appName: packageInfo.appName, packageName: packageInfo.packageName, version: packageInfo.version, buildNumber: packageInfo.buildNumber)),
             trailing: const Icon(Icons.arrow_right)
           ),
