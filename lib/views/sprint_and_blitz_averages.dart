@@ -39,6 +39,7 @@ class SprintAndBlitzState extends State<SprintAndBlitzView> {
   @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);
+    bool bigScreen = MediaQuery.of(context).size.width >= 368;
     return Scaffold(
       appBar: AppBar(
         title: Text(t.sprintAndBlitsViewTitle),
@@ -50,6 +51,7 @@ class SprintAndBlitzState extends State<SprintAndBlitzView> {
         children: [
           Container(
             alignment: Alignment.center,
+            width: MediaQuery.of(context).size.width,
             constraints: const BoxConstraints(maxWidth: 600),
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
@@ -66,11 +68,11 @@ class SprintAndBlitzState extends State<SprintAndBlitzView> {
                           Text(t.rank, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
                           Padding(
                             padding: const EdgeInsets.only(right: 8.0),
-                            child: Text(t.sprint, textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white)),
+                            child: Text(t.sprint, textAlign: TextAlign.right, style: TextStyle(fontFamily: bigScreen ? "Eurostile Round" : "Eurostile Round Condensed", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white)),
                           ),
                           Padding(
                             padding: const EdgeInsets.only(right: 8.0),
-                            child: Text(t.blitz, textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white)),
+                            child: Text(t.blitz, textAlign: TextAlign.right, style: TextStyle(fontFamily: bigScreen ? "Eurostile Round" : "Eurostile Round Condensed", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white)),
                           ),
                         ]
                       ),
@@ -80,11 +82,11 @@ class SprintAndBlitzState extends State<SprintAndBlitzView> {
                           Container(decoration: BoxDecoration(boxShadow: [BoxShadow(color: Colors.black.withAlpha(132), blurRadius: 32.0, blurStyle: BlurStyle.inner)]), child: Image.asset("res/tetrio_tl_alpha_ranks/${sprintEntry.key}.png", height: 48)),
                           Padding(
                             padding: const EdgeInsets.only(right: 8.0),
-                            child: Text(get40lTime(sprintEntry.value.inMicroseconds), textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white, shadows: textShadow)),
+                            child: Text(get40lTime(sprintEntry.value.inMicroseconds), textAlign: TextAlign.right, style: TextStyle(fontFamily: bigScreen ? "Eurostile Round" : "Eurostile Round Condensed", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white, shadows: textShadow)),
                           ),
                           Padding(
                             padding: const EdgeInsets.only(right: 8.0),
-                            child: Text(NumberFormat.decimalPattern().format(blitzAverages[sprintEntry.key]), textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white, shadows: textShadow)),
+                            child: Text(NumberFormat.decimalPattern().format(blitzAverages[sprintEntry.key]), textAlign: TextAlign.right, style: TextStyle(fontFamily: bigScreen ? "Eurostile Round" : "Eurostile Round Condensed", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white, shadows: textShadow)),
                           ),
                         ]
                       )
