@@ -48,11 +48,7 @@ class SettingsState extends State<SettingsView> {
 
   Future<void> _getPreferences() async {
     prefs = await SharedPreferences.getInstance();
-    if (prefs.getBool("showPositions") != null) {
-      showPositions = prefs.getBool("showPositions")!;
-    } else {
-      showPositions = false;
-    }
+    showPositions = prefs.getBool("showPositions") ?? false;
     _setDefaultNickname(prefs.getString("player"));
   }
 
@@ -76,7 +72,7 @@ class SettingsState extends State<SettingsView> {
 
   Future<void> _removePlayer() async {
     await prefs.remove('player');
-    await _setDefaultNickname("dan63047");
+    await _setDefaultNickname("6098518e3d5155e6ec429cdc");
   }
 
   @override
@@ -97,7 +93,7 @@ class SettingsState extends State<SettingsView> {
         children: [
           ListTile(
             title: Text(t.exportDB),
-            subtitle: Text(t.exportDBDescription),
+            subtitle: Text(t.exportDBDescription, style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
             onTap: () {
               if (kIsWeb){
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.notForWeb)));
@@ -151,7 +147,7 @@ class SettingsState extends State<SettingsView> {
           ),
           ListTile(
             title: Text(t.importDB),
-            subtitle: Text(t.importDBDescription),
+            subtitle: Text(t.importDBDescription, style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
             onTap: () {
               if (kIsWeb){
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.notForWeb)));
@@ -262,13 +258,13 @@ class SettingsState extends State<SettingsView> {
               ),
           ),
           ListTile(title: Text(t.customization),
-          subtitle: Text(t.customizationDescription),
+          subtitle: Text(t.customizationDescription, style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
           trailing: const Icon(Icons.arrow_right),
           onTap: () {
             context.go("/customization");
           },),
           ListTile(title: Text(t.lbStats),
-          subtitle: Text(t.lbStatsDescription),
+          subtitle: Text(t.lbStatsDescription, style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
           trailing: Switch(value: showPositions, onChanged: (bool value){
             prefs.setBool("showPositions", value);
             setState(() {
@@ -280,7 +276,7 @@ class SettingsState extends State<SettingsView> {
             onTap: (){
               launchInBrowser(Uri.https("github.com", "dan63047/TetraStats"));
             },
-            title: Text(t.aboutApp),
+            title: Text(t.aboutApp, style: const TextStyle(fontWeight: FontWeight.w500),),
             subtitle: Text(t.aboutAppText(appName: packageInfo.appName, packageName: packageInfo.packageName, version: packageInfo.version, buildNumber: packageInfo.buildNumber)),
             trailing: const Icon(Icons.arrow_right)
           ),

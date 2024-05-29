@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 
 class VsGraphs extends StatelessWidget{
   final double greenAPM;
@@ -205,6 +206,71 @@ class VsGraphs extends StatelessWidget{
             ),
           ),
         ),
+        Padding( // sq graph
+          padding: const EdgeInsets.fromLTRB(18, 0, 18, 44),
+          child: SizedBox(
+            height: 310,
+            width: 310,
+            child: RadarChart(
+              RadarChartData(
+                radarShape: RadarShape.polygon,
+                tickCount: 4,
+                ticksTextStyle: const TextStyle(color: Colors.white24, fontSize: 10),
+                radarBorderData: const BorderSide(color: Colors.transparent, width: 1),
+                gridBorderData: const BorderSide(color: Colors.white24, width: 1),
+                tickBorderData: const BorderSide(color: Colors.transparent, width: 1),
+                titleTextStyle: const TextStyle(height: 1.1),
+                radarTouchData: RadarTouchData(),
+                getTitle: (index, angle) {
+                  switch (index) {
+                    case 0:
+                      return RadarChartTitle(text: t.graphs.attack, angle: 0, positionPercentageOffset: 0.05);
+                    case 1:
+                      return RadarChartTitle(text: t.graphs.speed, angle: 0, positionPercentageOffset: 0.05);
+                    case 2:
+                      return RadarChartTitle(text: t.graphs.defense, angle: angle + 180, positionPercentageOffset: 0.05);
+                    case 3:
+                      return RadarChartTitle(text: t.graphs.cheese, angle: 0, positionPercentageOffset: 0.05);
+                    default:
+                      return const RadarChartTitle(text: '');
+                  }
+                },
+                dataSets: [
+                  RadarDataSet(
+                    fillColor: const Color.fromARGB(115, 76, 175, 79),
+                    borderColor: Colors.green,
+                    dataEntries: [
+                      RadarEntry(value: greenAPM / 60 * 0.4),
+                      RadarEntry(value: greenPPS / 3.75),
+                      RadarEntry(value: greenNerdStats.dss * 1.15),
+                      RadarEntry(value: greenNerdStats.cheese / 110),
+                    ],
+                  ),
+                  RadarDataSet(
+                    fillColor: const Color.fromARGB(115, 244, 67, 54),
+                    borderColor: Colors.red,
+                    dataEntries: [
+                      RadarEntry(value: redAPM / 60 * 0.4),
+                      RadarEntry(value: redPPS / 3.75),
+                      RadarEntry(value: redNerdStats.dss * 1.15),
+                      RadarEntry(value: redNerdStats.cheese / 110),
+                    ],
+                  ),
+                  RadarDataSet(
+                    fillColor: Colors.transparent,
+                    borderColor: Colors.transparent,
+                    dataEntries: [
+                      const RadarEntry(value: 0),
+                      const RadarEntry(value: 1.2),
+                      const RadarEntry(value: 0),
+                      const RadarEntry(value: 0),
+                    ],
+                  )
+                ],
+              )
+            )
+          )
+        )
       ],
     );
   }

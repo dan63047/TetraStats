@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 1120 (560 per locale)
+/// Strings: 1144 (572 per locale)
 ///
-/// Built on 2024-03-24 at 14:28 UTC
+/// Built on 2024-05-28 at 20:38 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -216,7 +216,12 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String verdictGeneral({required Object n, required Object verdict, required Object rank}) => '${n} ${verdict} than ${rank} rank average';
 	String get verdictBetter => 'better';
 	String get verdictWorse => 'worse';
+	String get smooth => 'Smooth';
 	String gamesUntilRanked({required Object left}) => '${left} games until being ranked';
+	String numOfVictories({required Object wins}) => '~${wins} victories';
+	String get promotionOnNextWin => 'Promotion on next win';
+	String numOfdefeats({required Object losses}) => '~${losses} defeats';
+	String get demotionOnNextLoss => 'Demotion on next loss';
 	String get nerdStats => 'Nerd Stats';
 	String get playersYouTrack => 'Players you track';
 	String get formula => 'Formula';
@@ -298,6 +303,9 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get calc => 'Calc';
 	String get calcViewNoValues => 'Enter values to calculate the stats';
 	String get rankAveragesViewTitle => 'Ranks cutoff and average stats';
+	String get sprintAndBlitsViewTitle => '40 lines and Blitz averages';
+	String sprintAndBlitsRelevance({required Object date}) => 'Relevance: ${date}';
+	String get rank => 'Rank';
 	String get averages => 'Averages';
 	String get lbViewZeroEntrys => 'Empty list';
 	String get lbViewOneEntry => 'There is only one player';
@@ -335,6 +343,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String currentAxis({required Object axis}) => '${axis} axis:';
 	String get p1nkl0bst3rAlert => 'That data was retrived from third party API maintained by p1nkl0bst3r';
 	String get notForWeb => 'Function is not available for web version';
+	late final _StringsGraphsEn graphs = _StringsGraphsEn._(_root);
 	late final _StringsStatCellNumEn statCellNum = _StringsStatCellNumEn._(_root);
 	Map<String, String> get playerRole => {
 		'user': 'User',
@@ -634,6 +643,19 @@ class _StringsNewsPartsEn {
 	String unknownNews({required Object type}) => 'Unknown news of type ${type}';
 }
 
+// Path: graphs
+class _StringsGraphsEn {
+	_StringsGraphsEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get attack => 'Attack';
+	String get speed => 'Speed';
+	String get defense => 'Defense';
+	String get cheese => 'Cheese';
+}
+
 // Path: statCellNum
 class _StringsStatCellNumEn {
 	_StringsStatCellNumEn._(this._root);
@@ -690,7 +712,7 @@ class _StringsStatCellNumEn {
 	String get nyaappDescription => '(Abbreviated as wAPP) Essentially, a measure of your ability to send cheese while still maintaining a high APP.\nInvented by Wertj.';
 	String get area => 'Area';
 	String get areaDescription => 'How much space your shape takes up on the graph, if you exclude the cheese and vs/apm sections';
-	String get estOfTR => 'Est. of TR';
+	String get estOfTR => 'Estimated TR';
 	String get estOfTRShort => 'Est. TR';
 	String get accOfEst => 'Accuracy';
 	String get accOfEstShort => 'Acc.';
@@ -763,16 +785,16 @@ class _StringsErrorsEn {
 	String forbiddenSub({required Object nickname}) => 'If you are using VPN or Proxy, turn it off. If this does not help, reach out to ${nickname}';
 	String get tooManyRequests => 'You have been rate limited.';
 	String get tooManyRequestsSub => 'Wait a few moments and try again';
-	String get internal => 'Something happend on the tetr.io side';
+	String get internal => 'Something happened on the tetr.io side';
 	String get internalSub => 'osk, probably, already aware about it';
-	String get internalWebVersion => 'Something happend on the tetr.io side (or on oskware_bridge, idk honestly)';
+	String get internalWebVersion => 'Something happened on the tetr.io side (or on oskware_bridge, idk honestly)';
 	String get internalWebVersionSub => 'If osk status page says that everything is ok, let dan63047 know about this issue';
-	String get oskwareBridge => 'Something happend with oskware_bridge';
+	String get oskwareBridge => 'Something happened with oskware_bridge';
 	String get oskwareBridgeSub => 'Let dan63047 know';
 	String get p1nkl0bst3rForbidden => 'Third party API blocked your IP address';
 	String get p1nkl0bst3rTooManyRequests => 'Too many requests to third party API. Try again later';
-	String get p1nkl0bst3rinternal => 'Something happend on the p1nkl0bst3r side';
-	String get p1nkl0bst3rinternalWebVersion => 'Something happend on the p1nkl0bst3r side (or on oskware_bridge, idk honestly)';
+	String get p1nkl0bst3rinternal => 'Something happened on the p1nkl0bst3r side';
+	String get p1nkl0bst3rinternalWebVersion => 'Something happened on the p1nkl0bst3r side (or on oskware_bridge, idk honestly)';
 	String get replayAlreadySaved => 'Replay already saved';
 	String get replayExpired => 'Replay expired and not available anymore';
 	String get replayRejected => 'Third party API blocked your IP address';
@@ -870,7 +892,12 @@ class _StringsRu implements Translations {
 	@override String verdictGeneral({required Object verdict, required Object rank, required Object n}) => '${verdict} среднего ${rank} ранга на ${n}';
 	@override String get verdictBetter => 'Лучше';
 	@override String get verdictWorse => 'Хуже';
+	@override String get smooth => 'Гладкий';
 	@override String gamesUntilRanked({required Object left}) => '${left} матчей до получения рейтинга';
+	@override String numOfVictories({required Object wins}) => '~${wins} побед';
+	@override String get promotionOnNextWin => 'Повышение после следующей победы';
+	@override String numOfdefeats({required Object losses}) => '~${losses} поражений';
+	@override String get demotionOnNextLoss => 'Понижение после следующего поражения';
 	@override String get nerdStats => 'Для задротов';
 	@override String get playersYouTrack => 'Отслеживаемые игроки';
 	@override String get formula => 'Формула';
@@ -952,6 +979,9 @@ class _StringsRu implements Translations {
 	@override String get calc => 'Считать';
 	@override String get calcViewNoValues => 'Введите значения, чтобы посчитать статистику';
 	@override String get rankAveragesViewTitle => 'Требования рангов и средние значения';
+	@override String get sprintAndBlitsViewTitle => 'Средние результаты 40 линий и блица';
+	@override String sprintAndBlitsRelevance({required Object date}) => 'Актуальность: ${date}';
+	@override String get rank => 'Ранг';
 	@override String get averages => 'Средние значения';
 	@override String get lbViewZeroEntrys => 'Рейтинговая таблица пуста';
 	@override String get lbViewOneEntry => 'В рейтинговой таблице всего один игрок';
@@ -989,6 +1019,7 @@ class _StringsRu implements Translations {
 	@override String currentAxis({required Object axis}) => 'Ось ${axis}:';
 	@override String get p1nkl0bst3rAlert => 'Эти данные были получены из стороннего API, который поддерживается p1nkl0bst3r';
 	@override String get notForWeb => 'Функция недоступна для веб версии';
+	@override late final _StringsGraphsRu graphs = _StringsGraphsRu._(_root);
 	@override late final _StringsStatCellNumRu statCellNum = _StringsStatCellNumRu._(_root);
 	@override Map<String, String> get playerRole => {
 		'user': 'Пользователь',
@@ -1288,6 +1319,19 @@ class _StringsNewsPartsRu implements _StringsNewsPartsEn {
 	@override String unknownNews({required Object type}) => 'Неизвестная новость типа ${type}';
 }
 
+// Path: graphs
+class _StringsGraphsRu implements _StringsGraphsEn {
+	_StringsGraphsRu._(this._root);
+
+	@override final _StringsRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get attack => 'Атака';
+	@override String get speed => 'Скорость';
+	@override String get defense => 'Защита';
+	@override String get cheese => 'Сыр';
+}
+
 // Path: statCellNum
 class _StringsStatCellNumRu implements _StringsStatCellNumEn {
 	_StringsStatCellNumRu._(this._root);
@@ -1516,7 +1560,12 @@ extension on Translations {
 			case 'verdictGeneral': return ({required Object n, required Object verdict, required Object rank}) => '${n} ${verdict} than ${rank} rank average';
 			case 'verdictBetter': return 'better';
 			case 'verdictWorse': return 'worse';
+			case 'smooth': return 'Smooth';
 			case 'gamesUntilRanked': return ({required Object left}) => '${left} games until being ranked';
+			case 'numOfVictories': return ({required Object wins}) => '~${wins} victories';
+			case 'promotionOnNextWin': return 'Promotion on next win';
+			case 'numOfdefeats': return ({required Object losses}) => '~${losses} defeats';
+			case 'demotionOnNextLoss': return 'Demotion on next loss';
 			case 'nerdStats': return 'Nerd Stats';
 			case 'playersYouTrack': return 'Players you track';
 			case 'formula': return 'Formula';
@@ -1598,6 +1647,9 @@ extension on Translations {
 			case 'calc': return 'Calc';
 			case 'calcViewNoValues': return 'Enter values to calculate the stats';
 			case 'rankAveragesViewTitle': return 'Ranks cutoff and average stats';
+			case 'sprintAndBlitsViewTitle': return '40 lines and Blitz averages';
+			case 'sprintAndBlitsRelevance': return ({required Object date}) => 'Relevance: ${date}';
+			case 'rank': return 'Rank';
 			case 'averages': return 'Averages';
 			case 'lbViewZeroEntrys': return 'Empty list';
 			case 'lbViewOneEntry': return 'There is only one player';
@@ -1635,6 +1687,10 @@ extension on Translations {
 			case 'currentAxis': return ({required Object axis}) => '${axis} axis:';
 			case 'p1nkl0bst3rAlert': return 'That data was retrived from third party API maintained by p1nkl0bst3r';
 			case 'notForWeb': return 'Function is not available for web version';
+			case 'graphs.attack': return 'Attack';
+			case 'graphs.speed': return 'Speed';
+			case 'graphs.defense': return 'Defense';
+			case 'graphs.cheese': return 'Cheese';
 			case 'statCellNum.xpLevel': return 'XP Level';
 			case 'statCellNum.xpProgress': return 'Progress to next level';
 			case 'statCellNum.xpFrom0ToLevel': return ({required Object n}) => 'Progress from 0 XP to level ${n}';
@@ -1684,7 +1740,7 @@ extension on Translations {
 			case 'statCellNum.nyaappDescription': return '(Abbreviated as wAPP) Essentially, a measure of your ability to send cheese while still maintaining a high APP.\nInvented by Wertj.';
 			case 'statCellNum.area': return 'Area';
 			case 'statCellNum.areaDescription': return 'How much space your shape takes up on the graph, if you exclude the cheese and vs/apm sections';
-			case 'statCellNum.estOfTR': return 'Est. of TR';
+			case 'statCellNum.estOfTR': return 'Estimated TR';
 			case 'statCellNum.estOfTRShort': return 'Est. TR';
 			case 'statCellNum.accOfEst': return 'Accuracy';
 			case 'statCellNum.accOfEstShort': return 'Acc.';
@@ -1738,16 +1794,16 @@ extension on Translations {
 			case 'errors.forbiddenSub': return ({required Object nickname}) => 'If you are using VPN or Proxy, turn it off. If this does not help, reach out to ${nickname}';
 			case 'errors.tooManyRequests': return 'You have been rate limited.';
 			case 'errors.tooManyRequestsSub': return 'Wait a few moments and try again';
-			case 'errors.internal': return 'Something happend on the tetr.io side';
+			case 'errors.internal': return 'Something happened on the tetr.io side';
 			case 'errors.internalSub': return 'osk, probably, already aware about it';
-			case 'errors.internalWebVersion': return 'Something happend on the tetr.io side (or on oskware_bridge, idk honestly)';
+			case 'errors.internalWebVersion': return 'Something happened on the tetr.io side (or on oskware_bridge, idk honestly)';
 			case 'errors.internalWebVersionSub': return 'If osk status page says that everything is ok, let dan63047 know about this issue';
-			case 'errors.oskwareBridge': return 'Something happend with oskware_bridge';
+			case 'errors.oskwareBridge': return 'Something happened with oskware_bridge';
 			case 'errors.oskwareBridgeSub': return 'Let dan63047 know';
 			case 'errors.p1nkl0bst3rForbidden': return 'Third party API blocked your IP address';
 			case 'errors.p1nkl0bst3rTooManyRequests': return 'Too many requests to third party API. Try again later';
-			case 'errors.p1nkl0bst3rinternal': return 'Something happend on the p1nkl0bst3r side';
-			case 'errors.p1nkl0bst3rinternalWebVersion': return 'Something happend on the p1nkl0bst3r side (or on oskware_bridge, idk honestly)';
+			case 'errors.p1nkl0bst3rinternal': return 'Something happened on the p1nkl0bst3r side';
+			case 'errors.p1nkl0bst3rinternalWebVersion': return 'Something happened on the p1nkl0bst3r side (or on oskware_bridge, idk honestly)';
 			case 'errors.replayAlreadySaved': return 'Replay already saved';
 			case 'errors.replayExpired': return 'Replay expired and not available anymore';
 			case 'errors.replayRejected': return 'Third party API blocked your IP address';
@@ -2096,7 +2152,12 @@ extension on _StringsRu {
 			case 'verdictGeneral': return ({required Object verdict, required Object rank, required Object n}) => '${verdict} среднего ${rank} ранга на ${n}';
 			case 'verdictBetter': return 'Лучше';
 			case 'verdictWorse': return 'Хуже';
+			case 'smooth': return 'Гладкий';
 			case 'gamesUntilRanked': return ({required Object left}) => '${left} матчей до получения рейтинга';
+			case 'numOfVictories': return ({required Object wins}) => '~${wins} побед';
+			case 'promotionOnNextWin': return 'Повышение после следующей победы';
+			case 'numOfdefeats': return ({required Object losses}) => '~${losses} поражений';
+			case 'demotionOnNextLoss': return 'Понижение после следующего поражения';
 			case 'nerdStats': return 'Для задротов';
 			case 'playersYouTrack': return 'Отслеживаемые игроки';
 			case 'formula': return 'Формула';
@@ -2178,6 +2239,9 @@ extension on _StringsRu {
 			case 'calc': return 'Считать';
 			case 'calcViewNoValues': return 'Введите значения, чтобы посчитать статистику';
 			case 'rankAveragesViewTitle': return 'Требования рангов и средние значения';
+			case 'sprintAndBlitsViewTitle': return 'Средние результаты 40 линий и блица';
+			case 'sprintAndBlitsRelevance': return ({required Object date}) => 'Актуальность: ${date}';
+			case 'rank': return 'Ранг';
 			case 'averages': return 'Средние значения';
 			case 'lbViewZeroEntrys': return 'Рейтинговая таблица пуста';
 			case 'lbViewOneEntry': return 'В рейтинговой таблице всего один игрок';
@@ -2215,6 +2279,10 @@ extension on _StringsRu {
 			case 'currentAxis': return ({required Object axis}) => 'Ось ${axis}:';
 			case 'p1nkl0bst3rAlert': return 'Эти данные были получены из стороннего API, который поддерживается p1nkl0bst3r';
 			case 'notForWeb': return 'Функция недоступна для веб версии';
+			case 'graphs.attack': return 'Атака';
+			case 'graphs.speed': return 'Скорость';
+			case 'graphs.defense': return 'Защита';
+			case 'graphs.cheese': return 'Сыр';
 			case 'statCellNum.xpLevel': return 'Уровень\nопыта';
 			case 'statCellNum.xpProgress': return 'Прогресс до следующего уровня';
 			case 'statCellNum.xpFrom0ToLevel': return ({required Object n}) => 'Прогресс от 0 XP до ${n} уровня';

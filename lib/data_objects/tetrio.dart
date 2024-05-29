@@ -17,6 +17,9 @@ const double appdspWeight = 140;
 const double vsapmWeight = 60;
 const double cheeseWeight = 1.25;
 const double gbeWeight = 315;
+const List<String> ranks = [
+  "d", "d+", "c-", "c", "c+", "b-", "b", "b+", "a-", "a", "a+", "s-", "s", "s+", "ss", "u", "x"
+];
 const Map<String, double> rankCutoffs = {
   "x": 0.01,
   "u": 0.05,
@@ -39,7 +42,7 @@ const Map<String, double> rankCutoffs = {
   "": 0.5
 };
 const Map<String, double> rankTargets = {
-  "x": 24008,
+  "x": 24503.75, // where that comes from?
   "u": 23038,
   "ss": 21583,
   "s+": 20128,
@@ -138,45 +141,87 @@ const Map<String, Color> rankColors = { // thanks osk for const rankColors at ht
 	'z': Color(0xFF375433)
 };
 
-const Map<String, Duration> sprintAverages = { // based on https://discord.com/channels/673303546107658242/917098364787650590/1214231970259673098 
-	'x': Duration(seconds: 25, milliseconds: 413),
-	'u': Duration(seconds: 34, milliseconds: 549),
-	'ss': Duration(seconds: 43, milliseconds: 373),
-	's+': Duration(seconds: 54, milliseconds: 027),
-	's': Duration(seconds: 60, milliseconds: 412),
-	's-': Duration(seconds: 67, milliseconds: 381),
-	'a+': Duration(seconds: 73, milliseconds: 694),
-	'a': Duration(seconds: 81, milliseconds: 166),
-	'a-': Duration(seconds: 88, milliseconds: 334),
-	'b+': Duration(seconds: 93, milliseconds: 741),
-	'b': Duration(seconds: 98, milliseconds: 354),
-	'b-': Duration(seconds: 109, milliseconds: 610),
-	'c+': Duration(seconds: 124, milliseconds: 641),
-	'c': Duration(seconds: 126, milliseconds: 104),
-	'c-': Duration(seconds: 145, milliseconds: 865),
-	'd+': Duration(seconds: 154, milliseconds: 338),
-	'd': Duration(seconds: 162, milliseconds: 063),
+// const Map<String, Duration> sprintAverages = { // old data, based on https://discord.com/channels/673303546107658242/917098364787650590/1214231970259673098 
+// 	'x': Duration(seconds: 25, milliseconds: 413),
+// 	'u': Duration(seconds: 34, milliseconds: 549),
+// 	'ss': Duration(seconds: 43, milliseconds: 373),
+// 	's+': Duration(seconds: 54, milliseconds: 027),
+// 	's': Duration(seconds: 60, milliseconds: 412),
+// 	's-': Duration(seconds: 67, milliseconds: 381),
+// 	'a+': Duration(seconds: 73, milliseconds: 694),
+// 	'a': Duration(seconds: 81, milliseconds: 166),
+// 	'a-': Duration(seconds: 88, milliseconds: 334),
+// 	'b+': Duration(seconds: 93, milliseconds: 741),
+// 	'b': Duration(seconds: 98, milliseconds: 354),
+// 	'b-': Duration(seconds: 109, milliseconds: 610),
+// 	'c+': Duration(seconds: 124, milliseconds: 641),
+// 	'c': Duration(seconds: 126, milliseconds: 104),
+// 	'c-': Duration(seconds: 145, milliseconds: 865),
+// 	'd+': Duration(seconds: 154, milliseconds: 338),
+// 	'd': Duration(seconds: 162, milliseconds: 063),
+// 	//'z': Duration(seconds: 66, milliseconds: 802)
+// };
+
+// const Map<String, int> blitzAverages = {
+//   'x': 626494,
+// 	'u': 406059,
+// 	'ss': 243166,
+// 	's+': 168636,
+// 	's': 121594,
+// 	's-': 107845,
+// 	'a+': 87142,
+// 	'a': 73413,
+// 	'a-': 60799,
+// 	'b+': 55417,
+// 	'b': 47608,
+// 	'b-': 40534,
+// 	'c+': 34200,
+// 	'c': 32535,
+// 	'c-': 25808,
+// 	'd+': 23345,
+// 	'd': 23063,
+// 	//'z': 72084
+// };
+
+const Map<String, Duration> sprintAverages = { // based on https://discord.com/channels/673303546107658242/674421736162197515/1244287342965952562
+	'x': Duration(seconds: 25, milliseconds: 144),
+	'u': Duration(seconds: 36, milliseconds: 115),
+	'ss': Duration(seconds: 46, milliseconds: 396),
+	's+': Duration(seconds: 55, milliseconds: 056),
+	's': Duration(seconds: 61, milliseconds: 892),
+	's-': Duration(seconds: 68, milliseconds: 918),
+	'a+': Duration(seconds: 76, milliseconds: 187),
+	'a': Duration(seconds: 83, milliseconds: 529),
+	'a-': Duration(seconds: 88, milliseconds: 608),
+	'b+': Duration(seconds: 97, milliseconds: 626),
+	'b': Duration(seconds: 104, milliseconds: 687),
+	'b-': Duration(seconds: 113, milliseconds: 372),
+	'c+': Duration(seconds: 123, milliseconds: 461),
+	'c': Duration(seconds: 135, milliseconds: 326),
+	'c-': Duration(seconds: 147, milliseconds: 056),
+	'd+': Duration(seconds: 156, milliseconds: 757),
+	'd': Duration(seconds: 167, milliseconds: 393),
 	//'z': Duration(seconds: 66, milliseconds: 802)
 };
 
 const Map<String, int> blitzAverages = {
-  'x': 626494,
-	'u': 406059,
-	'ss': 243166,
-	's+': 168636,
-	's': 121594,
-	's-': 107845,
-	'a+': 87142,
-	'a': 73413,
-	'a-': 60799,
-	'b+': 55417,
-	'b': 47608,
-	'b-': 40534,
-	'c+': 34200,
-	'c': 32535,
-	'c-': 25808,
-	'd+': 23345,
-	'd': 23063,
+  'x': 600715,
+	'u': 379418,
+	'ss': 233740,
+	's+': 158295,
+	's': 125164,
+	's-': 100933,
+	'a+': 83593,
+	'a': 68613,
+	'a-': 60219,
+	'b+': 51197,
+	'b': 44171,
+	'b-': 39045,
+	'c+': 34130,
+	'c': 28931,
+	'c-': 25095,
+	'd+': 22944,
+	'd': 20728,
 	//'z': 72084
 };
 
@@ -753,16 +798,15 @@ class EstTr {
     srarea = (_apm * 0) + (_pps * 135) + (_vs * 0) + (_app * 290) + (_dss * 0) + (_dsp * 700) + (_gbe * 0);
     statrank = 11.2 * atan((srarea - 93) / 130) + 1;
     if (statrank <= 0) statrank = 0.001;
-    estglicko = (4.0867 * srarea + 186.68);
+    //estglicko = (4.0867 * srarea + 186.68);
     double ntemp = _pps*(150+(((_vs/_apm) - 1.66)*35))+_app*290+_dsp*700;
+    estglicko = 0.000013*pow(ntemp, 3) - 0.0196 *pow(ntemp, 2) + (12.645*ntemp)-1005.4;
     esttr = 25000 / 
     (
       1 + pow(10, (
         (
           (
-            1500-(
-              0.000013*pow(ntemp, 3) - 0.0196 *pow(ntemp, 2) + (12.645*ntemp)-1005.4
-            )
+            1500-estglicko
           )*pi
         )/sqrt(
           (
@@ -1246,26 +1290,14 @@ class TetrioPlayersLeaderboard {
       lb.removeWhere((element) => element.country != country);
     }
     lb.sort(((a, b) {
+      if (a.getStatByEnum(stat).isNaN) return 1;
+      if (b.getStatByEnum(stat).isNaN) return -1;
       if (a.getStatByEnum(stat) > b.getStatByEnum(stat)){
         return reversed ? 1 : -1;
       }else if (a.getStatByEnum(stat) == b.getStatByEnum(stat)){
         return 0;
       }else{
         return reversed ? -1 : 1;
-      }
-    }));
-    return lb;
-  }
-
-  List<TetrioPlayerFromLeaderboard> getStatRankingSequel(Stats stat){
-    List<TetrioPlayerFromLeaderboard> lb = List.from(leaderboard);
-    lb.sort(((a, b) {
-      if (a.getStatByEnum(stat) > b.getStatByEnum(stat)){
-        return -1;
-      }else if (a.getStatByEnum(stat) == b.getStatByEnum(stat)){
-        return 0;
-      }else{
-        return 1;
       }
     }));
     return lb;
@@ -1853,11 +1885,12 @@ class TetrioPlayersLeaderboard {
         "avgStride": avgStride,
         "avgInfDS": avgInfDS,
         "toEnterTR": rank.toLowerCase() != "z" ? leaderboard[(leaderboard.length * rankCutoffs[rank]!).floor()-1].rating : lowestTR,
+        "toEnterGlicko": rank.toLowerCase() != "z" ? leaderboard[(leaderboard.length * rankCutoffs[rank]!).floor()-1].glicko : 0,
         "entries": filtredLeaderboard
       }];
     }else{
       return [TetraLeagueAlpha(timestamp: DateTime.now(), apm: 0, pps: 0, vs: 0, glicko: 0, rd: noTrRd, gamesPlayed: 0, gamesWon: 0, bestRank: rank, decaying: false, rating: 0, rank: rank, percentileRank: rank, percentile: rankCutoffs[rank]!, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1),
-      {"players": filtredLeaderboard.length, "lowestTR": 0, "toEnterTR": 0}];
+      {"players": filtredLeaderboard.length, "lowestTR": 0, "toEnterTR": 0, "toEnterGlicko": 0}];
     }
   }
 
@@ -1924,6 +1957,26 @@ class TetrioPlayersLeaderboard {
     'c-': getAverageOfRank("c-")[1]["toEnterTR"],
     'd+': getAverageOfRank("d+")[1]["toEnterTR"],
     'd': getAverageOfRank("d")[1]["toEnterTR"]
+    };
+
+  Map<String, double> get cutoffsGlicko => {
+    'x': getAverageOfRank("x")[1]["toEnterGlicko"],
+    'u': getAverageOfRank("u")[1]["toEnterGlicko"],
+    'ss': getAverageOfRank("ss")[1]["toEnterGlicko"],
+    's+': getAverageOfRank("s+")[1]["toEnterGlicko"],
+    's': getAverageOfRank("s")[1]["toEnterGlicko"],
+    's-': getAverageOfRank("s-")[1]["toEnterGlicko"],
+    'a+': getAverageOfRank("a+")[1]["toEnterGlicko"],
+    'a': getAverageOfRank("a")[1]["toEnterGlicko"],
+    'a-': getAverageOfRank("a-")[1]["toEnterGlicko"],
+    'b+': getAverageOfRank("b+")[1]["toEnterGlicko"],
+    'b': getAverageOfRank("b")[1]["toEnterGlicko"],
+    'b-': getAverageOfRank("b-")[1]["toEnterGlicko"],
+    'c+': getAverageOfRank("c+")[1]["toEnterGlicko"],
+    'c': getAverageOfRank("c")[1]["toEnterGlicko"],
+    'c-': getAverageOfRank("c-")[1]["toEnterGlicko"],
+    'd+': getAverageOfRank("d+")[1]["toEnterGlicko"],
+    'd': getAverageOfRank("d")[1]["toEnterGlicko"]
     };
 
   TetrioPlayersLeaderboard.fromJson(List<dynamic> json, String t, DateTime ts) {

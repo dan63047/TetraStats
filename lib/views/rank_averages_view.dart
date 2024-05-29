@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'dart:math';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -8,13 +6,16 @@ import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/views/main_view.dart' show MainView;
-import 'package:tetra_stats/utils/text_shadow.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 var _chartsShortTitlesDropdowns = <DropdownMenuItem>[for (MapEntry e in chartsShortTitles.entries) DropdownMenuItem(value: e.key, child: Text(e.value),)];
 Stats _chartsX = Stats.tr;
 Stats _chartsY = Stats.apm;
+late TooltipBehavior _tooltipBehavior;
+late ZoomPanBehavior _zoomPanBehavior;
 List<DropdownMenuItem> _itemStats = [for (MapEntry e in chartsShortTitles.entries) DropdownMenuItem(value: e.key, child: Text(e.value))];
+List<_MyScatterSpot> _spots = [];
 Stats _sortBy = Stats.tr;
 late List<TetrioPlayerFromLeaderboard> they;
 bool _reversed = false;
@@ -48,7 +49,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
   late double yScale;
   String headerTooltip = t.pseudoTooltipHeaderInit;
   String footerTooltip = t.pseudoTooltipFooterInit;
-  int hoveredPointId = -1;
+  ValueNotifier<int> hoveredPointId = ValueNotifier<int>(-1);
   double scaleFactor = 5e2;
   double dragFactor = 7e2;
 
@@ -56,6 +57,37 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
   void initState() {
     _scrollController = ScrollController();
     _tabController = TabController(length: 6, vsync: this);
+    _zoomPanBehavior = ZoomPanBehavior(
+      enablePinching: true,
+      enableSelectionZooming: true,
+      enableMouseWheelZooming : true,
+      enablePanning: true,
+    );
+    _tooltipBehavior = TooltipBehavior(
+      color: Colors.black,
+      borderColor: Colors.white,
+      enable: true,
+      animationDuration: 0,
+      builder: (dynamic data, dynamic point, dynamic series,
+        int pointIndex, int seriesIndex) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Text(
+                    "${data.nickname} (${data.rank.toUpperCase()})",
+                    style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 20),
+                  ),
+                ),
+                Text('${_f4.format(data.x)} ${chartsShortTitles[_chartsX]}\n${_f4.format(data.y)} ${chartsShortTitles[_chartsY]}')
+              ],
+            ),
+          );
+      }
+    );
     if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS){
       windowManager.getTitle().then((value) => _oldWindowTitle = value);
       windowManager.setTitle("Tetra Stats: ${widget.rank[1]["everyone"] ? t.everyoneAverages : t.rankAverages(rank: widget.rank[0].rank.toUpperCase())}");
@@ -63,56 +95,22 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
     super.initState();
     previousAxisTitles = _chartsX.toString()+_chartsY.toString();
     they = TetrioPlayersLeaderboard("lol", []).getStatRanking(widget.rank[1]["entries"]!, _sortBy, reversed: _reversed, country: _country);
-    recalculateBoundaries();
-    resetScale();
+    createSpots();
   }
 
-  void recalculateBoundaries(){
-    actualMinX = (widget.rank[1]["entries"] as List<TetrioPlayerFromLeaderboard>).reduce((value, element) {
-      num n = min(value.getStatByEnum(_chartsX), element.getStatByEnum(_chartsX));
-      if (value.getStatByEnum(_chartsX) == n) {
-        return value;
-      } else {
-        return element;
-      }
-    }).getStatByEnum(_chartsX).toDouble();
-    actualMaxX = (widget.rank[1]["entries"] as List<TetrioPlayerFromLeaderboard>).reduce((value, element) {
-      num n = max(value.getStatByEnum(_chartsX), element.getStatByEnum(_chartsX));
-      if (value.getStatByEnum(_chartsX) == n) {
-        return value;
-      } else {
-        return element;
-      }
-    }).getStatByEnum(_chartsX).toDouble();
-    actualMinY = (widget.rank[1]["entries"] as List<TetrioPlayerFromLeaderboard>).reduce((value, element) {
-      num n = min(value.getStatByEnum(_chartsY), element.getStatByEnum(_chartsY));
-      if (value.getStatByEnum(_chartsY) == n) {
-        return value;
-      } else {
-        return element;
-      }
-    }).getStatByEnum(_chartsY).toDouble();
-    actualMaxY = (widget.rank[1]["entries"] as List<TetrioPlayerFromLeaderboard>).reduce((value, element) {
-      num n = max(value.getStatByEnum(_chartsY), element.getStatByEnum(_chartsY));
-      if (value.getStatByEnum(_chartsY) == n) {
-        return value;
-      } else {
-        return element;
-      }
-    }).getStatByEnum(_chartsY).toDouble();
-  }
-  
-  void resetScale(){
-    maxX = actualMaxX;
-    minX = actualMinX;
-    maxY = actualMaxY;
-    minY = actualMinY;
-    recalculateScales();
-  }
-
-  void recalculateScales(){
-    xScale = maxX - minX;
-    yScale = maxY - minY;
+  void createSpots(){
+    _spots = [
+      for (TetrioPlayerFromLeaderboard entry in widget.rank[1]["entries"])
+      if (entry.apm != 0.0 && entry.vs != 0.0) // prevents from ScatterChart "Offset argument contained a NaN value." exception
+        _MyScatterSpot(
+            entry.getStatByEnum(_chartsX).toDouble(),
+            entry.getStatByEnum(_chartsY).toDouble(),
+            entry.userId,
+            entry.username,
+            entry.rank,
+            rankColors[entry.rank]??Colors.white
+        )
+    ];
   }
 
   @override
@@ -123,46 +121,15 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
-  void dragHandler(DragUpdateDetails dragUpdDet){
-    setState(() {
-      minX -= (xScale / dragFactor) * dragUpdDet.delta.dx;
-      maxX -= (xScale / dragFactor) * dragUpdDet.delta.dx;
-      minY += (yScale / dragFactor) * dragUpdDet.delta.dy;
-      maxY += (yScale / dragFactor) * dragUpdDet.delta.dy;
-
-      if (minX < actualMinX) {
-        minX = actualMinX;
-        maxX = actualMinX + xScale;
-      }
-      if (maxX > actualMaxX) {
-        maxX = actualMaxX;
-        minX = maxX - xScale;
-      }
-      if(minY < actualMinY){
-        minY = actualMinY;
-        maxY = actualMinY + yScale;
-      }
-      if(maxY > actualMaxY){
-        maxY = actualMaxY;
-        minY = actualMaxY - yScale;
-      }
-    });
-  }
-
   void _justUpdate() {
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    GlobalKey graphKey = GlobalKey();
     bool bigScreen = MediaQuery.of(context).size.width > 768;
-    EdgeInsets padding = bigScreen ? const EdgeInsets.fromLTRB(40, 40, 40, 48) : const EdgeInsets.fromLTRB(0, 40, 16, 48);
-    double graphStartX = padding.left;
-    double graphEndX = MediaQuery.sizeOf(context).width - padding.right;
     if (previousAxisTitles != _chartsX.toString()+_chartsY.toString()){
-      recalculateBoundaries();
-      resetScale();
+      createSpots();
       previousAxisTitles = _chartsX.toString()+_chartsY.toString();
     }
     final t = Translations.of(context);
@@ -230,7 +197,8 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                         Wrap(
                           direction: Axis.horizontal,
                           alignment: WrapAlignment.center,
-                          spacing: 25,
+                          crossAxisAlignment: WrapCrossAlignment.end,
+                          spacing: 20,
                           children: [
                             Column(
                               children: [
@@ -271,113 +239,39 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                 ),
                               ],
                             ),
+                            IconButton(onPressed: () => _zoomPanBehavior.reset(), icon: const Icon(Icons.refresh), alignment: Alignment.center,)
                           ],
                         ),
                         if (widget.rank[1]["entries"].length > 1)
                           SizedBox(
                               width: MediaQuery.of(context).size.width,
                               height: MediaQuery.of(context).size.height - 104,
-                              child: Listener(
-                                behavior: HitTestBehavior.translucent,
-                                onPointerSignal: (signal) {
-                                if (signal is PointerScrollEvent) {
-                                  RenderBox graphBox = graphKey.currentContext?.findRenderObject() as RenderBox;
-                                  Offset graphPosition = graphBox.localToGlobal(Offset.zero); 
-                                  double scrollPosRelativeX = (signal.position.dx - graphStartX) / (graphEndX - graphStartX);
-                                  double scrollPosRelativeY = (signal.position.dy - graphPosition.dy) / (graphBox.size.height - 30); // size - bottom titles height
-                                  double newMinX, newMaxX, newMinY, newMaxY;
-                                  newMinX = minX - (xScale / scaleFactor) * signal.scrollDelta.dy * scrollPosRelativeX;
-                                  newMaxX = maxX + (xScale / scaleFactor) * signal.scrollDelta.dy * (1-scrollPosRelativeX);
-                                  newMinY = minY - (yScale / scaleFactor) * signal.scrollDelta.dy * (1-scrollPosRelativeY);
-                                  newMaxY = maxY + (yScale / scaleFactor) * signal.scrollDelta.dy * scrollPosRelativeY; 
-                                  if ((newMaxX - newMinX).isNegative) return;
-                                  if ((newMaxY - newMinY).isNegative) return;
-                                  setState(() {
-                                    minX = max(newMinX, actualMinX);
-                                    maxX = min(newMaxX, actualMaxX);
-                                    minY = max(newMinY, actualMinY);
-                                    maxY = min(newMaxY, actualMaxY);
-                                    recalculateScales();
-                                    _scrollController.jumpTo(_scrollController.position.maxScrollExtent - signal.scrollDelta.dy);
-                                  });
-                                }},
-                                child: GestureDetector(
-                                  behavior: HitTestBehavior.opaque,
-                                  onDoubleTap: () {
+                              child: Padding(
+                                padding: bigScreen ? const EdgeInsets.fromLTRB(40, 10, 40, 20) : const EdgeInsets.fromLTRB(0, 10, 16, 20),
+                                child: Listener(
+                                  behavior: HitTestBehavior.translucent,
+                                  onPointerSignal: (signal) {
+                                  if (signal is PointerScrollEvent) {      
                                     setState(() {
-                                      minX = actualMinX;
-                                      maxX = actualMaxX;
-                                      minY = actualMinY;
-                                      maxY = actualMaxY;
-                                      recalculateScales();
+                                      _scrollController.jumpTo(_scrollController.position.maxScrollExtent - signal.scrollDelta.dy); // TODO: find a better way to stop scrolling in NestedScrollView
                                     });
-                                  },
-                                  // TODO: Figure out wtf is going on with gestures
-                                  child: Padding(
-                                    padding: bigScreen ? const EdgeInsets.fromLTRB(40, 40, 40, 48) : const EdgeInsets.fromLTRB(0, 40, 16, 48),
-                                    child: Stack(
-                                      children: [
-                                        ScatterChart(
-                                          key: graphKey,
-                                          ScatterChartData(
-                                            minX: minX,
-                                            maxX: maxX,
-                                            minY: minY,
-                                            maxY: maxY,
-                                            clipData: const FlClipData.all(),
-                                            scatterSpots: [
-                                              for (TetrioPlayerFromLeaderboard entry in widget.rank[1]["entries"])
-                                              if (entry.apm != 0.0 && entry.vs != 0.0) // prevents from ScatterChart "Offset argument contained a NaN value." exception
-                                                _MyScatterSpot(
-                                                    entry.getStatByEnum(_chartsX).toDouble(),
-                                                    entry.getStatByEnum(_chartsY).toDouble(),
-                                                    entry.userId,
-                                                    entry.username,
-                                                    dotPainter: FlDotCirclePainter(color: rankColors[entry.rank]??Colors.white, radius: 3))
-                                            ],
-                                            scatterTouchData: ScatterTouchData(
-                                              handleBuiltInTouches: false,
-                                              touchCallback:(touchEvent, touchResponse) {
-                                                if (touchEvent is FlPanUpdateEvent){
-                                                    dragHandler(touchEvent.details);
-                                                    return;
-                                                  }
-                                                if (touchEvent is FlPointerHoverEvent){
-                                                  setState(() {
-                                                  if (touchResponse?.touchedSpot == null) {
-                                                    hoveredPointId = -1;
-                                                  } else {
-                                                    hoveredPointId = touchResponse!.touchedSpot!.spotIndex;
-                                                    _MyScatterSpot castedPoint = touchResponse.touchedSpot!.spot as _MyScatterSpot;
-                                                    headerTooltip = castedPoint.nickname;
-                                                    footerTooltip = "${_f4.format(castedPoint.x)} ${chartsShortTitles[_chartsX]}; ${_f4.format(castedPoint.y)} ${chartsShortTitles[_chartsY]}";
-                                                  }
-                                                  });
-                                                }
-                                                if (touchEvent is FlPointerExitEvent){
-                                                  setState(() {hoveredPointId = -1;});
-                                                }
-                                                if (touchEvent is FlTapUpEvent && touchResponse?.touchedSpot?.spot != null){
-                                                  _MyScatterSpot spot = touchResponse!.touchedSpot!.spot as _MyScatterSpot;
-                                                  Navigator.push(context, MaterialPageRoute(builder: (context) => MainView(player: spot.nickname), maintainState: false));
-                                                }
-                                              },
-                                            ),
-                                          ),
-                                          swapAnimationDuration: const Duration(milliseconds: 150), // Optional
-                                          swapAnimationCurve: Curves.linear, // Optional
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.fromLTRB(graphStartX+8, padding.top/2+8, 0, 0),
-                                          child: Column(
-                                            children: [
-                                              AnimatedDefaultTextStyle(style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 24, color: Color.fromARGB(hoveredPointId == -1 ? 100 : 255, 255, 255, 255), shadows: hoveredPointId != -1 ? textShadow : null), duration: Durations.medium1, curve: Curves.elasticInOut, child: Text(headerTooltip)),
-                                              AnimatedDefaultTextStyle(style: TextStyle(fontFamily: "Eurostile Round", color: Color.fromARGB(hoveredPointId == -1 ? 100 : 255, 255, 255, 255), shadows: hoveredPointId != -1 ? textShadow : null), duration: Durations.medium1, curve: Curves.elasticInOut, child: Text(footerTooltip)),
-                                            ],
-                                          ),
-                                        )
-                                      ],
-                                    ),
+                                  }
+                                },
+                                child: SfCartesianChart(
+                                    tooltipBehavior: _tooltipBehavior,
+                                    zoomPanBehavior: _zoomPanBehavior,
+                                    //primaryXAxis: CategoryAxis(),
+                                    series: [
+                                      ScatterSeries(
+                                        enableTooltip: true,
+                                        dataSource: _spots,
+                                        animationDuration: 0,
+                                        pointColorMapper: (data, _) => data.color,
+                                        xValueMapper: (data, _) => data.x,
+                                        yValueMapper: (data, _) => data.y,
+                                        onPointTap: (point) => Navigator.push(context, MaterialPageRoute(builder: (context) => MainView(player: _spots[point.pointIndex!].nickname), maintainState: false)),
+                                      )
+                                    ],
                                   ),
                                 ),
                               ))
@@ -424,7 +318,9 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                       checkColor: Colors.black,
                                       onChanged: ((value) {
                                         _reversed = value!;
-                                        setState(() {});
+                                        setState(() {
+                                          they = TetrioPlayersLeaderboard("lol", []).getStatRanking(widget.rank[1]["entries"]!, _sortBy, reversed: _reversed, country: _country);
+                                        });
                                       }),
                                     ),
                                   ),
@@ -441,7 +337,9 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                     value: _country,
                                     onChanged: ((value) {
                                       _country = value;
-                                      setState(() {});
+                                      setState(() {
+                                        they = TetrioPlayersLeaderboard("lol", []).getStatRanking(widget.rank[1]["entries"]!, _sortBy, reversed: _reversed, country: _country);
+                                      });
                                     }),
                                   ),
                                 ],
@@ -456,7 +354,9 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                 bool bigScreen = MediaQuery.of(context).size.width > 768;
                                 return ListTile(
                                   title: Text(they[index].username, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
-                                  subtitle: Text(_sortBy == Stats.tr ? "${_f2.format(they[index].apm)} APM, ${_f2.format(they[index].pps)} PPS, ${_f2.format(they[index].vs)} VS, ${_f2.format(they[index].nerdStats.app)} APP, ${_f2.format(they[index].nerdStats.vsapm)} VS/APM" : "${_f4.format(they[index].getStatByEnum(_sortBy))} ${chartsShortTitles[_sortBy]}"),
+                                  subtitle: Text(
+                                    _sortBy == Stats.tr ? "${_f2.format(they[index].apm)} APM, ${_f2.format(they[index].pps)} PPS, ${_f2.format(they[index].vs)} VS, ${_f2.format(they[index].nerdStats.app)} APP, ${_f2.format(they[index].nerdStats.vsapm)} VS/APM" : "${_f4.format(they[index].getStatByEnum(_sortBy))} ${chartsShortTitles[_sortBy]}",
+                                    style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
                                   trailing: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
@@ -635,10 +535,12 @@ class _ListEntry extends StatelessWidget {
   }
 }
 
-class _MyScatterSpot extends ScatterSpot {
+class _MyScatterSpot{
+  num x;
+  num y;
   String id;
   String nickname;
-  //Color color;
-  //FlDotPainter painter = FlDotCirclePainter(color: color, radius: 2);
-  _MyScatterSpot(super.x, super.y, this.id, this.nickname, {super.dotPainter});
+  String rank;
+  Color color;
+  _MyScatterSpot(this.x, this.y, this.id, this.nickname, this.rank, this.color);
 }

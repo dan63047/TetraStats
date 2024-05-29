@@ -75,6 +75,7 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
                   case ConnectionState.done:
                     final allPlayers = snapshot.data?.getStatRanking(snapshot.data!.leaderboard, _sortBy, reversed: reversed, country: _country);
                     if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) windowManager.setTitle("Tetra Stats: ${t.tlLeaderboard} - ${t.players(n: allPlayers!.length)}");
+                    bool bigScreen = MediaQuery.of(context).size.width > 768;
                     return NestedScrollView(
                         headerSliverBuilder: (context, value) {
                           String howManyPlayers(int numberOfPlayers) => Intl.plural(
@@ -170,18 +171,26 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
                         },
                         body: ListView.builder(
                             itemCount: allPlayers!.length,
+                            prototypeItem: ListTile(
+                              leading: Text("0", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 28 : 24, height: 0.9)),
+                              title: Text("ehhh...", style: TextStyle(fontFamily: bigScreen ? "Eurostile Round Extended" : "Eurostile Round", height: 0.9)),
+                              trailing: Container(height: bigScreen ? 48 : 36, width: 1,),
+                              subtitle: Text("eh..."),
+                            ),
                             itemBuilder: (context, index) {
-                              bool bigScreen = MediaQuery.of(context).size.width > 768;
                               return ListTile(
-                                leading: Text((index+1).toString(), style: bigScreen ? const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28) : null),
-                                title: Text(allPlayers[index].username, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
+                                leading: Text(
+                                  (index+1).toString(),
+                                  style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 28 : 24, height: 0.9) 
+                                ),
+                                title: Text(allPlayers[index].username, style: TextStyle(fontFamily: bigScreen ? "Eurostile Round Extended" : "Eurostile Round", height: 0.9)),
                                 subtitle: Text(_sortBy == Stats.tr ? "${f2.format(allPlayers[index].apm)} APM, ${f2.format(allPlayers[index].pps)} PPS, ${f2.format(allPlayers[index].vs)} VS, ${f2.format(allPlayers[index].nerdStats.app)} APP, ${f2.format(allPlayers[index].nerdStats.vsapm)} VS/APM" : "${_f4.format(allPlayers[index].getStatByEnum(_sortBy))} ${chartsShortTitles[_sortBy]}",
-                                style: TextStyle(fontFamily: "Eurostile Round Condensed", color: _sortBy == Stats.tr ? Colors.grey : null)),
+                                  style: TextStyle(fontFamily: "Eurostile Round Condensed", fontSize: bigScreen ? null : 12, color: _sortBy == Stats.tr ? Colors.grey : null)),
                                 trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text("${f2.format(allPlayers[index].rating)} TR", style: bigScreen ? const TextStyle(fontSize: 28) : null),
-                                    Image.asset("res/tetrio_tl_alpha_ranks/${allPlayers[index].rank}.png", height: bigScreen ? 48 : 16),
+                                    Text("${f2.format(allPlayers[index].rating)} TR", style: TextStyle(fontSize: bigScreen ? 28 : 22)),
+                                    Image.asset("res/tetrio_tl_alpha_ranks/${allPlayers[index].rank}.png", height: bigScreen ? 48 : 36),
                                   ],
                                 ),
                                 onTap: () {

@@ -55,7 +55,7 @@ class RanksAverages extends State<RankAveragesView> {
                 leading: Image.asset("res/tetrio_tl_alpha_ranks/${keys[index]}.png", height: 48),
                 title: Text(t.players(n: averages[keys[index]]?[1]["players"]), style: const TextStyle(fontFamily: "Eurostile Round Extended")),
                 subtitle: Text("${f2.format(averages[keys[index]]?[0].apm)} APM, ${f2.format(averages[keys[index]]?[0].pps)} PPS, ${f2.format(averages[keys[index]]?[0].vs)} VS, ${f2.format(averages[keys[index]]?[0].nerdStats.app)} APP, ${f2.format(averages[keys[index]]?[0].nerdStats.vsapm)} VS/APM",
-                  style: TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
+                  style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
                 trailing: Text("${f2.format(averages[keys[index]]?[1]["toEnterTR"])} TR", style: bigScreen ? const TextStyle(fontSize: 28) : null),
                 onTap: (){
                   if (averages[keys[index]]?[1]["players"] > 0) {

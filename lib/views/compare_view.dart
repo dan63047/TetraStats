@@ -257,7 +257,7 @@ class CompareState extends State<CompareView> {
       backgroundColor: Colors.black,
       body: SingleChildScrollView(
         controller: _scrollController,
-        physics: AlwaysScrollableScrollPhysics(),
+        physics: const AlwaysScrollableScrollPhysics(),
         child: Center(
           child: Container(
             constraints: const BoxConstraints(maxWidth: 768),
@@ -317,7 +317,7 @@ class CompareState extends State<CompareView> {
                   ],
                 ),
               ),
-              Divider(),
+              const Divider(),
               if (!listEquals(theGreenSide, [null, null, null]) && !listEquals(theRedSide, [null, null, null])) Column(
                 children: [
                   if (theGreenSide[0] != null && theRedSide[0] != null && theGreenSide[0]!.role != "banned" && theRedSide[0]!.role != "banned")
@@ -816,21 +816,23 @@ class CompareThingy extends StatelessWidget {
               child: Container(
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-                gradient: LinearGradient(
-              colors: const [Colors.green, Colors.transparent],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              stops: [
-                0.0,
-                higherIsBetter
-                    ? greenSide > redSide
-                        ? 0.6
-                        : 0
-                    : greenSide < redSide
-                        ? 0.6
-                        : 0
-              ],
-            )),
+              gradient: LinearGradient(
+                colors: const [Colors.green, Colors.transparent],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                transform: const GradientRotation(0.6),
+                stops: [
+                  0.0,
+                  higherIsBetter
+                      ? greenSide > redSide
+                          ? 0.6
+                          : 0
+                      : greenSide < redSide
+                          ? 0.6
+                          : 0
+                ],
+              )
+            ),
             child: Text(
               (prefix ?? "") + f.format(greenSide) + (postfix ?? ""),
               style: const TextStyle(
@@ -838,7 +840,12 @@ class CompareThingy extends StatelessWidget {
                 shadows: <Shadow>[
                   Shadow(
                     offset: Offset(0.0, 0.0),
-                    blurRadius: 3.0,
+                    blurRadius: 1.0,
+                    color: Colors.black,
+                  ),
+                  Shadow(
+                    offset: Offset(0.0, 0.0),
+                    blurRadius: 2.0,
                     color: Colors.black,
                   ),
                   Shadow(
@@ -874,6 +881,7 @@ class CompareThingy extends StatelessWidget {
               colors: const [Colors.red, Colors.transparent],
               begin: Alignment.centerRight,
               end: Alignment.centerLeft,
+              transform: const GradientRotation(-0.6),
               stops: [
                 0.0,
                 higherIsBetter

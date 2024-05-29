@@ -9,14 +9,11 @@ import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/widgets/gauget_num.dart';
 import 'package:tetra_stats/widgets/graphs.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
+import 'package:tetra_stats/widgets/tl_progress_bar.dart';
 
 var fDiff = NumberFormat("+#,###.###;-#,###.###");
 var intFDiff = NumberFormat("+#,###;-#,###");
 final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
-late RangeValues _currentRangeValues;
-TetraLeagueAlpha? oldTl;
-late TetraLeagueAlpha currentTl;
-late List<TetrioPlayer> sortedStates;
 
 class TLThingy extends StatefulWidget {
   final TetraLeagueAlpha tl;
@@ -29,10 +26,12 @@ class TLThingy extends StatefulWidget {
   final PlayerLeaderboardPosition? lbPositions;
   final TetraLeagueAlpha? averages;
   final double? thatRankCutoff;
+  final double? thatRankCutoffGlicko;
   final double? thatRankTarget;
   final double? nextRankCutoff;
+  final double? nextRankCutoffGlicko;
   final double? nextRankTarget;
-  const TLThingy({super.key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.bot=false, this.guest=false, this.topTR, this.lbPositions, this.averages, this.nextRankCutoff = 25000, this.thatRankCutoff = 0, this.nextRankTarget = 25000, this.thatRankTarget = 0});
+  const TLThingy({super.key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.bot=false, this.guest=false, this.topTR, this.lbPositions, this.averages, this.nextRankCutoff, this.thatRankCutoff, this.thatRankCutoffGlicko, this.nextRankCutoffGlicko, this.nextRankTarget, this.thatRankTarget});
 
   @override
   State<TLThingy> createState() => _TLThingyState();
@@ -40,17 +39,17 @@ class TLThingy extends StatefulWidget {
 
 class _TLThingyState extends State<TLThingy> {
   late bool oskKagariGimmick;
+  late TetraLeagueAlpha? oldTl;
+  late TetraLeagueAlpha currentTl;
+  late RangeValues _currentRangeValues;
+  late List<TetrioPlayer> sortedStates;
   
 @override
   void initState() {
     _currentRangeValues = const RangeValues(0, 1);
     sortedStates = widget.states.reversed.toList();
     oskKagariGimmick = prefs.getBool("oskKagariGimmick")??true;
-    try{
-      oldTl = sortedStates[1].tlSeason1;
-    }on RangeError{
-      oldTl = null;
-    }
+    oldTl = sortedStates.elementAtOrNull(1)?.tlSeason1;
     currentTl = widget.tl;
     super.initState();
   }
@@ -139,20 +138,16 @@ class _TLThingyState extends State<TLThingy> {
                     ),
                   ],
                 ),
-              if (currentTl.gamesPlayed >= 10 && currentTl.rd! < 100 && currentTl.nextAt >=0 && currentTl.prevAt >= 0) Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SfLinearGauge(
-                  minimum: currentTl.nextAt.toDouble(),
-                  maximum: currentTl.prevAt.toDouble(),
-                  interval: currentTl.prevAt.toDouble() - currentTl.nextAt.toDouble(), 
-                  ranges: [LinearGaugeRange(startValue: currentTl.standing.toDouble() <= currentTl.prevAt.toDouble() ? currentTl.standing.toDouble() : currentTl.prevAt.toDouble(), endValue: currentTl.prevAt.toDouble(), color: Colors.cyanAccent,)],
-                  markerPointers: [LinearShapePointer(value: currentTl.standing.toDouble() <= currentTl.prevAt.toDouble() ? currentTl.standing.toDouble() : currentTl.prevAt.toDouble(), position: LinearElementPosition.inside, shapeType: LinearShapePointerType.triangle, color: Colors.white, height: 20),
-                  LinearWidgetPointer(offset: 4, position: LinearElementPosition.outside, value: currentTl.standing.toDouble() <= currentTl.prevAt.toDouble() ? currentTl.standing.toDouble() : currentTl.prevAt.toDouble(), child: Text(NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 0).format(currentTl.standing)))],
-                  isAxisInversed: true,
-                  isMirrored: true,
-                  showTicks: true,
-                  showLabels: true
-                  ),
+              if (currentTl.gamesPlayed > 9) TLProgress(
+                tlData: currentTl,
+                previousRankTRcutoff: widget.thatRankCutoff,
+                previousGlickoCutoff: widget.thatRankCutoffGlicko,
+                previousRank: widget.tl.prevRank,
+                previousRankTRcutoffTarget: widget.thatRankTarget,
+                nextRankTRcutoff: widget.nextRankCutoff,
+                nextRankGlickoCutoff: widget.nextRankCutoffGlicko,
+                nextRankTRcutoffTarget: widget.nextRankTarget,
+                nextRank: widget.tl.nextRank
               ),
               if (currentTl.gamesPlayed < 10)
                 Text(t.gamesUntilRanked(left: 10 - currentTl.gamesPlayed),
@@ -325,7 +320,7 @@ class _TLThingyState extends State<TLThingy> {
                                 ),),
                                 if (oldTl?.estTr?.esttr != null && widget.lbPositions?.estTr != null) const TextSpan(text: " • "),
                                 if (widget.lbPositions?.estTr != null) TextSpan(text: widget.lbPositions!.estTr!.position >= 1000 ? "${t.top} ${f2.format(widget.lbPositions!.estTr!.percentage*100)}%" : "№${widget.lbPositions!.estTr!.position}", style: TextStyle(color: getColorOfRank(widget.lbPositions!.estTr!.position))),
-                                if (widget.lbPositions?.estTr != null) const TextSpan(text: " • "),
+                                if (widget.lbPositions?.estTr != null || oldTl?.estTr?.esttr != null) const TextSpan(text: " • "),
                                 TextSpan(text: "Glicko: ${f2.format(currentTl.estTr!.estglicko)}")
                               ]
                               ),

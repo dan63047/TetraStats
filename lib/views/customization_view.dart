@@ -1,10 +1,8 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
-import 'package:tetra_stats/main.dart';
 import 'package:window_manager/window_manager.dart';
 
 late String oldWindowTitle;
