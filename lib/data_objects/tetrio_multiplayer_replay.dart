@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'tetrio.dart';
 
@@ -55,6 +56,14 @@ class Garbage{ // charsys where???
   Garbage operator + (Garbage other){
     return Garbage(sent: sent + other.sent, recived: recived + other.recived, attack: attack + other.attack, cleared: cleared + other.cleared);
   }
+}
+
+class RawReplay{
+  String id;
+  Uint8List asBytes;
+  String asString;
+
+  RawReplay(this.id, this.asBytes, this.asString);
 }
 
 class ReplayStats{

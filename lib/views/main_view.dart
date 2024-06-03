@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:tetra_stats/data_objects/tetra_stats.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
@@ -174,23 +175,23 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     // Requesting Tetra League (alpha), records, news and top TR of player
     late List<dynamic> requests;
     late TetraLeagueAlphaStream tlStream;
-    late Map<String, dynamic> records;
-    late List<News> news;
+    late UserRecords records;
+    late News news;
     late TetrioPlayerFromLeaderboard? topOne;
-    late double? topTR;
+    late TopTr? topTR;
     requests = await Future.wait([ // all at once
       teto.fetchTLStream(_searchFor),
       teto.fetchRecords(_searchFor),
       teto.fetchNews(_searchFor),
       prefs.getBool("showPositions") != true ? teto.fetchCutoffs() : Future.delayed(Duration.zero, ()=><Map<String, double>>[]),
       (me.tlSeason1.rank != "z" ? me.tlSeason1.rank == "x" : me.tlSeason1.percentileRank == "x") ? teto.fetchTopOneFromTheLeaderboard() : Future.delayed(Duration.zero, ()=>null),
-      if (me.tlSeason1.gamesPlayed > 9) teto.fetchTopTR(_searchFor) // can retrieve this only if player has TR
+      (me.tlSeason1.gamesPlayed > 9) ? teto.fetchTopTR(_searchFor) : Future.delayed(Duration.zero, () => null) // can retrieve this only if player has TR
     ]);
     tlStream = requests[0] as TetraLeagueAlphaStream;
-    records = requests[1] as Map<String, dynamic>;
-    news = requests[2] as List<News>;
+    records = requests[1] as UserRecords;
+    news = requests[2] as News;
     topOne = requests[4] as TetrioPlayerFromLeaderboard?;
-    topTR = requests.elementAtOrNull(5) as double?; // No TR - no Top TR
+    topTR = requests[5] as TopTr?; // No TR - no Top TR
 
     meAmongEveryone = teto.getCachedLeaderboardPositions(me.userId);
     if (prefs.getBool("showPositions") == true){
@@ -202,8 +203,8 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
         if (meAmongEveryone != null) teto.cacheLeaderboardPositions(me.userId, meAmongEveryone!); 
       }
     }
-    Map<String, double>? cutoffs = prefs.getBool("showPositions") == true ? everyone!.cutoffs : (requests[3] as List<Map<String, double>>).elementAtOrNull(0);
-    Map<String, double>? cutoffsGlicko = prefs.getBool("showPositions") == true ? everyone!.cutoffsGlicko : (requests[3] as List<Map<String, double>>).elementAtOrNull(1);
+    Map<String, double>? cutoffs = prefs.getBool("showPositions") == true ? everyone!.cutoffs : (requests[3] as Cutoffs?)?.tr;
+    Map<String, double>? cutoffsGlicko = prefs.getBool("showPositions") == true ? everyone!.cutoffsGlicko : (requests[3] as Cutoffs?)?.glicko;
     
     if (me.tlSeason1.gamesPlayed > 9) {
         thatRankCutoff = cutoffs?[me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank];
@@ -459,7 +460,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                                 tl: snapshot.data![0].tlSeason1,
                                 userID: snapshot.data![0].userId,
                                 states: snapshot.data![2],
-                                topTR: snapshot.data![7],
+                                topTR: snapshot.data![7]?.tr,
                                 bot: snapshot.data![0].role == "bot",
                                 guest: snapshot.data![0].role == "anon",
                                 thatRankCutoff: thatRankCutoff,
@@ -478,14 +479,14 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                             ),
                           ],),
                           _History(chartsData: chartsData, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
-                          _TwoRecordsThingy(sprint: snapshot.data![1]['sprint'], blitz: snapshot.data![1]['blitz'], rank: snapshot.data![0].tlSeason1.percentileRank,),
-                          _OtherThingy(zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6],)
+                          _TwoRecordsThingy(sprint: snapshot.data![1].sprint, blitz: snapshot.data![1].blitz, rank: snapshot.data![0].tlSeason1.percentileRank,),
+                          _OtherThingy(zen: snapshot.data![1].zen, bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6],)
                         ] : [
                           TLThingy(
                             tl: snapshot.data![0].tlSeason1,
                             userID: snapshot.data![0].userId,
                             states: snapshot.data![2],
-                            topTR: snapshot.data![7],
+                            topTR: snapshot.data![7]?.tr,
                             bot: snapshot.data![0].role == "bot",
                             guest: snapshot.data![0].role == "anon",
                             thatRankCutoff: thatRankCutoff,
@@ -499,9 +500,9 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                           ),
                           _TLRecords(userID: snapshot.data![0].userId, changePlayer: changePlayer, data: snapshot.data![3], wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0, oldMathcesHere: _TLHistoryWasFetched),
                           _History(chartsData: chartsData, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
-                          _RecordThingy(record: snapshot.data![1]['sprint'], rank: snapshot.data![0].tlSeason1.percentileRank),
-                          _RecordThingy(record: snapshot.data![1]['blitz'], rank: snapshot.data![0].tlSeason1.percentileRank),
-                          _OtherThingy(zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6],)
+                          _RecordThingy(record: snapshot.data![1].sprint, rank: snapshot.data![0].tlSeason1.percentileRank),
+                          _RecordThingy(record: snapshot.data![1].blitz, rank: snapshot.data![0].tlSeason1.percentileRank),
+                          _OtherThingy(zen: snapshot.data![1].zen, bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6],)
                         ],
                       ),
                     ),
@@ -1288,7 +1289,7 @@ class _OtherThingy extends StatelessWidget {
   final TetrioZen? zen;
   final String? bio;
   final Distinguishment? distinguishment;
-  final List<News>? newsletter;
+  final News? newsletter;
 
   /// Widget, that shows players [distinguishment], [bio], [zen] and [newsletter]
   const _OtherThingy({required this.zen, required this.bio, required this.distinguishment, this.newsletter});
@@ -1337,7 +1338,7 @@ class _OtherThingy extends StatelessWidget {
   }
 
   /// Handles [news] entry and returns widget that contains this entry
-  ListTile getNewsTile(News news){
+  ListTile getNewsTile(NewsEntry news){
     Map<String, String> gametypes = {
       "40l": t.sprint,
       "blitz": t.blitz,
@@ -1519,7 +1520,7 @@ class _OtherThingy extends StatelessWidget {
               ],
             ),
           ),
-        if (newsletter != null && newsletter!.isNotEmpty && showNewsTitle)
+        if (newsletter != null && newsletter!.news.isNotEmpty && showNewsTitle)
           Text(t.news, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
       ],
     );
@@ -1535,9 +1536,9 @@ class _OtherThingy extends StatelessWidget {
             SizedBox(width: 450, child: getShit(context, true, false)),
             SizedBox(width: constraints.maxWidth - 450, child: ListView.builder(
               physics: const AlwaysScrollableScrollPhysics(),
-              itemCount: newsletter!.length+1,
+              itemCount: newsletter!.news.length+1,
               itemBuilder: (BuildContext context, int index) {
-                return index == 0 ? Center(child: Text(t.news, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42))) : getNewsTile(newsletter![index-1]);
+                return index == 0 ? Center(child: Text(t.news, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42))) : getNewsTile(newsletter!.news[index-1]);
               }
             ))
           ]
@@ -1546,9 +1547,9 @@ class _OtherThingy extends StatelessWidget {
       else {
         return ListView.builder(
         physics: const AlwaysScrollableScrollPhysics(),
-        itemCount: newsletter!.length+1,
+        itemCount: newsletter!.news.length+1,
         itemBuilder: (BuildContext context, int index) {
-          return index == 0 ? getShit(context, bigScreen, true) : getNewsTile(newsletter![index-1]);          
+          return index == 0 ? getShit(context, bigScreen, true) : getNewsTile(newsletter!.news[index-1]);          
         },
       );
       }

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'package:tetra_stats/data_objects/tetra_stats.dart';
 import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
 import 'package:tetra_stats/main.dart' show packageInfo;
 import 'package:flutter/foundation.dart';
@@ -65,22 +66,77 @@ const String createTetrioTLReplayStats = '''
         )
 ''';
 
+class CacheController {
+  late Map<String, dynamic> _cache;
+  late Map<String, String> _nicknames;
+
+  CacheController.init(){
+    _cache = {};
+    _nicknames = {};
+  }
+
+  String _getObjectId(dynamic object){
+    switch (object.runtimeType){
+      case TetrioPlayer:
+        object as TetrioPlayer;
+        _nicknames[object.username] = object.userId;
+        return object.userId;
+      case TetrioPlayersLeaderboard:
+        return object.runtimeType.toString()+object.type;
+      case Cutoffs:
+        return object.runtimeType.toString();
+      case TetrioPlayerFromLeaderboard: // i may be a little stupid
+        return object.runtimeType.toString()+"topone";
+      case TetraLeagueAlphaStream:
+        return object.runtimeType.toString()+object.userId;
+      default:
+        return object.runtimeType.toString()+object.id;
+    }
+  }
+
+  void store(dynamic object, int? cachedUntil) async {
+    String key = _getObjectId(object) + cachedUntil!.toString();
+    _cache[key] = object;
+  }
+
+  dynamic get(String id, Type datatype){
+    if (_cache.isEmpty) return null;
+    MapEntry<String, dynamic>? objectEntry;
+    try{
+      switch (datatype){
+        case TetrioPlayer:
+          objectEntry = id.length <= 16 ? _cache.entries.firstWhere((element) => element.key.startsWith(_nicknames[id]??"huh?")) : _cache.entries.firstWhere((element) => element.key.startsWith(id));
+          if (id.length <= 16) id = _nicknames[id]??"huh?";
+          break;
+        default:
+          objectEntry = _cache.entries.firstWhere((element) => element.key.startsWith(datatype.toString()+id));
+          id = datatype.toString()+id;
+          break;
+      }
+    } on StateError{
+      return null;
+    }     
+    if (int.parse(objectEntry.key.substring(id.length)) <= DateTime.now().millisecondsSinceEpoch){
+      _cache.remove(objectEntry.key);
+      return null;
+    }else{
+      return objectEntry.value;
+    }
+  }
+
+  void removeOld() async {
+    _cache.removeWhere((key, value) => DateTime.fromMillisecondsSinceEpoch(int.parse(key.substring(_getObjectId(value).length)), isUtc: true).isAfter(DateTime.now()));
+  }
+
+  void reset(){
+    _cache.clear();
+  }
+}
+
 class TetrioService extends DB {
   final Map<String, String> _players = {};
-
-  // I'm trying to send as less requests, as possible, so i'm caching the results of those requests.
-  // Usually those maps looks like this: {"cached_until_unix_milliseconds": Object}
-  // TODO: Make a proper caching system
-  final Map<String, TetrioPlayer> _playersCache = {};
-  final Map<String, Map<String, dynamic>> _recordsCache = {};
-  final Map<String, dynamic> _replaysCache = {}; // the only one is different: {"replayID": [replayString, replayBytes]}
-  final Map<String, TetrioPlayersLeaderboard> _leaderboardsCache = {};
-  final Map<String, PlayerLeaderboardPosition> _lbPositions = {};
-  final Map<String, List<News>> _newsCache = {};
-  final Map<String, Map<String, double?>> _topTRcache = {};
-  final Map<String, List<Map<String, double>>> _cutoffsCache = {};
-  final Map<String, TetrioPlayerFromLeaderboard> _topOneFromLB = {};
-  final Map<String, TetraLeagueAlphaStream> _tlStreamsCache = {};
+  final _cache = CacheController.init(); // I'm trying to send as less requests, as possible, so i'm caching the results of those requests.
+  final Map<String, PlayerLeaderboardPosition> _lbPositions = {}; // separate one because attached to the leaderboard
   /// Thing, that sends every request to the API endpoints
   final client = kDebugMode ? UserAgentClient("Kagari-chan loves osk (Tetra Stats dev build)", http.Client()) : UserAgentClient("Tetra Stats v${packageInfo.version} (dm @dan63047 if someone abuse that software)", http.Client());
   /// We should have only one instanse of this service
@@ -157,14 +213,20 @@ class TetrioService extends DB {
   /// Downloads replay from inoue (szy API). Requiers [replayID]. If request have
   /// different from 200 statusCode, it will throw an excepction. Returns list, that contains same replay
   /// as string and as binary.
-  Future<List<dynamic>> szyGetReplay(String replayID) async {
-    try{ // read from cache
-      var cached = _replaysCache.entries.firstWhere((element) => element.key == replayID);
-      return cached.value;
-    }catch (e){
-      // actually going to obtain
+  Future<RawReplay> szyGetReplay(String replayID) async {
+    // Trying to get it from cache first
+    RawReplay? cached = _cache.get(replayID, RawReplay);
+    if (cached != null) return cached;
+
+    // If failed, trying to obtain replay from download directory
+    if (!kIsWeb){ // can't obtain download directory on web
+      var downloadPath = await getDownloadsDirectory();
+      downloadPath ??= Platform.isAndroid ? Directory("/storage/emulated/0/Download") : await getApplicationDocumentsDirectory();
+      var replayFile = File("${downloadPath.path}/$replayID.ttrm");
+      if (replayFile.existsSync()) return RawReplay(replayID, replayFile.readAsBytesSync(), replayFile.readAsStringSync());
     }
 
+    // If failed, actually trying to retrieve
     Uri url;
     if (kIsWeb) { // Web version sends every request through my php script at the same domain, where Tetra Stats located because of CORS
       url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "tetrioReplay", "replayid": replayID});
@@ -172,22 +234,16 @@ class TetrioService extends DB {
       url = Uri.https('inoue.szy.lol', '/api/replay/$replayID');
     }
 
-    // Trying to obtain replay from download directory first
-    if (!kIsWeb){ // can't obtain download directory on web
-      var downloadPath = await getDownloadsDirectory();
-      downloadPath ??= Platform.isAndroid ? Directory("/storage/emulated/0/Download") : await getApplicationDocumentsDirectory();
-      var replayFile = File("${downloadPath.path}/$replayID.ttrm");
-      if (replayFile.existsSync()) return [replayFile.readAsStringSync(), replayFile.readAsBytesSync()];
-    }
-
     try{
       final response = await client.get(url);
 
       switch (response.statusCode) {
         case 200:
-          developer.log("szyDownload: Replay downloaded", name: "services/tetrio_crud", error: response.statusCode);
-          _replaysCache[replayID] = [response.body, response.bodyBytes]; // Puts results into the cache 
-          return [response.body, response.bodyBytes];
+          developer.log("szyDownload: Replay $replayID downloaded", name: "services/tetrio_crud");
+          RawReplay replay = RawReplay(replayID, response.bodyBytes, response.body);
+          DateTime now = DateTime.now();
+          _cache.store(replay, now.millisecondsSinceEpoch + 3600000);
+          return replay;
         // if not 200 - throw a unique for each code exception  
         case 404:
           throw SzyNotFound();
@@ -203,7 +259,7 @@ class TetrioService extends DB {
         case 504:
           throw SzyInternalProblem();
         default:
-          developer.log("szyDownload: Failed to download a replay", name: "services/tetrio_crud", error: response.statusCode);
+          developer.log("szyDownload: Failed to download a replay $replayID", name: "services/tetrio_crud", error: response.statusCode);
           throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
       }
     } on http.ClientException catch (e, s) { // If local http client fails
@@ -219,8 +275,8 @@ class TetrioService extends DB {
     downloadPath ??= Platform.isAndroid ? Directory("/storage/emulated/0/Download") : await getApplicationDocumentsDirectory();
     var replayFile = File("${downloadPath.path}/$replayID.ttrm");
     if (replayFile.existsSync()) throw TetrioReplayAlreadyExist();
-    var replay = await szyGetReplay(replayID);
-    await replayFile.writeAsBytes(replay[1]);
+    RawReplay replay = await szyGetReplay(replayID);
+    await replayFile.writeAsBytes(replay.asBytes);
     return replayFile.path;
   }
 
@@ -235,7 +291,7 @@ class TetrioService extends DB {
     if (!isAvailable) throw ReplayNotAvalable(); // if replay too old
 
     // otherwise, actually going to download a replay and analyze it
-    String replay = (await szyGetReplay(replayID))[0];
+    String replay = (await szyGetReplay(replayID)).asString;
     Map<String, dynamic> toAnalyze = jsonDecode(replay);
     ReplayData data = ReplayData.fromJson(toAnalyze);
     saveReplayStats(data); // saving to DB for later
@@ -244,19 +300,10 @@ class TetrioService extends DB {
 
   /// Gets and returns Top TR for a player with given [id]. May return null if player top tr is unknown
   /// or api is unavaliable (404). May throw an exception, if something else happens.
-  Future<double?> fetchTopTR(String id) async {
-    try{ // read from cache
-      var cached = _topTRcache.entries.firstWhere((element) => element.value.keys.first == id);
-    if (DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true).isAfter(DateTime.now())){ // if not expired
-      developer.log("fetchTopTR: Top TR retrieved from cache, that expires ${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)}", name: "services/tetrio_crud");
-      return cached.value.values.first;
-    }else{ // if cache expired
-      _topTRcache.remove(cached.key);
-      developer.log("fetchTopTR: Top TR expired (${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)})", name: "services/tetrio_crud");
-    }
-    }catch(e){ // actually going to obtain
-      developer.log("fetchTopTR: Trying to retrieve Top TR", name: "services/tetrio_crud");
-    }
+  Future<TopTr?> fetchTopTR(String id) async {
+    // Trying to get it from cache first
+    TopTr? cached = _cache.get(id, TopTr);
+    if (cached != null) return cached;
 
     Uri url;
     if (kIsWeb) { // Web version sends every request through my php script at the same domain, where Tetra Stats located because of CORS
@@ -269,12 +316,15 @@ class TetrioService extends DB {
 
       switch (response.statusCode) {
         case 200: // ok - return the value
-          _topTRcache[(DateTime.now().millisecondsSinceEpoch + 300000).toString()] = {id: double.tryParse(response.body)};
-          return double.tryParse(response.body);
+          TopTr result = TopTr(id, double.tryParse(response.body));
+          _cache.store(result, DateTime.now().millisecondsSinceEpoch + 300000);
+          return result;
         case 404: // not found - return null
+          TopTr result = TopTr(id, null);
           developer.log("fetchTopTR: Probably, player doesn't have top TR", name: "services/tetrio_crud", error: response.statusCode);
-          _topTRcache[(DateTime.now().millisecondsSinceEpoch + 300000).toString()] = {id: null};
-          return null;
+          _cache.store(result, DateTime.now().millisecondsSinceEpoch + 300000);
+          //_topTRcache[(DateTime.now().millisecondsSinceEpoch + 300000).toString()] = {id: null};
+          return result;
         // if not 200 or 404 - throw a unique for each code exception  
         case 403:
           throw P1nkl0bst3rForbidden();
@@ -300,19 +350,9 @@ class TetrioService extends DB {
   // Sidenote: as you can see, fetch functions looks and works pretty much same way, as described above,
   // so i'm going to document only unique differences between them
 
-  Future<List<Map<String, double>>> fetchCutoffs() async {
-    try{ 
-      var cached = _cutoffsCache.entries.first;
-    if (DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true).isAfter(DateTime.now())){ // if not expired
-      developer.log("fetchCutoffs: Cutoffs retrieved from cache, that expires ${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)}", name: "services/tetrio_crud");
-      return cached.value;
-    }else{ // if cache expired
-      _topTRcache.remove(cached.key);
-      developer.log("fetchCutoffs: Cutoffs expired (${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)})", name: "services/tetrio_crud");
-    }
-    }catch(e){ // actually going to obtain
-      developer.log("fetchCutoffs: Trying to retrieve Cutoffs", name: "services/tetrio_crud");
-    }
+  Future<Cutoffs?> fetchCutoffs() async {
+    Cutoffs? cached = _cache.get("", Cutoffs);
+    if (cached != null) return cached;
 
     Uri url;
     if (kIsWeb) {
@@ -328,17 +368,16 @@ class TetrioService extends DB {
         case 200:
           Map<String, dynamic> rawData = jsonDecode(response.body);
           Map<String, dynamic> data = rawData["cutoffs"] as Map<String, dynamic>;
-          Map<String, double> trCutoffs = {};
-          Map<String, double> glickoCutoffs = {};
+          Cutoffs result = Cutoffs({}, {});
           for (String rank in data.keys){
-            trCutoffs[rank] = data[rank]["rating"];
-            glickoCutoffs[rank] = data[rank]["glicko"];
+            result.tr[rank] = data[rank]["rating"];
+            result.glicko[rank] = data[rank]["glicko"];
           }
-          _cutoffsCache[(rawData["ts"] + 300000).toString()] = [trCutoffs, glickoCutoffs];
-          return [trCutoffs, glickoCutoffs];
+          _cache.store(result, rawData["ts"] + 300000);
+          return result;
         case 404:
           developer.log("fetchCutoffs: Cutoffs are gone", name: "services/tetrio_crud", error: response.statusCode);
-          return [];
+          return null;
         // if not 200 or 404 - throw a unique for each code exception  
         case 403:
           throw P1nkl0bst3rForbidden();
@@ -362,18 +401,8 @@ class TetrioService extends DB {
   }
 
   Future<TetrioPlayerFromLeaderboard> fetchTopOneFromTheLeaderboard() async {
-    try{ 
-      var cached = _topOneFromLB.entries.first;
-    if (DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true).isAfter(DateTime.now())){ // if not expired
-      developer.log("fetchTopOneFromTheLeaderboard: Leader retrieved from cache, that expires ${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)}", name: "services/tetrio_crud");
-      return cached.value;
-    }else{ // if cache expired
-      _topTRcache.remove(cached.key);
-      developer.log("fetchTopOneFromTheLeaderboard: Leader expired (${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)})", name: "services/tetrio_crud");
-    }
-    }catch(e){ // actually going to obtain
-      developer.log("fetchTopOneFromTheLeaderboard: Trying to retrieve leader", name: "services/tetrio_crud");
-    }
+    TetrioPlayerFromLeaderboard? cached = _cache.get("topone", TetrioPlayerFromLeaderboard);
+    if (cached != null) return cached;
 
     Uri url;
     if (kIsWeb) {
@@ -388,7 +417,9 @@ class TetrioService extends DB {
       switch (response.statusCode) {
         case 200:
           var rawJson = jsonDecode(response.body);
-          return TetrioPlayerFromLeaderboard.fromJson(rawJson["data"]["users"][0], DateTime.fromMillisecondsSinceEpoch(rawJson["cache"]["cached_at"]));
+          TetrioPlayerFromLeaderboard result = TetrioPlayerFromLeaderboard.fromJson(rawJson["data"]["users"][0], DateTime.fromMillisecondsSinceEpoch(rawJson["cache"]["cached_at"]));
+          _cache.store(result, rawJson["cache"]["cached_until"]);
+          return result;
         case 404:
           throw TetrioPlayerNotExist();
         // if not 200 or 404 - throw a unique for each code exception  
@@ -606,18 +637,9 @@ class TetrioService extends DB {
 
   /// Retrieves full Tetra League leaderboard from Tetra Channel api. Returns a leaderboard object. Throws an exception if fails to retrieve.
   Future<TetrioPlayersLeaderboard> fetchTLLeaderboard() async {
-    try{
-      var cached = _leaderboardsCache.entries.firstWhere((element) => element.value.type == "league");
-    if (DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true).isAfter(DateTime.now())){
-      developer.log("fetchTLLeaderboard: Leaderboard retrieved from cache, that expires ${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)}", name: "services/tetrio_crud");
-      return cached.value;
-    }else{
-      _leaderboardsCache.remove(cached.key);
-      developer.log("fetchTLLeaderboard: Leaderboard expired (${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)})", name: "services/tetrio_crud");
-    }
-    }catch(e){
-      developer.log("fetchTLLeaderboard: Trying to retrieve leaderboard", name: "services/tetrio_crud");
-    }
+    TetrioPlayersLeaderboard? cached = _cache.get("league", TetrioPlayersLeaderboard);
+    if (cached != null) return cached;
+     
     Uri url;
     if (kIsWeb) {
       url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLLeaderboard"});
@@ -634,7 +656,8 @@ class TetrioService extends DB {
           if (rawJson['success']) { // if api confirmed that everything ok
             TetrioPlayersLeaderboard leaderboard = TetrioPlayersLeaderboard.fromJson(rawJson['data']['users'], "league", DateTime.fromMillisecondsSinceEpoch(rawJson['cache']['cached_at']));
             developer.log("fetchTLLeaderboard: Leaderboard retrieved and cached", name: "services/tetrio_crud");
-            _leaderboardsCache[rawJson['cache']['cached_until'].toString()] = leaderboard;
+            //_leaderboardsCache[rawJson['cache']['cached_until'].toString()] = leaderboard;
+            _cache.store(leaderboard, rawJson['cache']['cached_until']);
             return leaderboard;
           } else { // idk how to hit that one
             developer.log("fetchTLLeaderboard: Bruh", name: "services/tetrio_crud", error: rawJson);
@@ -662,25 +685,13 @@ class TetrioService extends DB {
   }
 
   TetrioPlayersLeaderboard? getCachedLeaderboard(){
-    return _leaderboardsCache.entries.firstOrNull?.value;
-    // That function will break if i decide to recive other leaderboards
-    // TODO: Think about better solution
+    return _cache.get("league", TetrioPlayersLeaderboard);
   }
 
   /// Retrieves and returns 100 latest news entries from Tetra Channel api for given [userID]. Throws an exception if fails to retrieve.
-  Future<List<News>> fetchNews(String userID) async{
-    try{
-      var cached = _newsCache.entries.firstWhere((element) => element.value[0].stream == "user_$userID");
-    if (DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true).isAfter(DateTime.now())){
-      developer.log("fetchNews: News for $userID retrieved from cache, that expires ${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)}", name: "services/tetrio_crud");
-      return cached.value;
-    }else{
-      _newsCache.remove(cached.key);
-      developer.log("fetchNews: Cached news for $userID expired (${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)})", name: "services/tetrio_crud");
-    }
-    }catch(e){
-      developer.log("fetchNews: Trying to retrieve news for $userID", name: "services/tetrio_crud");
-    }
+  Future<News> fetchNews(String userID) async{
+    News? cached = _cache.get(userID, News);
+    if (cached != null) return cached;
     
     Uri url;
     if (kIsWeb) {
@@ -695,8 +706,8 @@ class TetrioService extends DB {
         case 200:
           var payload = jsonDecode(response.body);
           if (payload['success']) { // if api confirmed that everything ok
-            List<News> news = [for (var entry in payload['data']['news']) News.fromJson(entry)];
-            _newsCache[payload['cache']['cached_until'].toString()] = news;
+            News news = News.fromJson(payload['data'], userID);
+            _cache.store(news, payload['cache']['cached_until']);
             developer.log("fetchNews: $userID news retrieved and cached", name: "services/tetrio_crud");
             return news;
           } else {
@@ -727,18 +738,8 @@ class TetrioService extends DB {
   /// Retrieves avaliable Tetra League matches from Tetra Channel api. Returns stream object (fake stream).
   /// Throws an exception if fails to retrieve.
   Future<TetraLeagueAlphaStream> fetchTLStream(String userID) async {
-    try{
-      var cached = _tlStreamsCache.entries.firstWhere((element) => element.value.userId == userID);
-    if (DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true).isAfter(DateTime.now())){
-      developer.log("fetchTLStream: Stream $userID retrieved from cache, that expires ${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)}", name: "services/tetrio_crud");
-      return cached.value;
-    }else{
-      _tlStreamsCache.remove(cached.key);
-      developer.log("fetchTLStream: Cached stream $userID expired (${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)})", name: "services/tetrio_crud");
-    }
-    }catch(e){
-      developer.log("fetchTLStream: Trying to retrieve stream $userID", name: "services/tetrio_crud");
-    }
+    TetraLeagueAlphaStream? cached = _cache.get(userID, TetraLeagueAlphaStream);
+    if (cached != null) return cached;
     
     Uri url;
     if (kIsWeb) {
@@ -753,7 +754,7 @@ class TetrioService extends DB {
         case 200:
           if (jsonDecode(response.body)['success']) {
             TetraLeagueAlphaStream stream = TetraLeagueAlphaStream.fromJson(jsonDecode(response.body)['data']['records'], userID);
-            _tlStreamsCache[jsonDecode(response.body)['cache']['cached_until'].toString()] = stream;
+            _cache.store(stream, jsonDecode(response.body)['cache']['cached_until']);
             developer.log("fetchTLStream: $userID stream retrieved and cached", name: "services/tetrio_crud");
             return stream;
           } else {
@@ -864,21 +865,11 @@ class TetrioService extends DB {
     await db.delete(tetrioTLReplayStatsTable, where: '$idCol = ?', whereArgs: [rID]);
   }
 
-  /// Retrieves Blitz, 40 Lines and Zen records for a given [userID] from Tetra Channel api. Returns Map, which contains user id (`user`),
-  /// Blitz (`blitz`) and 40 Lines (`sprint`) record objects and Zen object (`zen`). Throws an exception if fails to retrieve.
-  Future<Map<String, dynamic>> fetchRecords(String userID) async {
-    try{
-      var cached = _recordsCache.entries.firstWhere((element) => element.value['user'] == userID);
-    if (DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true).isAfter(DateTime.now())){
-      developer.log("fetchRecords: $userID records retrieved from cache, that expires ${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)}", name: "services/tetrio_crud");
-      return cached.value;
-    }else{
-      _recordsCache.remove(cached.key);
-      developer.log("fetchRecords: $userID records expired (${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)})", name: "services/tetrio_crud");
-    }
-    }catch(e){
-      developer.log("fetchRecords: Trying to retrieve $userID records", name: "services/tetrio_crud");
-    }
+  /// Retrieves Blitz, 40 Lines and Zen records for a given [userID] from Tetra Channel api. Returns `UserRecords`.
+  /// Throws an exception if fails to retrieve.
+  Future<UserRecords> fetchRecords(String userID) async {
+    UserRecords? cached = _cache.get(userID, UserRecords);
+    if (cached != null) return cached;
     
     Uri url;
     if (kIsWeb) {
@@ -892,7 +883,7 @@ class TetrioService extends DB {
       switch (response.statusCode) {
         case 200:
           if (jsonDecode(response.body)['success']) {
-          Map jsonRecords = jsonDecode(response.body);
+            Map jsonRecords = jsonDecode(response.body);
               var sprint = jsonRecords['data']['records']['40l']['record'] != null
                   ? RecordSingle.fromJson(jsonRecords['data']['records']['40l']['record'], jsonRecords['data']['records']['40l']['rank'])
                   : null;
@@ -900,10 +891,10 @@ class TetrioService extends DB {
                   ? RecordSingle.fromJson(jsonRecords['data']['records']['blitz']['record'], jsonRecords['data']['records']['blitz']['rank'])
                   : null;
               var zen = TetrioZen.fromJson(jsonRecords['data']['zen']);
-            Map<String, dynamic> map = {"user": userID.toLowerCase().trim(), "sprint": sprint, "blitz": blitz, "zen": zen};
-            _recordsCache[jsonDecode(response.body)['cache']['cached_until'].toString()] = map;
+            UserRecords result = UserRecords(userID, sprint, blitz, zen);
+            _cache.store(result, jsonDecode(response.body)['cache']['cached_until']);
             developer.log("fetchRecords: $userID records retrieved and cached", name: "services/tetrio_crud");
-            return map;
+            return result;
           } else {
             developer.log("fetchRecords User dosen't exist", name: "services/tetrio_crud", error: response.body);
             throw TetrioPlayerNotExist();
@@ -997,8 +988,7 @@ class TetrioService extends DB {
     }
 
     // we not going to add state, that is same, as the previous
-    bool test = states.last.isSameState(tetrioPlayer);
-    if (test == false) states.add(tetrioPlayer);
+    if (!states.last.isSameState(tetrioPlayer)) states.add(tetrioPlayer);
 
     // Making map of the states
     final Map<String, dynamic> statesJson = {};
@@ -1058,18 +1048,8 @@ class TetrioService extends DB {
   /// Retrieves general stats of [user] (nickname or id) from Tetra Channel api. Returns [TetrioPlayer] object of this user.
   /// If [isItDiscordID] is true, function expects [user] to be a discord user id. Throws an exception if fails to retrieve.
   Future<TetrioPlayer> fetchPlayer(String user, {bool isItDiscordID = false}) async {
-    try{
-      var cached = _playersCache.entries.firstWhere((element) => element.value.userId == user || element.value.username == user);
-    if (DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true).isAfter(DateTime.now())){
-      developer.log("fetchPlayer: User $user retrieved from cache, that expires ${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)}", name: "services/tetrio_crud");
-      return cached.value;
-    }else{
-      _playersCache.remove(cached.key);
-      developer.log("fetchPlayer: Cached user $user expired (${DateTime.fromMillisecondsSinceEpoch(int.parse(cached.key.toString()), isUtc: true)})", name: "services/tetrio_crud");
-    }
-    }catch(e){
-      developer.log("fetchPlayer: Trying to retrieve $user", name: "services/tetrio_crud");
-    }
+    TetrioPlayer? cached = _cache.get(user, TetrioPlayer);
+    if (cached != null) return cached;
 
     if (isItDiscordID){
       // trying to find player with given discord id
@@ -1131,7 +1111,7 @@ class TetrioService extends DB {
           if (json['success']) {
             // parse and count stats
             TetrioPlayer player = TetrioPlayer.fromJson(json['data']['user'], DateTime.fromMillisecondsSinceEpoch(json['cache']['cached_at'], isUtc: true), json['data']['user']['_id'], json['data']['user']['username']);
-            _playersCache[jsonDecode(response.body)['cache']['cached_until'].toString()] = player;
+            _cache.store(player, json['cache']['cached_until']);
             developer.log("fetchPlayer: $user retrieved and cached", name: "services/tetrio_crud");
             return player;
           } else {

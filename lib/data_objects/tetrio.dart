@@ -1164,6 +1164,15 @@ class TetrioZen {
   }
 }
 
+class UserRecords{
+  String id;
+  RecordSingle? sprint;
+  RecordSingle? blitz;
+  TetrioZen zen;
+
+  UserRecords(this.id, this.sprint, this.blitz, this.zen);
+}
+
 class Distinguishment {
   late String type;
   String? detail;
@@ -1192,18 +1201,28 @@ class Distinguishment {
   }
 }
 
-class News {
+class News{
   late String id;
-  late String stream;
+  late List<NewsEntry> news;
+
+  News(this.id, this.news);
+
+  News.fromJson(Map<String, dynamic> json, String? userID){
+    id = userID != null ? "user_${userID}" : json['news'].first['stream'];
+    news = [for (var entry in json['news']) NewsEntry.fromJson(entry)];
+  }
+}
+
+class NewsEntry {
+  //late String id; do i need it?
   late String type;
   late Map<String, dynamic> data;
   late DateTime timestamp;
 
-  News({required this.type, required this.id, required this.stream, required this.data, required this.timestamp});
+  NewsEntry({required this.type, required this.data, required this.timestamp});
 
-  News.fromJson(Map<String, dynamic> json){
-    id = json["_id"];
-    stream = json["stream"];
+  NewsEntry.fromJson(Map<String, dynamic> json){
+    //id = json["_id"];
     type = json["type"];
     data = json["data"];
     timestamp = DateTime.parse(json['ts']);
