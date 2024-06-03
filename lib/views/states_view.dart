@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:tetra_stats/main.dart' show teto;
 import 'package:tetra_stats/views/mathes_view.dart';
 import 'package:tetra_stats/views/state_view.dart';
 import 'package:window_manager/window_manager.dart';

@@ -1,5 +1,6 @@
 // ignore_for_file: type_literal_in_constant_pattern
 
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -13,8 +14,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:tetra_stats/data_objects/tetra_stats.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
-import 'package:tetra_stats/services/tetrio_crud.dart';
-import 'package:tetra_stats/main.dart' show prefs;
+import 'package:tetra_stats/main.dart' show prefs, teto;
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
@@ -33,7 +33,6 @@ import 'package:window_manager/window_manager.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:go_router/go_router.dart';
 
-final TetrioService teto = TetrioService(); // thing, that manadge our local DB
 int _chartsIndex = 0;
 bool _gamesPlayedInsteadOfDateAndTime = false;
 late ZoomPanBehavior _zoomPanBehavior;
@@ -95,6 +94,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   //var tableData = <TableRow>[];
   final bodyGlobalKey = GlobalKey();
   bool _showSearchBar = false;
+  Timer backgroundUpdate = Timer(Duration(days: 365), (){});
   bool _TLHistoryWasFetched = false;
   late TabController _tabController;
   late TabController _wideScreenTabController;
@@ -159,6 +159,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   Future<List> fetch(String nickOrID, {bool fetchHistory = false, bool fetchTLmatches = false}) async {
     TetrioPlayer me;
     _TLHistoryWasFetched = false;
+    backgroundUpdate.cancel();
     
     // If user trying to search with discord id
     if (nickOrID.startsWith("ds:")){
@@ -309,6 +310,11 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       compareWith = null;
       chartsData = [];
     }
+
+    backgroundUpdate = Timer(me.cachedUntil!.difference(DateTime.now()), () {
+      changePlayer(me.userId);
+    });
+
     return [me, records, states, tlMatches, compareWith, isTracking, news, topTR];
   }
 

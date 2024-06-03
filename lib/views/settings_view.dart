@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:go_router/go_router.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
-import 'package:tetra_stats/main.dart' show packageInfo;
+import 'package:tetra_stats/main.dart' show packageInfo, teto;
 import 'package:file_selector/file_selector.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -10,7 +10,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
-import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:tetra_stats/utils/open_in_browser.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -25,7 +24,6 @@ class SettingsView extends StatefulWidget {
 
 class SettingsState extends State<SettingsView> {
   late SharedPreferences prefs;
-  final TetrioService teto = TetrioService();
   String defaultNickname = "Checking...";
   late bool showPositions;
   final TextEditingController _playertext = TextEditingController();

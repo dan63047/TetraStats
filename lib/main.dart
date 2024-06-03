@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'dart:developer' as developer;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:tetra_stats/views/customization_view.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -18,6 +21,7 @@ import 'package:go_router/go_router.dart';
 
 late final PackageInfo packageInfo;
 late SharedPreferences prefs;
+late TetrioService teto;
 ColorScheme sheme = const ColorScheme.dark(primary: Colors.cyanAccent, secondary: Colors.white);
 
 void setAccentColor(Color color){ // does this thing work??? yes??? no???
@@ -77,6 +81,7 @@ void main() async {
 
   packageInfo = await PackageInfo.fromPlatform();
   prefs = await SharedPreferences.getInstance();
+  teto = TetrioService();
 
   // Choosing the locale
   String? locale = prefs.getString("locale");
@@ -85,6 +90,12 @@ void main() async {
   }else{
     LocaleSettings.setLocaleRaw(locale);
   }
+
+  // I dont want to store old cache
+  Timer.periodic(Duration(minutes: 5), (Timer timer) { 
+    teto.cacheRoutine();
+    developer.log("Cache routine complete", name: "main");
+  });
   
   runApp(TranslationProvider(
     child: const MyApp(),

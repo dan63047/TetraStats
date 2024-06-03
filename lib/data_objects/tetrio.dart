@@ -265,6 +265,7 @@ class TetrioPlayer {
   List<RecordSingle?> blitz = [];
   TetrioZen? zen;
   Distinguishment? distinguishment;
+  DateTime? cachedUntil;
 
   TetrioPlayer({
     required this.userId,
@@ -292,11 +293,12 @@ class TetrioPlayer {
     required this.blitz,
     this.zen,
     this.distinguishment,
+    this.cachedUntil
   });
 
   double get level => pow((xp / 500), 0.6) + (xp / (5000 + (max(0, xp - 4 * pow(10, 6)) / 5000))) + 1;
 
-  TetrioPlayer.fromJson(Map<String, dynamic> json, DateTime stateTime, String id, String nick) {
+  TetrioPlayer.fromJson(Map<String, dynamic> json, DateTime stateTime, String id, String nick, [DateTime? cUntil]) {
     //developer.log("TetrioPlayer.fromJson $stateTime: $json", name: "data_objects/tetrio");
     userId = id;
     username = nick;
@@ -324,6 +326,7 @@ class TetrioPlayer {
     friendCount = json['friend_count'] ?? 0;
     badstanding = json['badstanding'];
     botmaster = json['botmaster'];
+    cachedUntil = cUntil;
   }
 
   Map<String, dynamic> toJson() {

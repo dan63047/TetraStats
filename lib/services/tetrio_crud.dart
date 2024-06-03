@@ -125,7 +125,7 @@ class CacheController {
   }
 
   void removeOld() async {
-    _cache.removeWhere((key, value) => DateTime.fromMillisecondsSinceEpoch(int.parse(key.substring(_getObjectId(value).length)), isUtc: true).isAfter(DateTime.now()));
+    _cache.removeWhere((key, value) => int.parse(key.substring(_getObjectId(value).length)) <= DateTime.now().millisecondsSinceEpoch);
   }
 
   void reset(){
@@ -208,6 +208,10 @@ class TetrioService extends DB {
 
   PlayerLeaderboardPosition? getCachedLeaderboardPositions(String userID){
     return _lbPositions[userID];
+  }
+
+  void cacheRoutine(){
+    _cache.removeOld();
   }
 
   /// Downloads replay from inoue (szy API). Requiers [replayID]. If request have
@@ -1110,7 +1114,7 @@ class TetrioService extends DB {
           var json = jsonDecode(response.body);
           if (json['success']) {
             // parse and count stats
-            TetrioPlayer player = TetrioPlayer.fromJson(json['data']['user'], DateTime.fromMillisecondsSinceEpoch(json['cache']['cached_at'], isUtc: true), json['data']['user']['_id'], json['data']['user']['username']);
+            TetrioPlayer player = TetrioPlayer.fromJson(json['data']['user'], DateTime.fromMillisecondsSinceEpoch(json['cache']['cached_at'], isUtc: true), json['data']['user']['_id'], json['data']['user']['username'], DateTime.fromMillisecondsSinceEpoch(json['cache']['cached_until'], isUtc: true));
             _cache.store(player, json['cache']['cached_until']);
             developer.log("fetchPlayer: $user retrieved and cached", name: "services/tetrio_crud");
             return player;

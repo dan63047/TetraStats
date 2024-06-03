@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:tetra_stats/main.dart' show teto;
 import 'package:tetra_stats/views/compare_view.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';

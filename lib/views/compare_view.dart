@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
-import 'package:tetra_stats/services/tetrio_crud.dart';
+import 'package:tetra_stats/main.dart' show teto;
 import 'package:tetra_stats/widgets/vs_graphs.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -18,7 +18,6 @@ Mode greenSideMode = Mode.player;
 List<dynamic> theGreenSide = [null, null, null]; // TetrioPlayer?, List<DropdownMenuItem<TetrioPlayer>>?, TetraLeagueAlpha?
 Mode redSideMode = Mode.player;
 List<dynamic> theRedSide = [null, null, null];
-final TetrioService teto = TetrioService();
 final DateFormat dateFormat = DateFormat.yMd(LocaleSettings.currentLocale.languageCode).add_Hm();
 var numbersReg = RegExp(r'\d+(\.\d*)*');
 late String oldWindowTitle;
