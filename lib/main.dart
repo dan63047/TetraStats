@@ -92,9 +92,10 @@ void main() async {
   }
 
   // I dont want to store old cache
-  Timer.periodic(Duration(minutes: 5), (Timer timer) { 
+  Timer.periodic(Duration(minutes: 5), (Timer timer) async { 
     teto.cacheRoutine();
-    developer.log("Cache routine complete", name: "main");
+    developer.log("Cache routine complete, next one in ${DateTime.now().add(Duration(minutes: 5))}", name: "main");
+    if (prefs.getBool("updateInBG") == true) await teto.fetchTracked();
   });
   
   runApp(TranslationProvider(

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:tetra_stats/data_objects/tetra_stats.dart';
 import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
@@ -688,6 +689,21 @@ class TetrioService extends DB {
     }
   }
 
+  // i want to know progress, so i trying to figure out this thing:
+  // Stream<TetrioPlayersLeaderboard> fetchTLLeaderboardAsStream() async {
+  //   TetrioPlayersLeaderboard? cached = _cache.get("league", TetrioPlayersLeaderboard);
+  //   if (cached != null) return cached;
+     
+  //   Uri url;
+  //   if (kIsWeb) {
+  //     url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLLeaderboard"});
+  //   } else {
+  //     url = Uri.https('ch.tetr.io', 'api/users/lists/league/all');
+  //   }
+
+  //   Stream<TetrioPlayersLeaderboard> stream = http.StreamedRequest("GET", url);
+  // }
+
   TetrioPlayersLeaderboard? getCachedLeaderboard(){
     return _cache.get("league", TetrioPlayersLeaderboard);
   }
@@ -1156,5 +1172,16 @@ class TetrioService extends DB {
       data.addEntries({states.last.userId: states}.entries);
     }
     return data;
+  }
+
+  Future<void> fetchTracked() async {
+    for (String userID in (await getAllPlayerToTrack())) { 
+      TetrioPlayer player = await fetchPlayer(userID);
+      storeState(player);
+      sleep(Durations.extralong4);
+      TetraLeagueAlphaStream matches = await fetchTLStream(userID);
+      saveTLMatchesFromStream(matches);
+      sleep(Durations.extralong4);
+    }
   }
 }

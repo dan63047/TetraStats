@@ -311,9 +311,11 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       chartsData = [];
     }
 
-    backgroundUpdate = Timer(me.cachedUntil!.difference(DateTime.now()), () {
-      changePlayer(me.userId);
-    });
+    if (prefs.getBool("updateInBG") == true) {
+      backgroundUpdate = Timer(me.cachedUntil!.difference(DateTime.now()), () {
+        changePlayer(me.userId);
+      });
+    }
 
     return [me, records, states, tlMatches, compareWith, isTracking, news, topTR];
   }

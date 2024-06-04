@@ -14,6 +14,7 @@ import 'package:tetra_stats/utils/open_in_browser.dart';
 import 'package:window_manager/window_manager.dart';
 
 late String oldWindowTitle;
+TextStyle subtitleStyle = const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey);
 
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
@@ -26,6 +27,7 @@ class SettingsState extends State<SettingsView> {
   late SharedPreferences prefs;
   String defaultNickname = "Checking...";
   late bool showPositions;
+  late bool updateInBG;
   final TextEditingController _playertext = TextEditingController();
 
   @override
@@ -47,6 +49,7 @@ class SettingsState extends State<SettingsView> {
   Future<void> _getPreferences() async {
     prefs = await SharedPreferences.getInstance();
     showPositions = prefs.getBool("showPositions") ?? false;
+    updateInBG = prefs.getBool("updateInBG") ?? false;
     _setDefaultNickname(prefs.getString("player"));
   }
 
@@ -91,7 +94,7 @@ class SettingsState extends State<SettingsView> {
         children: [
           ListTile(
             title: Text(t.exportDB),
-            subtitle: Text(t.exportDBDescription, style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
+            subtitle: Text(t.exportDBDescription, style: subtitleStyle),
             onTap: () {
               if (kIsWeb){
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.notForWeb)));
@@ -145,7 +148,7 @@ class SettingsState extends State<SettingsView> {
           ),
           ListTile(
             title: Text(t.importDB),
-            subtitle: Text(t.importDBDescription, style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
+            subtitle: Text(t.importDBDescription, style: subtitleStyle),
             onTap: () {
               if (kIsWeb){
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.notForWeb)));
@@ -197,6 +200,7 @@ class SettingsState extends State<SettingsView> {
           ),
           ListTile(
             title: Text(t.yourID),
+            subtitle: Text(t.yourIDText, style: subtitleStyle),
             trailing: Text(defaultNickname),
             onTap: () => showDialog(
                 context: context,
@@ -242,6 +246,7 @@ class SettingsState extends State<SettingsView> {
           ),
           ListTile(
             title: Text(t.language),
+            subtitle: Text("By default, the system language will be selected (if available among Tetra Stats locales, otherwise English)", style: subtitleStyle),
             trailing: DropdownButton(
                 items: locales,
                 value: LocaleSettings.currentLocale,
@@ -261,6 +266,14 @@ class SettingsState extends State<SettingsView> {
           onTap: () {
             context.go("/customization");
           },),
+          ListTile(title: Text("Update stats in the background"),
+          subtitle: Text("While tetra stats is running, it can update stats of the current player when cache expires, as well, as tetra league stats of tracked players", style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
+          trailing: Switch(value: updateInBG, onChanged: (bool value){
+            prefs.setBool("updateInBG", value);
+            setState(() {
+              updateInBG = value;
+            });
+          }),),
           ListTile(title: Text(t.lbStats),
           subtitle: Text(t.lbStatsDescription, style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
           trailing: Switch(value: showPositions, onChanged: (bool value){
