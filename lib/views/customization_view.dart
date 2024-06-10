@@ -21,6 +21,7 @@ class CustomizationState extends State<CustomizationView> {
   late SharedPreferences prefs;
   late bool oskKagariGimmick;
   late bool sheetbotRadarGraphs;
+  late int ratingMode;
 
   void changeColor(Color color) {
   setState(() => pickerColor = color);
@@ -53,6 +54,11 @@ class CustomizationState extends State<CustomizationView> {
       sheetbotRadarGraphs = prefs.getBool("sheetbotRadarGraphs")!;
     } else {
       sheetbotRadarGraphs = false;
+    }
+    if (prefs.getInt("ratingMode") != null) {
+      ratingMode = prefs.getInt("ratingMode")!;
+    } else {
+      ratingMode = 0;
     }
   }
 
@@ -119,6 +125,30 @@ class CustomizationState extends State<CustomizationView> {
               oskKagariGimmick = value;
             });
           }),),
+          ListTile(title: Text("Main representation of rating"),
+          subtitle: Text(t.oskKagariDescription, style: subtitleStyle),
+          trailing: DropdownButton(
+            value: ratingMode,
+            items: <DropdownMenuItem>[
+              DropdownMenuItem(value: 0, child: Text("TR")),
+              DropdownMenuItem(value: 1, child: Text("Glicko")),
+              DropdownMenuItem(value: 2, child: Text("LB position"))
+            ],
+            onChanged: (dynamic value){
+              prefs.setInt("ratingMode", value);
+              setState(() {
+                ratingMode = value;
+              });
+            },
+          ),
+          // trailing: Switch(value: sheetbotRadarGraphs, onChanged: (bool value){
+          //   prefs.setBool("sheetbotRadarGraphs", value);
+          //   setState(() {
+          //     sheetbotRadarGraphs = value;
+          //   });
+          // }
+          // ),
+          ),
           ListTile(title: Text("Sheetbot-like behavior for radar graphs"),
           subtitle: Text(t.oskKagariDescription, style: subtitleStyle),
           trailing: Switch(value: sheetbotRadarGraphs, onChanged: (bool value){

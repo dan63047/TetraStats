@@ -3,15 +3,16 @@ import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
-import 'package:tetra_stats/main.dart' show prefs;
+
 import 'package:tetra_stats/utils/colors_functions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/widgets/gauget_num.dart';
 import 'package:tetra_stats/widgets/graphs.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
 import 'package:tetra_stats/widgets/tl_progress_bar.dart';
+import 'package:tetra_stats/widgets/tl_rating_thingy.dart';
 
-var fDiff = NumberFormat("+#,###.###;-#,###.###");
+
 var intFDiff = NumberFormat("+#,###;-#,###");
 final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
 
@@ -48,7 +49,6 @@ class _TLThingyState extends State<TLThingy> {
   void initState() {
     _currentRangeValues = const RangeValues(0, 1);
     sortedStates = widget.states.reversed.toList();
-    oskKagariGimmick = prefs.getBool("oskKagariGimmick")??true;
     oldTl = sortedStates.elementAtOrNull(1)?.tlSeason1;
     currentTl = widget.tl;
     super.initState();
@@ -92,52 +92,7 @@ class _TLThingyState extends State<TLThingy> {
                   });
                 },
               ),
-              if (currentTl.gamesPlayed >= 10)
-                Wrap(
-                  direction: Axis.horizontal,
-                  alignment: WrapAlignment.spaceAround,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  clipBehavior: Clip.hardEdge,
-                  children: [
-                    (widget.userID == "5e32fc85ab319c2ab1beb07c" && oskKagariGimmick) // he love her so much, you can't even imagine
-                        ? Image.asset("res/icons/kagari.png", height: 128) // Btw why she wearing Kazamatsuri high school uniform?
-                        : Image.asset("res/tetrio_tl_alpha_ranks/${currentTl.rank}.png", height: 128),
-                    Column(
-                      children: [
-                        Text("${f2.format(currentTl.rating)} TR", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                        if (oldTl != null) Text(
-                          "${fDiff.format(currentTl.rating - oldTl!.rating)} TR",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: currentTl.rating - oldTl!.rating < 0 ?
-                            Colors.red :
-                            Colors.green
-                          ),
-                        ),
-                        Column(
-                          children: [
-                            RichText(
-                              textAlign: TextAlign.center,
-                              softWrap: true,
-                              text: TextSpan(
-                                style: DefaultTextStyle.of(context).style,
-                                children: [
-                                  TextSpan(text: "${t.top} ${f2.format(currentTl.percentile * 100)}% (${currentTl.percentileRank.toUpperCase()})"),
-                                  if (currentTl.bestRank != "z") const TextSpan(text: " • "),
-                                  if (currentTl.bestRank != "z") TextSpan(text: "${t.topRank}: ${currentTl.bestRank.toUpperCase()}"),
-                                  if (widget.topTR != null) TextSpan(text: " (${f2.format(widget.topTR)} TR)"),
-                                  TextSpan(text: " • Glicko: ${f2.format(currentTl.glicko!)}±"),
-                                  TextSpan(text: f2.format(currentTl.rd!), style: currentTl.decaying ? TextStyle(color: currentTl.rd! > 98 ? Colors.red : Colors.yellow) : null),
-                                  if (currentTl.decaying) WidgetSpan(child: Icon(Icons.trending_up, color: currentTl.rd! > 98 ? Colors.red : Colors.yellow,), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic) 
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+              if (currentTl.gamesPlayed >= 10) TLRatingThingy(userID: widget.userID, tlData: currentTl, oldTl: oldTl, topTR: widget.topTR),
               if (currentTl.gamesPlayed > 9) TLProgress(
                 tlData: currentTl,
                 previousRankTRcutoff: widget.thatRankCutoff,
