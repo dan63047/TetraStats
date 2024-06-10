@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:tetra_stats/views/settings_view.dart' show subtitleStyle;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:window_manager/window_manager.dart';
@@ -19,6 +20,7 @@ class CustomizationView extends StatefulWidget {
 class CustomizationState extends State<CustomizationView> {
   late SharedPreferences prefs;
   late bool oskKagariGimmick;
+  late bool sheetbotRadarGraphs;
 
   void changeColor(Color color) {
   setState(() => pickerColor = color);
@@ -47,6 +49,11 @@ class CustomizationState extends State<CustomizationView> {
     } else {
       oskKagariGimmick = true;
     }
+    if (prefs.getBool("sheetbotRadarGraphs") != null) {
+      sheetbotRadarGraphs = prefs.getBool("sheetbotRadarGraphs")!;
+    } else {
+      sheetbotRadarGraphs = false;
+    }
   }
 
   ThemeData getTheme(BuildContext context, Color color){
@@ -64,7 +71,7 @@ class CustomizationState extends State<CustomizationView> {
     }
     return Scaffold(
       appBar: AppBar(
-        title: Text(t.settings),
+        title: Text(t.customization),
       ),
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -105,11 +112,19 @@ class CustomizationState extends State<CustomizationView> {
           //   subtitle: Text("Not implemented"),
           // ),
            ListTile(title: Text(t.oskKagari),
-          subtitle: Text(t.oskKagariDescription),
+          subtitle: Text(t.oskKagariDescription, style: subtitleStyle),
           trailing: Switch(value: oskKagariGimmick, onChanged: (bool value){
             prefs.setBool("oskKagariGimmick", value);
             setState(() {
               oskKagariGimmick = value;
+            });
+          }),),
+          ListTile(title: Text("Sheetbot-like behavior for radar graphs"),
+          subtitle: Text(t.oskKagariDescription, style: subtitleStyle),
+          trailing: Switch(value: sheetbotRadarGraphs, onChanged: (bool value){
+            prefs.setBool("sheetbotRadarGraphs", value);
+            setState(() {
+              sheetbotRadarGraphs = value;
             });
           }),)
         ],

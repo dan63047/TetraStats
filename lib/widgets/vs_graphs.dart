@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:tetra_stats/widgets/graphs.dart' show MyRadarChart;
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 
@@ -31,7 +32,7 @@ class VsGraphs extends StatelessWidget{
       child: SizedBox(
         height: 310,
         width: 310,
-        child: RadarChart(
+        child: MyRadarChart(
           RadarChartData(
             radarShape: RadarShape.polygon,
             tickCount: 4,
@@ -134,7 +135,7 @@ class VsGraphs extends StatelessWidget{
       child: SizedBox(
         height: 310,
         width: 310,
-        child: RadarChart(
+        child: MyRadarChart(
           RadarChartData(
             radarShape: RadarShape.polygon,
             tickCount: 4,
@@ -211,7 +212,7 @@ class VsGraphs extends StatelessWidget{
           child: SizedBox(
             height: 310,
             width: 310,
-            child: RadarChart(
+            child: MyRadarChart(
               RadarChartData(
                 radarShape: RadarShape.polygon,
                 tickCount: 4,
