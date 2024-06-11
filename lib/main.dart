@@ -1,13 +1,18 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:isolate';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:developer' as developer;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:tetra_stats/views/customization_view.dart';
+import 'package:tetra_stats/views/ranks_averages_view.dart';
+import 'package:tetra_stats/views/sprint_and_blitz_averages.dart';
+import 'package:tetra_stats/views/tl_leaderboard_view.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
@@ -24,6 +29,38 @@ late SharedPreferences prefs;
 late TetrioService teto;
 ColorScheme sheme = const ColorScheme.dark(primary: Colors.cyanAccent, secondary: Colors.white);
 
+Future<dynamic> computeIsolate(Future Function() function) async {
+  final receivePort = ReceivePort();
+  var rootToken = RootIsolateToken.instance!;
+  await Isolate.spawn<_IsolateData>(
+    _isolateEntry,
+    _IsolateData(
+      token: rootToken,
+      function: function,
+      answerPort: receivePort.sendPort,
+    ),
+  );
+  return await receivePort.first;
+}
+
+void _isolateEntry(_IsolateData isolateData) async {
+  BackgroundIsolateBinaryMessenger.ensureInitialized(isolateData.token);
+  final answer = await isolateData.function();
+  isolateData.answerPort.send(answer);
+}
+
+class _IsolateData {
+  final RootIsolateToken token;
+  final Function function;
+  final SendPort answerPort;
+
+  _IsolateData({
+    required this.token,
+    required this.function,
+    required this.answerPort,
+  });
+}
+
 void setAccentColor(Color color){ // does this thing work??? yes??? no???
   sheme = ColorScheme.dark(primary: color, secondary: Colors.white);
 }
@@ -38,6 +75,26 @@ final router = GoRouter(
          GoRoute(
           path: 'settings',
           builder: (_, __) => const SettingsView(),
+          routes: [
+            GoRoute(
+              path: 'customization',
+              builder: (_, __) => const CustomizationView(),
+            ),
+          ]
+        ),
+        GoRoute(
+          path: "leaderboard",
+          builder: (_, __) => const TLLeaderboardView(),
+          routes: [
+            GoRoute(
+              path: "LBvalues",
+              builder: (_, __) => const RankAveragesView(),
+            ),
+          ]
+        ),
+        GoRoute(
+          path: "LBvalues",
+          builder: (_, __) => const RankAveragesView(),
         ),
         GoRoute(
           path: 'states',
@@ -48,9 +105,9 @@ final router = GoRouter(
           builder: (_, __) => const CalcView(),
         ),
         GoRoute(
-          path: 'customization',
-          builder: (_, __) => const CustomizationView(),
-        ),
+          path: 'sprintAndBlitzAverages',
+          builder: (_, __) => const SprintAndBlitzView(),
+        )
       ]
     ),
     GoRoute( // that one intended for Android users, that can open https://ch.tetr.io/u/ links
@@ -92,10 +149,10 @@ void main() async {
   }
 
   // I dont want to store old cache
-  Timer.periodic(Duration(minutes: 5), (Timer timer) async { 
+  Timer.periodic(Duration(minutes: 5), (Timer timer) { 
     teto.cacheRoutine();
     developer.log("Cache routine complete, next one in ${DateTime.now().add(Duration(minutes: 5))}", name: "main");
-    if (prefs.getBool("updateInBG") == true) await teto.fetchTracked();
+    // if (prefs.getBool("updateInBG") == true) teto.fetchTracked(); // TODO: Somehow avoid doing that in main isolate
   });
   
   runApp(TranslationProvider(

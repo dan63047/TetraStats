@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
 import 'dart:developer' as developer;
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
+import 'package:tetra_stats/widgets/text_timestamp.dart';
 
 const Map<int, double> xpTableScuffed = { // level: xp required
   05000:    67009018.4885772,
@@ -126,7 +127,7 @@ class UserThingy extends StatelessWidget {
                               ],
                             ),
                             showStateTimestamp
-                            ? Text(t.fetchDate(date: dateFormat.format(player.state)))
+                            ? Text(t.fetchDate(date: timestamp(player.state)))
                             : Wrap(direction: Axis.horizontal, alignment: WrapAlignment.center, spacing: 25, crossAxisAlignment: WrapCrossAlignment.start, children: [
                                 FutureBuilder(
                                     future: teto.isPlayerTracking(player.userId),
@@ -340,7 +341,7 @@ class UserThingy extends StatelessWidget {
                   ),
                   children: [
                     if (player.country != null) TextSpan(text: "${t.countries[player.country]} • "),
-                    TextSpan(text: "${t.playerRole[player.role]}${t.playerRoleAccount}${player.registrationTime == null ? t.wasFromBeginning : '${t.created} ${dateFormat.format(player.registrationTime!)}'}"),
+                    TextSpan(text: "${t.playerRole[player.role]}${t.playerRoleAccount}${player.registrationTime == null ? t.wasFromBeginning : '${t.created} ${timestamp(player.registrationTime!)}'}"),
                     if (player.supporterTier > 0) const TextSpan(text: " • "),
                     if (player.supporterTier > 0) WidgetSpan(child: Icon(player.supporterTier > 1 ? Icons.star : Icons.star_border, color: player.supporterTier > 1 ? Colors.yellowAccent : Colors.white), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic),
                     if (player.supporterTier > 0) TextSpan(text: player.supporterTier.toString(), style: TextStyle(color: player.supporterTier > 1 ? Colors.yellowAccent : Colors.white))

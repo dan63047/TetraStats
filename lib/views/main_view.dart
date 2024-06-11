@@ -18,15 +18,13 @@ import 'package:tetra_stats/main.dart' show prefs, teto;
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
-import 'package:tetra_stats/views/ranks_averages_view.dart' show RankAveragesView;
-import 'package:tetra_stats/views/sprint_and_blitz_averages.dart';
-import 'package:tetra_stats/views/tl_leaderboard_view.dart' show TLLeaderboardView;
 import 'package:tetra_stats/views/tl_match_view.dart' show TlMatchResultView;
 import 'package:tetra_stats/widgets/finesse_thingy.dart';
 import 'package:tetra_stats/widgets/lineclears_thingy.dart';
 import 'package:tetra_stats/widgets/list_tile_trailing_stats.dart';
 import 'package:tetra_stats/widgets/search_box.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
+import 'package:tetra_stats/widgets/text_timestamp.dart';
 import 'package:tetra_stats/widgets/tl_thingy.dart';
 import 'package:tetra_stats/widgets/user_thingy.dart';
 import 'package:window_manager/window_manager.dart';
@@ -41,7 +39,6 @@ List _historyShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS
 late ScrollController _scrollController;
 final NumberFormat _timeInSec = NumberFormat("#,###.###s.", LocaleSettings.currentLocale.languageCode);
 final NumberFormat secs = NumberFormat("00.###", LocaleSettings.currentLocale.languageCode);
-final DateFormat _dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
 
 
 class MainView extends StatefulWidget {
@@ -98,7 +95,6 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   bool _TLHistoryWasFetched = false;
   late TabController _tabController;
   late TabController _wideScreenTabController;
-  late bool fixedScroll;
 
   String get title => "Tetra Stats: $_titleNickname";
 
@@ -652,12 +648,7 @@ class _NavDrawerState extends State<NavDrawer> {
                           leading: const Icon(Icons.leaderboard),
                           title: Text(t.tlLeaderboard),
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const TLLeaderboardView(),
-                              ),
-                            );
+                            context.go("/leaderboard");
                           },
                         ),
                       ),
@@ -666,12 +657,7 @@ class _NavDrawerState extends State<NavDrawer> {
                           leading: const Icon(Icons.compress),
                           title: Text(t.rankAveragesViewTitle),
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const RankAveragesView(),
-                              ),
-                            );
+                            context.go("/LBvalues");
                           },
                         ),
                       ),
@@ -680,12 +666,7 @@ class _NavDrawerState extends State<NavDrawer> {
                           leading: const Icon(Icons.bar_chart),
                           title: Text(t.sprintAndBlitsViewTitle),
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const SprintAndBlitzView(),
-                              ),
-                            );
+                            context.go("/sprintAndBlitzAverages");
                           },
                         ),
                       ),
@@ -767,7 +748,7 @@ class _TLRecords extends StatelessWidget {
           leading: Text("${data[index].endContext.firstWhere((element) => element.userId == userID).points} : ${data[index].endContext.firstWhere((element) => element.userId != userID).points}",
           style: bigScreen ? const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, shadows: textShadow) : const TextStyle(fontSize: 28, shadows: textShadow)),
           title: Text("vs. ${data[index].endContext.firstWhere((element) => element.userId != userID).username}"),
-          subtitle: Text(_dateFormat.format(data[index].timestamp)),
+          subtitle: Text(timestamp(data[index].timestamp)),
           trailing: TrailingStats(
             data[index].endContext.firstWhere((element) => element.userId == userID).secondary,
             data[index].endContext.firstWhere((element) => element.userId == userID).tertiary,
@@ -930,7 +911,7 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
                     style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 20),
                   ),
                 ),
-                Text(_gamesPlayedInsteadOfDateAndTime ? t.gamesPlayed(games: t.games(n: data.gamesPlayed)) : _dateFormat.format(data.timestamp))
+                Text(_gamesPlayedInsteadOfDateAndTime ? t.gamesPlayed(games: t.games(n: data.gamesPlayed)) : timestamp(data.timestamp))
               ],
             ),
           );
@@ -1086,7 +1067,7 @@ class _TwoRecordsThingy extends StatelessWidget {
                         )),
                         if (sprint!.rank != null) TextSpan(text: "№${sprint!.rank}", style: TextStyle(color: getColorOfRank(sprint!.rank!))),
                         if (sprint!.rank != null) const TextSpan(text: " • "),
-                        TextSpan(text: _dateFormat.format(sprint!.timestamp!)),
+                        TextSpan(text: timestamp(sprint!.timestamp!)),
                       ]
                       ),
                     ),
@@ -1142,7 +1123,7 @@ class _TwoRecordsThingy extends StatelessWidget {
                       else TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(blitz!.endContext!.score, closestAverageBlitz.value), verdict: blitzBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageBlitz.key.toUpperCase())}\n", style: TextStyle(
                         color: blitzBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
                       )),
-                      TextSpan(text: _dateFormat.format(blitz!.timestamp!)),
+                      TextSpan(text: timestamp(blitz!.timestamp!)),
                       if (blitz!.rank != null)  const TextSpan(text: " • "),
                       if (blitz!.rank != null)  TextSpan(text: "№${blitz!.rank}", style: TextStyle(color: getColorOfRank(blitz!.rank!))),
                     ]
@@ -1254,7 +1235,7 @@ class _RecordThingy extends StatelessWidget {
                           )),
                           if (record!.rank != null) TextSpan(text: "№${record!.rank}", style: TextStyle(color: getColorOfRank(record!.rank!))),
                           if (record!.rank != null) const TextSpan(text: " • "),
-                          TextSpan(text: _dateFormat.format(record!.timestamp!)),
+                          TextSpan(text: timestamp(record!.timestamp!)),
                         ]
                         ),
                       )
@@ -1368,7 +1349,7 @@ class _OtherThingy extends StatelessWidget {
               ]
             )
           ),
-          subtitle: Text(_dateFormat.format(news.timestamp)),
+          subtitle: Text(timestamp(news.timestamp)),
         );
       case "personalbest":
       return ListTile(
@@ -1383,7 +1364,7 @@ class _OtherThingy extends StatelessWidget {
               ]
             )
           ),
-          subtitle: Text(_dateFormat.format(news.timestamp)),
+          subtitle: Text(timestamp(news.timestamp)),
           leading: Image.asset(
             "res/icons/improvement-local.png",
             height: 48,
@@ -1405,7 +1386,7 @@ class _OtherThingy extends StatelessWidget {
               ]
             )
           ),
-          subtitle: Text(_dateFormat.format(news.timestamp)),
+          subtitle: Text(timestamp(news.timestamp)),
           leading: Image.asset(
             "res/tetrio_badges/${news.data["type"]}.png",
             height: 48,
@@ -1427,7 +1408,7 @@ class _OtherThingy extends StatelessWidget {
               ]
             )
           ),
-          subtitle: Text(_dateFormat.format(news.timestamp)),
+          subtitle: Text(timestamp(news.timestamp)),
           leading: Image.asset(
             "res/tetrio_tl_alpha_ranks/${news.data["rank"]}.png",
             height: 48,
@@ -1448,7 +1429,7 @@ class _OtherThingy extends StatelessWidget {
               ]
             )
           ),
-          subtitle: Text(_dateFormat.format(news.timestamp)),
+          subtitle: Text(timestamp(news.timestamp)),
           leading: Image.asset(
             "res/icons/supporter-tag.png",
             height: 48,
@@ -1469,7 +1450,7 @@ class _OtherThingy extends StatelessWidget {
               ]
             )
           ),
-          subtitle: Text(_dateFormat.format(news.timestamp)),
+          subtitle: Text(timestamp(news.timestamp)),
           leading: Image.asset(
             "res/icons/supporter-tag.png",
             height: 48,
@@ -1482,7 +1463,7 @@ class _OtherThingy extends StatelessWidget {
       default: // if type is unknown
       return ListTile(
         title: Text(t.newsParts.unknownNews(type: news.type)),
-        subtitle: Text(_dateFormat.format(news.timestamp)),
+        subtitle: Text(timestamp(news.timestamp)),
       );
     }
   }

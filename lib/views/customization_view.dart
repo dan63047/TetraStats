@@ -22,6 +22,7 @@ class CustomizationState extends State<CustomizationView> {
   late bool oskKagariGimmick;
   late bool sheetbotRadarGraphs;
   late int ratingMode;
+  late int timestampMode;
 
   void changeColor(Color color) {
   setState(() => pickerColor = color);
@@ -59,6 +60,11 @@ class CustomizationState extends State<CustomizationView> {
       ratingMode = prefs.getInt("ratingMode")!;
     } else {
       ratingMode = 0;
+    }
+    if (prefs.getInt("timestampMode") != null) {
+      timestampMode = prefs.getInt("ratingMode")!;
+    } else {
+      timestampMode = 0;
     }
   }
 
@@ -125,6 +131,23 @@ class CustomizationState extends State<CustomizationView> {
               oskKagariGimmick = value;
             });
           }),),
+          ListTile(title: Text("Timestamps"),
+          subtitle: Text(t.oskKagariDescription, style: subtitleStyle),
+          trailing: DropdownButton(
+            value: timestampMode,
+            items: <DropdownMenuItem>[
+              DropdownMenuItem(value: 0, child: Text("Absolute (GMT)")),
+              DropdownMenuItem(value: 1, child: Text("Absolute (Local Time)")),
+              DropdownMenuItem(value: 2, child: Text("Relative"))
+            ],
+            onChanged: (dynamic value){
+              prefs.setInt("timestampMode", value);
+              setState(() {
+                timestampMode = value;
+              });
+            },
+          ),
+          ),
           ListTile(title: Text("Main representation of rating"),
           subtitle: Text(t.oskKagariDescription, style: subtitleStyle),
           trailing: DropdownButton(
@@ -141,13 +164,6 @@ class CustomizationState extends State<CustomizationView> {
               });
             },
           ),
-          // trailing: Switch(value: sheetbotRadarGraphs, onChanged: (bool value){
-          //   prefs.setBool("sheetbotRadarGraphs", value);
-          //   setState(() {
-          //     sheetbotRadarGraphs = value;
-          //   });
-          // }
-          // ),
           ),
           ListTile(title: Text("Sheetbot-like behavior for radar graphs"),
           subtitle: Text(t.oskKagariDescription, style: subtitleStyle),

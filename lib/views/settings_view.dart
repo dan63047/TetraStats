@@ -264,7 +264,7 @@ class SettingsState extends State<SettingsView> {
           subtitle: Text(t.customizationDescription, style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
           trailing: const Icon(Icons.arrow_right),
           onTap: () {
-            context.go("/customization");
+            context.go("/settings/customization");
           },),
           ListTile(title: Text("Update stats in the background"),
           subtitle: Text("While tetra stats is running, it can update stats of the current player when cache expires, as well, as tetra league stats of tracked players", style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
