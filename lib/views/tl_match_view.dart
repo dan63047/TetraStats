@@ -5,6 +5,7 @@ import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/views/compare_view.dart' show CompareThingy, CompareBoolThingy;
 import 'package:tetra_stats/widgets/list_tile_trailing_stats.dart';
+import 'package:tetra_stats/widgets/text_timestamp.dart';
 import 'package:tetra_stats/widgets/vs_graphs.dart';
 import 'main_view.dart' show secs;
 import 'package:tetra_stats/main.dart' show teto;
@@ -15,11 +16,8 @@ import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/open_in_browser.dart';
 import 'package:window_manager/window_manager.dart';
-// ignore: avoid_web_libraries_in_flutter
-// import 'dart:html' show AnchorElement, document;
 
 
-final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
 int roundSelector = -1; // -1 = match averages, otherwise round number-1
 List<DropdownMenuItem> rounds = []; // index zero will be match stats
 bool timeWeightedStatsAvaliable = true;
@@ -50,7 +48,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
     replayData = teto.analyzeReplay(widget.record.replayId, widget.record.replayAvalable);
     if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS){
       windowManager.getTitle().then((value) => oldWindowTitle = value);
-      windowManager.setTitle("Tetra Stats: ${widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).username.toUpperCase()} ${t.vs} ${widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).username.toUpperCase()} ${t.inTLmatch} ${dateFormat.format(widget.record.timestamp)}");
+      windowManager.setTitle("Tetra Stats: ${widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).username.toUpperCase()} ${t.vs} ${widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).username.toUpperCase()} ${t.inTLmatch} ${timestamp(widget.record.timestamp)}");
     }
     super.initState();
   }
@@ -709,7 +707,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
     final t = Translations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text("${widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).username.toUpperCase()} ${t.vs} ${widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).username.toUpperCase()} ${t.inTLmatch} ${dateFormat.format(widget.record.timestamp)}"),
+        title: Text("${widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).username.toUpperCase()} ${t.vs} ${widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).username.toUpperCase()} ${t.inTLmatch} ${timestamp(widget.record.timestamp)}"),
         actions: [
           PopupMenuButton(
             enabled: widget.record.replayAvalable,

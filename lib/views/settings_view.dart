@@ -1,13 +1,12 @@
 import 'dart:io';
 import 'package:go_router/go_router.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
-import 'package:tetra_stats/main.dart' show packageInfo, teto;
+import 'package:tetra_stats/main.dart' show packageInfo, teto, prefs;
 import 'package:file_selector/file_selector.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/utils/open_in_browser.dart';
@@ -24,7 +23,6 @@ class SettingsView extends StatefulWidget {
 }
 
 class SettingsState extends State<SettingsView> {
-  late SharedPreferences prefs;
   String defaultNickname = "Checking...";
   late bool showPositions;
   late bool updateInBG;
@@ -46,8 +44,7 @@ class SettingsState extends State<SettingsView> {
     super.dispose();
   }
 
-  Future<void> _getPreferences() async {
-    prefs = await SharedPreferences.getInstance();
+  void _getPreferences() {
     showPositions = prefs.getBool("showPositions") ?? false;
     updateInBG = prefs.getBool("updateInBG") ?? false;
     _setDefaultNickname(prefs.getString("player"));
@@ -267,7 +264,7 @@ class SettingsState extends State<SettingsView> {
             context.go("/settings/customization");
           },),
           ListTile(title: Text("Update stats in the background"),
-          subtitle: Text("While tetra stats is running, it can update stats of the current player when cache expires, as well, as tetra league stats of tracked players", style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
+          subtitle: Text("While tetra stats is running, it can update stats of the current player when cache expires", style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
           trailing: Switch(value: updateInBG, onChanged: (bool value){
             prefs.setBool("updateInBG", value);
             setState(() {

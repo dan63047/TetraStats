@@ -37,7 +37,6 @@ class UserThingy extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);
-    final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
     return LayoutBuilder(builder: (context, constraints) {
       bool bigScreen = constraints.maxWidth > 768;
       double bannerHeight = bigScreen ? 240 : 120;
@@ -387,7 +386,7 @@ class UserThingy extends StatelessWidget {
                                       children: [
                                         Image.asset("res/tetrio_badges/${badge.badgeId}.png"),
                                         Text(badge.ts != null
-                                            ? t.obtainDate(date: dateFormat.format(badge.ts!))
+                                            ? t.obtainDate(date: timestamp(badge.ts!))
                                             : t.assignedManualy),
                                       ],
                                     )

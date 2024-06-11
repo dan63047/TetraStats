@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:tetra_stats/views/settings_view.dart' show subtitleStyle;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tetra_stats/main.dart' show prefs;
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -18,7 +18,6 @@ class CustomizationView extends StatefulWidget {
 }
 
 class CustomizationState extends State<CustomizationView> {
-  late SharedPreferences prefs;
   late bool oskKagariGimmick;
   late bool sheetbotRadarGraphs;
   late int ratingMode;
@@ -34,7 +33,7 @@ class CustomizationState extends State<CustomizationView> {
       windowManager.getTitle().then((value) => oldWindowTitle = value);
       windowManager.setTitle("Tetra Stats: ${t.settings}");
     }
-    _getPreferences().then((value) => setState((){}));
+    _getPreferences();
     super.initState();
   }
 
@@ -44,8 +43,7 @@ class CustomizationState extends State<CustomizationView> {
     super.dispose();
   }
 
-  Future<void> _getPreferences() async {
-    prefs = await SharedPreferences.getInstance();
+  void _getPreferences() {
     if (prefs.getBool("oskKagariGimmick") != null) {
       oskKagariGimmick = prefs.getBool("oskKagariGimmick")!;
     } else {
@@ -62,7 +60,7 @@ class CustomizationState extends State<CustomizationView> {
       ratingMode = 0;
     }
     if (prefs.getInt("timestampMode") != null) {
-      timestampMode = prefs.getInt("ratingMode")!;
+      timestampMode = prefs.getInt("timestampMode")!;
     } else {
       timestampMode = 0;
     }
