@@ -90,6 +90,8 @@ class CacheController {
         return object.runtimeType.toString()+"topone";
       case TetraLeagueAlphaStream:
         return object.runtimeType.toString()+object.userId;
+      case SingleplayerStream:
+        return object.type+object.userId;
       default:
         return object.runtimeType.toString()+object.id;
     }
@@ -301,6 +303,53 @@ class TetrioService extends DB {
     ReplayData data = ReplayData.fromJson(toAnalyze);
     saveReplayStats(data); // saving to DB for later
     return data;
+  }
+
+  /// Retrieves avaliable Tetra League matches from Tetra Channel api. Returns stream object (fake stream).
+  /// Throws an exception if fails to retrieve.
+  Future<SingleplayerStream> fetchSingleplayerStream(String userID, String stream) async {
+    SingleplayerStream? cached = _cache.get(userID, SingleplayerStream);
+    if (cached != null) return cached;
+    
+    Uri url;
+    if (kIsWeb) {
+      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "singleplayerStream", "user": userID.toLowerCase().trim(), "stream": stream});
+    } else {
+      url = Uri.https('ch.tetr.io', 'api/streams/${stream}_${userID.toLowerCase().trim()}');
+    }
+    try {
+      final response = await client.get(url);
+
+      switch (response.statusCode) {
+        case 200:
+          if (jsonDecode(response.body)['success']) {
+            SingleplayerStream records = SingleplayerStream.fromJson(jsonDecode(response.body)['data']['records'], userID, stream);
+            _cache.store(records, jsonDecode(response.body)['cache']['cached_until']);
+            developer.log("fetchSingleplayerStream: $stream $userID stream retrieved and cached", name: "services/tetrio_crud");
+            return records;
+          } else {
+            developer.log("fetchSingleplayerStream: User dosen't exist", name: "services/tetrio_crud", error: response.body);
+            throw TetrioPlayerNotExist();
+          }
+        case 403:
+          throw TetrioForbidden();
+        case 429:
+          throw TetrioTooManyRequests();
+        case 418:
+          throw TetrioOskwareBridgeProblem();
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+          throw TetrioInternalProblem();
+        default:
+          developer.log("fetchSingleplayerStream: Failed to fetch stream $stream $userID", name: "services/tetrio_crud", error: response.statusCode);
+          throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
+      }
+    } on http.ClientException catch (e, s) {
+      developer.log("$e, $s");
+      throw http.ClientException(e.message, e.uri);
+    }
   }
 
   /// Gets and returns Top TR for a player with given [id]. May return null if player top tr is unknown

@@ -174,12 +174,14 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     late TetraLeagueAlphaStream tlStream;
     late UserRecords records;
     late News news;
+    late SingleplayerStream recent;
     late TetrioPlayerFromLeaderboard? topOne;
     late TopTr? topTR;
     requests = await Future.wait([ // all at once
       teto.fetchTLStream(_searchFor),
       teto.fetchRecords(_searchFor),
       teto.fetchNews(_searchFor),
+      teto.fetchSingleplayerStream(_searchFor, "any_userrecent"),
       prefs.getBool("showPositions") != true ? teto.fetchCutoffs() : Future.delayed(Duration.zero, ()=><Map<String, double>>[]),
       (me.tlSeason1.rank != "z" ? me.tlSeason1.rank == "x" : me.tlSeason1.percentileRank == "x") ? teto.fetchTopOneFromTheLeaderboard() : Future.delayed(Duration.zero, ()=>null),
       (me.tlSeason1.gamesPlayed > 9) ? teto.fetchTopTR(_searchFor) : Future.delayed(Duration.zero, () => null) // can retrieve this only if player has TR
@@ -187,8 +189,9 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     tlStream = requests[0] as TetraLeagueAlphaStream;
     records = requests[1] as UserRecords;
     news = requests[2] as News;
-    topOne = requests[4] as TetrioPlayerFromLeaderboard?;
-    topTR = requests[5] as TopTr?; // No TR - no Top TR
+    recent = requests[3] as SingleplayerStream;
+    topOne = requests[5] as TetrioPlayerFromLeaderboard?;
+    topTR = requests[6] as TopTr?; // No TR - no Top TR
 
     meAmongEveryone = teto.getCachedLeaderboardPositions(me.userId);
     if (prefs.getBool("showPositions") == true){
@@ -200,8 +203,8 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
         if (meAmongEveryone != null) teto.cacheLeaderboardPositions(me.userId, meAmongEveryone!); 
       }
     }
-    Map<String, double>? cutoffs = prefs.getBool("showPositions") == true ? everyone!.cutoffs : (requests[3] as Cutoffs?)?.tr;
-    Map<String, double>? cutoffsGlicko = prefs.getBool("showPositions") == true ? everyone!.cutoffsGlicko : (requests[3] as Cutoffs?)?.glicko;
+    Map<String, double>? cutoffs = prefs.getBool("showPositions") == true ? everyone!.cutoffs : (requests[4] as Cutoffs?)?.tr;
+    Map<String, double>? cutoffsGlicko = prefs.getBool("showPositions") == true ? everyone!.cutoffsGlicko : (requests[4] as Cutoffs?)?.glicko;
     
     if (me.tlSeason1.gamesPlayed > 9) {
         thatRankCutoff = cutoffs?[me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank];
@@ -313,7 +316,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       });
     }
 
-    return [me, records, states, tlMatches, compareWith, isTracking, news, topTR];
+    return [me, records, states, tlMatches, compareWith, isTracking, news, topTR, recent];
   }
 
   /// Triggers widgets rebuild
@@ -483,7 +486,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                             ),
                           ],),
                           _History(chartsData: chartsData, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
-                          _TwoRecordsThingy(sprint: snapshot.data![1].sprint, blitz: snapshot.data![1].blitz, rank: snapshot.data![0].tlSeason1.percentileRank,),
+                          _TwoRecordsThingy(sprint: snapshot.data![1].sprint, blitz: snapshot.data![1].blitz, rank: snapshot.data![0].tlSeason1.percentileRank, recent: snapshot.data![8]),
                           _OtherThingy(zen: snapshot.data![1].zen, bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6],)
                         ] : [
                           TLThingy(
@@ -1000,9 +1003,10 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
 class _TwoRecordsThingy extends StatelessWidget {
   final RecordSingle? sprint;
   final RecordSingle? blitz;
+  final SingleplayerStream recent;
   final String? rank;
 
-  const _TwoRecordsThingy({required this.sprint, required this.blitz, this.rank});
+  const _TwoRecordsThingy({required this.sprint, required this.blitz, this.rank, required this.recent});
 
   Color getColorOfRank(int rank){
     if (rank == 1) return Colors.yellowAccent;
@@ -1018,17 +1022,17 @@ class _TwoRecordsThingy extends StatelessWidget {
     //if (record == null) return Center(child: Text(t.noRecord, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)));
     late MapEntry closestAverageBlitz;
     late bool blitzBetterThanClosestAverage;
-    bool? blitzBetterThanRankAverage = (rank != null && rank != "z" && blitz != null) ? blitz!.endContext!.score > blitzAverages[rank]! : null;
+    bool? blitzBetterThanRankAverage = (rank != null && rank != "z" && blitz != null) ? blitz!.endContext.score > blitzAverages[rank]! : null;
     late MapEntry closestAverageSprint;
     late bool sprintBetterThanClosestAverage;
-    bool? sprintBetterThanRankAverage = (rank != null && rank != "z" && sprint != null) ? sprint!.endContext!.finalTime < sprintAverages[rank]! : null;
+    bool? sprintBetterThanRankAverage = (rank != null && rank != "z" && sprint != null) ? sprint!.endContext.finalTime < sprintAverages[rank]! : null;
     if (sprint != null) {
-      closestAverageSprint = sprintAverages.entries.singleWhere((element) => element.value == sprintAverages.values.reduce((a, b) => (a-sprint!.endContext!.finalTime).abs() < (b -sprint!.endContext!.finalTime).abs() ? a : b));
-      sprintBetterThanClosestAverage = sprint!.endContext!.finalTime < closestAverageSprint.value;
+      closestAverageSprint = sprintAverages.entries.singleWhere((element) => element.value == sprintAverages.values.reduce((a, b) => (a-sprint!.endContext.finalTime).abs() < (b -sprint!.endContext.finalTime).abs() ? a : b));
+      sprintBetterThanClosestAverage = sprint!.endContext.finalTime < closestAverageSprint.value;
     }
     if (blitz != null){
-      closestAverageBlitz = blitzAverages.entries.singleWhere((element) => element.value == blitzAverages.values.reduce((a, b) => (a-blitz!.endContext!.score).abs() < (b -blitz!.endContext!.score).abs() ? a : b));
-      blitzBetterThanClosestAverage = blitz!.endContext!.score > closestAverageBlitz.value;
+      closestAverageBlitz = blitzAverages.entries.singleWhere((element) => element.value == blitzAverages.values.reduce((a, b) => (a-blitz!.endContext.score).abs() < (b -blitz!.endContext.score).abs() ? a : b));
+      blitzBetterThanClosestAverage = blitz!.endContext.score > closestAverageBlitz.value;
     }
     return SingleChildScrollView(child: Padding(
       padding: const EdgeInsets.only(top: 20.0),
@@ -1050,24 +1054,24 @@ class _TwoRecordsThingy extends StatelessWidget {
                     children: [
                     Text(t.sprint, style: const TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
                     RichText(text: TextSpan(
-                        text: sprint != null ? get40lTime(sprint!.endContext!.finalTime.inMicroseconds) : "---",
+                        text: sprint != null ? get40lTime(sprint!.endContext.finalTime.inMicroseconds) : "---",
                         style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: FontWeight.w500, color: sprint != null ? Colors.white : Colors.grey),
-                        //children: [TextSpan(text: get40lTime(record!.endContext!.finalTime.inMicroseconds), style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
+                        //children: [TextSpan(text: get40lTime(record!.endContext.finalTime.inMicroseconds), style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
                         ),
                       ),
                     if (sprint != null) RichText(text: TextSpan(
                       text: "",
                       style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
                       children: [
-                        if (rank != null && rank != "z") TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(sprint!.endContext!.finalTime, sprintAverages[rank]!), verdict: sprintBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
+                        if (rank != null && rank != "z") TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(sprint!.endContext.finalTime, sprintAverages[rank]!), verdict: sprintBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
                           color: sprintBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
                         ))
-                        else TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(sprint!.endContext!.finalTime, closestAverageSprint.value), verdict: sprintBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageSprint.key.toUpperCase())}\n", style: TextStyle(
+                        else TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(sprint!.endContext.finalTime, closestAverageSprint.value), verdict: sprintBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageSprint.key.toUpperCase())}\n", style: TextStyle(
                           color: sprintBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
                         )),
                         if (sprint!.rank != null) TextSpan(text: "№${sprint!.rank}", style: TextStyle(color: getColorOfRank(sprint!.rank!))),
                         if (sprint!.rank != null) const TextSpan(text: " • "),
-                        TextSpan(text: timestamp(sprint!.timestamp!)),
+                        TextSpan(text: timestamp(sprint!.timestamp)),
                       ]
                       ),
                     ),
@@ -1079,14 +1083,14 @@ class _TwoRecordsThingy extends StatelessWidget {
                   alignment: WrapAlignment.spaceBetween,
                   spacing: 20,
                   children: [
-                    StatCellNum(playerStat: sprint!.endContext!.piecesPlaced, playerStatLabel: t.statCellNum.pieces, isScreenBig: true, higherIsBetter: true, smallDecimal: false),
-                    StatCellNum(playerStat: sprint!.endContext!.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: true, higherIsBetter: true, smallDecimal: false),
-                    StatCellNum(playerStat: sprint!.endContext!.kpp, playerStatLabel: t.statCellNum.kpp, fractionDigits: 2, isScreenBig: true, higherIsBetter: true, smallDecimal: false),
+                    StatCellNum(playerStat: sprint!.endContext.piecesPlaced, playerStatLabel: t.statCellNum.pieces, isScreenBig: true, higherIsBetter: true, smallDecimal: false),
+                    StatCellNum(playerStat: sprint!.endContext.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: true, higherIsBetter: true, smallDecimal: false),
+                    StatCellNum(playerStat: sprint!.endContext.kpp, playerStatLabel: t.statCellNum.kpp, fractionDigits: 2, isScreenBig: true, higherIsBetter: true, smallDecimal: false),
                   ],
               ),
-              if (sprint != null) FinesseThingy(sprint?.endContext?.finesse, sprint?.endContext?.finessePercentage),
-              if (sprint != null) LineclearsThingy(sprint!.endContext!.clears, sprint!.endContext!.lines, sprint!.endContext!.holds, sprint!.endContext!.tSpins),
-              if (sprint != null) Text("${sprint!.endContext!.inputs} KP • ${f2.format(sprint!.endContext!.kps)} KPS")
+              if (sprint != null) FinesseThingy(sprint?.endContext.finesse, sprint?.endContext.finessePercentage),
+              if (sprint != null) LineclearsThingy(sprint!.endContext.clears, sprint!.endContext.lines, sprint!.endContext.holds, sprint!.endContext.tSpins),
+              if (sprint != null) Text("${sprint!.endContext.inputs} KP • ${f2.format(sprint!.endContext.kps)} KPS")
             ]
           ),
           Column(
@@ -1106,7 +1110,7 @@ class _TwoRecordsThingy extends StatelessWidget {
                       text: "",
                       style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: FontWeight.w500, color: Colors.white),
                       children: [
-                        TextSpan(text: blitz != null ? NumberFormat.decimalPattern().format(blitz!.endContext!.score) : "---"),
+                        TextSpan(text: blitz != null ? NumberFormat.decimalPattern().format(blitz!.endContext.score) : "---"),
                         //WidgetSpan(child: Image.asset("res/icons/kagari.png", height: 48))
                       ]
                       ),
@@ -1117,13 +1121,13 @@ class _TwoRecordsThingy extends StatelessWidget {
                     text: "",
                     style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
                     children: [
-                      if (rank != null && rank != "z") TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(blitz!.endContext!.score, blitzAverages[rank]!), verdict: blitzBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
+                      if (rank != null && rank != "z") TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(blitz!.endContext.score, blitzAverages[rank]!), verdict: blitzBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
                         color: blitzBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
                       ))
-                      else TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(blitz!.endContext!.score, closestAverageBlitz.value), verdict: blitzBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageBlitz.key.toUpperCase())}\n", style: TextStyle(
+                      else TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(blitz!.endContext.score, closestAverageBlitz.value), verdict: blitzBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageBlitz.key.toUpperCase())}\n", style: TextStyle(
                         color: blitzBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
                       )),
-                      TextSpan(text: timestamp(blitz!.timestamp!)),
+                      TextSpan(text: timestamp(blitz!.timestamp)),
                       if (blitz!.rank != null)  const TextSpan(text: " • "),
                       if (blitz!.rank != null)  TextSpan(text: "№${blitz!.rank}", style: TextStyle(color: getColorOfRank(blitz!.rank!))),
                     ]
@@ -1140,16 +1144,50 @@ class _TwoRecordsThingy extends StatelessWidget {
                 crossAxisAlignment: WrapCrossAlignment.start,
                 spacing: 20,
                 children: [
-                  StatCellNum(playerStat: blitz!.endContext!.level, playerStatLabel: t.statCellNum.level, isScreenBig: true, higherIsBetter: true, smallDecimal: false),
-                  StatCellNum(playerStat: blitz!.endContext!.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: true, higherIsBetter: true, smallDecimal: false),
-                  StatCellNum(playerStat: blitz!.endContext!.spp, playerStatLabel: t.statCellNum.spp, fractionDigits: 2, isScreenBig: true, higherIsBetter: true)
+                  StatCellNum(playerStat: blitz!.endContext.level, playerStatLabel: t.statCellNum.level, isScreenBig: true, higherIsBetter: true, smallDecimal: false),
+                  StatCellNum(playerStat: blitz!.endContext.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: true, higherIsBetter: true, smallDecimal: false),
+                  StatCellNum(playerStat: blitz!.endContext.spp, playerStatLabel: t.statCellNum.spp, fractionDigits: 2, isScreenBig: true, higherIsBetter: true)
                 ],
             ),
-            if (blitz != null) FinesseThingy(blitz?.endContext?.finesse, blitz?.endContext?.finessePercentage),
-            if (blitz != null) LineclearsThingy(blitz!.endContext!.clears, blitz!.endContext!.lines, blitz!.endContext!.holds, blitz!.endContext!.tSpins),
-            if (blitz != null) Text("${blitz!.endContext!.piecesPlaced} P • ${blitz!.endContext!.inputs} KP • ${f2.format(blitz!.endContext!.kpp)} KPP • ${f2.format(blitz!.endContext!.kps)} KPS")
+            if (blitz != null) FinesseThingy(blitz?.endContext.finesse, blitz?.endContext.finessePercentage),
+            if (blitz != null) LineclearsThingy(blitz!.endContext.clears, blitz!.endContext.lines, blitz!.endContext.holds, blitz!.endContext.tSpins),
+            if (blitz != null) Text("${blitz!.endContext.piecesPlaced} P • ${blitz!.endContext.inputs} KP • ${f2.format(blitz!.endContext.kpp)} KPP • ${f2.format(blitz!.endContext.kps)} KPS")
             ],
           ),
+          SizedBox(
+            width: 350,
+            child: Column(
+              children: [
+                Text("Recent", style: const TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
+                for(RecordSingle record in recent.records) ListTile(
+                  leading: Text(
+                    switch (record.endContext.gameType){
+                      "40l" => "40L",
+                      "blitz" => "BLZ",
+                      "5mblast" => "5MB",
+                      String() => "huh",
+                    },
+                    style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, shadows: textShadow)
+                  ),
+                  title: Text(
+                    switch (record.endContext.gameType){
+                      "40l" => get40lTime(record.endContext.finalTime.inMicroseconds),
+                      "blitz" => "${NumberFormat.decimalPattern().format(record.endContext.score)} points",
+                      "5mblast" => get40lTime(record.endContext.finalTime.inMicroseconds),
+                      String() => "huh",
+                    },
+                  ),
+                  subtitle: Text(timestamp(record.timestamp)),
+                  // trailing: switch (record.endContext.gameType){
+                  //     "40l" => get40lTime(record.endContext.finalTime.inMicroseconds),
+                  //     "blitz" => "${NumberFormat.decimalPattern().format(record.endContext.score)} points",
+                  //     "5mblast" => get40lTime(record.endContext.finalTime.inMicroseconds),
+                  //     String() => "huh",
+                  //   },
+                )
+              ],
+            ),
+          )
         ]),
     ));
   }
@@ -1176,16 +1214,16 @@ class _RecordThingy extends StatelessWidget {
     if (record == null) return Center(child: Text(t.noRecord, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)));
     late MapEntry closestAverageBlitz;
     late bool blitzBetterThanClosestAverage;
-    bool? blitzBetterThanRankAverage = (rank != null && rank != "z") ? record!.endContext!.score > blitzAverages[rank]! : null;
+    bool? blitzBetterThanRankAverage = (rank != null && rank != "z") ? record!.endContext.score > blitzAverages[rank]! : null;
     late MapEntry closestAverageSprint;
     late bool sprintBetterThanClosestAverage;
-    bool? sprintBetterThanRankAverage = (rank != null && rank != "z") ? record!.endContext!.finalTime < sprintAverages[rank]! : null;
-    if (record!.stream.contains("40l")) {
-      closestAverageSprint = sprintAverages.entries.singleWhere((element) => element.value == sprintAverages.values.reduce((a, b) => (a-record!.endContext!.finalTime).abs() < (b -record!.endContext!.finalTime).abs() ? a : b));
-      sprintBetterThanClosestAverage = record!.endContext!.finalTime < closestAverageSprint.value;
-    }else if (record!.stream.contains("blitz")){
-      closestAverageBlitz = blitzAverages.entries.singleWhere((element) => element.value == blitzAverages.values.reduce((a, b) => (a-record!.endContext!.score).abs() < (b -record!.endContext!.score).abs() ? a : b));
-      blitzBetterThanClosestAverage = record!.endContext!.score > closestAverageBlitz.value;
+    bool? sprintBetterThanRankAverage = (rank != null && rank != "z") ? record!.endContext.finalTime < sprintAverages[rank]! : null;
+    if (record!.endContext.gameType == "40l") {
+      closestAverageSprint = sprintAverages.entries.singleWhere((element) => element.value == sprintAverages.values.reduce((a, b) => (a-record!.endContext.finalTime).abs() < (b -record!.endContext.finalTime).abs() ? a : b));
+      sprintBetterThanClosestAverage = record!.endContext.finalTime < closestAverageSprint.value;
+    }else if (record!.endContext.gameType == "blitz"){
+      closestAverageBlitz = blitzAverages.entries.singleWhere((element) => element.value == blitzAverages.values.reduce((a, b) => (a-record!.endContext.score).abs() < (b -record!.endContext.score).abs() ? a : b));
+      blitzBetterThanClosestAverage = record!.endContext.score > closestAverageBlitz.value;
     }
     
     return LayoutBuilder(
@@ -1201,19 +1239,19 @@ class _RecordThingy extends StatelessWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (record!.stream.contains("40l")) Padding(padding: const EdgeInsets.only(right: 8.0),
+                    if (record!.endContext.gameType == "40l") Padding(padding: const EdgeInsets.only(right: 8.0),
                     child: Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageSprint.key}.png", height: 96)
                     ),
-                    if (record!.stream.contains("blitz")) Padding(padding: const EdgeInsets.only(right: 8.0),
+                    if (record!.endContext.gameType == "blitz") Padding(padding: const EdgeInsets.only(right: 8.0),
                     child: Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageBlitz.key}.png", height: 96)
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                      if (record!.stream.contains("40l")) Text(t.sprint, style: const TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
-                      if (record!.stream.contains("blitz")) Text(t.blitz, style: const TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
+                      if (record!.endContext.gameType == "40l") Text(t.sprint, style: const TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
+                      if (record!.endContext.gameType == "blitz") Text(t.blitz, style: const TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
                       RichText(text: TextSpan(
-                          text: record!.stream.contains("40l") ? get40lTime(record!.endContext!.finalTime.inMicroseconds) : NumberFormat.decimalPattern().format(record!.endContext!.score),
+                          text: record!.endContext.gameType == "40l" ? get40lTime(record!.endContext.finalTime.inMicroseconds) : NumberFormat.decimalPattern().format(record!.endContext.score),
                           style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 36 : 32, fontWeight: FontWeight.w500, color: Colors.white),
                           ),
                         ),
@@ -1221,50 +1259,50 @@ class _RecordThingy extends StatelessWidget {
                         text: "",
                         style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
                         children: [
-                          if (record!.stream.contains("40l") && (rank != null && rank != "z")) TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(record!.endContext!.finalTime, sprintAverages[rank]!), verdict: sprintBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
+                          if (record!.endContext.gameType == "40l" && (rank != null && rank != "z")) TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(record!.endContext.finalTime, sprintAverages[rank]!), verdict: sprintBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
                             color: sprintBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
                           ))
-                          else if (record!.stream.contains("40l") && (rank == null || rank == "z")) TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(record!.endContext!.finalTime, closestAverageSprint.value), verdict: sprintBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageSprint.key.toUpperCase())}\n", style: TextStyle(
+                          else if (record!.endContext.gameType == "40l" && (rank == null || rank == "z")) TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(record!.endContext.finalTime, closestAverageSprint.value), verdict: sprintBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageSprint.key.toUpperCase())}\n", style: TextStyle(
                             color: sprintBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
                           ))
-                          else if (record!.stream.contains("blitz") && (rank != null && rank != "z")) TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(record!.endContext!.score, blitzAverages[rank]!), verdict: blitzBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
+                          else if (record!.endContext.gameType == "blitz" && (rank != null && rank != "z")) TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(record!.endContext.score, blitzAverages[rank]!), verdict: blitzBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
                             color: blitzBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
                           ))
-                          else if (record!.stream.contains("blitz") && (rank == null || rank == "z")) TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(record!.endContext!.score, closestAverageBlitz.value), verdict: blitzBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageBlitz.key.toUpperCase())}\n", style: TextStyle(
+                          else if (record!.endContext.gameType == "blitz" && (rank == null || rank == "z")) TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(record!.endContext.score, closestAverageBlitz.value), verdict: blitzBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageBlitz.key.toUpperCase())}\n", style: TextStyle(
                             color: blitzBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
                           )),
                           if (record!.rank != null) TextSpan(text: "№${record!.rank}", style: TextStyle(color: getColorOfRank(record!.rank!))),
                           if (record!.rank != null) const TextSpan(text: " • "),
-                          TextSpan(text: timestamp(record!.timestamp!)),
+                          TextSpan(text: timestamp(record!.timestamp)),
                         ]
                         ),
                       )
                     ],),
                   ],
                 ),
-                if (record!.stream.contains("40l")) Wrap(
+                if (record!.endContext.gameType == "40l") Wrap(
                     alignment: WrapAlignment.spaceBetween,
                     spacing: 20,
                     children: [
-                      StatCellNum(playerStat: record!.endContext!.piecesPlaced, playerStatLabel: t.statCellNum.pieces, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
-                      StatCellNum(playerStat: record!.endContext!.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
-                      StatCellNum(playerStat: record!.endContext!.kpp, playerStatLabel: t.statCellNum.kpp, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
+                      StatCellNum(playerStat: record!.endContext.piecesPlaced, playerStatLabel: t.statCellNum.pieces, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
+                      StatCellNum(playerStat: record!.endContext.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
+                      StatCellNum(playerStat: record!.endContext.kpp, playerStatLabel: t.statCellNum.kpp, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
                     ],
                 ),
-                if (record!.stream.contains("blitz")) Wrap(
+                if (record!.endContext.gameType == "blitz") Wrap(
                     alignment: WrapAlignment.spaceBetween,
                     crossAxisAlignment: WrapCrossAlignment.start,
                     spacing: 20,
                     children: [
-                      StatCellNum(playerStat: record!.endContext!.level, playerStatLabel: t.statCellNum.level, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
-                      StatCellNum(playerStat: record!.endContext!.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
-                      StatCellNum(playerStat: record!.endContext!.spp, playerStatLabel: t.statCellNum.spp, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true)
+                      StatCellNum(playerStat: record!.endContext.level, playerStatLabel: t.statCellNum.level, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
+                      StatCellNum(playerStat: record!.endContext.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
+                      StatCellNum(playerStat: record!.endContext.spp, playerStatLabel: t.statCellNum.spp, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true)
                     ],
                 ),
-                FinesseThingy(record?.endContext?.finesse, record?.endContext?.finessePercentage),
-                LineclearsThingy(record!.endContext!.clears, record!.endContext!.lines, record!.endContext!.holds, record!.endContext!.tSpins),
-                if (record!.stream.contains("40l")) Text("${record!.endContext!.inputs} KP • ${f2.format(record!.endContext!.kps)} KPS"),
-                if (record!.stream.contains("blitz")) Text("${record!.endContext!.piecesPlaced} P • ${record!.endContext!.inputs} KP • ${f2.format(record!.endContext!.kpp)} KPP • ${f2.format(record!.endContext!.kps)} KPS")
+                FinesseThingy(record?.endContext.finesse, record?.endContext.finessePercentage),
+                LineclearsThingy(record!.endContext.clears, record!.endContext.lines, record!.endContext.holds, record!.endContext.tSpins),
+                if (record!.endContext.gameType == "40l") Text("${record!.endContext.inputs} KP • ${f2.format(record!.endContext.kps)} KPS"),
+                if (record!.endContext.gameType == "blitz") Text("${record!.endContext.piecesPlaced} P • ${record!.endContext.inputs} KP • ${f2.format(record!.endContext.kpp)} KPP • ${f2.format(record!.endContext.kps)} KPS")
               ]
             ),
           ),

@@ -872,6 +872,21 @@ class TetraLeagueAlphaStream{
   }
 }
 
+class SingleplayerStream{
+  late String userId;
+  late String type;
+  late List<RecordSingle> records;
+
+  SingleplayerStream({required this.userId, required this.records, required this.type});
+
+  SingleplayerStream.fromJson(List<dynamic> json, String userID, String tp) {
+    userId = userID;
+    type = tp;
+    records = [];
+    for (var value in json) {records.add(RecordSingle.fromJson(value, null));}
+  }
+}
+
 class TetraLeagueAlphaRecord{
   late String replayId;
   late String ownId;
@@ -1116,19 +1131,17 @@ class RecordSingle {
   late String userId;
   late String replayId;
   late String ownId;
-  late String stream;
-  DateTime? timestamp;
-  EndContextSingle? endContext;
+  late DateTime timestamp;
+  late EndContextSingle endContext;
   int? rank;
 
-  RecordSingle({required this.userId, required this.replayId, required this.ownId, this.timestamp, this.endContext, this.rank});
+  RecordSingle({required this.userId, required this.replayId, required this.ownId, required this.timestamp, required this.endContext, this.rank});
 
   RecordSingle.fromJson(Map<String, dynamic> json, int? ran) {
     //developer.log("RecordSingle.fromJson: $json", name: "data_objects/tetrio");
     ownId = json['_id'];
-    endContext = json['endcontext'] != null ? EndContextSingle.fromJson(json['endcontext']) : null;
+    endContext = EndContextSingle.fromJson(json['endcontext']);
     replayId = json['replayid'];
-    stream = json['stream'];
     timestamp = DateTime.parse(json['ts']);
     userId = json['user']['_id'];
     rank = ran;
@@ -1137,9 +1150,7 @@ class RecordSingle {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['_id'] = ownId;
-    if (endContext != null) {
-      data['endcontext'] = endContext!.toJson();
-    }
+    data['endcontext'] = endContext.toJson();
     data['ismulti'] = false;
     data['replayid'] = replayId;
     data['ts'] = timestamp;
