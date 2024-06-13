@@ -13,14 +13,14 @@ class TrailingStats extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    const TextStyle style = TextStyle(height: 1.1, fontWeight: FontWeight.w100);
+    const TextStyle style = TextStyle(height: 1.1, fontWeight: FontWeight.w100, fontSize: 13);
     return Table(
       defaultColumnWidth: const IntrinsicColumnWidth(),
       defaultVerticalAlignment: TableCellVerticalAlignment.baseline,
       textBaseline: TextBaseline.alphabetic,
       columnWidths: const {
-        0: FixedColumnWidth(42),
-        2: FixedColumnWidth(42),
+        0: FixedColumnWidth(48),
+        2: FixedColumnWidth(48),
       },
         children: [
         TableRow(children: [Text(f2.format(yourAPM), textAlign: TextAlign.right, style: style), const Text(" :", style: style), Text(f2.format(notyourAPM), textAlign: TextAlign.right, style: style), const Text(" APM", textAlign: TextAlign.right, style: style)]),
