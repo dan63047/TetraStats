@@ -11,3 +11,10 @@ final NumberFormat f2l = NumberFormat.decimalPatternDigits(locale: LocaleSetting
 final NumberFormat f1 = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 1);
 final NumberFormat f0 = NumberFormat.decimalPattern(LocaleSettings.currentLocale.languageCode);
 final NumberFormat percentage = NumberFormat.percentPattern(LocaleSettings.currentLocale.languageCode)..maximumFractionDigits = 2;
+
+/// Readable [a] - [b], without sign
+String readableIntDifference(int a, int b){
+  int result = a - b;
+
+  return NumberFormat("#,###;#,###", LocaleSettings.currentLocale.languageCode).format(result);
+}

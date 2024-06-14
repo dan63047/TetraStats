@@ -17,12 +17,16 @@ import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart' show prefs, teto;
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
+import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
+import 'package:tetra_stats/views/singleplayer_record_view.dart';
 import 'package:tetra_stats/views/tl_match_view.dart' show TlMatchResultView;
 import 'package:tetra_stats/widgets/finesse_thingy.dart';
 import 'package:tetra_stats/widgets/lineclears_thingy.dart';
 import 'package:tetra_stats/widgets/list_tile_trailing_stats.dart';
+import 'package:tetra_stats/widgets/recent_sp_games.dart';
 import 'package:tetra_stats/widgets/search_box.dart';
+import 'package:tetra_stats/widgets/singleplayer_record.dart';
 import 'package:tetra_stats/widgets/sp_trailing_stats.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
@@ -38,9 +42,6 @@ late ZoomPanBehavior _zoomPanBehavior;
 bool _smooth = false;
 List _historyShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR", "Opener", "Plonk", "Inf. DS", "Stride"];
 late ScrollController _scrollController;
-final NumberFormat _timeInSec = NumberFormat("#,###.###s.", LocaleSettings.currentLocale.languageCode);
-final NumberFormat secs = NumberFormat("00.###", LocaleSettings.currentLocale.languageCode);
-
 
 class MainView extends StatefulWidget {
   final String? player;
@@ -55,25 +56,6 @@ class MainView extends StatefulWidget {
 
 Future<void> copyToClipboard(String text) async {
   await Clipboard.setData(ClipboardData(text: text));
-}
-
-/// Takes number of [microseconds] and returns readable 40 lines time
-String get40lTime(int microseconds){
-  return microseconds > 60000000 ? "${(microseconds/1000000/60).floor()}:${(secs.format(microseconds /1000000 % 60))}" : _timeInSec.format(microseconds / 1000000);
-  }
-
-/// Readable [a] - [b], without sign
-String readableTimeDifference(Duration a, Duration b){
-  Duration result = a - b;
-  
-  return NumberFormat("0.000s;0.000s", LocaleSettings.currentLocale.languageCode).format(result.inMilliseconds/1000);
-}
-
-/// Readable [a] - [b], without sign
-String readableIntDifference(int a, int b){
-  int result = a - b;
-
-  return NumberFormat("#,###;#,###", LocaleSettings.currentLocale.languageCode).format(result);
 }
 
 class _MainState extends State<MainView> with TickerProviderStateMixin {
@@ -103,7 +85,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   void initState() {
     initDB();
     _scrollController = ScrollController();
-    _tabController = TabController(length: 6, vsync: this);
+    _tabController = TabController(length: 7, vsync: this);
     _wideScreenTabController = TabController(length: 4, vsync: this);
     _zoomPanBehavior = ZoomPanBehavior(
       enablePinching: true,
@@ -455,6 +437,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                                 Tab(text: t.history),
                                 Tab(text: t.sprint),
                                 Tab(text: t.blitz),
+                                Tab(text: "Recent runs"),
                                 Tab(text: t.other),
                               ],
                             ),
@@ -514,8 +497,9 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                           ),
                           _TLRecords(userID: snapshot.data![0].userId, changePlayer: changePlayer, data: snapshot.data![3], wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0, oldMathcesHere: _TLHistoryWasFetched),
                           _History(chartsData: chartsData, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
-                          _RecordThingy(record: snapshot.data![1].sprint, rank: snapshot.data![0].tlSeason1.percentileRank, stream: snapshot.data![9]),
-                          _RecordThingy(record: snapshot.data![1].blitz, rank: snapshot.data![0].tlSeason1.percentileRank, stream: snapshot.data![10]),
+                          SingleplayerRecord(record: snapshot.data![1].sprint, rank: snapshot.data![0].tlSeason1.percentileRank, stream: snapshot.data![9]),
+                          SingleplayerRecord(record: snapshot.data![1].blitz, rank: snapshot.data![0].tlSeason1.percentileRank, stream: snapshot.data![10]),
+                          _RecentSingleplayersThingy(snapshot.data![8]),
                           _OtherThingy(zen: snapshot.data![1].zen, bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6])
                         ],
                       ),
@@ -1106,9 +1090,7 @@ class _TwoRecordsThingy extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     for (int i = 1; i < sprintStream.records.length; i++) ListTile(
-                    onTap: () {
-                      print("lox");
-                    },
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SingleplayerRecordView(record: sprintStream.records[i]))),
                     leading: Text("#${i+1}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, shadows: textShadow, height: 0.9) ),
                     title: Text(get40lTime(sprintStream.records[i].endContext.finalTime.inMicroseconds),
                     style: TextStyle(fontSize: 18)),
@@ -1185,9 +1167,7 @@ class _TwoRecordsThingy extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     for (int i = 1; i < sprintStream.records.length; i++) ListTile(
-                    onTap: () {
-                      print("lox");
-                    },
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SingleplayerRecordView(record: blitzStream.records[i]))),
                     leading: Text("#${i+1}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, shadows: textShadow, height: 0.9) ),
                     title: Text("${NumberFormat.decimalPattern().format(blitzStream.records[i].endContext.score)} points",
                     style: TextStyle(fontSize: 18)),
@@ -1201,180 +1181,25 @@ class _TwoRecordsThingy extends StatelessWidget {
           ),
           SizedBox(
             width: 400,
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Text("Recent", style: const TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
-                ),
-                for(RecordSingle record in recent.records) ListTile(
-                  onTap: () {
-                    print("lox");
-                  },
-                  leading: Text(
-                    switch (record.endContext.gameType){
-                      "40l" => "40L",
-                      "blitz" => "BLZ",
-                      "5mblast" => "5MB",
-                      String() => "huh",
-                    },
-                    style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, shadows: textShadow, height: 0.9)
-                  ),
-                  title: Text(
-                    switch (record.endContext.gameType){
-                      "40l" => get40lTime(record.endContext.finalTime.inMicroseconds),
-                      "blitz" => "${NumberFormat.decimalPattern().format(record.endContext.score)} points",
-                      "5mblast" => get40lTime(record.endContext.finalTime.inMicroseconds),
-                      String() => "huh",
-                    },
-                  style: TextStyle(fontSize: 18)),
-                  subtitle: Text(timestamp(record.timestamp), style: TextStyle(color: Colors.grey, height: 0.85)),
-                  trailing: SpTrailingStats(record.endContext)
-                )
-              ],
-            ),
+            child: RecentSingleplayerGames(recent: recent),
           )
         ]),
     ));
   }
 }
 
-class _RecordThingy extends StatelessWidget {
-  final RecordSingle? record;
-  final SingleplayerStream stream;
-  final String? rank;
+class _RecentSingleplayersThingy extends StatelessWidget {
+  final SingleplayerStream recent;
 
-  /// Widget that displays data from [record]
-  const _RecordThingy({required this.record, required this.stream, this.rank});
-
-  Color getColorOfRank(int rank){
-    if (rank == 1) return Colors.yellowAccent;
-    if (rank == 2) return Colors.blueGrey;
-    if (rank == 3) return Colors.brown[400]!;
-    if (rank <= 9) return Colors.blueAccent;
-    if (rank <= 99) return Colors.greenAccent;
-    return Colors.grey;
-  }
+  const _RecentSingleplayersThingy(this.recent);
 
   @override
   Widget build(BuildContext context) {
-    if (record == null) return Center(child: Text(t.noRecord, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)));
-    late MapEntry closestAverageBlitz;
-    late bool blitzBetterThanClosestAverage;
-    bool? blitzBetterThanRankAverage = (rank != null && rank != "z") ? record!.endContext.score > blitzAverages[rank]! : null;
-    late MapEntry closestAverageSprint;
-    late bool sprintBetterThanClosestAverage;
-    bool? sprintBetterThanRankAverage = (rank != null && rank != "z") ? record!.endContext.finalTime < sprintAverages[rank]! : null;
-    if (record!.endContext.gameType == "40l") {
-      closestAverageSprint = sprintAverages.entries.singleWhere((element) => element.value == sprintAverages.values.reduce((a, b) => (a-record!.endContext.finalTime).abs() < (b -record!.endContext.finalTime).abs() ? a : b));
-      sprintBetterThanClosestAverage = record!.endContext.finalTime < closestAverageSprint.value;
-    }else if (record!.endContext.gameType == "blitz"){
-      closestAverageBlitz = blitzAverages.entries.singleWhere((element) => element.value == blitzAverages.values.reduce((a, b) => (a-record!.endContext.score).abs() < (b -record!.endContext.score).abs() ? a : b));
-      blitzBetterThanClosestAverage = record!.endContext.score > closestAverageBlitz.value;
-    }
-    
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        bool bigScreen = constraints.maxWidth > 768;
-        return SingleChildScrollView(
-          controller: _scrollController,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (record!.endContext.gameType == "40l") Padding(padding: const EdgeInsets.only(right: 8.0),
-                    child: Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageSprint.key}.png", height: 96)
-                    ),
-                    if (record!.endContext.gameType == "blitz") Padding(padding: const EdgeInsets.only(right: 8.0),
-                    child: Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageBlitz.key}.png", height: 96)
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                      if (record!.endContext.gameType == "40l") Text(t.sprint, style: const TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
-                      if (record!.endContext.gameType == "blitz") Text(t.blitz, style: const TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
-                      RichText(text: TextSpan(
-                          text: record!.endContext.gameType == "40l" ? get40lTime(record!.endContext.finalTime.inMicroseconds) : NumberFormat.decimalPattern().format(record!.endContext.score),
-                          style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 36 : 32, fontWeight: FontWeight.w500, color: Colors.white),
-                          ),
-                        ),
-                      RichText(text: TextSpan(
-                        text: "",
-                        style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
-                        children: [
-                          if (record!.endContext.gameType == "40l" && (rank != null && rank != "z")) TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(record!.endContext.finalTime, sprintAverages[rank]!), verdict: sprintBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
-                            color: sprintBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
-                          ))
-                          else if (record!.endContext.gameType == "40l" && (rank == null || rank == "z")) TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(record!.endContext.finalTime, closestAverageSprint.value), verdict: sprintBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageSprint.key.toUpperCase())}\n", style: TextStyle(
-                            color: sprintBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
-                          ))
-                          else if (record!.endContext.gameType == "blitz" && (rank != null && rank != "z")) TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(record!.endContext.score, blitzAverages[rank]!), verdict: blitzBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
-                            color: blitzBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
-                          ))
-                          else if (record!.endContext.gameType == "blitz" && (rank == null || rank == "z")) TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(record!.endContext.score, closestAverageBlitz.value), verdict: blitzBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageBlitz.key.toUpperCase())}\n", style: TextStyle(
-                            color: blitzBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
-                          )),
-                          if (record!.rank != null) TextSpan(text: "№${record!.rank}", style: TextStyle(color: getColorOfRank(record!.rank!))),
-                          if (record!.rank != null) const TextSpan(text: " • "),
-                          TextSpan(text: timestamp(record!.timestamp)),
-                        ]
-                        ),
-                      )
-                    ],),
-                  ],
-                ),
-                if (record!.endContext.gameType == "40l") Wrap(
-                    alignment: WrapAlignment.spaceBetween,
-                    spacing: 20,
-                    children: [
-                      StatCellNum(playerStat: record!.endContext.piecesPlaced, playerStatLabel: t.statCellNum.pieces, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
-                      StatCellNum(playerStat: record!.endContext.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
-                      StatCellNum(playerStat: record!.endContext.kpp, playerStatLabel: t.statCellNum.kpp, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
-                    ],
-                ),
-                if (record!.endContext.gameType == "blitz") Wrap(
-                    alignment: WrapAlignment.spaceBetween,
-                    crossAxisAlignment: WrapCrossAlignment.start,
-                    spacing: 20,
-                    children: [
-                      StatCellNum(playerStat: record!.endContext.level, playerStatLabel: t.statCellNum.level, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
-                      StatCellNum(playerStat: record!.endContext.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
-                      StatCellNum(playerStat: record!.endContext.spp, playerStatLabel: t.statCellNum.spp, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true)
-                    ],
-                ),
-                FinesseThingy(record?.endContext.finesse, record?.endContext.finessePercentage),
-                LineclearsThingy(record!.endContext.clears, record!.endContext.lines, record!.endContext.holds, record!.endContext.tSpins),
-                if (record!.endContext.gameType == "40l") Text("${record!.endContext.inputs} KP • ${f2.format(record!.endContext.kps)} KPS"),
-                if (record!.endContext.gameType == "blitz") Text("${record!.endContext.piecesPlaced} P • ${record!.endContext.inputs} KP • ${f2.format(record!.endContext.kpp)} KPP • ${f2.format(record!.endContext.kps)} KPS"),
-                if (stream.records.length > 1) for(int i = 1; i < stream.records.length; i++) ListTile(
-                  onTap: () {
-                    print("lox");
-                  },
-                  leading: Text("#${i+1}",
-                    style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, shadows: textShadow, height: 0.9)
-                  ),
-                  title: Text(
-                    switch (stream.records[i].endContext.gameType){
-                      "40l" => get40lTime(stream.records[i].endContext.finalTime.inMicroseconds),
-                      "blitz" => "${NumberFormat.decimalPattern().format(stream.records[i].endContext.score)} points",
-                      "5mblast" => get40lTime(stream.records[i].endContext.finalTime.inMicroseconds),
-                      String() => "huh",
-                    },
-                  style: TextStyle(fontSize: 18)),
-                  subtitle: Text(timestamp(stream.records[i].timestamp), style: TextStyle(color: Colors.grey, height: 0.85)),
-                  trailing: SpTrailingStats(stream.records[i].endContext)
-                )
-              ]
-            ),
-          ),
-        );
-      }
+    return SingleChildScrollView(
+      child: RecentSingleplayerGames(recent: recent, hideTitle: true)
     );
   }
+
 }
 
 class _OtherThingy extends StatelessWidget {

@@ -3,11 +3,11 @@
 import 'dart:io';
 import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
+import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/views/compare_view.dart' show CompareThingy, CompareBoolThingy;
 import 'package:tetra_stats/widgets/list_tile_trailing_stats.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
 import 'package:tetra_stats/widgets/vs_graphs.dart';
-import 'main_view.dart' show secs;
 import 'package:tetra_stats/main.dart' show teto;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
