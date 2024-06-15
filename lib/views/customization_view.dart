@@ -1,8 +1,9 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:tetra_stats/views/settings_view.dart' show subtitleStyle;
-import 'package:tetra_stats/main.dart' show prefs;
+import 'package:tetra_stats/main.dart' show MyApp, MyAppState, prefs, setAccentColor;
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -87,36 +88,33 @@ class CustomizationState extends State<CustomizationView> {
       body: SafeArea(
           child: ListView(
         children: [
-          // ListTile(
-          //     title: const Text("Accent color"),
-          //     trailing: ColorIndicator(HSVColor.fromColor(Theme.of(context).colorScheme.primary)),
-          //     onTap: () {
-          //       showDialog(
-          //           context: context,
-          //           builder: (BuildContext context) => AlertDialog(
-          //                   title: const Text('Pick an accent color'),
-          //                   content: SingleChildScrollView(
-          //                     child: ColorPicker(
-          //                       pickerColor: pickerColor,
-          //                       onColorChanged: changeColor,
-          //                     ),
-          //                   ),
-          //                   actions: <Widget>[
-          //                     ElevatedButton(
-          //                       child: const Text('Set'),
-          //                       onPressed: () {
-          //                         setState(() {
-          //                           setAccentColor(pickerColor);
-          //                         });
-          //                         Navigator.of(context).pop();
-          //                       },
-          //                     ),
-          //                   ]));
-          //     }),
-          // const ListTile(
-          //   title: Text("Font"),
-          //   subtitle: Text("Not implemented"),
-          // ),
+          ListTile(
+            title: const Text("Accent color"),
+            trailing: ColorIndicator(HSVColor.fromColor(Theme.of(context).colorScheme.primary), width: 25, height: 25),
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                title: const Text('Pick an accent color'),
+                content: SingleChildScrollView(
+                  child: ColorPicker(
+                    pickerColor: pickerColor,
+                    onColorChanged: changeColor,
+                  ),
+                ),
+                actions: <Widget>[
+                  ElevatedButton(
+                    child: const Text('Set'),
+                    onPressed: () {
+                      setState(() {
+                        context.findAncestorStateOfType<MyAppState>()?.setAccentColor(pickerColor);
+                      });
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ]));
+            }
+          ),
           // const ListTile(
           //   title: Text("Stats Table in TL mathes list"),
           //   subtitle: Text("Not implemented"),

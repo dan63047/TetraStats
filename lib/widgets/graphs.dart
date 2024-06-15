@@ -332,6 +332,8 @@ class Graphs extends StatelessWidget{
                 },
                 dataSets: [
                   RadarDataSet(
+                    fillColor: Theme.of(context).colorScheme.primary.withAlpha(100),
+                    borderColor: Theme.of(context).colorScheme.primary,
                     dataEntries: [
                       RadarEntry(value: apm * apmWeight),
                       RadarEntry(value: pps * ppsWeight),
@@ -399,6 +401,8 @@ class Graphs extends StatelessWidget{
                 },
                 dataSets: [
                   RadarDataSet(
+                    fillColor: Theme.of(context).colorScheme.primary.withAlpha(100),
+                    borderColor: Theme.of(context).colorScheme.primary,
                     dataEntries: [
                       RadarEntry(value: playstyle.opener),
                       RadarEntry(value: playstyle.stride),
@@ -454,6 +458,8 @@ class Graphs extends StatelessWidget{
                 },
                 dataSets: [
                   RadarDataSet(
+                    fillColor: Theme.of(context).colorScheme.primary.withAlpha(100),
+                    borderColor: Theme.of(context).colorScheme.primary,
                     dataEntries: [
                       RadarEntry(value: attack),
                       RadarEntry(value: speed),

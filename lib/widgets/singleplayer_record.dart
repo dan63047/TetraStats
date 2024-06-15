@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
+import 'package:tetra_stats/utils/open_in_browser.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
 import 'package:tetra_stats/views/singleplayer_record_view.dart';
@@ -125,6 +126,15 @@ class SingleplayerRecord extends StatelessWidget {
                 LineclearsThingy(record!.endContext.clears, record!.endContext.lines, record!.endContext.holds, record!.endContext.tSpins),
                 if (record!.endContext.gameType == "40l") Text("${record!.endContext.inputs} KP • ${f2.format(record!.endContext.kps)} KPS"),
                 if (record!.endContext.gameType == "blitz") Text("${record!.endContext.piecesPlaced} P • ${record!.endContext.inputs} KP • ${f2.format(record!.endContext.kpp)} KPP • ${f2.format(record!.endContext.kps)} KPS"),
+                Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.start,
+                  spacing: 20,
+                  children: [
+                    TextButton(onPressed: (){launchInBrowser(Uri.parse("https://tetr.io/#r:${record!.replayId}"));}, child: Text("Open replay in TETR.IO")),
+                    TextButton(onPressed: (){launchInBrowser(Uri.parse("https://inoue.szy.lol/api/replay/${record!.replayId}"));}, child: Text("Download replay")),
+                  ],
+                ),
                 if (stream != null && stream!.records.length > 1) for(int i = 1; i < stream!.records.length; i++) ListTile(
                   onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SingleplayerRecordView(record: stream!.records[i]))),
                   leading: Text("#${i+1}",

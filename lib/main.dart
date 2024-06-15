@@ -27,7 +27,7 @@ import 'package:go_router/go_router.dart';
 late final PackageInfo packageInfo;
 late SharedPreferences prefs;
 late TetrioService teto;
-ColorScheme sheme = const ColorScheme.dark(primary: Colors.cyanAccent, secondary: Colors.white);
+ThemeData theme = ThemeData(fontFamily: 'Eurostile Round', colorScheme: const ColorScheme.dark(primary: Colors.cyanAccent, secondary: Colors.white), scaffoldBackgroundColor: Colors.black);
 
 Future<dynamic> computeIsolate(Future Function() function) async {
   final receivePort = ReceivePort();
@@ -59,10 +59,6 @@ class _IsolateData {
     required this.function,
     required this.answerPort,
   });
-}
-
-void setAccentColor(Color color){ // does this thing work??? yes??? no???
-  sheme = ColorScheme.dark(primary: color, secondary: Colors.white);
 }
 
 final router = GoRouter(
@@ -160,8 +156,20 @@ void main() async {
   ));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => MyAppState();
+}
+
+class MyAppState extends State<MyApp> {
+  
+  void setAccentColor(Color color){ // does this thing work??? yes??? no??? 
+    setState(() {
+      theme = theme.copyWith(colorScheme: theme.colorScheme.copyWith(primary: color));
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -174,11 +182,7 @@ class MyApp extends StatelessWidget {
       locale: TranslationProvider.of(context).flutterLocale,
       supportedLocales: AppLocaleUtils.supportedLocales,
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      theme: ThemeData(
-        fontFamily: 'Eurostile Round',
-        colorScheme: sheme,
-        scaffoldBackgroundColor: Colors.black
-      )
+      theme: theme
     );
   }
 }

@@ -17,6 +17,7 @@ import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart' show prefs, teto;
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
+import 'package:tetra_stats/utils/open_in_browser.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
 import 'package:tetra_stats/views/singleplayer_record_view.dart';
@@ -948,6 +949,7 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
           primaryYAxis: const NumericAxis(
             rangePadding: ChartRangePadding.additional,
           ),
+          margin: const EdgeInsets.all(0),
           series: <CartesianSeries>[
             if (_gamesPlayedInsteadOfDateAndTime) StepLineSeries<_HistoryChartSpot, int>(
               enableTooltip: true,
@@ -958,12 +960,13 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
               opacity: _smooth ? 0 : 1,
               xValueMapper: (_HistoryChartSpot data, _) => data.gamesPlayed,
               yValueMapper: (_HistoryChartSpot data, _) => data.stat,
+              color: Theme.of(context).colorScheme.primary,
               trendlines:<Trendline>[
                 Trendline(
                   isVisible: _smooth,
                   period: (widget.data.length/175).floor(),
                   type: TrendlineType.movingAverage,
-                  color: Colors.blue)
+                  color: Theme.of(context).colorScheme.primary)
               ],
             )
             else StepLineSeries<_HistoryChartSpot, DateTime>(
@@ -975,12 +978,13 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
               opacity: _smooth ? 0 : 1,
               xValueMapper: (_HistoryChartSpot data, _) => data.timestamp,
               yValueMapper: (_HistoryChartSpot data, _) => data.stat,
+              color: Theme.of(context).colorScheme.primary,
               trendlines:<Trendline>[
                 Trendline(
                   isVisible: _smooth,
                   period: (widget.data.length/175).floor(),
                   type: TrendlineType.movingAverage,
-                  color: Colors.blue)
+                  color: Theme.of(context).colorScheme.primary)
               ],
             ),
           ],
@@ -1029,9 +1033,9 @@ class _TwoRecordsThingy extends StatelessWidget {
     }
     return SingleChildScrollView(child: Padding(
       padding: const EdgeInsets.only(top: 20.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Wrap(
+        alignment: WrapAlignment.spaceEvenly,
+        crossAxisAlignment: WrapCrossAlignment.start,
         children: [
           Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -1084,6 +1088,15 @@ class _TwoRecordsThingy extends StatelessWidget {
               if (sprint != null) FinesseThingy(sprint?.endContext.finesse, sprint?.endContext.finessePercentage),
               if (sprint != null) LineclearsThingy(sprint!.endContext.clears, sprint!.endContext.lines, sprint!.endContext.holds, sprint!.endContext.tSpins),
               if (sprint != null) Text("${sprint!.endContext.inputs} KP • ${f2.format(sprint!.endContext.kps)} KPS"),
+              Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.start,
+                  spacing: 20,
+                  children: [
+                    TextButton(onPressed: (){launchInBrowser(Uri.parse("https://tetr.io/#r:${sprint!.replayId}"));}, child: Text("Open replay in TETR.IO")),
+                    TextButton(onPressed: (){launchInBrowser(Uri.parse("https://inoue.szy.lol/api/replay/${sprint!.replayId}"));}, child: Text("Download replay")),
+                  ],
+                ),
               if (sprintStream.records.length > 1) SizedBox(
                 width: 400,
                 child: Column(
@@ -1161,6 +1174,15 @@ class _TwoRecordsThingy extends StatelessWidget {
             if (blitz != null) FinesseThingy(blitz?.endContext.finesse, blitz?.endContext.finessePercentage),
             if (blitz != null) LineclearsThingy(blitz!.endContext.clears, blitz!.endContext.lines, blitz!.endContext.holds, blitz!.endContext.tSpins),
             if (blitz != null) Text("${blitz!.endContext.piecesPlaced} P • ${blitz!.endContext.inputs} KP • ${f2.format(blitz!.endContext.kpp)} KPP • ${f2.format(blitz!.endContext.kps)} KPS"),
+            Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.start,
+                  spacing: 20,
+                  children: [
+                    TextButton(onPressed: (){launchInBrowser(Uri.parse("https://tetr.io/#r:${blitz!.replayId}"));}, child: Text("Open replay in TETR.IO")),
+                    TextButton(onPressed: (){launchInBrowser(Uri.parse("https://inoue.szy.lol/api/replay/${blitz!.replayId}"));}, child: Text("Download replay")),
+                  ],
+                ),
             if (blitzStream.records.length > 1) SizedBox(
                 width: 400,
                 child: Column(

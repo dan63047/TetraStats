@@ -33,6 +33,7 @@ class SingleplayerRecordView extends StatelessWidget {
               Column(
                 children: [
                   SingleplayerRecord(record: record, hideTitle: true),
+                  // TODO: Insert replay link here
                 ] 
               )
             ],
