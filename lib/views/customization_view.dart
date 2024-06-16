@@ -109,6 +109,7 @@ class CustomizationState extends State<CustomizationView> {
                     onPressed: () {
                       setState(() {
                         context.findAncestorStateOfType<MyAppState>()?.setAccentColor(pickerColor);
+                        prefs.setInt("accentColor", pickerColor.value);
                       });
                       Navigator.of(context).pop();
                     },
@@ -142,8 +143,8 @@ class CustomizationState extends State<CustomizationView> {
           trailing: DropdownButton(
             value: ratingMode,
             items: <DropdownMenuItem>[
-              DropdownMenuItem(value: 0, child: Text("TR")),
-              DropdownMenuItem(value: 1, child: Text("Glicko")),
+              const DropdownMenuItem(value: 0, child: Text("TR")),
+              const DropdownMenuItem(value: 1, child: Text("Glicko")),
               DropdownMenuItem(value: 2, child: Text(t.ratingLBposition))
             ],
             onChanged: (dynamic value){

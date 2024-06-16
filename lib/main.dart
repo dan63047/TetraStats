@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:isolate';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'dart:developer' as developer;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -145,9 +143,9 @@ void main() async {
   }
 
   // I dont want to store old cache
-  Timer.periodic(Duration(minutes: 5), (Timer timer) { 
+  Timer.periodic(const Duration(minutes: 5), (Timer timer) { 
     teto.cacheRoutine();
-    developer.log("Cache routine complete, next one in ${DateTime.now().add(Duration(minutes: 5))}", name: "main");
+    developer.log("Cache routine complete, next one in ${DateTime.now().add(const Duration(minutes: 5))}", name: "main");
     // if (prefs.getBool("updateInBG") == true) teto.fetchTracked(); // TODO: Somehow avoid doing that in main isolate
   });
   
@@ -164,6 +162,12 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
+
+  @override
+  void initState() {
+    setAccentColor(prefs.getInt("accentColor") != null ? Color(prefs.getInt("accentColor")!) : Colors.cyanAccent);
+    super.initState();
+  }
   
   void setAccentColor(Color color){ // does this thing work??? yes??? no??? 
     setState(() {

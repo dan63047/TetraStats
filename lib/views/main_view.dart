@@ -1,4 +1,4 @@
-// ignore_for_file: type_literal_in_constant_pattern
+// ignore_for_file: type_literal_in_constant_pattern, use_build_context_synchronously
 
 import 'dart:async';
 import 'dart:io';
@@ -75,7 +75,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   //var tableData = <TableRow>[];
   final bodyGlobalKey = GlobalKey();
   bool _showSearchBar = false;
-  Timer backgroundUpdate = Timer(Duration(days: 365), (){});
+  Timer backgroundUpdate = Timer(const Duration(days: 365), (){});
   bool _TLHistoryWasFetched = false;
   late TabController _tabController;
   late TabController _wideScreenTabController;
@@ -743,7 +743,7 @@ class _TLRecords extends StatelessWidget {
           leading: Text("${data[index].endContext.firstWhere((element) => element.userId == userID).points} : ${data[index].endContext.firstWhere((element) => element.userId != userID).points}",
           style: bigScreen ? const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, shadows: textShadow) : const TextStyle(fontSize: 28, shadows: textShadow)),
           title: Text("vs. ${data[index].endContext.firstWhere((element) => element.userId != userID).username}"),
-          subtitle: Text(timestamp(data[index].timestamp), style: TextStyle(color: Colors.grey)),
+          subtitle: Text(timestamp(data[index].timestamp), style: const TextStyle(color: Colors.grey)),
           trailing: TrailingStats(
             data[index].endContext.firstWhere((element) => element.userId == userID).secondary,
             data[index].endContext.firstWhere((element) => element.userId == userID).tertiary,
@@ -1089,8 +1089,8 @@ class _TwoRecordsThingy extends StatelessWidget {
                   crossAxisAlignment: WrapCrossAlignment.start,
                   spacing: 20,
                   children: [
-                    TextButton(onPressed: (){launchInBrowser(Uri.parse("https://tetr.io/#r:${sprint!.replayId}"));}, child: Text("Open replay in TETR.IO")),
-                    TextButton(onPressed: (){launchInBrowser(Uri.parse("https://inoue.szy.lol/api/replay/${sprint!.replayId}"));}, child: Text("Download replay")),
+                    TextButton(onPressed: (){launchInBrowser(Uri.parse("https://tetr.io/#r:${sprint!.replayId}"));}, child: Text(t.openSPreplay)),
+                    TextButton(onPressed: (){launchInBrowser(Uri.parse("https://inoue.szy.lol/api/replay/${sprint!.replayId}"));}, child: Text(t.downloadSPreplay)),
                   ],
                 ),
               if (sprintStream.records.length > 1) SizedBox(
@@ -1102,8 +1102,8 @@ class _TwoRecordsThingy extends StatelessWidget {
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SingleplayerRecordView(record: sprintStream.records[i]))),
                     leading: Text("#${i+1}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, shadows: textShadow, height: 0.9) ),
                     title: Text(get40lTime(sprintStream.records[i].endContext.finalTime.inMicroseconds),
-                    style: TextStyle(fontSize: 18)),
-                    subtitle: Text(timestamp(sprintStream.records[i].timestamp), style: TextStyle(color: Colors.grey, height: 0.85)),
+                    style: const TextStyle(fontSize: 18)),
+                    subtitle: Text(timestamp(sprintStream.records[i].timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
                     trailing: SpTrailingStats(sprintStream.records[i].endContext)
                   )
                     ],
@@ -1175,8 +1175,8 @@ class _TwoRecordsThingy extends StatelessWidget {
                   crossAxisAlignment: WrapCrossAlignment.start,
                   spacing: 20,
                   children: [
-                    TextButton(onPressed: (){launchInBrowser(Uri.parse("https://tetr.io/#r:${blitz!.replayId}"));}, child: Text("Open replay in TETR.IO")),
-                    TextButton(onPressed: (){launchInBrowser(Uri.parse("https://inoue.szy.lol/api/replay/${blitz!.replayId}"));}, child: Text("Download replay")),
+                    TextButton(onPressed: (){launchInBrowser(Uri.parse("https://tetr.io/#r:${blitz!.replayId}"));}, child: Text(t.openSPreplay)),
+                    TextButton(onPressed: (){launchInBrowser(Uri.parse("https://inoue.szy.lol/api/replay/${blitz!.replayId}"));}, child: Text(t.downloadSPreplay)),
                   ],
                 ),
             if (blitzStream.records.length > 1) SizedBox(
@@ -1188,8 +1188,8 @@ class _TwoRecordsThingy extends StatelessWidget {
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SingleplayerRecordView(record: blitzStream.records[i]))),
                     leading: Text("#${i+1}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, shadows: textShadow, height: 0.9) ),
                     title: Text("${NumberFormat.decimalPattern().format(blitzStream.records[i].endContext.score)} points",
-                    style: TextStyle(fontSize: 18)),
-                    subtitle: Text(timestamp(blitzStream.records[i].timestamp), style: TextStyle(color: Colors.grey, height: 0.85)),
+                    style: const TextStyle(fontSize: 18)),
+                    subtitle: Text(timestamp(blitzStream.records[i].timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
                     trailing: SpTrailingStats(blitzStream.records[i].endContext)
                   )
                     ],

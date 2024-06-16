@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, type_literal_in_constant_pattern
 
 import 'dart:io';
 import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';

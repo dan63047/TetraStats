@@ -1222,7 +1222,7 @@ class News{
   News(this.id, this.news);
 
   News.fromJson(Map<String, dynamic> json, String? userID){
-    id = userID != null ? "user_${userID}" : json['news'].first['stream'];
+    id = userID != null ? "user_$userID" : json['news'].first['stream'];
     news = [for (var entry in json['news']) NewsEntry.fromJson(entry)];
   }
 }

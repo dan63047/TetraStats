@@ -5,7 +5,7 @@ import 'package:tetra_stats/utils/numers_formats.dart';
 class SpTrailingStats extends StatelessWidget{
   final EndContextSingle endContext;
 
-  const SpTrailingStats(this.endContext);
+  const SpTrailingStats(this.endContext, {super.key});
 
   @override
   Widget build(BuildContext context) {

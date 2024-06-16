@@ -5,7 +5,6 @@ import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
 import 'package:tetra_stats/views/singleplayer_record_view.dart';
-import 'package:tetra_stats/widgets/singleplayer_record.dart';
 import 'package:tetra_stats/widgets/sp_trailing_stats.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
 
@@ -42,7 +41,7 @@ class RecentSingleplayerGames extends StatelessWidget{
               String() => "huh",
             },
           style: const TextStyle(fontSize: 18)),
-          subtitle: Text(timestamp(record.timestamp), style: TextStyle(color: Colors.grey, height: 0.85)),
+          subtitle: Text(timestamp(record.timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
           trailing: SpTrailingStats(record.endContext)
         )
       ],

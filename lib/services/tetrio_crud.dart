@@ -1,3 +1,5 @@
+// ignore_for_file: type_literal_in_constant_pattern
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer' as developer;
@@ -87,7 +89,7 @@ class CacheController {
       case Cutoffs:
         return object.runtimeType.toString();
       case TetrioPlayerFromLeaderboard: // i may be a little stupid
-        return object.runtimeType.toString()+"topone";
+        return "${object.runtimeType}topone";
       case TetraLeagueAlphaStream:
         return object.runtimeType.toString()+object.userId;
       case SingleplayerStream:

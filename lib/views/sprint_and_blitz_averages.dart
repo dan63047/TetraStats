@@ -60,7 +60,7 @@ class SprintAndBlitzState extends State<SprintAndBlitzView> {
                   Table(
                     defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                     border: TableBorder.all(color: Colors.grey.shade900),
-                    columnWidths: {0: const FixedColumnWidth(48)},
+                    columnWidths: const {0: FixedColumnWidth(48)},
                     children: [
                       TableRow(
                         children: [

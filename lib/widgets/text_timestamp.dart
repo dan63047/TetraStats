@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart';

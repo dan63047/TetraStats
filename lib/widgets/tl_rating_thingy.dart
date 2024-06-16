@@ -13,7 +13,7 @@ class TLRatingThingy extends StatelessWidget{
   final TetraLeagueAlpha? oldTl;
   final double? topTR;
 
-  const TLRatingThingy({required this.userID, required this.tlData, this.oldTl, this.topTR});
+  const TLRatingThingy({super.key, required this.userID, required this.tlData, this.oldTl, this.topTR});
 
   @override
   Widget build(BuildContext context) {

@@ -147,8 +147,8 @@ class SingleplayerRecord extends StatelessWidget {
                       "5mblast" => get40lTime(stream!.records[i].endContext.finalTime.inMicroseconds),
                       String() => "huh",
                     },
-                  style: TextStyle(fontSize: 18)),
-                  subtitle: Text(timestamp(stream!.records[i].timestamp), style: TextStyle(color: Colors.grey, height: 0.85)),
+                  style: const TextStyle(fontSize: 18)),
+                  subtitle: Text(timestamp(stream!.records[i].timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
                   trailing: SpTrailingStats(stream!.records[i].endContext)
                 )
               ]
