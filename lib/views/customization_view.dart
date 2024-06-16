@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:tetra_stats/views/settings_view.dart' show subtitleStyle;
-import 'package:tetra_stats/main.dart' show MyApp, MyAppState, prefs, setAccentColor;
+import 'package:tetra_stats/main.dart' show MyAppState, prefs;
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -89,7 +89,8 @@ class CustomizationState extends State<CustomizationView> {
           child: ListView(
         children: [
           ListTile(
-            title: const Text("Accent color"),
+            title: Text(t.AccentColor),
+            subtitle: Text(t.AccentColorDescription, style: subtitleStyle),
             trailing: ColorIndicator(HSVColor.fromColor(Theme.of(context).colorScheme.primary), width: 25, height: 25),
             onTap: () {
               showDialog(
@@ -119,22 +120,14 @@ class CustomizationState extends State<CustomizationView> {
           //   title: Text("Stats Table in TL mathes list"),
           //   subtitle: Text("Not implemented"),
           // ),
-           ListTile(title: Text(t.oskKagari),
-          subtitle: Text(t.oskKagariDescription, style: subtitleStyle),
-          trailing: Switch(value: oskKagariGimmick, onChanged: (bool value){
-            prefs.setBool("oskKagariGimmick", value);
-            setState(() {
-              oskKagariGimmick = value;
-            });
-          }),),
-          ListTile(title: Text("Timestamps"),
-          subtitle: Text(t.oskKagariDescription, style: subtitleStyle),
+          ListTile(title: Text(t.timestamps),
+          subtitle: Text(t.timestampsDescription, style: subtitleStyle),
           trailing: DropdownButton(
             value: timestampMode,
             items: <DropdownMenuItem>[
-              DropdownMenuItem(value: 0, child: Text("Absolute (GMT)")),
-              DropdownMenuItem(value: 1, child: Text("Absolute (Local Time)")),
-              DropdownMenuItem(value: 2, child: Text("Relative"))
+              DropdownMenuItem(value: 0, child: Text(t.timestampsAbsoluteGMT)),
+              DropdownMenuItem(value: 1, child: Text(t.timestampsAbsoluteLocalTime)),
+              DropdownMenuItem(value: 2, child: Text(t.timestampsRelative))
             ],
             onChanged: (dynamic value){
               prefs.setInt("timestampMode", value);
@@ -144,14 +137,14 @@ class CustomizationState extends State<CustomizationView> {
             },
           ),
           ),
-          ListTile(title: Text("Main representation of rating"),
-          subtitle: Text(t.oskKagariDescription, style: subtitleStyle),
+          ListTile(title: Text(t.rating),
+          subtitle: Text(t.ratingDescription, style: subtitleStyle),
           trailing: DropdownButton(
             value: ratingMode,
             items: <DropdownMenuItem>[
               DropdownMenuItem(value: 0, child: Text("TR")),
               DropdownMenuItem(value: 1, child: Text("Glicko")),
-              DropdownMenuItem(value: 2, child: Text("LB position"))
+              DropdownMenuItem(value: 2, child: Text(t.ratingLBposition))
             ],
             onChanged: (dynamic value){
               prefs.setInt("ratingMode", value);
@@ -161,12 +154,20 @@ class CustomizationState extends State<CustomizationView> {
             },
           ),
           ),
-          ListTile(title: Text("Sheetbot-like behavior for radar graphs"),
-          subtitle: Text(t.oskKagariDescription, style: subtitleStyle),
+          ListTile(title: Text(t.sheetbotGraphs),
+          subtitle: Text(t.sheetbotGraphsDescription, style: subtitleStyle),
           trailing: Switch(value: sheetbotRadarGraphs, onChanged: (bool value){
             prefs.setBool("sheetbotRadarGraphs", value);
             setState(() {
               sheetbotRadarGraphs = value;
+            });
+          }),),
+          ListTile(title: Text(t.oskKagari),
+          subtitle: Text(t.oskKagariDescription, style: subtitleStyle),
+          trailing: Switch(value: oskKagariGimmick, onChanged: (bool value){
+            prefs.setBool("oskKagariGimmick", value);
+            setState(() {
+              oskKagariGimmick = value;
             });
           }),)
         ],

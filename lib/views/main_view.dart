@@ -438,7 +438,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                                 Tab(text: t.history),
                                 Tab(text: t.sprint),
                                 Tab(text: t.blitz),
-                                Tab(text: "Recent runs"),
+                                Tab(text: t.recentRuns),
                                 Tab(text: t.other),
                               ],
                             ),

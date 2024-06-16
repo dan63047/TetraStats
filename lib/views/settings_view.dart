@@ -263,8 +263,8 @@ class SettingsState extends State<SettingsView> {
           onTap: () {
             context.go("/settings/customization");
           },),
-          ListTile(title: Text("Update stats in the background"),
-          subtitle: Text("While tetra stats is running, it can update stats of the current player when cache expires", style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
+          ListTile(title: Text(t.updateInBackground),
+          subtitle: Text(t.updateInBackgroundDescription, style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
           trailing: Switch(value: updateInBG, onChanged: (bool value){
             prefs.setBool("updateInBG", value);
             setState(() {

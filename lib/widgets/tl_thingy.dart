@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
@@ -58,7 +59,7 @@ class _TLThingyState extends State<TLThingy> {
   final t = Translations.of(context);
   String decimalSeparator = f2.symbols.DECIMAL_SEP;
   List<String> estTRformated = f2.format(currentTl.estTr!.esttr).split(decimalSeparator);
-  List<String> estTRaccFormated = intFDiff.format(currentTl.esttracc!).split(decimalSeparator);
+  List<String> estTRaccFormated = intFDiff.format(currentTl.esttracc!).split(".");
     if (currentTl.gamesPlayed == 0) return Center(child: Text(widget.guest ? t.anonTL : widget.bot ? t.botTL : t.neverPlayedTL, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28), textAlign: TextAlign.center,));
     return LayoutBuilder(builder: (context, constraints) {
     bool bigScreen = constraints.maxWidth >= 768;
@@ -245,12 +246,10 @@ class _TLThingyState extends State<TLThingy> {
                 ),
               if (currentTl.estTr != null)
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
+                  padding: const EdgeInsets.fromLTRB(8, 20, 8, 20),
                   child: Container(
-                    //alignment: Alignment.center,
-                    width: bigScreen ? MediaQuery.of(context).size.width * 0.4 : MediaQuery.of(context).size.width * 0.85,
                     height: 70,
-                    constraints: const BoxConstraints(maxWidth: 768),
+                    constraints: const BoxConstraints(maxWidth: 500),
                     child: Stack(
                       children: [
                         Positioned(

@@ -44,7 +44,7 @@ class TLRatingThingy extends StatelessWidget{
                     TextSpan(text: " Glicko", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
                   ],
                   2 => [
-                    TextSpan(text: "Top ${formatedPercentile[0]}", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                    TextSpan(text: "${t.top} ${formatedPercentile[0]}", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
                     if (formatedPercentile.elementAtOrNull(1) != null) TextSpan(text: decimalSeparator + formatedPercentile[1]),
                     TextSpan(text: " %", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
                   ],
@@ -77,7 +77,7 @@ class TLRatingThingy extends StatelessWidget{
                   text: TextSpan(
                     style: DefaultTextStyle.of(context).style,
                     children: [
-                      TextSpan(text: prefs.getInt("ratingMode") == 2 ? "${f2.format(tlData.rating)} TR  • % rank: ${tlData.percentileRank.toUpperCase()}" : "${t.top} ${f2.format(tlData.percentile * 100)}% (${tlData.percentileRank.toUpperCase()})"),
+                      TextSpan(text: prefs.getInt("ratingMode") == 2 ? "${f2.format(tlData.rating)} TR  • % ${t.rank}: ${tlData.percentileRank.toUpperCase()}" : "${t.top} ${f2.format(tlData.percentile * 100)}% (${tlData.percentileRank.toUpperCase()})"),
                       if (tlData.bestRank != "z") const TextSpan(text: " • "),
                       if (tlData.bestRank != "z") TextSpan(text: "${t.topRank}: ${tlData.bestRank.toUpperCase()}"),
                       if (topTR != null) TextSpan(text: " (${f2.format(topTR)} TR)"),

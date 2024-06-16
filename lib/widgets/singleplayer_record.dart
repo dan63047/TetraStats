@@ -131,8 +131,8 @@ class SingleplayerRecord extends StatelessWidget {
                   crossAxisAlignment: WrapCrossAlignment.start,
                   spacing: 20,
                   children: [
-                    TextButton(onPressed: (){launchInBrowser(Uri.parse("https://tetr.io/#r:${record!.replayId}"));}, child: Text("Open replay in TETR.IO")),
-                    TextButton(onPressed: (){launchInBrowser(Uri.parse("https://inoue.szy.lol/api/replay/${record!.replayId}"));}, child: Text("Download replay")),
+                    TextButton(onPressed: (){launchInBrowser(Uri.parse("https://tetr.io/#r:${record!.replayId}"));}, child: Text(t.openSPreplay)),
+                    TextButton(onPressed: (){launchInBrowser(Uri.parse("https://inoue.szy.lol/api/replay/${record!.replayId}"));}, child: Text(t.downloadSPreplay)),
                   ],
                 ),
                 if (stream != null && stream!.records.length > 1) for(int i = 1; i < stream!.records.length; i++) ListTile(
@@ -143,7 +143,7 @@ class SingleplayerRecord extends StatelessWidget {
                   title: Text(
                     switch (stream!.records[i].endContext.gameType){
                       "40l" => get40lTime(stream!.records[i].endContext.finalTime.inMicroseconds),
-                      "blitz" => "${NumberFormat.decimalPattern().format(stream!.records[i].endContext.score)} points",
+                      "blitz" => t.blitzScore(p: NumberFormat.decimalPattern().format(stream!.records[i].endContext.score)),
                       "5mblast" => get40lTime(stream!.records[i].endContext.finalTime.inMicroseconds),
                       String() => "huh",
                     },
