@@ -13,7 +13,7 @@ import 'package:tetra_stats/widgets/tl_progress_bar.dart';
 import 'package:tetra_stats/widgets/tl_rating_thingy.dart';
 
 
-var intFDiff = NumberFormat("+#,###;-#,###");
+var intFDiff = NumberFormat("+#,###.000;-#,###.000");
 
 class TLThingy extends StatefulWidget {
   final TetraLeagueAlpha tl;
@@ -56,8 +56,9 @@ class _TLThingyState extends State<TLThingy> {
   @override
   Widget build(BuildContext context) { 
   final t = Translations.of(context);
-  NumberFormat fractionfEstTR = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2)..maximumIntegerDigits = 0;
-  NumberFormat fractionfEstTRAcc = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 3)..maximumIntegerDigits = 0;
+  String decimalSeparator = f2.symbols.DECIMAL_SEP;
+  List<String> estTRformated = f2.format(currentTl.estTr!.esttr).split(decimalSeparator);
+  List<String> estTRaccFormated = intFDiff.format(currentTl.esttracc!).split(decimalSeparator);
     if (currentTl.gamesPlayed == 0) return Center(child: Text(widget.guest ? t.anonTL : widget.bot ? t.botTL : t.neverPlayedTL, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28), textAlign: TextAlign.center,));
     return LayoutBuilder(builder: (context, constraints) {
     bool bigScreen = constraints.maxWidth >= 768;
@@ -260,9 +261,9 @@ class _TLThingyState extends State<TLThingy> {
                             Text(t.statCellNum.estOfTR, style: const TextStyle(height: 0.1),),
                             RichText(
                               text: TextSpan(
-                                text: intf.format(currentTl.estTr!.esttr.truncate()),
+                                text: estTRformated[0],
                                 style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 36 : 30, fontWeight: FontWeight.w500, color: Colors.white),
-                                children: [TextSpan(text: fractionfEstTR.format(currentTl.estTr!.esttr - currentTl.estTr!.esttr.truncate()).substring(1), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
+                                children: [TextSpan(text: decimalSeparator+estTRformated[1], style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
                                 ),
                               ),
                             RichText(text: TextSpan(
@@ -289,10 +290,10 @@ class _TLThingyState extends State<TLThingy> {
                             Text(t.statCellNum.accOfEst, style: const TextStyle(height: 0.1),),
                             RichText(
                               text: TextSpan(
-                                text: (currentTl.esttracc != null && currentTl.bestRank != "z") ? intFDiff.format(currentTl.esttracc!.truncate()) : "---",
+                                text: (currentTl.esttracc != null && currentTl.bestRank != "z") ? estTRaccFormated[0] : "---",
                                 style: TextStyle(fontFamily: "Eurostile Round", fontSize: bigScreen ? 36 : 30, fontWeight: FontWeight.w500, color: Colors.white),
                                 children: [
-                                  TextSpan(text: (currentTl.esttracc != null && currentTl.bestRank != "z") ? fractionfEstTRAcc.format(currentTl.esttracc!.isNegative ? 1 - (currentTl.esttracc! - currentTl.esttracc!.truncate()) : (currentTl.esttracc! - currentTl.esttracc!.truncate())).substring(1) : ".---", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))
+                                  TextSpan(text: (currentTl.esttracc != null && currentTl.bestRank != "z") ? decimalSeparator+estTRaccFormated[1] : ".---", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))
                                 ]
                                 ),
                               ),

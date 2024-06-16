@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
@@ -43,16 +45,16 @@ class StatCellNum extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    NumberFormat f = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: fractionDigits ?? 0);
     NumberFormat comparef = NumberFormat("+#,###.###;-#,###.###")..maximumFractionDigits = fractionDigits ?? 0;
-    NumberFormat fractionf = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: fractionDigits ?? 0)..maximumIntegerDigits = 0;
-    num fraction = playerStat.isNegative ? 1 - (playerStat - playerStat.floor()) : playerStat - playerStat.floor();
-    int integer = playerStat.isNegative ? (playerStat + fraction).toInt() : (playerStat - fraction).toInt();
+    String formated = f.format(playerStat);
+    List<String> splited = formated.split(f.symbols.DECIMAL_SEP);
     return Column(
       children: [
         RichText(
-          text: TextSpan(text: intf.format(integer),
+          text: TextSpan(text: splited[0],
           children: [
-            TextSpan(text: fractionf.format(fraction).substring(1), style: smallDecimal ? const TextStyle(fontSize: 16) : null)
+            if ((fractionDigits??0) > 0) TextSpan(text: f.symbols.DECIMAL_SEP+splited[1], style: smallDecimal ? const TextStyle(fontFamily: "Eurostile Round", fontSize: 16) : null)
           ],
           style: TextStyle(
             fontFamily: "Eurostile Round Extended",

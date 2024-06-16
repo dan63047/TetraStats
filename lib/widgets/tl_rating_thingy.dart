@@ -5,7 +5,7 @@ import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart' show prefs;
 import 'package:tetra_stats/utils/numers_formats.dart';
 
-var fDiff = NumberFormat("+#,###.###;-#,###.###");
+var fDiff = NumberFormat("+#,###.####;-#,###.####");
 
 class TLRatingThingy extends StatelessWidget{
   final String userID;
@@ -19,7 +19,10 @@ class TLRatingThingy extends StatelessWidget{
   Widget build(BuildContext context) {
     bool oskKagariGimmick = prefs.getBool("oskKagariGimmick")??true;
     bool bigScreen = MediaQuery.of(context).size.width >= 768;
-    int test = 0;
+    String decimalSeparator = f4.symbols.DECIMAL_SEP;
+    List<String> formatedTR = f4.format(tlData.rating).split(decimalSeparator);
+    List<String> formatedGlicko = f4.format(tlData.glicko).split(decimalSeparator);
+    List<String> formatedPercentile = f4.format(tlData.percentile * 100).split(decimalSeparator);
     return Wrap(
       direction: Axis.horizontal,
       alignment: WrapAlignment.spaceAround,
@@ -31,17 +34,34 @@ class TLRatingThingy extends StatelessWidget{
             : Image.asset("res/tetrio_tl_alpha_ranks/${tlData.rank}.png", height: 128),
         Column(
           children: [
-            Text(
-              switch(prefs.getInt("ratingMode")){
-                1 => "${f2.format(tlData.glicko)} Glicko",
-                2 => "Top ${tlData.percentile < 0.1 ? f3.format(tlData.percentile * 100) : f2.format(tlData.percentile * 100)}%",
-                _ => "${(tlData.rating >= 24999 || tlData.rating < 100) ? f4.format(tlData.rating) : f2.format(tlData.rating)} TR",
-              },
-              style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)
+            RichText(
+              text: TextSpan(
+                style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 20, color: Colors.white),
+                children: switch(prefs.getInt("ratingMode")){
+                  1 => [
+                    TextSpan(text: formatedGlicko[0], style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                    if (formatedGlicko.elementAtOrNull(1) != null) TextSpan(text: decimalSeparator + formatedGlicko[1]),
+                    TextSpan(text: " Glicko", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
+                  ],
+                  2 => [
+                    TextSpan(text: "Top ${formatedPercentile[0]}", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                    if (formatedPercentile.elementAtOrNull(1) != null) TextSpan(text: decimalSeparator + formatedPercentile[1]),
+                    TextSpan(text: " %", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
+                  ],
+                  _ => [
+                  TextSpan(text: formatedTR[0], style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                  if (formatedTR.elementAtOrNull(1) != null) TextSpan(text: decimalSeparator + formatedTR[1]),
+                  TextSpan(text: " TR", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
+                ],
+                }
+              )
             ),
-            // Text("${f4.format(25000.0 - tlData.rating)} TR", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
             if (oldTl != null) Text(
-              "${fDiff.format(tlData.rating - oldTl!.rating)} TR",
+              switch(prefs.getInt("ratingMode")){
+                1 => "${fDiff.format(tlData.glicko! - oldTl!.glicko!)} Glicko",
+                2 => "${fDiff.format(tlData.percentile * 100 - oldTl!.percentile * 100)} %",
+                _ => "${fDiff.format(tlData.rating - oldTl!.rating)} TR"
+              },
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: tlData.rating - oldTl!.rating < 0 ?

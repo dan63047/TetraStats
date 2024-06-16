@@ -953,8 +953,6 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
           series: <CartesianSeries>[
             if (_gamesPlayedInsteadOfDateAndTime) StepLineSeries<_HistoryChartSpot, int>(
               enableTooltip: true,
-              // splineType: SplineType.cardinal,
-              // cardinalSplineTension: 0.2,
               dataSource: widget.data,
               animationDuration: 0,
               opacity: _smooth ? 0 : 1,
@@ -971,8 +969,6 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
             )
             else StepLineSeries<_HistoryChartSpot, DateTime>(
               enableTooltip: true,
-              // splineType: SplineType.cardinal,
-              // cardinalSplineTension: 0.2,
               dataSource: widget.data,
               animationDuration: 0,
               opacity: _smooth ? 0 : 1,
