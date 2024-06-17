@@ -1,10 +1,16 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'dart:developer' as developer;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:tetra_stats/views/customization_view.dart';
+import 'package:tetra_stats/views/ranks_averages_view.dart';
+import 'package:tetra_stats/views/sprint_and_blitz_averages.dart';
+import 'package:tetra_stats/views/tl_leaderboard_view.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
@@ -18,11 +24,40 @@ import 'package:go_router/go_router.dart';
 
 late final PackageInfo packageInfo;
 late SharedPreferences prefs;
-ColorScheme sheme = const ColorScheme.dark(primary: Colors.cyanAccent, secondary: Colors.white);
+late TetrioService teto;
+ThemeData theme = ThemeData(fontFamily: 'Eurostile Round', colorScheme: const ColorScheme.dark(primary: Colors.cyanAccent, secondary: Colors.white), scaffoldBackgroundColor: Colors.black);
 
-void setAccentColor(Color color){ // does this thing work??? yes??? no???
-  sheme = ColorScheme.dark(primary: color, secondary: Colors.white);
-}
+// Future<dynamic> computeIsolate(Future Function() function) async {
+//   final receivePort = ReceivePort();
+//   var rootToken = RootIsolateToken.instance!;
+//   await Isolate.spawn<_IsolateData>(
+//     _isolateEntry,
+//     _IsolateData(
+//       token: rootToken,
+//       function: function,
+//       answerPort: receivePort.sendPort,
+//     ),
+//   );
+//   return await receivePort.first;
+// }
+
+// void _isolateEntry(_IsolateData isolateData) async {
+//   BackgroundIsolateBinaryMessenger.ensureInitialized(isolateData.token);
+//   final answer = await isolateData.function();
+//   isolateData.answerPort.send(answer);
+// }
+
+// class _IsolateData {
+//   final RootIsolateToken token;
+//   final Function function;
+//   final SendPort answerPort;
+
+//   _IsolateData({
+//     required this.token,
+//     required this.function,
+//     required this.answerPort,
+//   });
+// }
 
 final router = GoRouter(
   initialLocation: "/",
@@ -34,6 +69,26 @@ final router = GoRouter(
          GoRoute(
           path: 'settings',
           builder: (_, __) => const SettingsView(),
+          routes: [
+            GoRoute(
+              path: 'customization',
+              builder: (_, __) => const CustomizationView(),
+            ),
+          ]
+        ),
+        GoRoute(
+          path: "leaderboard",
+          builder: (_, __) => const TLLeaderboardView(),
+          routes: [
+            GoRoute(
+              path: "LBvalues",
+              builder: (_, __) => const RankAveragesView(),
+            ),
+          ]
+        ),
+        GoRoute(
+          path: "LBvalues",
+          builder: (_, __) => const RankAveragesView(),
         ),
         GoRoute(
           path: 'states',
@@ -44,9 +99,9 @@ final router = GoRouter(
           builder: (_, __) => const CalcView(),
         ),
         GoRoute(
-          path: 'customization',
-          builder: (_, __) => const CustomizationView(),
-        ),
+          path: 'sprintAndBlitzAverages',
+          builder: (_, __) => const SprintAndBlitzView(),
+        )
       ]
     ),
     GoRoute( // that one intended for Android users, that can open https://ch.tetr.io/u/ links
@@ -77,6 +132,7 @@ void main() async {
 
   packageInfo = await PackageInfo.fromPlatform();
   prefs = await SharedPreferences.getInstance();
+  teto = TetrioService();
 
   // Choosing the locale
   String? locale = prefs.getString("locale");
@@ -85,14 +141,39 @@ void main() async {
   }else{
     LocaleSettings.setLocaleRaw(locale);
   }
+
+  // I dont want to store old cache
+  Timer.periodic(const Duration(minutes: 5), (Timer timer) { 
+    teto.cacheRoutine();
+    developer.log("Cache routine complete, next one in ${DateTime.now().add(const Duration(minutes: 5))}", name: "main");
+    // if (prefs.getBool("updateInBG") == true) teto.fetchTracked(); // TODO: Somehow avoid doing that in main isolate
+  });
   
   runApp(TranslationProvider(
     child: const MyApp(),
   ));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => MyAppState();
+}
+
+class MyAppState extends State<MyApp> {
+
+  @override
+  void initState() {
+    setAccentColor(prefs.getInt("accentColor") != null ? Color(prefs.getInt("accentColor")!) : Colors.cyanAccent);
+    super.initState();
+  }
+  
+  void setAccentColor(Color color){ // does this thing work??? yes??? no??? 
+    setState(() {
+      theme = theme.copyWith(colorScheme: theme.colorScheme.copyWith(primary: color));
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,11 +186,7 @@ class MyApp extends StatelessWidget {
       locale: TranslationProvider.of(context).flutterLocale,
       supportedLocales: AppLocaleUtils.supportedLocales,
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      theme: ThemeData(
-        fontFamily: 'Eurostile Round',
-        colorScheme: sheme,
-        scaffoldBackgroundColor: Colors.black
-      )
+      theme: theme
     );
   }
 }

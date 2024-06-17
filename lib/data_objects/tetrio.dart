@@ -265,6 +265,7 @@ class TetrioPlayer {
   List<RecordSingle?> blitz = [];
   TetrioZen? zen;
   Distinguishment? distinguishment;
+  DateTime? cachedUntil;
 
   TetrioPlayer({
     required this.userId,
@@ -292,11 +293,12 @@ class TetrioPlayer {
     required this.blitz,
     this.zen,
     this.distinguishment,
+    this.cachedUntil
   });
 
   double get level => pow((xp / 500), 0.6) + (xp / (5000 + (max(0, xp - 4 * pow(10, 6)) / 5000))) + 1;
 
-  TetrioPlayer.fromJson(Map<String, dynamic> json, DateTime stateTime, String id, String nick) {
+  TetrioPlayer.fromJson(Map<String, dynamic> json, DateTime stateTime, String id, String nick, [DateTime? cUntil]) {
     //developer.log("TetrioPlayer.fromJson $stateTime: $json", name: "data_objects/tetrio");
     userId = id;
     username = nick;
@@ -324,6 +326,7 @@ class TetrioPlayer {
     friendCount = json['friend_count'] ?? 0;
     badstanding = json['badstanding'];
     botmaster = json['botmaster'];
+    cachedUntil = cUntil;
   }
 
   Map<String, dynamic> toJson() {
@@ -869,6 +872,21 @@ class TetraLeagueAlphaStream{
   }
 }
 
+class SingleplayerStream{
+  late String userId;
+  late String type;
+  late List<RecordSingle> records;
+
+  SingleplayerStream({required this.userId, required this.records, required this.type});
+
+  SingleplayerStream.fromJson(List<dynamic> json, String userID, String tp) {
+    userId = userID;
+    type = tp;
+    records = [];
+    for (var value in json) {records.add(RecordSingle.fromJson(value, null));}
+  }
+}
+
 class TetraLeagueAlphaRecord{
   late String replayId;
   late String ownId;
@@ -1113,19 +1131,17 @@ class RecordSingle {
   late String userId;
   late String replayId;
   late String ownId;
-  late String stream;
-  DateTime? timestamp;
-  EndContextSingle? endContext;
+  late DateTime timestamp;
+  late EndContextSingle endContext;
   int? rank;
 
-  RecordSingle({required this.userId, required this.replayId, required this.ownId, this.timestamp, this.endContext, this.rank});
+  RecordSingle({required this.userId, required this.replayId, required this.ownId, required this.timestamp, required this.endContext, this.rank});
 
   RecordSingle.fromJson(Map<String, dynamic> json, int? ran) {
     //developer.log("RecordSingle.fromJson: $json", name: "data_objects/tetrio");
     ownId = json['_id'];
-    endContext = json['endcontext'] != null ? EndContextSingle.fromJson(json['endcontext']) : null;
+    endContext = EndContextSingle.fromJson(json['endcontext']);
     replayId = json['replayid'];
-    stream = json['stream'];
     timestamp = DateTime.parse(json['ts']);
     userId = json['user']['_id'];
     rank = ran;
@@ -1134,9 +1150,7 @@ class RecordSingle {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['_id'] = ownId;
-    if (endContext != null) {
-      data['endcontext'] = endContext!.toJson();
-    }
+    data['endcontext'] = endContext.toJson();
     data['ismulti'] = false;
     data['replayid'] = replayId;
     data['ts'] = timestamp;
@@ -1162,6 +1176,15 @@ class TetrioZen {
     data['score'] = score;
     return data;
   }
+}
+
+class UserRecords{
+  String id;
+  RecordSingle? sprint;
+  RecordSingle? blitz;
+  TetrioZen zen;
+
+  UserRecords(this.id, this.sprint, this.blitz, this.zen);
 }
 
 class Distinguishment {
@@ -1192,18 +1215,28 @@ class Distinguishment {
   }
 }
 
-class News {
+class News{
   late String id;
-  late String stream;
+  late List<NewsEntry> news;
+
+  News(this.id, this.news);
+
+  News.fromJson(Map<String, dynamic> json, String? userID){
+    id = userID != null ? "user_$userID" : json['news'].first['stream'];
+    news = [for (var entry in json['news']) NewsEntry.fromJson(entry)];
+  }
+}
+
+class NewsEntry {
+  //late String id; do i need it?
   late String type;
   late Map<String, dynamic> data;
   late DateTime timestamp;
 
-  News({required this.type, required this.id, required this.stream, required this.data, required this.timestamp});
+  NewsEntry({required this.type, required this.data, required this.timestamp});
 
-  News.fromJson(Map<String, dynamic> json){
-    id = json["_id"];
-    stream = json["stream"];
+  NewsEntry.fromJson(Map<String, dynamic> json){
+    //id = json["_id"];
     type = json["type"];
     data = json["data"];
     timestamp = DateTime.parse(json['ts']);

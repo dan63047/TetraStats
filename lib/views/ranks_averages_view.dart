@@ -5,7 +5,7 @@ import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/views/rank_averages_view.dart';
 import 'package:window_manager/window_manager.dart';
-import 'main_view.dart'; // lol
+import 'package:tetra_stats/main.dart' show teto;
 
 class RankAveragesView extends StatefulWidget {
   const RankAveragesView({super.key});

@@ -1,20 +1,19 @@
 import 'dart:io';
 import 'package:go_router/go_router.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
-import 'package:tetra_stats/main.dart' show packageInfo;
+import 'package:tetra_stats/main.dart' show packageInfo, teto, prefs;
 import 'package:file_selector/file_selector.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
-import 'package:tetra_stats/services/tetrio_crud.dart';
 import 'package:tetra_stats/utils/open_in_browser.dart';
 import 'package:window_manager/window_manager.dart';
 
 late String oldWindowTitle;
+TextStyle subtitleStyle = const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey);
 
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
@@ -24,10 +23,9 @@ class SettingsView extends StatefulWidget {
 }
 
 class SettingsState extends State<SettingsView> {
-  late SharedPreferences prefs;
-  final TetrioService teto = TetrioService();
   String defaultNickname = "Checking...";
   late bool showPositions;
+  late bool updateInBG;
   final TextEditingController _playertext = TextEditingController();
 
   @override
@@ -46,9 +44,9 @@ class SettingsState extends State<SettingsView> {
     super.dispose();
   }
 
-  Future<void> _getPreferences() async {
-    prefs = await SharedPreferences.getInstance();
+  void _getPreferences() {
     showPositions = prefs.getBool("showPositions") ?? false;
+    updateInBG = prefs.getBool("updateInBG") ?? false;
     _setDefaultNickname(prefs.getString("player"));
   }
 
@@ -93,7 +91,7 @@ class SettingsState extends State<SettingsView> {
         children: [
           ListTile(
             title: Text(t.exportDB),
-            subtitle: Text(t.exportDBDescription, style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
+            subtitle: Text(t.exportDBDescription, style: subtitleStyle),
             onTap: () {
               if (kIsWeb){
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.notForWeb)));
@@ -147,7 +145,7 @@ class SettingsState extends State<SettingsView> {
           ),
           ListTile(
             title: Text(t.importDB),
-            subtitle: Text(t.importDBDescription, style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
+            subtitle: Text(t.importDBDescription, style: subtitleStyle),
             onTap: () {
               if (kIsWeb){
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.notForWeb)));
@@ -199,6 +197,7 @@ class SettingsState extends State<SettingsView> {
           ),
           ListTile(
             title: Text(t.yourID),
+            subtitle: Text(t.yourIDText, style: subtitleStyle),
             trailing: Text(defaultNickname),
             onTap: () => showDialog(
                 context: context,
@@ -244,6 +243,7 @@ class SettingsState extends State<SettingsView> {
           ),
           ListTile(
             title: Text(t.language),
+            subtitle: Text("By default, the system language will be selected (if available among Tetra Stats locales, otherwise English)", style: subtitleStyle),
             trailing: DropdownButton(
                 items: locales,
                 value: LocaleSettings.currentLocale,
@@ -261,8 +261,16 @@ class SettingsState extends State<SettingsView> {
           subtitle: Text(t.customizationDescription, style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
           trailing: const Icon(Icons.arrow_right),
           onTap: () {
-            context.go("/customization");
+            context.go("/settings/customization");
           },),
+          ListTile(title: Text(t.updateInBackground),
+          subtitle: Text(t.updateInBackgroundDescription, style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
+          trailing: Switch(value: updateInBG, onChanged: (bool value){
+            prefs.setBool("updateInBG", value);
+            setState(() {
+              updateInBG = value;
+            });
+          }),),
           ListTile(title: Text(t.lbStats),
           subtitle: Text(t.lbStatsDescription, style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
           trailing: Switch(value: showPositions, onChanged: (bool value){

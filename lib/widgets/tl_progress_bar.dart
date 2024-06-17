@@ -70,7 +70,7 @@ class TLProgress extends StatelessWidget{
                       if (tlData.nextAt > 0 && nextRankTRcutoff != null) const TextSpan(text: "\n"),
                       if (nextRankTRcutoff != null) TextSpan(text: "${f2.format(nextRankTRcutoff)} (${comparef2.format(nextRankTRcutoff!-tlData.rating)}) TR"),
                       if ((tlData.nextAt > 0 || nextRankTRcutoff != null) && nextRankGlickoCutoff != null) const TextSpan(text: "\n"),
-                      if (nextRankGlickoCutoff != null) TextSpan(text: (tlData.standing < tlData.nextAt || ((nextRankGlickoCutoff!-tlData.glicko!)/glickoForWin < 0.5 && tlData.percentileRank != "x")) ? t.promotionOnNextWin : t.numOfVictories(wins: f2.format((nextRankGlickoCutoff!-tlData.glicko!)/glickoForWin)), style: TextStyle(color: (tlData.standing < tlData.nextAt || ((nextRankGlickoCutoff!-tlData.glicko!)/glickoForWin < 0.5 && tlData.percentileRank != "x")) ? Colors.greenAccent : null))
+                      if (nextRankGlickoCutoff != null) TextSpan(text: (tlData.standing < tlData.nextAt || ((nextRankGlickoCutoff!-tlData.glicko!)/glickoForWin < 0.5 && ((tlData.rank != "x" && tlData.rank != "z") || tlData.percentileRank != "x"))) ? t.promotionOnNextWin : t.numOfVictories(wins: f2.format((nextRankGlickoCutoff!-tlData.glicko!)/glickoForWin)), style: TextStyle(color: (tlData.standing < tlData.nextAt || ((nextRankGlickoCutoff!-tlData.glicko!)/glickoForWin < 0.5 && tlData.percentileRank != "x")) ? Colors.greenAccent : null))
                     ]
                   )
                 ),
@@ -82,8 +82,8 @@ class TLProgress extends StatelessWidget{
             maximum: 1,
             interval: 1, 
             ranges: [
-              if (previousRankTRcutoff != null && nextRankTRcutoff != null) LinearGaugeRange(endValue: getBarTR(tlData.rating)!, color: Colors.cyanAccent, position: LinearElementPosition.cross)
-              else if (tlData.standing != -1) LinearGaugeRange(endValue: getBarPosition(), color: Colors.cyanAccent, position: LinearElementPosition.cross),
+              if (previousRankTRcutoff != null && nextRankTRcutoff != null) LinearGaugeRange(endValue: getBarTR(tlData.rating)!, color: Theme.of(context).colorScheme.primary, position: LinearElementPosition.cross)
+              else if (tlData.standing != -1) LinearGaugeRange(endValue: getBarPosition(), color: Theme.of(context).colorScheme.primary, position: LinearElementPosition.cross),
               if (previousRankTRcutoff != null && previousRankTRcutoffTarget != null) LinearGaugeRange(endValue: getBarTR(previousRankTRcutoffTarget!)!, color: Colors.greenAccent, position: LinearElementPosition.inside),
               if (nextRankTRcutoff != null && nextRankTRcutoffTarget != null && previousRankTRcutoff != null) LinearGaugeRange(startValue: getBarTR(nextRankTRcutoffTarget!)!, endValue: 1, color: Colors.yellowAccent, position: LinearElementPosition.inside)
             ],

@@ -36,21 +36,115 @@
     // The value below is injected by flutter build, do not touch.
     var serviceWorkerVersion = null;
   </script>
+  <style>
+    @font-face {
+        font-family: 'Eurostile Round';
+        src: local('Eurostile Round Medium'), local('EurostileRound-Medium'), url('https://dan63.by/static/EurostileRound-Medium.ttf') format('truetype');
+        font-weight: 500;
+        font-style: normal;
+    }
+    @font-face {
+        font-family: 'Eurostile Round Extended';
+        src: local('Eurostile Round Extended Regular'), local('EurostileRoundExtended-Regular'), url('https://dan63.by/static/EurostileRoundExtended-Regular.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+    @font-face {
+        font-family: 'Eurostile Round Extended';
+        src: local('Eurostile Round Extended Black'), local('EurostileRoundExtended-Black'), url('https://dan63.by/static/EurostileRoundExtended-Black.ttf') format('truetype');
+        font-weight: 900;
+        font-style: normal;
+    }
+    @keyframes breathing {
+        from{
+            opacity: 1;
+        }
+
+        to{
+            opacity: 0.3;
+        }
+    }
+    *{
+        margin: 0;
+        padding: 0;
+    }
+    body{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100vw;
+        height: 100vh;
+        background-color: #000;
+        color: #fff;
+        font-family: 'Eurostile Round';
+        font-weight: 500;
+        font-style: normal;
+    }
+    #preloader{
+        display: flex;
+        width: fit-content;
+        height: fit-content;
+        align-items: center;
+        justify-content: center;
+        background-color: #111;
+        border-radius: 24px;
+        padding: 8px;
+        background-image: linear-gradient(240deg, #0000009e, transparent);
+    }
+    .hidden{
+        display: none!important;
+    }
+    .title{
+        font-family: "Eurostile Round Extended";
+        font-weight: 100;
+        padding-bottom: 8px;
+    }
+    .subtitle{
+        color: grey;
+    }
+    .logo{
+        height: 128px;
+        padding-right: 8px;
+        border-radius: 24px;
+    }
+    #progress{
+        padding-top: 8px;
+        animation: 1s cubic-bezier(.46,.03,.52,.96) infinite alternate breathing;
+    }
+    @media (max-width: 502px){
+        #preloader{
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+  </style>
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
 </head>
 <body>
+  <div id="preloader">
+    <img class="logo" src="icons/Icon-192.png" alt="Tetra Stats icon">
+    <div>
+        <h1 class="title">Tetra Stats</h1>
+        <p class="subtitle">Track your and other player stats in TETR.IO.<br>Made by dan63047</p>
+        <p id="progress">Loading...</p>
+    </div>
+  </div>
   <script>
     window.addEventListener('load', function(ev) {
+        let progress = document.querySelector("#progress");
+        let preloader = document.querySelector("#preloader");
       // Download main.dart.js
       _flutter.loader.loadEntrypoint({
         serviceWorker: {
           serviceWorkerVersion: serviceWorkerVersion,
         },
-        onEntrypointLoaded: function(engineInitializer) {
-          engineInitializer.initializeEngine().then(function(appRunner) {
-            appRunner.runApp();
-          });
+        onEntrypointLoaded: async function(engineInitializer) {
+            console.log(serviceWorkerVersion);
+            let appRunner = await engineInitializer.initializeEngine();
+            progress.innerHTML = "Booting...";
+            await appRunner.runApp();
+            preloader.classList.add("hidden");
         }
       });
     });

@@ -1,5 +1,6 @@
-// ignore_for_file: type_literal_in_constant_pattern
+// ignore_for_file: type_literal_in_constant_pattern, use_build_context_synchronously
 
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -10,39 +11,38 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:tetra_stats/data_objects/tetra_stats.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
-import 'package:tetra_stats/services/tetrio_crud.dart';
-import 'package:tetra_stats/main.dart' show prefs;
+import 'package:tetra_stats/main.dart' show prefs, teto;
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
+import 'package:tetra_stats/utils/open_in_browser.dart';
+import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
-import 'package:tetra_stats/views/ranks_averages_view.dart' show RankAveragesView;
-import 'package:tetra_stats/views/sprint_and_blitz_averages.dart';
-import 'package:tetra_stats/views/tl_leaderboard_view.dart' show TLLeaderboardView;
+import 'package:tetra_stats/views/singleplayer_record_view.dart';
 import 'package:tetra_stats/views/tl_match_view.dart' show TlMatchResultView;
 import 'package:tetra_stats/widgets/finesse_thingy.dart';
 import 'package:tetra_stats/widgets/lineclears_thingy.dart';
 import 'package:tetra_stats/widgets/list_tile_trailing_stats.dart';
+import 'package:tetra_stats/widgets/recent_sp_games.dart';
 import 'package:tetra_stats/widgets/search_box.dart';
+import 'package:tetra_stats/widgets/singleplayer_record.dart';
+import 'package:tetra_stats/widgets/sp_trailing_stats.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
+import 'package:tetra_stats/widgets/text_timestamp.dart';
 import 'package:tetra_stats/widgets/tl_thingy.dart';
 import 'package:tetra_stats/widgets/user_thingy.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:go_router/go_router.dart';
 
-final TetrioService teto = TetrioService(); // thing, that manadge our local DB
 int _chartsIndex = 0;
 bool _gamesPlayedInsteadOfDateAndTime = false;
 late ZoomPanBehavior _zoomPanBehavior;
 bool _smooth = false;
 List _historyShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR", "Opener", "Plonk", "Inf. DS", "Stride"];
 late ScrollController _scrollController;
-final NumberFormat _timeInSec = NumberFormat("#,###.###s.", LocaleSettings.currentLocale.languageCode);
-final NumberFormat secs = NumberFormat("00.###", LocaleSettings.currentLocale.languageCode);
-final DateFormat _dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
-
 
 class MainView extends StatefulWidget {
   final String? player;
@@ -57,25 +57,6 @@ class MainView extends StatefulWidget {
 
 Future<void> copyToClipboard(String text) async {
   await Clipboard.setData(ClipboardData(text: text));
-}
-
-/// Takes number of [microseconds] and returns readable 40 lines time
-String get40lTime(int microseconds){
-  return microseconds > 60000000 ? "${(microseconds/1000000/60).floor()}:${(secs.format(microseconds /1000000 % 60))}" : _timeInSec.format(microseconds / 1000000);
-  }
-
-/// Readable [a] - [b], without sign
-String readableTimeDifference(Duration a, Duration b){
-  Duration result = a - b;
-  
-  return NumberFormat("0.000s;0.000s", LocaleSettings.currentLocale.languageCode).format(result.inMilliseconds/1000);
-}
-
-/// Readable [a] - [b], without sign
-String readableIntDifference(int a, int b){
-  int result = a - b;
-
-  return NumberFormat("#,###;#,###", LocaleSettings.currentLocale.languageCode).format(result);
 }
 
 class _MainState extends State<MainView> with TickerProviderStateMixin {
@@ -94,10 +75,10 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   //var tableData = <TableRow>[];
   final bodyGlobalKey = GlobalKey();
   bool _showSearchBar = false;
+  Timer backgroundUpdate = Timer(const Duration(days: 365), (){});
   bool _TLHistoryWasFetched = false;
   late TabController _tabController;
   late TabController _wideScreenTabController;
-  late bool fixedScroll;
 
   String get title => "Tetra Stats: $_titleNickname";
 
@@ -105,7 +86,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   void initState() {
     initDB();
     _scrollController = ScrollController();
-    _tabController = TabController(length: 6, vsync: this);
+    _tabController = TabController(length: 7, vsync: this);
     _wideScreenTabController = TabController(length: 4, vsync: this);
     _zoomPanBehavior = ZoomPanBehavior(
       enablePinching: true,
@@ -158,6 +139,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   Future<List> fetch(String nickOrID, {bool fetchHistory = false, bool fetchTLmatches = false}) async {
     TetrioPlayer me;
     _TLHistoryWasFetched = false;
+    backgroundUpdate.cancel();
     
     // If user trying to search with discord id
     if (nickOrID.startsWith("ds:")){
@@ -174,23 +156,32 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     // Requesting Tetra League (alpha), records, news and top TR of player
     late List<dynamic> requests;
     late TetraLeagueAlphaStream tlStream;
-    late Map<String, dynamic> records;
-    late List<News> news;
+    late UserRecords records;
+    late News news;
+    late SingleplayerStream recent;
+    late SingleplayerStream sprint;
+    late SingleplayerStream blitz;
     late TetrioPlayerFromLeaderboard? topOne;
-    late double? topTR;
-    requests = await Future.wait([ // all at once
+    late TopTr? topTR;
+    requests = await Future.wait([ // all at once (7 requests to oskware lmao)
       teto.fetchTLStream(_searchFor),
       teto.fetchRecords(_searchFor),
       teto.fetchNews(_searchFor),
+      teto.fetchSingleplayerStream(_searchFor, "any_userrecent"),
+      teto.fetchSingleplayerStream(_searchFor, "40l_userbest"),
+      teto.fetchSingleplayerStream(_searchFor, "blitz_userbest"),
       prefs.getBool("showPositions") != true ? teto.fetchCutoffs() : Future.delayed(Duration.zero, ()=><Map<String, double>>[]),
       (me.tlSeason1.rank != "z" ? me.tlSeason1.rank == "x" : me.tlSeason1.percentileRank == "x") ? teto.fetchTopOneFromTheLeaderboard() : Future.delayed(Duration.zero, ()=>null),
-      if (me.tlSeason1.gamesPlayed > 9) teto.fetchTopTR(_searchFor) // can retrieve this only if player has TR
+      (me.tlSeason1.gamesPlayed > 9) ? teto.fetchTopTR(_searchFor) : Future.delayed(Duration.zero, () => null) // can retrieve this only if player has TR
     ]);
     tlStream = requests[0] as TetraLeagueAlphaStream;
-    records = requests[1] as Map<String, dynamic>;
-    news = requests[2] as List<News>;
-    topOne = requests[4] as TetrioPlayerFromLeaderboard?;
-    topTR = requests.elementAtOrNull(5) as double?; // No TR - no Top TR
+    records = requests[1] as UserRecords;
+    news = requests[2] as News;
+    recent = requests[3] as SingleplayerStream;
+    sprint = requests[4] as SingleplayerStream;
+    blitz = requests[5] as SingleplayerStream;
+    topOne = requests[7] as TetrioPlayerFromLeaderboard?;
+    topTR = requests[8] as TopTr?; // No TR - no Top TR
 
     meAmongEveryone = teto.getCachedLeaderboardPositions(me.userId);
     if (prefs.getBool("showPositions") == true){
@@ -202,8 +193,8 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
         if (meAmongEveryone != null) teto.cacheLeaderboardPositions(me.userId, meAmongEveryone!); 
       }
     }
-    Map<String, double>? cutoffs = prefs.getBool("showPositions") == true ? everyone!.cutoffs : (requests[3] as List<Map<String, double>>).elementAtOrNull(0);
-    Map<String, double>? cutoffsGlicko = prefs.getBool("showPositions") == true ? everyone!.cutoffsGlicko : (requests[3] as List<Map<String, double>>).elementAtOrNull(1);
+    Map<String, double>? cutoffs = prefs.getBool("showPositions") == true ? everyone!.cutoffs : (requests[6] as Cutoffs?)?.tr;
+    Map<String, double>? cutoffsGlicko = prefs.getBool("showPositions") == true ? everyone!.cutoffsGlicko : (requests[6] as Cutoffs?)?.glicko;
     
     if (me.tlSeason1.gamesPlayed > 9) {
         thatRankCutoff = cutoffs?[me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank];
@@ -308,7 +299,14 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       compareWith = null;
       chartsData = [];
     }
-    return [me, records, states, tlMatches, compareWith, isTracking, news, topTR];
+
+    if (prefs.getBool("updateInBG") == true) {
+      backgroundUpdate = Timer(me.cachedUntil!.difference(DateTime.now()), () {
+        changePlayer(me.userId);
+      });
+    }
+
+    return [me, records, states, tlMatches, compareWith, isTracking, news, topTR, recent, sprint, blitz];
   }
 
   /// Triggers widgets rebuild
@@ -440,6 +438,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                                 Tab(text: t.history),
                                 Tab(text: t.sprint),
                                 Tab(text: t.blitz),
+                                Tab(text: t.recentRuns),
                                 Tab(text: t.other),
                               ],
                             ),
@@ -459,7 +458,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                                 tl: snapshot.data![0].tlSeason1,
                                 userID: snapshot.data![0].userId,
                                 states: snapshot.data![2],
-                                topTR: snapshot.data![7],
+                                topTR: snapshot.data![7]?.tr,
                                 bot: snapshot.data![0].role == "bot",
                                 guest: snapshot.data![0].role == "anon",
                                 thatRankCutoff: thatRankCutoff,
@@ -478,14 +477,14 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                             ),
                           ],),
                           _History(chartsData: chartsData, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
-                          _TwoRecordsThingy(sprint: snapshot.data![1]['sprint'], blitz: snapshot.data![1]['blitz'], rank: snapshot.data![0].tlSeason1.percentileRank,),
-                          _OtherThingy(zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6],)
+                          _TwoRecordsThingy(sprint: snapshot.data![1].sprint, blitz: snapshot.data![1].blitz, rank: snapshot.data![0].tlSeason1.percentileRank, recent: snapshot.data![8], sprintStream: snapshot.data![9], blitzStream: snapshot.data![10]),
+                          _OtherThingy(zen: snapshot.data![1].zen, bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6],)
                         ] : [
                           TLThingy(
                             tl: snapshot.data![0].tlSeason1,
                             userID: snapshot.data![0].userId,
                             states: snapshot.data![2],
-                            topTR: snapshot.data![7],
+                            topTR: snapshot.data![7]?.tr,
                             bot: snapshot.data![0].role == "bot",
                             guest: snapshot.data![0].role == "anon",
                             thatRankCutoff: thatRankCutoff,
@@ -499,9 +498,10 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                           ),
                           _TLRecords(userID: snapshot.data![0].userId, changePlayer: changePlayer, data: snapshot.data![3], wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0, oldMathcesHere: _TLHistoryWasFetched),
                           _History(chartsData: chartsData, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![0].tlSeason1.gamesPlayed > 0),
-                          _RecordThingy(record: snapshot.data![1]['sprint'], rank: snapshot.data![0].tlSeason1.percentileRank),
-                          _RecordThingy(record: snapshot.data![1]['blitz'], rank: snapshot.data![0].tlSeason1.percentileRank),
-                          _OtherThingy(zen: snapshot.data![1]['zen'], bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6],)
+                          SingleplayerRecord(record: snapshot.data![1].sprint, rank: snapshot.data![0].tlSeason1.percentileRank, stream: snapshot.data![9]),
+                          SingleplayerRecord(record: snapshot.data![1].blitz, rank: snapshot.data![0].tlSeason1.percentileRank, stream: snapshot.data![10]),
+                          _RecentSingleplayersThingy(snapshot.data![8]),
+                          _OtherThingy(zen: snapshot.data![1].zen, bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![6])
                         ],
                       ),
                     ),
@@ -643,12 +643,7 @@ class _NavDrawerState extends State<NavDrawer> {
                           leading: const Icon(Icons.leaderboard),
                           title: Text(t.tlLeaderboard),
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const TLLeaderboardView(),
-                              ),
-                            );
+                            context.go("/leaderboard");
                           },
                         ),
                       ),
@@ -657,12 +652,7 @@ class _NavDrawerState extends State<NavDrawer> {
                           leading: const Icon(Icons.compress),
                           title: Text(t.rankAveragesViewTitle),
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const RankAveragesView(),
-                              ),
-                            );
+                            context.go("/LBvalues");
                           },
                         ),
                       ),
@@ -671,12 +661,7 @@ class _NavDrawerState extends State<NavDrawer> {
                           leading: const Icon(Icons.bar_chart),
                           title: Text(t.sprintAndBlitsViewTitle),
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const SprintAndBlitzView(),
-                              ),
-                            );
+                            context.go("/sprintAndBlitzAverages");
                           },
                         ),
                       ),
@@ -758,7 +743,7 @@ class _TLRecords extends StatelessWidget {
           leading: Text("${data[index].endContext.firstWhere((element) => element.userId == userID).points} : ${data[index].endContext.firstWhere((element) => element.userId != userID).points}",
           style: bigScreen ? const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, shadows: textShadow) : const TextStyle(fontSize: 28, shadows: textShadow)),
           title: Text("vs. ${data[index].endContext.firstWhere((element) => element.userId != userID).username}"),
-          subtitle: Text(_dateFormat.format(data[index].timestamp)),
+          subtitle: Text(timestamp(data[index].timestamp), style: const TextStyle(color: Colors.grey)),
           trailing: TrailingStats(
             data[index].endContext.firstWhere((element) => element.userId == userID).secondary,
             data[index].endContext.firstWhere((element) => element.userId == userID).tertiary,
@@ -921,7 +906,7 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
                     style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 20),
                   ),
                 ),
-                Text(_gamesPlayedInsteadOfDateAndTime ? t.gamesPlayed(games: t.games(n: data.gamesPlayed)) : _dateFormat.format(data.timestamp))
+                Text(_gamesPlayedInsteadOfDateAndTime ? t.gamesPlayed(games: t.games(n: data.gamesPlayed)) : timestamp(data.timestamp))
               ],
             ),
           );
@@ -964,39 +949,38 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
           primaryYAxis: const NumericAxis(
             rangePadding: ChartRangePadding.additional,
           ),
+          margin: const EdgeInsets.all(0),
           series: <CartesianSeries>[
             if (_gamesPlayedInsteadOfDateAndTime) StepLineSeries<_HistoryChartSpot, int>(
               enableTooltip: true,
-              // splineType: SplineType.cardinal,
-              // cardinalSplineTension: 0.2,
               dataSource: widget.data,
               animationDuration: 0,
               opacity: _smooth ? 0 : 1,
               xValueMapper: (_HistoryChartSpot data, _) => data.gamesPlayed,
               yValueMapper: (_HistoryChartSpot data, _) => data.stat,
+              color: Theme.of(context).colorScheme.primary,
               trendlines:<Trendline>[
                 Trendline(
                   isVisible: _smooth,
                   period: (widget.data.length/175).floor(),
                   type: TrendlineType.movingAverage,
-                  color: Colors.blue)
+                  color: Theme.of(context).colorScheme.primary)
               ],
             )
             else StepLineSeries<_HistoryChartSpot, DateTime>(
               enableTooltip: true,
-              // splineType: SplineType.cardinal,
-              // cardinalSplineTension: 0.2,
               dataSource: widget.data,
               animationDuration: 0,
               opacity: _smooth ? 0 : 1,
               xValueMapper: (_HistoryChartSpot data, _) => data.timestamp,
               yValueMapper: (_HistoryChartSpot data, _) => data.stat,
+              color: Theme.of(context).colorScheme.primary,
               trendlines:<Trendline>[
                 Trendline(
                   isVisible: _smooth,
                   period: (widget.data.length/175).floor(),
                   type: TrendlineType.movingAverage,
-                  color: Colors.blue)
+                  color: Theme.of(context).colorScheme.primary)
               ],
             ),
           ],
@@ -1010,9 +994,12 @@ class _HistoryChartThigyState extends State<_HistoryChartThigy> {
 class _TwoRecordsThingy extends StatelessWidget {
   final RecordSingle? sprint;
   final RecordSingle? blitz;
+  final SingleplayerStream recent;
+  final SingleplayerStream sprintStream;
+  final SingleplayerStream blitzStream;
   final String? rank;
 
-  const _TwoRecordsThingy({required this.sprint, required this.blitz, this.rank});
+  const _TwoRecordsThingy({required this.sprint, required this.blitz, this.rank, required this.recent, required this.sprintStream, required this.blitzStream});
 
   Color getColorOfRank(int rank){
     if (rank == 1) return Colors.yellowAccent;
@@ -1028,23 +1015,23 @@ class _TwoRecordsThingy extends StatelessWidget {
     //if (record == null) return Center(child: Text(t.noRecord, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)));
     late MapEntry closestAverageBlitz;
     late bool blitzBetterThanClosestAverage;
-    bool? blitzBetterThanRankAverage = (rank != null && rank != "z" && blitz != null) ? blitz!.endContext!.score > blitzAverages[rank]! : null;
+    bool? blitzBetterThanRankAverage = (rank != null && rank != "z" && blitz != null) ? blitz!.endContext.score > blitzAverages[rank]! : null;
     late MapEntry closestAverageSprint;
     late bool sprintBetterThanClosestAverage;
-    bool? sprintBetterThanRankAverage = (rank != null && rank != "z" && sprint != null) ? sprint!.endContext!.finalTime < sprintAverages[rank]! : null;
+    bool? sprintBetterThanRankAverage = (rank != null && rank != "z" && sprint != null) ? sprint!.endContext.finalTime < sprintAverages[rank]! : null;
     if (sprint != null) {
-      closestAverageSprint = sprintAverages.entries.singleWhere((element) => element.value == sprintAverages.values.reduce((a, b) => (a-sprint!.endContext!.finalTime).abs() < (b -sprint!.endContext!.finalTime).abs() ? a : b));
-      sprintBetterThanClosestAverage = sprint!.endContext!.finalTime < closestAverageSprint.value;
+      closestAverageSprint = sprintAverages.entries.singleWhere((element) => element.value == sprintAverages.values.reduce((a, b) => (a-sprint!.endContext.finalTime).abs() < (b -sprint!.endContext.finalTime).abs() ? a : b));
+      sprintBetterThanClosestAverage = sprint!.endContext.finalTime < closestAverageSprint.value;
     }
     if (blitz != null){
-      closestAverageBlitz = blitzAverages.entries.singleWhere((element) => element.value == blitzAverages.values.reduce((a, b) => (a-blitz!.endContext!.score).abs() < (b -blitz!.endContext!.score).abs() ? a : b));
-      blitzBetterThanClosestAverage = blitz!.endContext!.score > closestAverageBlitz.value;
+      closestAverageBlitz = blitzAverages.entries.singleWhere((element) => element.value == blitzAverages.values.reduce((a, b) => (a-blitz!.endContext.score).abs() < (b -blitz!.endContext.score).abs() ? a : b));
+      blitzBetterThanClosestAverage = blitz!.endContext.score > closestAverageBlitz.value;
     }
     return SingleChildScrollView(child: Padding(
       padding: const EdgeInsets.only(top: 20.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Wrap(
+        alignment: WrapAlignment.spaceEvenly,
+        crossAxisAlignment: WrapCrossAlignment.start,
         children: [
           Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -1060,24 +1047,24 @@ class _TwoRecordsThingy extends StatelessWidget {
                     children: [
                     Text(t.sprint, style: const TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
                     RichText(text: TextSpan(
-                        text: sprint != null ? get40lTime(sprint!.endContext!.finalTime.inMicroseconds) : "---",
+                        text: sprint != null ? get40lTime(sprint!.endContext.finalTime.inMicroseconds) : "---",
                         style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: FontWeight.w500, color: sprint != null ? Colors.white : Colors.grey),
-                        //children: [TextSpan(text: get40lTime(record!.endContext!.finalTime.inMicroseconds), style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
+                        //children: [TextSpan(text: get40lTime(record!.endContext.finalTime.inMicroseconds), style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
                         ),
                       ),
                     if (sprint != null) RichText(text: TextSpan(
                       text: "",
                       style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
                       children: [
-                        if (rank != null && rank != "z") TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(sprint!.endContext!.finalTime, sprintAverages[rank]!), verdict: sprintBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
+                        if (rank != null && rank != "z") TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(sprint!.endContext.finalTime, sprintAverages[rank]!), verdict: sprintBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
                           color: sprintBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
                         ))
-                        else TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(sprint!.endContext!.finalTime, closestAverageSprint.value), verdict: sprintBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageSprint.key.toUpperCase())}\n", style: TextStyle(
+                        else TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(sprint!.endContext.finalTime, closestAverageSprint.value), verdict: sprintBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageSprint.key.toUpperCase())}\n", style: TextStyle(
                           color: sprintBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
                         )),
                         if (sprint!.rank != null) TextSpan(text: "№${sprint!.rank}", style: TextStyle(color: getColorOfRank(sprint!.rank!))),
                         if (sprint!.rank != null) const TextSpan(text: " • "),
-                        TextSpan(text: _dateFormat.format(sprint!.timestamp!)),
+                        TextSpan(text: timestamp(sprint!.timestamp)),
                       ]
                       ),
                     ),
@@ -1089,14 +1076,39 @@ class _TwoRecordsThingy extends StatelessWidget {
                   alignment: WrapAlignment.spaceBetween,
                   spacing: 20,
                   children: [
-                    StatCellNum(playerStat: sprint!.endContext!.piecesPlaced, playerStatLabel: t.statCellNum.pieces, isScreenBig: true, higherIsBetter: true, smallDecimal: false),
-                    StatCellNum(playerStat: sprint!.endContext!.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: true, higherIsBetter: true, smallDecimal: false),
-                    StatCellNum(playerStat: sprint!.endContext!.kpp, playerStatLabel: t.statCellNum.kpp, fractionDigits: 2, isScreenBig: true, higherIsBetter: true, smallDecimal: false),
+                    StatCellNum(playerStat: sprint!.endContext.piecesPlaced, playerStatLabel: t.statCellNum.pieces, isScreenBig: true, higherIsBetter: true, smallDecimal: false),
+                    StatCellNum(playerStat: sprint!.endContext.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: true, higherIsBetter: true, smallDecimal: false),
+                    StatCellNum(playerStat: sprint!.endContext.kpp, playerStatLabel: t.statCellNum.kpp, fractionDigits: 2, isScreenBig: true, higherIsBetter: true, smallDecimal: false),
                   ],
               ),
-              if (sprint != null) FinesseThingy(sprint?.endContext?.finesse, sprint?.endContext?.finessePercentage),
-              if (sprint != null) LineclearsThingy(sprint!.endContext!.clears, sprint!.endContext!.lines, sprint!.endContext!.holds, sprint!.endContext!.tSpins),
-              if (sprint != null) Text("${sprint!.endContext!.inputs} KP • ${f2.format(sprint!.endContext!.kps)} KPS")
+              if (sprint != null) FinesseThingy(sprint?.endContext.finesse, sprint?.endContext.finessePercentage),
+              if (sprint != null) LineclearsThingy(sprint!.endContext.clears, sprint!.endContext.lines, sprint!.endContext.holds, sprint!.endContext.tSpins),
+              if (sprint != null) Text("${sprint!.endContext.inputs} KP • ${f2.format(sprint!.endContext.kps)} KPS"),
+              Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.start,
+                  spacing: 20,
+                  children: [
+                    TextButton(onPressed: (){launchInBrowser(Uri.parse("https://tetr.io/#r:${sprint!.replayId}"));}, child: Text(t.openSPreplay)),
+                    TextButton(onPressed: (){launchInBrowser(Uri.parse("https://inoue.szy.lol/api/replay/${sprint!.replayId}"));}, child: Text(t.downloadSPreplay)),
+                  ],
+                ),
+              if (sprintStream.records.length > 1) SizedBox(
+                width: 400,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    for (int i = 1; i < sprintStream.records.length; i++) ListTile(
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SingleplayerRecordView(record: sprintStream.records[i]))),
+                    leading: Text("#${i+1}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, shadows: textShadow, height: 0.9) ),
+                    title: Text(get40lTime(sprintStream.records[i].endContext.finalTime.inMicroseconds),
+                    style: const TextStyle(fontSize: 18)),
+                    subtitle: Text(timestamp(sprintStream.records[i].timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
+                    trailing: SpTrailingStats(sprintStream.records[i].endContext)
+                  )
+                    ],
+                ),
+              )
             ]
           ),
           Column(
@@ -1116,7 +1128,7 @@ class _TwoRecordsThingy extends StatelessWidget {
                       text: "",
                       style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: FontWeight.w500, color: Colors.white),
                       children: [
-                        TextSpan(text: blitz != null ? NumberFormat.decimalPattern().format(blitz!.endContext!.score) : "---"),
+                        TextSpan(text: blitz != null ? NumberFormat.decimalPattern().format(blitz!.endContext.score) : "---"),
                         //WidgetSpan(child: Image.asset("res/icons/kagari.png", height: 48))
                       ]
                       ),
@@ -1127,13 +1139,13 @@ class _TwoRecordsThingy extends StatelessWidget {
                     text: "",
                     style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
                     children: [
-                      if (rank != null && rank != "z") TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(blitz!.endContext!.score, blitzAverages[rank]!), verdict: blitzBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
+                      if (rank != null && rank != "z") TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(blitz!.endContext.score, blitzAverages[rank]!), verdict: blitzBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
                         color: blitzBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
                       ))
-                      else TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(blitz!.endContext!.score, closestAverageBlitz.value), verdict: blitzBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageBlitz.key.toUpperCase())}\n", style: TextStyle(
+                      else TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(blitz!.endContext.score, closestAverageBlitz.value), verdict: blitzBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageBlitz.key.toUpperCase())}\n", style: TextStyle(
                         color: blitzBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
                       )),
-                      TextSpan(text: _dateFormat.format(blitz!.timestamp!)),
+                      TextSpan(text: timestamp(blitz!.timestamp)),
                       if (blitz!.rank != null)  const TextSpan(text: " • "),
                       if (blitz!.rank != null)  TextSpan(text: "№${blitz!.rank}", style: TextStyle(color: getColorOfRank(blitz!.rank!))),
                     ]
@@ -1150,145 +1162,69 @@ class _TwoRecordsThingy extends StatelessWidget {
                 crossAxisAlignment: WrapCrossAlignment.start,
                 spacing: 20,
                 children: [
-                  StatCellNum(playerStat: blitz!.endContext!.level, playerStatLabel: t.statCellNum.level, isScreenBig: true, higherIsBetter: true, smallDecimal: false),
-                  StatCellNum(playerStat: blitz!.endContext!.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: true, higherIsBetter: true, smallDecimal: false),
-                  StatCellNum(playerStat: blitz!.endContext!.spp, playerStatLabel: t.statCellNum.spp, fractionDigits: 2, isScreenBig: true, higherIsBetter: true)
+                  StatCellNum(playerStat: blitz!.endContext.level, playerStatLabel: t.statCellNum.level, isScreenBig: true, higherIsBetter: true, smallDecimal: false),
+                  StatCellNum(playerStat: blitz!.endContext.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: true, higherIsBetter: true, smallDecimal: false),
+                  StatCellNum(playerStat: blitz!.endContext.spp, playerStatLabel: t.statCellNum.spp, fractionDigits: 2, isScreenBig: true, higherIsBetter: true)
                 ],
             ),
-            if (blitz != null) FinesseThingy(blitz?.endContext?.finesse, blitz?.endContext?.finessePercentage),
-            if (blitz != null) LineclearsThingy(blitz!.endContext!.clears, blitz!.endContext!.lines, blitz!.endContext!.holds, blitz!.endContext!.tSpins),
-            if (blitz != null) Text("${blitz!.endContext!.piecesPlaced} P • ${blitz!.endContext!.inputs} KP • ${f2.format(blitz!.endContext!.kpp)} KPP • ${f2.format(blitz!.endContext!.kps)} KPS")
+            if (blitz != null) FinesseThingy(blitz?.endContext.finesse, blitz?.endContext.finessePercentage),
+            if (blitz != null) LineclearsThingy(blitz!.endContext.clears, blitz!.endContext.lines, blitz!.endContext.holds, blitz!.endContext.tSpins),
+            if (blitz != null) Text("${blitz!.endContext.piecesPlaced} P • ${blitz!.endContext.inputs} KP • ${f2.format(blitz!.endContext.kpp)} KPP • ${f2.format(blitz!.endContext.kps)} KPS"),
+            Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.start,
+                  spacing: 20,
+                  children: [
+                    TextButton(onPressed: (){launchInBrowser(Uri.parse("https://tetr.io/#r:${blitz!.replayId}"));}, child: Text(t.openSPreplay)),
+                    TextButton(onPressed: (){launchInBrowser(Uri.parse("https://inoue.szy.lol/api/replay/${blitz!.replayId}"));}, child: Text(t.downloadSPreplay)),
+                  ],
+                ),
+            if (blitzStream.records.length > 1) SizedBox(
+                width: 400,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    for (int i = 1; i < sprintStream.records.length; i++) ListTile(
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SingleplayerRecordView(record: blitzStream.records[i]))),
+                    leading: Text("#${i+1}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, shadows: textShadow, height: 0.9) ),
+                    title: Text("${NumberFormat.decimalPattern().format(blitzStream.records[i].endContext.score)} points",
+                    style: const TextStyle(fontSize: 18)),
+                    subtitle: Text(timestamp(blitzStream.records[i].timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
+                    trailing: SpTrailingStats(blitzStream.records[i].endContext)
+                  )
+                    ],
+                ),
+              )
             ],
           ),
+          SizedBox(
+            width: 400,
+            child: RecentSingleplayerGames(recent: recent),
+          )
         ]),
     ));
   }
 }
 
-class _RecordThingy extends StatelessWidget {
-  final RecordSingle? record;
-  final String? rank;
+class _RecentSingleplayersThingy extends StatelessWidget {
+  final SingleplayerStream recent;
 
-  /// Widget that displays data from [record]
-  const _RecordThingy({required this.record, this.rank});
-
-  Color getColorOfRank(int rank){
-    if (rank == 1) return Colors.yellowAccent;
-    if (rank == 2) return Colors.blueGrey;
-    if (rank == 3) return Colors.brown[400]!;
-    if (rank <= 9) return Colors.blueAccent;
-    if (rank <= 99) return Colors.greenAccent;
-    return Colors.grey;
-  }
+  const _RecentSingleplayersThingy(this.recent);
 
   @override
   Widget build(BuildContext context) {
-    if (record == null) return Center(child: Text(t.noRecord, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)));
-    late MapEntry closestAverageBlitz;
-    late bool blitzBetterThanClosestAverage;
-    bool? blitzBetterThanRankAverage = (rank != null && rank != "z") ? record!.endContext!.score > blitzAverages[rank]! : null;
-    late MapEntry closestAverageSprint;
-    late bool sprintBetterThanClosestAverage;
-    bool? sprintBetterThanRankAverage = (rank != null && rank != "z") ? record!.endContext!.finalTime < sprintAverages[rank]! : null;
-    if (record!.stream.contains("40l")) {
-      closestAverageSprint = sprintAverages.entries.singleWhere((element) => element.value == sprintAverages.values.reduce((a, b) => (a-record!.endContext!.finalTime).abs() < (b -record!.endContext!.finalTime).abs() ? a : b));
-      sprintBetterThanClosestAverage = record!.endContext!.finalTime < closestAverageSprint.value;
-    }else if (record!.stream.contains("blitz")){
-      closestAverageBlitz = blitzAverages.entries.singleWhere((element) => element.value == blitzAverages.values.reduce((a, b) => (a-record!.endContext!.score).abs() < (b -record!.endContext!.score).abs() ? a : b));
-      blitzBetterThanClosestAverage = record!.endContext!.score > closestAverageBlitz.value;
-    }
-    
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        bool bigScreen = constraints.maxWidth > 768;
-        return SingleChildScrollView(
-          controller: _scrollController,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (record!.stream.contains("40l")) Padding(padding: const EdgeInsets.only(right: 8.0),
-                    child: Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageSprint.key}.png", height: 96)
-                    ),
-                    if (record!.stream.contains("blitz")) Padding(padding: const EdgeInsets.only(right: 8.0),
-                    child: Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageBlitz.key}.png", height: 96)
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                      if (record!.stream.contains("40l")) Text(t.sprint, style: const TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
-                      if (record!.stream.contains("blitz")) Text(t.blitz, style: const TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
-                      RichText(text: TextSpan(
-                          text: record!.stream.contains("40l") ? get40lTime(record!.endContext!.finalTime.inMicroseconds) : NumberFormat.decimalPattern().format(record!.endContext!.score),
-                          style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 36 : 32, fontWeight: FontWeight.w500, color: Colors.white),
-                          ),
-                        ),
-                      RichText(text: TextSpan(
-                        text: "",
-                        style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
-                        children: [
-                          if (record!.stream.contains("40l") && (rank != null && rank != "z")) TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(record!.endContext!.finalTime, sprintAverages[rank]!), verdict: sprintBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
-                            color: sprintBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
-                          ))
-                          else if (record!.stream.contains("40l") && (rank == null || rank == "z")) TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(record!.endContext!.finalTime, closestAverageSprint.value), verdict: sprintBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageSprint.key.toUpperCase())}\n", style: TextStyle(
-                            color: sprintBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
-                          ))
-                          else if (record!.stream.contains("blitz") && (rank != null && rank != "z")) TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(record!.endContext!.score, blitzAverages[rank]!), verdict: blitzBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
-                            color: blitzBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
-                          ))
-                          else if (record!.stream.contains("blitz") && (rank == null || rank == "z")) TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(record!.endContext!.score, closestAverageBlitz.value), verdict: blitzBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageBlitz.key.toUpperCase())}\n", style: TextStyle(
-                            color: blitzBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
-                          )),
-                          if (record!.rank != null) TextSpan(text: "№${record!.rank}", style: TextStyle(color: getColorOfRank(record!.rank!))),
-                          if (record!.rank != null) const TextSpan(text: " • "),
-                          TextSpan(text: _dateFormat.format(record!.timestamp!)),
-                        ]
-                        ),
-                      )
-                    ],),
-                  ],
-                ),
-                if (record!.stream.contains("40l")) Wrap(
-                    alignment: WrapAlignment.spaceBetween,
-                    spacing: 20,
-                    children: [
-                      StatCellNum(playerStat: record!.endContext!.piecesPlaced, playerStatLabel: t.statCellNum.pieces, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
-                      StatCellNum(playerStat: record!.endContext!.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
-                      StatCellNum(playerStat: record!.endContext!.kpp, playerStatLabel: t.statCellNum.kpp, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
-                    ],
-                ),
-                if (record!.stream.contains("blitz")) Wrap(
-                    alignment: WrapAlignment.spaceBetween,
-                    crossAxisAlignment: WrapCrossAlignment.start,
-                    spacing: 20,
-                    children: [
-                      StatCellNum(playerStat: record!.endContext!.level, playerStatLabel: t.statCellNum.level, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
-                      StatCellNum(playerStat: record!.endContext!.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
-                      StatCellNum(playerStat: record!.endContext!.spp, playerStatLabel: t.statCellNum.spp, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true)
-                    ],
-                ),
-                FinesseThingy(record?.endContext?.finesse, record?.endContext?.finessePercentage),
-                LineclearsThingy(record!.endContext!.clears, record!.endContext!.lines, record!.endContext!.holds, record!.endContext!.tSpins),
-                if (record!.stream.contains("40l")) Text("${record!.endContext!.inputs} KP • ${f2.format(record!.endContext!.kps)} KPS"),
-                if (record!.stream.contains("blitz")) Text("${record!.endContext!.piecesPlaced} P • ${record!.endContext!.inputs} KP • ${f2.format(record!.endContext!.kpp)} KPP • ${f2.format(record!.endContext!.kps)} KPS")
-              ]
-            ),
-          ),
-        );
-      }
+    return SingleChildScrollView(
+      child: RecentSingleplayerGames(recent: recent, hideTitle: true)
     );
   }
+
 }
 
 class _OtherThingy extends StatelessWidget {
   final TetrioZen? zen;
   final String? bio;
   final Distinguishment? distinguishment;
-  final List<News>? newsletter;
+  final News? newsletter;
 
   /// Widget, that shows players [distinguishment], [bio], [zen] and [newsletter]
   const _OtherThingy({required this.zen, required this.bio, required this.distinguishment, this.newsletter});
@@ -1337,7 +1273,7 @@ class _OtherThingy extends StatelessWidget {
   }
 
   /// Handles [news] entry and returns widget that contains this entry
-  ListTile getNewsTile(News news){
+  ListTile getNewsTile(NewsEntry news){
     Map<String, String> gametypes = {
       "40l": t.sprint,
       "blitz": t.blitz,
@@ -1359,7 +1295,7 @@ class _OtherThingy extends StatelessWidget {
               ]
             )
           ),
-          subtitle: Text(_dateFormat.format(news.timestamp)),
+          subtitle: Text(timestamp(news.timestamp)),
         );
       case "personalbest":
       return ListTile(
@@ -1374,7 +1310,7 @@ class _OtherThingy extends StatelessWidget {
               ]
             )
           ),
-          subtitle: Text(_dateFormat.format(news.timestamp)),
+          subtitle: Text(timestamp(news.timestamp)),
           leading: Image.asset(
             "res/icons/improvement-local.png",
             height: 48,
@@ -1396,7 +1332,7 @@ class _OtherThingy extends StatelessWidget {
               ]
             )
           ),
-          subtitle: Text(_dateFormat.format(news.timestamp)),
+          subtitle: Text(timestamp(news.timestamp)),
           leading: Image.asset(
             "res/tetrio_badges/${news.data["type"]}.png",
             height: 48,
@@ -1418,7 +1354,7 @@ class _OtherThingy extends StatelessWidget {
               ]
             )
           ),
-          subtitle: Text(_dateFormat.format(news.timestamp)),
+          subtitle: Text(timestamp(news.timestamp)),
           leading: Image.asset(
             "res/tetrio_tl_alpha_ranks/${news.data["rank"]}.png",
             height: 48,
@@ -1439,7 +1375,7 @@ class _OtherThingy extends StatelessWidget {
               ]
             )
           ),
-          subtitle: Text(_dateFormat.format(news.timestamp)),
+          subtitle: Text(timestamp(news.timestamp)),
           leading: Image.asset(
             "res/icons/supporter-tag.png",
             height: 48,
@@ -1460,7 +1396,7 @@ class _OtherThingy extends StatelessWidget {
               ]
             )
           ),
-          subtitle: Text(_dateFormat.format(news.timestamp)),
+          subtitle: Text(timestamp(news.timestamp)),
           leading: Image.asset(
             "res/icons/supporter-tag.png",
             height: 48,
@@ -1473,7 +1409,7 @@ class _OtherThingy extends StatelessWidget {
       default: // if type is unknown
       return ListTile(
         title: Text(t.newsParts.unknownNews(type: news.type)),
-        subtitle: Text(_dateFormat.format(news.timestamp)),
+        subtitle: Text(timestamp(news.timestamp)),
       );
     }
   }
@@ -1519,7 +1455,7 @@ class _OtherThingy extends StatelessWidget {
               ],
             ),
           ),
-        if (newsletter != null && newsletter!.isNotEmpty && showNewsTitle)
+        if (newsletter != null && newsletter!.news.isNotEmpty && showNewsTitle)
           Text(t.news, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
       ],
     );
@@ -1535,9 +1471,9 @@ class _OtherThingy extends StatelessWidget {
             SizedBox(width: 450, child: getShit(context, true, false)),
             SizedBox(width: constraints.maxWidth - 450, child: ListView.builder(
               physics: const AlwaysScrollableScrollPhysics(),
-              itemCount: newsletter!.length+1,
+              itemCount: newsletter!.news.length+1,
               itemBuilder: (BuildContext context, int index) {
-                return index == 0 ? Center(child: Text(t.news, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42))) : getNewsTile(newsletter![index-1]);
+                return index == 0 ? Center(child: Text(t.news, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42))) : getNewsTile(newsletter!.news[index-1]);
               }
             ))
           ]
@@ -1546,9 +1482,9 @@ class _OtherThingy extends StatelessWidget {
       else {
         return ListView.builder(
         physics: const AlwaysScrollableScrollPhysics(),
-        itemCount: newsletter!.length+1,
+        itemCount: newsletter!.news.length+1,
         itemBuilder: (BuildContext context, int index) {
-          return index == 0 ? getShit(context, bigScreen, true) : getNewsTile(newsletter![index-1]);          
+          return index == 0 ? getShit(context, bigScreen, true) : getNewsTile(newsletter!.news[index-1]);          
         },
       );
       }

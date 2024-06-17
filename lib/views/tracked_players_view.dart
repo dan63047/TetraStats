@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
-import 'package:tetra_stats/services/tetrio_crud.dart';
+import 'package:tetra_stats/main.dart' show teto;
 import 'package:tetra_stats/utils/filesizes_converter.dart';
 import 'package:tetra_stats/views/states_view.dart';
+import 'package:tetra_stats/widgets/text_timestamp.dart';
 import 'package:window_manager/window_manager.dart';
 
-final TetrioService teto = TetrioService();
 late String oldWindowTitle;
 
 class TrackedPlayersView extends StatefulWidget {
@@ -38,7 +38,6 @@ class TrackedPlayersState extends State<TrackedPlayersView> {
   @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);
-    final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
     return Scaffold(
       appBar: AppBar(
         title: Text(t.trackedPlayersViewTitle),
@@ -110,7 +109,7 @@ class TrackedPlayersState extends State<TrackedPlayersView> {
                             itemBuilder: (context, index) {
                               return ListTile(
                                 title: Text(t.trackedPlayersEntry(nickname: allPlayers[keys[index]]!.last.username, numberOfStates: allPlayers[keys[index]]!.length)),
-                                subtitle: Text(t.trackedPlayersDescription(firstStateDate: dateFormat.format(allPlayers[keys[index]]!.first.state), lastStateDate: dateFormat.format(allPlayers[keys[index]]!.last.state))),
+                                subtitle: Text(t.trackedPlayersDescription(firstStateDate: timestamp(allPlayers[keys[index]]!.first.state), lastStateDate: timestamp(allPlayers[keys[index]]!.last.state))),
                                 trailing: IconButton(
                                   icon: const Icon(Icons.delete_forever),
                                   onPressed: () {

@@ -174,8 +174,8 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
                             prototypeItem: ListTile(
                               leading: Text("0", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 28 : 24, height: 0.9)),
                               title: Text("ehhh...", style: TextStyle(fontFamily: bigScreen ? "Eurostile Round Extended" : "Eurostile Round", height: 0.9)),
-                              trailing: Container(height: bigScreen ? 48 : 36, width: 1,),
-                              subtitle: Text("eh..."),
+                              trailing: SizedBox(height: bigScreen ? 48 : 36, width: 1,),
+                              subtitle: const Text("eh..."),
                             ),
                             itemBuilder: (context, index) {
                               return ListTile(

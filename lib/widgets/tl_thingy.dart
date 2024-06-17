@@ -3,17 +3,17 @@ import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
-import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/utils/colors_functions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/widgets/gauget_num.dart';
 import 'package:tetra_stats/widgets/graphs.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
+import 'package:tetra_stats/widgets/text_timestamp.dart';
 import 'package:tetra_stats/widgets/tl_progress_bar.dart';
+import 'package:tetra_stats/widgets/tl_rating_thingy.dart';
 
-var fDiff = NumberFormat("+#,###.###;-#,###.###");
-var intFDiff = NumberFormat("+#,###;-#,###");
-final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
+
+var intFDiff = NumberFormat("+#,###.000;-#,###.000");
 
 class TLThingy extends StatefulWidget {
   final TetraLeagueAlpha tl;
@@ -48,7 +48,6 @@ class _TLThingyState extends State<TLThingy> {
   void initState() {
     _currentRangeValues = const RangeValues(0, 1);
     sortedStates = widget.states.reversed.toList();
-    oskKagariGimmick = prefs.getBool("oskKagariGimmick")??true;
     oldTl = sortedStates.elementAtOrNull(1)?.tlSeason1;
     currentTl = widget.tl;
     super.initState();
@@ -57,8 +56,9 @@ class _TLThingyState extends State<TLThingy> {
   @override
   Widget build(BuildContext context) { 
   final t = Translations.of(context);
-  NumberFormat fractionfEstTR = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2)..maximumIntegerDigits = 0;
-  NumberFormat fractionfEstTRAcc = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 3)..maximumIntegerDigits = 0;
+  String decimalSeparator = f2.symbols.DECIMAL_SEP;
+  List<String> estTRformated = f2.format(currentTl.estTr!.esttr).split(decimalSeparator);
+  List<String> estTRaccFormated = intFDiff.format(currentTl.esttracc!).split(".");
     if (currentTl.gamesPlayed == 0) return Center(child: Text(widget.guest ? t.anonTL : widget.bot ? t.botTL : t.neverPlayedTL, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28), textAlign: TextAlign.center,));
     return LayoutBuilder(builder: (context, constraints) {
     bool bigScreen = constraints.maxWidth >= 768;
@@ -69,7 +69,7 @@ class _TLThingyState extends State<TLThingy> {
           return Column(
             children: [
               if (widget.showTitle) Text(t.tetraLeague, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-              if (oldTl != null) Text(t.comparingWith(newDate: dateFormat.format(currentTl.timestamp), oldDate: dateFormat.format(oldTl!.timestamp)),
+              if (oldTl != null) Text(t.comparingWith(newDate: timestamp(currentTl.timestamp), oldDate: timestamp(oldTl!.timestamp)),
               textAlign: TextAlign.center,),
               if (oldTl != null) RangeSlider(values: _currentRangeValues, max: widget.states.length.toDouble(),
               labels: RangeLabels(
@@ -92,52 +92,7 @@ class _TLThingyState extends State<TLThingy> {
                   });
                 },
               ),
-              if (currentTl.gamesPlayed >= 10)
-                Wrap(
-                  direction: Axis.horizontal,
-                  alignment: WrapAlignment.spaceAround,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  clipBehavior: Clip.hardEdge,
-                  children: [
-                    (widget.userID == "5e32fc85ab319c2ab1beb07c" && oskKagariGimmick) // he love her so much, you can't even imagine
-                        ? Image.asset("res/icons/kagari.png", height: 128) // Btw why she wearing Kazamatsuri high school uniform?
-                        : Image.asset("res/tetrio_tl_alpha_ranks/${currentTl.rank}.png", height: 128),
-                    Column(
-                      children: [
-                        Text("${f2.format(currentTl.rating)} TR", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                        if (oldTl != null) Text(
-                          "${fDiff.format(currentTl.rating - oldTl!.rating)} TR",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: currentTl.rating - oldTl!.rating < 0 ?
-                            Colors.red :
-                            Colors.green
-                          ),
-                        ),
-                        Column(
-                          children: [
-                            RichText(
-                              textAlign: TextAlign.center,
-                              softWrap: true,
-                              text: TextSpan(
-                                style: DefaultTextStyle.of(context).style,
-                                children: [
-                                  TextSpan(text: "${t.top} ${f2.format(currentTl.percentile * 100)}% (${currentTl.percentileRank.toUpperCase()})"),
-                                  if (currentTl.bestRank != "z") const TextSpan(text: " • "),
-                                  if (currentTl.bestRank != "z") TextSpan(text: "${t.topRank}: ${currentTl.bestRank.toUpperCase()}"),
-                                  if (widget.topTR != null) TextSpan(text: " (${f2.format(widget.topTR)} TR)"),
-                                  TextSpan(text: " • Glicko: ${f2.format(currentTl.glicko!)}±"),
-                                  TextSpan(text: f2.format(currentTl.rd!), style: currentTl.decaying ? TextStyle(color: currentTl.rd! > 98 ? Colors.red : Colors.yellow) : null),
-                                  if (currentTl.decaying) WidgetSpan(child: Icon(Icons.trending_up, color: currentTl.rd! > 98 ? Colors.red : Colors.yellow,), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic) 
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+              if (currentTl.gamesPlayed >= 10) TLRatingThingy(userID: widget.userID, tlData: currentTl, oldTl: oldTl, topTR: widget.topTR),
               if (currentTl.gamesPlayed > 9) TLProgress(
                 tlData: currentTl,
                 previousRankTRcutoff: widget.thatRankCutoff,
@@ -290,12 +245,10 @@ class _TLThingyState extends State<TLThingy> {
                 ),
               if (currentTl.estTr != null)
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
+                  padding: const EdgeInsets.fromLTRB(8, 20, 8, 20),
                   child: Container(
-                    //alignment: Alignment.center,
-                    width: bigScreen ? MediaQuery.of(context).size.width * 0.4 : MediaQuery.of(context).size.width * 0.85,
                     height: 70,
-                    constraints: const BoxConstraints(maxWidth: 768),
+                    constraints: const BoxConstraints(maxWidth: 500),
                     child: Stack(
                       children: [
                         Positioned(
@@ -306,9 +259,9 @@ class _TLThingyState extends State<TLThingy> {
                             Text(t.statCellNum.estOfTR, style: const TextStyle(height: 0.1),),
                             RichText(
                               text: TextSpan(
-                                text: intf.format(currentTl.estTr!.esttr.truncate()),
+                                text: estTRformated[0],
                                 style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 36 : 30, fontWeight: FontWeight.w500, color: Colors.white),
-                                children: [TextSpan(text: fractionfEstTR.format(currentTl.estTr!.esttr - currentTl.estTr!.esttr.truncate()).substring(1), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
+                                children: [TextSpan(text: decimalSeparator+estTRformated[1], style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
                                 ),
                               ),
                             RichText(text: TextSpan(
@@ -335,10 +288,10 @@ class _TLThingyState extends State<TLThingy> {
                             Text(t.statCellNum.accOfEst, style: const TextStyle(height: 0.1),),
                             RichText(
                               text: TextSpan(
-                                text: (currentTl.esttracc != null && currentTl.bestRank != "z") ? intFDiff.format(currentTl.esttracc!.truncate()) : "---",
+                                text: (currentTl.esttracc != null && currentTl.bestRank != "z") ? estTRaccFormated[0] : "---",
                                 style: TextStyle(fontFamily: "Eurostile Round", fontSize: bigScreen ? 36 : 30, fontWeight: FontWeight.w500, color: Colors.white),
                                 children: [
-                                  TextSpan(text: (currentTl.esttracc != null && currentTl.bestRank != "z") ? fractionfEstTRAcc.format(currentTl.esttracc!.isNegative ? 1 - (currentTl.esttracc! - currentTl.esttracc!.truncate()) : (currentTl.esttracc! - currentTl.esttracc!.truncate())).substring(1) : ".---", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))
+                                  TextSpan(text: (currentTl.esttracc != null && currentTl.bestRank != "z") ? decimalSeparator+estTRaccFormated[1] : ".---", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))
                                 ]
                                 ),
                               ),

@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 1144 (572 per locale)
+/// Strings: 1182 (591 per locale)
 ///
-/// Built on 2024-05-28 at 20:38 UTC
+/// Built on 2024-06-16 at 21:03 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -157,6 +157,11 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get history => 'History';
 	String get sprint => '40 Lines';
 	String get blitz => 'Blitz';
+	String get recent => 'Recent';
+	String get recentRuns => 'Recent runs';
+	String blitzScore({required Object p}) => '${p} points';
+	String get openSPreplay => 'Open replay in TETR.IO';
+	String get downloadSPreplay => 'Download replay';
 	String get other => 'Other';
 	String get distinguishment => 'Distinguishment';
 	String get zen => 'Zen';
@@ -244,14 +249,28 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get yourIDAlertTitle => 'Your nickname in TETR.IO';
 	String get yourIDText => 'When app loads, it will retrieve data for this account';
 	String get language => 'Language';
+	String get updateInBackground => 'Update stats in the background';
+	String get updateInBackgroundDescription => 'While Tetra Stats is running, it can update stats of the current player when cache expires';
 	String get customization => 'Customization';
-	String get customizationDescription => 'There is only one toggle, planned to add more settings';
+	String get customizationDescription => 'Change appearance of different things in Tetra Stats UI';
+	String get oskKagari => 'Osk Kagari gimmick';
+	String get oskKagariDescription => 'If on, osk\'s rank on main view will be rendered as :kagari:';
+	String get AccentColor => 'Accent color';
+	String get AccentColorDescription => 'Almost all interactive UI elements highlighted with this color';
+	String get timestamps => 'Timestamps';
+	String get timestampsDescription => 'You can choose, in which way timestamps shows time';
+	String get timestampsAbsoluteGMT => 'Absolute (GMT)';
+	String get timestampsAbsoluteLocalTime => 'Absolute (Your timezone)';
+	String get timestampsRelative => 'Relative';
+	String get rating => 'Main representation of rating';
+	String get ratingDescription => 'TR is not linear, while Glicko does not have boundaries and percentile is volatile';
+	String get ratingLBposition => 'LB position';
+	String get sheetbotGraphs => 'Sheetbot-like behavior for radar graphs';
+	String get sheetbotGraphsDescription => 'If on, points on the graphs can appear on the opposite half of the graph if value is negative';
 	String get lbStats => 'Show leaderboard based stats';
 	String get lbStatsDescription => 'That will impact on loading times, but will allow you to see position on LB by stats and comparison with average values';
 	String get aboutApp => 'About app';
 	String aboutAppText({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Version ${version} Build ${buildNumber}\n\nDeveloped by dan63047\nFormulas provided by kerrmunism\nHistory provided by p1nkl0bst3r\nTETR.IO replay grabber API by szy';
-	String get oskKagari => 'Osk Kagari gimmick';
-	String get oskKagariDescription => 'If on, osk\'s rank on main view will be rendered as :kagari:';
 	String stateViewTitle({required Object nickname, required Object date}) => '${nickname} account on ${date}';
 	String statesViewTitle({required Object number, required Object nickname}) => '${number} states of ${nickname} account';
 	String matchesViewTitle({required Object nickname}) => '${nickname} TL matches';
@@ -833,6 +852,11 @@ class _StringsRu implements Translations {
 	@override String get history => 'История';
 	@override String get sprint => '40 линий';
 	@override String get blitz => 'Блиц';
+	@override String get recent => 'Недавно';
+	@override String get recentRuns => 'Недавние';
+	@override String blitzScore({required Object p}) => '${p} очков';
+	@override String get openSPreplay => 'Открыть повтор в TETR.IO';
+	@override String get downloadSPreplay => 'Скачать повтор';
 	@override String get other => 'Другое';
 	@override String get distinguishment => 'Заслуга';
 	@override String get zen => 'Дзен';
@@ -920,14 +944,28 @@ class _StringsRu implements Translations {
 	@override String get yourIDAlertTitle => 'Ваш ник в TETR.IO';
 	@override String get yourIDText => 'При запуске приложения оно будет получать статистику этого игрока.';
 	@override String get language => 'Язык (Language)';
+	@override String get updateInBackground => 'Обновлять статистику в фоне';
+	@override String get updateInBackgroundDescription => 'Пока Tetra Stats работает, он может обновлять статистику самостоятельно когда кеш истекает';
 	@override String get customization => 'Кастомизация';
-	@override String get customizationDescription => 'Здесь только один переключатель, в планах добавить больше';
+	@override String get customizationDescription => 'Измените внешний вид пользовательского интерфейса Tetra Stats';
+	@override String get oskKagari => '"Оск Кагари" прикол';
+	@override String get oskKagariDescription => 'Если включено, вместо настоящего ранга оска будет рендерится :kagari:';
+	@override String get AccentColor => 'Цветовой акцент';
+	@override String get AccentColorDescription => 'Почти все интерактивные элементы пользовательского интерфейса окрашены в этот цвет';
+	@override String get timestamps => 'Метки времени';
+	@override String get timestampsDescription => 'Вы можете выбрать, каким образом метки времени показывают время';
+	@override String get timestampsAbsoluteGMT => 'Абсолютные (GMT)';
+	@override String get timestampsAbsoluteLocalTime => 'Абсолютные (Ваш часовой пояс)';
+	@override String get timestampsRelative => 'Относительные';
+	@override String get rating => 'Основное представление рейтинга';
+	@override String get ratingDescription => 'TR нелинеен, тогда как Glicko не имеет границ, а положение в таблице лидеров волатильно';
+	@override String get ratingLBposition => 'Позиция в рейтинге';
+	@override String get sheetbotGraphs => 'Графики-радары как у sheetBot';
+	@override String get sheetbotGraphsDescription => 'Если включено, точки на графике могут появляться на противоположной стороне графика если значение отрицательное';
 	@override String get lbStats => 'Показывать статистику, основанную на рейтинговой таблице';
 	@override String get lbStatsDescription => 'Это повлияет на время загрузки, но позволит видеть положение в рейтинге и сравнение со средними значениями по рангу по каждой стате';
 	@override String get aboutApp => 'О приложении';
 	@override String aboutAppText({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Версия ${version} Сборка ${buildNumber}\n\nРазработал dan63047\nФормулы предоставил kerrmunism\nИсторию предоставляет p1nkl0bst3r\nВозможность скачивать повторы из TETR.IO предоставляет szy';
-	@override String get oskKagari => '"Оск Кагари" прикол';
-	@override String get oskKagariDescription => 'Если включено, вместо настоящего ранга оска будет рендерится :kagari:';
 	@override String stateViewTitle({required Object nickname, required Object date}) => 'Аккаунт ${nickname} ${date}';
 	@override String statesViewTitle({required Object number, required Object nickname}) => '${number} состояний аккаунта ${nickname}';
 	@override String matchesViewTitle({required Object nickname}) => 'Матчи аккаунта ${nickname}';
@@ -1489,6 +1527,11 @@ extension on Translations {
 			case 'history': return 'History';
 			case 'sprint': return '40 Lines';
 			case 'blitz': return 'Blitz';
+			case 'recent': return 'Recent';
+			case 'recentRuns': return 'Recent runs';
+			case 'blitzScore': return ({required Object p}) => '${p} points';
+			case 'openSPreplay': return 'Open replay in TETR.IO';
+			case 'downloadSPreplay': return 'Download replay';
 			case 'other': return 'Other';
 			case 'distinguishment': return 'Distinguishment';
 			case 'zen': return 'Zen';
@@ -1588,14 +1631,28 @@ extension on Translations {
 			case 'yourIDAlertTitle': return 'Your nickname in TETR.IO';
 			case 'yourIDText': return 'When app loads, it will retrieve data for this account';
 			case 'language': return 'Language';
+			case 'updateInBackground': return 'Update stats in the background';
+			case 'updateInBackgroundDescription': return 'While Tetra Stats is running, it can update stats of the current player when cache expires';
 			case 'customization': return 'Customization';
-			case 'customizationDescription': return 'There is only one toggle, planned to add more settings';
+			case 'customizationDescription': return 'Change appearance of different things in Tetra Stats UI';
+			case 'oskKagari': return 'Osk Kagari gimmick';
+			case 'oskKagariDescription': return 'If on, osk\'s rank on main view will be rendered as :kagari:';
+			case 'AccentColor': return 'Accent color';
+			case 'AccentColorDescription': return 'Almost all interactive UI elements highlighted with this color';
+			case 'timestamps': return 'Timestamps';
+			case 'timestampsDescription': return 'You can choose, in which way timestamps shows time';
+			case 'timestampsAbsoluteGMT': return 'Absolute (GMT)';
+			case 'timestampsAbsoluteLocalTime': return 'Absolute (Your timezone)';
+			case 'timestampsRelative': return 'Relative';
+			case 'rating': return 'Main representation of rating';
+			case 'ratingDescription': return 'TR is not linear, while Glicko does not have boundaries and percentile is volatile';
+			case 'ratingLBposition': return 'LB position';
+			case 'sheetbotGraphs': return 'Sheetbot-like behavior for radar graphs';
+			case 'sheetbotGraphsDescription': return 'If on, points on the graphs can appear on the opposite half of the graph if value is negative';
 			case 'lbStats': return 'Show leaderboard based stats';
 			case 'lbStatsDescription': return 'That will impact on loading times, but will allow you to see position on LB by stats and comparison with average values';
 			case 'aboutApp': return 'About app';
 			case 'aboutAppText': return ({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Version ${version} Build ${buildNumber}\n\nDeveloped by dan63047\nFormulas provided by kerrmunism\nHistory provided by p1nkl0bst3r\nTETR.IO replay grabber API by szy';
-			case 'oskKagari': return 'Osk Kagari gimmick';
-			case 'oskKagariDescription': return 'If on, osk\'s rank on main view will be rendered as :kagari:';
 			case 'stateViewTitle': return ({required Object nickname, required Object date}) => '${nickname} account on ${date}';
 			case 'statesViewTitle': return ({required Object number, required Object nickname}) => '${number} states of ${nickname} account';
 			case 'matchesViewTitle': return ({required Object nickname}) => '${nickname} TL matches';
@@ -2081,6 +2138,11 @@ extension on _StringsRu {
 			case 'history': return 'История';
 			case 'sprint': return '40 линий';
 			case 'blitz': return 'Блиц';
+			case 'recent': return 'Недавно';
+			case 'recentRuns': return 'Недавние';
+			case 'blitzScore': return ({required Object p}) => '${p} очков';
+			case 'openSPreplay': return 'Открыть повтор в TETR.IO';
+			case 'downloadSPreplay': return 'Скачать повтор';
 			case 'other': return 'Другое';
 			case 'distinguishment': return 'Заслуга';
 			case 'zen': return 'Дзен';
@@ -2180,14 +2242,28 @@ extension on _StringsRu {
 			case 'yourIDAlertTitle': return 'Ваш ник в TETR.IO';
 			case 'yourIDText': return 'При запуске приложения оно будет получать статистику этого игрока.';
 			case 'language': return 'Язык (Language)';
+			case 'updateInBackground': return 'Обновлять статистику в фоне';
+			case 'updateInBackgroundDescription': return 'Пока Tetra Stats работает, он может обновлять статистику самостоятельно когда кеш истекает';
 			case 'customization': return 'Кастомизация';
-			case 'customizationDescription': return 'Здесь только один переключатель, в планах добавить больше';
+			case 'customizationDescription': return 'Измените внешний вид пользовательского интерфейса Tetra Stats';
+			case 'oskKagari': return '"Оск Кагари" прикол';
+			case 'oskKagariDescription': return 'Если включено, вместо настоящего ранга оска будет рендерится :kagari:';
+			case 'AccentColor': return 'Цветовой акцент';
+			case 'AccentColorDescription': return 'Почти все интерактивные элементы пользовательского интерфейса окрашены в этот цвет';
+			case 'timestamps': return 'Метки времени';
+			case 'timestampsDescription': return 'Вы можете выбрать, каким образом метки времени показывают время';
+			case 'timestampsAbsoluteGMT': return 'Абсолютные (GMT)';
+			case 'timestampsAbsoluteLocalTime': return 'Абсолютные (Ваш часовой пояс)';
+			case 'timestampsRelative': return 'Относительные';
+			case 'rating': return 'Основное представление рейтинга';
+			case 'ratingDescription': return 'TR нелинеен, тогда как Glicko не имеет границ, а положение в таблице лидеров волатильно';
+			case 'ratingLBposition': return 'Позиция в рейтинге';
+			case 'sheetbotGraphs': return 'Графики-радары как у sheetBot';
+			case 'sheetbotGraphsDescription': return 'Если включено, точки на графике могут появляться на противоположной стороне графика если значение отрицательное';
 			case 'lbStats': return 'Показывать статистику, основанную на рейтинговой таблице';
 			case 'lbStatsDescription': return 'Это повлияет на время загрузки, но позволит видеть положение в рейтинге и сравнение со средними значениями по рангу по каждой стате';
 			case 'aboutApp': return 'О приложении';
 			case 'aboutAppText': return ({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) Версия ${version} Сборка ${buildNumber}\n\nРазработал dan63047\nФормулы предоставил kerrmunism\nИсторию предоставляет p1nkl0bst3r\nВозможность скачивать повторы из TETR.IO предоставляет szy';
-			case 'oskKagari': return '"Оск Кагари" прикол';
-			case 'oskKagariDescription': return 'Если включено, вместо настоящего ранга оска будет рендерится :kagari:';
 			case 'stateViewTitle': return ({required Object nickname, required Object date}) => 'Аккаунт ${nickname} ${date}';
 			case 'statesViewTitle': return ({required Object number, required Object nickname}) => '${number} состояний аккаунта ${nickname}';
 			case 'matchesViewTitle': return ({required Object nickname}) => 'Матчи аккаунта ${nickname}';
