@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:vector_math/vector_math_64.dart';
+
 import 'tetrio.dart';
 
 // I want to implement those fancy TWC stats
@@ -269,399 +271,435 @@ class ReplayData{
 
 // can't belive i have to implement that difficult shit
 
-// List<Event> readEventList(Map<dynamic, dynamic> json){
-//   List<Event> events = [];
-//   int id = 0;
-//   for (var event in json['data'][0]['replays'][0]['events']){
-//     int frame = event["frame"];
-//     EventType type = EventType.values.byName(event['type']);
-//     switch (type) {
-//       case EventType.start:
-//         events.add(Event(id, frame, type));
-//         break;
-//       case EventType.full:
-//         events.add(EventFull(id, frame, type, DataFull.fromJson(event["data"])));
-//         break;
-//       case EventType.targets:
-//         // TODO
-//         break;
-//       case EventType.keydown:
-//         events.add(EventKeyPress(id, frame, type, 
-//           Keypress(
-//             KeyType.values.byName(event['data']['key']),
-//             event['data']['subframe'],
-//             false)
-//         ));
-//         break;
-//       case EventType.keyup:
-//         events.add(EventKeyPress(id, frame, type,
-//         Keypress(
-//           KeyType.values.byName(event['data']['key']),
-//           event['data']['subframe'],
-//           true)
-//         ));
-//         break;
-//       case EventType.end:
-//         // TODO: Handle this case.
-//       case EventType.ige:
-//         // TODO: Handle this case.
-//       case EventType.exit:
-//         // TODO: Handle this case.
-//     }
-//     id++;
-//   }
-//   return [];
-// }
+List<Event> readEventList(Map<dynamic, dynamic> json){
+  List<Event> events = [];
+  int id = 0;
+  for (var event in json['data'][0]['replays'][0]['events']){
+    int frame = event["frame"];
+    EventType type = EventType.values.byName(event['type']);
+    switch (type) {
+      case EventType.start:
+        events.add(Event(id, frame, type));
+        break;
+      case EventType.full:
+        events.add(EventFull(id, frame, type, DataFull.fromJson(event["data"])));
+        break;
+      case EventType.targets:
+        events.add(EventTargets(id, frame, type, Targets.fromJson(event["data"])));
+        break;
+      case EventType.keydown:
+        events.add(EventKeyPress(id, frame, type, 
+          Keypress(
+            KeyType.values.byName(event['data']['key']),
+            event['data']['subframe'],
+            false)
+        ));
+        break;
+      case EventType.keyup:
+        events.add(EventKeyPress(id, frame, type,
+        Keypress(
+          KeyType.values.byName(event['data']['key']),
+          event['data']['subframe'],
+          true)
+        ));
+        break;
+      case EventType.end:
+        event.add(EventEnd(id, frame, type, EndData(event['data']['reason'], DataFull.fromJson(event['data']['export']))));
+        break;
+      case EventType.ige:
+        // TODO: Handle this case.
+      case EventType.exit:
+        events.add(Event(id, frame, type));
+    }
+    id++;
+  }
+  return [];
+}
 
-// enum EventType
-// {
-// 	start,
-// 	end,
-// 	full,
-// 	keydown,
-// 	keyup,
-// 	targets,
-// 	ige,
-// 	exit
-// }
+enum EventType
+{
+	start,
+	end,
+	full,
+	keydown,
+	keyup,
+	targets,
+	ige,
+	exit
+}
 
-// enum KeyType
-// {
-// 	moveLeft,
-// 	moveRight,
-// 	softDrop,
-// 	rotateCCW,
-// 	rotateCW,
-// 	rotate180,
-// 	hardDrop,
-// 	hold,
-// 	chat,
-// 	exit,
-// 	retry
-// }
+enum KeyType
+{
+	moveLeft,
+	moveRight,
+	softDrop,
+	rotateCCW,
+	rotateCW,
+	rotate180,
+	hardDrop,
+	hold,
+	chat,
+	exit,
+	retry
+}
 
-// class Event{
-//   int id;
-//   int frame;
-//   EventType type;
-//   //dynamic data;
+class Event{
+  int id;
+  int frame;
+  EventType type;
+  //dynamic data;
 
-//   Event(this.id, this.frame, this.type);
+  Event(this.id, this.frame, this.type);
 
-//   @override
-//   String toString(){
-//     return "E#$id f#$frame: $type";
-//   }
-// }
+  @override
+  String toString(){
+    return "E#$id f#$frame: $type";
+  }
+}
 
-// class Keypress{
-//   KeyType key;
-//   double subframe;
-//   bool released;
+class Keypress{
+  KeyType key;
+  double subframe;
+  bool released;
 
-//   Keypress(this.key, this.subframe, this.released);
-// }
+  Keypress(this.key, this.subframe, this.released);
+}
 
-// class EventKeyPress extends Event{
-//   Keypress data;
+class EventKeyPress extends Event{
+  Keypress data;
 
-//   EventKeyPress(super.id, super.frame, super.type, this.data);
-// }
+  EventKeyPress(super.id, super.frame, super.type, this.data);
+}
 
-// class IGE{
-//   int id;
-//   int frame;
-//   String type;
-//   int amount;
+class Targets{
+  String? id;
+	int? frame;
+	String? type;
+	List<String>? data;
 
-//   IGE(this.id, this.frame, this.type, this.amount);
-// }
+  Targets(this.id, this.frame, this.type, this.data);
 
-// class EventIGE extends Event{
-//   IGE data;
+  Targets.fromJson(Map<String, dynamic> json){
+    id = json["id"];
+    frame = json["frame"];
+    type = json["type"];
+    data = json["data"];
+  }
+}
 
-//   EventIGE(super.id, super.frame, super.type, this.data);
-// }
+class EventTargets extends Event{
+  Targets data;
 
-// class Hold
-// {
-// 	String? piece;
-// 	bool locked;
+  EventTargets(super.id, super.frame, super.type, this.data);
+}
 
-//   Hold(this.piece, this.locked);
-// }
+class IGE{
+  int id;
+  int frame;
+  String type;
+  int amount;
 
-// class DataFullOptions{
-//   int? version;
-//   bool? seedRandom;
-//   int? seed;
-//   double? g;
-//   int? stock;
-//   int? gMargin;
-//   double? gIncrease;
-//   double? garbageMultiplier;
-//   int? garbageMargin;
-//   double? garbageIncrease;
-//   int? garbageCap;
-//   double? garbageCapIncrease;
-//   int? garbageCapMax;
-//   int? garbageHoleSize;
-//   String? garbageBlocking; // TODO: enum
-//   bool? hasGarbage;
-//   int? locktime;
-//   int? garbageSpeed;
-//   int? forfeitTime;
-//   int? are;
-//   int? areLineclear;
-//   bool? infiniteMovement;
-//   int? lockresets;
-//   bool? allow180;
-//   bool? btbChaining;
-//   bool? allclears;
-//   bool? clutch;
-//   bool? noLockout;
-//   String? passthrough;
-//   int? boardwidth;
-//   int? boardheight;
-//   Handling? handling;
-//   int? boardbuffer;
+  IGE(this.id, this.frame, this.type, this.amount);
+}
 
-//   DataFullOptions.fromJson(Map<String, dynamic> json){
-//     version = json["version"];
-//     seedRandom = json["seed_random"];
-//     seed = json["seed"];
-//     g = json["g"];
-//     stock = json["stock"];
-//     gMargin = json["gmargin"];
-//     gIncrease = json["gincrease"];
-//     garbageMultiplier = json["garbagemultiplier"];
-//     garbageCapIncrease = json["garbagecapincrease"];
-//     garbageCapMax = json["garbagecapmax"];
-//     garbageHoleSize = json["garbageholesize"];
-//     garbageBlocking = json["garbageblocking"];
-//     hasGarbage = json["hasgarbage"];
-//     locktime = json["locktime"];
-//     garbageSpeed = json["garbagespeed"];
-//     forfeitTime = json["forfeit_time"];
-//     are = json["are"];
-//     areLineclear = json["lineclear_are"];
-//     infiniteMovement = json["infinitemovement"];
-//     lockresets = json["lockresets"];
-//     allow180 = json["allow180"];
-//     btbChaining = json["b2bchaining"];
-//     allclears = json["allclears"];
-//     clutch = json["clutch"];
-//     noLockout = json["nolockout"];
-//     passthrough = json["passthrough"];
-//     boardwidth = json["boardwidth"];
-//     boardheight = json["boardheight"];
-//     handling = Handling.fromJson(json["handling"]);
-//     boardbuffer = json["boardbuffer"];
-//   }
-// }
+class EventIGE extends Event{
+  IGE data;
 
-// class DataFullStats
-// 	{
-// 		double? seed;
-// 		int? lines;
-// 		int? levelLines;
-// 		int? levelLinesNeeded;
-// 		int? inputs;
-// 		int? holds;
-// 		int? score;
-// 		int? zenLevel;
-// 		int? zenProgress;
-// 		int? level;
-// 		int? combo;
-// 		int? currentComboPower;
-// 		int? topCombo;
-// 		int? btb;
-// 		int? topbtb;
-// 		int? tspins;
-// 		int? piecesPlaced;
-//     Clears? clears;
-//     Garbage? garbage;
-// 		int? kills;
-//     Finesse? finesse;
+  EventIGE(super.id, super.frame, super.type, this.data);
+}
 
-//     DataFullStats.fromJson(Map<String, dynamic> json){
-//       seed = json["seed"];
-//       lines = json["lines"];
-//       levelLines = json["level_lines"];
-//       levelLinesNeeded = json["level_lines_needed"];
-//       inputs = json["inputs"];
-//       holds = json["holds"];
-//       score = json["score"];
-//       zenLevel = json["zenlevel"];
-//       zenProgress = json["zenprogress"];
-//       level = json["level"];
-//       combo = json["combo"];
-//       currentComboPower = json["currentcombopower"];
-//       topCombo = json["topcombo"];
-//       btb = json["btb"];
-//       topbtb = json["topbtb"];
-//       tspins = json["tspins"];
-//       piecesPlaced = json["piecesplaced"];
-//       clears = Clears.fromJson(json["clears"]);
-//       garbage = Garbage.fromJson(json["garbage"]);
-//       kills = json["kills"];
-//       finesse = Finesse.fromJson(json["finesse"]);
-//     }
-// 	}
+class EndData {
+  String reason;
+  DataFull export;
 
-// class DataFullGame
-// 	{
-// 		List<List<String?>>? board;
-// 		List<String>? bag;
-// 		double? g;
-// 		bool? playing;
-// 		Hold? hold;
-// 		String? piece;
-// 		Handling? handling;
+  EndData(this.reason, this.export);
+}
 
-//     DataFullGame.fromJson(Map<String, dynamic> json){
-//       board = json["board"];
-//       bag = json["bag"];
-//       hold = Hold(json["hold"]["piece"], json["hold"]["locked"]);
-//       g = json["g"];
-//       handling = Handling.fromJson(json["handling"]);
-//     }
-// 	}
+class EventEnd extends Event{
+  EndData data;
 
-// class DataFull{
-//   bool? successful;
-//   String? gameOverReason;
-//   int? fire;
-//   DataFullOptions? options;
-//   DataFullStats? stats;
-//   DataFullGame? game;
+  EventEnd(super.id, super.frame, super.type, this.data);
+}
 
-//   DataFull.fromJson(Map<String, dynamic> json){
-//     successful = json["successful"];
-//     gameOverReason = json["gameoverreason"];
-//     fire = json["fire"];
-//     options = DataFullOptions.fromJson(json["options"]);
-//     stats = DataFullStats.fromJson(json["stats"]);
-//     game = DataFullGame.fromJson(json["game"]);
-//   }
-// }
+class Hold
+{
+	String? piece;
+	bool locked;
 
-// class EventFull extends Event{
-//   DataFull data;
+  Hold(this.piece, this.locked);
+}
 
-//   EventFull(super.id, super.frame, super.type, this.data);
-// }
+class DataFullOptions{
+  int? version;
+  bool? seedRandom;
+  int? seed;
+  double? g;
+  int? stock;
+  int? gMargin;
+  double? gIncrease;
+  double? garbageMultiplier;
+  int? garbageMargin;
+  double? garbageIncrease;
+  int? garbageCap;
+  double? garbageCapIncrease;
+  int? garbageCapMax;
+  int? garbageHoleSize;
+  String? garbageBlocking; // TODO: enum
+  bool? hasGarbage;
+  int? locktime;
+  int? garbageSpeed;
+  int? forfeitTime;
+  int? are;
+  int? areLineclear;
+  bool? infiniteMovement;
+  int? lockresets;
+  bool? allow180;
+  bool? btbChaining;
+  bool? allclears;
+  bool? clutch;
+  bool? noLockout;
+  String? passthrough;
+  int? boardwidth;
+  int? boardheight;
+  Handling? handling;
+  int? boardbuffer;
 
-// class TetrioRNG{
-//   late double _t;
+  DataFullOptions.fromJson(Map<String, dynamic> json){
+    version = json["version"];
+    seedRandom = json["seed_random"];
+    seed = json["seed"];
+    g = json["g"];
+    stock = json["stock"];
+    gMargin = json["gmargin"];
+    gIncrease = json["gincrease"];
+    garbageMultiplier = json["garbagemultiplier"];
+    garbageCapIncrease = json["garbagecapincrease"];
+    garbageCapMax = json["garbagecapmax"];
+    garbageHoleSize = json["garbageholesize"];
+    garbageBlocking = json["garbageblocking"];
+    hasGarbage = json["hasgarbage"];
+    locktime = json["locktime"];
+    garbageSpeed = json["garbagespeed"];
+    forfeitTime = json["forfeit_time"];
+    are = json["are"];
+    areLineclear = json["lineclear_are"];
+    infiniteMovement = json["infinitemovement"];
+    lockresets = json["lockresets"];
+    allow180 = json["allow180"];
+    btbChaining = json["b2bchaining"];
+    allclears = json["allclears"];
+    clutch = json["clutch"];
+    noLockout = json["nolockout"];
+    passthrough = json["passthrough"];
+    boardwidth = json["boardwidth"];
+    boardheight = json["boardheight"];
+    handling = Handling.fromJson(json["handling"]);
+    boardbuffer = json["boardbuffer"];
+  }
+}
 
-//   TetrioRNG(int seed){
-//     _t = seed % 2147483647;
-// 		if (_t <= 0) _t += 2147483646;
-//   }
+class DataFullStats
+	{
+		double? seed;
+		int? lines;
+		int? levelLines;
+		int? levelLinesNeeded;
+		int? inputs;
+		int? holds;
+		int? score;
+		int? zenLevel;
+		int? zenProgress;
+		int? level;
+		int? combo;
+		int? currentComboPower;
+		int? topCombo;
+		int? btb;
+		int? topbtb;
+		int? tspins;
+		int? piecesPlaced;
+    Clears? clears;
+    Garbage? garbage;
+		int? kills;
+    Finesse? finesse;
 
-//   int next(){
-//     _t = 16807 * _t % 2147483647;
-// 		return _t.toInt();
-//   }
+    DataFullStats.fromJson(Map<String, dynamic> json){
+      seed = json["seed"];
+      lines = json["lines"];
+      levelLines = json["level_lines"];
+      levelLinesNeeded = json["level_lines_needed"];
+      inputs = json["inputs"];
+      holds = json["holds"];
+      score = json["score"];
+      zenLevel = json["zenlevel"];
+      zenProgress = json["zenprogress"];
+      level = json["level"];
+      combo = json["combo"];
+      currentComboPower = json["currentcombopower"];
+      topCombo = json["topcombo"];
+      btb = json["btb"];
+      topbtb = json["topbtb"];
+      tspins = json["tspins"];
+      piecesPlaced = json["piecesplaced"];
+      clears = Clears.fromJson(json["clears"]);
+      garbage = Garbage.fromJson(json["garbage"]);
+      kills = json["kills"];
+      finesse = Finesse.fromJson(json["finesse"]);
+    }
+	}
 
-//   double nextFloat(){
-// 		return (next() - 1) / 2147483646;
-// 	}
+class DataFullGame
+	{
+		List<List<String?>>? board;
+		List<String>? bag;
+		double? g;
+		bool? playing;
+		Hold? hold;
+		String? piece;
+		Handling? handling;
 
-//   List<Tetromino> shuffleList(List<Tetromino> array){
-// 		int length = array.length;
-// 		if (length == 0) return [];
+    DataFullGame.fromJson(Map<String, dynamic> json){
+      board = json["board"];
+      bag = json["bag"];
+      hold = Hold(json["hold"]["piece"], json["hold"]["locked"]);
+      g = json["g"];
+      handling = Handling.fromJson(json["handling"]);
+    }
+	}
 
-// 		for (; --length > 0;){
-// 			int swapIndex = ((nextFloat()) * (length + 1)).toInt();
-//       Tetromino tmp = array[length];
-// 			array[length] = array[swapIndex];
-//       array[swapIndex] = tmp;
-// 		}
-//     return array;
-// 	}
-// }
+class DataFull{
+  bool? successful;
+  String? gameOverReason;
+  int? fire;
+  DataFullOptions? options;
+  DataFullStats? stats;
+  DataFullGame? game;
 
-// enum Tetromino{
-//   Z,
-//   L,
-//   O,
-//   S,
-//   I,
-//   J,
-//   T,
-//   garbage,
-//   empty
-// }
+  DataFull.fromJson(Map<String, dynamic> json){
+    successful = json["successful"];
+    gameOverReason = json["gameoverreason"];
+    fire = json["fire"];
+    options = DataFullOptions.fromJson(json["options"]);
+    stats = DataFullStats.fromJson(json["stats"]);
+    game = DataFullGame.fromJson(json["game"]);
+  }
+}
 
-// List<Tetromino> tetrominoes = [Tetromino.Z, Tetromino.L, Tetromino.O, Tetromino.S, Tetromino.I, Tetromino.J, Tetromino.T];
-// List<List<List<Vector2>>> shapes = [
-//   [ // Z
-//     [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(2, 1)],
-//     [Vector2(2, 0), Vector2(1, 1), Vector2(2, 1), Vector2(1, 2)],
-//     [Vector2(0, 1), Vector2(1, 1), Vector2(1, 2), Vector2(2, 2)],
-//     [Vector2(1, 0), Vector2(0, 1), Vector2(1, 1), Vector2(0, 2)]
-//   ],
-//   [ // L
-//     [Vector2(2, 0), Vector2(0, 1), Vector2(1, 1), Vector2(2, 1)],
-//     [Vector2(1, 0), Vector2(1, 1), Vector2(1, 2), Vector2(2, 2)],
-//     [Vector2(0, 1), Vector2(1, 1), Vector2(2, 1), Vector2(0, 2)],
-//     [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(1, 2)]
-//   ],
-//   [ // O
-//     [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(1, 1)],
-//     [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(1, 1)],
-//     [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(1, 1)],
-//     [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(1, 1)]
-//   ],
-//   [ // S
-//     [Vector2(1, 0), Vector2(2, 0), Vector2(0, 1), Vector2(1, 1)],
-//     [Vector2(1, 0), Vector2(1, 1), Vector2(2, 1), Vector2(2, 2)],
-//     [Vector2(1, 1), Vector2(2, 1), Vector2(0, 2), Vector2(1, 2)],
-//     [Vector2(0, 0), Vector2(0, 1), Vector2(1, 1), Vector2(1, 2)]
-//   ],
-//   [ // I
-//     [Vector2(0, 1), Vector2(1, 1), Vector2(2, 1), Vector2(3, 1)],
-// 		[Vector2(2, 0), Vector2(2, 1), Vector2(2, 2), Vector2(2, 3)],
-// 		[Vector2(0, 2), Vector2(1, 2), Vector2(2, 2), Vector2(3, 2)],
-// 		[Vector2(1, 0), Vector2(1, 1), Vector2(1, 2), Vector2(1, 3)]
-//   ],
-//   [ // J
-//     [Vector2(0, 0), Vector2(0, 1), Vector2(1, 1), Vector2(2, 1)],
-//     [Vector2(1, 0), Vector2(2, 0), Vector2(1, 1), Vector2(1, 2)],
-//     [Vector2(0, 1), Vector2(1, 1), Vector2(2, 1), Vector2(2, 2)],
-//     [Vector2(1, 0), Vector2(1, 1), Vector2(0, 2), Vector2(1, 2)]
-//   ],
-//   [ // T
-//     [Vector2(1, 0), Vector2(0, 1), Vector2(1, 1), Vector2(2, 1)],
-//     [Vector2(1, 0), Vector2(1, 1), Vector2(2, 1), Vector2(1, 2)],
-//     [Vector2(0, 1), Vector2(1, 1), Vector2(2, 1), Vector2(1, 2)],
-//     [Vector2(1, 0), Vector2(0, 1), Vector2(1, 1), Vector2(1, 2)]
-//   ]
-// ];
-// List<Vector2> spawnPositionFixes = [Vector2(1, 1), Vector2(1, 1), Vector2(0, 1), Vector2(1, 1), Vector2(1, 1), Vector2(1, 1), Vector2(1, 1)];
+class EventFull extends Event{
+  DataFull data;
 
-// const Map<String, double> garbage = {
-//   "single": 0,
-//   "double": 1,
-//   "triple": 2,
-//   "quad": 4,
-//   "penta": 5,
-//   "t-spin": 0,
-//   "t-spin single": 2,
-//   "t-spin double": 4,
-//   "t-spin triple": 6,
-//   "t-spin quad": 10,
-//   "t-spin penta": 12,
-//   "t-spin mini": 0,
-//   "t-spin mini single": 0,
-//   "t-spin mini double": 1,
-//   "allclear": 10
-// };
-// int btbBonus = 1;
-// double btbLog = 0.8;
-// double comboBonus = 0.25;
-// int comboMinifier = 1;
-// double comboMinifierLog = 1.25;
-// List<int> comboTable = [0, 1, 1, 2, 2, 3, 3, 4, 4, 4, 5];
+  EventFull(super.id, super.frame, super.type, this.data);
+}
+
+class TetrioRNG{
+  late double _t;
+
+  TetrioRNG(int seed){
+    _t = seed % 2147483647;
+		if (_t <= 0) _t += 2147483646;
+  }
+
+  int next(){
+    _t = 16807 * _t % 2147483647;
+		return _t.toInt();
+  }
+
+  double nextFloat(){
+		return (next() - 1) / 2147483646;
+	}
+
+  List<Tetromino> shuffleList(List<Tetromino> array){
+		int length = array.length;
+		if (length == 0) return [];
+
+		for (; --length > 0;){
+			int swapIndex = ((nextFloat()) * (length + 1)).toInt();
+      Tetromino tmp = array[length];
+			array[length] = array[swapIndex];
+      array[swapIndex] = tmp;
+		}
+    return array;
+	}
+}
+
+enum Tetromino{
+  Z,
+  L,
+  O,
+  S,
+  I,
+  J,
+  T,
+  garbage,
+  empty
+}
+
+List<Tetromino> tetrominoes = [Tetromino.Z, Tetromino.L, Tetromino.O, Tetromino.S, Tetromino.I, Tetromino.J, Tetromino.T];
+List<List<List<Vector2>>> shapes = [
+  [ // Z
+    [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(2, 1)],
+    [Vector2(2, 0), Vector2(1, 1), Vector2(2, 1), Vector2(1, 2)],
+    [Vector2(0, 1), Vector2(1, 1), Vector2(1, 2), Vector2(2, 2)],
+    [Vector2(1, 0), Vector2(0, 1), Vector2(1, 1), Vector2(0, 2)]
+  ],
+  [ // L
+    [Vector2(2, 0), Vector2(0, 1), Vector2(1, 1), Vector2(2, 1)],
+    [Vector2(1, 0), Vector2(1, 1), Vector2(1, 2), Vector2(2, 2)],
+    [Vector2(0, 1), Vector2(1, 1), Vector2(2, 1), Vector2(0, 2)],
+    [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(1, 2)]
+  ],
+  [ // O
+    [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(1, 1)],
+    [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(1, 1)],
+    [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(1, 1)],
+    [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(1, 1)]
+  ],
+  [ // S
+    [Vector2(1, 0), Vector2(2, 0), Vector2(0, 1), Vector2(1, 1)],
+    [Vector2(1, 0), Vector2(1, 1), Vector2(2, 1), Vector2(2, 2)],
+    [Vector2(1, 1), Vector2(2, 1), Vector2(0, 2), Vector2(1, 2)],
+    [Vector2(0, 0), Vector2(0, 1), Vector2(1, 1), Vector2(1, 2)]
+  ],
+  [ // I
+    [Vector2(0, 1), Vector2(1, 1), Vector2(2, 1), Vector2(3, 1)],
+		[Vector2(2, 0), Vector2(2, 1), Vector2(2, 2), Vector2(2, 3)],
+		[Vector2(0, 2), Vector2(1, 2), Vector2(2, 2), Vector2(3, 2)],
+		[Vector2(1, 0), Vector2(1, 1), Vector2(1, 2), Vector2(1, 3)]
+  ],
+  [ // J
+    [Vector2(0, 0), Vector2(0, 1), Vector2(1, 1), Vector2(2, 1)],
+    [Vector2(1, 0), Vector2(2, 0), Vector2(1, 1), Vector2(1, 2)],
+    [Vector2(0, 1), Vector2(1, 1), Vector2(2, 1), Vector2(2, 2)],
+    [Vector2(1, 0), Vector2(1, 1), Vector2(0, 2), Vector2(1, 2)]
+  ],
+  [ // T
+    [Vector2(1, 0), Vector2(0, 1), Vector2(1, 1), Vector2(2, 1)],
+    [Vector2(1, 0), Vector2(1, 1), Vector2(2, 1), Vector2(1, 2)],
+    [Vector2(0, 1), Vector2(1, 1), Vector2(2, 1), Vector2(1, 2)],
+    [Vector2(1, 0), Vector2(0, 1), Vector2(1, 1), Vector2(1, 2)]
+  ]
+];
+List<Vector2> spawnPositionFixes = [Vector2(1, 1), Vector2(1, 1), Vector2(0, 1), Vector2(1, 1), Vector2(1, 1), Vector2(1, 1), Vector2(1, 1)];
+
+const Map<String, double> garbage = {
+  "single": 0,
+  "double": 1,
+  "triple": 2,
+  "quad": 4,
+  "penta": 5,
+  "t-spin": 0,
+  "t-spin single": 2,
+  "t-spin double": 4,
+  "t-spin triple": 6,
+  "t-spin quad": 10,
+  "t-spin penta": 12,
+  "t-spin mini": 0,
+  "t-spin mini single": 0,
+  "t-spin mini double": 1,
+  "allclear": 10
+};
+int btbBonus = 1;
+double btbLog = 0.8;
+double comboBonus = 0.25;
+int comboMinifier = 1;
+double comboMinifierLog = 1.25;
+List<int> comboTable = [0, 1, 1, 2, 2, 3, 3, 4, 4, 4, 5];
