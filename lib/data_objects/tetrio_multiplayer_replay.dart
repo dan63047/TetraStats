@@ -304,16 +304,24 @@ List<Event> readEventList(Map<dynamic, dynamic> json){
         ));
         break;
       case EventType.end:
-        event.add(EventEnd(id, frame, type, EndData(event['data']['reason'], DataFull.fromJson(event['data']['export']))));
+        events.add(EventEnd(id, frame, type, EndData(event['data']['reason'], DataFull.fromJson(event['data']['export']))));
         break;
       case EventType.ige:
-        // TODO: Handle this case.
+        events.add(EventIGE(id, frame, type, IGE(
+            event['data']['id'],
+            event['data']['frame'],
+            event['data']['type'],
+            event['data']['data']
+          ))
+        );
+        break;
       case EventType.exit:
         events.add(Event(id, frame, type));
+        break;
     }
     id++;
   }
-  return [];
+  return events;
 }
 
 enum EventType
@@ -359,10 +367,12 @@ class Event{
 
 class Keypress{
   KeyType key;
-  double subframe;
+  late double subframe;
   bool released;
 
-  Keypress(this.key, this.subframe, this.released);
+  Keypress(this.key, num sframe, this.released){
+    subframe = sframe.toDouble();
+  }
 }
 
 class EventKeyPress extends Event{
@@ -393,13 +403,76 @@ class EventTargets extends Event{
   EventTargets(super.id, super.frame, super.type, this.data);
 }
 
+class IGEdata{
+  
+}
+
+enum GarbageStatus
+{
+	sleeping,
+	caution,
+	spawn,
+	danger
+}
+
+// class GarbageData{
+//   int id;
+// 	int iid;
+// 	int ackiid;
+// 	String username;
+// 	String type;
+// 	bool active;
+// 	GarbageStatus status;
+// 	int delay;
+// 	bool queued;
+// 	int amt;
+// 	int x;
+// 	int y;
+// 	int size;
+// 	int column;
+// 	int cid;
+// 	bool firstcycle;
+// 	int gid;
+
+//   GarbageData.fromJson(Map<String, dynamic> data){
+//     id;
+//     iid;
+//     ackiid;
+//     username;
+//     type;
+//     active;
+//     status;
+//     delay;
+//     queued;
+//     amt;
+//     x;
+//     y;
+//     size;
+//     column;
+//     cid;
+//     firstcycle;
+//     gid;
+//   }
+// }
+
+// class IGEdataTarget extends {
+//   String type;
+// 	List<String> targets;
+// 	int frame;
+	
+// 	String gameid
+// 	GarbageData? data;
+// 	//compatibility for v15 targets event
+// 	String? sender_id;
+// }
+
 class IGE{
   int id;
   int frame;
   String type;
-  int amount;
+  Map<String, dynamic> data;
 
-  IGE(this.id, this.frame, this.type, this.amount);
+  IGE(this.id, this.frame, this.type, this.data);
 }
 
 class EventIGE extends Event{
@@ -472,8 +545,8 @@ class DataFullOptions{
     stock = json["stock"];
     gMargin = json["gmargin"];
     gIncrease = json["gincrease"];
-    garbageMultiplier = json["garbagemultiplier"];
-    garbageCapIncrease = json["garbagecapincrease"];
+    garbageMultiplier = json["garbagemultiplier"].toDouble();
+    garbageCapIncrease = json["garbagecapincrease"].toDouble();
     garbageCapMax = json["garbagecapmax"];
     garbageHoleSize = json["garbageholesize"];
     garbageBlocking = json["garbageblocking"];
@@ -500,7 +573,7 @@ class DataFullOptions{
 
 class DataFullStats
 	{
-		double? seed;
+		int? seed;
 		int? lines;
 		int? levelLines;
 		int? levelLinesNeeded;
@@ -549,8 +622,8 @@ class DataFullStats
 
 class DataFullGame
 	{
-		List<List<String?>>? board;
-		List<String>? bag;
+		List<dynamic>? board;
+		List<dynamic>? bag;
 		double? g;
 		bool? playing;
 		Hold? hold;
