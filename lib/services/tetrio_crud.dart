@@ -379,7 +379,6 @@ class TetrioService extends DB {
           TopTr result = TopTr(id, null);
           developer.log("fetchTopTR: Probably, player doesn't have top TR", name: "services/tetrio_crud", error: response.statusCode);
           _cache.store(result, DateTime.now().millisecondsSinceEpoch + 300000);
-          //_topTRcache[(DateTime.now().millisecondsSinceEpoch + 300000).toString()] = {id: null};
           return result;
         // if not 200 or 404 - throw a unique for each code exception  
         case 403:
@@ -392,7 +391,10 @@ class TetrioService extends DB {
         case 502:
         case 503:
         case 504:
-          throw P1nkl0bst3rInternalProblem();
+          TopTr result = TopTr(id, null);
+          developer.log("fetchTopTR: API returned ${response.statusCode}", name: "services/tetrio_crud", error: response.statusCode);
+          //_cache.store(result, DateTime.now().millisecondsSinceEpoch + 300000);
+          return result;
         default:
           developer.log("fetchTopTR: Failed to fetch top TR", name: "services/tetrio_crud", error: response.statusCode);
           throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
@@ -445,7 +447,8 @@ class TetrioService extends DB {
         case 502:
         case 503:
         case 504:
-          throw P1nkl0bst3rInternalProblem();
+          developer.log("fetchCutoffs: Cutoffs are unavalable (${response.statusCode})", name: "services/tetrio_crud", error: response.statusCode);
+          return null;
         default:
           developer.log("fetchCutoffs: Failed to fetch top Cutoffs", name: "services/tetrio_crud", error: response.statusCode);
           throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
