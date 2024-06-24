@@ -1,8 +1,6 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:vector_math/vector_math_64.dart';
-
 import 'tetrio.dart';
 
 // I want to implement those fancy TWC stats
@@ -752,52 +750,72 @@ enum Tetromino{
   empty
 }
 
+class Coords{
+  int x;
+  int y;
+
+  Coords(this.x, this.y);
+
+  @override
+  String toString() {
+    return "($x; $y)";
+  }
+
+  Coords operator+(Coords other){
+    return Coords(x+other.x, y+other.y);
+  }
+
+  Coords operator-(Coords other){
+    return Coords(x-other.x, y-other.y);
+  }
+}
+
 List<Tetromino> tetrominoes = [Tetromino.Z, Tetromino.L, Tetromino.O, Tetromino.S, Tetromino.I, Tetromino.J, Tetromino.T];
-List<List<List<Vector2>>> shapes = [
+List<List<List<Coords>>> shapes = [
   [ // Z
-    [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(2, 1)],
-    [Vector2(2, 0), Vector2(1, 1), Vector2(2, 1), Vector2(1, 2)],
-    [Vector2(0, 1), Vector2(1, 1), Vector2(1, 2), Vector2(2, 2)],
-    [Vector2(1, 0), Vector2(0, 1), Vector2(1, 1), Vector2(0, 2)]
+    [Coords(0, 0), Coords(1, 0), Coords(1, 1), Coords(2, 1)],
+    [Coords(2, 0), Coords(1, 1), Coords(2, 1), Coords(1, 2)],
+    [Coords(0, 1), Coords(1, 1), Coords(1, 2), Coords(2, 2)],
+    [Coords(1, 0), Coords(0, 1), Coords(1, 1), Coords(0, 2)]
   ],
   [ // L
-    [Vector2(2, 0), Vector2(0, 1), Vector2(1, 1), Vector2(2, 1)],
-    [Vector2(1, 0), Vector2(1, 1), Vector2(1, 2), Vector2(2, 2)],
-    [Vector2(0, 1), Vector2(1, 1), Vector2(2, 1), Vector2(0, 2)],
-    [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(1, 2)]
+    [Coords(2, 0), Coords(0, 1), Coords(1, 1), Coords(2, 1)],
+    [Coords(1, 0), Coords(1, 1), Coords(1, 2), Coords(2, 2)],
+    [Coords(0, 1), Coords(1, 1), Coords(2, 1), Coords(0, 2)],
+    [Coords(0, 0), Coords(1, 0), Coords(1, 1), Coords(1, 2)]
   ],
   [ // O
-    [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(1, 1)],
-    [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(1, 1)],
-    [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(1, 1)],
-    [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(1, 1)]
+    [Coords(0, 0), Coords(1, 0), Coords(0, 1), Coords(1, 1)],
+    [Coords(0, 0), Coords(1, 0), Coords(0, 1), Coords(1, 1)],
+    [Coords(0, 0), Coords(1, 0), Coords(0, 1), Coords(1, 1)],
+    [Coords(0, 0), Coords(1, 0), Coords(0, 1), Coords(1, 1)]
   ],
   [ // S
-    [Vector2(1, 0), Vector2(2, 0), Vector2(0, 1), Vector2(1, 1)],
-    [Vector2(1, 0), Vector2(1, 1), Vector2(2, 1), Vector2(2, 2)],
-    [Vector2(1, 1), Vector2(2, 1), Vector2(0, 2), Vector2(1, 2)],
-    [Vector2(0, 0), Vector2(0, 1), Vector2(1, 1), Vector2(1, 2)]
+    [Coords(1, 0), Coords(2, 0), Coords(0, 1), Coords(1, 1)],
+    [Coords(1, 0), Coords(1, 1), Coords(2, 1), Coords(2, 2)],
+    [Coords(1, 1), Coords(2, 1), Coords(0, 2), Coords(1, 2)],
+    [Coords(0, 0), Coords(0, 1), Coords(1, 1), Coords(1, 2)]
   ],
   [ // I
-    [Vector2(0, 1), Vector2(1, 1), Vector2(2, 1), Vector2(3, 1)],
-		[Vector2(2, 0), Vector2(2, 1), Vector2(2, 2), Vector2(2, 3)],
-		[Vector2(0, 2), Vector2(1, 2), Vector2(2, 2), Vector2(3, 2)],
-		[Vector2(1, 0), Vector2(1, 1), Vector2(1, 2), Vector2(1, 3)]
+    [Coords(0, 1), Coords(1, 1), Coords(2, 1), Coords(3, 1)],
+		[Coords(2, 0), Coords(2, 1), Coords(2, 2), Coords(2, 3)],
+		[Coords(0, 2), Coords(1, 2), Coords(2, 2), Coords(3, 2)],
+		[Coords(1, 0), Coords(1, 1), Coords(1, 2), Coords(1, 3)]
   ],
   [ // J
-    [Vector2(0, 0), Vector2(0, 1), Vector2(1, 1), Vector2(2, 1)],
-    [Vector2(1, 0), Vector2(2, 0), Vector2(1, 1), Vector2(1, 2)],
-    [Vector2(0, 1), Vector2(1, 1), Vector2(2, 1), Vector2(2, 2)],
-    [Vector2(1, 0), Vector2(1, 1), Vector2(0, 2), Vector2(1, 2)]
+    [Coords(0, 0), Coords(0, 1), Coords(1, 1), Coords(2, 1)],
+    [Coords(1, 0), Coords(2, 0), Coords(1, 1), Coords(1, 2)],
+    [Coords(0, 1), Coords(1, 1), Coords(2, 1), Coords(2, 2)],
+    [Coords(1, 0), Coords(1, 1), Coords(0, 2), Coords(1, 2)]
   ],
   [ // T
-    [Vector2(1, 0), Vector2(0, 1), Vector2(1, 1), Vector2(2, 1)],
-    [Vector2(1, 0), Vector2(1, 1), Vector2(2, 1), Vector2(1, 2)],
-    [Vector2(0, 1), Vector2(1, 1), Vector2(2, 1), Vector2(1, 2)],
-    [Vector2(1, 0), Vector2(0, 1), Vector2(1, 1), Vector2(1, 2)]
+    [Coords(1, 0), Coords(0, 1), Coords(1, 1), Coords(2, 1)],
+    [Coords(1, 0), Coords(1, 1), Coords(2, 1), Coords(1, 2)],
+    [Coords(0, 1), Coords(1, 1), Coords(2, 1), Coords(1, 2)],
+    [Coords(1, 0), Coords(0, 1), Coords(1, 1), Coords(1, 2)]
   ]
 ];
-List<Vector2> spawnPositionFixes = [Vector2(1, 1), Vector2(1, 1), Vector2(0, 1), Vector2(1, 1), Vector2(1, 1), Vector2(1, 1), Vector2(1, 1)];
+List<Coords> spawnPositionFixes = [Coords(1, 1), Coords(1, 1), Coords(0, 1), Coords(1, 1), Coords(1, 1), Coords(1, 1), Coords(1, 1)];
 
 const Map<String, double> garbage = {
   "single": 0,
