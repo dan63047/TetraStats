@@ -773,16 +773,16 @@ class Coords{
 List<Tetromino> tetrominoes = [Tetromino.Z, Tetromino.L, Tetromino.O, Tetromino.S, Tetromino.I, Tetromino.J, Tetromino.T];
 List<List<List<Coords>>> shapes = [
   [ // Z
-    [Coords(0, 0), Coords(1, 0), Coords(1, 1), Coords(2, 1)],
-    [Coords(2, 0), Coords(1, 1), Coords(2, 1), Coords(1, 2)],
-    [Coords(0, 1), Coords(1, 1), Coords(1, 2), Coords(2, 2)],
-    [Coords(1, 0), Coords(0, 1), Coords(1, 1), Coords(0, 2)]
+    [Coords(0, 2), Coords(1, 2), Coords(1, 1), Coords(2, 1)],
+    [Coords(2, 2), Coords(2, 1), Coords(1, 1), Coords(1, 0)],
+    [Coords(2, 0), Coords(1, 0), Coords(1, 1), Coords(0, 1)],
+    [Coords(0, 0), Coords(0, 1), Coords(1, 1), Coords(1, 2)]
   ],
   [ // L
-    [Coords(2, 0), Coords(0, 1), Coords(1, 1), Coords(2, 1)],
-    [Coords(1, 0), Coords(1, 1), Coords(1, 2), Coords(2, 2)],
-    [Coords(0, 1), Coords(1, 1), Coords(2, 1), Coords(0, 2)],
-    [Coords(0, 0), Coords(1, 0), Coords(1, 1), Coords(1, 2)]
+    [Coords(2, 2), Coords(2, 1), Coords(1, 1), Coords(0, 1)],
+    [Coords(2, 0), Coords(1, 0), Coords(1, 1), Coords(1, 2)],
+    [Coords(0, 0), Coords(0, 1), Coords(1, 1), Coords(2, 1)],
+    [Coords(0, 2), Coords(1, 2), Coords(1, 1), Coords(1, 0)]
   ],
   [ // O
     [Coords(0, 0), Coords(1, 0), Coords(0, 1), Coords(1, 1)],
@@ -791,31 +791,31 @@ List<List<List<Coords>>> shapes = [
     [Coords(0, 0), Coords(1, 0), Coords(0, 1), Coords(1, 1)]
   ],
   [ // S
-    [Coords(1, 0), Coords(2, 0), Coords(0, 1), Coords(1, 1)],
-    [Coords(1, 0), Coords(1, 1), Coords(2, 1), Coords(2, 2)],
-    [Coords(1, 1), Coords(2, 1), Coords(0, 2), Coords(1, 2)],
-    [Coords(0, 0), Coords(0, 1), Coords(1, 1), Coords(1, 2)]
+    [Coords(2, 2), Coords(1, 2), Coords(1, 1), Coords(0, 1)],
+    [Coords(2, 0), Coords(2, 1), Coords(1, 1), Coords(1, 2)],
+    [Coords(0, 0), Coords(1, 0), Coords(1, 1), Coords(2, 1)],
+    [Coords(0, 2), Coords(0, 1), Coords(1, 1), Coords(1, 0)]
   ],
   [ // I
-    [Coords(0, 1), Coords(1, 1), Coords(2, 1), Coords(3, 1)],
-		[Coords(2, 0), Coords(2, 1), Coords(2, 2), Coords(2, 3)],
-		[Coords(0, 2), Coords(1, 2), Coords(2, 2), Coords(3, 2)],
+    [Coords(0, 2), Coords(1, 2), Coords(2, 2), Coords(3, 2)],
+		[Coords(2, 3), Coords(2, 2), Coords(2, 1), Coords(2, 0)],
+		[Coords(3, 1), Coords(2, 1), Coords(1, 1), Coords(0, 1)],
 		[Coords(1, 0), Coords(1, 1), Coords(1, 2), Coords(1, 3)]
   ],
   [ // J
-    [Coords(0, 0), Coords(0, 1), Coords(1, 1), Coords(2, 1)],
-    [Coords(1, 0), Coords(2, 0), Coords(1, 1), Coords(1, 2)],
-    [Coords(0, 1), Coords(1, 1), Coords(2, 1), Coords(2, 2)],
-    [Coords(1, 0), Coords(1, 1), Coords(0, 2), Coords(1, 2)]
+    [Coords(0, 2), Coords(0, 1), Coords(1, 1), Coords(2, 1)],
+    [Coords(2, 2), Coords(1, 2), Coords(1, 1), Coords(1, 0)],
+    [Coords(2, 0), Coords(2, 1), Coords(1, 1), Coords(0, 1)],
+    [Coords(0, 0), Coords(1, 0), Coords(1, 1), Coords(1, 2)]
   ],
   [ // T
-    [Coords(1, 0), Coords(0, 1), Coords(1, 1), Coords(2, 1)],
-    [Coords(1, 0), Coords(1, 1), Coords(2, 1), Coords(1, 2)],
-    [Coords(0, 1), Coords(1, 1), Coords(2, 1), Coords(1, 2)],
-    [Coords(1, 0), Coords(0, 1), Coords(1, 1), Coords(1, 2)]
+    [Coords(1, 2), Coords(0, 1), Coords(1, 1), Coords(2, 1)],
+    [Coords(2, 1), Coords(1, 2), Coords(1, 1), Coords(1, 0)],
+    [Coords(1, 0), Coords(2, 1), Coords(1, 1), Coords(0, 1)],
+    [Coords(0, 1), Coords(1, 0), Coords(1, 1), Coords(1, 2)]
   ]
 ];
-List<Coords> spawnPositionFixes = [Coords(1, 1), Coords(1, 1), Coords(0, 1), Coords(1, 1), Coords(1, 1), Coords(1, 1), Coords(1, 1)];
+List<Coords> spawnPositionFixes = [Coords(0, 0), Coords(0, 0), Coords(1, 1), Coords(0, 0), Coords(0, -1), Coords(0, 0), Coords(0, 0)];
 
 const Map<String, double> garbage = {
   "single": 0,

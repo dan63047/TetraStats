@@ -22,7 +22,7 @@ class HandlingHandler{
     arrLeft = arr;
   }
 
-  void movement_key_pressed(bool left, bool right){
+  void movementKeyPressed(bool left, bool right, double subframe){
       if (left) {
         activeLeft = left;
         direction = -1;
@@ -31,10 +31,11 @@ class HandlingHandler{
         activeRight = right;
         direction = 1;
       }
-      dasLeft = das;
+      dasLeft = das - (1 - subframe);
     }
 
-    void movement_key_released(bool left, bool right){
+    int movementKeyReleased(bool left, bool right, double subframe){
+      int lastFrameMovement = processMovenent(subframe);
       if (left) {
         activeLeft = !left;
       }
@@ -52,9 +53,10 @@ class HandlingHandler{
         dasLeft = das;
         direction = 0;
       }
+      return lastFrameMovement;
     }
 
-  int process_movenent(double delta){
+  int processMovenent(double delta){
     if (!activeLeft && !activeRight) return 0;
     if (dasLeft > 0.0) {
         dasLeft -= delta;
@@ -92,7 +94,7 @@ class Board{
   @override
   String toString() {
     String result = "";
-    for (var row in board){
+    for (var row in board.reversed){
       for (var cell in row) result += cell.name[0];
       result += "\n";
     }
@@ -116,7 +118,7 @@ class Board{
   }
 
   void writeToBoard(Tetromino type, Coords coords, int rot) {
-    if (!positionIsValid(type, coords, rot)) return;
+    if (!positionIsValid(type, coords, rot)) throw Exception("Attempted to write $type to $coords in $rot rot");
     List<Coords> shape = shapes[type.index][rot];
     for (Coords mino in shape){
       var finalCoords = coords+mino;
@@ -134,7 +136,7 @@ void main() async {
   var replayJson = jsonDecode(File("/home/dan63047/Документы/replays/6550eecf2ffc5604e6224fc5.ttrm").readAsStringSync());
   ReplayData replay = ReplayData.fromJson(replayJson);
   TetrioRNG rng = TetrioRNG(replay.stats[0][0].seed);
-  List<Tetromino> queue = rng.shuffleList(tetrominoes);
+  List<Tetromino> queue = rng.shuffleList(tetrominoes.toList());
   List<Event> events = readEventList(replay.rawJson);
   DataFullOptions? settings;
   HandlingHandler? handling;
@@ -162,8 +164,13 @@ void main() async {
   }
 
   Tetromino getNewOne(){
-    if (queue.length <= 1) queue.addAll(rng.shuffleList(tetrominoes));
-    developer.log("Next queue is $queue");
+    
+    if (queue.length <= 1) {
+      List<Tetromino> nextPieces = rng.shuffleList(tetrominoes.toList());
+      queue.addAll(nextPieces);
+    }
+    //developer.log("Next queue is $queue");
+    rot = 0;
     return queue.removeAt(0);
   }
 
@@ -171,7 +178,7 @@ void main() async {
   for (currentFrame; currentFrame <= replay.roundLengths[0]; currentFrame++){
     gravityBucket += settings != null ? (handling!.sdfActive ? settings.g! * settings.handling!.sdf : settings.g!) : 0;
 
-    int movement = handling != null ? handling.process_movenent(1.0) : 0;
+    int movement = handling != null ? handling.processMovenent(1.0) : 0;
     if (board.positionIsValid(current, Coords(coords.x+movement, coords.y), rot)) coords.x += movement;
 
     int gravityImpact = 0;
@@ -184,7 +191,7 @@ void main() async {
 
     if (currentFrame == nextEvent.frame){
       while (currentFrame == nextEvent.frame){
-        //print("Processing $nextEvent");
+        print("Processing $nextEvent");
         switch (nextEvent.type){
         case EventType.start:
           developer.log("go");
@@ -198,19 +205,19 @@ void main() async {
           activeKeypresses[nextEvent.data.key] = nextEvent;
           switch (nextEvent.data.key){
             case KeyType.rotateCCW:
-              rot = (rot+1)%4;
+              rot = (rot-1)%4;
               break;
             case KeyType.rotateCW:
-              rot = (rot-1)%4;
+              rot = (rot+1)%4;
               break;
             case KeyType.rotate180:
               rot = (rot+2)%4;
               break;
             case KeyType.moveLeft:
-              handling!.movement_key_pressed(true, false);
+              handling!.movementKeyPressed(true, false, nextEvent.data.subframe);
               break;
             case KeyType.moveRight:
-              handling!.movement_key_pressed(false, true);
+              handling!.movementKeyPressed(false, true, nextEvent.data.subframe);
               break;
             case KeyType.softDrop:
               handling!.sdfActive = true;
@@ -220,7 +227,7 @@ void main() async {
               board.writeToBoard(current, coords, rot);
               current = getNewOne();
               coords = Coords(4, 21) + spawnPositionFixes[current.index];
-              //handling!.movement_key_released(true, true);
+              //handling!.movementKeyReleased(true, true);
             case KeyType.hold:
               switch (hold){
                 case null:
@@ -250,10 +257,12 @@ void main() async {
           nextEvent as EventKeyPress;
           switch (nextEvent.data.key){
             case KeyType.moveLeft:
-              handling!.movement_key_released(true, false);
+              int pontencialMovement = handling!.movementKeyReleased(true, false, nextEvent.data.subframe);
+              if (board.positionIsValid(current, Coords(coords.x+pontencialMovement, coords.y), rot)) coords.x += pontencialMovement;
               break;
             case KeyType.moveRight:
-              handling!.movement_key_released(false, true);
+              int pontencialMovement = handling!.movementKeyReleased(false, true, nextEvent.data.subframe);
+              if (board.positionIsValid(current, Coords(coords.x+pontencialMovement, coords.y), rot)) coords.x += pontencialMovement;
               break;
             case KeyType.softDrop:
                handling?.sdfActive = false;
