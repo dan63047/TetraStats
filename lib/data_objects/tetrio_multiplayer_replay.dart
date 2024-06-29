@@ -815,7 +815,7 @@ List<List<List<Coords>>> shapes = [
     [Coords(0, 1), Coords(1, 0), Coords(1, 1), Coords(1, 2)]
   ]
 ];
-List<Coords> spawnPositionFixes = [Coords(0, 0), Coords(0, 0), Coords(1, 1), Coords(0, 0), Coords(0, -1), Coords(0, 0), Coords(0, 0)];
+List<Coords> spawnPositionFixes = [Coords(0, 0), Coords(0, 0), Coords(2, 1), Coords(0, 0), Coords(0, -1), Coords(0, 0), Coords(0, 0)];
 
 const Map<String, double> garbage = {
   "single": 0,

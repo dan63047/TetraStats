@@ -22,7 +22,12 @@ class HandlingHandler{
     arrLeft = arr;
   }
 
-  void movementKeyPressed(bool left, bool right, double subframe){
+  @override
+  String toString(){
+    return "das: ${das}f; arr: ${arr}f";
+  }
+
+  int movementKeyPressed(bool left, bool right, double subframe){
       if (left) {
         activeLeft = left;
         direction = -1;
@@ -32,6 +37,7 @@ class HandlingHandler{
         direction = 1;
       }
       dasLeft = das - (1 - subframe);
+      return direction;
     }
 
     int movementKeyReleased(bool left, bool right, double subframe){
@@ -60,7 +66,7 @@ class HandlingHandler{
     if (!activeLeft && !activeRight) return 0;
     if (dasLeft > 0.0) {
         dasLeft -= delta;
-        if (dasLeft <= 0.0) {
+        if (dasLeft < 0.0) {
             arrLeft += dasLeft;
             dasLeft = 0.0;
             return direction;
@@ -69,7 +75,7 @@ class HandlingHandler{
         }
     }else{
         arrLeft -= delta;
-        if (arrLeft <= 0.0) {
+        if (arrLeft < 0.0) {
             arrLeft += arr;
             return direction;
         }else {
@@ -147,7 +153,7 @@ void main() async {
   Board board = Board(10, 20, 20); 
   Tetromino? hold;
   int rot = 0;
-  Coords coords = Coords(4, 21);
+  Coords coords = Coords(3, 21);
   double gravityBucket = 0.00000000000000;
 
   developer.log("Seed is ${replay.stats[0][0].seed}, first bag is $queue");
@@ -199,6 +205,7 @@ void main() async {
         case EventType.full:
           settings = (nextEvent as EventFull).data.options;
           handling = HandlingHandler(settings!.handling!.das.toDouble(), settings.handling!.arr.toDouble());
+          print(handling);
           break;
         case EventType.keydown:
           nextEvent as EventKeyPress;
@@ -214,10 +221,9 @@ void main() async {
               rot = (rot+2)%4;
               break;
             case KeyType.moveLeft:
-              handling!.movementKeyPressed(true, false, nextEvent.data.subframe);
-              break;
             case KeyType.moveRight:
-              handling!.movementKeyPressed(false, true, nextEvent.data.subframe);
+              int pontencialMovement = handling!.movementKeyPressed(nextEvent.data.key == KeyType.moveLeft, nextEvent.data.key == KeyType.moveRight, nextEvent.data.subframe);
+              if (board.positionIsValid(current, Coords(coords.x+pontencialMovement, coords.y), rot)) coords.x += pontencialMovement;
               break;
             case KeyType.softDrop:
               handling!.sdfActive = true;
@@ -226,7 +232,7 @@ void main() async {
               coords.y = sonicDrop();
               board.writeToBoard(current, coords, rot);
               current = getNewOne();
-              coords = Coords(4, 21) + spawnPositionFixes[current.index];
+              coords = Coords(3, 21) + spawnPositionFixes[current.index];
               //handling!.movementKeyReleased(true, true);
             case KeyType.hold:
               switch (hold){
@@ -241,7 +247,7 @@ void main() async {
                 current = temp;
                 break;
               }
-              coords = Coords(4, 21) + spawnPositionFixes[current.index];
+              coords = Coords(3, 21) + spawnPositionFixes[current.index];
               break;
             case KeyType.chat:
               // TODO: Handle this case.
@@ -257,11 +263,8 @@ void main() async {
           nextEvent as EventKeyPress;
           switch (nextEvent.data.key){
             case KeyType.moveLeft:
-              int pontencialMovement = handling!.movementKeyReleased(true, false, nextEvent.data.subframe);
-              if (board.positionIsValid(current, Coords(coords.x+pontencialMovement, coords.y), rot)) coords.x += pontencialMovement;
-              break;
             case KeyType.moveRight:
-              int pontencialMovement = handling!.movementKeyReleased(false, true, nextEvent.data.subframe);
+              int pontencialMovement = handling!.movementKeyReleased(nextEvent.data.key == KeyType.moveLeft, nextEvent.data.key == KeyType.moveRight, nextEvent.data.subframe);
               if (board.positionIsValid(current, Coords(coords.x+pontencialMovement, coords.y), rot)) coords.x += pontencialMovement;
               break;
             case KeyType.softDrop:
