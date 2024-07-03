@@ -123,6 +123,17 @@ class Board{
     return true;
   }
 
+  bool wasATSpin(Tetromino type, Coords coords, int rot){
+    if (!(positionIsValid(type, Coords(coords.x+1, coords.y), rot) ||
+			    positionIsValid(type, Coords(coords.x-1, coords.y), rot) ||
+			    positionIsValid(type, Coords(coords.x, coords.y+1), rot) ||
+			    positionIsValid(type, Coords(coords.x, coords.y-1), rot))
+      ){
+      return true;
+    }
+    return false;
+  }
+
   void writeToBoard(Tetromino type, Coords coords, int rot) {
     if (!positionIsValid(type, coords, rot)) throw Exception("Attempted to write $type to $coords in $rot rot");
     List<Coords> shape = shapes[type.index][rot];
@@ -130,6 +141,117 @@ class Board{
       var finalCoords = coords+mino;
       board[finalCoords.y][finalCoords.x] = type;
     }
+  }
+
+  void writeGarbage(GarbageData data, [int? amt]){
+    List<List<Tetromino>> garbage = [for (int i = 0; i < (amt??data.amt!); i++) [for (int k = 0; k < width; k++) k == data.column! ? Tetromino.empty : Tetromino.garbage]];
+    board.insertAll(0, garbage);
+    board.removeRange(height-garbage.length, height);
+  }
+
+  List<int> clearFullLines(){
+    int linesCleared = 0;
+    int garbageLines = 0;
+    int difficultLineClear = 0;
+    for (int i = 0; i < board.length; i++){
+      if (board[i-linesCleared].every((element) => element != Tetromino.empty)){
+        if (board[i-linesCleared].any((element) => element == Tetromino.garbage)) garbageLines++;
+        board.removeAt(i-linesCleared);
+        List<Tetromino> emptyRow = [for (int t = 0; t < width; t++) Tetromino.empty];
+        board.add(emptyRow);
+        linesCleared += 1;
+      }
+    }
+    if (linesCleared >= 4) difficultLineClear = 1;
+    return [linesCleared, garbageLines, difficultLineClear];
+  }
+}
+
+class IncomingGarbage{
+  int? frameOfThreat; // will enter board after this frame, null if unconfirmed
+  GarbageData data;
+
+  IncomingGarbage(this.data);
+
+  @override
+  String toString(){
+    return "f$frameOfThreat: col${data.column} amt${data.amt}";
+  }
+
+  void confirm(int confirmationFrame, int garbageSpeed){
+    frameOfThreat = confirmationFrame+garbageSpeed;
+  }
+}
+
+class LineClearResult{
+  int linesCleared;
+  Tetromino piece;
+  bool spin;
+  int garbageCleared;
+  int column;
+  int attackProduced;
+
+  LineClearResult(this.linesCleared, this.piece, this.spin, this.garbageCleared, this.column, this.attackProduced);
+}
+
+class Stats{
+  int combo = -1;
+  int btb = -1;
+  int attackRecived = 0;
+  int attackTanked = 0;
+
+  LineClearResult processLineClear(List<int> clearFullLinesResult, Tetromino current, Coords pos, bool spinWasLastMove, bool tspin){
+    if (clearFullLinesResult[0] > 0) combo++;
+    else combo = -1;
+    if (clearFullLinesResult[2] > 0) btb++;
+    else btb = -1;
+    int attack = 0;
+    switch (clearFullLinesResult[0]){
+      case 0:
+        if (spinWasLastMove && tspin) {
+          attack = garbage['t-spin']!;
+        }
+      break;
+      case 1:
+        if (spinWasLastMove && tspin) {
+          attack = garbage['t-spin single']!;
+        }else{
+          attack = garbage['single']!;
+        }
+      break;
+      case 2:
+        if (spinWasLastMove && tspin) {
+          attack = garbage['t-spin double']!;
+        }else{
+          attack = garbage['double']!;
+        }
+      break;
+      case 3:
+        if (spinWasLastMove && tspin) {
+          attack = garbage['t-spin triple']!;
+        }else{
+          attack = garbage['triple']!;
+        }
+      break;
+      case 4:
+        if (spinWasLastMove && tspin) {
+          attack = garbage['t-spin quad']!;
+        }else{
+          attack = garbage['quad']!;
+        }
+      break;
+      case 5:
+        if (spinWasLastMove && tspin) {
+          attack = garbage['t-spin penta']!;
+        }else{
+          attack = garbage['penta']!;
+        }
+      break;
+      case _:
+      developer.log("${clearFullLinesResult[0]} lines cleared");
+      break;
+    }
+    return LineClearResult(clearFullLinesResult[0], Tetromino.empty, false, clearFullLinesResult[1], 0, attack);
   }
 }
 
@@ -150,9 +272,13 @@ void main() async {
   int currentFrame = 0;
   events.removeAt(0); // get rig of Event.start
   Event nextEvent = events.removeAt(0);
-  Board board = Board(10, 20, 20); 
+  Stats stats = Stats();
+  Board board = Board(10, 20, 20);
+  KicksetBase kickset = SRSPlus();
+  List<IncomingGarbage> garbageQueue = [];
   Tetromino? hold;
   int rot = 0;
+  bool spinWasLastMove = false;
   Coords coords = Coords(3, 21);
   double gravityBucket = 0.00000000000000;
 
@@ -180,6 +306,20 @@ void main() async {
     return queue.removeAt(0);
   }
 
+  bool handleRotation(int r){
+    if (r == 0) return true;
+    int future_rotation = (rot + r) % 4;
+    List<Coords> tests = (current == Tetromino.I ? kickset.kickTableI : kickset.kickTable)[rot][r == -1 ? 0 : r];
+    for (Coords test in tests){
+      if (board.positionIsValid(current, coords+test, future_rotation)){
+        coords += test;
+        rot = future_rotation;
+        return true;
+      }
+    }
+    return false;
+  }
+
   coords += spawnPositionFixes[current.index];
   for (currentFrame; currentFrame <= replay.roundLengths[0]; currentFrame++){
     gravityBucket += settings != null ? (handling!.sdfActive ? settings.g! * settings.handling!.sdf : settings.g!) : 0;
@@ -194,7 +334,7 @@ void main() async {
     }
     if (board.positionIsValid(current, Coords(coords.x, coords.y-gravityImpact), rot)) coords.y -= gravityImpact;
     print("$currentFrame: $current at $coords\n$board");
-
+    //print(stats.combo);
     if (currentFrame == nextEvent.frame){
       while (currentFrame == nextEvent.frame){
         print("Processing $nextEvent");
@@ -212,13 +352,13 @@ void main() async {
           activeKeypresses[nextEvent.data.key] = nextEvent;
           switch (nextEvent.data.key){
             case KeyType.rotateCCW:
-              rot = (rot-1)%4;
+              handleRotation(-1);
               break;
             case KeyType.rotateCW:
-              rot = (rot+1)%4;
+              handleRotation(1);
               break;
             case KeyType.rotate180:
-              rot = (rot+2)%4;
+              handleRotation(2);
               break;
             case KeyType.moveLeft:
             case KeyType.moveRight:
@@ -231,9 +371,42 @@ void main() async {
             case KeyType.hardDrop:
               coords.y = sonicDrop();
               board.writeToBoard(current, coords, rot);
+              bool tspin = board.wasATSpin(current, coords, rot);
+              LineClearResult lineClear = stats.processLineClear(board.clearFullLines(), current, coords, spinWasLastMove, tspin);
+              print("${lineClear.linesCleared} lines, ${lineClear.garbageCleared} garbage");
+              if (garbageQueue.isNotEmpty) {
+                if (lineClear.linesCleared > 0){
+                  int garbageToDelete = lineClear.attackProduced;
+                  for (IncomingGarbage garbage in garbageQueue){
+                    if (garbage.data.amt! >= garbageToDelete) {
+                      garbageToDelete -= garbage.data.amt!;
+                      lineClear.attackProduced = garbageToDelete;
+                      garbage.data.amt = 0;
+                    }else{
+                      garbage.data.amt = garbage.data.amt! - garbageToDelete;
+                      lineClear.attackProduced = 0;
+                      break;
+                    }
+                  }
+                }else{
+                  int needToTake = settings!.garbageCap!;
+                  for (IncomingGarbage garbage in garbageQueue){
+                    if ((garbage.frameOfThreat??99999999) > currentFrame) break;
+                    if (garbage.data.amt! > needToTake) {
+                      board.writeGarbage(garbage.data, needToTake);
+                      garbage.data.amt = garbage.data.amt! - needToTake;
+                      break;
+                    } else {
+                      board.writeGarbage(garbage.data);
+                      needToTake -= garbage.data.amt!;
+                      garbage.data.amt = 0;
+                    }                  
+                  }
+                }
+                garbageQueue.removeWhere((element) => element.data.amt == 0);
+              }
               current = getNewOne();
               coords = Coords(3, 21) + spawnPositionFixes[current.index];
-              //handling!.movementKeyReleased(true, true);
             case KeyType.hold:
               switch (hold){
                 case null:
@@ -247,6 +420,7 @@ void main() async {
                 current = temp;
                 break;
               }
+              rot = 0;
               coords = Coords(3, 21) + spawnPositionFixes[current.index];
               break;
             case KeyType.chat:
@@ -257,6 +431,11 @@ void main() async {
               // TODO: Handle this case.
             default:
               developer.log(nextEvent.data.key.name);
+          }
+          if (nextEvent.data.key == KeyType.rotateCW && nextEvent.data.key == KeyType.rotateCW && nextEvent.data.key == KeyType.rotateCW){
+            spinWasLastMove = true;
+          }else{
+            spinWasLastMove = false;
           }
           break;
         case EventType.keyup:
@@ -291,6 +470,22 @@ void main() async {
           break;
         case EventType.end:
           currentFrame = replay.roundLengths[0]+1;
+          break;
+        case EventType.ige:
+          nextEvent as EventIGE;
+          switch (nextEvent.data.data.type){
+            case "interaction":
+            garbageQueue.add(IncomingGarbage((nextEvent.data.data as IGEdataInteraction).data));
+            case "interaction_confirm":
+            GarbageData data = (nextEvent.data.data as IGEdataInteraction).data;
+            if(data.type != "targeted") garbageQueue.firstWhere((element) => element.data.iid == data.iid).confirm(currentFrame, settings!.garbageSpeed!);
+            case "allow_targeting":
+            case "target":
+            default:
+            developer.log("Unknown IGE type: ${nextEvent.data.type}", level: 900);
+            break;
+          }
+          // garbage speed counts from interaction comfirm
           break;
         default:
           developer.log("Event wasn't processed: ${nextEvent}", level: 900);

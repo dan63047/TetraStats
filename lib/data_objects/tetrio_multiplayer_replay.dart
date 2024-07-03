@@ -590,6 +590,7 @@ class DataFullOptions{
     gMargin = json["gmargin"];
     gIncrease = json["gincrease"];
     garbageMultiplier = json["garbagemultiplier"].toDouble();
+    garbageCap = json["garbagecap"];
     garbageCapIncrease = json["garbagecapincrease"].toDouble();
     garbageCapMax = json["garbagecapmax"];
     garbageHoleSize = json["garbageholesize"];
@@ -815,9 +816,9 @@ List<List<List<Coords>>> shapes = [
     [Coords(0, 1), Coords(1, 0), Coords(1, 1), Coords(1, 2)]
   ]
 ];
-List<Coords> spawnPositionFixes = [Coords(0, 0), Coords(0, 0), Coords(2, 1), Coords(0, 0), Coords(0, -1), Coords(0, 0), Coords(0, 0)];
+List<Coords> spawnPositionFixes = [Coords(0, 0), Coords(0, 0), Coords(1, 1), Coords(0, 0), Coords(0, -1), Coords(0, 0), Coords(0, 0)];
 
-const Map<String, double> garbage = {
+const Map<String, int> garbage = {
   "single": 0,
   "double": 1,
   "triple": 2,
@@ -840,3 +841,61 @@ double comboBonus = 0.25;
 int comboMinifier = 1;
 double comboMinifierLog = 1.25;
 List<int> comboTable = [0, 1, 1, 2, 2, 3, 3, 4, 4, 4, 5];
+
+class KicksetBase {
+	List<Coords>? additionalOffsets;
+	late List<Coords> additionalOffsetEmpty;
+	List<int>? spawnRotation;
+	late List<List<List<Coords>>> kickTable; //kickTable[initRot][rotDirection-1][kick]
+	late List<List<List<Coords>>> kickTableI;
+}
+
+class SRSPlus extends KicksetBase{
+  SRSPlus(){
+    kickTable = [
+      [
+        [Coords( 0, 0), Coords( 1, 0), Coords( 1, 1), Coords( 0,-2), Coords( 1,-2)], // 0 -> 270
+        [Coords( 0, 0), Coords(-1, 0), Coords(-1, 1), Coords( 0,-2), Coords(-1,-2)], // 0 -> 90
+        [Coords( 0, 0), Coords(-1, 0), Coords(-1, 1), Coords( 0,-2), Coords(-1,-2)], // 0 -> 180
+      ],
+      [
+        [Coords( 0, 0), Coords( 1, 0), Coords( 1,-1), Coords( 0, 2), Coords( 1, 2)], // 90 -> 0
+        [Coords( 0, 0), Coords( 1, 0), Coords( 1,-1), Coords( 0, 2), Coords( 1, 2)], // 90 -> 180
+        [Coords( 0, 0), Coords( 1, 0), Coords( 1,-1), Coords( 0, 2), Coords( 1, 2)], // 90 -> 270
+      ],
+      [
+        [Coords( 0, 0), Coords(-1, 0), Coords(-1, 1), Coords( 0,-2), Coords(-1,-2)], // 180 -> 90
+        [Coords( 0, 0), Coords( 1, 0), Coords( 1, 1), Coords( 0,-2), Coords( 1,-2)], // 180 -> 270
+        [Coords( 0, 0), Coords( 1, 0), Coords( 1, 1), Coords( 0,-2), Coords( 1,-2)], // 180 -> 0
+      ], 
+      [ 
+        [Coords( 0, 0), Coords(-1, 0), Coords(-1,-1), Coords( 0, 2), Coords(-1, 2)], // 270 -> 180
+        [Coords( 0, 0), Coords(-1, 0), Coords(-1,-1), Coords( 0, 2), Coords(-1, 2)], // 270 -> 0
+        [Coords( 0, 0), Coords(-1, 0), Coords(-1,-1), Coords( 0, 2), Coords(-1, 2)], // 270 -> 90
+      ] 
+    ];
+    kickTableI = [
+      [
+        [Coords( 0, 0), Coords( 1, 0), Coords( 1, 1), Coords( 0,-2), Coords( 1,-2)], // 0 -> 270
+        [Coords( 0, 0), Coords(-1, 0), Coords(-1, 1), Coords( 0,-2), Coords(-1,-2)], // 0 -> 90
+        [Coords( 0, 0), Coords( 1, 0), Coords( 1, 1), Coords( 0,-2), Coords( 1,-2)], // 0 -> 180
+      ],
+      [
+        [Coords( 0, 0), Coords( 1, 0), Coords( 1,-1), Coords( 0, 2), Coords( 1, 2)], // 90 -> 0
+        [Coords( 0, 0), Coords( 1, 0), Coords( 1,-1), Coords( 0, 2), Coords( 1, 2)], // 90 -> 180
+        [Coords( 0, 0), Coords( 1, 0), Coords( 1, 1), Coords( 0,-2), Coords( 1,-2)], // 90 -> 270
+      ],
+      [
+        [Coords( 0, 0), Coords(-1, 0), Coords(-1, 1), Coords( 0,-2), Coords(-1,-2)], // 180 -> 90
+        [Coords( 0, 0), Coords( 1, 0), Coords( 1, 1), Coords( 0,-2), Coords( 1,-2)], // 180 -> 270
+        [Coords( 0, 0), Coords(-1, 0), Coords(-1, 1), Coords( 0,-2), Coords(-1,-2)], // 180 -> 0
+      ], 
+      [
+        [Coords( 0, 0), Coords(-1, 0), Coords(-1,-1), Coords( 0, 2), Coords(-1, 2)], // 270 -> 180
+        [Coords( 0, 0), Coords(-1, 0), Coords(-1,-1), Coords( 0, 2), Coords(-1, 2)], // 270 -> 0
+        [Coords( 0, 0), Coords(-1, 0), Coords(-1,-1), Coords( 0, 2), Coords(-1, 2)], // 270 -> 90
+      ] 
+    ];
+    additionalOffsetEmpty = [Coords( 0, 0),Coords( 0, 0),Coords( 0, 0),Coords( 0, 0)];
+  }
+}

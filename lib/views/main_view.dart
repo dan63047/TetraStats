@@ -1184,7 +1184,7 @@ class _TwoRecordsThingy extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    for (int i = 1; i < sprintStream.records.length; i++) ListTile(
+                    for (int i = 1; i < blitzStream.records.length; i++) ListTile(
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SingleplayerRecordView(record: blitzStream.records[i]))),
                     leading: Text("#${i+1}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, shadows: textShadow, height: 0.9) ),
                     title: Text("${NumberFormat.decimalPattern().format(blitzStream.records[i].endContext.score)} points",
