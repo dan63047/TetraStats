@@ -40,8 +40,7 @@ class HandlingHandler{
       return direction;
     }
 
-    int movementKeyReleased(bool left, bool right, double subframe){
-      int lastFrameMovement = processMovenent(subframe);
+    void movementKeyReleased(bool left, bool right, double subframe){
       if (left) {
         activeLeft = !left;
       }
@@ -59,7 +58,6 @@ class HandlingHandler{
         dasLeft = das;
         direction = 0;
       }
-      return lastFrameMovement;
     }
 
   int processMovenent(double delta){
@@ -75,6 +73,7 @@ class HandlingHandler{
         }
     }else{
         arrLeft -= delta;
+        if (arr == 0.0) return direction*10;
         if (arrLeft < 0.0) {
             arrLeft += arr;
             return direction;
@@ -262,6 +261,8 @@ class Simulation{
 // That thing allows me to test my new staff i'm trying to implement
 void main() async {
   var replayJson = jsonDecode(File("/home/dan63047/Документы/replays/6550eecf2ffc5604e6224fc5.ttrm").readAsStringSync());
+  // frame 994: garbage lost
+  // frame 1550: T-spin failed
   ReplayData replay = ReplayData.fromJson(replayJson);
   TetrioRNG rng = TetrioRNG(replay.stats[0][0].seed);
   List<Tetromino> queue = rng.shuffleList(tetrominoes.toList());
@@ -270,6 +271,7 @@ void main() async {
   HandlingHandler? handling;
   Map<KeyType, EventKeyPress> activeKeypresses = {};
   int currentFrame = 0;
+  double subframesWent = 0;
   events.removeAt(0); // get rig of Event.start
   Event nextEvent = events.removeAt(0);
   Stats stats = Stats();
@@ -308,31 +310,48 @@ void main() async {
 
   bool handleRotation(int r){
     if (r == 0) return true;
-    int future_rotation = (rot + r) % 4;
+    int futureRotation = (rot + r) % 4;
     List<Coords> tests = (current == Tetromino.I ? kickset.kickTableI : kickset.kickTable)[rot][r == -1 ? 0 : r];
     for (Coords test in tests){
-      if (board.positionIsValid(current, coords+test, future_rotation)){
+      if (board.positionIsValid(current, coords+test, futureRotation)){
         coords += test;
-        rot = future_rotation;
+        rot = futureRotation;
         return true;
       }
     }
     return false;
   }
 
-  coords += spawnPositionFixes[current.index];
-  for (currentFrame; currentFrame <= replay.roundLengths[0]; currentFrame++){
-    gravityBucket += settings != null ? (handling!.sdfActive ? settings.g! * settings.handling!.sdf : settings.g!) : 0;
-
-    int movement = handling != null ? handling.processMovenent(1.0) : 0;
-    if (board.positionIsValid(current, Coords(coords.x+movement, coords.y), rot)) coords.x += movement;
-
+  void handleGravity(double frames){
+    if (frames == 0) return;
+    gravityBucket += settings != null ? (handling!.sdfActive ? settings.g! * settings.handling!.sdf : settings.g!) * frames : 0;
     int gravityImpact = 0;
     if (gravityBucket >= 1.0){
       gravityImpact = gravityBucket.truncate();
       gravityBucket -= gravityBucket.truncate();
     }
-    if (board.positionIsValid(current, Coords(coords.x, coords.y-gravityImpact), rot)) coords.y -= gravityImpact;
+    while (gravityImpact > 0){
+      if (board.positionIsValid(current, Coords(coords.x, coords.y-1), rot)) coords.y -= 1;
+      gravityImpact--;
+    }
+  }
+
+  void handleMovement(double frames){
+    if (frames == 0 || handling == null) return;
+    int movement = handling.processMovenent(frames);
+    while (movement.abs() > 0){
+      if (board.positionIsValid(current, Coords(movement.isNegative ? coords.x-1 : coords.x+1, coords.y), rot)) movement.isNegative ? coords.x-- : coords.x++;
+      movement.isNegative ? movement++ : movement--;
+    }   
+  }
+
+  coords += spawnPositionFixes[current.index];
+  for (currentFrame; currentFrame <= replay.roundLengths[0]; currentFrame++){
+    handleMovement(1-subframesWent);
+    handleGravity(1-subframesWent);
+    subframesWent = 0;
+    
+    if (settings?.handling?.sdf == 41) coords.y = sonicDrop();
     print("$currentFrame: $current at $coords\n$board");
     //print(stats.combo);
     if (currentFrame == nextEvent.frame){
@@ -349,7 +368,11 @@ void main() async {
           break;
         case EventType.keydown:
           nextEvent as EventKeyPress;
-          activeKeypresses[nextEvent.data.key] = nextEvent;
+          double subframesDiff = nextEvent.data.subframe - subframesWent;
+          subframesWent += subframesDiff;
+          handleMovement(subframesDiff);
+          handleGravity(subframesDiff);
+          //activeKeypresses[nextEvent.data.key] = nextEvent;
           switch (nextEvent.data.key){
             case KeyType.rotateCCW:
               handleRotation(-1);
@@ -440,11 +463,14 @@ void main() async {
           break;
         case EventType.keyup:
           nextEvent as EventKeyPress;
+          double subframesDiff = nextEvent.data.subframe - subframesWent;
+          subframesWent += subframesDiff;
+          handleMovement(subframesDiff);
+          handleGravity(subframesDiff);
           switch (nextEvent.data.key){
             case KeyType.moveLeft:
             case KeyType.moveRight:
-              int pontencialMovement = handling!.movementKeyReleased(nextEvent.data.key == KeyType.moveLeft, nextEvent.data.key == KeyType.moveRight, nextEvent.data.subframe);
-              if (board.positionIsValid(current, Coords(coords.x+pontencialMovement, coords.y), rot)) coords.x += pontencialMovement;
+              handling!.movementKeyReleased(nextEvent.data.key == KeyType.moveLeft, nextEvent.data.key == KeyType.moveRight, nextEvent.data.subframe);
               break;
             case KeyType.softDrop:
                handling?.sdfActive = false;

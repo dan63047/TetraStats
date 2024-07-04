@@ -856,44 +856,44 @@ class SRSPlus extends KicksetBase{
       [
         [Coords( 0, 0), Coords( 1, 0), Coords( 1, 1), Coords( 0,-2), Coords( 1,-2)], // 0 -> 270
         [Coords( 0, 0), Coords(-1, 0), Coords(-1, 1), Coords( 0,-2), Coords(-1,-2)], // 0 -> 90
-        [Coords( 0, 0), Coords(-1, 0), Coords(-1, 1), Coords( 0,-2), Coords(-1,-2)], // 0 -> 180
+        [Coords( 0, 0), Coords( 0, 1), Coords( 1, 1), Coords(-1, 1), Coords( 1, 0), Coords(-1, 0)], // 0 -> 180
       ],
       [
         [Coords( 0, 0), Coords( 1, 0), Coords( 1,-1), Coords( 0, 2), Coords( 1, 2)], // 90 -> 0
         [Coords( 0, 0), Coords( 1, 0), Coords( 1,-1), Coords( 0, 2), Coords( 1, 2)], // 90 -> 180
-        [Coords( 0, 0), Coords( 1, 0), Coords( 1,-1), Coords( 0, 2), Coords( 1, 2)], // 90 -> 270
+        [Coords( 0, 0), Coords( 1, 0), Coords( 1, 2), Coords( 1, 1), Coords( 0, 2), Coords( 0, 1)], // 90 -> 270
       ],
       [
         [Coords( 0, 0), Coords(-1, 0), Coords(-1, 1), Coords( 0,-2), Coords(-1,-2)], // 180 -> 90
         [Coords( 0, 0), Coords( 1, 0), Coords( 1, 1), Coords( 0,-2), Coords( 1,-2)], // 180 -> 270
-        [Coords( 0, 0), Coords( 1, 0), Coords( 1, 1), Coords( 0,-2), Coords( 1,-2)], // 180 -> 0
+        [Coords( 0, 0), Coords( 0,-1), Coords(-1,-1), Coords( 1,-1), Coords(-1, 0), Coords( 1, 0)], // 180 -> 0
       ], 
       [ 
         [Coords( 0, 0), Coords(-1, 0), Coords(-1,-1), Coords( 0, 2), Coords(-1, 2)], // 270 -> 180
         [Coords( 0, 0), Coords(-1, 0), Coords(-1,-1), Coords( 0, 2), Coords(-1, 2)], // 270 -> 0
-        [Coords( 0, 0), Coords(-1, 0), Coords(-1,-1), Coords( 0, 2), Coords(-1, 2)], // 270 -> 90
+        [Coords( 0, 0), Coords(-1, 0), Coords(-1, 2), Coords(-1, 1), Coords( 0, 2), Coords( 0, 1)], // 270 -> 90
       ] 
     ];
     kickTableI = [
       [
-        [Coords( 0, 0), Coords( 1, 0), Coords( 1, 1), Coords( 0,-2), Coords( 1,-2)], // 0 -> 270
-        [Coords( 0, 0), Coords(-1, 0), Coords(-1, 1), Coords( 0,-2), Coords(-1,-2)], // 0 -> 90
-        [Coords( 0, 0), Coords( 1, 0), Coords( 1, 1), Coords( 0,-2), Coords( 1,-2)], // 0 -> 180
+        [Coords( 0, 0), Coords(-1, 0), Coords( 2, 0), Coords( 2,-1), Coords(-1, 2)], // 0 -> 270
+        [Coords( 0, 0), Coords( 1, 0), Coords( 2, 0), Coords(-1,-1), Coords( 1, 2)], // 0 -> 90
+        [Coords( 0, 0), Coords( 0, 1)], // 0 -> 180
       ],
       [
-        [Coords( 0, 0), Coords( 1, 0), Coords( 1,-1), Coords( 0, 2), Coords( 1, 2)], // 90 -> 0
-        [Coords( 0, 0), Coords( 1, 0), Coords( 1,-1), Coords( 0, 2), Coords( 1, 2)], // 90 -> 180
-        [Coords( 0, 0), Coords( 1, 0), Coords( 1, 1), Coords( 0,-2), Coords( 1,-2)], // 90 -> 270
+        [Coords( 0, 0), Coords(-1, 0), Coords( 2, 0), Coords(-1,-2), Coords( 2,-1)], // 90 -> 0
+        [Coords( 0, 0), Coords(-1, 0), Coords( 2, 0), Coords(-1, 2), Coords( 2, 1)], // 90 -> 180
+        [Coords( 0, 0), Coords( 1, 0)], // 90 -> 270
       ],
       [
-        [Coords( 0, 0), Coords(-1, 0), Coords(-1, 1), Coords( 0,-2), Coords(-1,-2)], // 180 -> 90
-        [Coords( 0, 0), Coords( 1, 0), Coords( 1, 1), Coords( 0,-2), Coords( 1,-2)], // 180 -> 270
-        [Coords( 0, 0), Coords(-1, 0), Coords(-1, 1), Coords( 0,-2), Coords(-1,-2)], // 180 -> 0
+        [Coords( 0, 0), Coords(-2, 0), Coords( 1, 0), Coords(-2, 1), Coords( 1,-2)], // 180 -> 90
+        [Coords( 0, 0), Coords(-2, 0), Coords(-1, 0), Coords( 2, 1), Coords(-1,-2)], // 180 -> 270
+        [Coords( 0, 0), Coords( 0,-1)], // 180 -> 0
       ], 
       [
-        [Coords( 0, 0), Coords(-1, 0), Coords(-1,-1), Coords( 0, 2), Coords(-1, 2)], // 270 -> 180
-        [Coords( 0, 0), Coords(-1, 0), Coords(-1,-1), Coords( 0, 2), Coords(-1, 2)], // 270 -> 0
-        [Coords( 0, 0), Coords(-1, 0), Coords(-1,-1), Coords( 0, 2), Coords(-1, 2)], // 270 -> 90
+        [Coords( 0, 0), Coords( 1, 0), Coords(-2, 0), Coords( 1, 2), Coords(-2,-1)], // 270 -> 180
+        [Coords( 0, 0), Coords( 1, 0), Coords(-2, 0), Coords( 1,-2), Coords(-2, 1)], // 270 -> 0
+        [Coords( 0, 0), Coords(-1, 0)], // 270 -> 90
       ] 
     ];
     additionalOffsetEmpty = [Coords( 0, 0),Coords( 0, 0),Coords( 0, 0),Coords( 0, 0)];
