@@ -282,7 +282,10 @@ void main() async {
   int rot = 0;
   bool spinWasLastMove = false;
   Coords coords = Coords(3, 21);
-  double gravityBucket = 0.00000000000000;
+  double lockDelay = 30; // frames
+  int lockResets = 15;
+  bool floored = false;
+  double gravityBucket = 1.0;
 
   developer.log("Seed is ${replay.stats[0][0].seed}, first bag is $queue");
   Tetromino current = queue.removeAt(0);
@@ -305,6 +308,10 @@ void main() async {
     }
     //developer.log("Next queue is $queue");
     rot = 0;
+    lockResets = 15;
+    lockDelay = 30;
+    floored = false;
+    gravityBucket = 1.0;
     return queue.removeAt(0);
   }
 
@@ -322,17 +329,62 @@ void main() async {
     return false;
   }
 
+  void handleHardDrop(){
+    board.writeToBoard(current, coords, rot);
+    bool tspin = board.wasATSpin(current, coords, rot);
+    LineClearResult lineClear = stats.processLineClear(board.clearFullLines(), current, coords, spinWasLastMove, tspin);
+    print("${lineClear.linesCleared} lines, ${lineClear.garbageCleared} garbage");
+    if (garbageQueue.isNotEmpty) {
+      if (lineClear.linesCleared > 0){
+        int garbageToDelete = lineClear.attackProduced;
+        for (IncomingGarbage garbage in garbageQueue){
+          if (garbage.data.amt! >= garbageToDelete) {
+            garbageToDelete -= garbage.data.amt!;
+            lineClear.attackProduced = garbageToDelete;
+            garbage.data.amt = 0;
+          }else{
+            garbage.data.amt = garbage.data.amt! - garbageToDelete;
+            lineClear.attackProduced = 0;
+            break;
+          }
+        }
+      }else{
+        int needToTake = settings!.garbageCap!;
+        for (IncomingGarbage garbage in garbageQueue){
+          if ((garbage.frameOfThreat??99999999) > currentFrame) break;
+          if (garbage.data.amt! > needToTake) {
+            board.writeGarbage(garbage.data, needToTake);
+            garbage.data.amt = garbage.data.amt! - needToTake;
+            break;
+          } else {
+            board.writeGarbage(garbage.data);
+            needToTake -= garbage.data.amt!;
+            garbage.data.amt = 0;
+          }                  
+        }
+      }
+      garbageQueue.removeWhere((element) => element.data.amt == 0);
+    }
+    current = getNewOne();
+    coords = Coords(3, 21) + spawnPositionFixes[current.index];
+  }
+
   void handleGravity(double frames){
     if (frames == 0) return;
-    gravityBucket += settings != null ? (handling!.sdfActive ? settings.g! * settings.handling!.sdf : settings.g!) * frames : 0;
+    gravityBucket += settings != null ? (handling!.sdfActive ? max(settings.g! * settings.handling!.sdf, 0.05 * settings.handling!.sdf)  : settings.g!) * frames : 0;
     int gravityImpact = 0;
     if (gravityBucket >= 1.0){
       gravityImpact = gravityBucket.truncate();
       gravityBucket -= gravityBucket.truncate();
     }
     while (gravityImpact > 0){
-      if (board.positionIsValid(current, Coords(coords.x, coords.y-1), rot)) coords.y -= 1;
+      if (board.positionIsValid(current, Coords(coords.x, coords.y-1), rot)) {coords.y -= 1; floored = false;}
+      else floored = true;
       gravityImpact--;
+    }
+    if (floored) lockDelay -= frames;
+    if (lockDelay <= 0 && floored){
+      handleHardDrop();
     }
   }
 
@@ -364,7 +416,8 @@ void main() async {
         case EventType.full:
           settings = (nextEvent as EventFull).data.options;
           handling = HandlingHandler(settings!.handling!.das.toDouble(), settings.handling!.arr.toDouble());
-          print(handling);
+          lockDelay = settings.locktime!.toDouble();
+          lockResets = settings.lockresets!;
           break;
         case EventType.keydown:
           nextEvent as EventKeyPress;
@@ -393,43 +446,7 @@ void main() async {
               break;
             case KeyType.hardDrop:
               coords.y = sonicDrop();
-              board.writeToBoard(current, coords, rot);
-              bool tspin = board.wasATSpin(current, coords, rot);
-              LineClearResult lineClear = stats.processLineClear(board.clearFullLines(), current, coords, spinWasLastMove, tspin);
-              print("${lineClear.linesCleared} lines, ${lineClear.garbageCleared} garbage");
-              if (garbageQueue.isNotEmpty) {
-                if (lineClear.linesCleared > 0){
-                  int garbageToDelete = lineClear.attackProduced;
-                  for (IncomingGarbage garbage in garbageQueue){
-                    if (garbage.data.amt! >= garbageToDelete) {
-                      garbageToDelete -= garbage.data.amt!;
-                      lineClear.attackProduced = garbageToDelete;
-                      garbage.data.amt = 0;
-                    }else{
-                      garbage.data.amt = garbage.data.amt! - garbageToDelete;
-                      lineClear.attackProduced = 0;
-                      break;
-                    }
-                  }
-                }else{
-                  int needToTake = settings!.garbageCap!;
-                  for (IncomingGarbage garbage in garbageQueue){
-                    if ((garbage.frameOfThreat??99999999) > currentFrame) break;
-                    if (garbage.data.amt! > needToTake) {
-                      board.writeGarbage(garbage.data, needToTake);
-                      garbage.data.amt = garbage.data.amt! - needToTake;
-                      break;
-                    } else {
-                      board.writeGarbage(garbage.data);
-                      needToTake -= garbage.data.amt!;
-                      garbage.data.amt = 0;
-                    }                  
-                  }
-                }
-                garbageQueue.removeWhere((element) => element.data.amt == 0);
-              }
-              current = getNewOne();
-              coords = Coords(3, 21) + spawnPositionFixes[current.index];
+              handleHardDrop();
             case KeyType.hold:
               switch (hold){
                 case null:
@@ -441,10 +458,14 @@ void main() async {
                 temp = hold;
                 hold = current;
                 current = temp;
+                rot = 0;
+                lockResets = 15;
+                lockDelay = 30;
+                gravityBucket = 1.0;
+                floored = false;
+                coords = Coords(3, 21) + spawnPositionFixes[current.index];
                 break;
               }
-              rot = 0;
-              coords = Coords(3, 21) + spawnPositionFixes[current.index];
               break;
             case KeyType.chat:
               // TODO: Handle this case.

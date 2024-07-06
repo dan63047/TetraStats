@@ -80,6 +80,9 @@
         font-weight: 500;
         font-style: normal;
     }
+    a{
+      color: aqua;
+    }
     #preloader{
         display: flex;
         width: fit-content;
@@ -111,6 +114,15 @@
         padding-top: 8px;
         animation: 1s cubic-bezier(.46,.03,.52,.96) infinite alternate breathing;
     }
+    .error{
+      color: red;
+    }
+    #tip{
+      position: absolute;
+      bottom: 5%;
+      color: gray;
+      text-align: center;
+    }
     @media (max-width: 502px){
         #preloader{
             flex-direction: column;
@@ -130,24 +142,44 @@
         <p id="progress">Loading...</p>
     </div>
   </div>
-  <script>
+  <p id="tip"></p>
+  <script> 
     window.addEventListener('load', function(ev) {
-        let progress = document.querySelector("#progress");
-        let preloader = document.querySelector("#preloader");
-      // Download main.dart.js
-      _flutter.loader.loadEntrypoint({
-        serviceWorker: {
-          serviceWorkerVersion: serviceWorkerVersion,
-        },
-        onEntrypointLoaded: async function(engineInitializer) {
-            console.log(serviceWorkerVersion);
-            let appRunner = await engineInitializer.initializeEngine();
-            progress.innerHTML = "Booting...";
-            await appRunner.runApp();
-            preloader.classList.add("hidden");
-        }
-      });
-    });
+    let progress = document.querySelector("#progress");
+    let preloader = document.querySelector("#preloader");
+    let tip = document.querySelector("#tip");
+    const tips = [
+      // Promoting Tetra Stats "native"
+      "Want a better perfomance?<br><a href=\"ya.ru\">Try out Tetra Stats Native</a>",
+      "Imagine a world, where Tetra Stats was written in JS",
+      "Welcome to fullscreen canvas",
+
+      // An actual tips
+      "You can interact with most objects that have an accent color",
+      "Like Sheetbot graphs? Go to three dots menu → Settings → Customization",
+      "Click and hold on line chart graph, then start dragging to zoom in"
+    ];
+    tip.innerHTML = tips[Math.floor(Math.random() * tips.length)];
+      try{
+        // Download main.dart.js
+        _flutter.loader.loadEntrypoint({
+          serviceWorker: {
+            serviceWorkerVersion: serviceWorkerVersion,
+          },
+          onEntrypointLoaded: async function(engineInitializer) {
+              console.log(serviceWorkerVersion);
+              progress.innerHTML = "Booting...";
+              let appRunner = await engineInitializer.initializeEngine();
+              await appRunner.runApp();
+              preloader.classList.add("hidden");
+          }
+        });
+      } catch (e){
+        progress.classList.add("error");
+        document.getAnimations()[0].cancel();
+        progress.innerHTML = "fuck: "+e; 
+      }
+    }); 
   </script>
 </body>
 </html>
