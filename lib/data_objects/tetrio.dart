@@ -901,7 +901,7 @@ class TetraLeagueAlphaRecord{
     replayId = json['replayid'];
     ownId = json['_id']??replayId;
     timestamp = DateTime.parse(json['ts']);
-    replayAvalable = true;
+    replayAvalable = ownId != replayId;
   }
 
   Map<String, dynamic> toJson() {

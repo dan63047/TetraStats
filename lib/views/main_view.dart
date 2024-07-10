@@ -1085,7 +1085,7 @@ class _TwoRecordsThingy extends StatelessWidget {
               if (sprint != null) FinesseThingy(sprint?.endContext.finesse, sprint?.endContext.finessePercentage),
               if (sprint != null) LineclearsThingy(sprint!.endContext.clears, sprint!.endContext.lines, sprint!.endContext.holds, sprint!.endContext.tSpins),
               if (sprint != null) Text("${sprint!.endContext.inputs} KP • ${f2.format(sprint!.endContext.kps)} KPS"),
-              Wrap(
+              if (sprint != null) Wrap(
                   alignment: WrapAlignment.spaceBetween,
                   crossAxisAlignment: WrapCrossAlignment.start,
                   spacing: 20,
@@ -1171,7 +1171,7 @@ class _TwoRecordsThingy extends StatelessWidget {
             if (blitz != null) FinesseThingy(blitz?.endContext.finesse, blitz?.endContext.finessePercentage),
             if (blitz != null) LineclearsThingy(blitz!.endContext.clears, blitz!.endContext.lines, blitz!.endContext.holds, blitz!.endContext.tSpins),
             if (blitz != null) Text("${blitz!.endContext.piecesPlaced} P • ${blitz!.endContext.inputs} KP • ${f2.format(blitz!.endContext.kpp)} KPP • ${f2.format(blitz!.endContext.kps)} KPS"),
-            Wrap(
+            if (blitz != null) Wrap(
                   alignment: WrapAlignment.spaceBetween,
                   crossAxisAlignment: WrapCrossAlignment.start,
                   spacing: 20,

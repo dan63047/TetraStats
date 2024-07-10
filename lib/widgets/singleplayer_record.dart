@@ -126,7 +126,7 @@ class SingleplayerRecord extends StatelessWidget {
                 LineclearsThingy(record!.endContext.clears, record!.endContext.lines, record!.endContext.holds, record!.endContext.tSpins),
                 if (record!.endContext.gameType == "40l") Text("${record!.endContext.inputs} KP • ${f2.format(record!.endContext.kps)} KPS"),
                 if (record!.endContext.gameType == "blitz") Text("${record!.endContext.piecesPlaced} P • ${record!.endContext.inputs} KP • ${f2.format(record!.endContext.kpp)} KPP • ${f2.format(record!.endContext.kps)} KPS"),
-                Wrap(
+                if (record != null) Wrap(
                   alignment: WrapAlignment.spaceBetween,
                   crossAxisAlignment: WrapCrossAlignment.start,
                   spacing: 20,

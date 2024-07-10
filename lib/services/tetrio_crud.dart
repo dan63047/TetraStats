@@ -606,7 +606,7 @@ class TetrioService extends DB {
     if (kIsWeb) {
       url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLMatches", "user": userID});
     } else {
-      url = Uri.https('api.p1nkl0bst3r.xyz', 'tlmatches/$userID', {"before": "66749c93ffcbce61b2a1d912"});
+      url = Uri.https('api.p1nkl0bst3r.xyz', 'tlmatches/$userID', {"before": "0", "count": "9000"});
     }
 
     try{
