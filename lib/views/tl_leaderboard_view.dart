@@ -58,7 +58,7 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
               );
             },
             icon: const Icon(Icons.compress),
-            tooltip: t.averages,
+            tooltip: t.rankAveragesViewTitle,
           ),
         ],
       ),
@@ -102,11 +102,11 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
                               ),
                               TextButton(onPressed: (){
                                 Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => RankView(rank: snapshot.data!.getAverageOfRank("")),
-                        ),
-                      );
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => RankView(rank: snapshot.data!.getAverageOfRank("")),
+                                  ),
+                                );
                               }, child: Text(t.everyoneAverages,
                                 style: const TextStyle(fontSize: 25)))
                               ],) 
@@ -184,12 +184,12 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
                                   style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 28 : 24, height: 0.9) 
                                 ),
                                 title: Text(allPlayers[index].username, style: TextStyle(fontFamily: bigScreen ? "Eurostile Round Extended" : "Eurostile Round", height: 0.9)),
-                                subtitle: Text(_sortBy == Stats.tr ? "${f2.format(allPlayers[index].apm)} APM, ${f2.format(allPlayers[index].pps)} PPS, ${f2.format(allPlayers[index].vs)} VS, ${f2.format(allPlayers[index].nerdStats.app)} APP, ${f2.format(allPlayers[index].nerdStats.vsapm)} VS/APM" : "${_f4.format(allPlayers[index].getStatByEnum(_sortBy))} ${chartsShortTitles[_sortBy]}",
-                                  style: TextStyle(fontFamily: "Eurostile Round Condensed", fontSize: bigScreen ? null : 12, color: _sortBy == Stats.tr ? Colors.grey : null)),
+                                subtitle: (bigScreen || _sortBy != Stats.tr) ? Text(_sortBy == Stats.tr ? "${f2.format(allPlayers[index].apm)} APM, ${f2.format(allPlayers[index].pps)} PPS, ${f2.format(allPlayers[index].vs)} VS, ${f2.format(allPlayers[index].nerdStats.app)} APP, ${f2.format(allPlayers[index].nerdStats.vsapm)} VS/APM" : "${_f4.format(allPlayers[index].getStatByEnum(_sortBy))} ${chartsShortTitles[_sortBy]}",
+                                  style: TextStyle(fontFamily: "Eurostile Round Condensed", fontSize: bigScreen ? null : 13, color: _sortBy == Stats.tr ? Colors.grey : null)) : null,
                                 trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text("${f2.format(allPlayers[index].rating)} TR", style: TextStyle(fontSize: bigScreen ? 28 : 22)),
+                                    Text("${f2.format(allPlayers[index].rating)} TR", style: const TextStyle(fontSize: 28)),
                                     Image.asset("res/tetrio_tl_alpha_ranks/${allPlayers[index].rank}.png", height: bigScreen ? 48 : 36),
                                   ],
                                 ),

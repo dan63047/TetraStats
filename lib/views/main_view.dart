@@ -306,7 +306,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       });
     }
 
-    return [me, records, states, tlMatches, compareWith, isTracking, news, topTR, recent, sprint, blitz];
+    return [me, records, states, tlMatches, compareWith, isTracking, news, topTR, recent, sprint, blitz, tlMatches.elementAtOrNull(0)?.timestamp];
   }
 
   /// Triggers widgets rebuild
@@ -459,6 +459,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                                 userID: snapshot.data![0].userId,
                                 states: snapshot.data![2],
                                 topTR: snapshot.data![7]?.tr,
+                                lastMatchPlayed: snapshot.data![11],
                                 bot: snapshot.data![0].role == "bot",
                                 guest: snapshot.data![0].role == "anon",
                                 thatRankCutoff: thatRankCutoff,

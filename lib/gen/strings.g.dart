@@ -6,7 +6,7 @@
 /// Locales: 2
 /// Strings: 1182 (591 per locale)
 ///
-/// Built on 2024-06-16 at 21:03 UTC
+/// Built on 2024-07-10 at 15:23 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -321,7 +321,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get fromBeginning => 'From beginning';
 	String get calc => 'Calc';
 	String get calcViewNoValues => 'Enter values to calculate the stats';
-	String get rankAveragesViewTitle => 'Ranks cutoff and average stats';
+	String get rankAveragesViewTitle => 'Ranks cutoffs';
 	String get sprintAndBlitsViewTitle => '40 lines and Blitz averages';
 	String sprintAndBlitsRelevance({required Object date}) => 'Relevance: ${date}';
 	String get rank => 'Rank';
@@ -1016,7 +1016,7 @@ class _StringsRu implements Translations {
 	@override String get fromBeginning => 'С начала';
 	@override String get calc => 'Считать';
 	@override String get calcViewNoValues => 'Введите значения, чтобы посчитать статистику';
-	@override String get rankAveragesViewTitle => 'Требования рангов и средние значения';
+	@override String get rankAveragesViewTitle => 'Требования рангов';
 	@override String get sprintAndBlitsViewTitle => 'Средние результаты 40 линий и блица';
 	@override String sprintAndBlitsRelevance({required Object date}) => 'Актуальность: ${date}';
 	@override String get rank => 'Ранг';
@@ -1703,7 +1703,7 @@ extension on Translations {
 			case 'fromBeginning': return 'From beginning';
 			case 'calc': return 'Calc';
 			case 'calcViewNoValues': return 'Enter values to calculate the stats';
-			case 'rankAveragesViewTitle': return 'Ranks cutoff and average stats';
+			case 'rankAveragesViewTitle': return 'Ranks cutoffs';
 			case 'sprintAndBlitsViewTitle': return '40 lines and Blitz averages';
 			case 'sprintAndBlitsRelevance': return ({required Object date}) => 'Relevance: ${date}';
 			case 'rank': return 'Rank';
@@ -2314,7 +2314,7 @@ extension on _StringsRu {
 			case 'fromBeginning': return 'С начала';
 			case 'calc': return 'Считать';
 			case 'calcViewNoValues': return 'Введите значения, чтобы посчитать статистику';
-			case 'rankAveragesViewTitle': return 'Требования рангов и средние значения';
+			case 'rankAveragesViewTitle': return 'Требования рангов';
 			case 'sprintAndBlitsViewTitle': return 'Средние результаты 40 линий и блица';
 			case 'sprintAndBlitsRelevance': return ({required Object date}) => 'Актуальность: ${date}';
 			case 'rank': return 'Ранг';

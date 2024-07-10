@@ -31,7 +31,8 @@ class TLThingy extends StatefulWidget {
   final double? nextRankCutoff;
   final double? nextRankCutoffGlicko;
   final double? nextRankTarget;
-  const TLThingy({super.key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.bot=false, this.guest=false, this.topTR, this.lbPositions, this.averages, this.nextRankCutoff, this.thatRankCutoff, this.thatRankCutoffGlicko, this.nextRankCutoffGlicko, this.nextRankTarget, this.thatRankTarget});
+  final DateTime? lastMatchPlayed;
+  const TLThingy({super.key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.bot=false, this.guest=false, this.topTR, this.lbPositions, this.averages, this.nextRankCutoff, this.thatRankCutoff, this.thatRankCutoffGlicko, this.nextRankCutoffGlicko, this.nextRankTarget, this.thatRankTarget, this.lastMatchPlayed});
 
   @override
   State<TLThingy> createState() => _TLThingyState();
@@ -92,7 +93,7 @@ class _TLThingyState extends State<TLThingy> {
                   });
                 },
               ),
-              if (currentTl.gamesPlayed >= 10) TLRatingThingy(userID: widget.userID, tlData: currentTl, oldTl: oldTl, topTR: widget.topTR),
+              if (currentTl.gamesPlayed > 9) TLRatingThingy(userID: widget.userID, tlData: currentTl, oldTl: oldTl, topTR: widget.topTR, lastMatchPlayed: widget.lastMatchPlayed),
               if (currentTl.gamesPlayed > 9) TLProgress(
                 tlData: currentTl,
                 previousRankTRcutoff: widget.thatRankCutoff,
