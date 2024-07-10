@@ -269,7 +269,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
                         label: "Sent", higherIsBetter: true),
                       CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].garbage.recived : snapshot.data!.stats[roundSelector][greenSidePlayer].garbage.recived,
                         redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].garbage.recived : snapshot.data!.stats[roundSelector][redSidePlayer].garbage.recived,
-                        label: "Recived", higherIsBetter: true),
+                        label: "Received", higherIsBetter: true),
                       CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].garbage.attack : snapshot.data!.stats[roundSelector][greenSidePlayer].garbage.attack,
                         redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].garbage.attack : snapshot.data!.stats[roundSelector][redSidePlayer].garbage.attack,
                         label: "Attack", higherIsBetter: true),

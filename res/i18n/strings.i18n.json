@@ -186,7 +186,7 @@
     "fromBeginning": "From beginning",
     "calc": "Calc",
     "calcViewNoValues": "Enter values to calculate the stats",
-    "rankAveragesViewTitle": "Ranks cutoff and average stats",
+    "rankAveragesViewTitle": "Ranks cutoffs",
     "sprintAndBlitsViewTitle": "40 lines and Blitz averages",
     "sprintAndBlitsRelevance": "Relevance: ${date}",
     "rank": "Rank",

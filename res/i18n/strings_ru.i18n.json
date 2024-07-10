@@ -186,7 +186,7 @@
     "fromBeginning": "С начала",
     "calc": "Считать",
     "calcViewNoValues": "Введите значения, чтобы посчитать статистику",
-    "rankAveragesViewTitle": "Требования рангов и средние значения",
+    "rankAveragesViewTitle": "Требования рангов",
     "sprintAndBlitsViewTitle": "Средние результаты 40 линий и блица",
     "sprintAndBlitsRelevance": "Актуальность: ${date}",
     "rank": "Ранг",

@@ -288,6 +288,13 @@ class SettingsState extends State<SettingsView> {
             subtitle: Text(t.aboutAppText(appName: packageInfo.appName, packageName: packageInfo.packageName, version: packageInfo.version, buildNumber: packageInfo.buildNumber)),
             trailing: const Icon(Icons.arrow_right)
           ),
+          // Wrap(
+          //   alignment: WrapAlignment.center,
+          //   spacing: 8,
+          //   children: [
+          //     TextButton(child: Text("Donate to me"), onPressed: (){},),TextButton(child: Text("Donate to NOT me"), onPressed: (){},),TextButton(child: Text("Donate to someone else"), onPressed: (){},),
+          //   ],
+          // ),
         ],
       )),
     );

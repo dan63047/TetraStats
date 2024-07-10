@@ -306,7 +306,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       });
     }
 
-    return [me, records, states, tlMatches, compareWith, isTracking, news, topTR, recent, sprint, blitz];
+    return [me, records, states, tlMatches, compareWith, isTracking, news, topTR, recent, sprint, blitz, tlMatches.elementAtOrNull(0)?.timestamp];
   }
 
   /// Triggers widgets rebuild
@@ -459,6 +459,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                                 userID: snapshot.data![0].userId,
                                 states: snapshot.data![2],
                                 topTR: snapshot.data![7]?.tr,
+                                lastMatchPlayed: snapshot.data![11],
                                 bot: snapshot.data![0].role == "bot",
                                 guest: snapshot.data![0].role == "anon",
                                 thatRankCutoff: thatRankCutoff,
@@ -1084,7 +1085,7 @@ class _TwoRecordsThingy extends StatelessWidget {
               if (sprint != null) FinesseThingy(sprint?.endContext.finesse, sprint?.endContext.finessePercentage),
               if (sprint != null) LineclearsThingy(sprint!.endContext.clears, sprint!.endContext.lines, sprint!.endContext.holds, sprint!.endContext.tSpins),
               if (sprint != null) Text("${sprint!.endContext.inputs} KP • ${f2.format(sprint!.endContext.kps)} KPS"),
-              Wrap(
+              if (sprint != null) Wrap(
                   alignment: WrapAlignment.spaceBetween,
                   crossAxisAlignment: WrapCrossAlignment.start,
                   spacing: 20,
@@ -1170,7 +1171,7 @@ class _TwoRecordsThingy extends StatelessWidget {
             if (blitz != null) FinesseThingy(blitz?.endContext.finesse, blitz?.endContext.finessePercentage),
             if (blitz != null) LineclearsThingy(blitz!.endContext.clears, blitz!.endContext.lines, blitz!.endContext.holds, blitz!.endContext.tSpins),
             if (blitz != null) Text("${blitz!.endContext.piecesPlaced} P • ${blitz!.endContext.inputs} KP • ${f2.format(blitz!.endContext.kpp)} KPP • ${f2.format(blitz!.endContext.kps)} KPS"),
-            Wrap(
+            if (blitz != null) Wrap(
                   alignment: WrapAlignment.spaceBetween,
                   crossAxisAlignment: WrapCrossAlignment.start,
                   spacing: 20,
@@ -1184,7 +1185,7 @@ class _TwoRecordsThingy extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    for (int i = 1; i < sprintStream.records.length; i++) ListTile(
+                    for (int i = 1; i < blitzStream.records.length; i++) ListTile(
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SingleplayerRecordView(record: blitzStream.records[i]))),
                     leading: Text("#${i+1}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, shadows: textShadow, height: 0.9) ),
                     title: Text("${NumberFormat.decimalPattern().format(blitzStream.records[i].endContext.score)} points",

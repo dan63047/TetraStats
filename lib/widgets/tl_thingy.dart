@@ -31,7 +31,8 @@ class TLThingy extends StatefulWidget {
   final double? nextRankCutoff;
   final double? nextRankCutoffGlicko;
   final double? nextRankTarget;
-  const TLThingy({super.key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.bot=false, this.guest=false, this.topTR, this.lbPositions, this.averages, this.nextRankCutoff, this.thatRankCutoff, this.thatRankCutoffGlicko, this.nextRankCutoffGlicko, this.nextRankTarget, this.thatRankTarget});
+  final DateTime? lastMatchPlayed;
+  const TLThingy({super.key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.bot=false, this.guest=false, this.topTR, this.lbPositions, this.averages, this.nextRankCutoff, this.thatRankCutoff, this.thatRankCutoffGlicko, this.nextRankCutoffGlicko, this.nextRankTarget, this.thatRankTarget, this.lastMatchPlayed});
 
   @override
   State<TLThingy> createState() => _TLThingyState();
@@ -57,8 +58,8 @@ class _TLThingyState extends State<TLThingy> {
   Widget build(BuildContext context) { 
   final t = Translations.of(context);
   String decimalSeparator = f2.symbols.DECIMAL_SEP;
-  List<String> estTRformated = f2.format(currentTl.estTr!.esttr).split(decimalSeparator);
-  List<String> estTRaccFormated = intFDiff.format(currentTl.esttracc!).split(".");
+  List<String> estTRformated = currentTl.estTr != null ? f2.format(currentTl.estTr!.esttr).split(decimalSeparator) : [];
+  List<String> estTRaccFormated = currentTl.esttracc != null ? intFDiff.format(currentTl.esttracc!).split(".") : [];
     if (currentTl.gamesPlayed == 0) return Center(child: Text(widget.guest ? t.anonTL : widget.bot ? t.botTL : t.neverPlayedTL, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28), textAlign: TextAlign.center,));
     return LayoutBuilder(builder: (context, constraints) {
     bool bigScreen = constraints.maxWidth >= 768;
@@ -92,7 +93,7 @@ class _TLThingyState extends State<TLThingy> {
                   });
                 },
               ),
-              if (currentTl.gamesPlayed >= 10) TLRatingThingy(userID: widget.userID, tlData: currentTl, oldTl: oldTl, topTR: widget.topTR),
+              if (currentTl.gamesPlayed > 9) TLRatingThingy(userID: widget.userID, tlData: currentTl, oldTl: oldTl, topTR: widget.topTR, lastMatchPlayed: widget.lastMatchPlayed),
               if (currentTl.gamesPlayed > 9) TLProgress(
                 tlData: currentTl,
                 previousRankTRcutoff: widget.thatRankCutoff,

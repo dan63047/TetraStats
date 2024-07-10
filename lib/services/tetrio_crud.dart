@@ -379,7 +379,6 @@ class TetrioService extends DB {
           TopTr result = TopTr(id, null);
           developer.log("fetchTopTR: Probably, player doesn't have top TR", name: "services/tetrio_crud", error: response.statusCode);
           _cache.store(result, DateTime.now().millisecondsSinceEpoch + 300000);
-          //_topTRcache[(DateTime.now().millisecondsSinceEpoch + 300000).toString()] = {id: null};
           return result;
         // if not 200 or 404 - throw a unique for each code exception  
         case 403:
@@ -392,7 +391,10 @@ class TetrioService extends DB {
         case 502:
         case 503:
         case 504:
-          throw P1nkl0bst3rInternalProblem();
+          TopTr result = TopTr(id, null);
+          developer.log("fetchTopTR: API returned ${response.statusCode}", name: "services/tetrio_crud", error: response.statusCode);
+          //_cache.store(result, DateTime.now().millisecondsSinceEpoch + 300000);
+          return result;
         default:
           developer.log("fetchTopTR: Failed to fetch top TR", name: "services/tetrio_crud", error: response.statusCode);
           throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
@@ -445,7 +447,8 @@ class TetrioService extends DB {
         case 502:
         case 503:
         case 504:
-          throw P1nkl0bst3rInternalProblem();
+          developer.log("fetchCutoffs: Cutoffs are unavalable (${response.statusCode})", name: "services/tetrio_crud", error: response.statusCode);
+          return null;
         default:
           developer.log("fetchCutoffs: Failed to fetch top Cutoffs", name: "services/tetrio_crud", error: response.statusCode);
           throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
@@ -603,7 +606,7 @@ class TetrioService extends DB {
     if (kIsWeb) {
       url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLMatches", "user": userID});
     } else {
-      url = Uri.https('api.p1nkl0bst3r.xyz', 'tlmatches/$userID');
+      url = Uri.https('api.p1nkl0bst3r.xyz', 'tlmatches/$userID', {"before": "0", "count": "9000"});
     }
 
     try{
@@ -611,62 +614,9 @@ class TetrioService extends DB {
 
       switch (response.statusCode) {
         case 200:
-          // that one api returns csv instead of json
-          List<List<dynamic>> csv = const CsvToListConverter().convert(response.body)..removeAt(0);
-          List<TetraLeagueAlphaRecord> matches = [];
-
-          // parsing data into TetraLeagueAlphaRecord objects
-          for (var entry in csv){
-            TetraLeagueAlphaRecord match = TetraLeagueAlphaRecord(
-              replayId: entry[0].toString(),
-              ownId: entry[0].toString(), // i gonna disting p1nkl0bst3r entries with it
-              timestamp: DateTime.parse(entry[1]),
-              endContext: [
-                EndContextMulti(
-                  userId: entry[2].toString(),
-                  username: entry[3].toString(),
-                  naturalOrder: 0,
-                  inputs: -1,
-                  piecesPlaced: -1,
-                  handling: Handling(arr: -1, das: -1, sdf: -1, dcd: 0, cancel: true, safeLock: true),
-                  points: entry[4],
-                  wins: entry[4],
-                  secondary: entry[6],
-                  secondaryTracking: [],
-                  tertiary: entry[5],
-                  tertiaryTracking: [],
-                  extra: entry[7],
-                  extraTracking: [],
-                  success: true
-                ),
-                EndContextMulti(
-                  userId: entry[8].toString(),
-                  username: entry[9].toString(),
-                  naturalOrder: 1,
-                  inputs: -1,
-                  piecesPlaced: -1,
-                  handling: Handling(arr: -1, das: -1, sdf: -1, dcd: 0, cancel: true, safeLock: true),
-                  points: entry[10],
-                  wins: entry[10],
-                  secondary: entry[12],
-                  secondaryTracking: [],
-                  tertiary: entry[11],
-                  tertiaryTracking: [],
-                  extra: entry[13],
-                  extraTracking: [],
-                  success: false
-                )
-              ],
-              replayAvalable: false
-            );
-            matches.add(match);
-          }
-          
-          // trying to dump it to local DB
-          TetraLeagueAlphaStream fakeStream = TetraLeagueAlphaStream(userId: userID, records: matches);
-          saveTLMatchesFromStream(fakeStream);
-
-          return matches;
+          TetraLeagueAlphaStream stream = TetraLeagueAlphaStream.fromJson(jsonDecode(response.body)['data']['records'], userID);
+          saveTLMatchesFromStream(stream);
+          return stream.records;
         case 404:
           developer.log("fetchAndSaveOldTLmatches: Probably, history doesn't exist", name: "services/tetrio_crud", error: response.statusCode);
           throw TetrioHistoryNotExist();

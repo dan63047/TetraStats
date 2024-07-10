@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
@@ -6,14 +8,16 @@ import 'package:tetra_stats/main.dart' show prefs;
 import 'package:tetra_stats/utils/numers_formats.dart';
 
 var fDiff = NumberFormat("+#,###.####;-#,###.####");
+DateTime seasonEnd = DateTime.utc(2024, 07, 26);
 
 class TLRatingThingy extends StatelessWidget{
   final String userID;
   final TetraLeagueAlpha tlData;
   final TetraLeagueAlpha? oldTl;
   final double? topTR;
+  final DateTime? lastMatchPlayed;
 
-  const TLRatingThingy({super.key, required this.userID, required this.tlData, this.oldTl, this.topTR});
+  const TLRatingThingy({super.key, required this.userID, required this.tlData, this.oldTl, this.topTR, this.lastMatchPlayed});
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +27,11 @@ class TLRatingThingy extends StatelessWidget{
     List<String> formatedTR = f4.format(tlData.rating).split(decimalSeparator);
     List<String> formatedGlicko = f4.format(tlData.glicko).split(decimalSeparator);
     List<String> formatedPercentile = f4.format(tlData.percentile * 100).split(decimalSeparator);
+    DateTime now = DateTime.now();
+    bool beforeS1end = now.isBefore(seasonEnd);
+    int daysLeft = seasonEnd.difference(now).inDays;
+    print(max(0, 7 - (lastMatchPlayed != null ? now.difference(lastMatchPlayed!).inDays : 7)));
+    int safeRD = min(100, (100 + ((tlData.rd! >= 100 && tlData.decaying) ? 7 : max(0, 7 - (lastMatchPlayed != null ? now.difference(lastMatchPlayed!).inDays : 7))) - daysLeft).toInt());
     return Wrap(
       direction: Axis.horizontal,
       alignment: WrapAlignment.spaceAround,
@@ -83,7 +92,8 @@ class TLRatingThingy extends StatelessWidget{
                       if (topTR != null) TextSpan(text: " (${f2.format(topTR)} TR)"),
                       TextSpan(text: " • ${prefs.getInt("ratingMode") == 1 ? "${f2.format(tlData.rating)} TR • RD: " : "Glicko: ${f2.format(tlData.glicko!)}±"}"),
                       TextSpan(text: f2.format(tlData.rd!), style: tlData.decaying ? TextStyle(color: tlData.rd! > 98 ? Colors.red : Colors.yellow) : null),
-                      if (tlData.decaying) WidgetSpan(child: Icon(Icons.trending_up, color: tlData.rd! > 98 ? Colors.red : Colors.yellow,), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic) 
+                      if (tlData.decaying) WidgetSpan(child: Icon(Icons.trending_up, color: tlData.rd! > 98 ? Colors.red : Colors.yellow,), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic),
+                      if (beforeS1end) tlData.rd! <= safeRD ? TextSpan(text: " (Safe)", style: TextStyle(color: Colors.greenAccent)) : TextSpan(text: " (> ${safeRD} RD !!!)", style: TextStyle(color: Colors.redAccent))
                     ],
                   ),
                 ),

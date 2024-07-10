@@ -16,14 +16,14 @@ int biggestSpikeFromReplay(events){
         spikeCounter = event['data']['data']['data']['amt'];
         biggestSpike = spikeCounter;
       }else{
-        if (event['data']['data']['frame'] - previousIGEeventFrame < 60){
+        if ((event['data']['data']['frame']??event['data']['frame']) - previousIGEeventFrame < 60){
           spikeCounter = spikeCounter + event['data']['data']['data']['amt'] as int;
         }else{
           spikeCounter = event['data']['data']['data']['amt'];
         }
         biggestSpike = max(biggestSpike, spikeCounter);
       }
-      previousIGEeventFrame = event['data']['data']['frame'];
+      previousIGEeventFrame = event['data']['data']['frame']??event['data']['frame'];
     }
   }
   return biggestSpike; 
@@ -216,8 +216,8 @@ class ReplayData{
     List<double> KPSmultipliedByWeights = [0, 0];
     totalStats = [ReplayStats.createEmpty(), ReplayStats.createEmpty()];
     for(var round in json['data']) {
-      int firstInEndContext = round['replays'][0]["events"].last['data']['export']['options']['gameid'].startsWith(endcontext[0].userId) ? 0 : 1;
-      int secondInEndContext = round['replays'][1]["events"].last['data']['export']['options']['gameid'].startsWith(endcontext[1].userId) ? 1 : 0;
+      int firstInEndContext = round['replays'][0]["events"].last['data']['export']['options']['username'].startsWith(endcontext[0].username) ? 0 : 1;
+      int secondInEndContext = round['replays'][1]["events"].last['data']['export']['options']['username'].startsWith(endcontext[1].username) ? 1 : 0;
       int roundLength = max(round['replays'][0]['frames'], round['replays'][1]['frames']);
       roundLengths.add(roundLength);
       totalLength = totalLength + max(round['replays'][0]['frames'], round['replays'][1]['frames']);
@@ -228,7 +228,7 @@ class ReplayData{
       VSmultipliedByWeights[0] += endcontext[0].extraTracking[roundID]*roundLength;
       VSmultipliedByWeights[1] += endcontext[1].extraTracking[roundID]*roundLength;
       int winner = round['board'].indexWhere((element) => element['success'] == true);
-      roundWinners.add([round['board'][winner]['id'], round['board'][winner]['username']]);
+      roundWinners.add([round['board'][winner]['id']??round['board'][winner]['user']['_id'], round['board'][winner]['username']??round['board'][winner]['user']['username']]);
       ReplayStats playerOne = ReplayStats.fromJson(round['replays'][firstInEndContext]['events'].last['data']['export']['stats'], biggestSpikeFromReplay(round['replays'][secondInEndContext]['events']), round['replays'][firstInEndContext]['frames']); // (events contain recived attacks)
       ReplayStats playerTwo = ReplayStats.fromJson(round['replays'][secondInEndContext]['events'].last['data']['export']['stats'], biggestSpikeFromReplay(round['replays'][firstInEndContext]['events']), round['replays'][secondInEndContext]['frames']);
       SPPmultipliedByWeights[0] += playerOne.spp*roundLength;
@@ -283,7 +283,7 @@ class ReplayData{
 //         events.add(EventFull(id, frame, type, DataFull.fromJson(event["data"])));
 //         break;
 //       case EventType.targets:
-//         // TODO
+//         events.add(EventTargets(id, frame, type, Targets.fromJson(event["data"])));
 //         break;
 //       case EventType.keydown:
 //         events.add(EventKeyPress(id, frame, type, 
@@ -302,15 +302,24 @@ class ReplayData{
 //         ));
 //         break;
 //       case EventType.end:
-//         // TODO: Handle this case.
+//         events.add(EventEnd(id, frame, type, EndData(event['data']['reason'], DataFull.fromJson(event['data']['export']))));
+//         break;
 //       case EventType.ige:
-//         // TODO: Handle this case.
+//         events.add(EventIGE(id, frame, type, IGE(
+//             event['data']['id'],
+//             event['data']['frame'],
+//             event['data']['type'],
+//             event['data']['data']
+//           ))
+//         );
+//         break;
 //       case EventType.exit:
-//         // TODO: Handle this case.
+//         events.add(Event(id, frame, type));
+//         break;
 //     }
 //     id++;
 //   }
-//   return [];
+//   return events;
 // }
 
 // enum EventType
@@ -356,10 +365,12 @@ class ReplayData{
 
 // class Keypress{
 //   KeyType key;
-//   double subframe;
+//   late double subframe;
 //   bool released;
 
-//   Keypress(this.key, this.subframe, this.released);
+//   Keypress(this.key, num sframe, this.released){
+//     subframe = sframe.toDouble();
+//   }
 // }
 
 // class EventKeyPress extends Event{
@@ -368,19 +379,163 @@ class ReplayData{
 //   EventKeyPress(super.id, super.frame, super.type, this.data);
 // }
 
+// class Targets{
+//   String? id;
+// 	int? frame;
+// 	String? type;
+// 	List<dynamic>? data;
+
+//   Targets(this.id, this.frame, this.type, this.data);
+
+//   Targets.fromJson(Map<String, dynamic> json){
+//     id = json["id"];
+//     frame = json["frame"];
+//     type = json["type"];
+//     data = json["data"];
+//   }
+// }
+
+// class EventTargets extends Event{
+//   Targets data;
+
+//   EventTargets(super.id, super.frame, super.type, this.data);
+// }
+
+// class IGEdata{
+//   late String type;
+//   late String? gameid;
+//   late int? frame;
+
+//   IGEdata.fromJson(Map<String, dynamic> d){
+//     type = d['type'];
+//     gameid = d['gameid'];
+//     frame = d['frame'];
+//   }
+// }
+
+// enum GarbageStatus
+// {
+// 	sleeping,
+// 	caution,
+// 	spawn,
+// 	danger
+// }
+
+// class GarbageData{
+//   int? id;
+// 	int? iid;
+// 	int? ackiid;
+// 	String? username;
+// 	late String type;
+// 	bool? active;
+// 	GarbageStatus? status;
+// 	int? delay;
+// 	bool? queued;
+// 	int? amt;
+// 	int? x;
+// 	int? y;
+// 	int? size;
+// 	int? column;
+// 	int? cid;
+// 	bool? firstcycle;
+// 	int? gid;
+//   bool? value;
+
+//   GarbageData.fromJson(Map<String, dynamic> data){
+//     id = data['id'];
+//     iid = data['iid'];
+//     ackiid = data['ackiid'];
+//     username = data['username'];
+//     type = data['type'];
+//     active = data['active'];
+//     status = data['status'] != null ? GarbageStatus.values[data['status']] : null;
+//     delay = data['delay'];
+//     queued = data['queued'];
+//     amt = data['amt'];
+//     x = data['x'];
+//     y = data['y'];
+//     size = data['size'];
+//     column = data['column'];
+//     cid = data['cid'];
+//     firstcycle = data['firstcycle'];
+//     gid = data['gid'];
+//     value = data['value'];
+//   }
+// }
+
+// class IGEdataTarget extends IGEdata{
+// 	late List<dynamic> targets;
+	
+// 	GarbageData? data;
+// 	//compatibility for v15 targets event
+// 	String? sender_id;
+
+//   IGEdataTarget.fromJson(Map<String, dynamic> d) : super.fromJson(d){
+//     targets = d['targets'];
+//     data = d['data'] != null ? GarbageData.fromJson(d['data']) : null;
+//   }
+// }
+
+// class IGEdataAllowTargeting extends IGEdata{
+//   late bool value;
+
+//   IGEdataAllowTargeting.fromJson(Map<String, dynamic> d) : super.fromJson(d){
+//     value = d['value'];
+//     frame = d['frame'];
+//   }
+// }
+
+// class IGEdataInteraction extends IGEdata{
+//   late GarbageData data;
+//   String? sender;
+//   String? senderID;
+//   int? sentFrame;
+//   bool confirm = false;
+  
+
+//   IGEdataInteraction.fromJson(Map<String, dynamic> d) : super.fromJson(d){
+//     //data = Targeted(d['data']['targeted'], d['data']['value']);
+//     data = GarbageData.fromJson(d['data']);
+//     sender = d['sender'];
+//     senderID = d['sender_id'];
+//     confirm = type == "interaction_confirm";
+//   }
+// }
+
 // class IGE{
 //   int id;
 //   int frame;
 //   String type;
-//   int amount;
+//   late IGEdata data;
 
-//   IGE(this.id, this.frame, this.type, this.amount);
+//   IGE(this.id, this.frame, this.type, Map<String, dynamic> d){
+//     data = switch (d["type"] as String) {
+//       "interaction" => IGEdataInteraction.fromJson(d),
+//       "interaction_confirm" => IGEdataInteraction.fromJson(d),
+//       "target" => IGEdataTarget.fromJson(d),
+//       "allow_targeting" => IGEdataAllowTargeting.fromJson(d),
+//       _ => IGEdata.fromJson(d),
+//     };
+//   }
 // }
 
 // class EventIGE extends Event{
 //   IGE data;
 
 //   EventIGE(super.id, super.frame, super.type, this.data);
+// }
+
+// class EndData {
+//   String reason;
+//   DataFull export;
+
+//   EndData(this.reason, this.export);
+// }
+
+// class EventEnd extends Event{
+//   EndData data;
+
+//   EventEnd(super.id, super.frame, super.type, this.data);
 // }
 
 // class Hold
@@ -434,8 +589,9 @@ class ReplayData{
 //     stock = json["stock"];
 //     gMargin = json["gmargin"];
 //     gIncrease = json["gincrease"];
-//     garbageMultiplier = json["garbagemultiplier"];
-//     garbageCapIncrease = json["garbagecapincrease"];
+//     garbageMultiplier = json["garbagemultiplier"].toDouble();
+//     garbageCap = json["garbagecap"];
+//     garbageCapIncrease = json["garbagecapincrease"].toDouble();
 //     garbageCapMax = json["garbagecapmax"];
 //     garbageHoleSize = json["garbageholesize"];
 //     garbageBlocking = json["garbageblocking"];
@@ -462,7 +618,7 @@ class ReplayData{
 
 // class DataFullStats
 // 	{
-// 		double? seed;
+// 		int? seed;
 // 		int? lines;
 // 		int? levelLines;
 // 		int? levelLinesNeeded;
@@ -511,8 +667,8 @@ class ReplayData{
 
 // class DataFullGame
 // 	{
-// 		List<List<String?>>? board;
-// 		List<String>? bag;
+// 		List<dynamic>? board;
+// 		List<dynamic>? bag;
 // 		double? g;
 // 		bool? playing;
 // 		Hold? hold;
@@ -595,54 +751,74 @@ class ReplayData{
 //   empty
 // }
 
+// class Coords{
+//   int x;
+//   int y;
+
+//   Coords(this.x, this.y);
+
+//   @override
+//   String toString() {
+//     return "($x; $y)";
+//   }
+
+//   Coords operator+(Coords other){
+//     return Coords(x+other.x, y+other.y);
+//   }
+
+//   Coords operator-(Coords other){
+//     return Coords(x-other.x, y-other.y);
+//   }
+// }
+
 // List<Tetromino> tetrominoes = [Tetromino.Z, Tetromino.L, Tetromino.O, Tetromino.S, Tetromino.I, Tetromino.J, Tetromino.T];
-// List<List<List<Vector2>>> shapes = [
+// List<List<List<Coords>>> shapes = [
 //   [ // Z
-//     [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(2, 1)],
-//     [Vector2(2, 0), Vector2(1, 1), Vector2(2, 1), Vector2(1, 2)],
-//     [Vector2(0, 1), Vector2(1, 1), Vector2(1, 2), Vector2(2, 2)],
-//     [Vector2(1, 0), Vector2(0, 1), Vector2(1, 1), Vector2(0, 2)]
+//     [Coords(0, 2), Coords(1, 2), Coords(1, 1), Coords(2, 1)],
+//     [Coords(2, 2), Coords(2, 1), Coords(1, 1), Coords(1, 0)],
+//     [Coords(2, 0), Coords(1, 0), Coords(1, 1), Coords(0, 1)],
+//     [Coords(0, 0), Coords(0, 1), Coords(1, 1), Coords(1, 2)]
 //   ],
 //   [ // L
-//     [Vector2(2, 0), Vector2(0, 1), Vector2(1, 1), Vector2(2, 1)],
-//     [Vector2(1, 0), Vector2(1, 1), Vector2(1, 2), Vector2(2, 2)],
-//     [Vector2(0, 1), Vector2(1, 1), Vector2(2, 1), Vector2(0, 2)],
-//     [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(1, 2)]
+//     [Coords(2, 2), Coords(2, 1), Coords(1, 1), Coords(0, 1)],
+//     [Coords(2, 0), Coords(1, 0), Coords(1, 1), Coords(1, 2)],
+//     [Coords(0, 0), Coords(0, 1), Coords(1, 1), Coords(2, 1)],
+//     [Coords(0, 2), Coords(1, 2), Coords(1, 1), Coords(1, 0)]
 //   ],
 //   [ // O
-//     [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(1, 1)],
-//     [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(1, 1)],
-//     [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(1, 1)],
-//     [Vector2(0, 0), Vector2(1, 0), Vector2(0, 1), Vector2(1, 1)]
+//     [Coords(0, 0), Coords(1, 0), Coords(0, 1), Coords(1, 1)],
+//     [Coords(0, 0), Coords(1, 0), Coords(0, 1), Coords(1, 1)],
+//     [Coords(0, 0), Coords(1, 0), Coords(0, 1), Coords(1, 1)],
+//     [Coords(0, 0), Coords(1, 0), Coords(0, 1), Coords(1, 1)]
 //   ],
 //   [ // S
-//     [Vector2(1, 0), Vector2(2, 0), Vector2(0, 1), Vector2(1, 1)],
-//     [Vector2(1, 0), Vector2(1, 1), Vector2(2, 1), Vector2(2, 2)],
-//     [Vector2(1, 1), Vector2(2, 1), Vector2(0, 2), Vector2(1, 2)],
-//     [Vector2(0, 0), Vector2(0, 1), Vector2(1, 1), Vector2(1, 2)]
+//     [Coords(2, 2), Coords(1, 2), Coords(1, 1), Coords(0, 1)],
+//     [Coords(2, 0), Coords(2, 1), Coords(1, 1), Coords(1, 2)],
+//     [Coords(0, 0), Coords(1, 0), Coords(1, 1), Coords(2, 1)],
+//     [Coords(0, 2), Coords(0, 1), Coords(1, 1), Coords(1, 0)]
 //   ],
 //   [ // I
-//     [Vector2(0, 1), Vector2(1, 1), Vector2(2, 1), Vector2(3, 1)],
-// 		[Vector2(2, 0), Vector2(2, 1), Vector2(2, 2), Vector2(2, 3)],
-// 		[Vector2(0, 2), Vector2(1, 2), Vector2(2, 2), Vector2(3, 2)],
-// 		[Vector2(1, 0), Vector2(1, 1), Vector2(1, 2), Vector2(1, 3)]
+//     [Coords(0, 2), Coords(1, 2), Coords(2, 2), Coords(3, 2)],
+// 		[Coords(2, 3), Coords(2, 2), Coords(2, 1), Coords(2, 0)],
+// 		[Coords(3, 1), Coords(2, 1), Coords(1, 1), Coords(0, 1)],
+// 		[Coords(1, 0), Coords(1, 1), Coords(1, 2), Coords(1, 3)]
 //   ],
 //   [ // J
-//     [Vector2(0, 0), Vector2(0, 1), Vector2(1, 1), Vector2(2, 1)],
-//     [Vector2(1, 0), Vector2(2, 0), Vector2(1, 1), Vector2(1, 2)],
-//     [Vector2(0, 1), Vector2(1, 1), Vector2(2, 1), Vector2(2, 2)],
-//     [Vector2(1, 0), Vector2(1, 1), Vector2(0, 2), Vector2(1, 2)]
+//     [Coords(0, 2), Coords(0, 1), Coords(1, 1), Coords(2, 1)],
+//     [Coords(2, 2), Coords(1, 2), Coords(1, 1), Coords(1, 0)],
+//     [Coords(2, 0), Coords(2, 1), Coords(1, 1), Coords(0, 1)],
+//     [Coords(0, 0), Coords(1, 0), Coords(1, 1), Coords(1, 2)]
 //   ],
 //   [ // T
-//     [Vector2(1, 0), Vector2(0, 1), Vector2(1, 1), Vector2(2, 1)],
-//     [Vector2(1, 0), Vector2(1, 1), Vector2(2, 1), Vector2(1, 2)],
-//     [Vector2(0, 1), Vector2(1, 1), Vector2(2, 1), Vector2(1, 2)],
-//     [Vector2(1, 0), Vector2(0, 1), Vector2(1, 1), Vector2(1, 2)]
+//     [Coords(1, 2), Coords(0, 1), Coords(1, 1), Coords(2, 1)],
+//     [Coords(2, 1), Coords(1, 2), Coords(1, 1), Coords(1, 0)],
+//     [Coords(1, 0), Coords(2, 1), Coords(1, 1), Coords(0, 1)],
+//     [Coords(0, 1), Coords(1, 0), Coords(1, 1), Coords(1, 2)]
 //   ]
 // ];
-// List<Vector2> spawnPositionFixes = [Vector2(1, 1), Vector2(1, 1), Vector2(0, 1), Vector2(1, 1), Vector2(1, 1), Vector2(1, 1), Vector2(1, 1)];
+// List<Coords> spawnPositionFixes = [Coords(0, 0), Coords(0, 0), Coords(1, 1), Coords(0, 0), Coords(0, -1), Coords(0, 0), Coords(0, 0)];
 
-// const Map<String, double> garbage = {
+// const Map<String, int> garbage = {
 //   "single": 0,
 //   "double": 1,
 //   "triple": 2,
@@ -665,3 +841,61 @@ class ReplayData{
 // int comboMinifier = 1;
 // double comboMinifierLog = 1.25;
 // List<int> comboTable = [0, 1, 1, 2, 2, 3, 3, 4, 4, 4, 5];
+
+// class KicksetBase {
+// 	List<Coords>? additionalOffsets;
+// 	late List<Coords> additionalOffsetEmpty;
+// 	List<int>? spawnRotation;
+// 	late List<List<List<Coords>>> kickTable; //kickTable[initRot][rotDirection-1][kick]
+// 	late List<List<List<Coords>>> kickTableI;
+// }
+
+// class SRSPlus extends KicksetBase{
+//   SRSPlus(){
+//     kickTable = [
+//       [
+//         [Coords( 0, 0), Coords( 1, 0), Coords( 1, 1), Coords( 0,-2), Coords( 1,-2)], // 0 -> 270
+//         [Coords( 0, 0), Coords(-1, 0), Coords(-1, 1), Coords( 0,-2), Coords(-1,-2)], // 0 -> 90
+//         [Coords( 0, 0), Coords( 0, 1), Coords( 1, 1), Coords(-1, 1), Coords( 1, 0), Coords(-1, 0)], // 0 -> 180
+//       ],
+//       [
+//         [Coords( 0, 0), Coords( 1, 0), Coords( 1,-1), Coords( 0, 2), Coords( 1, 2)], // 90 -> 0
+//         [Coords( 0, 0), Coords( 1, 0), Coords( 1,-1), Coords( 0, 2), Coords( 1, 2)], // 90 -> 180
+//         [Coords( 0, 0), Coords( 1, 0), Coords( 1, 2), Coords( 1, 1), Coords( 0, 2), Coords( 0, 1)], // 90 -> 270
+//       ],
+//       [
+//         [Coords( 0, 0), Coords(-1, 0), Coords(-1, 1), Coords( 0,-2), Coords(-1,-2)], // 180 -> 90
+//         [Coords( 0, 0), Coords( 1, 0), Coords( 1, 1), Coords( 0,-2), Coords( 1,-2)], // 180 -> 270
+//         [Coords( 0, 0), Coords( 0,-1), Coords(-1,-1), Coords( 1,-1), Coords(-1, 0), Coords( 1, 0)], // 180 -> 0
+//       ], 
+//       [ 
+//         [Coords( 0, 0), Coords(-1, 0), Coords(-1,-1), Coords( 0, 2), Coords(-1, 2)], // 270 -> 180
+//         [Coords( 0, 0), Coords(-1, 0), Coords(-1,-1), Coords( 0, 2), Coords(-1, 2)], // 270 -> 0
+//         [Coords( 0, 0), Coords(-1, 0), Coords(-1, 2), Coords(-1, 1), Coords( 0, 2), Coords( 0, 1)], // 270 -> 90
+//       ] 
+//     ];
+//     kickTableI = [
+//       [
+//         [Coords( 0, 0), Coords(-1, 0), Coords( 2, 0), Coords( 2,-1), Coords(-1, 2)], // 0 -> 270
+//         [Coords( 0, 0), Coords( 1, 0), Coords( 2, 0), Coords(-1,-1), Coords( 1, 2)], // 0 -> 90
+//         [Coords( 0, 0), Coords( 0, 1)], // 0 -> 180
+//       ],
+//       [
+//         [Coords( 0, 0), Coords(-1, 0), Coords( 2, 0), Coords(-1,-2), Coords( 2,-1)], // 90 -> 0
+//         [Coords( 0, 0), Coords(-1, 0), Coords( 2, 0), Coords(-1, 2), Coords( 2, 1)], // 90 -> 180
+//         [Coords( 0, 0), Coords( 1, 0)], // 90 -> 270
+//       ],
+//       [
+//         [Coords( 0, 0), Coords(-2, 0), Coords( 1, 0), Coords(-2, 1), Coords( 1,-2)], // 180 -> 90
+//         [Coords( 0, 0), Coords(-2, 0), Coords(-1, 0), Coords( 2, 1), Coords(-1,-2)], // 180 -> 270
+//         [Coords( 0, 0), Coords( 0,-1)], // 180 -> 0
+//       ], 
+//       [
+//         [Coords( 0, 0), Coords( 1, 0), Coords(-2, 0), Coords( 1, 2), Coords(-2,-1)], // 270 -> 180
+//         [Coords( 0, 0), Coords( 1, 0), Coords(-2, 0), Coords( 1,-2), Coords(-2, 1)], // 270 -> 0
+//         [Coords( 0, 0), Coords(-1, 0)], // 270 -> 90
+//       ] 
+//     ];
+//     additionalOffsetEmpty = [Coords( 0, 0),Coords( 0, 0),Coords( 0, 0),Coords( 0, 0)];
+//   }
+// }
