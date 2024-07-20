@@ -1013,7 +1013,6 @@ class _TwoRecordsThingy extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    //if (record == null) return Center(child: Text(t.noRecord, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)));
     late MapEntry closestAverageBlitz;
     late bool blitzBetterThanClosestAverage;
     bool? blitzBetterThanRankAverage = (rank != null && rank != "z" && blitz != null) ? blitz!.endContext.score > blitzAverages[rank]! : null;
@@ -1186,13 +1185,13 @@ class _TwoRecordsThingy extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     for (int i = 1; i < blitzStream.records.length; i++) ListTile(
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SingleplayerRecordView(record: blitzStream.records[i]))),
-                    leading: Text("#${i+1}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, shadows: textShadow, height: 0.9) ),
-                    title: Text("${NumberFormat.decimalPattern().format(blitzStream.records[i].endContext.score)} points",
-                    style: const TextStyle(fontSize: 18)),
-                    subtitle: Text(timestamp(blitzStream.records[i].timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
-                    trailing: SpTrailingStats(blitzStream.records[i].endContext)
-                  )
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SingleplayerRecordView(record: blitzStream.records[i]))),
+                        leading: Text("#${i+1}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, shadows: textShadow, height: 0.9) ),
+                        title: Text("${NumberFormat.decimalPattern().format(blitzStream.records[i].endContext.score)} points",
+                        style: const TextStyle(fontSize: 18)),
+                        subtitle: Text(timestamp(blitzStream.records[i].timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
+                        trailing: SpTrailingStats(blitzStream.records[i].endContext)
+                      )
                     ],
                 ),
               )

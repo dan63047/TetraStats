@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
@@ -5,6 +7,7 @@ import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/colors_functions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
+import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/widgets/gauget_num.dart';
 import 'package:tetra_stats/widgets/graphs.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
@@ -38,12 +41,14 @@ class TLThingy extends StatefulWidget {
   State<TLThingy> createState() => _TLThingyState();
 }
 
-class _TLThingyState extends State<TLThingy> {
+class _TLThingyState extends State<TLThingy> with TickerProviderStateMixin {
   late bool oskKagariGimmick;
   late TetraLeagueAlpha? oldTl;
   late TetraLeagueAlpha currentTl;
   late RangeValues _currentRangeValues;
   late List<TetrioPlayer> sortedStates;
+  late Timer _countdownTimer;
+  Duration seasonLeft = seasonEnd.difference(DateTime.now());
   
 @override
   void initState() {
@@ -52,7 +57,22 @@ class _TLThingyState extends State<TLThingy> {
     oldTl = sortedStates.elementAtOrNull(1)?.tlSeason1;
     currentTl = widget.tl;
     super.initState();
+    _countdownTimer = Timer.periodic(
+        Durations.extralong4,
+        (Timer timer) {
+          setState(() {
+            seasonLeft = seasonEnd.difference(DateTime.now());
+          });
+        },
+    );
   }
+
+  @override
+  void dispose() {
+    _countdownTimer.cancel();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) { 
@@ -70,6 +90,8 @@ class _TLThingyState extends State<TLThingy> {
           return Column(
             children: [
               if (widget.showTitle) Text(t.tetraLeague, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+              if (DateTime.now().isBefore(seasonEnd)) Text("Season ends in ${countdown(seasonLeft)}")
+              else Text("Season has ended"),
               if (oldTl != null) Text(t.comparingWith(newDate: timestamp(currentTl.timestamp), oldDate: timestamp(oldTl!.timestamp)),
               textAlign: TextAlign.center,),
               if (oldTl != null) RangeSlider(values: _currentRangeValues, max: widget.states.length.toDouble(),

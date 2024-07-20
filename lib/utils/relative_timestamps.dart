@@ -3,6 +3,7 @@ import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 
 final NumberFormat secs = NumberFormat("00.###", LocaleSettings.currentLocale.languageCode);
+final NumberFormat nonsecs = NumberFormat("00.###", LocaleSettings.currentLocale.languageCode);
 final NumberFormat _timeInSec = NumberFormat("#,###.###s.", LocaleSettings.currentLocale.languageCode);
 
 /// Returns string, that represents time difference between [dateTime] and now
@@ -73,4 +74,8 @@ String readableTimeDifference(Duration a, Duration b){
   Duration result = a - b;
   
   return NumberFormat("0.000s;0.000s", LocaleSettings.currentLocale.languageCode).format(result.inMilliseconds/1000);
+}
+
+String countdown(Duration difference){
+  return "${difference.inDays}:${nonsecs.format(difference.inHours%24)}:${nonsecs.format(difference.inMinutes%60)}:${secs.format(difference.inSeconds%60)}";
 }

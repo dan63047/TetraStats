@@ -8,7 +8,6 @@ import 'package:tetra_stats/main.dart' show prefs;
 import 'package:tetra_stats/utils/numers_formats.dart';
 
 var fDiff = NumberFormat("+#,###.####;-#,###.####");
-DateTime seasonEnd = DateTime.utc(2024, 07, 26);
 
 class TLRatingThingy extends StatelessWidget{
   final String userID;
@@ -30,7 +29,6 @@ class TLRatingThingy extends StatelessWidget{
     DateTime now = DateTime.now();
     bool beforeS1end = now.isBefore(seasonEnd);
     int daysLeft = seasonEnd.difference(now).inDays;
-    print(max(0, 7 - (lastMatchPlayed != null ? now.difference(lastMatchPlayed!).inDays : 7)));
     int safeRD = min(100, (100 + ((tlData.rd! >= 100 && tlData.decaying) ? 7 : max(0, 7 - (lastMatchPlayed != null ? now.difference(lastMatchPlayed!).inDays : 7))) - daysLeft).toInt());
     return Wrap(
       direction: Axis.horizontal,
