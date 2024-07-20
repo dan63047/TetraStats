@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 1182 (591 per locale)
+/// Strings: 1186 (593 per locale)
 ///
-/// Built on 2024-07-10 at 15:23 UTC
+/// Built on 2024-07-20 at 13:24 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -222,6 +222,8 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get verdictBetter => 'better';
 	String get verdictWorse => 'worse';
 	String get smooth => 'Smooth';
+	String seasonEnds({required Object countdown}) => 'Season ends in ${countdown}';
+	String get seasonEnded => 'Season has ended';
 	String gamesUntilRanked({required Object left}) => '${left} games until being ranked';
 	String numOfVictories({required Object wins}) => '~${wins} victories';
 	String get promotionOnNextWin => 'Promotion on next win';
@@ -917,6 +919,8 @@ class _StringsRu implements Translations {
 	@override String get verdictBetter => 'Лучше';
 	@override String get verdictWorse => 'Хуже';
 	@override String get smooth => 'Гладкий';
+	@override String seasonEnds({required Object countdown}) => 'Сезон закончится через ${countdown}';
+	@override String get seasonEnded => 'Сезон закончился';
 	@override String gamesUntilRanked({required Object left}) => '${left} матчей до получения рейтинга';
 	@override String numOfVictories({required Object wins}) => '~${wins} побед';
 	@override String get promotionOnNextWin => 'Повышение после следующей победы';
@@ -1604,6 +1608,8 @@ extension on Translations {
 			case 'verdictBetter': return 'better';
 			case 'verdictWorse': return 'worse';
 			case 'smooth': return 'Smooth';
+			case 'seasonEnds': return ({required Object countdown}) => 'Season ends in ${countdown}';
+			case 'seasonEnded': return 'Season has ended';
 			case 'gamesUntilRanked': return ({required Object left}) => '${left} games until being ranked';
 			case 'numOfVictories': return ({required Object wins}) => '~${wins} victories';
 			case 'promotionOnNextWin': return 'Promotion on next win';
@@ -2215,6 +2221,8 @@ extension on _StringsRu {
 			case 'verdictBetter': return 'Лучше';
 			case 'verdictWorse': return 'Хуже';
 			case 'smooth': return 'Гладкий';
+			case 'seasonEnds': return ({required Object countdown}) => 'Сезон закончится через ${countdown}';
+			case 'seasonEnded': return 'Сезон закончился';
 			case 'gamesUntilRanked': return ({required Object left}) => '${left} матчей до получения рейтинга';
 			case 'numOfVictories': return ({required Object wins}) => '~${wins} побед';
 			case 'promotionOnNextWin': return 'Повышение после следующей победы';

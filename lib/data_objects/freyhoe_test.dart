@@ -123,6 +123,7 @@
 //   }
 
 //   bool wasATSpin(Tetromino type, Coords coords, int rot){
+//     if (type != Tetromino.T) return false;
 //     if (!(positionIsValid(type, Coords(coords.x+1, coords.y), rot) ||
 // 			    positionIsValid(type, Coords(coords.x-1, coords.y), rot) ||
 // 			    positionIsValid(type, Coords(coords.x, coords.y+1), rot) ||
@@ -200,10 +201,6 @@
 //   int attackTanked = 0;
 
 //   LineClearResult processLineClear(List<int> clearFullLinesResult, Tetromino current, Coords pos, bool spinWasLastMove, bool tspin){
-//     if (clearFullLinesResult[0] > 0) combo++;
-//     else combo = -1;
-//     if (clearFullLinesResult[2] > 0) btb++;
-//     else btb = -1;
 //     int attack = 0;
 //     switch (clearFullLinesResult[0]){
 //       case 0:
@@ -215,7 +212,8 @@
 //         if (spinWasLastMove && tspin) {
 //           attack = garbage['t-spin single']!;
 //         }else{
-//           attack = garbage['single']!;
+//           if (combo == -1) attack = garbage['single']!;
+//           else attack = comboTable[combo];
 //         }
 //       break;
 //       case 2:
@@ -250,6 +248,10 @@
 //       developer.log("${clearFullLinesResult[0]} lines cleared");
 //       break;
 //     }
+//     if (clearFullLinesResult[0] > 0) combo++;
+//     else combo = -1;
+//     if (clearFullLinesResult[2] > 0) btb++;
+//     else btb = -1;
 //     return LineClearResult(clearFullLinesResult[0], Tetromino.empty, false, clearFullLinesResult[1], 0, attack);
 //   }
 // }
@@ -269,7 +271,7 @@
 //   List<Event> events = readEventList(replay.rawJson);
 //   DataFullOptions? settings;
 //   HandlingHandler? handling;
-//   Map<KeyType, EventKeyPress> activeKeypresses = {};
+//   //Map<KeyType, EventKeyPress> activeKeypresses = {};
 //   int currentFrame = 0;
 //   double subframesWent = 0;
 //   events.removeAt(0); // get rig of Event.start
@@ -278,6 +280,7 @@
 //   Board board = Board(10, 20, 20);
 //   KicksetBase kickset = SRSPlus();
 //   List<IncomingGarbage> garbageQueue = [];
+//   List<GarbageData> outcomingGarbage = [];
 //   Tetromino? hold;
 //   int rot = 0;
 //   bool spinWasLastMove = false;
@@ -287,9 +290,9 @@
 //   bool floored = false;
 //   double gravityBucket = 1.0;
 
-//   developer.log("Seed is ${replay.stats[0][0].seed}, first bag is $queue");
+//   //developer.log("Seed is ${replay.stats[0][0].seed}, first bag is $queue");
 //   Tetromino current = queue.removeAt(0);
-//   //developer.log("Second bag is ${rng.shuffleList(tetrominoes)}");
+//   //developer.log("Handling is ");
 
 //   int sonicDrop(){
 //     int height = coords.y;
@@ -333,12 +336,13 @@
 //     board.writeToBoard(current, coords, rot);
 //     bool tspin = board.wasATSpin(current, coords, rot);
 //     LineClearResult lineClear = stats.processLineClear(board.clearFullLines(), current, coords, spinWasLastMove, tspin);
-//     print("${lineClear.linesCleared} lines, ${lineClear.garbageCleared} garbage");
+//     //if (lineClear.attackProduced > 0) outcomingGarbage.add(GarbageData());
+//     //print("${lineClear.linesCleared} lines, ${lineClear.garbageCleared} garbage");
 //     if (garbageQueue.isNotEmpty) {
 //       if (lineClear.linesCleared > 0){
 //         int garbageToDelete = lineClear.attackProduced;
 //         for (IncomingGarbage garbage in garbageQueue){
-//           if (garbage.data.amt! >= garbageToDelete) {
+//           if (garbage.data.amt! < garbageToDelete) {
 //             garbageToDelete -= garbage.data.amt!;
 //             lineClear.attackProduced = garbageToDelete;
 //             garbage.data.amt = 0;
@@ -367,11 +371,17 @@
 //     }
 //     current = getNewOne();
 //     coords = Coords(3, 21) + spawnPositionFixes[current.index];
+//     print("${lineClear.linesCleared} lines, ${lineClear.attackProduced} atk, ${lineClear.spin}, combo ${stats.combo}, btb ${stats.btb}");
 //   }
 
 //   void handleGravity(double frames){
 //     if (frames == 0) return;
-//     gravityBucket += settings != null ? (handling!.sdfActive ? max(settings.g! * settings.handling!.sdf, 0.05 * settings.handling!.sdf)  : settings.g!) * frames : 0;
+//     gravityBucket += settings != null ? 
+//       (handling!.sdfActive ?
+//         max(settings.g! * settings.handling!.sdf, 0.05 * settings.handling!.sdf) :
+//         settings.g!
+//       ) * frames
+//       : 0;
 //     int gravityImpact = 0;
 //     if (gravityBucket >= 1.0){
 //       gravityImpact = gravityBucket.truncate();
@@ -404,17 +414,17 @@
 //     subframesWent = 0;
     
 //     if (settings?.handling?.sdf == 41) coords.y = sonicDrop();
-//     print("$currentFrame: $current at $coords\n$board");
 //     //print(stats.combo);
 //     if (currentFrame == nextEvent.frame){
 //       while (currentFrame == nextEvent.frame){
-//         print("Processing $nextEvent");
+//         //print("Processing $nextEvent");
 //         switch (nextEvent.type){
 //         case EventType.start:
 //           developer.log("go");
 //           break;
 //         case EventType.full:
 //           settings = (nextEvent as EventFull).data.options;
+//           developer.log("SDF is ${settings?.handling?.sdf}, replay version is ${settings?.version}");
 //           handling = HandlingHandler(settings!.handling!.das.toDouble(), settings.handling!.arr.toDouble());
 //           lockDelay = settings.locktime!.toDouble();
 //           lockResets = settings.lockresets!;
@@ -446,6 +456,7 @@
 //               break;
 //             case KeyType.hardDrop:
 //               coords.y = sonicDrop();
+//               print("$currentFrame: $current at $coords, garbage queue $garbageQueue\n$board");
 //               handleHardDrop();
 //             case KeyType.hold:
 //               switch (hold){
@@ -513,7 +524,7 @@
 //             case KeyType.retry:
 //               // TODO: Handle this case.
 //           }
-//           activeKeypresses.remove(nextEvent.data.key);
+//           //activeKeypresses.remove(nextEvent.data.key);
 //           break;
 //         case EventType.end:
 //           currentFrame = replay.roundLengths[0]+1;

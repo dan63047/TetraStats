@@ -60,6 +60,7 @@ const Map<String, double> rankTargets = {
   "d+": 606,
   "d": 0,
 };
+DateTime seasonEnd = DateTime.utc(2024, 07, 26, 15);
 enum Stats {
   tr,
   glicko,
