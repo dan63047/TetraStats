@@ -87,6 +87,8 @@
     "verdictBetter": "Лучше",
     "verdictWorse": "Хуже",
     "smooth": "Гладкий",
+    "seasonEnds": "Сезон закончится через ${countdown}",
+    "seasonEnded": "Сезон закончился",
     "gamesUntilRanked": "${left} матчей до получения рейтинга",
     "numOfVictories": "~${wins} побед",
     "promotionOnNextWin": "Повышение после следующей победы",

@@ -90,8 +90,8 @@ class _TLThingyState extends State<TLThingy> with TickerProviderStateMixin {
           return Column(
             children: [
               if (widget.showTitle) Text(t.tetraLeague, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-              if (DateTime.now().isBefore(seasonEnd)) Text("Season ends in ${countdown(seasonLeft)}")
-              else Text("Season has ended"),
+              if (DateTime.now().isBefore(seasonEnd)) Text(t.seasonEnds(countdown: countdown(seasonLeft)))
+              else Text(t.seasonEnded),
               if (oldTl != null) Text(t.comparingWith(newDate: timestamp(currentTl.timestamp), oldDate: timestamp(oldTl!.timestamp)),
               textAlign: TextAlign.center,),
               if (oldTl != null) RangeSlider(values: _currentRangeValues, max: widget.states.length.toDouble(),

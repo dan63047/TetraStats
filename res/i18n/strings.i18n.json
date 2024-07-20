@@ -87,6 +87,8 @@
     "verdictBetter": "better",
     "verdictWorse": "worse",
     "smooth": "Smooth",
+    "seasonEnds": "Season ends in ${countdown}",
+    "seasonEnded": "Season has ended",
     "gamesUntilRanked": "${left} games until being ranked",
     "numOfVictories": "~${wins} victories",
     "promotionOnNextWin": "Promotion on next win",
