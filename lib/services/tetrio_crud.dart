@@ -557,8 +557,6 @@ class TetrioService extends DB {
                 nextAt: -1,
                 prevAt: -1
               ),
-              sprint: [],
-              blitz: []
               );
               history.add(state);
           }
@@ -601,7 +599,7 @@ class TetrioService extends DB {
   }
 
   /// Docs later
-  Future<List<TetraLeagueAlphaRecord>> fetchAndSaveOldTLmatches(String userID) async {
+  Future<TetraLeagueAlphaStream> fetchAndSaveOldTLmatches(String userID) async {
     Uri url;
     if (kIsWeb) {
       url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLMatches", "user": userID});
@@ -616,7 +614,7 @@ class TetrioService extends DB {
         case 200:
           TetraLeagueAlphaStream stream = TetraLeagueAlphaStream.fromJson(jsonDecode(response.body)['data']['records'], userID);
           saveTLMatchesFromStream(stream);
-          return stream.records;
+          return stream;
         case 404:
           developer.log("fetchAndSaveOldTLmatches: Probably, history doesn't exist", name: "services/tetrio_crud", error: response.statusCode);
           throw TetrioHistoryNotExist();
@@ -650,7 +648,7 @@ class TetrioService extends DB {
     if (kIsWeb) {
       url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLLeaderboard"});
     } else {
-      url = Uri.https('ch.tetr.io', 'api/users/lists/league/all');
+      url = Uri.https('ch.tetr.io', 'api/users/by/league');
     }
     try{
       final response = await client.get(url);
@@ -660,7 +658,7 @@ class TetrioService extends DB {
           _lbPositions.clear();
           var rawJson = jsonDecode(response.body);
           if (rawJson['success']) { // if api confirmed that everything ok
-            TetrioPlayersLeaderboard leaderboard = TetrioPlayersLeaderboard.fromJson(rawJson['data']['users'], "league", DateTime.fromMillisecondsSinceEpoch(rawJson['cache']['cached_at']));
+            TetrioPlayersLeaderboard leaderboard = TetrioPlayersLeaderboard.fromJson(rawJson['data']['entries'], "league", DateTime.fromMillisecondsSinceEpoch(rawJson['cache']['cached_at']));
             developer.log("fetchTLLeaderboard: Leaderboard retrieved and cached", name: "services/tetrio_crud");
             //_leaderboardsCache[rawJson['cache']['cached_until'].toString()] = leaderboard;
             _cache.store(leaderboard, rawJson['cache']['cached_until']);
@@ -758,15 +756,15 @@ class TetrioService extends DB {
 
   /// Retrieves avaliable Tetra League matches from Tetra Channel api. Returns stream object (fake stream).
   /// Throws an exception if fails to retrieve.
-  Future<TetraLeagueAlphaStream> fetchTLStream(String userID) async {
-    TetraLeagueAlphaStream? cached = _cache.get(userID, TetraLeagueAlphaStream);
+  Future<TetraLeagueBetaStream> fetchTLStream(String userID) async {
+    TetraLeagueBetaStream? cached = _cache.get(userID, TetraLeagueAlphaStream);
     if (cached != null) return cached;
     
     Uri url;
     if (kIsWeb) {
       url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "tetrioUserTL", "user": userID.toLowerCase().trim()});
     } else {
-      url = Uri.https('ch.tetr.io', 'api/streams/league_userrecent_${userID.toLowerCase().trim()}');
+      url = Uri.https('ch.tetr.io', 'api/users/${userID.toLowerCase().trim()}/records/league/recent');
     }
     try {
       final response = await client.get(url);
@@ -774,7 +772,7 @@ class TetrioService extends DB {
       switch (response.statusCode) {
         case 200:
           if (jsonDecode(response.body)['success']) {
-            TetraLeagueAlphaStream stream = TetraLeagueAlphaStream.fromJson(jsonDecode(response.body)['data']['records'], userID);
+            TetraLeagueBetaStream stream = TetraLeagueBetaStream.fromJson(jsonDecode(response.body)['data']['entries'], userID);
             _cache.store(stream, jsonDecode(response.body)['cache']['cached_until']);
             developer.log("fetchTLStream: $userID stream retrieved and cached", name: "services/tetrio_crud");
             return stream;
@@ -918,6 +916,50 @@ class TetrioService extends DB {
             return result;
           } else {
             developer.log("fetchRecords User dosen't exist", name: "services/tetrio_crud", error: response.body);
+            throw TetrioPlayerNotExist();
+          }
+        case 403:
+          throw TetrioForbidden();
+        case 429:
+          throw TetrioTooManyRequests();
+        case 418:
+          throw TetrioOskwareBridgeProblem();
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+          throw TetrioInternalProblem();
+        default:
+          developer.log("fetchRecords Failed to fetch records", name: "services/tetrio_crud", error: response.statusCode);
+          throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
+      }
+    } on http.ClientException catch (e, s) {
+      developer.log("$e, $s");
+      throw http.ClientException(e.message, e.uri);
+    }
+  }
+
+  Future<Summaries> fetchSummaries(String id) async {
+    Summaries? cached = _cache.get(id, Summaries);
+    if (cached != null) return cached;
+
+    Uri url;
+    if (kIsWeb) {
+      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "Summaries", "id": id});
+    } else {
+      url = Uri.https('ch.tetr.io', 'api/users/$id/summaries');
+    }
+
+    try{
+      final response = await client.get(url);
+
+      switch (response.statusCode) {
+        case 200:
+          if (jsonDecode(response.body)['success']) {
+            developer.log("fetchSummaries: $id summaries retrieved and cached", name: "services/tetrio_crud");
+            return Summaries.fromJson(jsonDecode(response.body)['data'], id);
+          } else {
+            developer.log("fetchSummaries: User dosen't exist", name: "services/tetrio_crud", error: response.body);
             throw TetrioPlayerNotExist();
           }
         case 403:
@@ -1131,7 +1173,7 @@ class TetrioService extends DB {
           var json = jsonDecode(response.body);
           if (json['success']) {
             // parse and count stats
-            TetrioPlayer player = TetrioPlayer.fromJson(json['data']['user'], DateTime.fromMillisecondsSinceEpoch(json['cache']['cached_at'], isUtc: true), json['data']['user']['_id'], json['data']['user']['username'], DateTime.fromMillisecondsSinceEpoch(json['cache']['cached_until'], isUtc: true));
+            TetrioPlayer player = TetrioPlayer.fromJson(json['data'], DateTime.fromMillisecondsSinceEpoch(json['cache']['cached_at'], isUtc: true), json['data']['_id'], json['data']['username'], DateTime.fromMillisecondsSinceEpoch(json['cache']['cached_until'], isUtc: true));
             _cache.store(player, json['cache']['cached_until']);
             developer.log("fetchPlayer: $user retrieved and cached", name: "services/tetrio_crud");
             return player;
@@ -1175,14 +1217,14 @@ class TetrioService extends DB {
     return data;
   }
 
-  Future<void> fetchTracked() async {
-    for (String userID in (await getAllPlayerToTrack())) { 
-      TetrioPlayer player = await fetchPlayer(userID);
-      storeState(player);
-      sleep(Durations.extralong4);
-      TetraLeagueAlphaStream matches = await fetchTLStream(userID);
-      saveTLMatchesFromStream(matches);
-      sleep(Durations.extralong4);
-    }
-  }
+  // Future<void> fetchTracked() async {
+  //   for (String userID in (await getAllPlayerToTrack())) { 
+  //     TetrioPlayer player = await fetchPlayer(userID);
+  //     storeState(player);
+  //     sleep(Durations.extralong4);
+  //     TetraLeagueBetaStream matches = await fetchTLStream(userID);
+  //     saveTLMatchesFromStream(matches);
+  //     sleep(Durations.extralong4);
+  //   }
+  // }
 }

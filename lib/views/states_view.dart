@@ -61,7 +61,7 @@ class StatesState extends State<StatesView> {
                 itemBuilder: (context, index) {
                   return ListTile(
                     title: Text(timestamp(widget.states[index].state)),
-                    subtitle: Text(t.statesViewEntry(level: widget.states[index].level.toStringAsFixed(2), gameTime: widget.states[index].gameTime, friends: widget.states[index].friendCount, rd: NumberFormat.compact().format(widget.states[index].tlSeason1.rd))),
+                    subtitle: Text(t.statesViewEntry(level: widget.states[index].level.toStringAsFixed(2), gameTime: widget.states[index].gameTime, friends: widget.states[index].friendCount, rd: NumberFormat.compact().format(widget.states[index].tlSeason1?.rd??0))),
                     trailing: IconButton(
                       icon: const Icon(Icons.delete_forever),
                       onPressed: () {

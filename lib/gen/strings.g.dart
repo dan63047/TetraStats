@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 1186 (593 per locale)
+/// Strings: 1198 (599 per locale)
 ///
-/// Built on 2024-07-20 at 13:24 UTC
+/// Built on 2024-07-27 at 18:54 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -222,6 +222,12 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get verdictBetter => 'better';
 	String get verdictWorse => 'worse';
 	String get smooth => 'Smooth';
+	String get postSeason => 'Off-season';
+	String get seasonStarts => 'Season starts in:';
+	String get myMessadgeHeader => 'A messadge from dan63';
+	String get myMessadgeBody => 'TETR.IO Tetra Channel API has been seriously modified after the last update, therefore, some functions may not work. I will try to catch up and add new stats (and return back the old ones) as soon, as public docs on new Tetra Channel API will be available.';
+	String preSeasonMessage({required Object n}) => 'Right now you can play unranked FT3 matches against absolutely random player.\nSeason ${n} rules applied';
+	String get nanow => 'Not avaliable for now...';
 	String seasonEnds({required Object countdown}) => 'Season ends in ${countdown}';
 	String get seasonEnded => 'Season has ended';
 	String gamesUntilRanked({required Object left}) => '${left} games until being ranked';
@@ -919,6 +925,12 @@ class _StringsRu implements Translations {
 	@override String get verdictBetter => 'Лучше';
 	@override String get verdictWorse => 'Хуже';
 	@override String get smooth => 'Гладкий';
+	@override String get postSeason => 'Внесезонье';
+	@override String get seasonStarts => 'Сезон начнётся через:';
+	@override String get myMessadgeHeader => 'Сообщение от dan63';
+	@override String get myMessadgeBody => 'TETR.IO Tetra Channel API был серьёзно изменён после последнего обновления, поэтому некоторый функционал может не работать. Я постараюсь добавить новую статистику (и вернуть старую) как только будут опубликована новая документация по данному API.';
+	@override String preSeasonMessage({required Object n}) => 'Прямо сейчас вы можете сыграть безранговый матч до трёх побед против абсолютно рандомного по скиллу игрока.\nПрименяются правила ${n} сезона';
+	@override String get nanow => 'Пока недоступно...';
 	@override String seasonEnds({required Object countdown}) => 'Сезон закончится через ${countdown}';
 	@override String get seasonEnded => 'Сезон закончился';
 	@override String gamesUntilRanked({required Object left}) => '${left} матчей до получения рейтинга';
@@ -1608,6 +1620,12 @@ extension on Translations {
 			case 'verdictBetter': return 'better';
 			case 'verdictWorse': return 'worse';
 			case 'smooth': return 'Smooth';
+			case 'postSeason': return 'Off-season';
+			case 'seasonStarts': return 'Season starts in:';
+			case 'myMessadgeHeader': return 'A messadge from dan63';
+			case 'myMessadgeBody': return 'TETR.IO Tetra Channel API has been seriously modified after the last update, therefore, some functions may not work. I will try to catch up and add new stats (and return back the old ones) as soon, as public docs on new Tetra Channel API will be available.';
+			case 'preSeasonMessage': return ({required Object n}) => 'Right now you can play unranked FT3 matches against absolutely random player.\nSeason ${n} rules applied';
+			case 'nanow': return 'Not avaliable for now...';
 			case 'seasonEnds': return ({required Object countdown}) => 'Season ends in ${countdown}';
 			case 'seasonEnded': return 'Season has ended';
 			case 'gamesUntilRanked': return ({required Object left}) => '${left} games until being ranked';
@@ -2221,6 +2239,12 @@ extension on _StringsRu {
 			case 'verdictBetter': return 'Лучше';
 			case 'verdictWorse': return 'Хуже';
 			case 'smooth': return 'Гладкий';
+			case 'postSeason': return 'Внесезонье';
+			case 'seasonStarts': return 'Сезон начнётся через:';
+			case 'myMessadgeHeader': return 'Сообщение от dan63';
+			case 'myMessadgeBody': return 'TETR.IO Tetra Channel API был серьёзно изменён после последнего обновления, поэтому некоторый функционал может не работать. Я постараюсь добавить новую статистику (и вернуть старую) как только будут опубликована новая документация по данному API.';
+			case 'preSeasonMessage': return ({required Object n}) => 'Прямо сейчас вы можете сыграть безранговый матч до трёх побед против абсолютно рандомного по скиллу игрока.\nПрименяются правила ${n} сезона';
+			case 'nanow': return 'Пока недоступно...';
 			case 'seasonEnds': return ({required Object countdown}) => 'Сезон закончится через ${countdown}';
 			case 'seasonEnded': return 'Сезон закончился';
 			case 'gamesUntilRanked': return ({required Object left}) => '${left} матчей до получения рейтинга';

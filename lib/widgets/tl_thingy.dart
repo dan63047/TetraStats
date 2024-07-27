@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:path/path.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/utils/colors_functions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
@@ -24,6 +26,7 @@ class TLThingy extends StatefulWidget {
   final List<TetrioPlayer> states;
   final bool showTitle;
   final bool bot;
+  final bool hidePreSeasonThingy;
   final bool guest;
   final double? topTR;
   final PlayerLeaderboardPosition? lbPositions;
@@ -35,7 +38,7 @@ class TLThingy extends StatefulWidget {
   final double? nextRankCutoffGlicko;
   final double? nextRankTarget;
   final DateTime? lastMatchPlayed;
-  const TLThingy({super.key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.bot=false, this.guest=false, this.topTR, this.lbPositions, this.averages, this.nextRankCutoff, this.thatRankCutoff, this.thatRankCutoffGlicko, this.nextRankCutoffGlicko, this.nextRankTarget, this.thatRankTarget, this.lastMatchPlayed});
+  const TLThingy({super.key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.bot=false, this.guest=false, this.hidePreSeasonThingy=false, this.topTR, this.lbPositions, this.averages, this.nextRankCutoff, this.thatRankCutoff, this.thatRankCutoffGlicko, this.nextRankCutoffGlicko, this.nextRankTarget, this.thatRankTarget, this.lastMatchPlayed});
 
   @override
   State<TLThingy> createState() => _TLThingyState();
@@ -48,8 +51,9 @@ class _TLThingyState extends State<TLThingy> with TickerProviderStateMixin {
   late RangeValues _currentRangeValues;
   late List<TetrioPlayer> sortedStates;
   late Timer _countdownTimer;
-  Duration seasonLeft = seasonEnd.difference(DateTime.now());
-  
+  //Duration seasonLeft = seasonEnd.difference(DateTime.now());
+  Duration postSeasonLeft = seasonStart.difference(DateTime.now());
+
 @override
   void initState() {
     _currentRangeValues = const RangeValues(0, 1);
@@ -61,7 +65,8 @@ class _TLThingyState extends State<TLThingy> with TickerProviderStateMixin {
         Durations.extralong4,
         (Timer timer) {
           setState(() {
-            seasonLeft = seasonEnd.difference(DateTime.now());
+            //seasonLeft = seasonEnd.difference(DateTime.now());
+            postSeasonLeft = seasonStart.difference(DateTime.now());
           });
         },
     );
@@ -80,6 +85,47 @@ class _TLThingyState extends State<TLThingy> with TickerProviderStateMixin {
   String decimalSeparator = f2.symbols.DECIMAL_SEP;
   List<String> estTRformated = currentTl.estTr != null ? f2.format(currentTl.estTr!.esttr).split(decimalSeparator) : [];
   List<String> estTRaccFormated = currentTl.esttracc != null ? intFDiff.format(currentTl.esttracc!).split(".") : [];
+    if (DateTime.now().isBefore(seasonStart) && !widget.hidePreSeasonThingy) {
+      return Center(child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(t.postSeason.toUpperCase(), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28), textAlign: TextAlign.center),
+        Text(t.seasonStarts, textAlign: TextAlign.center),
+        const Spacer(),
+        Text(countdown(postSeasonLeft), textAlign: TextAlign.center, style: const TextStyle(fontSize: 36.0),),
+        if (prefs.getBool("hideDanMessadge") != true) const Spacer(),
+        if (prefs.getBool("hideDanMessadge") != true) Card(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 450.0),
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      t.myMessadgeHeader,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.bold)
+                    ),
+                    const Spacer(),
+                    IconButton(onPressed: (){setState(() {
+                      prefs.setBool("hideDanMessadge", true); 
+                    });}, icon: const Icon(Icons.close))
+                  ],
+                ),
+                Text(t.myMessadgeBody, textAlign: TextAlign.center),
+              ],
+            ),
+          ),
+        ),
+        const Spacer(),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Text(t.preSeasonMessage(n: postSeasonLeft.inDays >= 14 ? "1" : "2"), textAlign: TextAlign.center),
+        ),
+      ],
+          ));
+    }
     if (currentTl.gamesPlayed == 0) return Center(child: Text(widget.guest ? t.anonTL : widget.bot ? t.botTL : t.neverPlayedTL, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28), textAlign: TextAlign.center,));
     return LayoutBuilder(builder: (context, constraints) {
     bool bigScreen = constraints.maxWidth >= 768;
@@ -90,8 +136,8 @@ class _TLThingyState extends State<TLThingy> with TickerProviderStateMixin {
           return Column(
             children: [
               if (widget.showTitle) Text(t.tetraLeague, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-              if (DateTime.now().isBefore(seasonEnd)) Text(t.seasonEnds(countdown: countdown(seasonLeft)))
-              else Text(t.seasonEnded),
+              //if (DateTime.now().isBefore(seasonEnd)) Text(t.seasonEnds(countdown: countdown(seasonLeft)))
+              //else Text(t.seasonEnded),
               if (oldTl != null) Text(t.comparingWith(newDate: timestamp(currentTl.timestamp), oldDate: timestamp(oldTl!.timestamp)),
               textAlign: TextAlign.center,),
               if (oldTl != null) RangeSlider(values: _currentRangeValues, max: widget.states.length.toDouble(),
@@ -105,7 +151,7 @@ class _TLThingyState extends State<TLThingy> with TickerProviderStateMixin {
                     if (values.start.round() == 0){
                       currentTl = widget.tl;
                     }else{
-                      currentTl = sortedStates[values.start.round()-1].tlSeason1;
+                      currentTl = sortedStates[values.start.round()-1].tlSeason1!;
                     }
                     if (values.end.round() == 0){
                       oldTl = widget.tl;

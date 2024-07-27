@@ -36,16 +36,16 @@ class SingleplayerRecord extends StatelessWidget {
     if (record == null) return Center(child: Text(t.noRecord, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)));
     late MapEntry closestAverageBlitz;
     late bool blitzBetterThanClosestAverage;
-    bool? blitzBetterThanRankAverage = (rank != null && rank != "z") ? record!.endContext.score > blitzAverages[rank]! : null;
+    bool? blitzBetterThanRankAverage = (rank != null && rank != "z") ? record!.stats.score > blitzAverages[rank]! : null;
     late MapEntry closestAverageSprint;
     late bool sprintBetterThanClosestAverage;
-    bool? sprintBetterThanRankAverage = (rank != null && rank != "z") ? record!.endContext.finalTime < sprintAverages[rank]! : null;
-    if (record!.endContext.gameType == "40l") {
-      closestAverageSprint = sprintAverages.entries.singleWhere((element) => element.value == sprintAverages.values.reduce((a, b) => (a-record!.endContext.finalTime).abs() < (b -record!.endContext.finalTime).abs() ? a : b));
-      sprintBetterThanClosestAverage = record!.endContext.finalTime < closestAverageSprint.value;
-    }else if (record!.endContext.gameType == "blitz"){
-      closestAverageBlitz = blitzAverages.entries.singleWhere((element) => element.value == blitzAverages.values.reduce((a, b) => (a-record!.endContext.score).abs() < (b -record!.endContext.score).abs() ? a : b));
-      blitzBetterThanClosestAverage = record!.endContext.score > closestAverageBlitz.value;
+    bool? sprintBetterThanRankAverage = (rank != null && rank != "z") ? record!.stats.finalTime < sprintAverages[rank]! : null;
+    if (record!.gamemode == "40l") {
+      closestAverageSprint = sprintAverages.entries.singleWhere((element) => element.value == sprintAverages.values.reduce((a, b) => (a-record!.stats.finalTime).abs() < (b -record!.stats.finalTime).abs() ? a : b));
+      sprintBetterThanClosestAverage = record!.stats.finalTime < closestAverageSprint.value;
+    }else if (record!.gamemode == "blitz"){
+      closestAverageBlitz = blitzAverages.entries.singleWhere((element) => element.value == blitzAverages.values.reduce((a, b) => (a-record!.stats.score).abs() < (b -record!.stats.score).abs() ? a : b));
+      blitzBetterThanClosestAverage = record!.stats.score > closestAverageBlitz.value;
     }
     
     return LayoutBuilder(
@@ -61,20 +61,20 @@ class SingleplayerRecord extends StatelessWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (record!.endContext.gameType == "40l") Padding(padding: const EdgeInsets.only(right: 8.0),
+                    if (record!.gamemode == "40l") Padding(padding: const EdgeInsets.only(right: 8.0),
                     child: Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageSprint.key}.png", height: 96)
                     ),
-                    if (record!.endContext.gameType == "blitz") Padding(padding: const EdgeInsets.only(right: 8.0),
+                    if (record!.gamemode == "blitz") Padding(padding: const EdgeInsets.only(right: 8.0),
                     child: Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageBlitz.key}.png", height: 96)
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                      if (record!.endContext.gameType == "40l" && !hideTitle) Text(t.sprint, style: const TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
-                      if (record!.endContext.gameType == "blitz" && !hideTitle) Text(t.blitz, style: const TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
+                      if (record!.gamemode == "40l" && !hideTitle) Text(t.sprint, style: const TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
+                      if (record!.gamemode == "blitz" && !hideTitle) Text(t.blitz, style: const TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
                       RichText(text: TextSpan(
-                          text: record!.endContext.gameType == "40l" ? get40lTime(record!.endContext.finalTime.inMicroseconds) : NumberFormat.decimalPattern().format(record!.endContext.score),
+                          text: record!.gamemode == "40l" ? get40lTime(record!.stats.finalTime.inMicroseconds) : NumberFormat.decimalPattern().format(record!.stats.score),
                           style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 36 : 32, fontWeight: FontWeight.w500, color: Colors.white),
                           ),
                         ),
@@ -82,16 +82,16 @@ class SingleplayerRecord extends StatelessWidget {
                         text: "",
                         style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
                         children: [
-                          if (record!.endContext.gameType == "40l" && (rank != null && rank != "z")) TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(record!.endContext.finalTime, sprintAverages[rank]!), verdict: sprintBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
+                          if (record!.gamemode == "40l" && (rank != null && rank != "z")) TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(record!.stats.finalTime, sprintAverages[rank]!), verdict: sprintBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
                             color: sprintBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
                           ))
-                          else if (record!.endContext.gameType == "40l" && (rank == null || rank == "z")) TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(record!.endContext.finalTime, closestAverageSprint.value), verdict: sprintBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageSprint.key.toUpperCase())}\n", style: TextStyle(
+                          else if (record!.gamemode == "40l" && (rank == null || rank == "z")) TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(record!.stats.finalTime, closestAverageSprint.value), verdict: sprintBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageSprint.key.toUpperCase())}\n", style: TextStyle(
                             color: sprintBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
                           ))
-                          else if (record!.endContext.gameType == "blitz" && (rank != null && rank != "z")) TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(record!.endContext.score, blitzAverages[rank]!), verdict: blitzBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
+                          else if (record!.gamemode == "blitz" && (rank != null && rank != "z")) TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(record!.stats.score, blitzAverages[rank]!), verdict: blitzBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
                             color: blitzBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
                           ))
-                          else if (record!.endContext.gameType == "blitz" && (rank == null || rank == "z")) TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(record!.endContext.score, closestAverageBlitz.value), verdict: blitzBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageBlitz.key.toUpperCase())}\n", style: TextStyle(
+                          else if (record!.gamemode == "blitz" && (rank == null || rank == "z")) TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(record!.stats.score, closestAverageBlitz.value), verdict: blitzBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageBlitz.key.toUpperCase())}\n", style: TextStyle(
                             color: blitzBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
                           )),
                           if (record!.rank != null) TextSpan(text: "№${record!.rank}", style: TextStyle(color: getColorOfRank(record!.rank!))),
@@ -103,29 +103,29 @@ class SingleplayerRecord extends StatelessWidget {
                     ],),
                   ],
                 ),
-                if (record!.endContext.gameType == "40l") Wrap(
+                if (record!.gamemode == "40l") Wrap(
                     alignment: WrapAlignment.spaceBetween,
                     spacing: 20,
                     children: [
-                      StatCellNum(playerStat: record!.endContext.piecesPlaced, playerStatLabel: t.statCellNum.pieces, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
-                      StatCellNum(playerStat: record!.endContext.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
-                      StatCellNum(playerStat: record!.endContext.kpp, playerStatLabel: t.statCellNum.kpp, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
+                      StatCellNum(playerStat: record!.stats.piecesPlaced, playerStatLabel: t.statCellNum.pieces, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
+                      StatCellNum(playerStat: record!.stats.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
+                      StatCellNum(playerStat: record!.stats.kpp, playerStatLabel: t.statCellNum.kpp, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
                     ],
                 ),
-                if (record!.endContext.gameType == "blitz") Wrap(
+                if (record!.gamemode == "blitz") Wrap(
                     alignment: WrapAlignment.spaceBetween,
                     crossAxisAlignment: WrapCrossAlignment.start,
                     spacing: 20,
                     children: [
-                      StatCellNum(playerStat: record!.endContext.level, playerStatLabel: t.statCellNum.level, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
-                      StatCellNum(playerStat: record!.endContext.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
-                      StatCellNum(playerStat: record!.endContext.spp, playerStatLabel: t.statCellNum.spp, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true)
+                      StatCellNum(playerStat: record!.stats.level, playerStatLabel: t.statCellNum.level, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
+                      StatCellNum(playerStat: record!.stats.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
+                      StatCellNum(playerStat: record!.stats.spp, playerStatLabel: t.statCellNum.spp, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true)
                     ],
                 ),
-                FinesseThingy(record?.endContext.finesse, record?.endContext.finessePercentage),
-                LineclearsThingy(record!.endContext.clears, record!.endContext.lines, record!.endContext.holds, record!.endContext.tSpins),
-                if (record!.endContext.gameType == "40l") Text("${record!.endContext.inputs} KP • ${f2.format(record!.endContext.kps)} KPS"),
-                if (record!.endContext.gameType == "blitz") Text("${record!.endContext.piecesPlaced} P • ${record!.endContext.inputs} KP • ${f2.format(record!.endContext.kpp)} KPP • ${f2.format(record!.endContext.kps)} KPS"),
+                FinesseThingy(record?.stats.finesse, record?.stats.finessePercentage),
+                LineclearsThingy(record!.stats.clears, record!.stats.lines, record!.stats.holds, record!.stats.tSpins),
+                if (record!.gamemode == "40l") Text("${record!.stats.inputs} KP • ${f2.format(record!.stats.kps)} KPS"),
+                if (record!.gamemode == "blitz") Text("${record!.stats.piecesPlaced} P • ${record!.stats.inputs} KP • ${f2.format(record!.stats.kpp)} KPP • ${f2.format(record!.stats.kps)} KPS"),
                 if (record != null) Wrap(
                   alignment: WrapAlignment.spaceBetween,
                   crossAxisAlignment: WrapCrossAlignment.start,
@@ -141,15 +141,15 @@ class SingleplayerRecord extends StatelessWidget {
                     style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, shadows: textShadow, height: 0.9)
                   ),
                   title: Text(
-                    switch (stream!.records[i].endContext.gameType){
-                      "40l" => get40lTime(stream!.records[i].endContext.finalTime.inMicroseconds),
-                      "blitz" => t.blitzScore(p: NumberFormat.decimalPattern().format(stream!.records[i].endContext.score)),
-                      "5mblast" => get40lTime(stream!.records[i].endContext.finalTime.inMicroseconds),
+                    switch (stream!.records[i].gamemode){
+                      "40l" => get40lTime(stream!.records[i].stats.finalTime.inMicroseconds),
+                      "blitz" => t.blitzScore(p: NumberFormat.decimalPattern().format(stream!.records[i].stats.score)),
+                      "5mblast" => get40lTime(stream!.records[i].stats.finalTime.inMicroseconds),
                       String() => "huh",
                     },
                   style: const TextStyle(fontSize: 18)),
                   subtitle: Text(timestamp(stream!.records[i].timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
-                  trailing: SpTrailingStats(stream!.records[i].endContext)
+                  trailing: SpTrailingStats(stream!.records[i].stats, stream!.records[i].gamemode)
                 )
               ]
             ),

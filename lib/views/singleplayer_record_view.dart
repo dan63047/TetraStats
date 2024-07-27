@@ -17,7 +17,7 @@ class SingleplayerRecordView extends StatelessWidget {
       backgroundColor: Colors.black,
       appBar: AppBar(
         title: Text("${
-          switch (record.endContext.gameType){
+          switch (record.gamemode){
             "40l" => t.sprint,
             "blitz" => t.blitz,
             String() => "5000000 Blast",

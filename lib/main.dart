@@ -25,39 +25,15 @@ import 'package:go_router/go_router.dart';
 late final PackageInfo packageInfo;
 late SharedPreferences prefs;
 late TetrioService teto;
-ThemeData theme = ThemeData(fontFamily: 'Eurostile Round', colorScheme: const ColorScheme.dark(primary: Colors.cyanAccent, secondary: Colors.white), scaffoldBackgroundColor: Colors.black);
-
-// Future<dynamic> computeIsolate(Future Function() function) async {
-//   final receivePort = ReceivePort();
-//   var rootToken = RootIsolateToken.instance!;
-//   await Isolate.spawn<_IsolateData>(
-//     _isolateEntry,
-//     _IsolateData(
-//       token: rootToken,
-//       function: function,
-//       answerPort: receivePort.sendPort,
-//     ),
-//   );
-//   return await receivePort.first;
-// }
-
-// void _isolateEntry(_IsolateData isolateData) async {
-//   BackgroundIsolateBinaryMessenger.ensureInitialized(isolateData.token);
-//   final answer = await isolateData.function();
-//   isolateData.answerPort.send(answer);
-// }
-
-// class _IsolateData {
-//   final RootIsolateToken token;
-//   final Function function;
-//   final SendPort answerPort;
-
-//   _IsolateData({
-//     required this.token,
-//     required this.function,
-//     required this.answerPort,
-//   });
-// }
+ThemeData theme = ThemeData(
+  fontFamily: 'Eurostile Round',
+  colorScheme: const ColorScheme.dark(
+    primary: Colors.cyanAccent,
+    surface: Color.fromARGB(255, 10, 10, 10),
+    secondary: Colors.white
+  ),
+  scaffoldBackgroundColor: Colors.black
+);
 
 final router = GoRouter(
   initialLocation: "/",

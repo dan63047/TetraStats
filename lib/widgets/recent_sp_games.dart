@@ -25,7 +25,7 @@ class RecentSingleplayerGames extends StatelessWidget{
         for(RecordSingle record in recent.records) ListTile(
           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SingleplayerRecordView(record: record))),
           leading: Text(
-            switch (record.endContext.gameType){
+            switch (record.gamemode){
               "40l" => "40L",
               "blitz" => "BLZ",
               "5mblast" => "5MB",
@@ -34,15 +34,15 @@ class RecentSingleplayerGames extends StatelessWidget{
             style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, shadows: textShadow, height: 0.9)
           ),
           title: Text(
-            switch (record.endContext.gameType){
-              "40l" => get40lTime(record.endContext.finalTime.inMicroseconds),
-              "blitz" => t.blitzScore(p: NumberFormat.decimalPattern().format(record.endContext.score)),
-              "5mblast" => get40lTime(record.endContext.finalTime.inMicroseconds),
+            switch (record.gamemode){
+              "40l" => get40lTime(record.stats.finalTime.inMicroseconds),
+              "blitz" => t.blitzScore(p: NumberFormat.decimalPattern().format(record.stats.score)),
+              "5mblast" => get40lTime(record.stats.finalTime.inMicroseconds),
               String() => "huh",
             },
           style: const TextStyle(fontSize: 18)),
           subtitle: Text(timestamp(record.timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
-          trailing: SpTrailingStats(record.endContext)
+          trailing: SpTrailingStats(record.stats, record.gamemode)
         )
       ],
     );

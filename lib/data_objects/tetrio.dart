@@ -60,7 +60,8 @@ const Map<String, double> rankTargets = {
   "d+": 606,
   "d": 0,
 };
-DateTime seasonEnd = DateTime.utc(2024, 07, 26, 15);
+DateTime seasonStart = DateTime.utc(2024, 08, 16, 18);
+//DateTime seasonEnd = DateTime.utc(2024, 07, 26, 15);
 enum Stats {
   tr,
   glicko,
@@ -261,9 +262,7 @@ class TetrioPlayer {
   bool? badstanding;
   String? botmaster;
   Connections? connections;
-  late TetraLeagueAlpha tlSeason1;
-  List<RecordSingle?> sprint = [];
-  List<RecordSingle?> blitz = [];
+  TetraLeagueAlpha? tlSeason1;
   TetrioZen? zen;
   Distinguishment? distinguishment;
   DateTime? cachedUntil;
@@ -290,8 +289,6 @@ class TetrioPlayer {
     this.botmaster,
     required this.connections,
     required this.tlSeason1,
-    required this.sprint,
-    required this.blitz,
     this.zen,
     this.distinguishment,
     this.cachedUntil
@@ -318,7 +315,7 @@ class TetrioPlayer {
     country = json['country'];
     supporterTier = json['supporter_tier'] ?? 0;
     verified = json['verified'] ?? false;
-    tlSeason1 = TetraLeagueAlpha.fromJson(json['league'], stateTime);
+    tlSeason1 = json['league'] != null ? TetraLeagueAlpha.fromJson(json['league'], stateTime) : null;
     avatarRevision = json['avatar_revision'];
     bannerRevision = json['banner_revision'];
     bio = json['bio'];
@@ -344,7 +341,7 @@ class TetrioPlayer {
     if (country != null) data['country'] = country;
     if (supporterTier > 0) data['supporter_tier'] = supporterTier;
     if (verified) data['verified'] = verified;
-    data['league'] = tlSeason1.toJson();
+    data['league'] = tlSeason1?.toJson();
     if (distinguishment != null) data['distinguishment'] = distinguishment?.toJson();
     if (avatarRevision != null) data['avatar_revision'] = avatarRevision;
     if (bannerRevision != null) data['banner_revision'] = bannerRevision;
@@ -380,12 +377,12 @@ class TetrioPlayer {
   }
 
   bool checkForRetrivedHistory(covariant TetrioPlayer other) {
-    return tlSeason1.lessStrictCheck(other.tlSeason1);
+    return tlSeason1!.lessStrictCheck(other.tlSeason1!);
   }
 
   TetrioPlayerFromLeaderboard convertToPlayerFromLeaderboard() => TetrioPlayerFromLeaderboard(
-    userId, username, role, xp, country, supporterTier > 0, verified, state, gamesPlayed, gamesWon,
-    tlSeason1.rating, tlSeason1.glicko??0, tlSeason1.rd??noTrRd, tlSeason1.rank, tlSeason1.bestRank, tlSeason1.apm??0, tlSeason1.pps??0, tlSeason1.vs??0, tlSeason1.decaying);
+    userId, username, role, xp, country, verified, state, gamesPlayed, gamesWon,
+    tlSeason1!.rating, tlSeason1!.glicko??0, tlSeason1!.rd??noTrRd, tlSeason1!.rank, tlSeason1!.bestRank, tlSeason1!.apm??0, tlSeason1!.pps??0, tlSeason1!.vs??0, tlSeason1!.decaying);
 
   @override
   String toString() {
@@ -395,59 +392,59 @@ class TetrioPlayer {
   num? getStatByEnum(Stats stat){
     switch (stat) {
       case Stats.tr:
-        return tlSeason1.rating;
+        return tlSeason1?.rating;
       case Stats.glicko:
-        return tlSeason1.glicko;
+        return tlSeason1?.glicko;
       case Stats.rd:
-        return tlSeason1.rd;
+        return tlSeason1?.rd;
       case Stats.gp:
-        return tlSeason1.gamesPlayed;
+        return tlSeason1?.gamesPlayed;
       case Stats.gw:
-        return tlSeason1.gamesWon;
+        return tlSeason1?.gamesWon;
       case Stats.wr:
-        return tlSeason1.winrate;
+        return tlSeason1?.winrate;
       case Stats.apm:
-        return tlSeason1.apm;
+        return tlSeason1?.apm;
       case Stats.pps:
-        return tlSeason1.pps;
+        return tlSeason1?.pps;
       case Stats.vs:
-        return tlSeason1.vs;
+        return tlSeason1?.vs;
       case Stats.app:
-        return tlSeason1.nerdStats?.app;
+        return tlSeason1?.nerdStats?.app;
       case Stats.dss:
-        return tlSeason1.nerdStats?.dss;
+        return tlSeason1?.nerdStats?.dss;
       case Stats.dsp:
-        return tlSeason1.nerdStats?.dsp;
+        return tlSeason1?.nerdStats?.dsp;
       case Stats.appdsp:
-        return tlSeason1.nerdStats?.appdsp;
+        return tlSeason1?.nerdStats?.appdsp;
       case Stats.vsapm:
-        return tlSeason1.nerdStats?.vsapm;
+        return tlSeason1?.nerdStats?.vsapm;
       case Stats.cheese:
-        return tlSeason1.nerdStats?.cheese;
+        return tlSeason1?.nerdStats?.cheese;
       case Stats.gbe:
-        return tlSeason1.nerdStats?.gbe;
+        return tlSeason1?.nerdStats?.gbe;
       case Stats.nyaapp:
-        return tlSeason1.nerdStats?.nyaapp;
+        return tlSeason1?.nerdStats?.nyaapp;
       case Stats.area:
-        return tlSeason1.nerdStats?.area;
+        return tlSeason1?.nerdStats?.area;
       case Stats.eTR:
-        return tlSeason1.estTr?.esttr;
+        return tlSeason1?.estTr?.esttr;
       case Stats.acceTR:
-        return tlSeason1.esttracc;
+        return tlSeason1?.esttracc;
       case Stats.acceTRabs:
-        return tlSeason1.esttracc?.abs();
+        return tlSeason1?.esttracc?.abs();
       case Stats.opener:
-        return tlSeason1.playstyle?.opener;
+        return tlSeason1?.playstyle?.opener;
       case Stats.plonk:
-        return tlSeason1.playstyle?.plonk;
+        return tlSeason1?.playstyle?.plonk;
       case Stats.infDS:
-        return tlSeason1.playstyle?.infds;
+        return tlSeason1?.playstyle?.infds;
       case Stats.stride:
-        return tlSeason1.playstyle?.stride;
+        return tlSeason1?.playstyle?.stride;
       case Stats.stridemMinusPlonk:
-        return tlSeason1.playstyle != null ? tlSeason1.playstyle!.stride - tlSeason1.playstyle!.plonk : null;
+        return tlSeason1?.playstyle != null ? tlSeason1!.playstyle!.stride - tlSeason1!.playstyle!.plonk : null;
       case Stats.openerMinusInfDS:
-        return tlSeason1.playstyle != null ? tlSeason1.playstyle!.opener - tlSeason1.playstyle!.infds : null;
+        return tlSeason1?.playstyle != null ? tlSeason1!.playstyle!.opener - tlSeason1!.playstyle!.infds : null;
     }
   }
 
@@ -456,6 +453,24 @@ class TetrioPlayer {
 
   @override
   bool operator ==(covariant TetrioPlayer other) => isSameState(other) && state.isAtSameMomentAs(other.state);
+}
+
+class Summaries{
+  late String id;
+  late RecordSingle sprint;
+  late RecordSingle blitz;
+  late TetraLeagueAlpha league;
+  late TetrioZen zen;
+
+  Summaries(this.id, this.league, this.zen);
+
+  Summaries.fromJson(Map<String, dynamic> json, String i){
+    id = i;
+    sprint = RecordSingle.fromJson(json['40l']['record'], json['40l']['rank']);
+    blitz = RecordSingle.fromJson(json['blitz']['record'], json['blitz']['rank']);
+    league = TetraLeagueAlpha.fromJson(json['league'], DateTime.now());
+    zen = TetrioZen.fromJson(json['zen']);
+  }
 }
 
 class Badge {
@@ -652,8 +667,7 @@ class Finesse {
   }
 }
 
-class EndContextSingle {
-  late String gameType;
+class ResultsStats {
   late int topBtB;
   late int topCombo;
   late int holds;
@@ -662,7 +676,7 @@ class EndContextSingle {
   late int piecesPlaced;
   late int lines;
   late int score;
-  late double seed;
+  late int seed;
   late Duration finalTime;
   late int tSpins;
   late Clears clears;
@@ -674,8 +688,8 @@ class EndContextSingle {
   double get kps => inputs / (finalTime.inMicroseconds / 1000000);
   double get finessePercentage => finesse != null ? finesse!.perfectPieces / piecesPlaced : 0;
 
-  EndContextSingle(
-      {required this.gameType,
+  ResultsStats(
+      {
       required this.topBtB,
       required this.topCombo,
       required this.holds,
@@ -690,12 +704,12 @@ class EndContextSingle {
       required this.clears,
       required this.finesse});
 
-  EndContextSingle.fromJson(Map<String, dynamic> json) {
-    seed = json['seed'].toDouble();
+  ResultsStats.fromJson(Map<String, dynamic> json) {
+    seed = json['seed'];
     lines = json['lines'];
     inputs = json['inputs'];
     holds = json['holds'] ?? 0;
-    finalTime = doubleMillisecondsToDuration(json['finalTime'].toDouble());
+    finalTime = doubleMillisecondsToDuration(json['finaltime'].toDouble());
     score = json['score'];
     level = json['level'];
     topCombo = json['topcombo'];
@@ -704,7 +718,6 @@ class EndContextSingle {
     piecesPlaced = json['piecesplaced'];
     clears = Clears.fromJson(json['clears']);
     finesse = json.containsKey("finesse") ? Finesse.fromJson(json['finesse']) : null;
-    gameType = json['gametype'];
   }
 
   Map<String, dynamic> toJson() {
@@ -722,7 +735,6 @@ class EndContextSingle {
     data['clears'] = clears.toJson();
     if (finesse != null) data['finesse'] = finesse!.toJson();
     data['finalTime'] = finalTime;
-    data['gametype'] = gameType;
     return data;
   }
 }
@@ -873,6 +885,119 @@ class TetraLeagueAlphaStream{
   }
 }
 
+class TetraLeagueBetaStream{
+  late String id;
+  List<BetaRecord> records = [];
+
+  TetraLeagueBetaStream({required this.id, required this.records});
+
+  TetraLeagueBetaStream.fromJson(List<dynamic> json, String userID) {
+    id = userID;
+    for (var entry in json) records.add(BetaRecord.fromJson(entry));
+  }
+
+  addFromAlphaStream(TetraLeagueAlphaStream oldStream){
+    for (var entry in oldStream.records) {
+      records.add(
+      BetaRecord(
+        id: entry.ownId,
+        replayID: entry.replayId,
+        ts: entry.timestamp,
+        enemyID: entry.endContext[1].userId,
+        enemyUsername: entry.endContext[1].username,
+        gamemode: "oldleague",
+        results: BetaLeagueResults(
+          leaderboard: [
+            BetaLeagueLeaderboardEntry(
+              id: entry.endContext[0].userId,
+              username: entry.endContext[0].username,
+              naturalorder: entry.endContext[0].naturalOrder,
+              wins: entry.endContext[0].points,
+              stats: BetaLeagueStats(
+                apm: entry.endContext[0].secondary,
+                pps: entry.endContext[0].tertiary,
+                vs: entry.endContext[0].extra,
+                garbageSent: -1,
+                garbageReceived: -1,
+                kills: entry.endContext[0].points,
+                altitude: 0.0,
+                rank: -1,
+                nerdStats: entry.endContext[0].nerdStats,
+                playstyle: entry.endContext[0].playstyle,
+                estTr: entry.endContext[0].estTr,
+              )
+            ),
+            BetaLeagueLeaderboardEntry(
+              id: entry.endContext[1].userId,
+              username: entry.endContext[1].username,
+              naturalorder: entry.endContext[1].naturalOrder,
+              wins: entry.endContext[1].points,
+              stats: BetaLeagueStats(
+                apm: entry.endContext[1].secondary,
+                pps: entry.endContext[1].tertiary,
+                vs: entry.endContext[1].extra,
+                garbageSent: -1,
+                garbageReceived: -1,
+                kills: entry.endContext[1].points,
+                altitude: 0.0,
+                rank: -1,
+                nerdStats: entry.endContext[1].nerdStats,
+                playstyle: entry.endContext[1].playstyle,
+                estTr: entry.endContext[1].estTr,
+              )
+            )
+          ],
+          rounds: [
+            for (int i=0; i<entry.endContext[0].secondaryTracking.length; i++)
+            [BetaLeagueRound(
+              id: entry.endContext[0].userId,
+              username: entry.endContext[0].username,
+              naturalorder: entry.endContext[0].naturalOrder,
+              active: false,
+              alive: false,
+              lifetime: Duration(milliseconds: -1),
+              stats: BetaLeagueStats(
+                apm: entry.endContext[0].secondaryTracking[i],
+                pps: entry.endContext[0].tertiaryTracking[i],
+                vs: entry.endContext[0].extraTracking[i],
+                garbageSent: -1,
+                garbageReceived: -1,
+                kills: 0,
+                altitude: 0.0,
+                rank: -1,
+                nerdStats: entry.endContext[0].nerdStatsTracking[i],
+                playstyle: entry.endContext[0].playstyleTracking[i],
+                estTr: entry.endContext[0].estTrTracking[i],
+              )
+            ),BetaLeagueRound(
+              id: entry.endContext[1].userId,
+              username: entry.endContext[1].username,
+              naturalorder: entry.endContext[1].naturalOrder,
+              active: false,
+              alive: false,
+              lifetime: Duration(milliseconds: -1),
+              stats: BetaLeagueStats(
+                apm: entry.endContext[1].secondaryTracking[i],
+                pps: entry.endContext[1].tertiaryTracking[i],
+                vs: entry.endContext[1].extraTracking[i],
+                garbageSent: -1,
+                garbageReceived: -1,
+                kills: 0,
+                altitude: 0.0,
+                rank: -1,
+                nerdStats: entry.endContext[1].nerdStatsTracking[i],
+                playstyle: entry.endContext[1].playstyleTracking[i],
+                estTr: entry.endContext[1].estTrTracking[i],
+              )
+            )]
+          ]
+        )
+      )
+    );
+    }
+  }
+}
+
 class SingleplayerStream{
   late String userId;
   late String type;
@@ -885,6 +1010,118 @@ class SingleplayerStream{
     type = tp;
     records = [];
     for (var value in json) {records.add(RecordSingle.fromJson(value, null));}
+  }
+}
+
+class BetaRecord{
+  late String id;
+  late String replayID;
+  late String gamemode;
+  late DateTime ts;
+  late String enemyUsername;
+  late String enemyID;
+  late BetaLeagueResults results;
+
+  BetaRecord({required this.id, required this.replayID, required this.gamemode, required this.ts, required this.enemyUsername, required this.enemyID, required this.results});
+
+  BetaRecord.fromJson(Map<String, dynamic> json){
+    id = json['_id'];
+    replayID = json['replayid'];
+    gamemode = json['gamemode'];
+    ts = DateTime.parse(json['ts']);
+    enemyUsername = json['otherusers'][0]['username'];
+    enemyID = json['otherusers'][0]['id'];
+    results = BetaLeagueResults.fromJson(json['results']);
+  }
+}
+
+class BetaLeagueResults{
+  List<BetaLeagueLeaderboardEntry> leaderboard = [];
+  List<List<BetaLeagueRound>> rounds = [];
+
+  BetaLeagueResults({required this.leaderboard, required this.rounds});
+
+  BetaLeagueResults.fromJson(Map<String, dynamic> json){
+    for (var lbEntry in json['leaderboard']) leaderboard.add(BetaLeagueLeaderboardEntry.fromJson(lbEntry));
+    for (var roundEntry in json['rounds']){
+      List<BetaLeagueRound> round = [];
+      for (var r in roundEntry) round.add(BetaLeagueRound.fromJson(r));
+      rounds.add(round);
+    }
+  }
+}
+
+class BetaLeagueLeaderboardEntry{
+  late String id;
+  late String username;
+  late int naturalorder;
+  late int wins;
+  late BetaLeagueStats stats;
+
+  BetaLeagueLeaderboardEntry({required this.id, required this.username, required this.naturalorder, required this.wins, required this.stats});
+  
+  BetaLeagueLeaderboardEntry.fromJson(Map<String, dynamic> json){
+    id = json['id'];
+    username = json['username'];
+    naturalorder = json['naturalorder'];
+    wins = json['wins'];
+    stats = BetaLeagueStats.fromJson(json['stats']);
+  }
+}
+
+class BetaLeagueStats{
+  late double apm;
+  late double pps;
+  late double vs;
+  late int garbageSent;
+  late int garbageReceived;
+  late int kills;
+  late double altitude;
+  late int rank;
+  int? targetingFactor;
+  int? targetingRace;
+  late NerdStats nerdStats;
+  late EstTr estTr;
+  late Playstyle playstyle;
+
+  BetaLeagueStats({required this.apm, required this.pps, required this.vs, required this.garbageSent, required this.garbageReceived, required this.kills, required this.altitude, required this.rank, required this.nerdStats, required this.estTr, required this.playstyle});
+
+  BetaLeagueStats.fromJson(Map<String, dynamic> json){
+    apm = json['apm'].toDouble();
+    pps = json['pps'].toDouble();
+    vs = json['vsscore'].toDouble();
+    garbageSent = json['garbagesent'];
+    garbageReceived = json['garbagereceived'];
+    kills = json['kills'];
+    altitude = json['altitude'].toDouble();
+    rank = json['rank'];
+    targetingFactor = json['targetingfactor'];
+    targetingRace = json['targetinggrace'];
+    nerdStats = NerdStats(apm, pps, vs);
+    estTr = EstTr(apm, pps, vs, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
+    playstyle = Playstyle(apm, pps, nerdStats.app, nerdStats.vsapm, nerdStats.dsp, nerdStats.gbe, estTr.srarea, estTr.statrank);
+  }
+}
+
+class BetaLeagueRound{
+  late String id;
+  late String username;
+  late bool active;
+  late int naturalorder;
+  late bool alive;
+  late Duration lifetime;
+  late BetaLeagueStats stats;
+
+  BetaLeagueRound({required this.id, required this.username, required this.active, required this.naturalorder, required this.alive, required this.lifetime, required this.stats});
+
+  BetaLeagueRound.fromJson(Map<String, dynamic> json){
+    id = json['id'];
+    username = json['username'];
+    active = json['active'];
+    naturalorder = json['naturalorder'];
+    alive = json['alive'];
+    lifetime = Duration(milliseconds: json['lifetime']);
+    stats = BetaLeagueStats.fromJson(json['stats']);
   }
 }
 
@@ -1132,26 +1369,28 @@ class RecordSingle {
   late String userId;
   late String replayId;
   late String ownId;
+  late String gamemode;
   late DateTime timestamp;
-  late EndContextSingle endContext;
+  late ResultsStats stats;
   int? rank;
 
-  RecordSingle({required this.userId, required this.replayId, required this.ownId, required this.timestamp, required this.endContext, this.rank});
+  RecordSingle({required this.userId, required this.replayId, required this.ownId, required this.timestamp, required this.stats, this.rank});
 
   RecordSingle.fromJson(Map<String, dynamic> json, int? ran) {
     //developer.log("RecordSingle.fromJson: $json", name: "data_objects/tetrio");
     ownId = json['_id'];
-    endContext = EndContextSingle.fromJson(json['endcontext']);
+    gamemode = json['gamemode'];
+    stats = ResultsStats.fromJson(json['results']['stats']);
     replayId = json['replayid'];
     timestamp = DateTime.parse(json['ts']);
-    userId = json['user']['_id'];
+    userId = json['user']['id'];
     rank = ran;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['_id'] = ownId;
-    data['endcontext'] = endContext.toJson();
+    data['results']['stats'] = stats.toJson();
     data['ismulti'] = false;
     data['replayid'] = replayId;
     data['ts'] = timestamp;
@@ -1470,8 +1709,8 @@ class TetrioPlayersLeaderboard {
         avgPPS += entry.pps;
         avgVS += entry.vs;
         avgTR += entry.rating;
-        avgGlicko += entry.glicko;
-        avgRD += entry.rd;
+        if (entry.glicko != null) avgGlicko += entry.glicko!;
+        if (entry.rd != null) avgRD += entry.rd!;
         avgAPP += entry.nerdStats.app;
         avgVSAPM += entry.nerdStats.vsapm;
         avgDSS += entry.nerdStats.dss;
@@ -1494,13 +1733,13 @@ class TetrioPlayersLeaderboard {
           lowestTRid = entry.userId;
           lowestTRnick = entry.username;
         }
-        if (entry.glicko < lowestGlicko){
-          lowestGlicko = entry.glicko;
+        if (entry.glicko != null && entry.glicko! < lowestGlicko){
+          lowestGlicko = entry.glicko!;
           lowestGlickoID = entry.userId;
           lowestGlickoNick = entry.username;
         }
-        if (entry.rd < lowestRD){
-          lowestRD = entry.rd;
+        if (entry.rd != null && entry.rd! < lowestRD){
+          lowestRD = entry.rd!;
           lowestRdID = entry.userId;
           lowestRdNick = entry.username;
         }
@@ -1614,13 +1853,13 @@ class TetrioPlayersLeaderboard {
           highestTRid = entry.userId;
           highestTRnick = entry.username;
         }
-        if (entry.glicko > highestGlicko){
-          highestGlicko = entry.glicko;
+        if (entry.glicko != null && entry.glicko! > highestGlicko){
+          highestGlicko = entry.glicko!;
           highestGlickoID = entry.userId;
           highestGlickoNick = entry.username;
         }
-        if (entry.rd > highestRD){
-          highestRD = entry.rd;
+        if (entry.rd != null && entry.rd! > highestRD){
+          highestRD = entry.rd!;
           highestRdID = entry.userId;
           highestRdNick = entry.username;
         }
@@ -1929,7 +2168,7 @@ class TetrioPlayersLeaderboard {
   }
 
   PlayerLeaderboardPosition? getLeaderboardPosition(TetrioPlayer user) {
-    if (user.tlSeason1.gamesPlayed == 0) return null;
+    if (user.tlSeason1?.gamesPlayed == 0) return null;
     bool fakePositions = false;
     late List<TetrioPlayerFromLeaderboard> copyOfLeaderboard;
     if (leaderboard.indexWhere((element) => element.userId == user.userId) == -1){
@@ -2029,16 +2268,15 @@ class TetrioPlayerFromLeaderboard {
   late String role;
   late double xp;
   String? country;
-  late bool supporter;
   late bool verified;
   late DateTime timestamp;
   late int gamesPlayed;
   late int gamesWon;
   late double rating;
-  late double glicko;
-  late double rd;
+  late double? glicko;
+  late double? rd;
   late String rank;
-  late String bestRank;
+  late String? bestRank;
   late double apm;
   late double pps;
   late double vs;
@@ -2053,7 +2291,6 @@ class TetrioPlayerFromLeaderboard {
     this.role,
     this.xp,
     this.country,
-    this.supporter,
     this.verified,
     this.timestamp,
     this.gamesPlayed,
@@ -2081,14 +2318,13 @@ class TetrioPlayerFromLeaderboard {
     role = json['role'];
     xp = json['xp'].toDouble();
     country = json['country'];
-    supporter = json['supporter'];
     verified = json['verified'];
     timestamp = ts;
-    gamesPlayed = json['league']['gamesplayed'];
-    gamesWon = json['league']['gameswon'];
-    rating = json['league']['rating'].toDouble();
-    glicko = json['league']['glicko'].toDouble();
-    rd = json['league']['rd'].toDouble();
+    gamesPlayed = json['league']['gamesplayed'] as int;
+    gamesWon = json['league']['gameswon'] as int;
+    rating = json['league']['rating'] != null ? json['league']['rating'].toDouble() : 0;
+    glicko = json['league']['glicko'] != null ? json['league']['glicko'].toDouble() : null;
+    rd = json['league']['rd'] != null ? json['league']['rd'].toDouble() : null;
     rank = json['league']['rank'];
     bestRank = json['league']['bestrank'];
     apm = json['league']['apm'] != null ? json['league']['apm'].toDouble() : 0.00;
@@ -2105,9 +2341,9 @@ class TetrioPlayerFromLeaderboard {
       case Stats.tr:
         return rating;
       case Stats.glicko:
-        return glicko;
+        return glicko??-1;
       case Stats.rd:
-        return rd;
+        return rd??-1;
       case Stats.gp:
         return gamesPlayed;
       case Stats.gw:

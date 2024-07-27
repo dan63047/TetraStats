@@ -27,9 +27,9 @@ class TLRatingThingy extends StatelessWidget{
     List<String> formatedGlicko = f4.format(tlData.glicko).split(decimalSeparator);
     List<String> formatedPercentile = f4.format(tlData.percentile * 100).split(decimalSeparator);
     DateTime now = DateTime.now();
-    bool beforeS1end = now.isBefore(seasonEnd);
-    int daysLeft = seasonEnd.difference(now).inDays;
-    int safeRD = min(100, (100 + ((tlData.rd! >= 100 && tlData.decaying) ? 7 : max(0, 7 - (lastMatchPlayed != null ? now.difference(lastMatchPlayed!).inDays : 7))) - daysLeft).toInt());
+    //bool beforeS1end = now.isBefore(seasonEnd);
+    //int daysLeft = seasonEnd.difference(now).inDays;
+    //int safeRD = min(100, (100 + ((tlData.rd! >= 100 && tlData.decaying) ? 7 : max(0, 7 - (lastMatchPlayed != null ? now.difference(lastMatchPlayed!).inDays : 7))) - daysLeft).toInt());
     return Wrap(
       direction: Axis.horizontal,
       alignment: WrapAlignment.spaceAround,
@@ -91,7 +91,7 @@ class TLRatingThingy extends StatelessWidget{
                       TextSpan(text: " • ${prefs.getInt("ratingMode") == 1 ? "${f2.format(tlData.rating)} TR • RD: " : "Glicko: ${f2.format(tlData.glicko!)}±"}"),
                       TextSpan(text: f2.format(tlData.rd!), style: tlData.decaying ? TextStyle(color: tlData.rd! > 98 ? Colors.red : Colors.yellow) : null),
                       if (tlData.decaying) WidgetSpan(child: Icon(Icons.trending_up, color: tlData.rd! > 98 ? Colors.red : Colors.yellow,), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic),
-                      if (beforeS1end) tlData.rd! <= safeRD ? TextSpan(text: " (Safe)", style: TextStyle(color: Colors.greenAccent)) : TextSpan(text: " (> ${safeRD} RD !!!)", style: TextStyle(color: Colors.redAccent))
+                      //if (beforeS1end) tlData.rd! <= safeRD ? TextSpan(text: " (Safe)", style: TextStyle(color: Colors.greenAccent)) : TextSpan(text: " (> ${safeRD} RD !!!)", style: TextStyle(color: Colors.redAccent))
                     ],
                   ),
                 ),
