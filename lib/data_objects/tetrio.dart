@@ -921,10 +921,7 @@ class TetraLeagueBetaStream{
                 garbageReceived: -1,
                 kills: entry.endContext[0].points,
                 altitude: 0.0,
-                rank: -1,
-                nerdStats: entry.endContext[0].nerdStats,
-                playstyle: entry.endContext[0].playstyle,
-                estTr: entry.endContext[0].estTr,
+                rank: -1
               )
             ),
             BetaLeagueLeaderboardEntry(
@@ -940,10 +937,7 @@ class TetraLeagueBetaStream{
                 garbageReceived: -1,
                 kills: entry.endContext[1].points,
                 altitude: 0.0,
-                rank: -1,
-                nerdStats: entry.endContext[1].nerdStats,
-                playstyle: entry.endContext[1].playstyle,
-                estTr: entry.endContext[1].estTr,
+                rank: -1
               )
             )
           ],
@@ -964,10 +958,7 @@ class TetraLeagueBetaStream{
                 garbageReceived: -1,
                 kills: 0,
                 altitude: 0.0,
-                rank: -1,
-                nerdStats: entry.endContext[0].nerdStatsTracking[i],
-                playstyle: entry.endContext[0].playstyleTracking[i],
-                estTr: entry.endContext[0].estTrTracking[i],
+                rank: -1
               )
             ),BetaLeagueRound(
               id: entry.endContext[1].userId,
@@ -984,10 +975,7 @@ class TetraLeagueBetaStream{
                 garbageReceived: -1,
                 kills: 0,
                 altitude: 0.0,
-                rank: -1,
-                nerdStats: entry.endContext[1].nerdStatsTracking[i],
-                playstyle: entry.endContext[1].playstyleTracking[i],
-                estTr: entry.endContext[1].estTrTracking[i],
+                rank: -1
               )
             )]
           ]
@@ -1084,7 +1072,11 @@ class BetaLeagueStats{
   late EstTr estTr;
   late Playstyle playstyle;
 
-  BetaLeagueStats({required this.apm, required this.pps, required this.vs, required this.garbageSent, required this.garbageReceived, required this.kills, required this.altitude, required this.rank, required this.nerdStats, required this.estTr, required this.playstyle});
+  BetaLeagueStats({required this.apm, required this.pps, required this.vs, required this.garbageSent, required this.garbageReceived, required this.kills, required this.altitude, required this.rank}){
+    nerdStats = NerdStats(apm, pps, vs);
+    estTr = EstTr(apm, pps, vs, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
+    playstyle = Playstyle(apm, pps, nerdStats.app, nerdStats.vsapm, nerdStats.dsp, nerdStats.gbe, estTr.srarea, estTr.statrank);
+  }
 
   BetaLeagueStats.fromJson(Map<String, dynamic> json){
     apm = json['apm'].toDouble();

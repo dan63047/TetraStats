@@ -73,12 +73,6 @@ class MatchesState extends State<MatchesView> {
                                       }));
                                 },
                               ),
-                            onTap: (){Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => TlMatchResultView(record: value, initPlayerId: widget.userID),
-                                  ),
-                                );},
                           )]
                           : [Center(child: Text(t.noRecords, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))],
                     );

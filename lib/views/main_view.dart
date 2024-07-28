@@ -754,7 +754,7 @@ class _TLRecords extends StatelessWidget {
             data[index].results.leaderboard.firstWhere((element) => element.id != userID).stats.pps,
             data[index].results.leaderboard.firstWhere((element) => element.id != userID).stats.vs,
             ),
-          onTap: () => {if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.nanow)))} //Navigator.push(context, MaterialPageRoute(builder: (context) => TlMatchResultView(record: data[index], initPlayerId: userID))),
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => TlMatchResultView(record: data[index], initPlayerId: userID))) //Navigator.push(context, MaterialPageRoute(builder: (context) => TlMatchResultView(record: data[index], initPlayerId: userID))),
         ),
       );
     });

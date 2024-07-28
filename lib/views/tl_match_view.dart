@@ -2,13 +2,11 @@
 
 import 'dart:io';
 import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
-import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
-import 'package:tetra_stats/views/compare_view.dart' show CompareThingy, CompareBoolThingy;
+import 'package:tetra_stats/views/compare_view.dart' show CompareThingy;
 import 'package:tetra_stats/widgets/list_tile_trailing_stats.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
 import 'package:tetra_stats/widgets/vs_graphs.dart';
-import 'package:tetra_stats/main.dart' show teto;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -30,7 +28,7 @@ Duration framesToTime(int frames){
 }
 
 class TlMatchResultView extends StatefulWidget {
-  final TetraLeagueAlphaRecord record;
+  final BetaRecord record;
   final String initPlayerId;
   const TlMatchResultView({super.key, required this.record, required this.initPlayerId});
 
@@ -40,15 +38,65 @@ class TlMatchResultView extends StatefulWidget {
 
 class TlMatchResultState extends State<TlMatchResultView> {
   late Future<ReplayData?> replayData;
+  late Duration time;
+  late String readableTime;
+  late String reason;
+  Duration totalTime = Duration();
+  List<Duration> roundLengths = [];
+  List<BetaLeagueStats> timeWeightedStats = [];
+  late bool initPlayerWon;
 
   @override
   void initState(){
     rounds = [DropdownMenuItem(value: -1, child: Text(t.match))];
-    rounds.addAll([for (int i = 0; i < widget.record.endContext.first.secondaryTracking.length; i++) DropdownMenuItem(value: i, child: Text(t.roundNumber(n: i+1)))]);
-    replayData = teto.analyzeReplay(widget.record.replayId, widget.record.replayAvalable);
+    rounds.addAll([for (int i = 0; i < widget.record.results.rounds.length; i++) DropdownMenuItem(value: i, child: Text(t.roundNumber(n: i+1)))]);
+    if (rounds.indexWhere((element) => element.value == -2) == -1) rounds.insert(1, DropdownMenuItem(value: -2, child: Text(t.timeWeightedmatch)));
+    greenSidePlayer = widget.record.results.leaderboard.indexWhere((element) => element.id == widget.initPlayerId);
+    redSidePlayer = widget.record.results.leaderboard.indexWhere((element) => element.id != widget.initPlayerId);
+    List<double> APMmultipliedByWeights = [0, 0];
+    List<double> PPSmultipliedByWeights = [0, 0];
+    List<double> VSmultipliedByWeights = [0, 0];
+    for (var round in widget.record.results.rounds){
+      var longerLifetime = round[0].lifetime.compareTo(round[1].lifetime) == 1 ? round[0].lifetime : round[1].lifetime;
+      roundLengths.add(longerLifetime);
+      totalTime += longerLifetime;
+
+      BetaLeagueRound greenSide = round.firstWhere((element) => element.id == widget.initPlayerId);
+      BetaLeagueRound redSide = round.firstWhere((element) => element.id != widget.initPlayerId);
+
+      APMmultipliedByWeights[0] += greenSide.stats.apm*longerLifetime.inMilliseconds;
+      APMmultipliedByWeights[1] += redSide.stats.apm*longerLifetime.inMilliseconds;
+      PPSmultipliedByWeights[0] += greenSide.stats.pps*longerLifetime.inMilliseconds;
+      PPSmultipliedByWeights[1] += redSide.stats.pps*longerLifetime.inMilliseconds;
+      VSmultipliedByWeights[0] += greenSide.stats.vs*longerLifetime.inMilliseconds;
+      VSmultipliedByWeights[1] += redSide.stats.vs*longerLifetime.inMilliseconds;
+    }
+    timeWeightedStats = [
+      BetaLeagueStats(
+        apm: APMmultipliedByWeights[0]/totalTime.inMilliseconds,
+        pps: PPSmultipliedByWeights[0]/totalTime.inMilliseconds,
+        vs: VSmultipliedByWeights[0]/totalTime.inMilliseconds,
+        garbageSent: widget.record.results.leaderboard[greenSidePlayer].stats.garbageSent,
+        garbageReceived: widget.record.results.leaderboard[greenSidePlayer].stats.garbageReceived,
+        kills: widget.record.results.leaderboard[greenSidePlayer].stats.kills,
+        altitude: widget.record.results.leaderboard[greenSidePlayer].stats.altitude,
+        rank: widget.record.results.leaderboard[greenSidePlayer].stats.rank
+      ),
+      BetaLeagueStats(
+        apm: APMmultipliedByWeights[1]/totalTime.inMilliseconds,
+        pps: PPSmultipliedByWeights[1]/totalTime.inMilliseconds,
+        vs: VSmultipliedByWeights[1]/totalTime.inMilliseconds,
+        garbageSent: widget.record.results.leaderboard[redSidePlayer].stats.garbageSent,
+        garbageReceived: widget.record.results.leaderboard[redSidePlayer].stats.garbageReceived,
+        kills: widget.record.results.leaderboard[redSidePlayer].stats.kills,
+        altitude: widget.record.results.leaderboard[redSidePlayer].stats.altitude,
+        rank: widget.record.results.leaderboard[redSidePlayer].stats.rank
+      ),
+    ];
+    initPlayerWon = widget.record.results.leaderboard[greenSidePlayer].wins > widget.record.results.leaderboard[redSidePlayer].wins;
     if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS){
       windowManager.getTitle().then((value) => oldWindowTitle = value);
-      windowManager.setTitle("Tetra Stats: ${widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).username.toUpperCase()} ${t.vs} ${widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).username.toUpperCase()} ${t.inTLmatch} ${timestamp(widget.record.timestamp)}");
+      windowManager.setTitle("Tetra Stats: ${widget.record.results.leaderboard[greenSidePlayer].username.toUpperCase()} ${t.vs} ${widget.record.results.leaderboard[redSidePlayer].username.toUpperCase()} ${t.inTLmatch} ${widget.record.gamemode} ${timestamp(widget.record.ts)}");
     }
     super.initState();
   }
@@ -62,45 +110,16 @@ class TlMatchResultState extends State<TlMatchResultView> {
 
   Widget buildComparison(double width, bool showMobileSelector){
     bool bigScreen = width >= 768;
+    if (roundSelector.isNegative){
+      time = totalTime;
+      readableTime = "${t.matchLength}: ${time.inMinutes}:${secs.format(time.inMicroseconds /1000000 % 60)}";
+    }else{
+      time = roundLengths[roundSelector];
+      readableTime = "${t.roundLength}: ${time.inMinutes}:${secs.format(time.inMicroseconds /1000000 % 60)}\n${t.winner}: ${widget.record.results.rounds[roundSelector].firstWhere((element) => element.alive)}";
+    }
     return SizedBox(
       width: width,
-      child: FutureBuilder(future: replayData, builder: (context, snapshot){
-        late Duration time;
-        late String readableTime;
-        late String reason;
-        timeWeightedStatsAvaliable = true;
-        if (snapshot.connectionState != ConnectionState.done) return const LinearProgressIndicator();
-        if (!snapshot.hasError){
-          if (rounds.indexWhere((element) => element.value == -2) == -1) rounds.insert(1, DropdownMenuItem(value: -2, child: Text(t.timeWeightedmatch)));
-          greenSidePlayer = snapshot.data!.endcontext.indexWhere((element) => element.userId == widget.initPlayerId);
-          redSidePlayer = snapshot.data!.endcontext.indexWhere((element) => element.userId != widget.initPlayerId);
-          if (roundSelector.isNegative){
-            time = framesToTime(snapshot.data!.totalLength);
-            readableTime = "${t.matchLength}: ${time.inMinutes}:${secs.format(time.inMicroseconds /1000000 % 60)}";
-          }else{
-            time = framesToTime(snapshot.data!.roundLengths[roundSelector]);
-            readableTime = "${t.roundLength}: ${time.inMinutes}:${secs.format(time.inMicroseconds /1000000 % 60)}\n${t.winner}: ${snapshot.data!.roundWinners[roundSelector][1]}";
-          }
-        }else{
-          switch (snapshot.error.runtimeType){
-            case ReplayNotAvalable:
-              reason = t.matchIsTooOld;
-              break;
-            case SzyNotFound:
-              reason = t.matchIsTooOld;
-              break;
-            case SzyForbidden:
-              reason = t.errors.replayRejected;
-              break;
-            case SzyTooManyRequests:
-              reason = t.errors.tooManyRequests;
-              break;
-            default:
-              reason = snapshot.error.toString();
-              break;
-          }
-        }
-        return NestedScrollView(
+      child: NestedScrollView(
           headerSliverBuilder: (context, value) {
             return [
               SliverToBoxAdapter(
@@ -117,15 +136,15 @@ class TlMatchResultState extends State<TlMatchResultView> {
                             colors: const [Colors.green, Colors.transparent],
                             begin: Alignment.bottomCenter,
                             end: Alignment.topCenter,
-                            stops: [0.0, widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).success ? 0.4 : 0.0],
+                            stops: [0.0, initPlayerWon ? 0.4 : 0.0],
                           )),
                           child: Padding(
                             padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
                             child: Column(children: [
-                              Text(widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).username, style: bigScreen ? const TextStyle(
+                              Text(widget.record.results.leaderboard[greenSidePlayer].username, style: bigScreen ? const TextStyle(
                             fontFamily: "Eurostile Round Extended",
                             fontSize: 28) : const TextStyle()),
-                              Text(widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).points.toString(), style: const TextStyle(
+                              Text(widget.record.results.leaderboard[greenSidePlayer].wins.toString(), style: const TextStyle(
                             fontFamily: "Eurostile Round Extended",
                             fontSize: 42))
                             ]),
@@ -143,15 +162,15 @@ class TlMatchResultState extends State<TlMatchResultView> {
                             colors: const [Colors.red, Colors.transparent],
                             begin: Alignment.bottomCenter,
                             end: Alignment.topCenter,
-                            stops: [0.0, widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).success ? 0.4 : 0.0],
+                            stops: [0.0, !initPlayerWon ? 0.4 : 0.0],
                           )),
                           child: Padding(
                             padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
                             child: Column(children: [
-                              Text(widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).username, style:  bigScreen ? const TextStyle(
+                              Text(widget.record.results.leaderboard[redSidePlayer].username, style:  bigScreen ? const TextStyle(
                             fontFamily: "Eurostile Round Extended",
                             fontSize: 28) : const TextStyle()),
-                              Text(widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).points.toString(), style: const TextStyle(
+                              Text(widget.record.results.leaderboard[redSidePlayer].wins.toString(), style: const TextStyle(
                             fontFamily: "Eurostile Round Extended",
                             fontSize: 42))
                             ]),
@@ -179,10 +198,10 @@ class TlMatchResultState extends State<TlMatchResultView> {
                   ),
                 ),
               ),
-              if (widget.record.ownId == widget.record.replayId && showMobileSelector) SliverToBoxAdapter(
+              if (widget.record.id == widget.record.replayID && showMobileSelector) SliverToBoxAdapter(
                 child: Center(child: Text(t.p1nkl0bst3rAlert, textAlign: TextAlign.center)),
               ),
-              if (showMobileSelector) SliverToBoxAdapter(child: Center(child: Text(snapshot.hasError ? reason : readableTime, textAlign: TextAlign.center))),
+              if (showMobileSelector) SliverToBoxAdapter(child: Center(child: Text(readableTime, textAlign: TextAlign.center))),
               const SliverToBoxAdapter(
                 child: Divider(),
               )
@@ -194,106 +213,37 @@ class TlMatchResultState extends State<TlMatchResultView> {
                 children: [
                     CompareThingy(
                       label: "APM",
-                      greenSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].apm :
-                      roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).secondary : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).secondaryTracking[roundSelector],
-                      redSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].apm :
-                      roundSelector == -1 ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).secondary : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).secondaryTracking[roundSelector],
+                      greenSide: roundSelector == -2 ? timeWeightedStats[0].apm :
+                      roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.apm : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.apm,
+                      redSide: roundSelector == -2 ? timeWeightedStats[1].apm :
+                      roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.apm : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.apm,
                       fractionDigits: 2,
                       higherIsBetter: true,
                     ),
                     CompareThingy(
                       label: "PPS",
-                      greenSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].pps:
-                      roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).tertiary : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).tertiaryTracking[roundSelector],
-                      redSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].pps :
-                      roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).tertiary: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).tertiaryTracking[roundSelector],
+                      greenSide: roundSelector == -2 ? timeWeightedStats[0].pps :
+                      roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.pps : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.pps,
+                      redSide: roundSelector == -2 ? timeWeightedStats[1].pps :
+                      roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.pps : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.pps,
                       fractionDigits: 2,
                       higherIsBetter: true,
                     ),
                     CompareThingy(
                       label: "VS",
-                      greenSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].vs :
-                      roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).extra : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).extraTracking[roundSelector],
-                      redSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].vs :
-                      roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).extra : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).extraTracking[roundSelector],
+                      greenSide: roundSelector == -2 ? timeWeightedStats[0].vs :
+                      roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.vs : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.vs,
+                      redSide: roundSelector == -2 ? timeWeightedStats[1].vs :
+                      roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.vs : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.vs,
                       fractionDigits: 2,
                       higherIsBetter: true,
                     ),
-                    if (snapshot.hasData) Column(children: [
-                      CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].inputs : snapshot.data!.stats[roundSelector][greenSidePlayer].inputs,
-                        redSide: roundSelector.isNegative ?  snapshot.data!.totalStats[redSidePlayer].inputs : snapshot.data!.stats[roundSelector][redSidePlayer].inputs,
-                        label: "Inputs", higherIsBetter: true),
-                      CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].piecesPlaced : snapshot.data!.stats[roundSelector][greenSidePlayer].piecesPlaced,
-                        redSide: roundSelector.isNegative ?  snapshot.data!.totalStats[redSidePlayer].piecesPlaced : snapshot.data!.stats[roundSelector][redSidePlayer].piecesPlaced,
-                        label: "Pieces Placed", higherIsBetter: true),
-                      CompareThingy(greenSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].kpp : 
-                        roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].kpp : snapshot.data!.stats[roundSelector][greenSidePlayer].kpp,
-                        redSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].kpp :
-                        roundSelector.isNegative ?  snapshot.data!.totalStats[redSidePlayer].kpp : snapshot.data!.stats[roundSelector][redSidePlayer].kpp,
-                        label: "KPP", higherIsBetter: false, fractionDigits: 2,),
-                      CompareThingy(greenSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].kps : 
-                        roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].kps : snapshot.data!.stats[roundSelector][greenSidePlayer].kps,
-                        redSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].kps :
-                        roundSelector.isNegative ?  snapshot.data!.totalStats[redSidePlayer].kps : snapshot.data!.stats[roundSelector][redSidePlayer].kps,
-                        label: "KPS", higherIsBetter: true, fractionDigits: 2,),
-                      CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].linesCleared : snapshot.data!.stats[roundSelector][greenSidePlayer].linesCleared,
-                        redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].linesCleared : snapshot.data!.stats[roundSelector][redSidePlayer].linesCleared,
-                        label: "Lines Cleared", higherIsBetter: true),
-                      CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].score : snapshot.data!.stats[roundSelector][greenSidePlayer].score,
-                        redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].score : snapshot.data!.stats[roundSelector][redSidePlayer].score,
-                        label: "Score", higherIsBetter: true),
-                      CompareThingy(greenSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].spp : 
-                        roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].spp : snapshot.data!.stats[roundSelector][greenSidePlayer].spp,
-                        redSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].spp :
-                        roundSelector.isNegative ?  snapshot.data!.totalStats[redSidePlayer].spp : snapshot.data!.stats[roundSelector][redSidePlayer].spp,
-                        label: "SPP", higherIsBetter: true, fractionDigits: 2,),  
-                      CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].finessePercentage * 100 : snapshot.data!.stats[roundSelector][greenSidePlayer].finessePercentage * 100,
-                        redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].finessePercentage * 100 : snapshot.data!.stats[roundSelector][redSidePlayer].finessePercentage * 100,
-                        label: "Finnese", postfix: "%", fractionDigits: 2, higherIsBetter: true),
-                      CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].topSpike : snapshot.data!.stats[roundSelector][greenSidePlayer].topSpike,
-                        redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].topSpike : snapshot.data!.stats[roundSelector][redSidePlayer].topSpike,
-                        label: "Best Spike", higherIsBetter: true),
-                      CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].topCombo : snapshot.data!.stats[roundSelector][greenSidePlayer].topCombo,
-                        redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].topCombo : snapshot.data!.stats[roundSelector][redSidePlayer].topCombo,
-                        label: "Best Combo", higherIsBetter: true),
-                      CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].topBtB : snapshot.data!.stats[roundSelector][greenSidePlayer].topBtB,
-                        redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].topBtB : snapshot.data!.stats[roundSelector][redSidePlayer].topBtB,
-                        label: "Best BtB", higherIsBetter: true),
-                      const Divider(),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: Text("Garbage", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                      ),
-                      CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].garbage.sent : snapshot.data!.stats[roundSelector][greenSidePlayer].garbage.sent,
-                        redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].garbage.sent : snapshot.data!.stats[roundSelector][redSidePlayer].garbage.sent,
-                        label: "Sent", higherIsBetter: true),
-                      CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].garbage.recived : snapshot.data!.stats[roundSelector][greenSidePlayer].garbage.recived,
-                        redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].garbage.recived : snapshot.data!.stats[roundSelector][redSidePlayer].garbage.recived,
-                        label: "Received", higherIsBetter: true),
-                      CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].garbage.attack : snapshot.data!.stats[roundSelector][greenSidePlayer].garbage.attack,
-                        redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].garbage.attack : snapshot.data!.stats[roundSelector][redSidePlayer].garbage.attack,
-                        label: "Attack", higherIsBetter: true),
-                      CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].garbage.cleared : snapshot.data!.stats[roundSelector][greenSidePlayer].garbage.cleared,
-                        redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].garbage.cleared : snapshot.data!.stats[roundSelector][redSidePlayer].garbage.cleared,
-                        label: "Cleared", higherIsBetter: true),
-                      const Divider(),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: Text("Line Clears", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                      ),
-                      CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].clears.allClears : snapshot.data!.stats[roundSelector][greenSidePlayer].clears.allClears,
-                        redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].clears.allClears : snapshot.data!.stats[roundSelector][redSidePlayer].clears.allClears,
-                        label: "PC", higherIsBetter: true),
-                      CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].tspins : snapshot.data!.stats[roundSelector][greenSidePlayer].tspins,
-                        redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].tspins : snapshot.data!.stats[roundSelector][redSidePlayer].tspins,
-                        label: "T-spins", higherIsBetter: true),
-                      CompareThingy(greenSide: roundSelector.isNegative ? snapshot.data!.totalStats[greenSidePlayer].clears.quads : snapshot.data!.stats[roundSelector][greenSidePlayer].clears.quads,
-                        redSide: roundSelector.isNegative ? snapshot.data!.totalStats[redSidePlayer].clears.quads : snapshot.data!.stats[roundSelector][redSidePlayer].clears.quads,
-                        label: "Quads", higherIsBetter: true),
-                    ],),
-                    ],
-                    ),
-                    const Divider(),
+                    if (widget.record.gamemode == "league") CompareThingy(greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.garbageSent : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.garbageSent,
+                      redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.garbageSent : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.garbageSent,
+                      label: "Sent", higherIsBetter: true),
+                    if (widget.record.gamemode == "league") CompareThingy(greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.garbageReceived : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.garbageReceived,
+                      redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.garbageReceived : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.garbageReceived,
+                      label: "Received", higherIsBetter: true),                    const Divider(),
                       Column(
                         children: [
                           Padding(
@@ -305,180 +255,179 @@ class TlMatchResultState extends State<TlMatchResultView> {
                           ),
                           CompareThingy(
                             label: "APP",
-                            greenSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].nerdStats.app  :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.app : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].app,
-                            redSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].nerdStats.app :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.app : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].app,
+                            greenSide: roundSelector == -2 ? timeWeightedStats[0].nerdStats.app :
+                            roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.app : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.app,
+                            redSide: roundSelector == -2 ? timeWeightedStats[1].nerdStats.app :
+                            roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.app : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.app,
                             fractionDigits: 3,
                             higherIsBetter: true,
                           ),
                           CompareThingy(
                             label: "VS/APM",
-                            greenSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].nerdStats.vsapm :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.vsapm : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].vsapm,
-                            redSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].nerdStats.vsapm :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.vsapm : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].vsapm,
+                            greenSide: roundSelector == -2 ? timeWeightedStats[0].nerdStats.vsapm :
+                            roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.vsapm : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.vsapm,
+                            redSide: roundSelector == -2 ? timeWeightedStats[1].nerdStats.vsapm :
+                            roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.vsapm : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.vsapm,
                             fractionDigits: 3,
                             higherIsBetter: true,
                           ),
                           CompareThingy(
                             label: "DS/S",
-                            greenSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].nerdStats.dss :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.dss : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].dss,
-                            redSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].nerdStats.dss :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.dss : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].dss,
+                            greenSide: roundSelector == -2 ? timeWeightedStats[0].nerdStats.dss :
+                            roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.dss : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.dss,
+                            redSide: roundSelector == -2 ? timeWeightedStats[1].nerdStats.dss :
+                            roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.dss : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.dss,
                             fractionDigits: 3,
                             higherIsBetter: true,
                           ),
                           CompareThingy(
                             label: "DS/P",
-                            greenSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].nerdStats.dsp :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.dsp : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].dsp,
-                            redSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].nerdStats.dsp :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.dsp : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].dsp,
+                            greenSide: roundSelector == -2 ? timeWeightedStats[0].nerdStats.dsp :
+                            roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.dsp : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.dsp,
+                            redSide: roundSelector == -2 ? timeWeightedStats[1].nerdStats.dsp :
+                            roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.dsp : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.dsp,
                             fractionDigits: 3,
                             higherIsBetter: true,
                           ),
                           CompareThingy(
                             label: "APP + DS/P",
-                            greenSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].nerdStats.appdsp :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.appdsp : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].appdsp,
-                            redSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].nerdStats.appdsp :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.appdsp : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].appdsp,
+                            greenSide: roundSelector == -2 ? timeWeightedStats[0].nerdStats.appdsp :
+                            roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.appdsp : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.appdsp,
+                            redSide: roundSelector == -2 ? timeWeightedStats[1].nerdStats.appdsp :
+                            roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.appdsp : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.appdsp,
                             fractionDigits: 3,
                             higherIsBetter: true,
                           ),
                           CompareThingy(
                             label: t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "),
-                            greenSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].nerdStats.cheese :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.cheese : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].cheese,
-                            redSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].nerdStats.cheese :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.cheese : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].cheese,
+                            greenSide: roundSelector == -2 ? timeWeightedStats[0].nerdStats.cheese :
+                            roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.cheese : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.cheese,
+                            redSide: roundSelector == -2 ? timeWeightedStats[1].nerdStats.cheese :
+                            roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.cheese : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.cheese,
                             fractionDigits: 2,
                             higherIsBetter: false,
                           ),
                           CompareThingy(
                             label: "Gb Eff.",
-                            greenSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].nerdStats.gbe :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.gbe : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].gbe,
-                            redSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].nerdStats.gbe :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.gbe : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].gbe,
+                            greenSide: roundSelector == -2 ? timeWeightedStats[0].nerdStats.gbe :
+                            roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.gbe : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.gbe,
+                            redSide: roundSelector == -2 ? timeWeightedStats[1].nerdStats.gbe :
+                            roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.gbe : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.gbe,
                             fractionDigits: 3,
                             higherIsBetter: true,
                           ),
                           CompareThingy(
                             label: "wAPP",
-                            greenSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].nerdStats.nyaapp :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.nyaapp : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].nyaapp,
-                            redSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].nerdStats.nyaapp :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.nyaapp : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].nyaapp,
+                            greenSide: roundSelector == -2 ? timeWeightedStats[0].nerdStats.nyaapp :
+                            roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.nyaapp : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.nyaapp,
+                            redSide: roundSelector == -2 ? timeWeightedStats[1].nerdStats.nyaapp :
+                            roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.nyaapp : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.nyaapp,
                             fractionDigits: 3,
                             higherIsBetter: true,
                           ),
                           CompareThingy(
                             label: "Area",
-                            greenSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].nerdStats.area :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats.area : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector].area,
-                            redSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].nerdStats.area :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats.area : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector].area,
+                            greenSide: roundSelector == -2 ? timeWeightedStats[0].nerdStats.area :
+                            roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.area : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.area,
+                            redSide: roundSelector == -2 ? timeWeightedStats[1].nerdStats.area :
+                            roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.area : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.area,
                             fractionDigits: 2,
                             higherIsBetter: true,
                           ),
                           CompareThingy(
                             label: t.statCellNum.estOfTRShort,
-                            greenSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].estTr.esttr :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).estTr.esttr : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).estTrTracking[roundSelector].esttr,
-                            redSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].estTr.esttr :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).estTr.esttr : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).estTrTracking[roundSelector].esttr,
+                            greenSide: roundSelector == -2 ? timeWeightedStats[0].estTr.esttr :
+                            roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.app : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.estTr.esttr,
+                            redSide: roundSelector == -2 ? timeWeightedStats[1].estTr.esttr :
+                            roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.estTr.esttr : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.estTr.esttr,
                             fractionDigits: 2,
                             higherIsBetter: true,
                           ),
                           CompareThingy(
                             label: "Opener",
-                            greenSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].playstyle.opener :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle.opener : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyleTracking[roundSelector].opener,
-                            redSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].playstyle.opener :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle.opener : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyleTracking[roundSelector].opener,
+                            greenSide: roundSelector == -2 ? timeWeightedStats[0].playstyle.opener :
+                            roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.playstyle.opener : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.playstyle.opener,
+                            redSide: roundSelector == -2 ? timeWeightedStats[1].playstyle.opener :
+                            roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.playstyle.opener : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.playstyle.opener,
                             fractionDigits: 3,
                             higherIsBetter: true,
                           ),
                           CompareThingy(
                             label: "Plonk",
-                            greenSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].playstyle.plonk :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle.plonk : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyleTracking[roundSelector].plonk,
-                            redSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].playstyle.plonk :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle.plonk : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyleTracking[roundSelector].plonk,
+                            greenSide: roundSelector == -2 ? timeWeightedStats[0].playstyle.plonk :
+                            roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.playstyle.opener : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.playstyle.plonk,
+                            redSide: roundSelector == -2 ? timeWeightedStats[1].playstyle.plonk :
+                            roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.playstyle.opener : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.playstyle.plonk,
                             fractionDigits: 3,
                             higherIsBetter: true,
                           ),
                           CompareThingy(
                             label: "Stride",
-                            greenSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].playstyle.stride :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle.stride  : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyleTracking[roundSelector].stride,
-                            redSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].playstyle.stride :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle.stride : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyleTracking[roundSelector].stride,
+                            greenSide: roundSelector == -2 ? timeWeightedStats[0].playstyle.stride :
+                            roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.playstyle.stride : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.playstyle.stride,
+                            redSide: roundSelector == -2 ? timeWeightedStats[1].playstyle.stride :
+                            roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.playstyle.stride : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.playstyle.stride,
                             fractionDigits: 3,
                             higherIsBetter: true,
                           ),
                           CompareThingy(
                             label: "Inf. DS",
-                            greenSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].playstyle.infds :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle.infds : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyleTracking[roundSelector].infds,
-                            redSide: (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].playstyle.infds :
-                            roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle.infds : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyleTracking[roundSelector].infds,
+                            greenSide: roundSelector == -2 ? timeWeightedStats[0].playstyle.infds :
+                            roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.playstyle.infds : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.playstyle.infds,
+                            redSide: roundSelector == -2 ? timeWeightedStats[1].playstyle.infds :
+                            roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.playstyle.infds : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.playstyle.infds,
                             fractionDigits: 3,
                             higherIsBetter: true,
                           ),
                           VsGraphs(
-                            (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].apm : roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).secondary : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).secondaryTracking[roundSelector],
-                            (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].pps : roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).tertiary : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).tertiaryTracking[roundSelector],
-                            (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].vs : roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).extra : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).extraTracking[roundSelector],
-                            (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].nerdStats : roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStats : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).nerdStatsTracking[roundSelector],
-                            (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[greenSidePlayer].playstyle : roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyle : widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).playstyleTracking[roundSelector],
-                            (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].apm : roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).secondary : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).secondaryTracking[roundSelector],
-                            (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].pps : roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).tertiary : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).tertiaryTracking[roundSelector],
-                            (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].vs : roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).extra : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).extraTracking[roundSelector],
-                            (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].nerdStats : roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStats : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).nerdStatsTracking[roundSelector],
-                            (roundSelector == -2 && snapshot.hasData) ? snapshot.data!.timeWeightedStats[redSidePlayer].playstyle : roundSelector.isNegative ? widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyle : widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).playstyleTracking[roundSelector]
+                            roundSelector == -2 ? timeWeightedStats[0].apm : roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.apm : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.apm,
+                            roundSelector == -2 ? timeWeightedStats[0].pps : roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.pps : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.vs,
+                            roundSelector == -2 ? timeWeightedStats[0].vs : roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.vs : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.pps,
+                            roundSelector == -2 ? timeWeightedStats[0].nerdStats : roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats,
+                            roundSelector == -2 ? timeWeightedStats[0].playstyle : roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.playstyle : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.playstyle,
+                            roundSelector == -2 ? timeWeightedStats[1].apm : roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.apm : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.apm,
+                            roundSelector == -2 ? timeWeightedStats[1].pps : roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.pps : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.pps,
+                            roundSelector == -2 ? timeWeightedStats[1].vs : roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.vs : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.vs,
+                            roundSelector == -2 ? timeWeightedStats[1].nerdStats : roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats,
+                            roundSelector == -2 ? timeWeightedStats[1].playstyle : roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.playstyle : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.playstyle,
                           )
                         ],
                       ),
-                      if (widget.record.ownId != widget.record.replayId) const Divider(),
-                      if (widget.record.ownId != widget.record.replayId) Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: Text("Handling",
-                                style: TextStyle(
-                                    fontFamily: "Eurostile Round Extended",
-                                    fontSize: bigScreen ? 42 : 28)),
-                          ),
-                          CompareThingy(
-                            greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.das,
-                            redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.das,
-                            label: "DAS", fractionDigits: 1, postfix: "F",
-                            higherIsBetter: false),
-                          CompareThingy(
-                            greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.arr,
-                            redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.arr,
-                            label: "ARR", fractionDigits: 1, postfix: "F",
-                            higherIsBetter: false),
-                          CompareThingy(
-                            greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.sdf,
-                            redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.sdf,
-                            label: "SDF", prefix: "x",
-                            higherIsBetter: true),
-                          CompareBoolThingy(
-                            greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.safeLock,
-                            redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.safeLock,
-                            label: "Safe HD",
-                            trueIsBetter: true)
-                        ],
-                      )
+                      // if (widget.record.ownId != widget.record.replayId) const Divider(),
+                      // if (widget.record.ownId != widget.record.replayId) Column(
+                      //   children: [
+                      //     Padding(
+                      //       padding: const EdgeInsets.only(bottom: 16),
+                      //       child: Text("Handling",
+                      //           style: TextStyle(
+                      //               fontFamily: "Eurostile Round Extended",
+                      //               fontSize: bigScreen ? 42 : 28)),
+                      //     ),
+                      //     CompareThingy(
+                      //       greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.das,
+                      //       redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.das,
+                      //       label: "DAS", fractionDigits: 1, postfix: "F",
+                      //       higherIsBetter: false),
+                      //     CompareThingy(
+                      //       greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.arr,
+                      //       redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.arr,
+                      //       label: "ARR", fractionDigits: 1, postfix: "F",
+                      //       higherIsBetter: false),
+                      //     CompareThingy(
+                      //       greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.sdf,
+                      //       redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.sdf,
+                      //       label: "SDF", prefix: "x",
+                      //       higherIsBetter: true),
+                      //     CompareBoolThingy(
+                      //       greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.safeLock,
+                      //       redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.safeLock,
+                      //       label: "Safe HD",
+                      //       trueIsBetter: true)
+                      //   ],
+                      // )
                   ],
                 )
-        );
-      }),
+        ])),
     );
   }
 
@@ -494,76 +443,30 @@ class TlMatchResultState extends State<TlMatchResultView> {
                 Wrap(
                   alignment: WrapAlignment.spaceBetween,
                   children: [
-                    FutureBuilder(future: replayData, builder: (context, snapshot) {
-                      switch(snapshot.connectionState){
-                        case ConnectionState.none:
-                        case ConnectionState.waiting:
-                        case ConnectionState.active:
-                          return const CircularProgressIndicator();
-                        case ConnectionState.done:
-                        if (!snapshot.hasError){
-                          var time = framesToTime(snapshot.data!.totalLength);
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                            Text(t.matchLength),
-                            RichText(
-                              text: TextSpan(
-                                text: "${time.inMinutes}:${NumberFormat("00", LocaleSettings.currentLocale.languageCode).format(time.inSeconds%60)}",
-                                style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white),
-                                children: [TextSpan(text: ".${NumberFormat("000", LocaleSettings.currentLocale.languageCode).format(time.inMilliseconds%1000)}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
-                                ),
-                              )
-                          ],);
-                        }else{
-                          String reason;
-                          switch (snapshot.error.runtimeType){
-                            case ReplayNotAvalable:
-                              reason = t.matchIsTooOld;
-                              break;
-                            case SzyNotFound:
-                              reason = t.matchIsTooOld;
-                              break;
-                            case SzyForbidden:
-                              reason = t.errors.replayRejected;
-                              break;
-                            case SzyTooManyRequests:
-                              reason = t.errors.tooManyRequests;
-                              break;
-                            default:
-                              reason = snapshot.error.toString();
-                              break;
-                          }
-                          timeWeightedStatsAvaliable = false;
-                          return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                              if (widget.record.ownId != widget.record.replayId) Text("${t.replayIssue}: $reason"),
-                              if (widget.record.ownId == widget.record.replayId) Center(child: Text(t.p1nkl0bst3rAlert, textAlign: TextAlign.center)),
-                              if (widget.record.ownId != widget.record.replayId) RichText(
-                                text: const TextSpan(
-                                  text: "-:--",
-                                  style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.grey),
-                                  children: [TextSpan(text: ".---", style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
-                                  ),
-                                )
-                            ],);
-                        }
-                          
-                      }
-                    },),
-                     if (widget.record.ownId != widget.record.replayId) Column(
+                    Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                        Text(t.matchLength),
+                        RichText(
+                          text: TextSpan(
+                            text: "${totalTime.inMinutes}:${NumberFormat("00", LocaleSettings.currentLocale.languageCode).format(totalTime.inSeconds%60)}",
+                            style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white),
+                            children: [TextSpan(text: ".${NumberFormat("000", LocaleSettings.currentLocale.languageCode).format(totalTime.inMilliseconds%1000)}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
+                            ),
+                          )
+                      ],),
+                     if (widget.record.id != widget.record.replayID) Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                       Text(t.numberOfRounds),
                       RichText(
                         text: TextSpan(
-                          text: widget.record.endContext.first.secondaryTracking.isNotEmpty ? widget.record.endContext.first.secondaryTracking.length.toString() : "---",
-                          style: TextStyle(
+                          text: widget.record.results.rounds.length.toString(),
+                          style: const TextStyle(
                             fontFamily: "Eurostile Round Extended",
                             fontSize: 28,
                             fontWeight: FontWeight.w500,
-                            color: widget.record.endContext.first.secondaryTracking.isEmpty ? Colors.grey : Colors.white
+                            color: Colors.white
                             ),
                           ),
                         )
@@ -582,99 +485,49 @@ class TlMatchResultState extends State<TlMatchResultView> {
                             roundSelector = -2;
                             setState(() {});
                           } : null, child: Text(t.timeWeightedmatchStats)) ,
-                          //TextButton( child: const Text('Button 3'), onPressed: () {}),
                         ],
                       )
                     ]),
-                    // Column(
-                    //   children: [
-                    //     ListTile(
-                    //       leading: Text("Round time"),
-                    //       title: Text("Winner", textAlign: TextAlign.center,),
-                    //       trailing: Text("Round stats"),
-                    //     )
-                    //   ],
-                    // )
                   ],
                 )
               )
             ];
            },
-          body: ListView.builder(itemCount: widget.record.endContext.first.secondaryTracking.length,
+          body: ListView.builder(itemCount: widget.record.results.rounds.length,
             itemBuilder: (BuildContext context, int index) {
-              return FutureBuilder(future: replayData, builder: (context, snapshot) {
-                switch(snapshot.connectionState){
-                  case ConnectionState.none:
-                  case ConnectionState.waiting:
-                  case ConnectionState.active:
-                    return const LinearProgressIndicator();
-                  case ConnectionState.done:
-                  if (!snapshot.hasError){
-                    var time = framesToTime(snapshot.data!.roundLengths[index]);
-                    var accentColor = snapshot.data!.roundWinners[index][0] == widget.initPlayerId ? Colors.green : Colors.red;
-                    var bgColor = roundSelector == index ? Colors.grey.shade900 : Colors.transparent;
-                    return Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          stops: const [0, 0.05],
-                          colors: [accentColor, bgColor]
-                        )
-                      ),
-                      child: ListTile(
-                        leading:RichText(
-                          text: TextSpan(
-                            text: "${time.inMinutes}:${NumberFormat("00", LocaleSettings.currentLocale.languageCode).format(time.inSeconds%60)}",
-                            style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 22, fontWeight: FontWeight.w500, color: Colors.white),
-                            children: [TextSpan(text: ".${NumberFormat("000", LocaleSettings.currentLocale.languageCode).format(time.inMilliseconds%1000)}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
-                          ), 
-                        ),
-                        title: Text(snapshot.data!.roundWinners[index][1], textAlign: TextAlign.center),
-                        trailing: TrailingStats(
-                          widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).secondaryTracking[index],
-                          widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).tertiaryTracking[index],
-                          widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).extraTracking[index],
-                          widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).secondaryTracking[index],
-                          widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).tertiaryTracking[index],
-                          widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).extraTracking[index]
-                        ),
-                        onTap:(){
-                          roundSelector = index;
-                          setState(() {});
-                        },
-                      ),
-                    );
-                  }else{
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: roundSelector == index ? Colors.grey.shade900 : Colors.transparent
-                      ),
-                      child: ListTile(
-                        leading: RichText(
-                        text: const TextSpan(
-                          text: "-:--",
-                          style: TextStyle(fontFamily: "Eurostile Round", fontSize: 22, fontWeight: FontWeight.w500, color: Colors.grey),
-                          children: [TextSpan(text: ".---", style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
-                          ),
-                        ),
-                        title: const Text("---", style: TextStyle(color: Colors.grey), textAlign: TextAlign.center),
-                        trailing: TrailingStats(
-                          widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).secondaryTracking[index],
-                          widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).tertiaryTracking[index],
-                          widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).extraTracking[index],
-                          widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).secondaryTracking[index],
-                          widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).tertiaryTracking[index],
-                          widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).extraTracking[index]
-                        ),
-                        onTap:(){
-                          roundSelector = index;
-                          setState(() {});
-                        },
-                      ),
-                    );
-                  }
-                }
-              }
-            );
+              var accentColor = widget.record.results.rounds[index][0].id == widget.initPlayerId ? Colors.green : Colors.red;
+              var bgColor = roundSelector == index ? Colors.grey.shade900 : Colors.transparent;
+              var time = roundLengths[index];
+              return Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    stops: const [0, 0.05],
+                    colors: [accentColor, bgColor]
+                  )
+                ),
+                child: ListTile(
+                  leading:RichText(
+                    text: TextSpan(
+                      text: "${time.inMinutes}:${NumberFormat("00", LocaleSettings.currentLocale.languageCode).format(time.inSeconds%60)}",
+                      style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 22, fontWeight: FontWeight.w500, color: Colors.white),
+                      children: [TextSpan(text: ".${NumberFormat("000", LocaleSettings.currentLocale.languageCode).format(time.inMilliseconds%1000)}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
+                    ), 
+                  ),
+                  title: Text(widget.record.results.rounds[index][0].username, textAlign: TextAlign.center),
+                  trailing: TrailingStats(
+                    widget.record.results.rounds[index].firstWhere((element) => element.id == widget.initPlayerId).stats.apm,
+                    widget.record.results.rounds[index].firstWhere((element) => element.id == widget.initPlayerId).stats.pps,
+                    widget.record.results.rounds[index].firstWhere((element) => element.id == widget.initPlayerId).stats.vs,
+                    widget.record.results.rounds[index].firstWhere((element) => element.id != widget.initPlayerId).stats.apm,
+                    widget.record.results.rounds[index].firstWhere((element) => element.id != widget.initPlayerId).stats.pps,
+                    widget.record.results.rounds[index].firstWhere((element) => element.id != widget.initPlayerId).stats.vs
+                  ),
+                  onTap:(){
+                    roundSelector = index;
+                    setState(() {});
+                  },
+                ),
+              );
           })
         ),
       ),
@@ -707,10 +560,10 @@ class TlMatchResultState extends State<TlMatchResultView> {
     final t = Translations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text("${widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).username.toUpperCase()} ${t.vs} ${widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).username.toUpperCase()} ${t.inTLmatch} ${timestamp(widget.record.timestamp)}"),
+        title: Text("${widget.record.results.leaderboard[greenSidePlayer].username.toUpperCase()} ${t.vs} ${widget.record.results.leaderboard[redSidePlayer].username.toUpperCase()} ${t.inTLmatch} ${widget.record.gamemode} ${timestamp(widget.record.ts)}"),
         actions: [
           PopupMenuButton(
-            enabled: widget.record.replayAvalable,
+            enabled: widget.record.gamemode == "league",
             itemBuilder: (BuildContext context) => <PopupMenuEntry>[
               PopupMenuItem(
                 value: 1,
@@ -724,10 +577,10 @@ class TlMatchResultState extends State<TlMatchResultView> {
             onSelected: (value) async {
               switch (value) {
                 case 1:
-                  await launchInBrowser(Uri.parse("https://inoue.szy.lol/api/replay/${widget.record.replayId}"));
+                  await launchInBrowser(Uri.parse("https://inoue.szy.lol/api/replay/${widget.record.replayID}"));
                   break;
                 case 2:
-                  await launchInBrowser(Uri.parse("https://tetr.io/#r:${widget.record.replayId}"));
+                  await launchInBrowser(Uri.parse("https://tetr.io/#r:${widget.record.replayID}"));
                   break;
                 default:
               }

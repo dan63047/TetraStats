@@ -214,7 +214,15 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
             width: 450.0,
             child: Column(
               children: [
-                
+                Card(
+                  child: Row(
+                    children: [
+                      Spacer(),
+                      Text("test card"),
+                      Spacer()
+                    ],
+                  ),
+                )
               ],
             ),
           )
