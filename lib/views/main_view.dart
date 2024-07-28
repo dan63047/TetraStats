@@ -236,10 +236,10 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
         _TLHistoryWasFetched = true;
       }
     }
-    if (storedRecords.isNotEmpty) _TLHistoryWasFetched = true;
-    
-    // add stored match to list only if it missing from retrived ones
-    if (oldMatches != null) tlStream.addFromAlphaStream(oldMatches);
+    if (storedRecords.isNotEmpty) {
+      _TLHistoryWasFetched = true;
+      tlStream.addFromAlphaStream(storedRecords);
+    }
 
     // tlMatches.sort((a, b) { // Newest matches gonna be shown at the top of the list
     //   if(a.ts.isBefore(b.ts)) return 1;

@@ -896,8 +896,8 @@ class TetraLeagueBetaStream{
     for (var entry in json) records.add(BetaRecord.fromJson(entry));
   }
 
-  addFromAlphaStream(TetraLeagueAlphaStream oldStream){
-    for (var entry in oldStream.records) {
+  addFromAlphaStream(List<TetraLeagueAlphaRecord> r){
+    for (var entry in r) {
       records.add(
       BetaRecord(
         id: entry.ownId,

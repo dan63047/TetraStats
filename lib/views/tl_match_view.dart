@@ -112,10 +112,11 @@ class TlMatchResultState extends State<TlMatchResultView> {
     bool bigScreen = width >= 768;
     if (roundSelector.isNegative){
       time = totalTime;
-      readableTime = "${t.matchLength}: ${time.inMinutes}:${secs.format(time.inMicroseconds /1000000 % 60)}";
+      readableTime = !time.isNegative ? "${t.matchLength}: ${time.inMinutes}:${secs.format(time.inMicroseconds /1000000 % 60)}" : "${t.matchLength}: ---";
     }else{
       time = roundLengths[roundSelector];
-      readableTime = "${t.roundLength}: ${time.inMinutes}:${secs.format(time.inMicroseconds /1000000 % 60)}\n${t.winner}: ${widget.record.results.rounds[roundSelector].firstWhere((element) => element.alive)}";
+      int alive = widget.record.results.rounds[roundSelector].indexWhere((element) => element.alive);
+      readableTime = "${t.roundLength}: ${!time.isNegative ? "${time.inMinutes}:${secs.format(time.inMicroseconds /1000000 % 60)}" : "---"}\n${t.winner}: ${alive == -1 ? "idk" : widget.record.results.rounds[roundSelector][alive].username}";
     }
     return SizedBox(
       width: width,
@@ -448,12 +449,16 @@ class TlMatchResultState extends State<TlMatchResultView> {
                         children: [
                         Text(t.matchLength),
                         RichText(
-                          text: TextSpan(
-                            text: "${totalTime.inMinutes}:${NumberFormat("00", LocaleSettings.currentLocale.languageCode).format(totalTime.inSeconds%60)}",
-                            style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white),
-                            children: [TextSpan(text: ".${NumberFormat("000", LocaleSettings.currentLocale.languageCode).format(totalTime.inMilliseconds%1000)}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
-                            ),
-                          )
+                          text: !totalTime.isNegative ? TextSpan(
+                          text: "${totalTime.inMinutes}:${NumberFormat("00", LocaleSettings.currentLocale.languageCode).format(totalTime.inSeconds%60)}",
+                          style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white),
+                          children: [TextSpan(text: ".${NumberFormat("000", LocaleSettings.currentLocale.languageCode).format(totalTime.inMilliseconds%1000)}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
+                          ) : const TextSpan(
+                          text: "-:--",
+                          style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.grey),
+                          children: [TextSpan(text: ".---", style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
+                          ),
+                        )
                       ],),
                      if (widget.record.id != widget.record.replayID) Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -507,11 +512,15 @@ class TlMatchResultState extends State<TlMatchResultView> {
                 ),
                 child: ListTile(
                   leading:RichText(
-                    text: TextSpan(
+                    text: !time.isNegative ? TextSpan(
                       text: "${time.inMinutes}:${NumberFormat("00", LocaleSettings.currentLocale.languageCode).format(time.inSeconds%60)}",
                       style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 22, fontWeight: FontWeight.w500, color: Colors.white),
                       children: [TextSpan(text: ".${NumberFormat("000", LocaleSettings.currentLocale.languageCode).format(time.inMilliseconds%1000)}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
-                    ), 
+                    ) : const TextSpan(
+                      text: "-:--",
+                      style: TextStyle(fontFamily: "Eurostile Round", fontSize: 22, fontWeight: FontWeight.w500, color: Colors.grey),
+                      children: [TextSpan(text: ".---", style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
+                      ), 
                   ),
                   title: Text(widget.record.results.rounds[index][0].username, textAlign: TextAlign.center),
                   trailing: TrailingStats(
