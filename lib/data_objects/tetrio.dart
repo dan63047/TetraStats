@@ -457,8 +457,10 @@ class TetrioPlayer {
 
 class Summaries{
   late String id;
-  late RecordSingle sprint;
-  late RecordSingle blitz;
+  RecordSingle? sprint;
+  RecordSingle? blitz;
+  RecordSingle? zenith;
+  RecordSingle? zenithEx;
   late TetraLeagueAlpha league;
   late TetrioZen zen;
 
@@ -466,8 +468,10 @@ class Summaries{
 
   Summaries.fromJson(Map<String, dynamic> json, String i){
     id = i;
-    sprint = RecordSingle.fromJson(json['40l']['record'], json['40l']['rank']);
-    blitz = RecordSingle.fromJson(json['blitz']['record'], json['blitz']['rank']);
+    if (json['40l']['record'] != null) sprint = RecordSingle.fromJson(json['40l']['record'], json['40l']['rank'], json['40l']['rank_local']);
+    if (json['blitz']['record'] != null) blitz = RecordSingle.fromJson(json['blitz']['record'], json['blitz']['rank'], json['40l']['rank_local']);
+    if (json['zenith']['record'] != null) zenith = RecordSingle.fromJson(json['zenith']['record'], json['zenith']['rank'], json['zenith']['rank_local']);
+    if (json['zenithex']['record'] != null) zenithEx = RecordSingle.fromJson(json['zenithex']['record'], json['zenithex']['rank'], json['zenithex']['rank_local']);
     league = TetraLeagueAlpha.fromJson(json['league'], DateTime.now());
     zen = TetrioZen.fromJson(json['zen']);
   }
@@ -676,11 +680,13 @@ class ResultsStats {
   late int piecesPlaced;
   late int lines;
   late int score;
-  late int seed;
+  int? seed;
   late Duration finalTime;
   late int tSpins;
   late Clears clears;
-  late Finesse? finesse;
+  late int kills;
+  Finesse? finesse;
+  ZenithResults? zenith; 
 
   double get pps => piecesPlaced / (finalTime.inMicroseconds / 1000000);
   double get kpp => inputs / piecesPlaced;
@@ -717,7 +723,9 @@ class ResultsStats {
     tSpins = json['tspins'];
     piecesPlaced = json['piecesplaced'];
     clears = Clears.fromJson(json['clears']);
-    finesse = json.containsKey("finesse") ? Finesse.fromJson(json['finesse']) : null;
+    kills = json['kills'];
+    if (json.containsKey("finesse")) finesse = Finesse.fromJson(json['finesse']);
+    if (json.containsKey("zenith")) zenith = ZenithResults.fromJson(json['zenith']);
   }
 
   Map<String, dynamic> toJson() {
@@ -736,6 +744,39 @@ class ResultsStats {
     if (finesse != null) data['finesse'] = finesse!.toJson();
     data['finalTime'] = finalTime;
     return data;
+  }
+}
+
+class ZenithResults{
+  late double altitude;
+  late double rank;
+  late double peakrank;
+  late double avgrankpts;
+  late int floor;
+  late double targetingfactor;
+  late double targetinggrace;
+  late double totalbonus;
+  late int revives;
+  late int revivesTotal;
+  late bool speedrun;
+  late bool speedrunSeen;
+  late List<Duration> splits;
+
+  ZenithResults.fromJson(Map<String, dynamic> json){
+    altitude = json['altitude'].toDouble();
+    rank = json['rank'].toDouble();
+    peakrank = json['peakrank'].toDouble();
+    avgrankpts = json['avgrankpts'].toDouble();
+    floor = json['floor'];
+    targetingfactor = json['targetingfactor'].toDouble();
+    targetinggrace = json['targetinggrace'].toDouble();
+    totalbonus = json['totalbonus'].toDouble();
+    revives = json['revives'];
+    revivesTotal = json['revivesTotal'];
+    speedrun = json['speedrun'];
+    speedrunSeen = json['speedrun_seen'];
+    splits = [];
+    for (int ms in json['splits']) splits.add(Duration(milliseconds: ms));
   }
 }
 
@@ -997,7 +1038,7 @@ class SingleplayerStream{
     userId = userID;
     type = tp;
     records = [];
-    for (var value in json) {records.add(RecordSingle.fromJson(value, null));}
+    for (var value in json) {records.add(RecordSingle.fromJson(value, -1, -1));}
   }
 }
 
@@ -1079,9 +1120,9 @@ class BetaLeagueStats{
   }
 
   BetaLeagueStats.fromJson(Map<String, dynamic> json){
-    apm = json['apm'].toDouble();
-    pps = json['pps'].toDouble();
-    vs = json['vsscore'].toDouble();
+    apm = json['apm'] != null ? json['apm'].toDouble() : 0.00;
+    pps = json['apm'] != null ? json['pps'].toDouble() : 0.00;
+    vs = json['apm'] != null ? json['vsscore'].toDouble() : 0.00;
     garbageSent = json['garbagesent'];
     garbageReceived = json['garbagereceived'];
     kills = json['kills'];
@@ -1364,11 +1405,13 @@ class RecordSingle {
   late String gamemode;
   late DateTime timestamp;
   late ResultsStats stats;
-  int? rank;
+  late int rank;
+  late int countryRank;
+  late AggregateStats aggregateStats;
 
-  RecordSingle({required this.userId, required this.replayId, required this.ownId, required this.timestamp, required this.stats, this.rank});
+  RecordSingle({required this.userId, required this.replayId, required this.ownId, required this.timestamp, required this.stats, required this.rank, required this.countryRank, required this.aggregateStats});
 
-  RecordSingle.fromJson(Map<String, dynamic> json, int? ran) {
+  RecordSingle.fromJson(Map<String, dynamic> json, int ran, int cran) {
     //developer.log("RecordSingle.fromJson: $json", name: "data_objects/tetrio");
     ownId = json['_id'];
     gamemode = json['gamemode'];
@@ -1377,6 +1420,8 @@ class RecordSingle {
     timestamp = DateTime.parse(json['ts']);
     userId = json['user']['id'];
     rank = ran;
+    countryRank = cran;
+    aggregateStats = AggregateStats.fromJson(json['results']['aggregatestats']);
   }
 
   Map<String, dynamic> toJson() {
@@ -1391,11 +1436,37 @@ class RecordSingle {
   }
 }
 
+class AggregateStats{
+  late double apm;
+  late double pps;
+  late double vs;
+  late NerdStats nerdStats;
+  late EstTr estTr;
+  late Playstyle playstyle;
+
+  AggregateStats(this.apm, this.pps, this.vs){
+    nerdStats = NerdStats(apm, pps, vs);
+    estTr = EstTr(apm, pps, vs, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
+    playstyle = Playstyle(apm, pps, nerdStats.app, nerdStats.vsapm, nerdStats.dsp, nerdStats.gbe, estTr.srarea, estTr.statrank);
+  }
+
+  AggregateStats.fromJson(Map<String, dynamic> json){
+    apm = json['apm'] != null ? json['apm'].toDouble() : 0.00;
+    pps = json['apm'] != null ? json['pps'].toDouble() : 0.00;
+    vs = json['apm'] != null ? json['vsscore'].toDouble() : 0.00;
+    nerdStats = NerdStats(apm, pps, vs);
+    estTr = EstTr(apm, pps, vs, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
+    playstyle = Playstyle(apm, pps, nerdStats.app, nerdStats.vsapm, nerdStats.dsp, nerdStats.gbe, estTr.srarea, estTr.statrank);
+  }
+}
+
 class TetrioZen {
   late int level;
   late int score;
 
   TetrioZen({required this.level, required this.score});
+
+  double get scoreRequirement => (10000 + 10000 * ((log(level + 1) / log(2)) - 1));
 
   TetrioZen.fromJson(Map<String, dynamic> json) {
     level = json['level'];

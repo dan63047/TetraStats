@@ -3,6 +3,7 @@ import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 
 final NumberFormat secs = NumberFormat("00.###", LocaleSettings.currentLocale.languageCode);
+final NumberFormat fixedSecs = NumberFormat("00.000", LocaleSettings.currentLocale.languageCode);
 final NumberFormat nonsecs = NumberFormat("00", LocaleSettings.currentLocale.languageCode);
 final NumberFormat nonsecs3 = NumberFormat("000", LocaleSettings.currentLocale.languageCode);
 final NumberFormat _timeInSec = NumberFormat("#,###.###s.", LocaleSettings.currentLocale.languageCode);
@@ -68,6 +69,10 @@ String relativeDateTime(DateTime dateTime){
 /// Takes number of [microseconds] and returns readable 40 lines time
 String get40lTime(int microseconds){
   return microseconds > 60000000 ? "${(microseconds/1000000/60).floor()}:${(secs.format(microseconds /1000000 % 60))}" : _timeInSec.format(microseconds / 1000000);
+}
+
+String getMoreNormalTime(Duration time){
+  return "${nonsecs.format(time.inMinutes)}:${(fixedSecs.format(time.inMilliseconds/1000%60))}";
 }
 
 /// Readable [a] - [b], without sign

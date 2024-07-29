@@ -904,10 +904,10 @@ class TetrioService extends DB {
           if (jsonDecode(response.body)['success']) {
             Map jsonRecords = jsonDecode(response.body);
               var sprint = jsonRecords['data']['records']['40l']['record'] != null
-                  ? RecordSingle.fromJson(jsonRecords['data']['records']['40l']['record'], jsonRecords['data']['records']['40l']['rank'])
+                  ? RecordSingle.fromJson(jsonRecords['data']['records']['40l']['record'], jsonRecords['data']['records']['40l']['rank'], jsonRecords['data']['records']['40l']['rank_local'])
                   : null;
               var blitz = jsonRecords['data']['records']['blitz']['record'] != null
-                  ? RecordSingle.fromJson(jsonRecords['data']['records']['blitz']['record'], jsonRecords['data']['records']['blitz']['rank'])
+                  ? RecordSingle.fromJson(jsonRecords['data']['records']['blitz']['record'], jsonRecords['data']['records']['blitz']['rank'], jsonRecords['data']['records']['blitz']['rank_local'])
                   : null;
               var zen = TetrioZen.fromJson(jsonRecords['data']['zen']);
             UserRecords result = UserRecords(userID, sprint, blitz, zen);

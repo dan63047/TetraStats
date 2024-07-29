@@ -11,7 +11,7 @@ class StatCellNum extends StatelessWidget {
       required this.playerStat,
       required this.playerStatLabel,
       required this.isScreenBig,
-      this.smallDecimal = true,
+      this.smallDecimal = false,
       this.alertWidgets,
       this.fractionDigits,
       this.oldPlayerStat,

@@ -68,8 +68,21 @@ News testNews = News("6098518e3d5155e6ec429cdc", [
   NewsEntry(type: "personalbest", data: {"gametype": "blitz", "result": 23.232}, timestamp: DateTime(2002, 2, 25, 10, 30, 02)),
   NewsEntry(type: "personalbest", data: {"gametype": "5mblast", "result": 23.232}, timestamp: DateTime(2002, 2, 25, 10, 30, 03)),
 ]);
+late ScrollController controller;
 
 class _MainState extends State<MainView> with TickerProviderStateMixin {
+  @override
+  void initState() {
+    controller = ScrollController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(body: Row(
@@ -94,138 +107,185 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
           ],
           selectedIndex: 0
           ),
-          SizedBox(
-            width: 450.0,
-            child: Column(
-              children: [
-                NewUserThingy(player: testPlayer, showStateTimestamp: false, setState: setState),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 0.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(child: ElevatedButton.icon(onPressed: (){print("ok, and?");}, icon: Icon(Icons.person_add), label: Text(t.track), style: ButtonStyle(shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.horizontal(left: Radius.circular(12.0), right: Radius.zero)))))),
-                      Expanded(child: ElevatedButton.icon(onPressed: (){print("ok, and?");}, icon: Icon(Icons.balance), label: Text(t.compare), style: ButtonStyle(shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.horizontal(left: Radius.zero, right: Radius.circular(12.0)))))))
-                    ],
-                  ),
-                ),
-                Card(
-                  surfaceTintColor: theme.colorScheme.surface,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
-                        child: Row(
-                          children: [
-                            Text("Badges", style: TextStyle(fontFamily: "Eurostile Round Extended")),
-                            Spacer(),
-                            Text(intf.format(testPlayer.badges.length))
-                          ],
-                        ),
-                      ),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: [
-                            for (var badge in testPlayer.badges)
-                            IconButton(
-                              onPressed: () => showDialog<void>(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text(badge.label, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
-                                    content: SingleChildScrollView(
-                                      child: ListBody(
-                                        children: [
-                                          Wrap(
-                                            direction: Axis.horizontal,
-                                            alignment: WrapAlignment.center,
-                                            crossAxisAlignment: WrapCrossAlignment.center,
-                                            spacing: 25,
-                                            children: [
-                                              Image.asset("res/tetrio_badges/${badge.badgeId}.png"),
-                                              Text(badge.ts != null
-                                                  ? t.obtainDate(date: timestamp(badge.ts!))
-                                                  : t.assignedManualy),
-                                            ],
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                    actions: <Widget>[
-                                      TextButton(
-                                        child: Text(t.popupActions.ok),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                },
-                                ),
-                                tooltip: badge.label,
-                                icon: Image.asset(
-                                  "res/tetrio_badges/${badge.badgeId}.png",
-                                  height: 32,
-                                  width: 32,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Image.network(
-                                      kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioBadge&badge=${badge.badgeId}" : "https://tetr.io/res/badges/${badge.badgeId}.png",
-                                      height: 32,
-                                      width: 32,
-                                      errorBuilder:(context, error, stackTrace) {
-                                        return Image.asset("res/icons/kagari.png", height: 32, width: 32);
-                                      }
-                                    ); 
-                                  },
-                                )
-                            )
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                if (testPlayer.distinguishment != null) DistinguishmentThingy(testPlayer.distinguishment!),
-                if (testPlayer.bio != null) Card(
-                  surfaceTintColor: theme.colorScheme.surface,
-                  child: Column(
-                    children: [
-                      Row(
+          Expanded(
+            child: Scrollbar(
+              controller: controller,
+              thumbVisibility: true,
+              child: SingleChildScrollView(
+                controller: controller,
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: 450.0,
+                      child: Column(
                         children: [
-                          Spacer(), 
-                          Text(t.bio, style: TextStyle(fontFamily: "Eurostile Round Extended")),
-                          Spacer()
+                          NewUserThingy(player: testPlayer, showStateTimestamp: false, setState: setState),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 0.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Expanded(child: ElevatedButton.icon(onPressed: (){print("ok, and?");}, icon: Icon(Icons.person_add), label: Text(t.track), style: ButtonStyle(shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.horizontal(left: Radius.circular(12.0), right: Radius.zero)))))),
+                                Expanded(child: ElevatedButton.icon(onPressed: (){print("ok, and?");}, icon: Icon(Icons.balance), label: Text(t.compare), style: ButtonStyle(shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.horizontal(left: Radius.zero, right: Radius.circular(12.0)))))))
+                              ],
+                            ),
+                          ),
+                          Card(
+                            surfaceTintColor: theme.colorScheme.surface,
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
+                                  child: Row(
+                                    children: [
+                                      Text("Badges", style: TextStyle(fontFamily: "Eurostile Round Extended")),
+                                      Spacer(),
+                                      Text(intf.format(testPlayer.badges.length))
+                                    ],
+                                  ),
+                                ),
+                                SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                    children: [
+                                      for (var badge in testPlayer.badges)
+                                      IconButton(
+                                        onPressed: () => showDialog<void>(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              title: Text(badge.label, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
+                                              content: SingleChildScrollView(
+                                                child: ListBody(
+                                                  children: [
+                                                    Wrap(
+                                                      direction: Axis.horizontal,
+                                                      alignment: WrapAlignment.center,
+                                                      crossAxisAlignment: WrapCrossAlignment.center,
+                                                      spacing: 25,
+                                                      children: [
+                                                        Image.asset("res/tetrio_badges/${badge.badgeId}.png"),
+                                                        Text(badge.ts != null
+                                                            ? t.obtainDate(date: timestamp(badge.ts!))
+                                                            : t.assignedManualy),
+                                                      ],
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                              actions: <Widget>[
+                                                TextButton(
+                                                  child: Text(t.popupActions.ok),
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                          ),
+                                          tooltip: badge.label,
+                                          icon: Image.asset(
+                                            "res/tetrio_badges/${badge.badgeId}.png",
+                                            height: 32,
+                                            width: 32,
+                                            errorBuilder: (context, error, stackTrace) {
+                                              return Image.network(
+                                                kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioBadge&badge=${badge.badgeId}" : "https://tetr.io/res/badges/${badge.badgeId}.png",
+                                                height: 32,
+                                                width: 32,
+                                                errorBuilder:(context, error, stackTrace) {
+                                                  return Image.asset("res/icons/kagari.png", height: 32, width: 32);
+                                                }
+                                              ); 
+                                            },
+                                          )
+                                      )
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          if (testPlayer.distinguishment != null) DistinguishmentThingy(testPlayer.distinguishment!),
+                          if (testPlayer.bio != null) Card(
+                            surfaceTintColor: theme.colorScheme.surface,
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Spacer(), 
+                                    Text(t.bio, style: TextStyle(fontFamily: "Eurostile Round Extended")),
+                                    Spacer()
+                                  ],
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 8.0),
+                                  child: MarkdownBody(data: testPlayer.bio!, styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.center)),
+                                )
+                              ],
+                            ),
+                          ),
+                          //if (testNews != null && testNews!.news.isNotEmpty)
+                          Expanded(child: NewsThingy(testNews))
+                        ],
+                      )
+                    ),
+                    SizedBox(
+                      width: 450.0,
+                      child: Column(
+                        children: [
+                          Card(
+                            child: Row(
+                              children: [
+                                Spacer(),
+                                Text("test card"),
+                                Spacer()
+                              ],
+                            ),
+                          )
                         ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 8.0),
-                        child: MarkdownBody(data: testPlayer.bio!, styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.center)),
-                      )
-                    ],
-                  ),
+                    ),
+                    SizedBox(
+                      width: 450.0,
+                      child: Column(
+                        children: [
+                          Card(
+                            child: Row(
+                              children: [
+                                Spacer(),
+                                Text("test card"),
+                                Spacer()
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      width: 450.0,
+                      child: Column(
+                        children: [
+                          Card(
+                            child: Row(
+                              children: [
+                                Spacer(),
+                                Text("test card"),
+                                Spacer()
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                //if (testNews != null && testNews!.news.isNotEmpty)
-                Expanded(child: NewsThingy(testNews))
-              ],
-            )
-          ),
-          SizedBox(
-            width: 450.0,
-            child: Column(
-              children: [
-                Card(
-                  child: Row(
-                    children: [
-                      Spacer(),
-                      Text("test card"),
-                      Spacer()
-                    ],
-                  ),
-                )
-              ],
+              ),
             ),
-          )
+          ),
       ],
     ));
   }
