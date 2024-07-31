@@ -52,7 +52,7 @@ class StatCellNum extends StatelessWidget {
         RichText(
           text: TextSpan(text: splited[0],
           children: [
-            if ((fractionDigits??0) > 0) TextSpan(text: f.symbols.DECIMAL_SEP+splited[1], style: smallDecimal ? const TextStyle(fontFamily: "Eurostile Round", fontSize: 16) : null)
+            if ((fractionDigits??0) > 0 && splited.elementAtOrNull(1) != null) TextSpan(text: f.symbols.DECIMAL_SEP+splited[1], style: smallDecimal ? const TextStyle(fontFamily: "Eurostile Round", fontSize: 16) : null)
           ],
           style: TextStyle(
             fontFamily: "Eurostile Round Extended",

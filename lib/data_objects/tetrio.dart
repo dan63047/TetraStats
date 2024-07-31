@@ -693,6 +693,7 @@ class ResultsStats {
   double get spp => score / piecesPlaced;
   double get kps => inputs / (finalTime.inMicroseconds / 1000000);
   double get finessePercentage => finesse != null ? finesse!.perfectPieces / piecesPlaced : 0;
+  double get cps => zenith != null ? zenith!.avgrankpts / (finalTime.inMilliseconds / 1000 * 60) : 0;
 
   ResultsStats(
       {
@@ -1399,7 +1400,7 @@ class TetraLeagueAlpha {
 }
 
 class RecordSingle {
-  late String userId;
+  late String? userId;
   late String replayId;
   late String ownId;
   late String gamemode;
@@ -1408,6 +1409,7 @@ class RecordSingle {
   late int rank;
   late int countryRank;
   late AggregateStats aggregateStats;
+  late RecordExtras extras;
 
   RecordSingle({required this.userId, required this.replayId, required this.ownId, required this.timestamp, required this.stats, required this.rank, required this.countryRank, required this.aggregateStats});
 
@@ -1418,10 +1420,17 @@ class RecordSingle {
     stats = ResultsStats.fromJson(json['results']['stats']);
     replayId = json['replayid'];
     timestamp = DateTime.parse(json['ts']);
-    userId = json['user']['id'];
+    if (json['user'] != null) userId = json['user']['id'];
     rank = ran;
     countryRank = cran;
     aggregateStats = AggregateStats.fromJson(json['results']['aggregatestats']);
+    var ex = json['extras'] as Map<String, dynamic>;
+    switch (ex.keys.firstOrNull){
+      case "zenith":
+        extras = ZenithExtras.fromJson(json['extras']['zenith']);
+      default:
+      break;
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -1457,6 +1466,18 @@ class AggregateStats{
     nerdStats = NerdStats(apm, pps, vs);
     estTr = EstTr(apm, pps, vs, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
     playstyle = Playstyle(apm, pps, nerdStats.app, nerdStats.vsapm, nerdStats.dsp, nerdStats.gbe, estTr.srarea, estTr.statrank);
+  }
+}
+
+class RecordExtras{
+
+}
+
+class ZenithExtras extends RecordExtras{
+  List<String> mods = [];
+
+  ZenithExtras.fromJson(Map<String, dynamic> json){
+    for (var mod in json["mods"]) mods.add(mod);
   }
 }
 

@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 1198 (599 per locale)
+/// Strings: 1216 (608 per locale)
 ///
-/// Built on 2024-07-27 at 18:54 UTC
+/// Built on 2024-07-31 at 20:51 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -226,7 +226,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get seasonStarts => 'Season starts in:';
 	String get myMessadgeHeader => 'A messadge from dan63';
 	String get myMessadgeBody => 'TETR.IO Tetra Channel API has been seriously modified after the last update, therefore, some functions may not work. I will try to catch up and add new stats (and return back the old ones) as soon, as public docs on new Tetra Channel API will be available.';
-	String preSeasonMessage({required Object n}) => 'Right now you can play unranked FT3 matches against absolutely random player.\nSeason ${n} rules applied';
+	String preSeasonMessage({required Object n}) => 'Right now you can play unranked FT3 matches with hidden glicko (200 RD 🙂).\nSeason ${n} rules applied';
 	String get nanow => 'Not avaliable for now...';
 	String seasonEnds({required Object countdown}) => 'Season ends in ${countdown}';
 	String get seasonEnded => 'Season has ended';
@@ -242,6 +242,17 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get neverPlayedTL => 'That user never played Tetra League';
 	String get botTL => 'Bots are not allowed to play Tetra League';
 	String get anonTL => 'Guests are not allowed to play Tetra League';
+	String get quickPlay => 'Quick Play';
+	String get expert => 'Expert';
+	String get withMods => 'With mods';
+	String withModsPlural({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		zero: 'with ${n} mods',
+		one: 'with ${n} mod',
+		two: 'with ${n} mods',
+		few: 'with ${n} mods',
+		many: 'with ${n} mods',
+		other: 'with ${n} mods',
+	);
 	String get exportDB => 'Export local database';
 	String get exportDBDescription => 'It contains states and Tetra League records of the tracked players and list of tracked players.';
 	String get desktopExportAlertTitle => 'Desktop export';
@@ -929,7 +940,7 @@ class _StringsRu implements Translations {
 	@override String get seasonStarts => 'Сезон начнётся через:';
 	@override String get myMessadgeHeader => 'Сообщение от dan63';
 	@override String get myMessadgeBody => 'TETR.IO Tetra Channel API был серьёзно изменён после последнего обновления, поэтому некоторый функционал может не работать. Я постараюсь добавить новую статистику (и вернуть старую) как только будут опубликована новая документация по данному API.';
-	@override String preSeasonMessage({required Object n}) => 'Прямо сейчас вы можете сыграть безранговый матч до трёх побед против абсолютно рандомного по скиллу игрока.\nПрименяются правила ${n} сезона';
+	@override String preSeasonMessage({required Object n}) => 'Прямо сейчас вы можете сыграть безранговый матч до трёх побед со скрытым Glicko (200 RD 🙂).\nПрименяются правила ${n} сезона';
 	@override String get nanow => 'Пока недоступно...';
 	@override String seasonEnds({required Object countdown}) => 'Сезон закончится через ${countdown}';
 	@override String get seasonEnded => 'Сезон закончился';
@@ -945,6 +956,17 @@ class _StringsRu implements Translations {
 	@override String get neverPlayedTL => 'Этот игрок никогда не играл в Тетра Лигу';
 	@override String get botTL => 'Ботам нельзя играть в Тетра Лигу';
 	@override String get anonTL => 'Гостям нельзя играть в Тетра Лигу';
+	@override String get quickPlay => 'Быстрая Игра';
+	@override String get expert => 'Эксперт';
+	@override String get withMods => 'С модами';
+	@override String withModsPlural({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
+		zero: 'с ${n} модами',
+		one: 'с ${n} модом',
+		two: 'с ${n} модами',
+		few: 'с ${n} модами',
+		many: 'с ${n} модами',
+		other: 'с ${n} модами',
+	);
 	@override String get exportDB => 'Экспортировать локальную базу данных';
 	@override String get exportDBDescription => 'Она содержит состояния аккаунтов и их матчей в Тетра Лиге для отслеживаемых игроков и список таких игроков.';
 	@override String get desktopExportAlertTitle => 'Экспорт на десктопе';
@@ -1624,7 +1646,7 @@ extension on Translations {
 			case 'seasonStarts': return 'Season starts in:';
 			case 'myMessadgeHeader': return 'A messadge from dan63';
 			case 'myMessadgeBody': return 'TETR.IO Tetra Channel API has been seriously modified after the last update, therefore, some functions may not work. I will try to catch up and add new stats (and return back the old ones) as soon, as public docs on new Tetra Channel API will be available.';
-			case 'preSeasonMessage': return ({required Object n}) => 'Right now you can play unranked FT3 matches against absolutely random player.\nSeason ${n} rules applied';
+			case 'preSeasonMessage': return ({required Object n}) => 'Right now you can play unranked FT3 matches with hidden glicko (200 RD 🙂).\nSeason ${n} rules applied';
 			case 'nanow': return 'Not avaliable for now...';
 			case 'seasonEnds': return ({required Object countdown}) => 'Season ends in ${countdown}';
 			case 'seasonEnded': return 'Season has ended';
@@ -1640,6 +1662,17 @@ extension on Translations {
 			case 'neverPlayedTL': return 'That user never played Tetra League';
 			case 'botTL': return 'Bots are not allowed to play Tetra League';
 			case 'anonTL': return 'Guests are not allowed to play Tetra League';
+			case 'quickPlay': return 'Quick Play';
+			case 'expert': return 'Expert';
+			case 'withMods': return 'With mods';
+			case 'withModsPlural': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+				zero: 'with ${n} mods',
+				one: 'with ${n} mod',
+				two: 'with ${n} mods',
+				few: 'with ${n} mods',
+				many: 'with ${n} mods',
+				other: 'with ${n} mods',
+			);
 			case 'exportDB': return 'Export local database';
 			case 'exportDBDescription': return 'It contains states and Tetra League records of the tracked players and list of tracked players.';
 			case 'desktopExportAlertTitle': return 'Desktop export';
@@ -2243,7 +2276,7 @@ extension on _StringsRu {
 			case 'seasonStarts': return 'Сезон начнётся через:';
 			case 'myMessadgeHeader': return 'Сообщение от dan63';
 			case 'myMessadgeBody': return 'TETR.IO Tetra Channel API был серьёзно изменён после последнего обновления, поэтому некоторый функционал может не работать. Я постараюсь добавить новую статистику (и вернуть старую) как только будут опубликована новая документация по данному API.';
-			case 'preSeasonMessage': return ({required Object n}) => 'Прямо сейчас вы можете сыграть безранговый матч до трёх побед против абсолютно рандомного по скиллу игрока.\nПрименяются правила ${n} сезона';
+			case 'preSeasonMessage': return ({required Object n}) => 'Прямо сейчас вы можете сыграть безранговый матч до трёх побед со скрытым Glicko (200 RD 🙂).\nПрименяются правила ${n} сезона';
 			case 'nanow': return 'Пока недоступно...';
 			case 'seasonEnds': return ({required Object countdown}) => 'Сезон закончится через ${countdown}';
 			case 'seasonEnded': return 'Сезон закончился';
@@ -2259,6 +2292,17 @@ extension on _StringsRu {
 			case 'neverPlayedTL': return 'Этот игрок никогда не играл в Тетра Лигу';
 			case 'botTL': return 'Ботам нельзя играть в Тетра Лигу';
 			case 'anonTL': return 'Гостям нельзя играть в Тетра Лигу';
+			case 'quickPlay': return 'Быстрая Игра';
+			case 'expert': return 'Эксперт';
+			case 'withMods': return 'С модами';
+			case 'withModsPlural': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
+				zero: 'с ${n} модами',
+				one: 'с ${n} модом',
+				two: 'с ${n} модами',
+				few: 'с ${n} модами',
+				many: 'с ${n} модами',
+				other: 'с ${n} модами',
+			);
 			case 'exportDB': return 'Экспортировать локальную базу данных';
 			case 'exportDBDescription': return 'Она содержит состояния аккаунтов и их матчей в Тетра Лиге для отслеживаемых игроков и список таких игроков.';
 			case 'desktopExportAlertTitle': return 'Экспорт на десктопе';

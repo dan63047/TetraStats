@@ -90,8 +90,6 @@ class CacheController {
         return object.runtimeType.toString();
       case TetrioPlayerFromLeaderboard: // i may be a little stupid
         return "${object.runtimeType}topone";
-      case TetraLeagueAlphaStream:
-        return object.runtimeType.toString()+object.userId;
       case SingleplayerStream:
         return object.type+object.userId;
       default:
@@ -99,8 +97,8 @@ class CacheController {
     }
   }
 
-  void store(dynamic object, int? cachedUntil) async {
-    String key = _getObjectId(object) + cachedUntil!.toString();
+  void store(dynamic object, int cachedUntil) async {
+    String key = _getObjectId(object) + cachedUntil.toString();
     _cache[key] = object;
   }
 
@@ -113,6 +111,8 @@ class CacheController {
           objectEntry = id.length <= 16 ? _cache.entries.firstWhere((element) => element.key.startsWith(_nicknames[id]??"huh?")) : _cache.entries.firstWhere((element) => element.key.startsWith(id));
           if (id.length <= 16) id = _nicknames[id]??"huh?";
           break;
+        case SingleplayerStream:
+          objectEntry = _cache.entries.firstWhere((element) => element.key.startsWith(id));
         default:
           objectEntry = _cache.entries.firstWhere((element) => element.key.startsWith(datatype.toString()+id));
           id = datatype.toString()+id;
@@ -309,15 +309,15 @@ class TetrioService extends DB {
 
   /// Retrieves avaliable Tetra League matches from Tetra Channel api. Returns stream object (fake stream).
   /// Throws an exception if fails to retrieve.
-  Future<SingleplayerStream> fetchSingleplayerStream(String userID, String stream) async {
-    SingleplayerStream? cached = _cache.get(userID, SingleplayerStream);
+  Future<SingleplayerStream> fetchStream(String userID, String stream) async {
+    SingleplayerStream? cached = _cache.get(stream+userID, SingleplayerStream);
     if (cached != null) return cached;
     
     Uri url;
     if (kIsWeb) {
       url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "singleplayerStream", "user": userID.toLowerCase().trim(), "stream": stream});
     } else {
-      url = Uri.https('ch.tetr.io', 'api/streams/${stream}_${userID.toLowerCase().trim()}');
+      url = Uri.https('ch.tetr.io', 'api/users/${userID.toLowerCase().trim()}/records/$stream');
     }
     try {
       final response = await client.get(url);
@@ -325,7 +325,7 @@ class TetrioService extends DB {
       switch (response.statusCode) {
         case 200:
           if (jsonDecode(response.body)['success']) {
-            SingleplayerStream records = SingleplayerStream.fromJson(jsonDecode(response.body)['data']['records'], userID, stream);
+            SingleplayerStream records = SingleplayerStream.fromJson(jsonDecode(response.body)['data']['entries'], userID, stream);
             _cache.store(records, jsonDecode(response.body)['cache']['cached_until']);
             developer.log("fetchSingleplayerStream: $stream $userID stream retrieved and cached", name: "services/tetrio_crud");
             return records;
@@ -709,7 +709,7 @@ class TetrioService extends DB {
 
   /// Retrieves and returns 100 latest news entries from Tetra Channel api for given [userID]. Throws an exception if fails to retrieve.
   Future<News> fetchNews(String userID) async{
-    News? cached = _cache.get(userID, News);
+    News? cached = _cache.get("user_$userID", News);
     if (cached != null) return cached;
     
     Uri url;
@@ -757,7 +757,7 @@ class TetrioService extends DB {
   /// Retrieves avaliable Tetra League matches from Tetra Channel api. Returns stream object (fake stream).
   /// Throws an exception if fails to retrieve.
   Future<TetraLeagueBetaStream> fetchTLStream(String userID) async {
-    TetraLeagueBetaStream? cached = _cache.get(userID, TetraLeagueAlphaStream);
+    TetraLeagueBetaStream? cached = _cache.get(userID, TetraLeagueBetaStream);
     if (cached != null) return cached;
     
     Uri url;
@@ -957,7 +957,9 @@ class TetrioService extends DB {
         case 200:
           if (jsonDecode(response.body)['success']) {
             developer.log("fetchSummaries: $id summaries retrieved and cached", name: "services/tetrio_crud");
-            return Summaries.fromJson(jsonDecode(response.body)['data'], id);
+            Summaries summaries = Summaries.fromJson(jsonDecode(response.body)['data'], id);
+            _cache.store(summaries, jsonDecode(response.body)['cache']['cached_until']);
+            return summaries;
           } else {
             developer.log("fetchSummaries: User dosen't exist", name: "services/tetrio_crud", error: response.body);
             throw TetrioPlayerNotExist();
@@ -1183,6 +1185,8 @@ class TetrioService extends DB {
           }
         case 403:
           throw TetrioForbidden();
+        case 404:
+          throw TetrioPlayerNotExist();
         case 429:
           throw TetrioTooManyRequests();
         case 418:

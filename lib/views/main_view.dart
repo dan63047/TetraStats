@@ -23,6 +23,7 @@ import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
 import 'package:tetra_stats/views/singleplayer_record_view.dart';
 import 'package:tetra_stats/views/tl_match_view.dart' show TlMatchResultView;
+import 'package:tetra_stats/views/zenith_record_view.dart';
 import 'package:tetra_stats/widgets/finesse_thingy.dart';
 import 'package:tetra_stats/widgets/gauget_num.dart';
 import 'package:tetra_stats/widgets/graphs.dart';
@@ -36,6 +37,7 @@ import 'package:tetra_stats/widgets/stat_sell_num.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
 import 'package:tetra_stats/widgets/tl_thingy.dart';
 import 'package:tetra_stats/widgets/user_thingy.dart';
+import 'package:tetra_stats/widgets/zenith_thingy.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:go_router/go_router.dart';
@@ -82,6 +84,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   bool _TLHistoryWasFetched = false;
   late TabController _tabController;
   late TabController _wideScreenTabController;
+  bool zenithEX = false;
 
   String get title => "Tetra Stats: $_titleNickname";
 
@@ -89,8 +92,8 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   void initState() {
     initDB();
     _scrollController = ScrollController();
-    _tabController = TabController(length: 7, vsync: this);
-    _wideScreenTabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 9, vsync: this);
+    _wideScreenTabController = TabController(length: 5, vsync: this);
     _zoomPanBehavior = ZoomPanBehavior(
       enablePinching: true,
       enableSelectionZooming: true,
@@ -160,29 +163,33 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     late List<dynamic> requests;
     late Summaries summaries;
     late TetraLeagueBetaStream tlStream;
-    late UserRecords records;
     late News news;
-    late SingleplayerStream recent;
-    late SingleplayerStream sprint;
-    late SingleplayerStream blitz;
-    late TetrioPlayerFromLeaderboard? topOne;
-    late TopTr? topTR;
-    requests = await Future.wait([ // all at once (7 requests to oskware lmao)
+    // late SingleplayerStream recentSprint;
+    // late SingleplayerStream recentBlitz;
+    // late SingleplayerStream sprint;
+    // late SingleplayerStream blitz;
+    late SingleplayerStream recentZenith;
+    late SingleplayerStream recentZenithEX;
+    // late TetrioPlayerFromLeaderboard? topOne;
+    // late TopTr? topTR;
+    requests = await Future.wait([ // all at once (8 requests to oskware in total)
       teto.fetchSummaries(_searchFor),
       teto.fetchTLStream(_searchFor),
-      //teto.fetchRecords(_searchFor),
       teto.fetchNews(_searchFor),
-      // teto.fetchSingleplayerStream(_searchFor, "any_userrecent"),
-      // teto.fetchSingleplayerStream(_searchFor, "40l_userbest"),
-      // teto.fetchSingleplayerStream(_searchFor, "blitz_userbest"),
-      // prefs.getBool("showPositions") != true ? teto.fetchCutoffs() : Future.delayed(Duration.zero, ()=><Map<String, double>>[]),
-      //(me.tlSeason1.rank != "z" ? me.tlSeason1.rank == "x" : me.tlSeason1.percentileRank == "x") ? teto.fetchTopOneFromTheLeaderboard() : Future.delayed(Duration.zero, ()=>null),
-      //(me.tlSeason1.gamesPlayed > 9) ? teto.fetchTopTR(_searchFor) : Future.delayed(Duration.zero, () => null) // can retrieve this only if player has TR
+      teto.fetchStream(_searchFor, "zenith/recent"),
+      teto.fetchStream(_searchFor, "zenithex/recent"),
+      //teto.fetchStream(_searchFor, "40l/top"),
+      //teto.fetchStream(_searchFor, "blitz/top"), 
     ]);
+    //prefs.getBool("showPositions") != true ? teto.fetchCutoffs() : Future.delayed(Duration.zero, ()=><Map<String, double>>[]),
+    //(me.tlSeason1.rank != "z" ? me.tlSeason1.rank == "x" : me.tlSeason1.percentileRank == "x") ? teto.fetchTopOneFromTheLeaderboard() : Future.delayed(Duration.zero, ()=>null),
+    //(me.tlSeason1.gamesPlayed > 9) ? teto.fetchTopTR(_searchFor) : Future.delayed(Duration.zero, () => null) // can retrieve this only if player has TR
     summaries = requests[0] as Summaries;
     tlStream = requests[1] as TetraLeagueBetaStream;
     // records = requests[1] as UserRecords;
     news = requests[2] as News;
+    recentZenith = requests[3] as SingleplayerStream;
+    recentZenithEX = requests[4] as SingleplayerStream;
     // recent = requests[3] as SingleplayerStream;
     // sprint = requests[4] as SingleplayerStream;
     // blitz = requests[5] as SingleplayerStream;
@@ -194,7 +201,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       // Get tetra League leaderboard
       everyone = teto.getCachedLeaderboard();
       everyone ??= await teto.fetchTLLeaderboard();
-      if (meAmongEveryone == null){
+      if (meAmongEveryone == null && everyone!.leaderboard.isNotEmpty){
         meAmongEveryone = await compute(everyone!.getLeaderboardPosition, me);
         if (meAmongEveryone != null) teto.cacheLeaderboardPositions(me.userId, meAmongEveryone!); 
       }
@@ -308,13 +315,17 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
         changePlayer(me.userId);
       });
     }
-    return [me, summaries, news, tlStream];
+    return [me, summaries, news, tlStream, recentZenith, recentZenithEX];
     //return [me, records, states, tlMatches, compareWith, isTracking, news, topTR, recent, sprint, blitz, tlMatches.elementAtOrNull(0)?.timestamp];
   }
 
   /// Triggers widgets rebuild
   void _justUpdate() {
     setState(() {});
+  }
+
+  void toggleZenith(){
+    setState(() {zenithEX = !zenithEX;});
   }
 
   @override
@@ -433,14 +444,15 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                               tabs: bigScreen ? [
                                 Tab(text: t.tetraLeague,),
                                 Tab(text: t.history),
-                                Tab(text: "Quick Play"),
+                                Tab(text: t.quickPlay),
                                 Tab(text: "${t.sprint} & ${t.blitz}"),
                                 Tab(text: t.other),
                               ] : [
                                 Tab(text: t.tetraLeague),
                                 Tab(text: t.tlRecords),
                                 Tab(text: t.history),
-                                Tab(text: "Quick Play"),
+                                Tab(text: t.quickPlay),
+                                Tab(text: "${t.quickPlay} ${t.recent}"),
                                 Tab(text: t.sprint),
                                 Tab(text: t.blitz),
                                 Tab(text: t.recentRuns),
@@ -483,7 +495,20 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                             ),
                           ],),
                           _History(chartsData: chartsData, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![1].league.gamesPlayed > 0),
-                          _ZenithThingy(record: snapshot.data![1].zenith, recordEX: snapshot.data![1].zenithEx),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width-450,
+                                constraints: const BoxConstraints(maxWidth: 1024),
+                                child: ZenithThingy(record: snapshot.data![1].zenith, recordEX: snapshot.data![1].zenithEx, parentZenithToggle: toggleZenith, initEXvalue: zenithEX)
+                              ),
+                              SizedBox(
+                                width: 450.0,
+                                child: _ZenithRecords(userID: snapshot.data![0].userId, data: snapshot.data![zenithEX ? 5 : 4], separateScrollController: true),
+                              )
+                            ],
+                          ),
                           _TwoRecordsThingy(sprint: snapshot.data![1].sprint, blitz: snapshot.data![1].blitz, rank: snapshot.data![1].league.percentileRank, recent: SingleplayerStream(userId: "userId", records: [], type: "recent"), sprintStream: SingleplayerStream(userId: "userId", records: [], type: "40l"), blitzStream: SingleplayerStream(userId: "userId", records: [], type: "blitz")),
                           _OtherThingy(zen: snapshot.data![1].zen, bio: snapshot.data![0].bio, distinguishment: snapshot.data![0].distinguishment, newsletter: snapshot.data![2])
                         ] : [
@@ -506,7 +531,8 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                           ),
                           _TLRecords(userID: snapshot.data![0].userId, changePlayer: changePlayer, data: snapshot.data![3].records, wasActiveInTL: true, oldMathcesHere: _TLHistoryWasFetched, separateScrollController: true),
                           _History(chartsData: chartsData, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![1].league.gamesPlayed > 0),
-                          _ZenithThingy(record: snapshot.data![1].zenith, recordEX: snapshot.data![1].zenithEx),
+                          ZenithThingy(record: snapshot.data![1].zenith, recordEX: snapshot.data![1].zenithEx, parentZenithToggle: toggleZenith, initEXvalue: zenithEX),
+                          _ZenithRecords(userID: snapshot.data![0].userId, data: snapshot.data![zenithEX ? 5 : 4], separateScrollController: true),
                           SingleplayerRecord(record: snapshot.data![1].sprint, rank: snapshot.data![1].league.percentileRank, stream: SingleplayerStream(userId: "userId", records: [], type: "40l")),
                           SingleplayerRecord(record: snapshot.data![1].blitz, rank: snapshot.data![1].league.percentileRank, stream: SingleplayerStream(userId: "userId", records: [], type: "Blitz")),
                           _RecentSingleplayersThingy(SingleplayerStream(userId: "userId", records: [], type: "recent")),
@@ -762,6 +788,63 @@ class _TLRecords extends StatelessWidget {
             data[index].results.leaderboard.firstWhere((element) => element.id != userID).stats.vs,
             ),
           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => TlMatchResultView(record: data[index], initPlayerId: userID))) //Navigator.push(context, MaterialPageRoute(builder: (context) => TlMatchResultView(record: data[index], initPlayerId: userID))),
+        ),
+      );
+    });
+  }
+}
+
+class _ZenithRecords extends StatelessWidget {
+  final String userID;
+  final SingleplayerStream data;
+  final bool separateScrollController;
+
+  /// Widget, that displays Quick Play records.
+  /// Accepts list of TL records ([data]) and [userID] of player from the view
+  const _ZenithRecords({required this.userID, required this.data, this.separateScrollController = false});
+
+  @override
+  Widget build(BuildContext context) {
+    if (data.records.isEmpty) {
+      return Center(child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(t.noRecords, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
+      ],
+    ));
+    }
+    bool bigScreen = MediaQuery.of(context).size.width >= 768;
+    int length = data.records.length;
+    return ListView.builder(
+      physics: const AlwaysScrollableScrollPhysics(),
+      controller: separateScrollController ? ScrollController() : null,
+      itemCount: length + 1,
+      itemBuilder: (BuildContext context, int index) {
+        if (index == length) {
+          return Center(child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(t.noOldRecords(n: length), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
+          ],
+        ));
+        }
+        const TextStyle style = TextStyle(height: 1.1, fontWeight: FontWeight.w100, fontSize: 13);
+      return Container(
+        child: ListTile(
+          leading: Text("QP",
+          style: bigScreen ? const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, shadows: textShadow) : const TextStyle(fontSize: 28, shadows: textShadow)),
+          title: Text("${f2.format(data.records[index].stats.zenith!.altitude)} m${(data.records[index].extras as ZenithExtras).mods.isNotEmpty ? " (${t.withModsPlural(n: (data.records[index].extras as ZenithExtras).mods.length)})" : ""}"),
+          subtitle: Text(timestamp(data.records[index].timestamp), style: const TextStyle(color: Colors.grey)),
+          trailing: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text("${f2.format(data.records[index].aggregateStats.apm)} APM, ${f2.format(data.records[index].aggregateStats.pps)} PPS", style: style, textAlign: TextAlign.right),
+              Text("${f2.format(data.records[index].stats.cps)} CSP (${f2.format(data.records[index].stats.zenith!.peakrank)} peak)", style: style, textAlign: TextAlign.right),
+              Text("${data.records[index].stats.kills} KO's, ${getMoreNormalTime(data.records[index].stats.finalTime)}", style: style, textAlign: TextAlign.right)
+            ],
+          ),
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ZenithRecordView(record: data.records[index]))) //Navigator.push(context, MaterialPageRoute(builder: (context) => TlMatchResultView(record: data[index], initPlayerId: userID))),
         ),
       );
     });
@@ -1224,230 +1307,6 @@ class _RecentSingleplayersThingy extends StatelessWidget {
     return SingleChildScrollView(
       child: RecentSingleplayerGames(recent: recent, hideTitle: true)
     );
-  }
-}
-
-class _ZenithThingy extends StatefulWidget{
-  final RecordSingle? record;
-  final RecordSingle? recordEX;
-
-  _ZenithThingy({this.record, this.recordEX});
-
-  @override
-  State<_ZenithThingy> createState() => _ZenithThingyState();
-}
-
-class _ZenithThingyState extends State<_ZenithThingy> {
-  late RecordSingle? record;
-  bool ex = false;
-
-  @override
-  void initState(){
-    super.initState();
-    record = ex ? widget.recordEX : widget.record;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints){
-      bool bigScreen = constraints.maxWidth > 768;
-      if (record == null) {
-        return Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: Column(
-          children: [
-            Text("Quick Play${ex ? " Expert" : ""}", style: const TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
-            RichText(text: TextSpan(
-              text: "--- m",
-              style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 36 : 32, fontWeight: FontWeight.w500, color: Colors.grey),
-              ),
-            ),
-            TextButton(onPressed: (){
-              if (ex){
-                ex = false;
-              }else{
-                ex = true;
-              }
-              setState(() {
-                record = ex ? widget.recordEX : widget.record;
-              });
-            }, child: Text(ex ? "Switch to normal" : "Switch to Expert")),
-          ],
-                ),
-        );
-      }
-      return SingleChildScrollView(
-        child: Padding(padding: const EdgeInsets.only(top: 8.0),
-          child: Column(
-            children: [
-              Text("Quick Play${ex ? " Expert" : ""}", style: const TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
-              RichText(text: TextSpan(
-                text: "${f2.format(record!.stats.zenith!.altitude)} m",
-                style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 36 : 32, fontWeight: FontWeight.w500, color: Colors.white),
-                ),
-              ),
-              RichText(
-                text: TextSpan(
-                  text: "",
-                  style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
-                  children: [
-                    if (record!.rank != -1) TextSpan(text: "№${record!.rank}"),
-                    if (record!.rank != -1) const TextSpan(text: " • "),
-                    if (record!.countryRank != -1) TextSpan(text: "№${record!.countryRank} local"),
-                    if (record!.countryRank != -1) const TextSpan(text: " • "),
-                    TextSpan(text: timestamp(widget.record!.timestamp)),
-                  ]
-                ),
-              ),
-              TextButton(onPressed: (){
-                if (ex){
-                  ex = false;
-                }else{
-                  ex = true;
-                }
-                setState(() {
-                  record = ex ? widget.recordEX : widget.record;
-                });
-              }, child: Text(ex ? "Switch to normal" : "Switch to Expert")),
-              Wrap(
-                alignment: WrapAlignment.spaceBetween,
-                crossAxisAlignment: WrapCrossAlignment.start,
-                spacing: 20,
-                children: [
-                  StatCellNum(playerStat: record!.aggregateStats.apm, playerStatLabel: t.statCellNum.apm, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: true),
-                  StatCellNum(playerStat: record!.aggregateStats.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
-                  StatCellNum(playerStat: record!.aggregateStats.vs, playerStatLabel: t.statCellNum.vs, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: true),
-                  StatCellNum(playerStat: record!.stats.kills, playerStatLabel: "Kills", isScreenBig: bigScreen, higherIsBetter: true)
-                ],
-              ),
-              FinesseThingy(record?.stats.finesse, record?.stats.finessePercentage),
-              LineclearsThingy(record!.stats.clears, record!.stats.lines, record!.stats.holds, record!.stats.tSpins),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: SizedBox(
-                  width: 300,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text("Total time: ${getMoreNormalTime(record!.stats.finalTime)}", style: const TextStyle(color: Colors.white, fontFamily: "Eurostile Round Extended"), textAlign: TextAlign.center),
-                      Table(
-                        children: [
-                          TableRow(
-                            children: [
-                              Text("Floor"),
-                              Text("Split"),
-                              Text("Total"),
-                            ]
-                          ),
-                          for (int i = 0; i < record!.stats.zenith!.splits.length; i++) TableRow(
-                            children: [
-                              Text((i+1).toString()),
-                              Text(record!.stats.zenith!.splits[i] != Duration.zero ? getMoreNormalTime(record!.stats.zenith!.splits[i]-(i-1 != -1 ? record!.stats.zenith!.splits[i-1] : Duration.zero)) : "--:--.---"),
-                              Text(record!.stats.zenith!.splits[i] != Duration.zero ? getMoreNormalTime(record!.stats.zenith!.splits[i]) : "--:--.---"),
-                            ]
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Column(
-                children: [
-                  Text(t.nerdStats, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 40, 0, 0),
-                    child: Wrap(
-                      direction: Axis.horizontal,
-                      alignment: WrapAlignment.center,
-                      spacing: 35,
-                      crossAxisAlignment: WrapCrossAlignment.start,
-                      clipBehavior: Clip.hardEdge,
-                      children: [
-                        GaugetNum(playerStat: record!.aggregateStats.nerdStats.app, playerStatLabel: t.statCellNum.app, higherIsBetter: true, minimum: 0, maximum: 1, ranges: [
-                          GaugeRange(startValue: 0, endValue: 0.2, color: Colors.red),
-                          GaugeRange(startValue: 0.2, endValue: 0.4, color: Colors.yellow),
-                          GaugeRange(startValue: 0.4, endValue: 0.6, color: Colors.green),
-                          GaugeRange(startValue: 0.6, endValue: 0.8, color: Colors.blue),
-                          GaugeRange(startValue: 0.8, endValue: 1, color: Colors.purple),
-                        ], alertWidgets: [
-                          Text(t.statCellNum.appDescription),
-                          Text("${t.exactValue}: ${record!.aggregateStats.nerdStats.app}")
-                        ]),
-                        GaugetNum(playerStat: record!.aggregateStats.nerdStats.vsapm, playerStatLabel: "VS / APM", higherIsBetter: true, minimum: 1.8, maximum: 2.4, ranges: [
-                          GaugeRange(startValue: 1.8, endValue: 2.0, color: Colors.green),
-                          GaugeRange(startValue: 2.0, endValue: 2.2, color: Colors.blue),
-                          GaugeRange(startValue: 2.2, endValue: 2.4, color: Colors.purple),
-                        ], alertWidgets: [
-                          Text(t.statCellNum.vsapmDescription),
-                          Text("${t.exactValue}: ${record!.aggregateStats.nerdStats.vsapm}")
-                        ])
-                    ]),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                    child: Wrap(
-                        direction: Axis.horizontal,
-                        alignment: WrapAlignment.center,
-                        spacing: 25,
-                        crossAxisAlignment: WrapCrossAlignment.start,
-                        clipBehavior: Clip.hardEdge,
-                        children: [
-                          StatCellNum(playerStat: record!.aggregateStats.nerdStats.dss, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.dss,
-                          alertWidgets: [Text(t.statCellNum.dssDescription),
-                              Text("${t.formula}: (VS / 100) - (APM / 60)"),
-                              Text("${t.exactValue}: ${record!.aggregateStats.nerdStats.dss}"),],
-                              okText: t.popupActions.ok,
-                              higherIsBetter: true,),
-                          StatCellNum(playerStat: record!.aggregateStats.nerdStats.dsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.dsp,
-                          alertWidgets: [Text(t.statCellNum.dspDescription),
-                              Text("${t.formula}: DS/S / PPS"),
-                              Text("${t.exactValue}: ${record!.aggregateStats.nerdStats.dsp}"),],
-                              okText: t.popupActions.ok,
-                              higherIsBetter: true),
-                          StatCellNum(playerStat: record!.aggregateStats.nerdStats.appdsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.appdsp,
-                          alertWidgets: [Text(t.statCellNum.appdspDescription),
-                              Text("${t.formula}: APP + DS/P"),
-                              Text("${t.exactValue}: ${record!.aggregateStats.nerdStats.appdsp}"),],
-                              okText: t.popupActions.ok,
-                              higherIsBetter: true),
-                          StatCellNum(playerStat: record!.aggregateStats.nerdStats.cheese, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.cheese,
-                          alertWidgets: [Text(t.statCellNum.cheeseDescription),
-                              Text("${t.formula}: (DS/P * 150) + ((VS/APM - 2) * 50) + (0.6 - APP) * 125"),
-                              Text("${t.exactValue}: ${record!.aggregateStats.nerdStats.cheese}"),],
-                              okText: t.popupActions.ok,
-                              higherIsBetter: false),
-                          StatCellNum(playerStat: record!.aggregateStats.nerdStats.gbe, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.gbe,
-                          alertWidgets: [Text(t.statCellNum.gbeDescription),
-                              Text("${t.formula}: APP * DS/P * 2"),
-                              Text("${t.exactValue}: ${record!.aggregateStats.nerdStats.gbe}"),],
-                              okText: t.popupActions.ok,
-                              higherIsBetter: true),
-                          StatCellNum(playerStat: record!.aggregateStats.nerdStats.nyaapp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.nyaapp,
-                          alertWidgets: [Text(t.statCellNum.nyaappDescription),
-                              Text("${t.formula}: APP - 5 * tan(radians((Cheese Index / -30) + 1))"),
-                              Text("${t.exactValue}:  ${record!.aggregateStats.nerdStats.nyaapp}")],
-                              okText: t.popupActions.ok,
-                              higherIsBetter: true),
-                          StatCellNum(playerStat: record!.aggregateStats.nerdStats.area, isScreenBig: bigScreen, fractionDigits: 1, playerStatLabel: t.statCellNum.area,
-                          alertWidgets: [Text(t.statCellNum.areaDescription),
-                              Text("${t.formula}: APM * 1 + PPS * 45 + VS * 0.444 + APP * 185 + DS/S * 175 + DS/P * 450 + Garbage Effi * 315"),
-                              Text("${t.exactValue}:  ${record!.aggregateStats.nerdStats.area}"),],
-                              okText: t.popupActions.ok,
-                              higherIsBetter: true)
-                        ]),
-                  )
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: Graphs(record!.aggregateStats.apm, record!.aggregateStats.pps, record!.aggregateStats.vs, record!.aggregateStats.nerdStats, record!.aggregateStats.playstyle),
-              )
-            ],
-          ) 
-        ),
-      );
-    });
   }
 }
 

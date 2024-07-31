@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:tetra_stats/utils/colors_functions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/open_in_browser.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
@@ -21,15 +22,6 @@ class SingleplayerRecord extends StatelessWidget {
 
   /// Widget that displays data from [record]
   const SingleplayerRecord({super.key, required this.record, this.stream, this.rank, this.hideTitle = false});
-
-  Color getColorOfRank(int rank){
-    if (rank == 1) return Colors.yellowAccent;
-    if (rank == 2) return Colors.blueGrey;
-    if (rank == 3) return Colors.brown[400]!;
-    if (rank <= 9) return Colors.blueAccent;
-    if (rank <= 99) return Colors.greenAccent;
-    return Colors.grey;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,8 +86,8 @@ class SingleplayerRecord extends StatelessWidget {
                           else if (record!.gamemode == "blitz" && (rank == null || rank == "z")) TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(record!.stats.score, closestAverageBlitz.value), verdict: blitzBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageBlitz.key.toUpperCase())}\n", style: TextStyle(
                             color: blitzBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
                           )),
-                          if (record!.rank != null) TextSpan(text: "№${record!.rank}", style: TextStyle(color: getColorOfRank(record!.rank!))),
-                          if (record!.rank != null) const TextSpan(text: " • "),
+                          if (record!.rank != -1) TextSpan(text: "№${record!.rank}", style: TextStyle(color: getColorOfRank(record!.rank))),
+                          if (record!.rank != -1) const TextSpan(text: " • "),
                           TextSpan(text: timestamp(record!.timestamp)),
                         ]
                         ),
