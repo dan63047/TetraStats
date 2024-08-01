@@ -1,8 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide Badge;
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
@@ -29,6 +27,17 @@ class MainView extends StatefulWidget {
   @override
   State<MainView> createState() => _MainState();
 }
+
+enum Cards {overview, tetraLeague, quickPlay, quickPlayExpert, sprint, blitz, other}
+Map<Cards, String> cardsTitles = {
+  Cards.overview: "Overview",
+  Cards.tetraLeague: t.tetraLeague,
+  Cards.quickPlay: t.quickPlay,
+  Cards.quickPlayExpert: "${t.quickPlay} ${t.expert}",
+  Cards.sprint: t.sprint,
+  Cards.blitz: t.blitz,
+  Cards.other: t.other
+};
 
 TetrioPlayer testPlayer = TetrioPlayer(
   userId: "6098518e3d5155e6ec429cdc",
@@ -85,209 +94,234 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Row(
-      children: [
-        NavigationRail(
-          destinations: [
-            NavigationRailDestination(
-              icon: Icon(Icons.favorite_border),
-              selectedIcon: Icon(Icons.favorite),
-              label: Text('First'),
-            ),
-            NavigationRailDestination(
-              icon: Icon(Icons.bookmark_border),
-              selectedIcon: Icon(Icons.book),
-              label: Text('Second'),
-            ),
-            NavigationRailDestination(
-              icon: Icon(Icons.star_border),
-              selectedIcon: Icon(Icons.star),
-              label: Text('Third'),
-            )
-          ],
-          selectedIndex: 0
-          ),
-          Expanded(
-            child: Scrollbar(
-              controller: controller,
-              thumbVisibility: true,
-              child: SingleChildScrollView(
-                controller: controller,
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      width: 450.0,
-                      child: Column(
-                        children: [
-                          NewUserThingy(player: testPlayer, showStateTimestamp: false, setState: setState),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 0.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Expanded(child: ElevatedButton.icon(onPressed: (){print("ok, and?");}, icon: Icon(Icons.person_add), label: Text(t.track), style: ButtonStyle(shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.horizontal(left: Radius.circular(12.0), right: Radius.zero)))))),
-                                Expanded(child: ElevatedButton.icon(onPressed: (){print("ok, and?");}, icon: Icon(Icons.balance), label: Text(t.compare), style: ButtonStyle(shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.horizontal(left: Radius.zero, right: Radius.circular(12.0)))))))
-                              ],
+    return Scaffold(
+      body: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          return Row(
+          children: [
+            NavigationRail(
+              leading: FloatingActionButton(
+                    elevation: 0,
+                    onPressed: () {
+                      // Add your onPressed code here!
+                    },
+                    child: const Icon(Icons.search),
+                  ),
+              trailing: IconButton(
+                    onPressed: () {
+                      // Add your onPressed code here!
+                    },
+                    icon: const Icon(Icons.more_horiz_rounded),
+                  ),
+              destinations: const [
+                NavigationRailDestination(
+                  icon: Icon(Icons.home),
+                  selectedIcon: Icon(Icons.home),
+                  label: Text('First'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.leaderboard),
+                  selectedIcon: Icon(Icons.leaderboard),
+                  label: Text('Second'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.compress),
+                  selectedIcon: Icon(Icons.compress),
+                  label: Text('Third'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.calculate),
+                  selectedIcon: Icon(Icons.calculate),
+                  label: Text('Calc'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.settings),
+                  selectedIcon: Icon(Icons.settings),
+                  label: Text('Third'),
+                )
+              ],
+              selectedIndex: 0
+              ),
+            Row(
+              children: [
+                SizedBox(
+                  width: 450.0,
+                  child: Column(
+                    children: [
+                      NewUserThingy(player: testPlayer, showStateTimestamp: false, setState: setState),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 0.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(child: ElevatedButton.icon(onPressed: (){print("ok, and?");}, icon: Icon(Icons.person_add), label: Text(t.track), style: ButtonStyle(shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.horizontal(left: Radius.circular(12.0), right: Radius.zero)))))),
+                            Expanded(child: ElevatedButton.icon(onPressed: (){print("ok, and?");}, icon: Icon(Icons.balance), label: Text(t.compare), style: ButtonStyle(shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.horizontal(left: Radius.zero, right: Radius.circular(12.0)))))))
+                          ],
+                        ),
+                      ),
+                      Card(
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
+                              child: Row(
+                                children: [
+                                  Text("Badges", style: TextStyle(fontFamily: "Eurostile Round Extended")),
+                                  Spacer(),
+                                  Text(intf.format(testPlayer.badges.length))
+                                ],
+                              ),
                             ),
-                          ),
-                          Card(
-                            surfaceTintColor: theme.colorScheme.surface,
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
-                                  child: Row(
-                                    children: [
-                                      Text("Badges", style: TextStyle(fontFamily: "Eurostile Round Extended")),
-                                      Spacer(),
-                                      Text(intf.format(testPlayer.badges.length))
-                                    ],
-                                  ),
-                                ),
-                                SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Row(
-                                    children: [
-                                      for (var badge in testPlayer.badges)
-                                      IconButton(
-                                        onPressed: () => showDialog<void>(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return AlertDialog(
-                                              title: Text(badge.label, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
-                                              content: SingleChildScrollView(
-                                                child: ListBody(
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: [
+                                  for (var badge in testPlayer.badges)
+                                  IconButton(
+                                    onPressed: () => showDialog<void>(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text(badge.label, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
+                                          content: SingleChildScrollView(
+                                            child: ListBody(
+                                              children: [
+                                                Wrap(
+                                                  direction: Axis.horizontal,
+                                                  alignment: WrapAlignment.center,
+                                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                                  spacing: 25,
                                                   children: [
-                                                    Wrap(
-                                                      direction: Axis.horizontal,
-                                                      alignment: WrapAlignment.center,
-                                                      crossAxisAlignment: WrapCrossAlignment.center,
-                                                      spacing: 25,
-                                                      children: [
-                                                        Image.asset("res/tetrio_badges/${badge.badgeId}.png"),
-                                                        Text(badge.ts != null
-                                                            ? t.obtainDate(date: timestamp(badge.ts!))
-                                                            : t.assignedManualy),
-                                                      ],
-                                                    )
+                                                    Image.asset("res/tetrio_badges/${badge.badgeId}.png"),
+                                                    Text(badge.ts != null
+                                                        ? t.obtainDate(date: timestamp(badge.ts!))
+                                                        : t.assignedManualy),
                                                   ],
-                                                ),
-                                              ),
-                                              actions: <Widget>[
-                                                TextButton(
-                                                  child: Text(t.popupActions.ok),
-                                                  onPressed: () {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                ),
+                                                )
                                               ],
-                                            );
-                                          },
+                                            ),
                                           ),
-                                          tooltip: badge.label,
-                                          icon: Image.asset(
-                                            "res/tetrio_badges/${badge.badgeId}.png",
+                                          actions: <Widget>[
+                                            TextButton(
+                                              child: Text(t.popupActions.ok),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                      ),
+                                      tooltip: badge.label,
+                                      icon: Image.asset(
+                                        "res/tetrio_badges/${badge.badgeId}.png",
+                                        height: 32,
+                                        width: 32,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return Image.network(
+                                            kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioBadge&badge=${badge.badgeId}" : "https://tetr.io/res/badges/${badge.badgeId}.png",
                                             height: 32,
                                             width: 32,
-                                            errorBuilder: (context, error, stackTrace) {
-                                              return Image.network(
-                                                kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioBadge&badge=${badge.badgeId}" : "https://tetr.io/res/badges/${badge.badgeId}.png",
-                                                height: 32,
-                                                width: 32,
-                                                errorBuilder:(context, error, stackTrace) {
-                                                  return Image.asset("res/icons/kagari.png", height: 32, width: 32);
-                                                }
-                                              ); 
-                                            },
-                                          )
+                                            errorBuilder:(context, error, stackTrace) {
+                                              return Image.asset("res/icons/kagari.png", height: 32, width: 32);
+                                            }
+                                          ); 
+                                        },
                                       )
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          if (testPlayer.distinguishment != null) DistinguishmentThingy(testPlayer.distinguishment!),
-                          if (testPlayer.bio != null) Card(
-                            surfaceTintColor: theme.colorScheme.surface,
-                            child: Column(
+                                  )
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      if (testPlayer.distinguishment != null) DistinguishmentThingy(testPlayer.distinguishment!),
+                      if (testPlayer.bio != null) Card(
+                        child: Column(
+                          children: [
+                            Row(
                               children: [
-                                Row(
-                                  children: [
-                                    Spacer(), 
-                                    Text(t.bio, style: TextStyle(fontFamily: "Eurostile Round Extended")),
-                                    Spacer()
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 8.0),
-                                  child: MarkdownBody(data: testPlayer.bio!, styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.center)),
-                                )
-                              ],
-                            ),
-                          ),
-                          //if (testNews != null && testNews!.news.isNotEmpty)
-                          Expanded(child: NewsThingy(testNews))
-                        ],
-                      )
-                    ),
-                    SizedBox(
-                      width: 450.0,
-                      child: Column(
-                        children: [
-                          Card(
-                            child: Row(
-                              children: [
-                                Spacer(),
-                                Text("test card"),
+                                Spacer(), 
+                                Text(t.bio, style: TextStyle(fontFamily: "Eurostile Round Extended")),
                                 Spacer()
                               ],
                             ),
-                          )
-                        ],
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8.0),
+                              child: MarkdownBody(data: testPlayer.bio!, styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.center)),
+                            )
+                          ],
+                        ),
                       ),
-                    ),
-                    SizedBox(
-                      width: 450.0,
-                      child: Column(
-                        children: [
-                          Card(
-                            child: Row(
-                              children: [
-                                Spacer(),
-                                Text("test card"),
-                                Spacer()
-                              ],
-                            ),
-                          )
-                        ],
+                        //if (testNews != null && testNews!.news.isNotEmpty)
+                      Expanded(child: NewsThingy(testNews))
+                      ],
+                    )
+                  ),
+                SizedBox(
+                  width: constraints.maxWidth - 450 - 80,
+                  child: Column(
+                    //crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Card(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Spacer(),
+                            Text(t.tetraLeague, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                            Spacer()
+                          ],
+                        ),
                       ),
-                    ),
-                    SizedBox(
-                      width: 450.0,
-                      child: Column(
-                        children: [
-                          Card(
-                            child: Row(
-                              children: [
-                                Spacer(),
-                                Text("test card"),
-                                Spacer()
-                              ],
-                            ),
-                          )
+                      Card(),
+                      SegmentedButton<Cards>(
+                        segments: const <ButtonSegment<Cards>>[
+                          ButtonSegment<Cards>(
+                              value: Cards.overview,
+                              label: Text('Overview'),
+                              icon: Icon(Icons.calendar_view_day)),
+                          ButtonSegment<Cards>(
+                              value: Cards.tetraLeague,
+                              label: Text('Tetra League'),
+                              icon: Icon(Icons.calendar_view_week)),
+                          ButtonSegment<Cards>(
+                              value: Cards.quickPlay,
+                              label: Text('Quick Play'),
+                              icon: Icon(Icons.calendar_view_month)),
+                          // ButtonSegment<Cards>(
+                          //     value: Cards.quickPlayExpert,
+                          //     label: Text('QP Expert'),
+                          //     icon: Icon(Icons.calendar_today)),
+                          ButtonSegment<Cards>(
+                              value: Cards.sprint,
+                              label: Text('40 Lines'),
+                              icon: Icon(Icons.calendar_today)),
+                          ButtonSegment<Cards>(
+                              value: Cards.blitz,
+                              label: Text('Blitz'),
+                              icon: Icon(Icons.calendar_today)),
+                          // ButtonSegment<Cards>(
+                          //     value: Cards.other,
+                          //     label: Text('Other'),
+                          //     icon: Icon(Icons.calendar_today)),
                         ],
-                      ),
-                    ),
-                  ],
+                        selected: <Cards>{Cards.tetraLeague},
+                        onSelectionChanged: (Set<Cards> newSelection) {
+                          setState(() {
+                            // By default there is only a single segment that can be
+                            // selected at one time, so its value is always the first
+                            // item in the selected set.
+                            //calendarView = newSelection.first;
+                          });})
+                    ],
+                  ),
                 ),
+                ],
               ),
-            ),
-          ),
-      ],
-    ));
+          ],
+              );
+        },
+      ));
   }
 }
 
@@ -599,7 +633,6 @@ class NewUserThingy extends StatelessWidget {
 
       return Card(
         clipBehavior: Clip.antiAlias,
-        surfaceTintColor: theme.colorScheme.surface,
         child: Padding(
           padding: const EdgeInsets.only(bottom: 8.0),
           child: Column(

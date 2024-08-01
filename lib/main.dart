@@ -30,8 +30,9 @@ ThemeData theme = ThemeData(
   colorScheme: const ColorScheme.dark(
     primary: Colors.cyanAccent,
     surface: Color.fromARGB(255, 10, 10, 10),
-    secondary: Colors.white
+    secondary: Colors.white,
   ),
+  cardTheme: CardTheme(surfaceTintColor: Color.fromARGB(255, 10, 10, 10)),
   scaffoldBackgroundColor: Colors.black
 );
 

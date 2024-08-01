@@ -338,7 +338,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
                           CompareThingy(
                             label: t.statCellNum.estOfTRShort,
                             greenSide: roundSelector == -2 ? timeWeightedStats[0].estTr.esttr :
-                            roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.app : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.estTr.esttr,
+                            roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.estTr.esttr : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.estTr.esttr,
                             redSide: roundSelector == -2 ? timeWeightedStats[1].estTr.esttr :
                             roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.estTr.esttr : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.estTr.esttr,
                             fractionDigits: 2,
