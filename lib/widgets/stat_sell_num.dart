@@ -106,7 +106,7 @@ class StatCellNum extends StatelessWidget {
                   );
                 },
                 style: ButtonStyle(
-                    padding: MaterialStateProperty.all(EdgeInsets.zero)),
+                    padding: WidgetStateProperty.all(EdgeInsets.zero)),
                 child: Text(
                   playerStatLabel,
                   textAlign: TextAlign.center,

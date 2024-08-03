@@ -1,3 +1,5 @@
+// ignore_for_file: curly_braces_in_flow_control_structures
+
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
@@ -87,7 +89,8 @@ String countdown(Duration difference){
 }
 
 String playtime(Duration difference){
-  if (difference.inHours > 0) return "${intf.format(difference.inHours)}h ${nonsecs.format(difference.inMinutes%60)}m";
-  else if (difference.inMinutes > 0) return "${difference.inMinutes}m ${nonsecs.format(difference.inSeconds%60)}s";
+  if (difference.inHours > 0) {
+    return "${intf.format(difference.inHours)}h ${nonsecs.format(difference.inMinutes%60)}m";
+  } else if (difference.inMinutes > 0) return "${difference.inMinutes}m ${nonsecs.format(difference.inSeconds%60)}s";
   else return "${secs.format(difference.inMilliseconds/1000)}s";
 }

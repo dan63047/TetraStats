@@ -9,12 +9,9 @@ import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
-import 'package:tetra_stats/views/compare_view.dart';
-import 'package:tetra_stats/widgets/stat_sell_num.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/main.dart';
-import 'package:tetra_stats/widgets/tl_thingy.dart';
 import 'package:tetra_stats/widgets/user_thingy.dart';
 
 class MainView extends StatefulWidget {
@@ -45,7 +42,7 @@ TetrioPlayer testPlayer = TetrioPlayer(
   registrationTime: DateTime(2002, 2, 25, 9, 30, 01),
   avatarRevision: 1704835194288,
   bannerRevision: 1661462402700,
-  role: "sysop",
+  role: "user",
   country: "BY",
   state: DateTime(1970),
   badges: [
@@ -63,13 +60,13 @@ TetrioPlayer testPlayer = TetrioPlayer(
   friendCount: 69,
   gamesPlayed: 13747,
   gamesWon: 6523,
-  gameTime: Duration(days: 79, minutes: 28, seconds: 23, microseconds: 637591),
+  gameTime: const Duration(days: 79, minutes: 28, seconds: 23, microseconds: 637591),
   xp: 1415239,
   supporterTier: 2,
   verified: true,
   connections: null,
   tlSeason1: TetraLeagueAlpha(timestamp: DateTime(1970), gamesPlayed: 28, gamesWon: 14, bestRank: "x", decaying: false, rating: 23500.6194, rank: "x", percentileRank: "x", percentile: 0.00, standing: 1, standingLocal: 1, nextAt: -1, prevAt: 500),
-  distinguishment: Distinguishment(type: "twc", detail: "2023"),
+  //distinguishment: Distinguishment(type: "twc", detail: "2023"),
   bio: "кровбер не в палку, без последнего тспина - 32 атаки. кровбер не в палку, без первого тсм и последнего тспина - 30 атаки. кровбер в палку с б2б - 38 атаки.(5 б2б)(не знаю от чего зависит) кровбер в палку с б2б - 36 атаки.(5 б2б)(не знаю от чего зависит)"
 );
 News testNews = News("6098518e3d5155e6ec429cdc", [
@@ -82,6 +79,7 @@ late ScrollController controller;
 class _MainState extends State<MainView> with TickerProviderStateMixin {
   @override
   void initState() {
+    teto.open();
     controller = ScrollController();
     super.initState();
   }
@@ -95,6 +93,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const SearchDrawer(),
       body: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           return Row(
@@ -103,7 +102,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
               leading: FloatingActionButton(
                     elevation: 0,
                     onPressed: () {
-                      // Add your onPressed code here!
+                      Scaffold.of(context).openDrawer();
                     },
                     child: const Icon(Icons.search),
                   ),
@@ -154,8 +153,8 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Expanded(child: ElevatedButton.icon(onPressed: (){print("ok, and?");}, icon: Icon(Icons.person_add), label: Text(t.track), style: ButtonStyle(shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.horizontal(left: Radius.circular(12.0), right: Radius.zero)))))),
-                            Expanded(child: ElevatedButton.icon(onPressed: (){print("ok, and?");}, icon: Icon(Icons.balance), label: Text(t.compare), style: ButtonStyle(shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.horizontal(left: Radius.zero, right: Radius.circular(12.0)))))))
+                            Expanded(child: ElevatedButton.icon(onPressed: (){print("ok, and?");}, icon: const Icon(Icons.person_add), label: Text(t.track), style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.horizontal(left: Radius.circular(12.0), right: Radius.zero)))))),
+                            Expanded(child: ElevatedButton.icon(onPressed: (){print("ok, and?");}, icon: const Icon(Icons.balance), label: Text(t.compare), style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.horizontal(left: Radius.zero, right: Radius.circular(12.0)))))))
                           ],
                         ),
                       ),
@@ -166,8 +165,8 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                               padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
                               child: Row(
                                 children: [
-                                  Text("Badges", style: TextStyle(fontFamily: "Eurostile Round Extended")),
-                                  Spacer(),
+                                  const Text("Badges", style: TextStyle(fontFamily: "Eurostile Round Extended")),
+                                  const Spacer(),
                                   Text(intf.format(testPlayer.badges.length))
                                 ],
                               ),
@@ -241,9 +240,9 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                           children: [
                             Row(
                               children: [
-                                Spacer(), 
-                                Text(t.bio, style: TextStyle(fontFamily: "Eurostile Round Extended")),
-                                Spacer()
+                                const Spacer(), 
+                                Text(t.bio, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
+                                const Spacer()
                               ],
                             ),
                             Padding(
@@ -267,13 +266,13 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Spacer(),
-                            Text(t.tetraLeague, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
-                            Spacer()
+                            const Spacer(),
+                            Text(t.tetraLeague, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                            const Spacer()
                           ],
                         ),
                       ),
-                      Card(),
+                      const Card(),
                       SegmentedButton<Cards>(
                         segments: const <ButtonSegment<Cards>>[
                           ButtonSegment<Cards>(
@@ -305,7 +304,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                           //     label: Text('Other'),
                           //     icon: Icon(Icons.calendar_today)),
                         ],
-                        selected: <Cards>{Cards.tetraLeague},
+                        selected: const <Cards>{Cards.tetraLeague},
                         onSelectionChanged: (Set<Cards> newSelection) {
                           setState(() {
                             // By default there is only a single segment that can be
@@ -328,7 +327,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
 class NewsThingy extends StatelessWidget{
   final News news;
 
-  NewsThingy(this.news);
+  const NewsThingy(this.news, {super.key});
 
   ListTile getNewsTile(NewsEntry news){
     Map<String, String> gametypes = {
@@ -480,9 +479,9 @@ class NewsThingy extends StatelessWidget{
           children: [
             Row(
               children: [
-                Spacer(), 
-                Text(t.news, style: TextStyle(fontFamily: "Eurostile Round Extended")),
-                Spacer()
+                const Spacer(), 
+                Text(t.news, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
+                const Spacer()
               ]
             ),
             for (NewsEntry entry in news.news) getNewsTile(entry)
@@ -497,7 +496,7 @@ class NewsThingy extends StatelessWidget{
 class DistinguishmentThingy extends StatelessWidget{
   final Distinguishment distinguishment;
 
-  DistinguishmentThingy(this.distinguishment, {super.key});
+  const DistinguishmentThingy(this.distinguishment, {super.key});
 
   List<InlineSpan> getDistinguishmentTitle(String? text) {
     // TWC champions don't have header in their distinguishments
@@ -544,23 +543,23 @@ class DistinguishmentThingy extends StatelessWidget{
     switch(type){
       case "staff":
         switch(detail){
-          case "founder": return Color(0xAAFD82D4);
-          case "kagarin": return Color(0xAAFF0060);
-          case "team": return Color(0xAAFACC2E);
-          case "team-minor": return Color(0xAAF5BD45);
-          case "administrator": return Color(0xAAFF4E8A);
-          case "globalmod": return Color(0xAAE878FF);
-          case "communitymod": return Color(0xAA4E68FB);
-          case "alumni": return Color(0xAA6057DB);
+          case "founder": return const Color(0xAAFD82D4);
+          case "kagarin": return const Color(0xAAFF0060);
+          case "team": return const Color(0xAAFACC2E);
+          case "team-minor": return const Color(0xAAF5BD45);
+          case "administrator": return const Color(0xAAFF4E8A);
+          case "globalmod": return const Color(0xAAE878FF);
+          case "communitymod": return const Color(0xAA4E68FB);
+          case "alumni": return const Color(0xAA6057DB);
           default: return theme.colorScheme.surface;
         }
       case "champion":
         switch (detail){
           case "blitz":
-          case "40l": return Color(0xAACCF5F6);
-          case "league": return Color(0xAAFFDB31);
+          case "40l": return const Color(0xAACCF5F6);
+          case "league": return const Color(0xAAFFDB31);
         }
-      case "twc": return Color(0xAAFFDB31);
+      case "twc": return const Color(0xAAFFDB31);
       default: return theme.colorScheme.surface;
     }
     return theme.colorScheme.surface;
@@ -574,9 +573,9 @@ class DistinguishmentThingy extends StatelessWidget{
         children: [
           Row(
             children: [
-              Spacer(),
-              Text(t.distinguishment, style: TextStyle(fontFamily: "Eurostile Round Extended")),
-              Spacer()
+              const Spacer(),
+              Text(t.distinguishment, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
+              const Spacer()
             ],
           ),
           RichText(
@@ -603,17 +602,17 @@ class NewUserThingy extends StatelessWidget {
   Color roleColor(String role){
     switch (role){
       case "sysop":
-        return Color.fromARGB(255, 23, 165, 133);
+        return const Color.fromARGB(255, 23, 165, 133);
       case "admin":
-        return Color.fromARGB(255, 255, 78, 138);
+        return const Color.fromARGB(255, 255, 78, 138);
       case "mod":
-        return Color.fromARGB(255, 204, 128, 242);
+        return const Color.fromARGB(255, 204, 128, 242);
       case "halfmod":
-        return Color.fromARGB(255, 95, 118, 254);
+        return const Color.fromARGB(255, 95, 118, 254);
       case "bot":
-        return Color.fromARGB(255, 60, 93, 55);
+        return const Color.fromARGB(255, 60, 93, 55);
       case "banned":
-        return Color.fromARGB(255, 248, 28, 28);
+        return const Color.fromARGB(255, 248, 28, 28);
       default:
         return Colors.white10;
     }
@@ -623,7 +622,7 @@ class NewUserThingy extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = Translations.of(context);
     return LayoutBuilder(builder: (context, constraints) {
-      bool bigScreen = constraints.maxWidth > 768;
+      //bool bigScreen = constraints.maxWidth > 768;
       double pfpHeight = 128;
       int xpTableID = 0;
 
@@ -638,7 +637,7 @@ class NewUserThingy extends StatelessWidget {
           child: Column(
             children: [
               Container(
-                constraints: BoxConstraints(maxWidth: 960),
+                constraints: const BoxConstraints(maxWidth: 960),
                 height: player.bannerRevision != null ? 218.0 : 138.0,
                 child: Stack(
                 //clipBehavior: Clip.none,
@@ -673,7 +672,7 @@ class NewUserThingy extends StatelessWidget {
                     child: Text(player.username,
                       //softWrap: true,
                       overflow: TextOverflow.fade,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontFamily: "Eurostile Round Extended",
                         fontSize: 28,
                       )
@@ -686,14 +685,14 @@ class NewUserThingy extends StatelessWidget {
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(right: 4.0),
-                          child: Chip(label: Text(player.role.toUpperCase(), style: TextStyle(shadows: textShadow),), padding: EdgeInsets.all(0.0), color: MaterialStatePropertyAll(roleColor(player.role))),
+                          child: Chip(label: Text(player.role.toUpperCase(), style: const TextStyle(shadows: textShadow),), padding: const EdgeInsets.all(0.0), color: WidgetStatePropertyAll(roleColor(player.role))),
                         ),
                         RichText(
                           text: TextSpan(
-                            style: TextStyle(fontFamily: "Eurostile Round"),
+                            style: const TextStyle(fontFamily: "Eurostile Round"),
                             children:
                             [
-                            if (player.friendCount > 0) WidgetSpan(child: Icon(Icons.person), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic),
+                            if (player.friendCount > 0) const WidgetSpan(child: Icon(Icons.person), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic),
                             if (player.friendCount > 0) TextSpan(text: "${intf.format(player.friendCount)} "),
                             if (player.supporterTier > 0) WidgetSpan(child: Icon(player.supporterTier > 1 ? Icons.star : Icons.star_border, color: player.supporterTier > 1 ? Colors.yellowAccent : Colors.white), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic),
                             if (player.supporterTier > 0) TextSpan(text: player.supporterTier.toString(), style: TextStyle(color: player.supporterTier > 1 ? Colors.yellowAccent : Colors.white)),
@@ -708,10 +707,10 @@ class NewUserThingy extends StatelessWidget {
                     left: 160.0,
                     child: RichText(
                       text: TextSpan(
-                        style: TextStyle(fontFamily: "Eurostile Round"),
+                        style: const TextStyle(fontFamily: "Eurostile Round"),
                         children: [
                           if (player.country != null) TextSpan(text: "${t.countries[player.country]} • "),
-                          TextSpan(text: "${player.registrationTime == null ? t.wasFromBeginning : '${timestamp(player.registrationTime!)}'}", style: TextStyle(color: Colors.grey))
+                          TextSpan(text: player.registrationTime == null ? t.wasFromBeginning : timestamp(player.registrationTime!), style: const TextStyle(color: Colors.grey))
                         ]
                       )
                     )
@@ -722,7 +721,7 @@ class NewUserThingy extends StatelessWidget {
                     child: RichText(
                       textAlign: TextAlign.end,
                       text: TextSpan(
-                        style: TextStyle(fontFamily: "Eurostile Round"),
+                        style: const TextStyle(fontFamily: "Eurostile Round"),
                         children: [
                           TextSpan(text: "Level ${intf.format(player.level.floor())}", recognizer: TapGestureRecognizer()..onTap = (){
                             showDialog(
@@ -756,14 +755,14 @@ class NewUserThingy extends StatelessWidget {
                                 ),
                                 actions: <Widget>[
                                   TextButton(
-                                    child: Text("OK"),
+                                    child: const Text("OK"),
                                     onPressed: () {Navigator.of(context).pop();}
                                   )  
                                 ]
                               )
                             );
                           }),
-                          TextSpan(text:"\n"),
+                          const TextSpan(text:"\n"),
                           TextSpan(text: player.gameTime.isNegative ? "-h --m" : playtime(player.gameTime), style: TextStyle(color: player.gameTime.isNegative ? Colors.grey : Colors.white), recognizer: TapGestureRecognizer()..onTap = (){
                             showDialog(
                               context: context,
@@ -781,16 +780,16 @@ class NewUserThingy extends StatelessWidget {
                                 ),
                                 actions: <Widget>[
                                   TextButton(
-                                    child: Text("OK"),
+                                    child: const Text("OK"),
                                     onPressed: () {Navigator.of(context).pop();}
                                   )  
                                 ]
                               )
                             );
                           }),
-                          TextSpan(text:"\n"),
-                          TextSpan(text: "${player.gamesWon > -1 ? intf.format(player.gamesWon) : "---"}", style: TextStyle(color: player.gamesWon > -1 ? Colors.white : Colors.grey)),
-                          TextSpan(text: "/${player.gamesPlayed > -1 ? intf.format(player.gamesPlayed) : "---"}", style: TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
+                          const TextSpan(text:"\n"),
+                          TextSpan(text: player.gamesWon > -1 ? intf.format(player.gamesWon) : "---", style: TextStyle(color: player.gamesWon > -1 ? Colors.white : Colors.grey)),
+                          TextSpan(text: "/${player.gamesPlayed > -1 ? intf.format(player.gamesPlayed) : "---"}", style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
                         ]
                       )
                     )
@@ -811,5 +810,63 @@ class NewUserThingy extends StatelessWidget {
         ),
       );
     });
+  }
+}
+
+class SearchDrawer extends StatefulWidget{
+  const SearchDrawer({super.key});
+
+  @override
+  State<SearchDrawer> createState() => _SearchDrawerState();
+}
+
+class _SearchDrawerState extends State<SearchDrawer>  {
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: StreamBuilder(
+        stream: teto.allPlayers,
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+            case ConnectionState.waiting:
+            case ConnectionState.done:
+            case ConnectionState.active:
+            final allPlayers = (snapshot.data != null)
+                ? snapshot.data as Map<String, String>
+                : <String, String>{};
+            allPlayers.remove(prefs.getString("player") ?? "6098518e3d5155e6ec429cdc"); // player from the home button will be delisted
+            List<String> keys = allPlayers.keys.toList();
+            return NestedScrollView(
+              headerSliverBuilder: (BuildContext context, bool value){
+                return [
+                  SliverToBoxAdapter(
+                    child: SearchBar(
+                      hintText: "Hello",
+                      hintStyle: const WidgetStatePropertyAll(TextStyle(color: Colors.grey)),
+                      trailing: [
+                        IconButton(onPressed: (){print("sas");}, icon: const Icon(Icons.search))
+                      ],
+                    ),
+                  )
+                ];
+              },
+              body: ListView.builder( // Builds list of tracked players.
+              itemCount: allPlayers.length,
+              itemBuilder: (context, index) {
+                var i = allPlayers.length-1-index; // Last players in this map are most recent ones, they are gonna be shown at the top.
+                return ListTile(
+                  title: Text(allPlayers[keys[i]]??keys[i]), // Takes last known username from list of states
+                  onTap: () {
+                    //widget.changePlayer(keys[i]); // changes to chosen player
+                    Navigator.of(context).pop(); // and closes itself.
+                  },
+                );
+              })
+            );
+          }
+        }
+      )
+    );
   }
 }

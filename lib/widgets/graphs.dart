@@ -1,3 +1,5 @@
+// ignore_for_file: unused_field, unused_local_variable, invalid_use_of_visible_for_testing_member, implementation_imports, overridden_fields
+
 import 'dart:math';
 
 import 'package:fl_chart/fl_chart.dart';
@@ -196,7 +198,7 @@ class MyRadarChartPainter extends RadarChartPainter{
 }
 
 class MyRadarChartLeaf extends RadarChartLeaf{
-  MyRadarChartLeaf({required super.data, required super.targetData});
+  const MyRadarChartLeaf({super.key, required super.data, required super.targetData});
 
   @override
   RenderRadarChart createRenderObject(BuildContext context) => MyRenderRadarChart(

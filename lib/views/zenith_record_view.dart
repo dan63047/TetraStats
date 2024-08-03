@@ -18,26 +18,18 @@ class ZenithRecordView extends StatelessWidget {
       appBar: AppBar(
         title: Text("${
           switch (record.gamemode){
-            "zenith" => "Quick Play",
-            "zenithex" => "Quick Play Expert",
+            "zenith" => t.quickPlay,
+            "zenithex" => "${t.quickPlay} ${t.expert}",
             String() => "5000000 Blast",
           }
         } ${timestamp(record.timestamp)}"),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Column(
-                children: [
-                  ZenithThingy(record: record, switchable: false),
-                  // TODO: Insert replay link here
-                ] 
-              )
-            ],
-          )
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width,
+          child: SingleChildScrollView(
+            child: ZenithThingy(record: record, switchable: false),
+          ),
         )
       ),
     );

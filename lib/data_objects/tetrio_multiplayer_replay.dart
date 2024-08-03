@@ -208,12 +208,12 @@ class ReplayData{
     stats = [];
     roundWinners = [];
     int roundID = 0;
-    List<double> APMmultipliedByWeights = [0, 0];
-    List<double> PPSmultipliedByWeights = [0, 0];
-    List<double> VSmultipliedByWeights = [0, 0];
-    List<double> SPPmultipliedByWeights = [0, 0];
-    List<double> KPPmultipliedByWeights = [0, 0];
-    List<double> KPSmultipliedByWeights = [0, 0];
+    List<double> apmMultipliedByWeights = [0, 0];
+    List<double> ppsMultipliedByWeights = [0, 0];
+    List<double> vsMultipliedByWeights = [0, 0];
+    List<double> sppMultipliedByWeights = [0, 0];
+    List<double> kppMultipliedByWeights = [0, 0];
+    List<double> kpsMultipliedByWeights = [0, 0];
     totalStats = [ReplayStats.createEmpty(), ReplayStats.createEmpty()];
     for(var round in json['data']) {
       int firstInEndContext = round['replays'][0]["events"].last['data']['export']['options']['username'].startsWith(endcontext[0].username) ? 0 : 1;
@@ -221,30 +221,30 @@ class ReplayData{
       int roundLength = max(round['replays'][0]['frames'], round['replays'][1]['frames']);
       roundLengths.add(roundLength);
       totalLength = totalLength + max(round['replays'][0]['frames'], round['replays'][1]['frames']);
-      APMmultipliedByWeights[0] += endcontext[0].secondaryTracking[roundID]*roundLength;
-      APMmultipliedByWeights[1] += endcontext[1].secondaryTracking[roundID]*roundLength;
-      PPSmultipliedByWeights[0] += endcontext[0].tertiaryTracking[roundID]*roundLength;
-      PPSmultipliedByWeights[1] += endcontext[1].tertiaryTracking[roundID]*roundLength;
-      VSmultipliedByWeights[0] += endcontext[0].extraTracking[roundID]*roundLength;
-      VSmultipliedByWeights[1] += endcontext[1].extraTracking[roundID]*roundLength;
+      apmMultipliedByWeights[0] += endcontext[0].secondaryTracking[roundID]*roundLength;
+      apmMultipliedByWeights[1] += endcontext[1].secondaryTracking[roundID]*roundLength;
+      ppsMultipliedByWeights[0] += endcontext[0].tertiaryTracking[roundID]*roundLength;
+      ppsMultipliedByWeights[1] += endcontext[1].tertiaryTracking[roundID]*roundLength;
+      vsMultipliedByWeights[0] += endcontext[0].extraTracking[roundID]*roundLength;
+      vsMultipliedByWeights[1] += endcontext[1].extraTracking[roundID]*roundLength;
       int winner = round['board'].indexWhere((element) => element['success'] == true);
       roundWinners.add([round['board'][winner]['id']??round['board'][winner]['user']['_id'], round['board'][winner]['username']??round['board'][winner]['user']['username']]);
       ReplayStats playerOne = ReplayStats.fromJson(round['replays'][firstInEndContext]['events'].last['data']['export']['stats'], biggestSpikeFromReplay(round['replays'][secondInEndContext]['events']), round['replays'][firstInEndContext]['frames']); // (events contain recived attacks)
       ReplayStats playerTwo = ReplayStats.fromJson(round['replays'][secondInEndContext]['events'].last['data']['export']['stats'], biggestSpikeFromReplay(round['replays'][firstInEndContext]['events']), round['replays'][secondInEndContext]['frames']);
-      SPPmultipliedByWeights[0] += playerOne.spp*roundLength;
-      SPPmultipliedByWeights[1] += playerTwo.spp*roundLength;
-      KPPmultipliedByWeights[0] += playerOne.kpp*roundLength;
-      KPPmultipliedByWeights[1] += playerTwo.kpp*roundLength;
-      KPSmultipliedByWeights[0] += playerOne.kps*roundLength;
-      KPSmultipliedByWeights[1] += playerTwo.kps*roundLength;
+      sppMultipliedByWeights[0] += playerOne.spp*roundLength;
+      sppMultipliedByWeights[1] += playerTwo.spp*roundLength;
+      kppMultipliedByWeights[0] += playerOne.kpp*roundLength;
+      kppMultipliedByWeights[1] += playerTwo.kpp*roundLength;
+     kpsMultipliedByWeights[0] += playerOne.kps*roundLength;
+     kpsMultipliedByWeights[1] += playerTwo.kps*roundLength;
       stats.add([playerOne, playerTwo]);
       totalStats[0] = totalStats[0] + playerOne;
       totalStats[1] = totalStats[1] + playerTwo;
       roundID ++;
     }
     timeWeightedStats = [
-      AggregateStats(APMmultipliedByWeights[0]/totalLength, PPSmultipliedByWeights[0]/totalLength, VSmultipliedByWeights[0]/totalLength, SPPmultipliedByWeights[0]/totalLength, KPPmultipliedByWeights[0]/totalLength, KPSmultipliedByWeights[0]/totalLength),
-      AggregateStats(APMmultipliedByWeights[1]/totalLength, PPSmultipliedByWeights[1]/totalLength, VSmultipliedByWeights[1]/totalLength, SPPmultipliedByWeights[1]/totalLength, KPPmultipliedByWeights[1]/totalLength, KPSmultipliedByWeights[1]/totalLength)
+      AggregateStats(apmMultipliedByWeights[0]/totalLength, ppsMultipliedByWeights[0]/totalLength, vsMultipliedByWeights[0]/totalLength, sppMultipliedByWeights[0]/totalLength, kppMultipliedByWeights[0]/totalLength, kpsMultipliedByWeights[0]/totalLength),
+      AggregateStats(apmMultipliedByWeights[1]/totalLength, ppsMultipliedByWeights[1]/totalLength, vsMultipliedByWeights[1]/totalLength, sppMultipliedByWeights[1]/totalLength, kppMultipliedByWeights[1]/totalLength, kpsMultipliedByWeights[1]/totalLength)
     ];
   }
 

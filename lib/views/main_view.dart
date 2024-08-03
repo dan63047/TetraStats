@@ -11,8 +11,6 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:syncfusion_flutter_gauges/gauges.dart';
-import 'package:tetra_stats/data_objects/tetra_stats.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart' show prefs, teto;
@@ -25,8 +23,6 @@ import 'package:tetra_stats/views/singleplayer_record_view.dart';
 import 'package:tetra_stats/views/tl_match_view.dart' show TlMatchResultView;
 import 'package:tetra_stats/views/zenith_record_view.dart';
 import 'package:tetra_stats/widgets/finesse_thingy.dart';
-import 'package:tetra_stats/widgets/gauget_num.dart';
-import 'package:tetra_stats/widgets/graphs.dart';
 import 'package:tetra_stats/widgets/lineclears_thingy.dart';
 import 'package:tetra_stats/widgets/list_tile_trailing_stats.dart';
 import 'package:tetra_stats/widgets/recent_sp_games.dart';
@@ -501,7 +497,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                               Container(
                                 width: MediaQuery.of(context).size.width-450,
                                 constraints: const BoxConstraints(maxWidth: 1024),
-                                child: ZenithThingy(record: snapshot.data![1].zenith, recordEX: snapshot.data![1].zenithEx, parentZenithToggle: toggleZenith, initEXvalue: zenithEX)
+                                child: SingleChildScrollView(child: ZenithThingy(record: snapshot.data![1].zenith, recordEX: snapshot.data![1].zenithEx, parentZenithToggle: toggleZenith, initEXvalue: zenithEX))
                               ),
                               SizedBox(
                                 width: 450.0,
@@ -531,7 +527,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                           ),
                           _TLRecords(userID: snapshot.data![0].userId, changePlayer: changePlayer, data: snapshot.data![3].records, wasActiveInTL: true, oldMathcesHere: _TLHistoryWasFetched, separateScrollController: true),
                           _History(chartsData: chartsData, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![1].league.gamesPlayed > 0),
-                          ZenithThingy(record: snapshot.data![1].zenith, recordEX: snapshot.data![1].zenithEx, parentZenithToggle: toggleZenith, initEXvalue: zenithEX),
+                          SingleChildScrollView(child: ZenithThingy(record: snapshot.data![1].zenith, recordEX: snapshot.data![1].zenithEx, parentZenithToggle: toggleZenith, initEXvalue: zenithEX)),
                           _ZenithRecords(userID: snapshot.data![0].userId, data: snapshot.data![zenithEX ? 5 : 4], separateScrollController: true),
                           SingleplayerRecord(record: snapshot.data![1].sprint, rank: snapshot.data![1].league.percentileRank, stream: SingleplayerStream(userId: "userId", records: [], type: "40l")),
                           SingleplayerRecord(record: snapshot.data![1].blitz, rank: snapshot.data![1].league.percentileRank, stream: SingleplayerStream(userId: "userId", records: [], type: "Blitz")),
@@ -1153,8 +1149,8 @@ class _TwoRecordsThingy extends StatelessWidget {
                         else TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(sprint!.stats.finalTime, closestAverageSprint.value), verdict: sprintBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageSprint.key.toUpperCase())}\n", style: TextStyle(
                           color: sprintBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
                         )),
-                        if (sprint!.rank != null) TextSpan(text: "№${sprint!.rank}", style: TextStyle(color: getColorOfRank(sprint!.rank!))),
-                        if (sprint!.rank != null) const TextSpan(text: " • "),
+                        TextSpan(text: "№${sprint!.rank}", style: TextStyle(color: getColorOfRank(sprint!.rank))),
+                        const TextSpan(text: " • "),
                         TextSpan(text: timestamp(sprint!.timestamp)),
                       ]
                       ),
@@ -1237,8 +1233,8 @@ class _TwoRecordsThingy extends StatelessWidget {
                         color: blitzBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
                       )),
                       TextSpan(text: timestamp(blitz!.timestamp)),
-                      if (blitz!.rank != null)  const TextSpan(text: " • "),
-                      if (blitz!.rank != null)  TextSpan(text: "№${blitz!.rank}", style: TextStyle(color: getColorOfRank(blitz!.rank!))),
+                      const TextSpan(text: " • "),
+                      TextSpan(text: "№${blitz!.rank}", style: TextStyle(color: getColorOfRank(blitz!.rank))),
                     ]
                     ),
                   ),
@@ -1554,10 +1550,10 @@ class _OtherThingy extends StatelessWidget {
                 Text("${t.statCellNum.level} ${NumberFormat.decimalPattern().format(zen!.level)}", style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
                 Text("${t.statCellNum.score} ${NumberFormat.decimalPattern().format(zen!.score)}", style: const TextStyle(fontSize: 18)),
                 Container(
-                  constraints: BoxConstraints(maxWidth: 300.0),
+                  constraints: const BoxConstraints(maxWidth: 300.0),
                   child: Row(children: [
-                    Text("Score requirement to level up:"),
-                    Spacer(),
+                    const Text("Score requirement to level up:"),
+                    const Spacer(),
                     Text(intf.format(zen!.scoreRequirement))
                   ],),
                 )

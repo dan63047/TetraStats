@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -26,7 +25,7 @@ class TLRatingThingy extends StatelessWidget{
     List<String> formatedTR = f4.format(tlData.rating).split(decimalSeparator);
     List<String> formatedGlicko = f4.format(tlData.glicko).split(decimalSeparator);
     List<String> formatedPercentile = f4.format(tlData.percentile * 100).split(decimalSeparator);
-    DateTime now = DateTime.now();
+    //DateTime now = DateTime.now();
     //bool beforeS1end = now.isBefore(seasonEnd);
     //int daysLeft = seasonEnd.difference(now).inDays;
     //int safeRD = min(100, (100 + ((tlData.rd! >= 100 && tlData.decaying) ? 7 : max(0, 7 - (lastMatchPlayed != null ? now.difference(lastMatchPlayed!).inDays : 7))) - daysLeft).toInt());

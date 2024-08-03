@@ -18,7 +18,7 @@ class ZenithThingy extends StatefulWidget{
   final RecordSingle? recordEX;
   final Function? parentZenithToggle; 
 
-  ZenithThingy({this.record, this.recordEX, this.switchable = true, this.parentZenithToggle, this.initEXvalue = false});
+  const ZenithThingy({super.key, this.record, this.recordEX, this.switchable = true, this.parentZenithToggle, this.initEXvalue = false});
 
   @override
   State<ZenithThingy> createState() => _ZenithThingyState();
@@ -71,188 +71,189 @@ class _ZenithThingyState extends State<ZenithThingy> {
                 ),
         );
       }
-      return SingleChildScrollView(
-        child: Padding(padding: const EdgeInsets.only(top: 8.0),
-          child: Column(
-            children: [
-              Text("${t.quickPlay}${ex ? " ${t.expert}" : ""}", style: const TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
-              RichText(text: TextSpan(
-                text: "${f2.format(record!.stats.zenith!.altitude)} m",
-                style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 36 : 32, fontWeight: FontWeight.w500, color: Colors.white),
-                ),
+      return Padding(padding: const EdgeInsets.only(top: 8.0),
+        child: Column(
+          children: [
+            Text("${t.quickPlay}${ex ? " ${t.expert}" : ""}", style: const TextStyle(height: 0.1, fontFamily: "Eurostile Round Extended", fontSize: 18)),
+            RichText(text: TextSpan(
+              text: "${f2.format(record!.stats.zenith!.altitude)} m",
+              style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 36 : 32, fontWeight: FontWeight.w500, color: Colors.white),
               ),
-              if ((record!.extras as ZenithExtras).mods.isNotEmpty) RichText(
-                text: TextSpan(
-                  text: "",
-                  style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.white),
-                  children: [
-                    TextSpan(text: "${t.withMods}: "),
-                    for (String mod in (record!.extras as ZenithExtras).mods) TextSpan(text: "${mod.toUpperCase()} "),
-                  ]
-                ),
-              ),
-              RichText(
-                text: TextSpan(
-                  text: "",
-                  style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
-                  children: [
-                    if (record!.rank != -1) TextSpan(text: "№${record!.rank}"),
-                    if (record!.rank != -1) const TextSpan(text: " • "),
-                    if (record!.countryRank != -1) TextSpan(text: "№${record!.countryRank} local"),
-                    if (record!.countryRank != -1) const TextSpan(text: " • "),
-                    TextSpan(text: timestamp(widget.record!.timestamp)),
-                  ]
-                ),
-              ),
-              if (widget.switchable) TextButton(onPressed: (){
-                if (ex){
-                  ex = false;
-                }else{
-                  ex = true;
-                }
-                setState(() {
-                  if (widget.parentZenithToggle != null) widget.parentZenithToggle!();
-                  record = ex ? widget.recordEX : widget.record;
-                });
-              }, child: Text(ex ? "Switch to normal" : "Switch to Expert")),
-              Wrap(
-                alignment: WrapAlignment.spaceBetween,
-                crossAxisAlignment: WrapCrossAlignment.start,
-                spacing: 20,
+            ),
+            if ((record!.extras as ZenithExtras).mods.isNotEmpty) RichText(
+              text: TextSpan(
+                text: "",
+                style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.white),
                 children: [
-                  StatCellNum(playerStat: record!.aggregateStats.apm, playerStatLabel: t.statCellNum.apm, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: true),
-                  StatCellNum(playerStat: record!.aggregateStats.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
-                  StatCellNum(playerStat: record!.aggregateStats.vs, playerStatLabel: t.statCellNum.vs, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: true),
-                  StatCellNum(playerStat: record!.stats.kills, playerStatLabel: "Kills", isScreenBig: bigScreen, higherIsBetter: true),
-                  StatCellNum(playerStat: record!.stats.cps, playerStatLabel: "CPS\n(Peak: ${f2.format(record!.stats.zenith!.peakrank)})", fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true)
-                ],
+                  TextSpan(text: "${t.withMods}: "),
+                  for (String mod in (record!.extras as ZenithExtras).mods) TextSpan(text: "${mod.toUpperCase()} "),
+                ]
               ),
-              FinesseThingy(record?.stats.finesse, record?.stats.finessePercentage),
-              LineclearsThingy(record!.stats.clears, record!.stats.lines, record!.stats.holds, record!.stats.tSpins),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: SizedBox(
-                  width: 300,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
+            ),
+            RichText(
+              text: TextSpan(
+                text: "",
+                style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
+                children: [
+                  if (record!.rank != -1) TextSpan(text: "№${record!.rank}"),
+                  if (record!.rank != -1) const TextSpan(text: " • "),
+                  if (record!.countryRank != -1) TextSpan(text: "№${record!.countryRank} local"),
+                  if (record!.countryRank != -1) const TextSpan(text: " • "),
+                  TextSpan(text: timestamp(widget.record!.timestamp)),
+                ]
+              ),
+            ),
+            if (widget.switchable) TextButton(onPressed: (){
+              if (ex){
+                ex = false;
+              }else{
+                ex = true;
+              }
+              setState(() {
+                if (widget.parentZenithToggle != null) widget.parentZenithToggle!();
+                record = ex ? widget.recordEX : widget.record;
+              });
+            }, child: Text(ex ? "Switch to normal" : "Switch to Expert")),
+            Wrap(
+              alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 20,
+              children: [
+                StatCellNum(playerStat: record!.aggregateStats.apm, playerStatLabel: t.statCellNum.apm, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: true),
+                StatCellNum(playerStat: record!.aggregateStats.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
+                StatCellNum(playerStat: record!.aggregateStats.vs, playerStatLabel: t.statCellNum.vs, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: true),
+                StatCellNum(playerStat: record!.stats.kills, playerStatLabel: "Kills", isScreenBig: bigScreen, higherIsBetter: true),
+                StatCellNum(playerStat: record!.stats.cps, playerStatLabel: "CPS\n(Peak: ${f2.format(record!.stats.zenith!.peakrank)})", fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true)
+              ],
+            ),
+            FinesseThingy(record?.stats.finesse, record?.stats.finessePercentage),
+            LineclearsThingy(record!.stats.clears, record!.stats.lines, record!.stats.holds, record!.stats.tSpins),
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: SizedBox(
+                width: 300,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text("Total time: ${getMoreNormalTime(record!.stats.finalTime)}", style: const TextStyle(color: Colors.white, fontFamily: "Eurostile Round Extended"), textAlign: TextAlign.center),
+                    Table(
+                      columnWidths: const {
+                        0: FixedColumnWidth(36)
+                      },
+                      children: [
+                        const TableRow(
+                          children: [
+                            Text("Floor"),
+                            Text("Split", textAlign: TextAlign.right),
+                            Text("Total", textAlign: TextAlign.right),
+                          ]
+                        ),
+                        for (int i = 0; i < record!.stats.zenith!.splits.length; i++) TableRow(
+                          children: [
+                            Text((i+1).toString()),
+                            Text(record!.stats.zenith!.splits[i] != Duration.zero ? getMoreNormalTime(record!.stats.zenith!.splits[i]-(i-1 != -1 ? record!.stats.zenith!.splits[i-1] : Duration.zero)) : "--:--.---", textAlign: TextAlign.right),
+                            Text(record!.stats.zenith!.splits[i] != Duration.zero ? getMoreNormalTime(record!.stats.zenith!.splits[i]) : "--:--.---", textAlign: TextAlign.right),
+                          ]
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Column(
+              children: [
+                Text(t.nerdStats, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 40, 0, 0),
+                  child: Wrap(
+                    direction: Axis.horizontal,
+                    alignment: WrapAlignment.center,
+                    spacing: 35,
+                    crossAxisAlignment: WrapCrossAlignment.start,
+                    //clipBehavior: Clip.hardEdge,
                     children: [
-                      Text("Total time: ${getMoreNormalTime(record!.stats.finalTime)}", style: const TextStyle(color: Colors.white, fontFamily: "Eurostile Round Extended"), textAlign: TextAlign.center),
-                      Table(
-                        children: [
-                          TableRow(
-                            children: [
-                              Text("Floor"),
-                              Text("Split"),
-                              Text("Total"),
-                            ]
-                          ),
-                          for (int i = 0; i < record!.stats.zenith!.splits.length; i++) TableRow(
-                            children: [
-                              Text((i+1).toString()),
-                              Text(record!.stats.zenith!.splits[i] != Duration.zero ? getMoreNormalTime(record!.stats.zenith!.splits[i]-(i-1 != -1 ? record!.stats.zenith!.splits[i-1] : Duration.zero)) : "--:--.---"),
-                              Text(record!.stats.zenith!.splits[i] != Duration.zero ? getMoreNormalTime(record!.stats.zenith!.splits[i]) : "--:--.---"),
-                            ]
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
+                      GaugetNum(playerStat: record!.aggregateStats.nerdStats.app, playerStatLabel: t.statCellNum.app, higherIsBetter: true, minimum: 0, maximum: 1, ranges: [
+                        GaugeRange(startValue: 0, endValue: 0.2, color: Colors.red),
+                        GaugeRange(startValue: 0.2, endValue: 0.4, color: Colors.yellow),
+                        GaugeRange(startValue: 0.4, endValue: 0.6, color: Colors.green),
+                        GaugeRange(startValue: 0.6, endValue: 0.8, color: Colors.blue),
+                        GaugeRange(startValue: 0.8, endValue: 1, color: Colors.purple),
+                      ], alertWidgets: [
+                        Text(t.statCellNum.appDescription),
+                        Text("${t.exactValue}: ${record!.aggregateStats.nerdStats.app}")
+                      ]),
+                      GaugetNum(playerStat: record!.aggregateStats.nerdStats.vsapm, playerStatLabel: "VS / APM", higherIsBetter: true, minimum: 1.8, maximum: 2.4, ranges: [
+                        GaugeRange(startValue: 1.8, endValue: 2.0, color: Colors.green),
+                        GaugeRange(startValue: 2.0, endValue: 2.2, color: Colors.blue),
+                        GaugeRange(startValue: 2.2, endValue: 2.4, color: Colors.purple),
+                      ], alertWidgets: [
+                        Text(t.statCellNum.vsapmDescription),
+                        Text("${t.exactValue}: ${record!.aggregateStats.nerdStats.vsapm}")
+                      ])
+                  ]),
                 ),
-              ),
-              Column(
-                children: [
-                  Text(t.nerdStats, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 40, 0, 0),
-                    child: Wrap(
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                  child: Wrap(
                       direction: Axis.horizontal,
                       alignment: WrapAlignment.center,
-                      spacing: 35,
+                      spacing: 25,
                       crossAxisAlignment: WrapCrossAlignment.start,
-                      clipBehavior: Clip.hardEdge,
+                      //clipBehavior: Clip.hardEdge,
                       children: [
-                        GaugetNum(playerStat: record!.aggregateStats.nerdStats.app, playerStatLabel: t.statCellNum.app, higherIsBetter: true, minimum: 0, maximum: 1, ranges: [
-                          GaugeRange(startValue: 0, endValue: 0.2, color: Colors.red),
-                          GaugeRange(startValue: 0.2, endValue: 0.4, color: Colors.yellow),
-                          GaugeRange(startValue: 0.4, endValue: 0.6, color: Colors.green),
-                          GaugeRange(startValue: 0.6, endValue: 0.8, color: Colors.blue),
-                          GaugeRange(startValue: 0.8, endValue: 1, color: Colors.purple),
-                        ], alertWidgets: [
-                          Text(t.statCellNum.appDescription),
-                          Text("${t.exactValue}: ${record!.aggregateStats.nerdStats.app}")
-                        ]),
-                        GaugetNum(playerStat: record!.aggregateStats.nerdStats.vsapm, playerStatLabel: "VS / APM", higherIsBetter: true, minimum: 1.8, maximum: 2.4, ranges: [
-                          GaugeRange(startValue: 1.8, endValue: 2.0, color: Colors.green),
-                          GaugeRange(startValue: 2.0, endValue: 2.2, color: Colors.blue),
-                          GaugeRange(startValue: 2.2, endValue: 2.4, color: Colors.purple),
-                        ], alertWidgets: [
-                          Text(t.statCellNum.vsapmDescription),
-                          Text("${t.exactValue}: ${record!.aggregateStats.nerdStats.vsapm}")
-                        ])
-                    ]),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                    child: Wrap(
-                        direction: Axis.horizontal,
-                        alignment: WrapAlignment.center,
-                        spacing: 25,
-                        crossAxisAlignment: WrapCrossAlignment.start,
-                        clipBehavior: Clip.hardEdge,
-                        children: [
-                          StatCellNum(playerStat: record!.aggregateStats.nerdStats.dss, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.dss,
-                          alertWidgets: [Text(t.statCellNum.dssDescription),
-                              Text("${t.formula}: (VS / 100) - (APM / 60)"),
-                              Text("${t.exactValue}: ${record!.aggregateStats.nerdStats.dss}"),],
-                              okText: t.popupActions.ok,
-                              higherIsBetter: true,),
-                          StatCellNum(playerStat: record!.aggregateStats.nerdStats.dsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.dsp,
-                          alertWidgets: [Text(t.statCellNum.dspDescription),
-                              Text("${t.formula}: DS/S / PPS"),
-                              Text("${t.exactValue}: ${record!.aggregateStats.nerdStats.dsp}"),],
-                              okText: t.popupActions.ok,
-                              higherIsBetter: true),
-                          StatCellNum(playerStat: record!.aggregateStats.nerdStats.appdsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.appdsp,
-                          alertWidgets: [Text(t.statCellNum.appdspDescription),
-                              Text("${t.formula}: APP + DS/P"),
-                              Text("${t.exactValue}: ${record!.aggregateStats.nerdStats.appdsp}"),],
-                              okText: t.popupActions.ok,
-                              higherIsBetter: true),
-                          StatCellNum(playerStat: record!.aggregateStats.nerdStats.cheese, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.cheese,
-                          alertWidgets: [Text(t.statCellNum.cheeseDescription),
-                              Text("${t.formula}: (DS/P * 150) + ((VS/APM - 2) * 50) + (0.6 - APP) * 125"),
-                              Text("${t.exactValue}: ${record!.aggregateStats.nerdStats.cheese}"),],
-                              okText: t.popupActions.ok,
-                              higherIsBetter: false),
-                          StatCellNum(playerStat: record!.aggregateStats.nerdStats.gbe, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.gbe,
-                          alertWidgets: [Text(t.statCellNum.gbeDescription),
-                              Text("${t.formula}: APP * DS/P * 2"),
-                              Text("${t.exactValue}: ${record!.aggregateStats.nerdStats.gbe}"),],
-                              okText: t.popupActions.ok,
-                              higherIsBetter: true),
-                          StatCellNum(playerStat: record!.aggregateStats.nerdStats.nyaapp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.nyaapp,
-                          alertWidgets: [Text(t.statCellNum.nyaappDescription),
-                              Text("${t.formula}: APP - 5 * tan(radians((Cheese Index / -30) + 1))"),
-                              Text("${t.exactValue}:  ${record!.aggregateStats.nerdStats.nyaapp}")],
-                              okText: t.popupActions.ok,
-                              higherIsBetter: true),
-                          StatCellNum(playerStat: record!.aggregateStats.nerdStats.area, isScreenBig: bigScreen, fractionDigits: 1, playerStatLabel: t.statCellNum.area,
-                          alertWidgets: [Text(t.statCellNum.areaDescription),
-                              Text("${t.formula}: APM * 1 + PPS * 45 + VS * 0.444 + APP * 185 + DS/S * 175 + DS/P * 450 + Garbage Effi * 315"),
-                              Text("${t.exactValue}:  ${record!.aggregateStats.nerdStats.area}"),],
-                              okText: t.popupActions.ok,
-                              higherIsBetter: true)
-                        ]),
-                  )
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: Graphs(record!.aggregateStats.apm, record!.aggregateStats.pps, record!.aggregateStats.vs, record!.aggregateStats.nerdStats, record!.aggregateStats.playstyle),
-              )
-            ],
-          ) 
-        ),
+                        StatCellNum(playerStat: record!.aggregateStats.nerdStats.dss, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.dss,
+                        alertWidgets: [Text(t.statCellNum.dssDescription),
+                            Text("${t.formula}: (VS / 100) - (APM / 60)"),
+                            Text("${t.exactValue}: ${record!.aggregateStats.nerdStats.dss}"),],
+                            okText: t.popupActions.ok,
+                            higherIsBetter: true,),
+                        StatCellNum(playerStat: record!.aggregateStats.nerdStats.dsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.dsp,
+                        alertWidgets: [Text(t.statCellNum.dspDescription),
+                            Text("${t.formula}: DS/S / PPS"),
+                            Text("${t.exactValue}: ${record!.aggregateStats.nerdStats.dsp}"),],
+                            okText: t.popupActions.ok,
+                            higherIsBetter: true),
+                        StatCellNum(playerStat: record!.aggregateStats.nerdStats.appdsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.appdsp,
+                        alertWidgets: [Text(t.statCellNum.appdspDescription),
+                            Text("${t.formula}: APP + DS/P"),
+                            Text("${t.exactValue}: ${record!.aggregateStats.nerdStats.appdsp}"),],
+                            okText: t.popupActions.ok,
+                            higherIsBetter: true),
+                        StatCellNum(playerStat: record!.aggregateStats.nerdStats.cheese, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.cheese,
+                        alertWidgets: [Text(t.statCellNum.cheeseDescription),
+                            Text("${t.formula}: (DS/P * 150) + ((VS/APM - 2) * 50) + (0.6 - APP) * 125"),
+                            Text("${t.exactValue}: ${record!.aggregateStats.nerdStats.cheese}"),],
+                            okText: t.popupActions.ok,
+                            higherIsBetter: false),
+                        StatCellNum(playerStat: record!.aggregateStats.nerdStats.gbe, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.gbe,
+                        alertWidgets: [Text(t.statCellNum.gbeDescription),
+                            Text("${t.formula}: APP * DS/P * 2"),
+                            Text("${t.exactValue}: ${record!.aggregateStats.nerdStats.gbe}"),],
+                            okText: t.popupActions.ok,
+                            higherIsBetter: true),
+                        StatCellNum(playerStat: record!.aggregateStats.nerdStats.nyaapp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.nyaapp,
+                        alertWidgets: [Text(t.statCellNum.nyaappDescription),
+                            Text("${t.formula}: APP - 5 * tan(radians((Cheese Index / -30) + 1))"),
+                            Text("${t.exactValue}:  ${record!.aggregateStats.nerdStats.nyaapp}")],
+                            okText: t.popupActions.ok,
+                            higherIsBetter: true),
+                        StatCellNum(playerStat: record!.aggregateStats.nerdStats.area, isScreenBig: bigScreen, fractionDigits: 1, playerStatLabel: t.statCellNum.area,
+                        alertWidgets: [Text(t.statCellNum.areaDescription),
+                            Text("${t.formula}: APM * 1 + PPS * 45 + VS * 0.444 + APP * 185 + DS/S * 175 + DS/P * 450 + Garbage Effi * 315"),
+                            Text("${t.exactValue}:  ${record!.aggregateStats.nerdStats.area}"),],
+                            okText: t.popupActions.ok,
+                            higherIsBetter: true)
+                      ]),
+                )
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: Graphs(record!.aggregateStats.apm, record!.aggregateStats.pps, record!.aggregateStats.vs, record!.aggregateStats.nerdStats, record!.aggregateStats.playstyle),
+            )
+          ],
+        ) 
       );
     });
   }

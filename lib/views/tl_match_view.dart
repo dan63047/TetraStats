@@ -41,7 +41,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
   late Duration time;
   late String readableTime;
   late String reason;
-  Duration totalTime = Duration();
+  Duration totalTime = const Duration();
   List<Duration> roundLengths = [];
   List<BetaLeagueStats> timeWeightedStats = [];
   late bool initPlayerWon;
@@ -53,9 +53,9 @@ class TlMatchResultState extends State<TlMatchResultView> {
     if (rounds.indexWhere((element) => element.value == -2) == -1) rounds.insert(1, DropdownMenuItem(value: -2, child: Text(t.timeWeightedmatch)));
     greenSidePlayer = widget.record.results.leaderboard.indexWhere((element) => element.id == widget.initPlayerId);
     redSidePlayer = widget.record.results.leaderboard.indexWhere((element) => element.id != widget.initPlayerId);
-    List<double> APMmultipliedByWeights = [0, 0];
-    List<double> PPSmultipliedByWeights = [0, 0];
-    List<double> VSmultipliedByWeights = [0, 0];
+    List<double> apmMultipliedByWeights = [0, 0];
+    List<double> ppsMultipliedByWeights= [0, 0];
+    List<double> vsMultipliedByWeights = [0, 0];
     for (var round in widget.record.results.rounds){
       var longerLifetime = round[0].lifetime.compareTo(round[1].lifetime) == 1 ? round[0].lifetime : round[1].lifetime;
       roundLengths.add(longerLifetime);
@@ -64,18 +64,18 @@ class TlMatchResultState extends State<TlMatchResultView> {
       BetaLeagueRound greenSide = round.firstWhere((element) => element.id == widget.initPlayerId);
       BetaLeagueRound redSide = round.firstWhere((element) => element.id != widget.initPlayerId);
 
-      APMmultipliedByWeights[0] += greenSide.stats.apm*longerLifetime.inMilliseconds;
-      APMmultipliedByWeights[1] += redSide.stats.apm*longerLifetime.inMilliseconds;
-      PPSmultipliedByWeights[0] += greenSide.stats.pps*longerLifetime.inMilliseconds;
-      PPSmultipliedByWeights[1] += redSide.stats.pps*longerLifetime.inMilliseconds;
-      VSmultipliedByWeights[0] += greenSide.stats.vs*longerLifetime.inMilliseconds;
-      VSmultipliedByWeights[1] += redSide.stats.vs*longerLifetime.inMilliseconds;
+      apmMultipliedByWeights[0] += greenSide.stats.apm*longerLifetime.inMilliseconds;
+      apmMultipliedByWeights[1] += redSide.stats.apm*longerLifetime.inMilliseconds;
+      ppsMultipliedByWeights[0] += greenSide.stats.pps*longerLifetime.inMilliseconds;
+      ppsMultipliedByWeights[1] += redSide.stats.pps*longerLifetime.inMilliseconds;
+      vsMultipliedByWeights[0] += greenSide.stats.vs*longerLifetime.inMilliseconds;
+      vsMultipliedByWeights[1] += redSide.stats.vs*longerLifetime.inMilliseconds;
     }
     timeWeightedStats = [
       BetaLeagueStats(
-        apm: APMmultipliedByWeights[0]/totalTime.inMilliseconds,
-        pps: PPSmultipliedByWeights[0]/totalTime.inMilliseconds,
-        vs: VSmultipliedByWeights[0]/totalTime.inMilliseconds,
+        apm: apmMultipliedByWeights[0]/totalTime.inMilliseconds,
+        pps: ppsMultipliedByWeights[0]/totalTime.inMilliseconds,
+        vs: vsMultipliedByWeights[0]/totalTime.inMilliseconds,
         garbageSent: widget.record.results.leaderboard[greenSidePlayer].stats.garbageSent,
         garbageReceived: widget.record.results.leaderboard[greenSidePlayer].stats.garbageReceived,
         kills: widget.record.results.leaderboard[greenSidePlayer].stats.kills,
@@ -83,9 +83,9 @@ class TlMatchResultState extends State<TlMatchResultView> {
         rank: widget.record.results.leaderboard[greenSidePlayer].stats.rank
       ),
       BetaLeagueStats(
-        apm: APMmultipliedByWeights[1]/totalTime.inMilliseconds,
-        pps: PPSmultipliedByWeights[1]/totalTime.inMilliseconds,
-        vs: VSmultipliedByWeights[1]/totalTime.inMilliseconds,
+        apm: apmMultipliedByWeights[1]/totalTime.inMilliseconds,
+        pps: ppsMultipliedByWeights[1]/totalTime.inMilliseconds,
+        vs: vsMultipliedByWeights[1]/totalTime.inMilliseconds,
         garbageSent: widget.record.results.leaderboard[redSidePlayer].stats.garbageSent,
         garbageReceived: widget.record.results.leaderboard[redSidePlayer].stats.garbageReceived,
         kills: widget.record.results.leaderboard[redSidePlayer].stats.kills,
@@ -480,12 +480,12 @@ class TlMatchResultState extends State<TlMatchResultView> {
                       OverflowBar(
                         alignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
-                          TextButton( style: roundSelector == -1 ? ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.grey.shade900)) : null,
+                          TextButton( style: roundSelector == -1 ? ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.grey.shade900)) : null,
                           onPressed: () {
                             roundSelector = -1;
                             setState(() {});
                           }, child: Text(t.matchStats)),
-                          TextButton( style: roundSelector == -2 ? ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.grey.shade900)) : null,
+                          TextButton( style: roundSelector == -2 ? ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.grey.shade900)) : null,
                           onPressed: timeWeightedStatsAvaliable ? () {
                             roundSelector = -2;
                             setState(() {});

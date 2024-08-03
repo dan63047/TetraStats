@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:tetra_stats/data_objects/tetra_stats.dart';
 import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';

@@ -777,7 +777,9 @@ class ZenithResults{
     speedrun = json['speedrun'];
     speedrunSeen = json['speedrun_seen'];
     splits = [];
-    for (int ms in json['splits']) splits.add(Duration(milliseconds: ms));
+    for (int ms in json['splits']) {
+      splits.add(Duration(milliseconds: ms));
+    }
   }
 }
 
@@ -935,7 +937,9 @@ class TetraLeagueBetaStream{
 
   TetraLeagueBetaStream.fromJson(List<dynamic> json, String userID) {
     id = userID;
-    for (var entry in json) records.add(BetaRecord.fromJson(entry));
+    for (var entry in json) {
+      records.add(BetaRecord.fromJson(entry));
+    }
   }
 
   addFromAlphaStream(List<TetraLeagueAlphaRecord> r){
@@ -991,7 +995,7 @@ class TetraLeagueBetaStream{
               naturalorder: entry.endContext[0].naturalOrder,
               active: false,
               alive: false,
-              lifetime: Duration(milliseconds: -1),
+              lifetime: const Duration(milliseconds: -1),
               stats: BetaLeagueStats(
                 apm: entry.endContext[0].secondaryTracking[i],
                 pps: entry.endContext[0].tertiaryTracking[i],
@@ -1008,7 +1012,7 @@ class TetraLeagueBetaStream{
               naturalorder: entry.endContext[1].naturalOrder,
               active: false,
               alive: false,
-              lifetime: Duration(milliseconds: -1),
+              lifetime: const Duration(milliseconds: -1),
               stats: BetaLeagueStats(
                 apm: entry.endContext[1].secondaryTracking[i],
                 pps: entry.endContext[1].tertiaryTracking[i],
@@ -1072,10 +1076,14 @@ class BetaLeagueResults{
   BetaLeagueResults({required this.leaderboard, required this.rounds});
 
   BetaLeagueResults.fromJson(Map<String, dynamic> json){
-    for (var lbEntry in json['leaderboard']) leaderboard.add(BetaLeagueLeaderboardEntry.fromJson(lbEntry));
+    for (var lbEntry in json['leaderboard']) {
+      leaderboard.add(BetaLeagueLeaderboardEntry.fromJson(lbEntry));
+    }
     for (var roundEntry in json['rounds']){
       List<BetaLeagueRound> round = [];
-      for (var r in roundEntry) round.add(BetaLeagueRound.fromJson(r));
+      for (var r in roundEntry) {
+        round.add(BetaLeagueRound.fromJson(r));
+      }
       rounds.add(round);
     }
   }
@@ -1477,7 +1485,9 @@ class ZenithExtras extends RecordExtras{
   List<String> mods = [];
 
   ZenithExtras.fromJson(Map<String, dynamic> json){
-    for (var mod in json["mods"]) mods.add(mod);
+    for (var mod in json["mods"]) {
+      mods.add(mod);
+    }
   }
 }
 
@@ -2407,8 +2417,8 @@ class TetrioPlayerFromLeaderboard {
     gamesPlayed = json['league']['gamesplayed'] as int;
     gamesWon = json['league']['gameswon'] as int;
     rating = json['league']['rating'] != null ? json['league']['rating'].toDouble() : 0;
-    glicko = json['league']['glicko'] != null ? json['league']['glicko'].toDouble() : null;
-    rd = json['league']['rd'] != null ? json['league']['rd'].toDouble() : null;
+    glicko = json['league']['glicko']?.toDouble();
+    rd = json['league']['rd']?.toDouble();
     rank = json['league']['rank'];
     bestRank = json['league']['bestrank'];
     apm = json['league']['apm'] != null ? json['league']['apm'].toDouble() : 0.00;
