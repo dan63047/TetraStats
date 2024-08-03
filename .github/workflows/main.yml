@@ -61,7 +61,7 @@ jobs:
         with:
           type: 'zip'
           filename: TetraStats-${{github.ref_name}}-linux.zip
-          directory: build/linux/x64/runner/Release/bundle
+          directory: build/linux/x64/runner/release/bundle
       - name: Push to Releases
         uses: ncipollo/release-action@v1
         with:
