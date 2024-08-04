@@ -12,6 +12,7 @@ import 'package:tetra_stats/utils/text_shadow.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/main.dart';
+import 'package:tetra_stats/widgets/tl_rating_thingy.dart';
 import 'package:tetra_stats/widgets/user_thingy.dart';
 
 class MainView extends StatefulWidget {
@@ -65,7 +66,23 @@ TetrioPlayer testPlayer = TetrioPlayer(
   supporterTier: 2,
   verified: true,
   connections: null,
-  tlSeason1: TetraLeagueAlpha(timestamp: DateTime(1970), gamesPlayed: 28, gamesWon: 14, bestRank: "x", decaying: false, rating: 23500.6194, rank: "x", percentileRank: "x", percentile: 0.00, standing: 1, standingLocal: 1, nextAt: -1, prevAt: 500),
+  tlSeason1: TetraLeagueAlpha(
+    timestamp: DateTime(1970),
+    gamesPlayed: 28,
+    gamesWon: 14,
+    bestRank: "x",
+    decaying: false,
+    rating: 23500.6194,
+    glicko: 3847.2134,
+    rd: 61.95383,
+    rank: "x",
+    percentileRank: "x",
+    percentile: 0.00,
+    standing: 1,
+    standingLocal: 1,
+    nextAt: -1,
+    prevAt: 500
+  ),
   //distinguishment: Distinguishment(type: "twc", detail: "2023"),
   bio: "кровбер не в палку, без последнего тспина - 32 атаки. кровбер не в палку, без первого тсм и последнего тспина - 30 атаки. кровбер в палку с б2б - 38 атаки.(5 б2б)(не знаю от чего зависит) кровбер в палку с б2б - 36 атаки.(5 б2б)(не знаю от чего зависит)"
 );
@@ -77,6 +94,9 @@ News testNews = News("6098518e3d5155e6ec429cdc", [
 late ScrollController controller;
 
 class _MainState extends State<MainView> with TickerProviderStateMixin {
+  String _searchFor = "6098518e3d5155e6ec429cdc";
+  final TextEditingController _searchController = TextEditingController();
+
   @override
   void initState() {
     teto.open();
@@ -84,16 +104,23 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     super.initState();
   }
 
+  void changePlayer(String player) {
+    setState(() {
+      _searchFor = player;
+    });
+  }
+
   @override
   void dispose() {
     controller.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const SearchDrawer(),
+      drawer: SearchDrawer(changePlayer: changePlayer, controller: _searchController),
       body: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           return Row(
@@ -145,118 +172,80 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
               children: [
                 SizedBox(
                   width: 450.0,
-                  child: Column(
-                    children: [
-                      NewUserThingy(player: testPlayer, showStateTimestamp: false, setState: setState),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 0.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Expanded(child: ElevatedButton.icon(onPressed: (){print("ok, and?");}, icon: const Icon(Icons.person_add), label: Text(t.track), style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.horizontal(left: Radius.circular(12.0), right: Radius.zero)))))),
-                            Expanded(child: ElevatedButton.icon(onPressed: (){print("ok, and?");}, icon: const Icon(Icons.balance), label: Text(t.compare), style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.horizontal(left: Radius.zero, right: Radius.circular(12.0)))))))
-                          ],
-                        ),
-                      ),
-                      Card(
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
-                              child: Row(
-                                children: [
-                                  const Text("Badges", style: TextStyle(fontFamily: "Eurostile Round Extended")),
-                                  const Spacer(),
-                                  Text(intf.format(testPlayer.badges.length))
-                                ],
+                  child: FutureBuilder<TetrioPlayer>(future: teto.fetchPlayer(_searchFor), builder:(context, snapshot) {
+                    switch (snapshot.connectionState){
+                      case ConnectionState.none:
+                      case ConnectionState.waiting:
+                      case ConnectionState.active:
+                        return const Center(child: CircularProgressIndicator());
+                      case ConnectionState.done:
+                        if (snapshot.hasData){
+                          return Column(
+                            children: [
+                              NewUserThingy(player: snapshot.data!, showStateTimestamp: false, setState: setState),
+                              if (snapshot.data!.badges.isNotEmpty) BadgesThingy(badges: snapshot.data!.badges),
+                              if (snapshot.data!.distinguishment != null) DistinguishmentThingy(snapshot.data!.distinguishment!),
+                              if (snapshot.data!.bio != null) Card(
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const Spacer(), 
+                                        Text(t.bio, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
+                                        const Spacer()
+                                      ],
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(bottom: 8.0),
+                                      child: MarkdownBody(data: snapshot.data!.bio!, styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.center)),
+                                    )
+                                  ],
+                                ),
                               ),
-                            ),
-                            SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                children: [
-                                  for (var badge in testPlayer.badges)
-                                  IconButton(
-                                    onPressed: () => showDialog<void>(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: Text(badge.label, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
-                                          content: SingleChildScrollView(
-                                            child: ListBody(
-                                              children: [
-                                                Wrap(
-                                                  direction: Axis.horizontal,
-                                                  alignment: WrapAlignment.center,
-                                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                                  spacing: 25,
-                                                  children: [
-                                                    Image.asset("res/tetrio_badges/${badge.badgeId}.png"),
-                                                    Text(badge.ts != null
-                                                        ? t.obtainDate(date: timestamp(badge.ts!))
-                                                        : t.assignedManualy),
-                                                  ],
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                          actions: <Widget>[
-                                            TextButton(
-                                              child: Text(t.popupActions.ok),
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                      ),
-                                      tooltip: badge.label,
-                                      icon: Image.asset(
-                                        "res/tetrio_badges/${badge.badgeId}.png",
-                                        height: 32,
-                                        width: 32,
-                                        errorBuilder: (context, error, stackTrace) {
-                                          return Image.network(
-                                            kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioBadge&badge=${badge.badgeId}" : "https://tetr.io/res/badges/${badge.badgeId}.png",
-                                            height: 32,
-                                            width: 32,
-                                            errorBuilder:(context, error, stackTrace) {
-                                              return Image.asset("res/icons/kagari.png", height: 32, width: 32);
-                                            }
-                                          ); 
-                                        },
-                                      )
-                                  )
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      if (testPlayer.distinguishment != null) DistinguishmentThingy(testPlayer.distinguishment!),
-                      if (testPlayer.bio != null) Card(
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                const Spacer(), 
-                                Text(t.bio, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
-                                const Spacer()
+                                //if (testNews != null && testNews!.news.isNotEmpty)
+                              Expanded(
+                                child: FutureBuilder<News>(
+                                  future: teto.fetchNews(_searchFor),
+                                  builder: (context, snapshot) {
+                                    switch (snapshot.connectionState){
+                                      case ConnectionState.none:
+                                      case ConnectionState.waiting:
+                                      case ConnectionState.active:
+                                        return Card(child: Center(child: CircularProgressIndicator()));
+                                      case ConnectionState.done:
+                                        if (snapshot.hasData){
+                                          return NewsThingy(snapshot.data!);
+                                        }else if (snapshot.hasError){
+                                          return Card(child: Column(children: [
+                                            Text(snapshot.error.toString(), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                                            Text(snapshot.stackTrace.toString())
+                                          ]
+                                        ));
+                                      }
+                                    }
+                                    return Text("what?");
+                                  }
+                                ),
+                              )
                               ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 8.0),
-                              child: MarkdownBody(data: testPlayer.bio!, styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.center)),
+                            );
+                        }else{
+                          return Center(child: 
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(snapshot.error != null ? snapshot.error.toString() : "lol", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: Text(snapshot.stackTrace != null ? snapshot.stackTrace.toString() : "lol", textAlign: TextAlign.center),
+                                ),
+                              ],
                             )
-                          ],
-                        ),
-                      ),
-                        //if (testNews != null && testNews!.news.isNotEmpty)
-                      Expanded(child: NewsThingy(testNews))
-                      ],
-                    )
-                  ),
+                          );
+                        }
+                    }
+                  },
+                )),
                 SizedBox(
                   width: constraints.maxWidth - 450 - 80,
                   child: Column(
@@ -272,7 +261,8 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                           ],
                         ),
                       ),
-                      const Card(),
+                      TetraLeagueThingy(league: testPlayer.tlSeason1!),
+                      //const Card(),
                       SegmentedButton<Cards>(
                         segments: const <ButtonSegment<Cards>>[
                           ButtonSegment<Cards>(
@@ -333,7 +323,9 @@ class NewsThingy extends StatelessWidget{
     Map<String, String> gametypes = {
       "40l": t.sprint,
       "blitz": t.blitz,
-      "5mblast": "5,000,000 Blast"
+      "5mblast": "5,000,000 Blast",
+      "zenith": "Quick Play",
+      "zenithex": "Quick Play Expert",
     };
 
     // Individuly handle each entry type
@@ -362,7 +354,16 @@ class NewsThingy extends StatelessWidget{
               children: [
                 TextSpan(text: "${gametypes[news.data["gametype"]]} ", style: const TextStyle(fontWeight: FontWeight.bold)),
                 TextSpan(text: t.newsParts.personalbestMiddle),
-                TextSpan(text: news.data["gametype"] == "blitz" ? NumberFormat.decimalPattern().format(news.data["result"]) : get40lTime((news.data["result"]*1000).floor()), style: const TextStyle(fontWeight: FontWeight.bold)),
+                TextSpan(text: switch (news.data["gametype"]){
+                  "blitz" => NumberFormat.decimalPattern().format(news.data["result"]),
+                  "40l" => get40lTime((news.data["result"]*1000).floor()),
+                  "5mblast" => get40lTime((news.data["result"]*1000).floor()),
+                  "zenith" => "${f2.format(news.data["result"])} m.",
+                  "zenithex" => "${f2.format(news.data["result"])} m.",
+                  _ => "unknown"
+                },
+                style: const TextStyle(fontWeight: FontWeight.bold)
+                ),
               ]
             )
           ),
@@ -473,7 +474,6 @@ class NewsThingy extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return Card(
-      surfaceTintColor: theme.colorScheme.surface,
       child: SingleChildScrollView(
         child: Column(
           children: [
@@ -484,7 +484,8 @@ class NewsThingy extends StatelessWidget{
                 const Spacer()
               ]
             ),
-            for (NewsEntry entry in news.news) getNewsTile(entry)
+            if (news.news.isEmpty) Center(child: Text("Empty list"))
+            else for (NewsEntry entry in news.news) getNewsTile(entry)
           ],
         ),
       ),
@@ -592,6 +593,92 @@ class DistinguishmentThingy extends StatelessWidget{
   }
 }
 
+class BadgesThingy extends StatelessWidget{
+  final List<Badge> badges;
+
+  const BadgesThingy({super.key, required this.badges});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
+            child: Row(
+              children: [
+                const Text("Badges", style: TextStyle(fontFamily: "Eurostile Round Extended")),
+                const Spacer(),
+                Text(intf.format(badges.length))
+              ],
+            ),
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (var badge in badges)
+                IconButton(
+                  onPressed: () => showDialog<void>(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text(badge.label, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
+                        content: SingleChildScrollView(
+                          child: ListBody(
+                            children: [
+                              Wrap(
+                                direction: Axis.horizontal,
+                                alignment: WrapAlignment.center,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: 25,
+                                children: [
+                                  Image.asset("res/tetrio_badges/${badge.badgeId}.png"),
+                                  Text(badge.ts != null
+                                      ? t.obtainDate(date: timestamp(badge.ts!))
+                                      : t.assignedManualy),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            child: Text(t.popupActions.ok),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                    ),
+                    tooltip: badge.label,
+                    icon: Image.asset(
+                      "res/tetrio_badges/${badge.badgeId}.png",
+                      height: 32,
+                      width: 32,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Image.network(
+                          kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioBadge&badge=${badge.badgeId}" : "https://tetr.io/res/badges/${badge.badgeId}.png",
+                          height: 32,
+                          width: 32,
+                          errorBuilder:(context, error, stackTrace) {
+                            return Image.asset("res/icons/kagari.png", height: 32, width: 32);
+                          }
+                        ); 
+                      },
+                    )
+                )
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
 class NewUserThingy extends StatelessWidget {
   final TetrioPlayer player;
   final bool showStateTimestamp;
@@ -618,6 +705,12 @@ class NewUserThingy extends StatelessWidget {
     }
   }
 
+  String fontStyle(int length){
+    if (length < 10) return "Eurostile Round Extended";
+    else if (length < 13) return "Eurostile Round";
+    else return "Eurostile Round Condensed";
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);
@@ -632,11 +725,11 @@ class NewUserThingy extends StatelessWidget {
 
       return Card(
         clipBehavior: Clip.antiAlias,
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
-          child: Column(
-            children: [
-              Container(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4.0),
+              child: Container(
                 constraints: const BoxConstraints(maxWidth: 960),
                 height: player.bannerRevision != null ? 218.0 : 138.0,
                 child: Stack(
@@ -645,7 +738,6 @@ class NewUserThingy extends StatelessWidget {
                   if (player.bannerRevision != null) Image.network(kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioBanner&user=${player.userId}&rv=${player.bannerRevision}" : "https://tetr.io/user-content/banners/${player.userId}.jpg?rv=${player.bannerRevision}",
                     fit: BoxFit.cover,
                     height: 120,
-                    //width: 450,
                     errorBuilder: (context, error, stackTrace) {
                       return Container();
                     },
@@ -672,8 +764,8 @@ class NewUserThingy extends StatelessWidget {
                     child: Text(player.username,
                       //softWrap: true,
                       overflow: TextOverflow.fade,
-                      style: const TextStyle(
-                        fontFamily: "Eurostile Round Extended",
+                      style: TextStyle(
+                        fontFamily: fontStyle(player.username.length),
                         fontSize: 28,
                       )
                     ),
@@ -763,7 +855,7 @@ class NewUserThingy extends StatelessWidget {
                             );
                           }),
                           const TextSpan(text:"\n"),
-                          TextSpan(text: player.gameTime.isNegative ? "-h --m" : playtime(player.gameTime), style: TextStyle(color: player.gameTime.isNegative ? Colors.grey : Colors.white), recognizer: TapGestureRecognizer()..onTap = (){
+                          TextSpan(text: player.gameTime.isNegative ? "-h --m" : playtime(player.gameTime), style: TextStyle(color: player.gameTime.isNegative ? Colors.grey : Colors.white), recognizer: !player.gameTime.isNegative ? (TapGestureRecognizer()..onTap = (){
                             showDialog(
                               context: context,
                               builder: (BuildContext context) => AlertDialog(
@@ -772,7 +864,7 @@ class NewUserThingy extends StatelessWidget {
                                   child: ListBody(children: [
                                     Text(
                                       //"${intf.format(testPlayer.gameTime.inDays)} d\n${nonsecs.format(testPlayer.gameTime.inHours%24)} h\n${nonsecs.format(testPlayer.gameTime.inMinutes%60)} m\n${nonsecs.format(testPlayer.gameTime.inSeconds%60)} s\n${nonsecs3.format(testPlayer.gameTime.inMilliseconds%1000)} ms\n${nonsecs.format(testPlayer.gameTime.inMicroseconds%1000)} μs",
-                                      "${intf.format(testPlayer.gameTime.inDays)}d ${nonsecs.format(testPlayer.gameTime.inHours%24)}h ${nonsecs.format(testPlayer.gameTime.inMinutes%60)}m ${nonsecs.format(testPlayer.gameTime.inSeconds%60)}s ${nonsecs3.format(testPlayer.gameTime.inMilliseconds%1000)}ms ${nonsecs.format(testPlayer.gameTime.inMicroseconds%1000)}μs",
+                                      "${intf.format(player.gameTime.inDays)}d ${nonsecs.format(player.gameTime.inHours%24)}h ${nonsecs.format(player.gameTime.inMinutes%60)}m ${nonsecs.format(player.gameTime.inSeconds%60)}s ${nonsecs3.format(player.gameTime.inMilliseconds%1000)}ms ${nonsecs3.format(player.gameTime.inMicroseconds%1000)}μs",
                                       style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 24)
                                       ),
                                     ]
@@ -786,7 +878,7 @@ class NewUserThingy extends StatelessWidget {
                                 ]
                               )
                             );
-                          }),
+                          }) : null),
                           const TextSpan(text:"\n"),
                           TextSpan(text: player.gamesWon > -1 ? intf.format(player.gamesWon) : "---", style: TextStyle(color: player.gamesWon > -1 ? Colors.white : Colors.grey)),
                           TextSpan(text: "/${player.gamesPlayed > -1 ? intf.format(player.gamesPlayed) : "---"}", style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
@@ -795,18 +887,17 @@ class NewUserThingy extends StatelessWidget {
                     )
                   )
                 ],
-                          ),
+                ),
               ),
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.center,
-              //   crossAxisAlignment: CrossAxisAlignment.center,
-              //   children: [
-              //     ElevatedButton.icon(onPressed: (){print("ok, and?");}, icon: Icon(Icons.person_add), label: Text(t.track), style: ButtonStyle(shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.horizontal(left: Radius.circular(8), right: Radius.zero))))),
-              //     ElevatedButton.icon(onPressed: (){print("ok, and?");}, icon: Icon(Icons.balance), label: Text(t.compare), style: ButtonStyle(shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.horizontal(left: Radius.zero, right: Radius.circular(8))))))
-              //   ]
-              // )
-            ],
-          ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(child: ElevatedButton.icon(onPressed: (){print("ok, and?");}, icon: const Icon(Icons.person_add), label: Text(t.track), style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12.0))))))),
+                Expanded(child: ElevatedButton.icon(onPressed: (){print("ok, and?");}, icon: const Icon(Icons.balance), label: Text(t.compare), style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomRight: Radius.circular(12.0)))))))
+              ],
+            )
+          ],
         ),
       );
     });
@@ -814,7 +905,9 @@ class NewUserThingy extends StatelessWidget {
 }
 
 class SearchDrawer extends StatefulWidget{
-  const SearchDrawer({super.key});
+  final Function changePlayer;
+  final TextEditingController controller;
+  const SearchDrawer({super.key, required this.changePlayer, required this.controller});
 
   @override
   State<SearchDrawer> createState() => _SearchDrawerState();
@@ -842,11 +935,21 @@ class _SearchDrawerState extends State<SearchDrawer>  {
                 return [
                   SliverToBoxAdapter(
                     child: SearchBar(
+                      controller: widget.controller,
                       hintText: "Hello",
                       hintStyle: const WidgetStatePropertyAll(TextStyle(color: Colors.grey)),
                       trailing: [
-                        IconButton(onPressed: (){print("sas");}, icon: const Icon(Icons.search))
+                        IconButton(onPressed: (){setState(() {
+                          widget.changePlayer(widget.controller.value.text);
+                          Navigator.of(context).pop();
+                        });}, icon: const Icon(Icons.search))
                       ],
+                      onSubmitted: (value) {
+                        setState(() {
+                          widget.changePlayer(value);
+                          Navigator.of(context).pop();
+                        });
+                      },
                     ),
                   )
                 ];
@@ -858,7 +961,7 @@ class _SearchDrawerState extends State<SearchDrawer>  {
                 return ListTile(
                   title: Text(allPlayers[keys[i]]??keys[i]), // Takes last known username from list of states
                   onTap: () {
-                    //widget.changePlayer(keys[i]); // changes to chosen player
+                    widget.changePlayer(keys[i]); // changes to chosen player
                     Navigator.of(context).pop(); // and closes itself.
                   },
                 );
@@ -867,6 +970,43 @@ class _SearchDrawerState extends State<SearchDrawer>  {
           }
         }
       )
+    );
+  }
+}
+
+class TetraLeagueThingy extends StatelessWidget{
+  final TetraLeagueAlpha league;
+
+  const TetraLeagueThingy({super.key, required this.league});
+  
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Column(
+        children: [
+          TLRatingThingy(userID: "w", tlData: league)
+          // SfRadialGauge(
+          //   axes: [
+          //     RadialAxis(
+          //       radiusFactor: 0.7,
+          //       showTicks: false,
+          //       showLabels: false,
+          //       annotations: [
+          //         GaugeAnnotation(widget: Container(height: 196, child:
+          //         Image.asset("res/tetrio_tl_alpha_ranks/${league.rank}.png")),
+          //         angle: 270,positionFactor: 0.05
+          //         ),
+          //         GaugeAnnotation(widget: Container(child:
+          //         Text('24803.7921 TR',style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold))),
+          //         angle: 90,positionFactor: 0.9
+          //         )
+          //       ],
+          //     )
+          //   ],
+          //   enableLoadingAnimation: true,
+          // )
+        ],
+      ),
     );
   }
 }
