@@ -10,8 +10,6 @@ import 'package:tetra_stats/utils/numers_formats.dart';
 
 class TLProgress extends StatelessWidget{
   final TetraLeagueAlpha tlData;
-  final String? nextRank;
-  final String? previousRank;
   final double? nextRankTRcutoff;
   final double? previousRankTRcutoff;
   final double? nextRankGlickoCutoff;
@@ -19,7 +17,7 @@ class TLProgress extends StatelessWidget{
   final double? nextRankTRcutoffTarget;
   final double? previousRankTRcutoffTarget;
 
-  const TLProgress({super.key, required this.tlData, this.nextRank, this.previousRank, this.nextRankTRcutoff, this.previousRankTRcutoff, this.nextRankGlickoCutoff, this.previousGlickoCutoff, this.nextRankTRcutoffTarget, this.previousRankTRcutoffTarget});
+  const TLProgress({super.key, required this.tlData, this.nextRankTRcutoff, this.previousRankTRcutoff, this.nextRankGlickoCutoff, this.previousGlickoCutoff, this.nextRankTRcutoffTarget, this.previousRankTRcutoffTarget});
 
   double getBarPosition(){
     return min(max(0, 1 - (tlData.standing - tlData.nextAt)/(tlData.prevAt - tlData.nextAt)), 1);
@@ -31,51 +29,43 @@ class TLProgress extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    if (nextRank == null && previousRank == null && nextRankTRcutoff == null && previousRankTRcutoff == null && nextRankGlickoCutoff == null && previousGlickoCutoff == null && nextRankTRcutoffTarget == null && previousRankTRcutoffTarget == null) return Container();
+    if (tlData.prevAt < 0 && tlData.nextAt < 0 && nextRankTRcutoff == null && previousRankTRcutoff == null && nextRankGlickoCutoff == null && previousGlickoCutoff == null && nextRankTRcutoffTarget == null && previousRankTRcutoffTarget == null) return Container();
     final glickoForWin = rate(tlData.glicko!, tlData.rd!, 0.06, [[tlData.glicko!, tlData.rd!, 1]], {})[0]-tlData.glicko!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
-            width: MediaQuery.of(context).size.width,
-            height: 48,
-            child: Stack(
-              alignment: AlignmentDirectional.bottomCenter,
-              fit: StackFit.expand,
-              children: [
-              Positioned(left: 0, 
-                child: RichText(
-                  textAlign: TextAlign.left,
-                  text: TextSpan(
-                    style: const TextStyle(color: Colors.white, fontFamily: "Eurostile Round", fontSize: 12),
-                    children: [
-                      if (tlData.prevAt > 0) TextSpan(text: "№ ${f0.format(tlData.prevAt)}"),
-                      if (tlData.prevAt > 0 && previousRankTRcutoff != null) const TextSpan(text: "\n"),
-                      if (previousRankTRcutoff != null) TextSpan(text: "${f2.format(previousRankTRcutoff)} (${comparef2.format(previousRankTRcutoff!-tlData.rating)}) TR"),
-                      if ((tlData.prevAt > 0 || previousRankTRcutoff != null) && previousGlickoCutoff != null) const TextSpan(text: "\n"),
-                      if (previousGlickoCutoff != null) TextSpan(text: (tlData.standing > tlData.prevAt || ((tlData.glicko!-previousGlickoCutoff!)/glickoForWin < 0.5 && tlData.percentileRank != "d")) ? t.demotionOnNextLoss : t.numOfdefeats(losses: f2.format((tlData.glicko!-previousGlickoCutoff!)/glickoForWin)), style: TextStyle(color: (tlData.standing > tlData.prevAt || ((tlData.glicko!-previousGlickoCutoff!)/glickoForWin < 0.5 && tlData.percentileRank != "d")) ? Colors.redAccent : null))
-                    ]
-                  )
-                ),
+          Row(
+            children: [
+              RichText(
+                textAlign: TextAlign.left,
+                text: TextSpan(
+                  style: const TextStyle(color: Colors.white, fontFamily: "Eurostile Round", fontSize: 12),
+                  children: [
+                    if (tlData.prevAt > 0) TextSpan(text: "№ ${f0.format(tlData.prevAt)}"),
+                    if (tlData.prevAt > 0 && previousRankTRcutoff != null) const TextSpan(text: "\n"),
+                    if (previousRankTRcutoff != null) TextSpan(text: "${f2.format(previousRankTRcutoff)} (${comparef2.format(previousRankTRcutoff!-tlData.rating)}) TR"),
+                    if ((tlData.prevAt > 0 || previousRankTRcutoff != null) && previousGlickoCutoff != null) const TextSpan(text: "\n"),
+                    if (previousGlickoCutoff != null) TextSpan(text: (tlData.standing > tlData.prevAt || ((tlData.glicko!-previousGlickoCutoff!)/glickoForWin < 0.5 && tlData.percentileRank != "d")) ? t.demotionOnNextLoss : t.numOfdefeats(losses: f2.format((tlData.glicko!-previousGlickoCutoff!)/glickoForWin)), style: TextStyle(color: (tlData.standing > tlData.prevAt || ((tlData.glicko!-previousGlickoCutoff!)/glickoForWin < 0.5 && tlData.percentileRank != "d")) ? Colors.redAccent : null))
+                  ]
+                )
               ),
-              Positioned(right: 0,
-                child: RichText(
-                  textAlign: TextAlign.right,
-                  text: TextSpan(
-                    style: const TextStyle(color: Colors.white, fontFamily: "Eurostile Round", fontSize: 12),
-                    children: [
-                      if (tlData.nextAt > 0) TextSpan(text: "№ ${f0.format(tlData.nextAt)}"),
-                      if (tlData.nextAt > 0 && nextRankTRcutoff != null) const TextSpan(text: "\n"),
-                      if (nextRankTRcutoff != null) TextSpan(text: "${f2.format(nextRankTRcutoff)} (${comparef2.format(nextRankTRcutoff!-tlData.rating)}) TR"),
-                      if ((tlData.nextAt > 0 || nextRankTRcutoff != null) && nextRankGlickoCutoff != null) const TextSpan(text: "\n"),
-                      if (nextRankGlickoCutoff != null) TextSpan(text: (tlData.standing < tlData.nextAt || ((nextRankGlickoCutoff!-tlData.glicko!)/glickoForWin < 0.5 && ((tlData.rank != "x" && tlData.rank != "z") || tlData.percentileRank != "x"))) ? t.promotionOnNextWin : t.numOfVictories(wins: f2.format((nextRankGlickoCutoff!-tlData.glicko!)/glickoForWin)), style: TextStyle(color: (tlData.standing < tlData.nextAt || ((nextRankGlickoCutoff!-tlData.glicko!)/glickoForWin < 0.5 && tlData.percentileRank != "x")) ? Colors.greenAccent : null))
-                    ]
-                  )
-                ),
+              Spacer(),
+              RichText(
+                textAlign: TextAlign.right,
+                text: TextSpan(
+                  style: const TextStyle(color: Colors.white, fontFamily: "Eurostile Round", fontSize: 12),
+                  children: [
+                    if (tlData.nextAt > 0) TextSpan(text: "№ ${f0.format(tlData.nextAt)}"),
+                    if (tlData.nextAt > 0 && nextRankTRcutoff != null) const TextSpan(text: "\n"),
+                    if (nextRankTRcutoff != null) TextSpan(text: "${f2.format(nextRankTRcutoff)} (${comparef2.format(nextRankTRcutoff!-tlData.rating)}) TR"),
+                    if ((tlData.nextAt > 0 || nextRankTRcutoff != null) && nextRankGlickoCutoff != null) const TextSpan(text: "\n"),
+                    if (nextRankGlickoCutoff != null) TextSpan(text: (tlData.standing < tlData.nextAt || ((nextRankGlickoCutoff!-tlData.glicko!)/glickoForWin < 0.5 && ((tlData.rank != "x" && tlData.rank != "z") || tlData.percentileRank != "x"))) ? t.promotionOnNextWin : t.numOfVictories(wins: f2.format((nextRankGlickoCutoff!-tlData.glicko!)/glickoForWin)), style: TextStyle(color: (tlData.standing < tlData.nextAt || ((nextRankGlickoCutoff!-tlData.glicko!)/glickoForWin < 0.5 && tlData.percentileRank != "x")) ? Colors.greenAccent : null))
+                  ]
+                )
               )
-            ],),
+            ],
           ),
           SfLinearGauge(
             minimum: 0,

@@ -165,12 +165,10 @@ class _TLThingyState extends State<TLThingy> with TickerProviderStateMixin {
                 tlData: currentTl,
                 previousRankTRcutoff: widget.thatRankCutoff,
                 previousGlickoCutoff: widget.thatRankCutoffGlicko,
-                previousRank: widget.tl.prevRank,
                 previousRankTRcutoffTarget: widget.thatRankTarget,
                 nextRankTRcutoff: widget.nextRankCutoff,
                 nextRankGlickoCutoff: widget.nextRankCutoffGlicko,
                 nextRankTRcutoffTarget: widget.nextRankTarget,
-                nextRank: widget.tl.nextRank
               ),
               if (currentTl.gamesPlayed < 10)
                 Text(t.gamesUntilRanked(left: 10 - currentTl.gamesPlayed),

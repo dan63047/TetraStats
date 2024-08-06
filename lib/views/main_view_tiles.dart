@@ -9,9 +9,13 @@ import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
+import 'package:tetra_stats/views/tl_match_view.dart';
+import 'package:tetra_stats/widgets/list_tile_trailing_stats.dart';
+import 'package:tetra_stats/widgets/stat_sell_num.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/main.dart';
+import 'package:tetra_stats/widgets/tl_progress_bar.dart';
 import 'package:tetra_stats/widgets/tl_rating_thingy.dart';
 import 'package:tetra_stats/widgets/user_thingy.dart';
 
@@ -26,7 +30,9 @@ class MainView extends StatefulWidget {
   State<MainView> createState() => _MainState();
 }
 
+enum Page {home, leaderboards, leagueAverages, calculator, settings}
 enum Cards {overview, tetraLeague, quickPlay, quickPlayExpert, sprint, blitz, other}
+enum CardMod {info, recent}
 Map<Cards, String> cardsTitles = {
   Cards.overview: "Overview",
   Cards.tetraLeague: t.tetraLeague,
@@ -75,12 +81,15 @@ TetrioPlayer testPlayer = TetrioPlayer(
     rating: 23500.6194,
     glicko: 3847.2134,
     rd: 61.95383,
+    apm: 62.48,
+    pps: 1.85,
+    vs: 134.32,
     rank: "x",
     percentileRank: "x",
     percentile: 0.00,
     standing: 1,
     standingLocal: 1,
-    nextAt: -1,
+    nextAt: 1,
     prevAt: 500
   ),
   //distinguishment: Distinguishment(type: "twc", detail: "2023"),
@@ -95,6 +104,7 @@ late ScrollController controller;
 
 class _MainState extends State<MainView> with TickerProviderStateMixin {
   String _searchFor = "6098518e3d5155e6ec429cdc";
+  Cards rightCard = Cards.tetraLeague;
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -263,48 +273,66 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                       ),
                       TetraLeagueThingy(league: testPlayer.tlSeason1!),
                       //const Card(),
+                      SegmentedButton<CardMod>(
+                        showSelectedIcon: false,
+                        selected: <CardMod>{CardMod.info},
+                        segments: <ButtonSegment<CardMod>>[
+                          ButtonSegment<CardMod>(
+                              value: CardMod.info,
+                              label: Text('PB'),
+                              //icon: Icon(Icons.calendar_view_day)
+                            ),
+                          ButtonSegment<CardMod>(
+                              value: CardMod.recent,
+                              label: Text('Recent'),
+                              //icon: Icon(Icons.calendar_view_day)
+                            ),
+                        ]
+                      ),
                       SegmentedButton<Cards>(
-                        segments: const <ButtonSegment<Cards>>[
+                        showSelectedIcon: false,
+                        segments: <ButtonSegment<Cards>>[
                           ButtonSegment<Cards>(
                               value: Cards.overview,
-                              label: Text('Overview'),
+                              //label: Text('Overview'),
                               icon: Icon(Icons.calendar_view_day)),
                           ButtonSegment<Cards>(
                               value: Cards.tetraLeague,
-                              label: Text('Tetra League'),
-                              icon: Icon(Icons.calendar_view_week)),
+                              //label: Text('Tetra League'),
+                              icon: SvgPicture.asset("res/icons/league.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
                           ButtonSegment<Cards>(
                               value: Cards.quickPlay,
-                              label: Text('Quick Play'),
-                              icon: Icon(Icons.calendar_view_month)),
+                              //label: Text('Quick Play'),
+                              icon: SvgPicture.asset("res/icons/qp.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
                           // ButtonSegment<Cards>(
                           //     value: Cards.quickPlayExpert,
                           //     label: Text('QP Expert'),
                           //     icon: Icon(Icons.calendar_today)),
                           ButtonSegment<Cards>(
                               value: Cards.sprint,
-                              label: Text('40 Lines'),
-                              icon: Icon(Icons.calendar_today)),
+                              //label: Text('40 Lines'),
+                              icon: SvgPicture.asset("res/icons/40l.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
                           ButtonSegment<Cards>(
                               value: Cards.blitz,
-                              label: Text('Blitz'),
-                              icon: Icon(Icons.calendar_today)),
+                              //label: Text('Blitz'),
+                              icon: SvgPicture.asset("res/icons/blitz.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
                           // ButtonSegment<Cards>(
                           //     value: Cards.other,
                           //     label: Text('Other'),
                           //     icon: Icon(Icons.calendar_today)),
                         ],
-                        selected: const <Cards>{Cards.tetraLeague},
+                        selected: <Cards>{rightCard},
                         onSelectionChanged: (Set<Cards> newSelection) {
                           setState(() {
-                            // By default there is only a single segment that can be
-                            // selected at one time, so its value is always the first
-                            // item in the selected set.
-                            //calendarView = newSelection.first;
+                            rightCard = newSelection.first;
                           });})
                     ],
                   ),
                 ),
+                // SizedBox(
+                //     width: 450,
+                //     child: _TLRecords(userID: "snapshot.data![0].userId", changePlayer: changePlayer, data: [], wasActiveInTL: true, oldMathcesHere: false, separateScrollController: true)
+                // )
                 ],
               ),
           ],
@@ -815,11 +843,11 @@ class NewUserThingy extends StatelessWidget {
                       text: TextSpan(
                         style: const TextStyle(fontFamily: "Eurostile Round"),
                         children: [
-                          TextSpan(text: "Level ${intf.format(player.level.floor())}", recognizer: TapGestureRecognizer()..onTap = (){
+                          TextSpan(text: "Level ${intf.format(player.level.floor())}", style: TextStyle(decoration: TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted), recognizer: TapGestureRecognizer()..onTap = (){
                             showDialog(
                               context: context,
                               builder: (BuildContext context) => AlertDialog(
-                                title: Text("Level ${intf.format(player.level.floor())}"),  
+                                title: Text("Level ${intf.format(player.level.floor())}", textAlign: TextAlign.center),  
                                 content: SingleChildScrollView(
                                   child: ListBody(children: [
                                     Text(
@@ -855,18 +883,25 @@ class NewUserThingy extends StatelessWidget {
                             );
                           }),
                           const TextSpan(text:"\n"),
-                          TextSpan(text: player.gameTime.isNegative ? "-h --m" : playtime(player.gameTime), style: TextStyle(color: player.gameTime.isNegative ? Colors.grey : Colors.white), recognizer: !player.gameTime.isNegative ? (TapGestureRecognizer()..onTap = (){
+                          TextSpan(text: player.gameTime.isNegative ? "-h --m" : playtime(player.gameTime), style: TextStyle(color: player.gameTime.isNegative ? Colors.grey : Colors.white, decoration: player.gameTime.isNegative ? null : TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted), recognizer: !player.gameTime.isNegative ? (TapGestureRecognizer()..onTap = (){
                             showDialog(
                               context: context,
                               builder: (BuildContext context) => AlertDialog(
-                                title: Text(t.exactGametime),  
+                                title: Text(t.exactGametime, textAlign: TextAlign.center),  
                                 content: SingleChildScrollView(
                                   child: ListBody(children: [
                                     Text(
-                                      //"${intf.format(testPlayer.gameTime.inDays)} d\n${nonsecs.format(testPlayer.gameTime.inHours%24)} h\n${nonsecs.format(testPlayer.gameTime.inMinutes%60)} m\n${nonsecs.format(testPlayer.gameTime.inSeconds%60)} s\n${nonsecs3.format(testPlayer.gameTime.inMilliseconds%1000)} ms\n${nonsecs.format(testPlayer.gameTime.inMicroseconds%1000)} μs",
                                       "${intf.format(player.gameTime.inDays)}d ${nonsecs.format(player.gameTime.inHours%24)}h ${nonsecs.format(player.gameTime.inMinutes%60)}m ${nonsecs.format(player.gameTime.inSeconds%60)}s ${nonsecs3.format(player.gameTime.inMilliseconds%1000)}ms ${nonsecs3.format(player.gameTime.inMicroseconds%1000)}μs",
                                       style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 24)
                                       ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Text("It's ${f4.format(player.gameTime.inSeconds/31536000)} years,"),
+                                    ),
+                                    Text("${f4.format(player.gameTime.inSeconds/2628000)} monts,"),
+                                    Text("${f4.format(player.gameTime.inSeconds/3600)} hours,"),
+                                    Text("${f2.format(player.gameTime.inMilliseconds/60000)} minutes,"),
+                                    Text("${intf.format(player.gameTime.inSeconds)} seconds"),
                                     ]
                                     ),
                                 ),
@@ -984,29 +1019,176 @@ class TetraLeagueThingy extends StatelessWidget{
     return Card(
       child: Column(
         children: [
-          TLRatingThingy(userID: "w", tlData: league)
-          // SfRadialGauge(
-          //   axes: [
-          //     RadialAxis(
-          //       radiusFactor: 0.7,
-          //       showTicks: false,
-          //       showLabels: false,
-          //       annotations: [
-          //         GaugeAnnotation(widget: Container(height: 196, child:
-          //         Image.asset("res/tetrio_tl_alpha_ranks/${league.rank}.png")),
-          //         angle: 270,positionFactor: 0.05
-          //         ),
-          //         GaugeAnnotation(widget: Container(child:
-          //         Text('24803.7921 TR',style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold))),
-          //         angle: 90,positionFactor: 0.9
-          //         )
-          //       ],
-          //     )
-          //   ],
-          //   enableLoadingAnimation: true,
-          // )
+          TLRatingThingy(userID: "w", tlData: league),
+          TLProgress(tlData: league,),
+          Wrap(
+            spacing: 25.0,
+            alignment: WrapAlignment.spaceAround,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Table(
+                defaultColumnWidth:IntrinsicColumnWidth(),
+                children: [
+                  TableRow(children: [
+                    Text("APM: ", style: TextStyle(fontSize: 21)),
+                    Text(league.apm != null ? f2.format(league.apm) : "---", textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
+                    //Text(" APM", style: TextStyle(fontSize: 21))
+                  ]),
+                  TableRow(children: [
+                    Text("PPS: ", style: TextStyle(fontSize: 21)),
+                    Text(league.apm != null ? f2.format(league.pps) : "---", textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
+                    //Text(" PPS", style: TextStyle(fontSize: 21))
+                  ]),
+                  TableRow(children: [
+                    Text("VS: ", style: TextStyle(fontSize: 21)),
+                    Text(league.apm != null ? f2.format(league.vs) : "---", textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
+                   // Text(" VS", style: TextStyle(fontSize: 21))
+                  ])
+                ],
+              ),
+              SizedBox(
+                height: 128.0,
+                width: 128.0,
+                child: SfRadialGauge(
+                  axes: [
+                    RadialAxis(
+                      // startAngle: 180,
+                      // endAngle: 0,
+                      minimum: 0.4,
+                      maximum: 0.6,
+                      //radiusFactor: 1.5,
+                      showTicks: true,
+                      showLabels: false,
+                      interval: 0.1,
+                      //labelsPosition: ElementsPosition.outside,
+                      ranges:[
+                        GaugeRange(startValue: 0, endValue: league.winrate, color: theme.colorScheme.primary)
+                      ],
+                      annotations: [
+                        GaugeAnnotation(widget: Container(child:
+                        Text('${f2l.format(league.winrate*100)}%\nWR', textAlign: TextAlign.center, style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold))),
+                        angle: 90,positionFactor: 0.1
+                        ),
+                        // GaugeAnnotation(widget: Container(child:
+                        // Text('50.03%\nWR', textAlign: TextAlign.center, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 22))),
+                        // angle: 90,positionFactor: 0.5
+                        // )
+                      ],
+                    )
+                  ]
+                ),
+              ),
+              Table(
+                defaultColumnWidth:IntrinsicColumnWidth(),
+                children: [
+                  TableRow(children: [
+                    //Text("APM: ", style: TextStyle(fontSize: 21)),
+                    Text(intf.format(league.gamesPlayed), textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
+                    Text(" GP", style: TextStyle(fontSize: 21))
+                  ]),
+                  TableRow(children: [
+                    //Text("PPS: ", style: TextStyle(fontSize: 21)),
+                    Text(intf.format(league.gamesWon), textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
+                    Text(" GW", style: TextStyle(fontSize: 21))
+                  ]),
+                  TableRow(children: [
+                    //Text("VS: ", style: TextStyle(fontSize: 21)),
+                    Text("№ ${intf.format(league.standingLocal)}", textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
+                    Text(" in BY", style: TextStyle(fontSize: 21))
+                  ])
+                ],
+              ),
+              // RichText(
+              //   textAlign: TextAlign.right,
+              //   text: TextSpan(
+              //     style: const TextStyle(color: Colors.white, fontFamily: "Eurostile Round", fontSize: 12),
+              //     children: [
+              //       TextSpan(text: "${league.apm != null ? f2.format(league.apm) : "---"} APM"),
+              //       const TextSpan(text: "\n"),
+              //       TextSpan(text: "${league.pps != null ? f2.format(league.pps) : "---"} PPS"),
+              //       const TextSpan(text: "\n"),
+              //       TextSpan(text: "${league.vs != null ? f2.format(league.vs) : "---"} VS"),
+              //     ]
+              //   )
+              // ),
+              // StatCellNum(playerStat: league.apm??0.00, fractionDigits: 2, playerStatLabel: "APM", isScreenBig: true, higherIsBetter: true),
+              // StatCellNum(playerStat: league.pps??0.00, fractionDigits: 2, playerStatLabel: "PPS", isScreenBig: true, higherIsBetter: true),
+              // StatCellNum(playerStat: league.vs??0.00, fractionDigits: 2, playerStatLabel: "VS", isScreenBig: true, higherIsBetter: true),
+              
+            ],
+          )
         ],
       ),
     );
+  }
+}
+
+class _TLRecords extends StatelessWidget {
+  final String userID;
+  final Function changePlayer;
+  final List<BetaRecord> data;
+  final bool wasActiveInTL;
+  final bool oldMathcesHere;
+  final bool separateScrollController;
+
+  /// Widget, that displays Tetra League records.
+  /// Accepts list of TL records ([data]) and [userID] of player from the view
+  const _TLRecords({required this.userID, required this.changePlayer, required this.data, required this.wasActiveInTL, required this.oldMathcesHere, this.separateScrollController = false});
+
+  @override
+  Widget build(BuildContext context) {
+    if (data.isEmpty) {
+      return Center(child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(t.noRecords, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
+        if (wasActiveInTL) Text(t.errors.actionSuggestion),
+        if (wasActiveInTL) TextButton(onPressed: (){changePlayer(userID, fetchTLmatches: true);}, child: Text(t.fetchAndSaveOldTLmatches))
+      ],
+    ));
+    }
+    bool bigScreen = MediaQuery.of(context).size.width >= 768;
+    int length = data.length;
+    return ListView.builder(
+      physics: const AlwaysScrollableScrollPhysics(),
+      controller: separateScrollController ? ScrollController() : null,
+      itemCount: oldMathcesHere ? length : length + 1,
+      itemBuilder: (BuildContext context, int index) {
+        if (index == length) {
+          return Center(child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(t.noOldRecords(n: length), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
+            if (wasActiveInTL) Text(t.errors.actionSuggestion),
+            if (wasActiveInTL) TextButton(onPressed: (){changePlayer(userID, fetchTLmatches: true);}, child: Text(t.fetchAndSaveOldTLmatches))
+          ],
+        ));
+        }
+
+        var accentColor = data[index].results.leaderboard.firstWhere((element) => element.id == userID).wins > data[index].results.leaderboard.firstWhere((element) => element.id != userID).wins ? Colors.green : Colors.red;
+      return Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            stops: const [0, 0.05],
+            colors: [accentColor, Colors.transparent]
+          )
+        ),
+        child: ListTile(
+          leading: Text("${data[index].results.leaderboard.firstWhere((element) => element.id == userID).wins} : ${data[index].results.leaderboard.firstWhere((element) => element.id != userID).wins}",
+          style: bigScreen ? const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, shadows: textShadow) : const TextStyle(fontSize: 28, shadows: textShadow)),
+          title: Text("vs. ${data[index].results.leaderboard.firstWhere((element) => element.id != userID).username}"),
+          subtitle: Text(timestamp(data[index].ts), style: const TextStyle(color: Colors.grey)),
+          trailing: TrailingStats(
+            data[index].results.leaderboard.firstWhere((element) => element.id == userID).stats.apm,
+            data[index].results.leaderboard.firstWhere((element) => element.id == userID).stats.pps,
+            data[index].results.leaderboard.firstWhere((element) => element.id == userID).stats.vs,
+            data[index].results.leaderboard.firstWhere((element) => element.id != userID).stats.apm,
+            data[index].results.leaderboard.firstWhere((element) => element.id != userID).stats.pps,
+            data[index].results.leaderboard.firstWhere((element) => element.id != userID).stats.vs,
+            ),
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => TlMatchResultView(record: data[index], initPlayerId: userID))) //Navigator.push(context, MaterialPageRoute(builder: (context) => TlMatchResultView(record: data[index], initPlayerId: userID))),
+        ),
+      );
+    });
   }
 }

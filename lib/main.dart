@@ -30,7 +30,7 @@ ThemeData theme = ThemeData(
   colorScheme: const ColorScheme.dark(
     primary: Colors.cyanAccent,
     surface: Color.fromARGB(255, 10, 10, 10),
-    secondary: Colors.white,
+    secondary: Color(0xFF00838F),
   ),
   cardTheme: const CardTheme(surfaceTintColor: Color.fromARGB(255, 10, 10, 10)),
   drawerTheme: const DrawerThemeData(surfaceTintColor: Color.fromARGB(255, 10, 10, 10)),
@@ -38,6 +38,17 @@ ThemeData theme = ThemeData(
     shadowColor: WidgetStatePropertyAll(Colors.black),
     shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.horizontal(left: Radius.circular(12.0), right: Radius.circular(12.0)))),
     elevation: WidgetStatePropertyAll(8.0)
+  ),
+  chipTheme: ChipThemeData(
+    side: BorderSide(color: Colors.transparent),
+  ),
+  segmentedButtonTheme: SegmentedButtonThemeData(
+    style: ButtonStyle(
+      side: WidgetStatePropertyAll(BorderSide(color: Colors.transparent)),
+      surfaceTintColor: WidgetStatePropertyAll(Colors.cyanAccent),
+      iconColor: WidgetStatePropertyAll(Colors.cyanAccent),
+      shadowColor: WidgetStatePropertyAll(Colors.cyanAccent.shade200),
+    )
   ),
   scaffoldBackgroundColor: Colors.black
 );
