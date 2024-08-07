@@ -75,7 +75,7 @@ TetrioPlayer testPlayer = TetrioPlayer(
   tlSeason1: TetraLeagueAlpha(
     timestamp: DateTime(1970),
     gamesPlayed: 28,
-    gamesWon: 14,
+    gamesWon: 15,
     bestRank: "x",
     decaying: false,
     rating: 23500.6194,
@@ -106,6 +106,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   String _searchFor = "6098518e3d5155e6ec429cdc";
   Cards rightCard = Cards.tetraLeague;
   final TextEditingController _searchController = TextEditingController();
+  Duration postSeasonLeft = seasonStart.difference(DateTime.now());
 
   @override
   void initState() {
@@ -153,6 +154,11 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                 NavigationRailDestination(
                   icon: Icon(Icons.home),
                   selectedIcon: Icon(Icons.home),
+                  label: Text('First'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.data_thresholding_outlined),
+                  selectedIcon: Icon(Icons.data_thresholding_outlined),
                   label: Text('First'),
                 ),
                 NavigationRailDestination(
@@ -261,18 +267,47 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                   child: Column(
                     //crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Card(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Spacer(),
-                            Text(t.tetraLeague, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
-                            const Spacer()
-                          ],
+                      SizedBox(
+                        height: constraints.maxHeight - 64,
+                        child: SingleChildScrollView(
+                          child: Column(
+                            //mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Card(
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Spacer(),
+                                    Text(t.tetraLeague, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                                    const Spacer()
+                                  ],
+                                ),
+                              ),
+                              Card(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(t.seasonStarts),
+                                    Center(child: Text(countdown(postSeasonLeft), textAlign: TextAlign.center, style: const TextStyle(fontSize: 32.0))),
+                                  ],
+                                ),
+                              ),
+                              TetraLeagueThingy(league: testPlayer.tlSeason1!),
+                              Card(
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Spacer(),
+                                    Text(t.nerdStats, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                                    const Spacer()
+                                  ],
+                                ),
+                              ),
+                              NerdStatsThingy(nerdStats: testPlayer.tlSeason1!.nerdStats!)
+                            ],
+                          ),
                         ),
                       ),
-                      TetraLeagueThingy(league: testPlayer.tlSeason1!),
-                      //const Card(),
                       SegmentedButton<CardMod>(
                         showSelectedIcon: false,
                         selected: <CardMod>{CardMod.info},
@@ -986,6 +1021,15 @@ class _SearchDrawerState extends State<SearchDrawer>  {
                         });
                       },
                     ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: ListTile(
+                    title: Text(prefs.getString("player") ?? "dan63"),
+                    onTap: () {
+                      widget.changePlayer("6098518e3d5155e6ec429cdc");
+                      Navigator.of(context).pop();
+                    },
+                  ),
                   )
                 ];
               },
@@ -1021,30 +1065,34 @@ class TetraLeagueThingy extends StatelessWidget{
         children: [
           TLRatingThingy(userID: "w", tlData: league),
           TLProgress(tlData: league,),
-          Wrap(
-            spacing: 25.0,
-            alignment: WrapAlignment.spaceAround,
-            crossAxisAlignment: WrapCrossAlignment.center,
+          Row(
+            // spacing: 25.0,
+            // alignment: WrapAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Table(
-                defaultColumnWidth:IntrinsicColumnWidth(),
-                children: [
-                  TableRow(children: [
-                    Text("APM: ", style: TextStyle(fontSize: 21)),
-                    Text(league.apm != null ? f2.format(league.apm) : "---", textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
-                    //Text(" APM", style: TextStyle(fontSize: 21))
-                  ]),
-                  TableRow(children: [
-                    Text("PPS: ", style: TextStyle(fontSize: 21)),
-                    Text(league.apm != null ? f2.format(league.pps) : "---", textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
-                    //Text(" PPS", style: TextStyle(fontSize: 21))
-                  ]),
-                  TableRow(children: [
-                    Text("VS: ", style: TextStyle(fontSize: 21)),
-                    Text(league.apm != null ? f2.format(league.vs) : "---", textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
-                   // Text(" VS", style: TextStyle(fontSize: 21))
-                  ])
-                ],
+              Expanded(
+                child: Center(
+                  child: Table(
+                    defaultColumnWidth:IntrinsicColumnWidth(),
+                    children: [
+                      TableRow(children: [
+                        Text("APM: ", style: TextStyle(fontSize: 21)),
+                        Text(league.apm != null ? f2.format(league.apm) : "---", textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
+                        //Text(" APM", style: TextStyle(fontSize: 21))
+                      ]),
+                      TableRow(children: [
+                        Text("PPS: ", style: TextStyle(fontSize: 21)),
+                        Text(league.apm != null ? f2.format(league.pps) : "---", textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
+                        //Text(" PPS", style: TextStyle(fontSize: 21))
+                      ]),
+                      TableRow(children: [
+                        Text("VS: ", style: TextStyle(fontSize: 21)),
+                        Text(league.apm != null ? f2.format(league.vs) : "---", textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
+                       // Text(" VS", style: TextStyle(fontSize: 21))
+                      ])
+                    ],
+                  ),
+                ),
               ),
               SizedBox(
                 height: 128.0,
@@ -1066,61 +1114,190 @@ class TetraLeagueThingy extends StatelessWidget{
                       ],
                       annotations: [
                         GaugeAnnotation(widget: Container(child:
-                        Text('${f2l.format(league.winrate*100)}%\nWR', textAlign: TextAlign.center, style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold))),
+                        Text(percentage.format(league.winrate), textAlign: TextAlign.center, style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold))),
                         angle: 90,positionFactor: 0.1
                         ),
-                        // GaugeAnnotation(widget: Container(child:
-                        // Text('50.03%\nWR', textAlign: TextAlign.center, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 22))),
-                        // angle: 90,positionFactor: 0.5
-                        // )
+                        GaugeAnnotation(widget: Container(child:
+                        Text(t.statCellNum.winrate, textAlign: TextAlign.center)),
+                        angle: 270,positionFactor: 0.4
+                        )
                       ],
                     )
                   ]
                 ),
               ),
-              Table(
-                defaultColumnWidth:IntrinsicColumnWidth(),
-                children: [
-                  TableRow(children: [
-                    //Text("APM: ", style: TextStyle(fontSize: 21)),
-                    Text(intf.format(league.gamesPlayed), textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
-                    Text(" GP", style: TextStyle(fontSize: 21))
-                  ]),
-                  TableRow(children: [
-                    //Text("PPS: ", style: TextStyle(fontSize: 21)),
-                    Text(intf.format(league.gamesWon), textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
-                    Text(" GW", style: TextStyle(fontSize: 21))
-                  ]),
-                  TableRow(children: [
-                    //Text("VS: ", style: TextStyle(fontSize: 21)),
-                    Text("№ ${intf.format(league.standingLocal)}", textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
-                    Text(" in BY", style: TextStyle(fontSize: 21))
-                  ])
-                ],
+              Expanded(
+                child: Center(
+                  child: Table(
+                    defaultColumnWidth:IntrinsicColumnWidth(),
+                    children: [
+                      TableRow(children: [
+                        //Text("APM: ", style: TextStyle(fontSize: 21)),
+                        Text(intf.format(league.gamesPlayed), textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
+                        Text(" Games", style: TextStyle(fontSize: 21))
+                      ]),
+                      TableRow(children: [
+                        //Text("PPS: ", style: TextStyle(fontSize: 21)),
+                        Text(intf.format(league.gamesWon), textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
+                        Text(" Won", style: TextStyle(fontSize: 21))
+                      ]),
+                      TableRow(children: [
+                        //Text("VS: ", style: TextStyle(fontSize: 21)),
+                        Text("№ ${intf.format(league.standingLocal)}", textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
+                        Text(" in BY", style: TextStyle(fontSize: 21))
+                      ])
+                    ],
+                  ),
+                ),
               ),
-              // RichText(
-              //   textAlign: TextAlign.right,
-              //   text: TextSpan(
-              //     style: const TextStyle(color: Colors.white, fontFamily: "Eurostile Round", fontSize: 12),
-              //     children: [
-              //       TextSpan(text: "${league.apm != null ? f2.format(league.apm) : "---"} APM"),
-              //       const TextSpan(text: "\n"),
-              //       TextSpan(text: "${league.pps != null ? f2.format(league.pps) : "---"} PPS"),
-              //       const TextSpan(text: "\n"),
-              //       TextSpan(text: "${league.vs != null ? f2.format(league.vs) : "---"} VS"),
-              //     ]
-              //   )
-              // ),
-              // StatCellNum(playerStat: league.apm??0.00, fractionDigits: 2, playerStatLabel: "APM", isScreenBig: true, higherIsBetter: true),
-              // StatCellNum(playerStat: league.pps??0.00, fractionDigits: 2, playerStatLabel: "PPS", isScreenBig: true, higherIsBetter: true),
-              // StatCellNum(playerStat: league.vs??0.00, fractionDigits: 2, playerStatLabel: "VS", isScreenBig: true, higherIsBetter: true),
-              
             ],
-          )
+          ),
         ],
       ),
     );
   }
+}
+
+class NerdStatsThingy extends StatelessWidget{
+  final NerdStats nerdStats;
+
+  const NerdStatsThingy({super.key, required this.nerdStats});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Column(
+        children: [
+          Row(
+            children: [
+              SizedBox(
+                height: 256.0,
+                width: 256.0,
+                child: SfRadialGauge(
+                  axes: [
+                    RadialAxis(
+                      startAngle: 120,
+                      endAngle: 240,
+                      minimum: 0.0,
+                      maximum: 1.0,
+                      //radiusFactor: 1.5,
+                      showTicks: true,
+                      showLabels: false,
+                      interval: 0.1,
+                      //labelsPosition: ElementsPosition.outside,
+                      ranges:[
+                        GaugeRange(startValue: 0, endValue: nerdStats.app, color: theme.colorScheme.primary)
+                      ],
+                      annotations: [
+                        GaugeAnnotation(widget: Container(child:
+                        RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            style: TextStyle(fontFamily: "Eurostile Round"),
+                            children: [
+                              TextSpan(text: "APP\n"),
+                              TextSpan(text: f3.format(nerdStats.app), style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold)),
+                            //TextSpan(text: "\nAPP"),
+                            ]
+                        ))),
+                        angle: 180,positionFactor: 0.5
+                        ),
+                      ],
+                    ),
+                    RadialAxis(
+                      startAngle: 300,
+                      endAngle: 60,
+                      isInversed: true,
+                      minimum: 1.8,
+                      maximum: 2.4,
+                      //radiusFactor: 1.5,
+                      showTicks: true,
+                      showLabels: false,
+                      interval: 0.1,
+                      //labelsPosition: ElementsPosition.outside,
+                      ranges:[
+                        GaugeRange(startValue: 0, endValue: nerdStats.vsapm, color: theme.colorScheme.primary)
+                      ],
+                      annotations: [
+                        GaugeAnnotation(widget: Container(child:
+                        RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            style: TextStyle(fontFamily: "Eurostile Round"),
+                            children: [
+                              TextSpan(text: "VS/APM\n"),
+                              TextSpan(text: f3.format(nerdStats.vsapm), style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold)),
+                            ]
+                        ))),
+                        angle: 0,positionFactor: 0.5
+                        )
+                      ],
+                    )
+                  ]
+                ),
+              ),
+              Wrap(
+                children: [
+                  GaugetThingy(value: nerdStats.dss, min: 0, max: 1.0, label: t.statCellNum.dss, sideSize: 128.0, fractionDigits: 3),
+                  GaugetThingy(value: nerdStats.dsp, min: 0, max: 1.0, label: t.statCellNum.dsp, sideSize: 128.0, fractionDigits: 3),
+                  GaugetThingy(value: nerdStats.appdsp, min: 0, max: 1.2, label: t.statCellNum.appdsp, sideSize: 128.0, fractionDigits: 3)
+                ],
+              )
+            ]
+          ),
+        ],
+      )
+    );
+  }
+  
+}
+
+class GaugetThingy extends StatelessWidget{
+  final double value;
+  final double min;
+  final double max;
+  final String label;
+  final double sideSize;
+  final int fractionDigits;
+
+  GaugetThingy({super.key, required this.value, required this.min, required this.max, required this.label, required this.sideSize, required this.fractionDigits});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: sideSize,
+      width: sideSize,
+      child: SfRadialGauge(
+        axes: [
+          RadialAxis(
+            // startAngle: 180,
+            // endAngle: 0,
+            minimum: min,
+            maximum: max,
+            //radiusFactor: 1.5,
+            showTicks: true,
+            showLabels: false,
+            interval: 0.1,
+            //labelsPosition: ElementsPosition.outside,
+            ranges:[
+              GaugeRange(startValue: 0, endValue: value, color: theme.colorScheme.primary)
+            ],
+            annotations: [
+              GaugeAnnotation(widget: Container(child:
+              Text(f3.format(value), textAlign: TextAlign.center, style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold))),
+              angle: 90,positionFactor: 0.25
+              ),
+              GaugeAnnotation(widget: Container(child:
+              Text(label, textAlign: TextAlign.center, style: TextStyle(height: .9))),
+              angle: 270,positionFactor: 0.4
+              )
+            ],
+          )
+        ]
+      ),
+    );
+  }
+  
 }
 
 class _TLRecords extends StatelessWidget {

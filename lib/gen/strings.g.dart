@@ -6,7 +6,7 @@
 /// Locales: 2
 /// Strings: 1216 (608 per locale)
 ///
-/// Built on 2024-07-31 at 20:51 UTC
+/// Built on 2024-08-07 at 15:58 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -720,7 +720,7 @@ class _StringsStatCellNumEn {
 	String get lbpcShort => '№ in local LB';
 	String get gamesPlayed => 'Games\nplayed';
 	String get gamesWonTL => 'Games\nWon';
-	String get winrate => 'Winrate\nprecentage';
+	String get winrate => 'Winrate';
 	String get level => 'Level';
 	String get score => 'Score';
 	String get spp => 'Score\nPer Piece';
@@ -1824,7 +1824,7 @@ extension on Translations {
 			case 'statCellNum.lbpcShort': return '№ in local LB';
 			case 'statCellNum.gamesPlayed': return 'Games\nplayed';
 			case 'statCellNum.gamesWonTL': return 'Games\nWon';
-			case 'statCellNum.winrate': return 'Winrate\nprecentage';
+			case 'statCellNum.winrate': return 'Winrate';
 			case 'statCellNum.level': return 'Level';
 			case 'statCellNum.score': return 'Score';
 			case 'statCellNum.spp': return 'Score\nPer Piece';
