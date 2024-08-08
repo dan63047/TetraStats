@@ -4,8 +4,10 @@ import 'package:flutter/material.dart' hide Badge;
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
@@ -103,10 +105,9 @@ News testNews = News("6098518e3d5155e6ec429cdc", [
 late ScrollController controller;
 
 class _MainState extends State<MainView> with TickerProviderStateMixin {
+  int destination = 0;
   String _searchFor = "6098518e3d5155e6ec429cdc";
-  Cards rightCard = Cards.tetraLeague;
   final TextEditingController _searchController = TextEditingController();
-  Duration postSeasonLeft = seasonStart.difference(DateTime.now());
 
   @override
   void initState() {
@@ -154,22 +155,22 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                 NavigationRailDestination(
                   icon: Icon(Icons.home),
                   selectedIcon: Icon(Icons.home),
-                  label: Text('First'),
+                  label: Text('Home'),
                 ),
                 NavigationRailDestination(
                   icon: Icon(Icons.data_thresholding_outlined),
                   selectedIcon: Icon(Icons.data_thresholding_outlined),
-                  label: Text('First'),
+                  label: Text('Graphs'),
                 ),
                 NavigationRailDestination(
                   icon: Icon(Icons.leaderboard),
                   selectedIcon: Icon(Icons.leaderboard),
-                  label: Text('Second'),
+                  label: Text('Leaderboards'),
                 ),
                 NavigationRailDestination(
                   icon: Icon(Icons.compress),
                   selectedIcon: Icon(Icons.compress),
-                  label: Text('Third'),
+                  label: Text('Cutoffs'),
                 ),
                 NavigationRailDestination(
                   icon: Icon(Icons.calculate),
@@ -179,201 +180,581 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                 NavigationRailDestination(
                   icon: Icon(Icons.settings),
                   selectedIcon: Icon(Icons.settings),
-                  label: Text('Third'),
+                  label: Text('Settings'),
                 )
               ],
-              selectedIndex: 0
+              selectedIndex: destination,
+              onDestinationSelected: (value) {
+                setState(() {
+                  destination = value;
+                });
+              },
               ),
-            Row(
+            switch (destination){
+              0 => DestinationHome(searchFor: _searchFor, constraints: constraints),
+              1 => DestinationGraphs(searchFor: _searchFor, constraints: constraints),
+              2 => DestinationLeaderboards(constraints: constraints),
+              _ => Text("Unknown destination $destination")
+            }
+          ]);
+        },
+      ));
+  }
+}
+
+class DestinationLeaderboards extends StatefulWidget{
+  final BoxConstraints constraints;
+
+  const DestinationLeaderboards({super.key, required this.constraints});
+
+  @override
+  State<DestinationLeaderboards> createState() => _DestinationLeaderboardsState();
+}
+
+class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
+  Cards rightCard = Cards.tetraLeague;
+  Duration postSeasonLeft = seasonStart.difference(DateTime.now());
+  final List<String> leaderboards = ["Tetra League", "Quick Play", "Quick Play Expert"];
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 350.0,
+          height: widget.constraints.maxHeight,
+          child: Column(
+            children: [
+              Card(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Spacer(),
+                    Text("Leaderboards", style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36)),
+                    const Spacer()
+                  ],
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: leaderboards.length,
+                  itemBuilder: (BuildContext context, int index) { 
+                    return Card(
+                      surfaceTintColor: theme.colorScheme.primary,
+                      child: ListTile(
+                        title: Text(leaderboards[index]),
+                      ),
+                    );
+                  }
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          width: widget.constraints.maxWidth - 350 - 88,
+          child: Column(
+            children: [
+              
+            ],
+          ),
+        ),
+        ],
+      );
+  }
+}
+
+class DestinationGraphs extends StatefulWidget{
+  final String searchFor;
+  //final Function setState;
+  final BoxConstraints constraints;
+
+  const DestinationGraphs({super.key, required this.searchFor, required this.constraints});
+
+  @override
+  State<DestinationGraphs> createState() => _DestinationGraphsState();
+}
+
+class _DestinationGraphsState extends State<DestinationGraphs> {
+  Cards rightCard = Cards.tetraLeague;
+  bool fetchData = false;
+  bool _gamesPlayedInsteadOfDateAndTime = false;
+  late ZoomPanBehavior _zoomPanBehavior;
+  late TooltipBehavior _tooltipBehavior;
+  String yAxisTitle = "";
+  bool _smooth = false;
+  final List _historyShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR", "Opener", "Plonk", "Inf. DS", "Stride"];
+  int _chartsIndex = 0;
+  late List<DropdownMenuItem<List<_HistoryChartSpot>>> chartsData;
+  Duration postSeasonLeft = seasonStart.difference(DateTime.now());
+
+  @override
+  void initState(){
+    _tooltipBehavior = TooltipBehavior(
+      color: Colors.black,
+      borderColor: Colors.white,
+      enable: true,
+      animationDuration: 0,
+      builder: (dynamic data, dynamic point, dynamic series,
+        int pointIndex, int seriesIndex) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(
-                  width: 450.0,
-                  child: FutureBuilder<TetrioPlayer>(future: teto.fetchPlayer(_searchFor), builder:(context, snapshot) {
-                    switch (snapshot.connectionState){
-                      case ConnectionState.none:
-                      case ConnectionState.waiting:
-                      case ConnectionState.active:
-                        return const Center(child: CircularProgressIndicator());
-                      case ConnectionState.done:
-                        if (snapshot.hasData){
-                          return Column(
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Text(
+                    "${f4.format(data.stat)} $yAxisTitle",
+                    style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 20),
+                  ),
+                ),
+                Text(_gamesPlayedInsteadOfDateAndTime ? t.gamesPlayed(games: t.games(n: data.gamesPlayed)) : timestamp(data.timestamp))
+              ],
+            ),
+          );
+      }
+    );
+    _zoomPanBehavior = ZoomPanBehavior(
+      enablePinching: true,
+      enableSelectionZooming: true,
+      enableMouseWheelZooming : true,
+      enablePanning: true,
+    );
+    super.initState();
+  }
+
+  Future<List<DropdownMenuItem<List<_HistoryChartSpot>>>> getChartsData(bool fetchHistory) async {
+    List<TetrioPlayer> states = [];
+    Set<TetraLeagueAlpha> uniqueTL = {};
+
+    if(fetchHistory){
+      try{
+        var history = await teto.fetchAndsaveTLHistory(widget.searchFor);
+        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.fetchAndsaveTLHistoryResult(number: history.length))));
+      }on TetrioHistoryNotExist{
+        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.noHistorySaved)));
+      }on P1nkl0bst3rForbidden {
+        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.p1nkl0bst3rForbidden)));
+      }on P1nkl0bst3rInternalProblem {
+        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.p1nkl0bst3rinternal)));
+      }on P1nkl0bst3rTooManyRequests{
+        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.p1nkl0bst3rTooManyRequests)));
+      }
+    } 
+
+    states.addAll(await teto.getPlayer(widget.searchFor));
+    for (var element in states) {
+      if (element.tlSeason1 != null && uniqueTL.isNotEmpty && uniqueTL.last != element.tlSeason1) uniqueTL.add(element.tlSeason1!);
+      if (uniqueTL.isEmpty) uniqueTL.add(element.tlSeason1!);
+    }
+
+    if (uniqueTL.length >= 2){
+      chartsData = <DropdownMenuItem<List<_HistoryChartSpot>>>[ // Dumping charts data into dropdown menu items, while cheking if every entry is valid
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.rating)], child: Text(t.statCellNum.tr)),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.glicko!)], child: const Text("Glicko")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.rd!)], child: const Text("Rating Deviation")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.apm != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.apm!)], child: Text(t.statCellNum.apm.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.pps != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.pps!)], child: Text(t.statCellNum.pps.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.vs != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.vs!)], child: Text(t.statCellNum.vs.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.app)], child: Text(t.statCellNum.app.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.dss)], child: Text(t.statCellNum.dss.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.dsp)], child: Text(t.statCellNum.dsp.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.appdsp)], child: const Text("APP + DS/P")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.vsapm)], child: const Text("VS/APM")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.cheese)], child: Text(t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.gbe)], child: Text(t.statCellNum.gbe.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.nyaapp)], child: Text(t.statCellNum.nyaapp.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.area)], child: Text(t.statCellNum.area.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.estTr != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.estTr!.esttr)], child: Text(t.statCellNum.estOfTR.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.esttracc != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.esttracc!)], child: Text(t.statCellNum.accOfEst.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.playstyle!.opener)], child: const Text("Opener")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.playstyle!.plonk)], child: const Text("Plonk")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.playstyle!.infds)], child: const Text("Inf. DS")),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.playstyle!.stride)], child: const Text("Stride")),
+      ];
+    }else{
+      chartsData = [];
+    }
+
+    fetchData = false;
+
+    return chartsData;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<DropdownMenuItem<List<_HistoryChartSpot>>>>(
+      future: getChartsData(fetchData),
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState){
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+          case ConnectionState.active:
+            return const Center(child: CircularProgressIndicator());
+          case ConnectionState.done:
+            if (snapshot.hasData){
+              List<_HistoryChartSpot> selectedGraph = snapshot.data![_chartsIndex].value!;
+              yAxisTitle = _historyShortTitles[_chartsIndex];
+              return SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Card(
+                      child: Wrap(
+                        spacing: 20,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              NewUserThingy(player: snapshot.data!, showStateTimestamp: false, setState: setState),
-                              if (snapshot.data!.badges.isNotEmpty) BadgesThingy(badges: snapshot.data!.badges),
-                              if (snapshot.data!.distinguishment != null) DistinguishmentThingy(snapshot.data!.distinguishment!),
-                              if (snapshot.data!.bio != null) Card(
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        const Spacer(), 
-                                        Text(t.bio, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
-                                        const Spacer()
-                                      ],
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(bottom: 8.0),
-                                      child: MarkdownBody(data: snapshot.data!.bio!, styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.center)),
-                                    )
-                                  ],
-                                ),
+                              const Padding(padding: EdgeInsets.all(8.0), child: Text("X:", style: TextStyle(fontSize: 22))),
+                              DropdownButton(
+                                items: const [DropdownMenuItem(value: false, child: Text("Date & Time")), DropdownMenuItem(value: true, child: Text("Games Played"))],
+                                value: _gamesPlayedInsteadOfDateAndTime,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _gamesPlayedInsteadOfDateAndTime = value!;
+                                  });
+                                }
                               ),
-                                //if (testNews != null && testNews!.news.isNotEmpty)
-                              Expanded(
-                                child: FutureBuilder<News>(
-                                  future: teto.fetchNews(_searchFor),
-                                  builder: (context, snapshot) {
-                                    switch (snapshot.connectionState){
-                                      case ConnectionState.none:
-                                      case ConnectionState.waiting:
-                                      case ConnectionState.active:
-                                        return Card(child: Center(child: CircularProgressIndicator()));
-                                      case ConnectionState.done:
-                                        if (snapshot.hasData){
-                                          return NewsThingy(snapshot.data!);
-                                        }else if (snapshot.hasError){
-                                          return Card(child: Column(children: [
-                                            Text(snapshot.error.toString(), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                                            Text(snapshot.stackTrace.toString())
-                                          ]
-                                        ));
-                                      }
-                                    }
-                                    return Text("what?");
-                                  }
-                                ),
-                              )
                               ],
-                            );
-                        }else{
-                          return Center(child: 
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(snapshot.error != null ? snapshot.error.toString() : "lol", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 8.0),
-                                  child: Text(snapshot.stackTrace != null ? snapshot.stackTrace.toString() : "lol", textAlign: TextAlign.center),
-                                ),
-                              ],
-                            )
-                          );
-                        }
-                    }
-                  },
-                )),
-                SizedBox(
-                  width: constraints.maxWidth - 450 - 80,
-                  child: Column(
-                    //crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        height: constraints.maxHeight - 64,
-                        child: SingleChildScrollView(
-                          child: Column(
-                            //mainAxisSize: MainAxisSize.min,
+                          ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Card(
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Spacer(),
-                                    Text(t.tetraLeague, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
-                                    const Spacer()
-                                  ],
-                                ),
+                              const Padding(padding: EdgeInsets.all(8.0), child: Text("Y:", style: TextStyle(fontSize: 22))),
+                              DropdownButton(
+                                items: chartsData,
+                                value: chartsData[_chartsIndex].value,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _chartsIndex = chartsData.indexWhere((element) => element.value == value);
+                                  });
+                                }
                               ),
-                              Card(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(t.seasonStarts),
-                                    Center(child: Text(countdown(postSeasonLeft), textAlign: TextAlign.center, style: const TextStyle(fontSize: 32.0))),
-                                  ],
-                                ),
-                              ),
-                              TetraLeagueThingy(league: testPlayer.tlSeason1!),
-                              Card(
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Spacer(),
-                                    Text(t.nerdStats, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
-                                    const Spacer()
-                                  ],
-                                ),
-                              ),
-                              NerdStatsThingy(nerdStats: testPlayer.tlSeason1!.nerdStats!)
                             ],
                           ),
+                          if (selectedGraph.length > 300) Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Checkbox(value: _smooth,
+                                checkColor: Colors.black,
+                                onChanged: ((value) {
+                                  setState(() {
+                                    _smooth = value!;
+                                  });
+                                })),
+                                Text(t.smooth, style: const TextStyle(color: Colors.white, fontSize: 22))
+                            ],
+                          ),
+                          IconButton(onPressed: () => _zoomPanBehavior.reset(), icon: const Icon(Icons.refresh), alignment: Alignment.center,)
+                        ],
+                      ),
+                    ),
+                    if(chartsData[_chartsIndex].value!.length > 1) Card(
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width - 88,
+                        height: MediaQuery.of(context).size.height - 60,
+                        child: Padding( padding: const EdgeInsets.fromLTRB(40, 30, 40, 30),
+                        child: SfCartesianChart(
+                          tooltipBehavior: _tooltipBehavior,
+                          zoomPanBehavior: _zoomPanBehavior,
+                          primaryXAxis: _gamesPlayedInsteadOfDateAndTime ? const NumericAxis() : const DateTimeAxis(),
+                          primaryYAxis: const NumericAxis(
+                            rangePadding: ChartRangePadding.additional,
+                          ),
+                          margin: const EdgeInsets.all(0),
+                          series: <CartesianSeries>[
+                            if (_gamesPlayedInsteadOfDateAndTime) StepLineSeries<_HistoryChartSpot, int>(
+                              enableTooltip: true,
+                              dataSource: chartsData[_chartsIndex].value!,
+                              animationDuration: 0,
+                              opacity: _smooth ? 0 : 1,
+                              xValueMapper: (_HistoryChartSpot data, _) => data.gamesPlayed,
+                              yValueMapper: (_HistoryChartSpot data, _) => data.stat,
+                              color: Theme.of(context).colorScheme.primary,
+                              trendlines:<Trendline>[
+                                Trendline(
+                                  isVisible: _smooth,
+                                  period: (chartsData[_chartsIndex].value!.length/175).floor(),
+                                  type: TrendlineType.movingAverage,
+                                  color: Theme.of(context).colorScheme.primary)
+                              ],
+                            )
+                            else StepLineSeries<_HistoryChartSpot, DateTime>(
+                              enableTooltip: true,
+                              dataSource: chartsData[_chartsIndex].value!,
+                              animationDuration: 0,
+                              opacity: _smooth ? 0 : 1,
+                              xValueMapper: (_HistoryChartSpot data, _) => data.timestamp,
+                              yValueMapper: (_HistoryChartSpot data, _) => data.stat,
+                              color: Theme.of(context).colorScheme.primary,
+                              trendlines:<Trendline>[
+                                Trendline(
+                                  isVisible: _smooth,
+                                  period: (chartsData[_chartsIndex].value!.length/175).floor(),
+                                  type: TrendlineType.movingAverage,
+                                  color: Theme.of(context).colorScheme.primary)
+                              ],
+                            ),
+                          ],
+                        ),
+                        )
+                      ),
+                    )
+                    else if (chartsData[_chartsIndex].value!.length <= 1) Center(child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(t.notEnoughData, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
+                        Text(t.errors.actionSuggestion),
+                        TextButton(onPressed: (){setState(() {
+                          fetchData = true;
+                        });}, child: Text(t.fetchAndsaveTLHistory))
+                      ],
+                    ))
+                  ],
+                ),
+            );
+          }
+          if (snapshot.hasError){
+            return Center(child: 
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(snapshot.error != null ? snapshot.error.toString() : "lol", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(snapshot.stackTrace != null ? snapshot.stackTrace.toString() : "lol", textAlign: TextAlign.center),
+                  ),
+                ],
+              )
+            );
+          }
+        }
+        return Center(child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text("lol", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
+        ],
+      ));
+      },
+    ); 
+  }
+}
+
+class _HistoryChartSpot{
+  final DateTime timestamp;
+  final int gamesPlayed;
+  final String rank;
+  final double stat;
+  const _HistoryChartSpot(this.timestamp, this.gamesPlayed, this.rank, this.stat);
+}
+
+class DestinationHome extends StatefulWidget{
+  final String searchFor;
+  //final Function setState;
+  final BoxConstraints constraints;
+
+  const DestinationHome({super.key, required this.searchFor, required this.constraints});
+
+  @override
+  State<DestinationHome> createState() => _DestinationHomeState();
+}
+
+class _DestinationHomeState extends State<DestinationHome> {
+  Cards rightCard = Cards.tetraLeague;
+  Duration postSeasonLeft = seasonStart.difference(DateTime.now());
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 450.0,
+          child: FutureBuilder<TetrioPlayer>(future: teto.fetchPlayer(widget.searchFor), builder:(context, snapshot) {
+            switch (snapshot.connectionState){
+              case ConnectionState.none:
+              case ConnectionState.waiting:
+              case ConnectionState.active:
+                return const Center(child: CircularProgressIndicator());
+              case ConnectionState.done:
+                if (snapshot.hasData){
+                  return Column(
+                    children: [
+                      NewUserThingy(player: snapshot.data!, showStateTimestamp: false, setState: setState),
+                      if (snapshot.data!.badges.isNotEmpty) BadgesThingy(badges: snapshot.data!.badges),
+                      if (snapshot.data!.distinguishment != null) DistinguishmentThingy(snapshot.data!.distinguishment!),
+                      if (snapshot.data!.bio != null) Card(
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                const Spacer(), 
+                                Text(t.bio, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
+                                const Spacer()
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8.0),
+                              child: MarkdownBody(data: snapshot.data!.bio!, styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.center)),
+                            )
+                          ],
                         ),
                       ),
-                      SegmentedButton<CardMod>(
-                        showSelectedIcon: false,
-                        selected: <CardMod>{CardMod.info},
-                        segments: <ButtonSegment<CardMod>>[
-                          ButtonSegment<CardMod>(
-                              value: CardMod.info,
-                              label: Text('PB'),
-                              //icon: Icon(Icons.calendar_view_day)
-                            ),
-                          ButtonSegment<CardMod>(
-                              value: CardMod.recent,
-                              label: Text('Recent'),
-                              //icon: Icon(Icons.calendar_view_day)
-                            ),
-                        ]
+                        //if (testNews != null && testNews!.news.isNotEmpty)
+                      Expanded(
+                        child: FutureBuilder<News>(
+                          future: teto.fetchNews(widget.searchFor),
+                          builder: (context, snapshot) {
+                            switch (snapshot.connectionState){
+                              case ConnectionState.none:
+                              case ConnectionState.waiting:
+                              case ConnectionState.active:
+                                return Card(child: Center(child: CircularProgressIndicator()));
+                              case ConnectionState.done:
+                                if (snapshot.hasData){
+                                  return NewsThingy(snapshot.data!);
+                                }else if (snapshot.hasError){
+                                  return Card(child: Column(children: [
+                                    Text(snapshot.error.toString(), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                                    Text(snapshot.stackTrace.toString())
+                                  ]
+                                ));
+                              }
+                            }
+                            return Text("what?");
+                          }
+                        ),
+                      )
+                      ],
+                    );
+                }else{
+                  return Center(child: 
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(snapshot.error != null ? snapshot.error.toString() : "lol", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(snapshot.stackTrace != null ? snapshot.stackTrace.toString() : "lol", textAlign: TextAlign.center),
+                        ),
+                      ],
+                    )
+                  );
+                }
+            }
+          },
+        )),
+        SizedBox(
+          width: widget.constraints.maxWidth - 450 - 80,
+          child: Column(
+            //crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                height: widget.constraints.maxHeight - 64,
+                child: SingleChildScrollView(
+                  child: Column(
+                    //mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Card(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Spacer(),
+                            Text(t.tetraLeague, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                            const Spacer()
+                          ],
+                        ),
                       ),
-                      SegmentedButton<Cards>(
-                        showSelectedIcon: false,
-                        segments: <ButtonSegment<Cards>>[
-                          ButtonSegment<Cards>(
-                              value: Cards.overview,
-                              //label: Text('Overview'),
-                              icon: Icon(Icons.calendar_view_day)),
-                          ButtonSegment<Cards>(
-                              value: Cards.tetraLeague,
-                              //label: Text('Tetra League'),
-                              icon: SvgPicture.asset("res/icons/league.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
-                          ButtonSegment<Cards>(
-                              value: Cards.quickPlay,
-                              //label: Text('Quick Play'),
-                              icon: SvgPicture.asset("res/icons/qp.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
-                          // ButtonSegment<Cards>(
-                          //     value: Cards.quickPlayExpert,
-                          //     label: Text('QP Expert'),
-                          //     icon: Icon(Icons.calendar_today)),
-                          ButtonSegment<Cards>(
-                              value: Cards.sprint,
-                              //label: Text('40 Lines'),
-                              icon: SvgPicture.asset("res/icons/40l.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
-                          ButtonSegment<Cards>(
-                              value: Cards.blitz,
-                              //label: Text('Blitz'),
-                              icon: SvgPicture.asset("res/icons/blitz.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
-                          // ButtonSegment<Cards>(
-                          //     value: Cards.other,
-                          //     label: Text('Other'),
-                          //     icon: Icon(Icons.calendar_today)),
-                        ],
-                        selected: <Cards>{rightCard},
-                        onSelectionChanged: (Set<Cards> newSelection) {
-                          setState(() {
-                            rightCard = newSelection.first;
-                          });})
+                      Card(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(t.seasonStarts),
+                            Center(child: Text(countdown(postSeasonLeft), textAlign: TextAlign.center, style: const TextStyle(fontSize: 32.0))),
+                          ],
+                        ),
+                      ),
+                      TetraLeagueThingy(league: testPlayer.tlSeason1!),
+                      Card(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Spacer(),
+                            Text(t.nerdStats, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                            const Spacer()
+                          ],
+                        ),
+                      ),
+                      NerdStatsThingy(nerdStats: testPlayer.tlSeason1!.nerdStats!)
                     ],
                   ),
                 ),
-                // SizedBox(
-                //     width: 450,
-                //     child: _TLRecords(userID: "snapshot.data![0].userId", changePlayer: changePlayer, data: [], wasActiveInTL: true, oldMathcesHere: false, separateScrollController: true)
-                // )
-                ],
               ),
-          ],
-              );
-        },
-      ));
+              SegmentedButton<CardMod>(
+                showSelectedIcon: false,
+                selected: <CardMod>{CardMod.info},
+                segments: <ButtonSegment<CardMod>>[
+                  ButtonSegment<CardMod>(
+                      value: CardMod.info,
+                      label: Text('PB'),
+                      //icon: Icon(Icons.calendar_view_day)
+                    ),
+                  ButtonSegment<CardMod>(
+                      value: CardMod.recent,
+                      label: Text('Recent'),
+                      //icon: Icon(Icons.calendar_view_day)
+                    ),
+                ]
+              ),
+              SegmentedButton<Cards>(
+                showSelectedIcon: false,
+                segments: <ButtonSegment<Cards>>[
+                  ButtonSegment<Cards>(
+                      value: Cards.overview,
+                      //label: Text('Overview'),
+                      icon: Icon(Icons.calendar_view_day)),
+                  ButtonSegment<Cards>(
+                      value: Cards.tetraLeague,
+                      //label: Text('Tetra League'),
+                      icon: SvgPicture.asset("res/icons/league.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
+                  ButtonSegment<Cards>(
+                      value: Cards.quickPlay,
+                      //label: Text('Quick Play'),
+                      icon: SvgPicture.asset("res/icons/qp.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
+                  // ButtonSegment<Cards>(
+                  //     value: Cards.quickPlayExpert,
+                  //     label: Text('QP Expert'),
+                  //     icon: Icon(Icons.calendar_today)),
+                  ButtonSegment<Cards>(
+                      value: Cards.sprint,
+                      //label: Text('40 Lines'),
+                      icon: SvgPicture.asset("res/icons/40l.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
+                  ButtonSegment<Cards>(
+                      value: Cards.blitz,
+                      //label: Text('Blitz'),
+                      icon: SvgPicture.asset("res/icons/blitz.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
+                  // ButtonSegment<Cards>(
+                  //     value: Cards.other,
+                  //     label: Text('Other'),
+                  //     icon: Icon(Icons.calendar_today)),
+                ],
+                selected: <Cards>{rightCard},
+                onSelectionChanged: (Set<Cards> newSelection) {
+                  setState(() {
+                    rightCard = newSelection.first;
+                  });})
+            ],
+          ),
+        ),
+        // SizedBox(
+        //     width: 450,
+        //     child: _TLRecords(userID: "snapshot.data![0].userId", changePlayer: changePlayer, data: [], wasActiveInTL: true, oldMathcesHere: false, separateScrollController: true)
+        // )
+        ],
+      );
   }
 }
 
@@ -778,7 +1159,6 @@ class NewUserThingy extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = Translations.of(context);
     return LayoutBuilder(builder: (context, constraints) {
-      //bool bigScreen = constraints.maxWidth > 768;
       double pfpHeight = 128;
       int xpTableID = 0;
 
@@ -1132,6 +1512,11 @@ class TetraLeagueThingy extends StatelessWidget{
                     defaultColumnWidth:IntrinsicColumnWidth(),
                     children: [
                       TableRow(children: [
+                        //Text("VS: ", style: TextStyle(fontSize: 21)),
+                        Text("№ ${intf.format(league.standingLocal)}", textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
+                        Text(" in BY", style: TextStyle(fontSize: 21))
+                      ]),
+                      TableRow(children: [
                         //Text("APM: ", style: TextStyle(fontSize: 21)),
                         Text(intf.format(league.gamesPlayed), textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
                         Text(" Games", style: TextStyle(fontSize: 21))
@@ -1140,11 +1525,6 @@ class TetraLeagueThingy extends StatelessWidget{
                         //Text("PPS: ", style: TextStyle(fontSize: 21)),
                         Text(intf.format(league.gamesWon), textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
                         Text(" Won", style: TextStyle(fontSize: 21))
-                      ]),
-                      TableRow(children: [
-                        //Text("VS: ", style: TextStyle(fontSize: 21)),
-                        Text("№ ${intf.format(league.standingLocal)}", textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
-                        Text(" in BY", style: TextStyle(fontSize: 21))
                       ])
                     ],
                   ),
@@ -1169,6 +1549,7 @@ class NerdStatsThingy extends StatelessWidget{
       child: Column(
         children: [
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               SizedBox(
                 height: 256.0,
@@ -1236,34 +1617,53 @@ class NerdStatsThingy extends StatelessWidget{
                   ]
                 ),
               ),
-              Wrap(
-                children: [
-                  GaugetThingy(value: nerdStats.dss, min: 0, max: 1.0, label: t.statCellNum.dss, sideSize: 128.0, fractionDigits: 3),
-                  GaugetThingy(value: nerdStats.dsp, min: 0, max: 1.0, label: t.statCellNum.dsp, sideSize: 128.0, fractionDigits: 3),
-                  GaugetThingy(value: nerdStats.appdsp, min: 0, max: 1.2, label: t.statCellNum.appdsp, sideSize: 128.0, fractionDigits: 3)
-                ],
+              Expanded(
+                child: Wrap(
+                  children: [
+                    GaugetThingy(value: nerdStats.dss, min: 0, max: 1.0, tickInterval: .2, label: "DS/S", sideSize: 128.0, fractionDigits: 3),
+                    GaugetThingy(value: nerdStats.dsp, min: 0, max: 1.0, tickInterval: .2, label: "DS/P", sideSize: 128.0, fractionDigits: 3),
+                    GaugetThingy(value: nerdStats.appdsp, min: 0, max: 1.2, tickInterval: .2, label: "APP+DS/P", sideSize: 128.0, fractionDigits: 3),
+                    GaugetThingy(value: nerdStats.cheese, min: -80, max: 80, tickInterval: 40, label: "Cheese", sideSize: 128.0, fractionDigits: 2),
+                    GaugetThingy(value: nerdStats.gbe, min: 0, max: 1.0, tickInterval: .2, label: "GbE", sideSize: 128.0, fractionDigits: 3),
+                    GaugetThingy(value: nerdStats.nyaapp, min: 0, max: 1.2, tickInterval: .2, label: "wAPP", sideSize: 128.0, fractionDigits: 3),
+                    GaugetThingy(value: nerdStats.area, min: 0, max: 1000, tickInterval: 100, label: "Area", sideSize: 128.0, fractionDigits: 1),
+                  ],
+                ),
               )
             ]
           ),
         ],
       )
     );
-  }
+  } 
+}
+
+class EstTrThingy extends StatelessWidget{
+  final EstTr estTr;
+
+  const EstTrThingy({super.key, required this.estTr});
   
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    throw UnimplementedError();
+  }
 }
 
 class GaugetThingy extends StatelessWidget{
   final double value;
   final double min;
   final double max;
+  final double tickInterval;
   final String label;
   final double sideSize;
   final int fractionDigits;
 
-  GaugetThingy({super.key, required this.value, required this.min, required this.max, required this.label, required this.sideSize, required this.fractionDigits});
+  GaugetThingy({super.key, required this.value, required this.min, required this.max, required this.tickInterval, required this.label, required this.sideSize, required this.fractionDigits});
 
   @override
   Widget build(BuildContext context) {
+    NumberFormat f = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: fractionDigits);
     return SizedBox(
       height: sideSize,
       width: sideSize,
@@ -1277,14 +1677,14 @@ class GaugetThingy extends StatelessWidget{
             //radiusFactor: 1.5,
             showTicks: true,
             showLabels: false,
-            interval: 0.1,
+            interval: tickInterval,
             //labelsPosition: ElementsPosition.outside,
             ranges:[
               GaugeRange(startValue: 0, endValue: value, color: theme.colorScheme.primary)
             ],
             annotations: [
               GaugeAnnotation(widget: Container(child:
-              Text(f3.format(value), textAlign: TextAlign.center, style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold))),
+              Text(f.format(value), textAlign: TextAlign.center, style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold))),
               angle: 90,positionFactor: 0.25
               ),
               GaugeAnnotation(widget: Container(child:

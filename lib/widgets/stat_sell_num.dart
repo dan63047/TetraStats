@@ -88,21 +88,21 @@ class StatCellNum extends StatelessWidget {
             : TextButton(
                 onPressed: () {
                   showDialog(
-                      context: context,
-                      builder: (BuildContext context) => AlertDialog(
-                            title: Text(alertTitle??playerStatLabel.replaceAll(RegExp(r'\n'), " "),
-                                style: const TextStyle(
-                                    fontFamily: "Eurostile Round Extended")),
-                            content: SingleChildScrollView(
-                              child: ListBody(children: alertWidgets!),
-                            ),
-                            actions: <Widget>[
-                              TextButton(
-                                child: Text(okText??"OK"),
-                                onPressed: () {Navigator.of(context).pop();}
-                              )
-                      ],
-                    )
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                    title: Text(alertTitle??playerStatLabel.replaceAll(RegExp(r'\n'), " "),
+                        style: const TextStyle(
+                            fontFamily: "Eurostile Round Extended")),
+                    content: SingleChildScrollView(
+                      child: ListBody(children: alertWidgets!),
+                    ),
+                    actions: <Widget>[
+                      TextButton(
+                        child: Text(okText??"OK"),
+                        onPressed: () {Navigator.of(context).pop();}
+                      )
+                    ],
+                  )
                   );
                 },
                 style: ButtonStyle(

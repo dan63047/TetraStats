@@ -16,7 +16,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:tetra_stats/views/main_view.dart';
+import 'package:tetra_stats/views/main_view_tiles.dart';
 import 'package:tetra_stats/views/settings_view.dart';
 import 'package:tetra_stats/views/tracked_players_view.dart';
 import 'package:tetra_stats/views/calc_view.dart';

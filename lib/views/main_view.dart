@@ -871,7 +871,6 @@ class _History extends StatelessWidget{
       ));
     }
     bool bigScreen = MediaQuery.of(context).size.width > 768;
-    //List<_HistoryChartSpot> selectedGraph = _gamesPlayedInsteadOfDateAndTime ? chartsDataGamesPlayed[_chartsIndex].value! : chartsData[_chartsIndex].value!;
     List<_HistoryChartSpot> selectedGraph = chartsData[_chartsIndex].value!;
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
