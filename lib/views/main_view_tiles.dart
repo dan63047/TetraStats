@@ -8,10 +8,12 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
+import 'package:tetra_stats/utils/colors_functions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
 import 'package:tetra_stats/views/tl_match_view.dart';
+import 'package:tetra_stats/widgets/graphs.dart';
 import 'package:tetra_stats/widgets/list_tile_trailing_stats.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
@@ -33,16 +35,16 @@ class MainView extends StatefulWidget {
 }
 
 enum Page {home, leaderboards, leagueAverages, calculator, settings}
-enum Cards {overview, tetraLeague, quickPlay, quickPlayExpert, sprint, blitz, other}
-enum CardMod {info, recent}
+enum Cards {overview, tetraLeague, quickPlay, sprint, blitz}
+enum CardMod {info, recent, top, ex, exRecent, exTop}
 Map<Cards, String> cardsTitles = {
   Cards.overview: "Overview",
   Cards.tetraLeague: t.tetraLeague,
   Cards.quickPlay: t.quickPlay,
-  Cards.quickPlayExpert: "${t.quickPlay} ${t.expert}",
+  //Cards.quickPlayExpert: "${t.quickPlay} ${t.expert}",
   Cards.sprint: t.sprint,
   Cards.blitz: t.blitz,
-  Cards.other: t.other
+  //Cards.other: t.other
 };
 
 TetrioPlayer testPlayer = TetrioPlayer(
@@ -178,6 +180,11 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                   label: Text('Calc'),
                 ),
                 NavigationRailDestination(
+                  icon: Icon(Icons.storage),
+                  selectedIcon: Icon(Icons.storage),
+                  label: Text('Saved Data'),
+                ),
+                NavigationRailDestination(
                   icon: Icon(Icons.settings),
                   selectedIcon: Icon(Icons.settings),
                   label: Text('Settings'),
@@ -225,13 +232,13 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
           height: widget.constraints.maxHeight,
           child: Column(
             children: [
-              Card(
+              const Card(
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Spacer(),
-                    Text("Leaderboards", style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36)),
-                    const Spacer()
+                    Spacer(),
+                    Text("Leaderboards", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36)),
+                    Spacer()
                   ],
                 ),
               ),
@@ -253,10 +260,12 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
         ),
         SizedBox(
           width: widget.constraints.maxWidth - 350 - 88,
-          child: Column(
-            children: [
-              
-            ],
+          child: const Card(
+            child: Column(
+              children: [
+                
+              ],
+            ),
           ),
         ),
         ],
@@ -533,10 +542,10 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
             );
           }
         }
-        return Center(child: Column(
+        return const Center(child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text("lol", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
+          Text("lol", style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
         ],
       ));
       },
@@ -565,7 +574,258 @@ class DestinationHome extends StatefulWidget{
 
 class _DestinationHomeState extends State<DestinationHome> {
   Cards rightCard = Cards.tetraLeague;
+  CardMod cardMod = CardMod.info;
   Duration postSeasonLeft = seasonStart.difference(DateTime.now());
+  late Map<Cards, List<ButtonSegment<CardMod>>> modeButtons;
+  late MapEntry closestAverageBlitz;
+  late bool blitzBetterThanClosestAverage;
+  late MapEntry closestAverageSprint;
+  late bool sprintBetterThanClosestAverage;
+  bool? sprintBetterThanRankAverage;
+  bool? blitzBetterThanRankAverage;
+
+  Widget getOverviewCard(Summaries summaries){
+    return const Column(
+      children: [
+        Card(
+          child: Padding(
+            padding: EdgeInsets.only(bottom: 4.0),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text("Overview", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                ],
+              ),
+            ),
+          ),
+        ),
+        Card(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Text("Title"),
+                    Spacer(),
+                    Text("Value"),
+                  ],
+                )
+              ],
+            ),
+          ),
+        ),
+      ]
+    );
+  }
+
+  Widget getTetraLeagueCard(TetraLeagueAlpha data){
+    return Column(
+      children: [
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 4.0),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(t.tetraLeague, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                  Text("${t.seasonStarts} ${countdown(postSeasonLeft)}", textAlign: TextAlign.center)
+                ],
+              ),
+            ),
+          ),
+        ),
+        TetraLeagueThingy(league: testPlayer.tlSeason1!),
+        Card(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Spacer(),
+              Text(t.nerdStats, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+              const Spacer()
+            ],
+          ),
+        ),
+        NerdStatsThingy(nerdStats: testPlayer.tlSeason1!.nerdStats!),
+        GraphsThingy(nerdStats: testPlayer.tlSeason1!.nerdStats!, playstyle: testPlayer.tlSeason1!.playstyle!, apm: testPlayer.tlSeason1!.apm!, pps: testPlayer.tlSeason1!.pps!, vs: testPlayer.tlSeason1!.vs!)
+      ],
+    );
+  }
+
+  Widget getZenithCard(RecordSingle? record){
+    return Column(
+      children: [
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 4.0),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(t.quickPlay, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                  Text("Leaderboard reset in ${countdown(postSeasonLeft)}", textAlign: TextAlign.center),
+                ],
+              ),
+            ),
+          ),
+        ),
+        ZenithThingy(zenith: record),
+        if (record != null) Card(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Spacer(),
+              Text(t.nerdStats, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+              const Spacer()
+            ],
+          ),
+        ),
+        if (record != null) NerdStatsThingy(nerdStats: record.aggregateStats.nerdStats),
+        if (record != null) GraphsThingy(nerdStats: record.aggregateStats.nerdStats, playstyle: record.aggregateStats.playstyle, apm: record.aggregateStats.apm, pps: record.aggregateStats.pps, vs: record.aggregateStats.vs)
+      ],
+    );
+  }
+
+  Widget getRecordCard(RecordSingle? record){
+    return Column(
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // if (record!.gamemode == "40l") Padding(padding: const EdgeInsets.only(right: 8.0),
+            // child: Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageSprint.key}.png", height: 96)
+            // ),
+            // if (record!.gamemode == "blitz") Padding(padding: const EdgeInsets.only(right: 8.0),
+            // child: Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageBlitz.key}.png", height: 96)
+            // ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+              RichText(text: TextSpan(
+                  text: record!.gamemode == "40l" ? get40lTime(record.stats.finalTime.inMicroseconds) : NumberFormat.decimalPattern().format(record.stats.score),
+                  style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: FontWeight.w500, color: Colors.white),
+                  ),
+                ),
+              RichText(text: TextSpan(
+                text: "",
+                style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
+                children: [
+                  // if (record!.gamemode == "40l" && (rank != null && rank != "z")) TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(record!.stats.finalTime, sprintAverages[rank]!), verdict: sprintBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
+                  //   color: sprintBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
+                  // ))
+                  // else if (record!.gamemode == "40l" && (rank == null || rank == "z")) TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(record!.stats.finalTime, closestAverageSprint.value), verdict: sprintBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageSprint.key.toUpperCase())}\n", style: TextStyle(
+                  //   color: sprintBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
+                  // ))
+                  // else if (record!.gamemode == "blitz" && (rank != null && rank != "z")) TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(record!.stats.score, blitzAverages[rank]!), verdict: blitzBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
+                  //   color: blitzBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
+                  // ))
+                  // else if (record!.gamemode == "blitz" && (rank == null || rank == "z")) TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(record!.stats.score, closestAverageBlitz.value), verdict: blitzBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageBlitz.key.toUpperCase())}\n", style: TextStyle(
+                  //   color: blitzBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
+                  // )),
+                  if (record.rank != -1) TextSpan(text: "№${record.rank}", style: TextStyle(color: getColorOfRank(record.rank))),
+                  if (record.rank != -1) const TextSpan(text: " • "),
+                  TextSpan(text: timestamp(record.timestamp)),
+                ]
+                ),
+              )
+            ],),
+          ],
+        ),
+      ]
+    );
+  }
+
+  @override
+  initState(){
+    // bool? blitzBetterThanRankAverage = (rank != null && rank != "z") ? record!.stats.score > blitzAverages[rank]! : null;
+    // bool? sprintBetterThanRankAverage = (rank != null && rank != "z") ? record!.stats.finalTime < sprintAverages[rank]! : null;
+    // if (record!.gamemode == "40l") {
+    //   closestAverageSprint = sprintAverages.entries.singleWhere((element) => element.value == sprintAverages.values.reduce((a, b) => (a-record!.stats.finalTime).abs() < (b -record!.stats.finalTime).abs() ? a : b));
+    //   sprintBetterThanClosestAverage = record!.stats.finalTime < closestAverageSprint.value;
+    // }else if (record!.gamemode == "blitz"){
+    //   closestAverageBlitz = blitzAverages.entries.singleWhere((element) => element.value == blitzAverages.values.reduce((a, b) => (a-record!.stats.score).abs() < (b -record!.stats.score).abs() ? a : b));
+    //   blitzBetterThanClosestAverage = record!.stats.score > closestAverageBlitz.value;
+    // }
+    modeButtons = {
+      Cards.overview: [
+        const ButtonSegment<CardMod>(
+          value: CardMod.info,
+          label: Text('General'),
+        ),
+      ],
+      Cards.tetraLeague: [
+          const ButtonSegment<CardMod>(
+              value: CardMod.info,
+              label: Text('Standing'),
+            ),
+          const ButtonSegment<CardMod>(
+              value: CardMod.recent,
+              label: Text('Recent Matches'),
+            ),
+        ],
+      Cards.quickPlay: [
+        const ButtonSegment<CardMod>(
+            value: CardMod.info,
+            label: Text('Normal'),
+        ),
+        const ButtonSegment<CardMod>(
+            value: CardMod.recent,
+            label: Text('Recent Normal'),
+        ),
+        const ButtonSegment<CardMod>(
+            value: CardMod.top,
+            label: Text('Top Normal'),
+        ),
+        const ButtonSegment<CardMod>(
+            value: CardMod.ex,
+            label: Text('Expert'),
+        ),
+        const ButtonSegment<CardMod>(
+            value: CardMod.exRecent,
+            label: Text('Recent Expert'),
+        ),
+        const ButtonSegment<CardMod>(
+            value: CardMod.exTop,
+            label: Text('Top Expert'),
+        ),
+      ],
+      Cards.blitz: [
+        const ButtonSegment<CardMod>(
+              value: CardMod.info,
+              label: Text('PB'),
+        ),
+        const ButtonSegment<CardMod>(
+            value: CardMod.recent,
+            label: Text('Recent'),
+        ),
+        const ButtonSegment<CardMod>(
+            value: CardMod.top,
+            label: Text('Top'),
+        ),
+      ],
+      Cards.sprint: [
+        const ButtonSegment<CardMod>(
+              value: CardMod.info,
+              label: Text('PB'),
+        ),
+        const ButtonSegment<CardMod>(
+            value: CardMod.recent,
+            label: Text('Recent'),
+        ),
+        const ButtonSegment<CardMod>(
+            value: CardMod.top,
+            label: Text('Top'),
+        ),
+      ]
+    };
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -586,6 +846,9 @@ class _DestinationHomeState extends State<DestinationHome> {
                       NewUserThingy(player: snapshot.data!, showStateTimestamp: false, setState: setState),
                       if (snapshot.data!.badges.isNotEmpty) BadgesThingy(badges: snapshot.data!.badges),
                       if (snapshot.data!.distinguishment != null) DistinguishmentThingy(snapshot.data!.distinguishment!),
+                      if (snapshot.data!.role == "bot") FakeDistinguishmentThingy(bot: true, botMaintainers: snapshot.data!.botmaster),
+                      if (snapshot.data!.role == "banned") FakeDistinguishmentThingy(banned: true)
+                      else if (snapshot.data!.badstanding == true) FakeDistinguishmentThingy(badStanding: true),
                       if (snapshot.data!.bio != null) Card(
                         child: Column(
                           children: [
@@ -612,7 +875,7 @@ class _DestinationHomeState extends State<DestinationHome> {
                               case ConnectionState.none:
                               case ConnectionState.waiting:
                               case ConnectionState.active:
-                                return Card(child: Center(child: CircularProgressIndicator()));
+                                return const Card(child: Center(child: CircularProgressIndicator()));
                               case ConnectionState.done:
                                 if (snapshot.hasData){
                                   return NewsThingy(snapshot.data!);
@@ -624,13 +887,30 @@ class _DestinationHomeState extends State<DestinationHome> {
                                 ));
                               }
                             }
-                            return Text("what?");
+                            return const Text("what?");
                           }
                         ),
                       )
                       ],
                     );
-                }else{
+                }
+                if (snapshot.hasError){
+                  if (snapshot.error.runtimeType == TetrioPlayerNotExist) {
+                    return Card(
+                      child: Center(child: 
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(t.errors.noSuchUser, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Text(t.errors.noSuchUserSub, textAlign: TextAlign.center),
+                            ),
+                          ],
+                        )
+                      ),
+                    );
+                  } 
                   return Center(child: 
                     Column(
                       mainAxisSize: MainAxisSize.min,
@@ -644,6 +924,7 @@ class _DestinationHomeState extends State<DestinationHome> {
                     )
                   );
                 }
+                return Text("huh?");
             }
           },
         )),
@@ -655,64 +936,58 @@ class _DestinationHomeState extends State<DestinationHome> {
               SizedBox(
                 height: widget.constraints.maxHeight - 64,
                 child: SingleChildScrollView(
-                  child: Column(
-                    //mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Card(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Spacer(),
-                            Text(t.tetraLeague, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
-                            const Spacer()
-                          ],
-                        ),
-                      ),
-                      Card(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(t.seasonStarts),
-                            Center(child: Text(countdown(postSeasonLeft), textAlign: TextAlign.center, style: const TextStyle(fontSize: 32.0))),
-                          ],
-                        ),
-                      ),
-                      TetraLeagueThingy(league: testPlayer.tlSeason1!),
-                      Card(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Spacer(),
-                            Text(t.nerdStats, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
-                            const Spacer()
-                          ],
-                        ),
-                      ),
-                      NerdStatsThingy(nerdStats: testPlayer.tlSeason1!.nerdStats!)
-                    ],
+                  child: FutureBuilder<Summaries>(
+                    future: teto.fetchSummaries(widget.searchFor),
+                    builder: (context, snapshot) {
+                      switch (snapshot.connectionState){
+                        case ConnectionState.none:
+                        case ConnectionState.waiting:
+                        case ConnectionState.active:
+                          return const Center(child: CircularProgressIndicator());
+                        case ConnectionState.done:
+                          if (snapshot.hasData){
+                            return switch (rightCard){
+                              Cards.overview => getOverviewCard(snapshot.data!),
+                              Cards.tetraLeague => getTetraLeagueCard(snapshot.data!.league),
+                              Cards.quickPlay => getZenithCard(cardMod == CardMod.ex ? snapshot.data?.zenithEx : snapshot.data?.zenith),
+                              Cards.sprint => getRecordCard(snapshot.data?.sprint),
+                              Cards.blitz => getRecordCard(snapshot.data?.blitz),
+                            };
+                          }
+                          if (snapshot.hasError){
+                            return Center(child: 
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(snapshot.error != null ? snapshot.error.toString() : "lol", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8.0),
+                                    child: Text(snapshot.stackTrace != null ? snapshot.stackTrace.toString() : "lol", textAlign: TextAlign.center),
+                                  ),
+                                ],
+                              )
+                            );
+                          }
+                        return const Text("lol");
+                      }
+                    }
                   ),
                 ),
               ),
-              SegmentedButton<CardMod>(
+              if (modeButtons[rightCard]!.length > 1) SegmentedButton<CardMod>(
                 showSelectedIcon: false,
-                selected: <CardMod>{CardMod.info},
-                segments: <ButtonSegment<CardMod>>[
-                  ButtonSegment<CardMod>(
-                      value: CardMod.info,
-                      label: Text('PB'),
-                      //icon: Icon(Icons.calendar_view_day)
-                    ),
-                  ButtonSegment<CardMod>(
-                      value: CardMod.recent,
-                      label: Text('Recent'),
-                      //icon: Icon(Icons.calendar_view_day)
-                    ),
-                ]
+                selected: <CardMod>{cardMod},
+                segments: modeButtons[rightCard]!,
+                onSelectionChanged: (p0) {
+                  setState(() {
+                    cardMod = p0.first;
+                  });
+                },
               ),
               SegmentedButton<Cards>(
                 showSelectedIcon: false,
                 segments: <ButtonSegment<Cards>>[
-                  ButtonSegment<Cards>(
+                  const ButtonSegment<Cards>(
                       value: Cards.overview,
                       //label: Text('Overview'),
                       icon: Icon(Icons.calendar_view_day)),
@@ -724,10 +999,6 @@ class _DestinationHomeState extends State<DestinationHome> {
                       value: Cards.quickPlay,
                       //label: Text('Quick Play'),
                       icon: SvgPicture.asset("res/icons/qp.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
-                  // ButtonSegment<Cards>(
-                  //     value: Cards.quickPlayExpert,
-                  //     label: Text('QP Expert'),
-                  //     icon: Icon(Icons.calendar_today)),
                   ButtonSegment<Cards>(
                       value: Cards.sprint,
                       //label: Text('40 Lines'),
@@ -736,17 +1007,14 @@ class _DestinationHomeState extends State<DestinationHome> {
                       value: Cards.blitz,
                       //label: Text('Blitz'),
                       icon: SvgPicture.asset("res/icons/blitz.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
-                  // ButtonSegment<Cards>(
-                  //     value: Cards.other,
-                  //     label: Text('Other'),
-                  //     icon: Icon(Icons.calendar_today)),
                 ],
                 selected: <Cards>{rightCard},
                 onSelectionChanged: (Set<Cards> newSelection) {
                   setState(() {
+                    cardMod = CardMod.info;
                     rightCard = newSelection.first;
                   });})
-            ],
+            ]
           ),
         ),
         // SizedBox(
@@ -928,7 +1196,7 @@ class NewsThingy extends StatelessWidget{
                 const Spacer()
               ]
             ),
-            if (news.news.isEmpty) Center(child: Text("Empty list"))
+            if (news.news.isEmpty) const Center(child: Text("Empty list"))
             else for (NewsEntry entry in news.news) getNewsTile(entry)
           ],
         ),
@@ -1035,6 +1303,59 @@ class DistinguishmentThingy extends StatelessWidget{
       ),
     );
   }
+}
+
+class FakeDistinguishmentThingy extends StatelessWidget{
+  final bool banned;
+  final bool badStanding;
+  final bool bot;
+  final String? botMaintainers;
+
+  FakeDistinguishmentThingy({super.key, this.banned = false, this.badStanding = false, this.bot = false, this.botMaintainers});
+
+  Color getCardTint(){
+    if (banned) return Colors.red;
+    if (badStanding) return Colors.redAccent;
+    if (bot) return Color.fromARGB(255, 60, 93, 55);
+    return theme.colorScheme.surface;
+  }
+
+  InlineSpan getDistinguishmentTitle() {
+    String text = "";
+    if (banned) text = "banned";
+    if (badStanding) text = "bad standing";
+    if (bot) text = "bot account";
+    return TextSpan(text: text.toUpperCase(), style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white));
+  }
+
+  String getDistinguishmentSubtitle(){
+    if (banned) return "Bans are placed when TETR.IO rules or terms of service are broken";
+    if (badStanding) return "One or more recent bans on record";
+    if (bot) return "Operated by $botMaintainers";
+    return "";
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      surfaceTintColor: getCardTint(),
+      child: Column(
+        children: [
+          Center(
+            child: RichText(
+              textAlign: TextAlign.center,
+              text: TextSpan(
+                style: DefaultTextStyle.of(context).style,
+                children: [getDistinguishmentTitle()],
+              ),
+            ),
+          ),
+          Text(getDistinguishmentSubtitle(), style: const TextStyle(fontSize: 18), textAlign: TextAlign.center),
+        ],
+      ),
+    );
+  }
+  
 }
 
 class BadgesThingy extends StatelessWidget{
@@ -1258,7 +1579,7 @@ class NewUserThingy extends StatelessWidget {
                       text: TextSpan(
                         style: const TextStyle(fontFamily: "Eurostile Round"),
                         children: [
-                          TextSpan(text: "Level ${intf.format(player.level.floor())}", style: TextStyle(decoration: TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted), recognizer: TapGestureRecognizer()..onTap = (){
+                          TextSpan(text: "Level ${intf.format(player.level.floor())}", style: const TextStyle(decoration: TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted), recognizer: TapGestureRecognizer()..onTap = (){
                             showDialog(
                               context: context,
                               builder: (BuildContext context) => AlertDialog(
@@ -1453,21 +1774,21 @@ class TetraLeagueThingy extends StatelessWidget{
               Expanded(
                 child: Center(
                   child: Table(
-                    defaultColumnWidth:IntrinsicColumnWidth(),
+                    defaultColumnWidth:const IntrinsicColumnWidth(),
                     children: [
                       TableRow(children: [
-                        Text("APM: ", style: TextStyle(fontSize: 21)),
-                        Text(league.apm != null ? f2.format(league.apm) : "---", textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
+                        const Text("APM: ", style: TextStyle(fontSize: 21)),
+                        Text(league.apm != null ? f2.format(league.apm) : "---", textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
                         //Text(" APM", style: TextStyle(fontSize: 21))
                       ]),
                       TableRow(children: [
-                        Text("PPS: ", style: TextStyle(fontSize: 21)),
-                        Text(league.apm != null ? f2.format(league.pps) : "---", textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
+                        const Text("PPS: ", style: TextStyle(fontSize: 21)),
+                        Text(league.apm != null ? f2.format(league.pps) : "---", textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
                         //Text(" PPS", style: TextStyle(fontSize: 21))
                       ]),
                       TableRow(children: [
-                        Text("VS: ", style: TextStyle(fontSize: 21)),
-                        Text(league.apm != null ? f2.format(league.vs) : "---", textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
+                        const Text("VS: ", style: TextStyle(fontSize: 21)),
+                        Text(league.apm != null ? f2.format(league.vs) : "---", textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
                        // Text(" VS", style: TextStyle(fontSize: 21))
                       ])
                     ],
@@ -1494,7 +1815,7 @@ class TetraLeagueThingy extends StatelessWidget{
                       ],
                       annotations: [
                         GaugeAnnotation(widget: Container(child:
-                        Text(percentage.format(league.winrate), textAlign: TextAlign.center, style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold))),
+                        Text(percentage.format(league.winrate), textAlign: TextAlign.center, style: const TextStyle(fontSize: 25,fontWeight: FontWeight.bold))),
                         angle: 90,positionFactor: 0.1
                         ),
                         GaugeAnnotation(widget: Container(child:
@@ -1509,22 +1830,22 @@ class TetraLeagueThingy extends StatelessWidget{
               Expanded(
                 child: Center(
                   child: Table(
-                    defaultColumnWidth:IntrinsicColumnWidth(),
+                    defaultColumnWidth:const IntrinsicColumnWidth(),
                     children: [
                       TableRow(children: [
                         //Text("VS: ", style: TextStyle(fontSize: 21)),
-                        Text("№ ${intf.format(league.standingLocal)}", textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
-                        Text(" in BY", style: TextStyle(fontSize: 21))
+                        Text("№ ${intf.format(league.standingLocal)}", textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
+                        const Text(" in BY", style: TextStyle(fontSize: 21))
                       ]),
                       TableRow(children: [
                         //Text("APM: ", style: TextStyle(fontSize: 21)),
-                        Text(intf.format(league.gamesPlayed), textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
-                        Text(" Games", style: TextStyle(fontSize: 21))
+                        Text(intf.format(league.gamesPlayed), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
+                        const Text(" Games", style: TextStyle(fontSize: 21))
                       ]),
                       TableRow(children: [
                         //Text("PPS: ", style: TextStyle(fontSize: 21)),
-                        Text(intf.format(league.gamesWon), textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
-                        Text(" Won", style: TextStyle(fontSize: 21))
+                        Text(intf.format(league.gamesWon), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
+                        const Text(" Won", style: TextStyle(fontSize: 21))
                       ])
                     ],
                   ),
@@ -1574,10 +1895,10 @@ class NerdStatsThingy extends StatelessWidget{
                         RichText(
                           textAlign: TextAlign.center,
                           text: TextSpan(
-                            style: TextStyle(fontFamily: "Eurostile Round"),
+                            style: const TextStyle(fontFamily: "Eurostile Round"),
                             children: [
-                              TextSpan(text: "APP\n"),
-                              TextSpan(text: f3.format(nerdStats.app), style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold)),
+                              const TextSpan(text: "APP\n"),
+                              TextSpan(text: f3.format(nerdStats.app), style: const TextStyle(fontSize: 25,fontWeight: FontWeight.bold)),
                             //TextSpan(text: "\nAPP"),
                             ]
                         ))),
@@ -1604,10 +1925,10 @@ class NerdStatsThingy extends StatelessWidget{
                         RichText(
                           textAlign: TextAlign.center,
                           text: TextSpan(
-                            style: TextStyle(fontFamily: "Eurostile Round"),
+                            style: const TextStyle(fontFamily: "Eurostile Round"),
                             children: [
-                              TextSpan(text: "VS/APM\n"),
-                              TextSpan(text: f3.format(nerdStats.vsapm), style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold)),
+                              const TextSpan(text: "VS/APM\n"),
+                              TextSpan(text: f3.format(nerdStats.vsapm), style: const TextStyle(fontSize: 25,fontWeight: FontWeight.bold)),
                             ]
                         ))),
                         angle: 0,positionFactor: 0.5
@@ -1645,9 +1966,31 @@ class EstTrThingy extends StatelessWidget{
   
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
+    return const Card(
+      //child: ,
+    );
   }
+}
+
+class GraphsThingy extends StatelessWidget{
+  final double apm;
+  final double pps;
+  final double vs;
+  final NerdStats nerdStats;
+  final Playstyle playstyle;
+
+  const GraphsThingy({super.key, required this.nerdStats, required this.playstyle, required this.apm, required this.pps, required this.vs});
+  
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 8.0),
+        child: Center(child: Graphs(apm, pps, vs, nerdStats, playstyle)),
+      ),
+    );
+  }
+  
 }
 
 class GaugetThingy extends StatelessWidget{
@@ -1684,17 +2027,113 @@ class GaugetThingy extends StatelessWidget{
             ],
             annotations: [
               GaugeAnnotation(widget: Container(child:
-              Text(f.format(value), textAlign: TextAlign.center, style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold))),
+              Text(f.format(value), textAlign: TextAlign.center, style: const TextStyle(fontSize: 25,fontWeight: FontWeight.bold))),
               angle: 90,positionFactor: 0.25
               ),
               GaugeAnnotation(widget: Container(child:
-              Text(label, textAlign: TextAlign.center, style: TextStyle(height: .9))),
+              Text(label, textAlign: TextAlign.center, style: const TextStyle(height: .9))),
               angle: 270,positionFactor: 0.4
               )
             ],
           )
         ]
       ),
+    );
+  }
+}
+
+class ZenithThingy extends StatelessWidget{
+  final RecordSingle? zenith;
+
+  const ZenithThingy({super.key, required this.zenith});
+  
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    RichText(
+                      text: TextSpan(
+                        text: zenith != null ? "${f2.format(zenith!.stats.zenith!.altitude)} m" : "--- m",
+                        style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: FontWeight.w500, color: zenith != null ? Colors.white : Colors.grey),
+                      ),
+                    ),
+                    if (zenith != null) RichText(
+                      text: TextSpan(
+                        text: "",
+                        style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
+                        children: [
+                          if (zenith!.rank != -1) TextSpan(text: "№${zenith!.rank}", style: TextStyle(color: getColorOfRank(zenith!.rank))),
+                          if (zenith!.rank != -1) const TextSpan(text: " • "),
+                          if (zenith!.countryRank != -1) TextSpan(text: "№${zenith!.countryRank} local", style: TextStyle(color: getColorOfRank(zenith!.countryRank))),
+                          if (zenith!.countryRank != -1) const TextSpan(text: " • "),
+                          TextSpan(text: timestamp(zenith!.timestamp)),
+                        ]
+                      ),
+                    ),
+                  ],
+                ),
+                if (zenith != null && (zenith!.extras as ZenithExtras).mods.isNotEmpty) Container(width: 16.0),
+                if (zenith != null && (zenith!.extras as ZenithExtras).mods.isNotEmpty) for (String mod in (zenith!.extras as ZenithExtras).mods) Image.asset("res/icons/${mod}.png", height: 64.0) 
+              ],
+            ),
+            if (zenith != null) Row(
+              children: [
+                Expanded(
+                child: Center(
+                  child: Table(
+                    defaultColumnWidth:const IntrinsicColumnWidth(),
+                    children: [
+                      TableRow(children: [
+                        const Text("APM: ", style: TextStyle(fontSize: 21)),
+                        Text(f2.format(zenith!.aggregateStats.apm), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
+                      ]),
+                      TableRow(children: [
+                        const Text("PPS: ", style: TextStyle(fontSize: 21)),
+                        Text(f2.format(zenith!.aggregateStats.pps), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
+                      ]),
+                      TableRow(children: [
+                        const Text("VS: ", style: TextStyle(fontSize: 21)),
+                        Text(f2.format(zenith!.aggregateStats.vs), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
+                      ])
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Center(
+                  child: Table(
+                    defaultColumnWidth:const IntrinsicColumnWidth(),
+                    children: [
+                      TableRow(children: [
+                        Text("${intf.format(zenith!.stats.kills)}", textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
+                        const Text(" KO's", style: TextStyle(fontSize: 21))
+                      ]),
+                      TableRow(children: [
+                        Text(f2.format(zenith!.stats.cps), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
+                        const Text(" CPS", style: TextStyle(fontSize: 21))
+                      ]),
+                      TableRow(children: [
+                        Text(f2.format(zenith!.stats.zenith!.peakrank), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
+                        const Text(" Peak CPS", style: TextStyle(fontSize: 21))
+                      ])
+                    ],
+                  ),
+                ),
+              ),
+              ],
+            )
+          ]
+        ),
+      )
     );
   }
   
