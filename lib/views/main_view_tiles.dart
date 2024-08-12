@@ -656,6 +656,59 @@ class _DestinationHomeState extends State<DestinationHome> {
     );
   }
 
+  Widget getRecentTLrecords(String searchFor, BoxConstraints constraints){
+    return Column(
+      children: [
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 4.0),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(t.recent, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                ],
+              ),
+            ),
+          ),
+        ),
+        Card(
+          child: FutureBuilder<TetraLeagueBetaStream>(
+            future: teto.fetchTLStream(searchFor),
+            builder: (context, snapshot) {
+              switch (snapshot.connectionState){
+              case ConnectionState.none:
+              case ConnectionState.waiting:
+              case ConnectionState.active:
+                return const Center(child: CircularProgressIndicator());
+              case ConnectionState.done:
+                if (snapshot.hasData){
+                  return SizedBox(height: constraints.maxHeight, child: _TLRecords(userID: searchFor, changePlayer: (){}, data: snapshot.data!.records, wasActiveInTL: snapshot.data!.records.isNotEmpty, oldMathcesHere: false));
+                }
+                if (snapshot.hasError){
+                  return Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(t.errors.noSuchUser, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(t.errors.noSuchUserSub, textAlign: TextAlign.center),
+                        ),
+                      ],
+                    )
+                  );
+                }
+              }
+            return Text("what?");
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget getZenithCard(RecordSingle? record){
     return Column(
       children: [
@@ -691,51 +744,119 @@ class _DestinationHomeState extends State<DestinationHome> {
     );
   }
 
-  Widget getRecordCard(RecordSingle? record){
+  Widget getRecordCard(RecordSingle? record, bool? betterThanRankAverage, MapEntry? closestAverage, bool? betterThanClosestAverage, String? rank){
     return Column(
       children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // if (record!.gamemode == "40l") Padding(padding: const EdgeInsets.only(right: 8.0),
-            // child: Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageSprint.key}.png", height: 96)
-            // ),
-            // if (record!.gamemode == "blitz") Padding(padding: const EdgeInsets.only(right: 8.0),
-            // child: Image.asset("res/tetrio_tl_alpha_ranks/${closestAverageBlitz.key}.png", height: 96)
-            // ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 4.0),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(switch(record!.gamemode){
+                    "40l" => t.sprint,
+                    "blitz" => t.blitz,
+                    "5mblast" => "5,000,000 Blast",
+                    _ => record.gamemode
+                  }, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42))
+                ],
+              ),
+            ),
+          ),
+        ),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-              RichText(text: TextSpan(
-                  text: record!.gamemode == "40l" ? get40lTime(record.stats.finalTime.inMicroseconds) : NumberFormat.decimalPattern().format(record.stats.score),
-                  style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: FontWeight.w500, color: Colors.white),
+                if (closestAverage != null) Padding(padding: const EdgeInsets.only(right: 8.0),
+                child: Image.asset("res/tetrio_tl_alpha_ranks/${closestAverage.key}.png", height: 96)
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                  RichText(text: TextSpan(
+                      text: switch(record.gamemode){
+                        "40l" => get40lTime(record.stats.finalTime.inMicroseconds),
+                        "blitz" => NumberFormat.decimalPattern().format(record.stats.score),
+                        "5mblast" => get40lTime(record.stats.finalTime.inMicroseconds),
+                        _ => record.stats.score.toString()
+                      },
+                      style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: FontWeight.w500, color: Colors.white),
+                      ),
+                    ),
+                  RichText(text: TextSpan(
+                    text: "",
+                    style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
+                    children: [
+                      if (rank != null && rank != "z") TextSpan(text: "${t.verdictGeneral(n: switch(record.gamemode){
+                        "40l" => readableTimeDifference(record.stats.finalTime, sprintAverages[rank]!),
+                        "blitz" => readableIntDifference(record.stats.score, blitzAverages[rank]!),
+                        _ => record.stats.score.toString()
+                      }, verdict: betterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank.toUpperCase())}\n", style: TextStyle(
+                        color: betterThanClosestAverage??false ? Colors.greenAccent : Colors.redAccent
+                      ))
+                      else if ((rank == null || rank == "z") && closestAverage != null) TextSpan(text: "${t.verdictGeneral(n: switch(record.gamemode){
+                        "40l" => readableTimeDifference(record.stats.finalTime, closestAverage.value),
+                        "blitz" => readableIntDifference(record.stats.score, closestAverage.value),
+                        _ => record.stats.score.toString()
+                      }, verdict: sprintBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageSprint.key.toUpperCase())}\n", style: TextStyle(
+                        color: betterThanClosestAverage??false ? Colors.greenAccent : Colors.redAccent
+                      )),
+                      if (record.rank != -1) TextSpan(text: "№ ${intf.format(record.rank)}", style: TextStyle(color: getColorOfRank(record.rank))),
+                      if (record.rank != -1) const TextSpan(text: " • "),
+                      if (record.countryRank != -1) TextSpan(text: "№ ${intf.format(record.countryRank)} local", style: TextStyle(color: getColorOfRank(record.countryRank))),
+                      if (record.countryRank != -1) const TextSpan(text: " • "),
+                      TextSpan(text: timestamp(record.timestamp)),
+                    ]
+                    ),
                   ),
-                ),
-              RichText(text: TextSpan(
-                text: "",
-                style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
-                children: [
-                  // if (record!.gamemode == "40l" && (rank != null && rank != "z")) TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(record!.stats.finalTime, sprintAverages[rank]!), verdict: sprintBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
-                  //   color: sprintBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
-                  // ))
-                  // else if (record!.gamemode == "40l" && (rank == null || rank == "z")) TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(record!.stats.finalTime, closestAverageSprint.value), verdict: sprintBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageSprint.key.toUpperCase())}\n", style: TextStyle(
-                  //   color: sprintBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
-                  // ))
-                  // else if (record!.gamemode == "blitz" && (rank != null && rank != "z")) TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(record!.stats.score, blitzAverages[rank]!), verdict: blitzBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
-                  //   color: blitzBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
-                  // ))
-                  // else if (record!.gamemode == "blitz" && (rank == null || rank == "z")) TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(record!.stats.score, closestAverageBlitz.value), verdict: blitzBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageBlitz.key.toUpperCase())}\n", style: TextStyle(
-                  //   color: blitzBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
-                  // )),
-                  if (record.rank != -1) TextSpan(text: "№${record.rank}", style: TextStyle(color: getColorOfRank(record.rank))),
-                  if (record.rank != -1) const TextSpan(text: " • "),
-                  TextSpan(text: timestamp(record.timestamp)),
-                ]
-                ),
-              )
-            ],),
-          ],
+                ],),
+                Spacer(),
+                  Table(
+                      defaultColumnWidth:const IntrinsicColumnWidth(),
+                      children: [
+                        TableRow(children: [
+                          Text(switch(record.gamemode){
+                            "40l" => record.stats.piecesPlaced.toString(),
+                            "blitz" => record.stats.level.toString(),
+                            "5mblast" => NumberFormat.decimalPattern().format(record.stats.spp),
+                            _ => "What if "
+                          }, textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
+                          Text(switch(record.gamemode){
+                            "40l" => " Pieces",
+                            "blitz" => " Level",
+                            "5mblast" => " SPP",
+                            _ => " i wanted to"
+                          }, textAlign: TextAlign.left, style: const TextStyle(fontSize: 21)),
+                        ]),
+                        TableRow(children: [
+                          Text(f2.format(record.stats.pps), textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
+                          Text(" PPS", textAlign: TextAlign.left, style: const TextStyle(fontSize: 21)),
+                        ]),
+                        TableRow(children: [
+                          Text(switch(record.gamemode){
+                            "40l" => f2.format(record.stats.kpp),
+                            "blitz" => f2.format(record.stats.spp),
+                            "5mblast" => record.stats.piecesPlaced.toString(),
+                            _ => "but god said"
+                          }, textAlign: TextAlign.right, style: TextStyle(fontSize: 21)),
+                          Text(switch(record.gamemode){
+                            "40l" => " KPP",
+                            "blitz" => " SPP",
+                            "5mblast" => " Pieces",
+                            _ => " no"
+                          }, textAlign: TextAlign.left, style: const TextStyle(fontSize: 21)),
+                        ])
+                      ],
+                    ),
+              ],
+            ),
+          ),
         ),
       ]
     );
@@ -946,12 +1067,26 @@ class _DestinationHomeState extends State<DestinationHome> {
                           return const Center(child: CircularProgressIndicator());
                         case ConnectionState.done:
                           if (snapshot.hasData){
+                            blitzBetterThanRankAverage = (snapshot.data!.league.rank != "z" && snapshot.data!.blitz != null) ? snapshot.data!.blitz!.stats.score > blitzAverages[snapshot.data!.league.rank]! : null;
+                            sprintBetterThanRankAverage = (snapshot.data!.league.rank != "z" && snapshot.data!.sprint != null) ? snapshot.data!.sprint!.stats.finalTime < sprintAverages[snapshot.data!.league.rank]! : null;
+                             if (snapshot.data!.sprint != null) {
+                              closestAverageSprint = sprintAverages.entries.singleWhere((element) => element.value == sprintAverages.values.reduce((a, b) => (a-snapshot.data!.sprint!.stats.finalTime).abs() < (b -snapshot.data!.sprint!.stats.finalTime).abs() ? a : b));
+                              sprintBetterThanClosestAverage = snapshot.data!.sprint!.stats.finalTime < closestAverageSprint.value;
+                            }
+                            if (snapshot.data!.blitz != null){
+                              closestAverageBlitz = blitzAverages.entries.singleWhere((element) => element.value == blitzAverages.values.reduce((a, b) => (a-snapshot.data!.blitz!.stats.score).abs() < (b -snapshot.data!.blitz!.stats.score).abs() ? a : b));
+                              blitzBetterThanClosestAverage = snapshot.data!.blitz!.stats.score > closestAverageBlitz.value;
+                            }
                             return switch (rightCard){
                               Cards.overview => getOverviewCard(snapshot.data!),
-                              Cards.tetraLeague => getTetraLeagueCard(snapshot.data!.league),
+                              Cards.tetraLeague => switch (cardMod){
+                                CardMod.info => getTetraLeagueCard(snapshot.data!.league),
+                                CardMod.recent => getRecentTLrecords(widget.searchFor, widget.constraints),
+                                _ => Center(child: Text("huh?"))
+                              },
                               Cards.quickPlay => getZenithCard(cardMod == CardMod.ex ? snapshot.data?.zenithEx : snapshot.data?.zenith),
-                              Cards.sprint => getRecordCard(snapshot.data?.sprint),
-                              Cards.blitz => getRecordCard(snapshot.data?.blitz),
+                              Cards.sprint => getRecordCard(snapshot.data?.sprint, sprintBetterThanRankAverage, closestAverageSprint, sprintBetterThanClosestAverage, snapshot.data!.league.rank),
+                              Cards.blitz => getRecordCard(snapshot.data?.blitz, blitzBetterThanRankAverage, closestAverageBlitz, blitzBetterThanClosestAverage, snapshot.data!.league.rank),
                             };
                           }
                           if (snapshot.hasError){
@@ -1339,19 +1474,30 @@ class FakeDistinguishmentThingy extends StatelessWidget{
   Widget build(BuildContext context) {
     return Card(
       surfaceTintColor: getCardTint(),
-      child: Column(
-        children: [
-          Center(
-            child: RichText(
-              textAlign: TextAlign.center,
-              text: TextSpan(
-                style: DefaultTextStyle.of(context).style,
-                children: [getDistinguishmentTitle()],
+      child: Container(
+        decoration: banned ? BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.transparent, const Color.fromARGB(171, 244, 67, 54), Color.fromARGB(171, 244, 67, 54)],
+            stops: [0.1, 0.9, 0.01],
+            tileMode: TileMode.mirror,
+            begin: Alignment.topLeft,
+            end: AlignmentDirectional(-0.95, -0.95)
+          )
+        ) : null,
+        child: Column(
+          children: [
+            Center(
+              child: RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  style: DefaultTextStyle.of(context).style,
+                  children: [getDistinguishmentTitle()],
+                ),
               ),
             ),
-          ),
-          Text(getDistinguishmentSubtitle(), style: const TextStyle(fontSize: 18), textAlign: TextAlign.center),
-        ],
+            Text(getDistinguishmentSubtitle(), style: const TextStyle(fontSize: 18), textAlign: TextAlign.center),
+          ],
+        ),
       ),
     );
   }
@@ -1798,33 +1944,34 @@ class TetraLeagueThingy extends StatelessWidget{
               SizedBox(
                 height: 128.0,
                 width: 128.0,
-                child: SfRadialGauge(
-                  axes: [
-                    RadialAxis(
-                      // startAngle: 180,
-                      // endAngle: 0,
-                      minimum: 0.4,
-                      maximum: 0.6,
-                      //radiusFactor: 1.5,
-                      showTicks: true,
-                      showLabels: false,
-                      interval: 0.1,
-                      //labelsPosition: ElementsPosition.outside,
-                      ranges:[
-                        GaugeRange(startValue: 0, endValue: league.winrate, color: theme.colorScheme.primary)
-                      ],
-                      annotations: [
-                        GaugeAnnotation(widget: Container(child:
-                        Text(percentage.format(league.winrate), textAlign: TextAlign.center, style: const TextStyle(fontSize: 25,fontWeight: FontWeight.bold))),
-                        angle: 90,positionFactor: 0.1
-                        ),
-                        GaugeAnnotation(widget: Container(child:
-                        Text(t.statCellNum.winrate, textAlign: TextAlign.center)),
-                        angle: 270,positionFactor: 0.4
-                        )
-                      ],
-                    )
-                  ]
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(1000),
+                  child: SfRadialGauge(
+                    backgroundColor: Colors.black,
+                    axes: [
+                      RadialAxis(
+                        minimum: 0.4,
+                        maximum: 0.6,
+                        radiusFactor: 1.01,
+                        showTicks: true,
+                        showLabels: false,
+                        interval: 0.1,
+                        ranges:[
+                          GaugeRange(startValue: 0, endValue: league.winrate, color: theme.colorScheme.primary)
+                        ],
+                        annotations: [
+                          GaugeAnnotation(widget: Container(child:
+                          Text(percentage.format(league.winrate), textAlign: TextAlign.center, style: const TextStyle(fontSize: 25,fontWeight: FontWeight.bold))),
+                          angle: 90,positionFactor: 0.1
+                          ),
+                          GaugeAnnotation(widget: Container(child:
+                          Text(t.statCellNum.winrate, textAlign: TextAlign.center)),
+                          angle: 270,positionFactor: 0.4
+                          )
+                        ],
+                      )
+                    ]
+                  ),
                 ),
               ),
               Expanded(
@@ -1875,71 +2022,76 @@ class NerdStatsThingy extends StatelessWidget{
               SizedBox(
                 height: 256.0,
                 width: 256.0,
-                child: SfRadialGauge(
-                  axes: [
-                    RadialAxis(
-                      startAngle: 120,
-                      endAngle: 240,
-                      minimum: 0.0,
-                      maximum: 1.0,
-                      //radiusFactor: 1.5,
-                      showTicks: true,
-                      showLabels: false,
-                      interval: 0.1,
-                      //labelsPosition: ElementsPosition.outside,
-                      ranges:[
-                        GaugeRange(startValue: 0, endValue: nerdStats.app, color: theme.colorScheme.primary)
-                      ],
-                      annotations: [
-                        GaugeAnnotation(widget: Container(child:
-                        RichText(
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
-                            style: const TextStyle(fontFamily: "Eurostile Round"),
-                            children: [
-                              const TextSpan(text: "APP\n"),
-                              TextSpan(text: f3.format(nerdStats.app), style: const TextStyle(fontSize: 25,fontWeight: FontWeight.bold)),
-                            //TextSpan(text: "\nAPP"),
-                            ]
-                        ))),
-                        angle: 180,positionFactor: 0.5
-                        ),
-                      ],
-                    ),
-                    RadialAxis(
-                      startAngle: 300,
-                      endAngle: 60,
-                      isInversed: true,
-                      minimum: 1.8,
-                      maximum: 2.4,
-                      //radiusFactor: 1.5,
-                      showTicks: true,
-                      showLabels: false,
-                      interval: 0.1,
-                      //labelsPosition: ElementsPosition.outside,
-                      ranges:[
-                        GaugeRange(startValue: 0, endValue: nerdStats.vsapm, color: theme.colorScheme.primary)
-                      ],
-                      annotations: [
-                        GaugeAnnotation(widget: Container(child:
-                        RichText(
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
-                            style: const TextStyle(fontFamily: "Eurostile Round"),
-                            children: [
-                              const TextSpan(text: "VS/APM\n"),
-                              TextSpan(text: f3.format(nerdStats.vsapm), style: const TextStyle(fontSize: 25,fontWeight: FontWeight.bold)),
-                            ]
-                        ))),
-                        angle: 0,positionFactor: 0.5
-                        )
-                      ],
-                    )
-                  ]
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(1000),
+                  child: SfRadialGauge(
+                    backgroundColor: Colors.black,
+                    axes: [
+                      RadialAxis(
+                        startAngle: 200,
+                        endAngle: 340,
+                        minimum: 0.0,
+                        maximum: 1.0,
+                        radiusFactor: 1.01,
+                        showTicks: true,
+                        showLabels: false,
+                        interval: 0.1,
+                        //labelsPosition: ElementsPosition.outside,
+                        ranges:[
+                          GaugeRange(startValue: 0, endValue: nerdStats.app, color: theme.colorScheme.primary)
+                        ],
+                        annotations: [
+                          GaugeAnnotation(widget: Container(child:
+                          RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              style: const TextStyle(fontFamily: "Eurostile Round"),
+                              children: [
+                                const TextSpan(text: "APP\n"),
+                                TextSpan(text: f3.format(nerdStats.app), style: const TextStyle(fontSize: 25, fontFamily: "Eurostile Round Extended", fontWeight: FontWeight.w100)),
+                              //TextSpan(text: "\nAPP"),
+                              ]
+                          ))),
+                          angle: 270,positionFactor: 0.5
+                          ),
+                        ],
+                      ),
+                      RadialAxis(
+                        startAngle: 20,
+                        endAngle: 160,
+                        isInversed: true,
+                        minimum: 1.8,
+                        maximum: 2.4,
+                        radiusFactor: 1.01,
+                        showTicks: true,
+                        showLabels: false,
+                        interval: 0.1,
+                        //labelsPosition: ElementsPosition.outside,
+                        ranges:[
+                          GaugeRange(startValue: 0, endValue: nerdStats.vsapm, color: theme.colorScheme.primary)
+                        ],
+                        annotations: [
+                          GaugeAnnotation(widget: Container(child:
+                          RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              style: const TextStyle(fontFamily: "Eurostile Round"),
+                              children: [
+                                const TextSpan(text: "VS/APM\n"),
+                                TextSpan(text: f3.format(nerdStats.vsapm), style: const TextStyle(fontSize: 25, fontFamily: "Eurostile Round Extended", fontWeight: FontWeight.w100)),
+                              ]
+                          ))),
+                          angle: 90,positionFactor: 0.5
+                          )
+                        ],
+                      )
+                    ]
+                  ),
                 ),
               ),
               Expanded(
                 child: Wrap(
+                  spacing: 10,
                   children: [
                     GaugetThingy(value: nerdStats.dss, min: 0, max: 1.0, tickInterval: .2, label: "DS/S", sideSize: 128.0, fractionDigits: 3),
                     GaugetThingy(value: nerdStats.dsp, min: 0, max: 1.0, tickInterval: .2, label: "DS/P", sideSize: 128.0, fractionDigits: 3),
@@ -2007,36 +2159,38 @@ class GaugetThingy extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     NumberFormat f = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: fractionDigits);
-    return SizedBox(
-      height: sideSize,
-      width: sideSize,
-      child: SfRadialGauge(
-        axes: [
-          RadialAxis(
-            // startAngle: 180,
-            // endAngle: 0,
-            minimum: min,
-            maximum: max,
-            //radiusFactor: 1.5,
-            showTicks: true,
-            showLabels: false,
-            interval: tickInterval,
-            //labelsPosition: ElementsPosition.outside,
-            ranges:[
-              GaugeRange(startValue: 0, endValue: value, color: theme.colorScheme.primary)
-            ],
-            annotations: [
-              GaugeAnnotation(widget: Container(child:
-              Text(f.format(value), textAlign: TextAlign.center, style: const TextStyle(fontSize: 25,fontWeight: FontWeight.bold))),
-              angle: 90,positionFactor: 0.25
-              ),
-              GaugeAnnotation(widget: Container(child:
-              Text(label, textAlign: TextAlign.center, style: const TextStyle(height: .9))),
-              angle: 270,positionFactor: 0.4
-              )
-            ],
-          )
-        ]
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(1000),
+      child: SizedBox(
+        height: sideSize,
+        width: sideSize,
+        child: SfRadialGauge(
+          backgroundColor: Colors.black,
+          axes: [
+            RadialAxis(
+              radiusFactor: 1.01,
+              minimum: min,
+              maximum: max,
+              showTicks: true,
+              showLabels: false,
+              interval: tickInterval,
+              //labelsPosition: ElementsPosition.outside,
+              ranges:[
+                GaugeRange(startValue: 0, endValue: value, color: theme.colorScheme.primary)
+              ],
+              annotations: [
+                GaugeAnnotation(widget: Container(child:
+                Text(f.format(value), textAlign: TextAlign.center, style: const TextStyle(fontSize: 25,fontWeight: FontWeight.bold))),
+                angle: 90,positionFactor: 0.10
+                ),
+                GaugeAnnotation(widget: Container(child:
+                Text(label, textAlign: TextAlign.center, style: const TextStyle(height: .9))),
+                angle: 270,positionFactor: 0.4
+                )
+              ],
+            )
+          ]
+        ),
       ),
     );
   }

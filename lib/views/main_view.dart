@@ -573,6 +573,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                     break;
                     default:
                     errText = snapshot.error.toString();
+                    subText = snapshot.stackTrace.toString();
                   }
                   return Center(child: 
                     Column(
