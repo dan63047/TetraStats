@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:tetra_stats/utils/colors_functions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
+import 'package:tetra_stats/utils/text_shadow.dart';
 import 'package:tetra_stats/widgets/finesse_thingy.dart';
 import 'package:tetra_stats/widgets/gauget_num.dart';
 import 'package:tetra_stats/widgets/graphs.dart';
@@ -95,9 +97,9 @@ class _ZenithThingyState extends State<ZenithThingy> {
                 text: "",
                 style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
                 children: [
-                  if (record!.rank != -1) TextSpan(text: "№${record!.rank}"),
+                  if (record!.rank != -1) TextSpan(text: "№ ${intf.format(record!.rank)}", style: TextStyle(color: getColorOfRank(record!.rank))),
                   if (record!.rank != -1) const TextSpan(text: " • "),
-                  if (record!.countryRank != -1) TextSpan(text: "№${record!.countryRank} local"),
+                  if (record!.countryRank != -1) TextSpan(text: "№ ${intf.format(record!.countryRank)} local", style: TextStyle(color: getColorOfRank(record!.countryRank))),
                   if (record!.countryRank != -1) const TextSpan(text: " • "),
                   TextSpan(text: timestamp(widget.record!.timestamp)),
                 ]
@@ -135,6 +137,27 @@ class _ZenithThingyState extends State<ZenithThingy> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    Stack(
+                      alignment: AlignmentDirectional.bottomStart,
+                      children: [
+                        const Text("T", style: TextStyle(
+                          fontStyle: FontStyle.italic,
+                          fontSize: 65,
+                          height: 1.2,
+                        )),
+                        const Positioned(left: 25, top: 20, child: Text("otal time", style: TextStyle(fontFamily: "Eurostile Round Extended"))),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10.0),
+                          child: Text("${getMoreNormalTime(record!.stats.finalTime)}%", style: TextStyle(
+                            shadows: textShadow,
+                            fontFamily: "Eurostile Round Extended",
+                            fontSize: 36,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white
+                          )),
+                        )
+                      ],
+                    ),
                     Text("Total time: ${getMoreNormalTime(record!.stats.finalTime)}", style: const TextStyle(color: Colors.white, fontFamily: "Eurostile Round Extended"), textAlign: TextAlign.center),
                     Table(
                       columnWidths: const {

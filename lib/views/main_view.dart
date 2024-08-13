@@ -1191,7 +1191,7 @@ class _TwoRecordsThingy extends StatelessWidget {
                     title: Text(get40lTime(sprintStream.records[i].stats.finalTime.inMicroseconds),
                     style: const TextStyle(fontSize: 18)),
                     subtitle: Text(timestamp(sprintStream.records[i].timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
-                    trailing: SpTrailingStats(sprintStream.records[i].stats, sprintStream.records[i].gamemode)
+                    trailing: SpTrailingStats(sprintStream.records[i], sprintStream.records[i].gamemode)
                   )
                     ],
                 ),
@@ -1277,7 +1277,7 @@ class _TwoRecordsThingy extends StatelessWidget {
                         title: Text("${NumberFormat.decimalPattern().format(blitzStream.records[i].stats.score)} points",
                         style: const TextStyle(fontSize: 18)),
                         subtitle: Text(timestamp(blitzStream.records[i].timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
-                        trailing: SpTrailingStats(blitzStream.records[i].stats, blitzStream.records[i].gamemode)
+                        trailing: SpTrailingStats(blitzStream.records[i], blitzStream.records[i].gamemode)
                       )
                     ],
                 ),

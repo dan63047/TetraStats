@@ -141,7 +141,7 @@ class SingleplayerRecord extends StatelessWidget {
                     },
                   style: const TextStyle(fontSize: 18)),
                   subtitle: Text(timestamp(stream!.records[i].timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
-                  trailing: SpTrailingStats(stream!.records[i].stats, stream!.records[i].gamemode)
+                  trailing: SpTrailingStats(stream!.records[i], stream!.records[i].gamemode)
                 )
               ]
             ),

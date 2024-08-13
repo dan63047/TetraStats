@@ -546,6 +546,8 @@ class Clears {
   late int tSpinMiniZeros;
   late int tSpinMiniSingles;
   late int tSpinMiniDoubles;
+  late int tSpinMiniTriples;
+  late int tSpinMiniQuads;
 
   Clears(
       {required this.singles,
@@ -562,7 +564,9 @@ class Clears {
       required this.tSpinQuads,
       required this.tSpinMiniZeros,
       required this.tSpinMiniSingles,
-      required this.tSpinMiniDoubles});
+      required this.tSpinMiniDoubles,
+      required this.tSpinMiniTriples,
+      required this.tSpinMiniQuads});
 
   Clears.fromJson(Map<String, dynamic> json) {
     singles = json['singles'];
@@ -576,7 +580,9 @@ class Clears {
     tSpinSingles = json['tspinsingles'];
     tSpinMiniDoubles = json['minitspindoubles'];
     tSpinDoubles = json['tspindoubles'];
+    tSpinMiniTriples = json['minitspintriples']??0;
     tSpinTriples = json['tspintriples'];
+    tSpinMiniQuads = json['minitspinquads']??0;
     tSpinQuads = json['tspinquads'];
     tSpinPentas = json['tspinpentas']??0;
     allClears = json['allclear'];
@@ -598,7 +604,9 @@ class Clears {
       tSpinQuads: tSpinQuads + other.tSpinQuads,
       tSpinMiniZeros: tSpinMiniZeros + other.tSpinMiniZeros,
       tSpinMiniSingles: tSpinMiniSingles + other.tSpinMiniSingles,
-      tSpinMiniDoubles: tSpinMiniDoubles + other.tSpinMiniDoubles
+      tSpinMiniDoubles: tSpinMiniDoubles + other.tSpinMiniDoubles,
+      tSpinMiniTriples: tSpinMiniTriples + other.tSpinMiniTriples,
+      tSpinMiniQuads: tSpinMiniQuads + other.tSpinMiniQuads
       );
   }
 

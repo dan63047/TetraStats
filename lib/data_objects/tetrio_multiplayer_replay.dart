@@ -134,7 +134,7 @@ class ReplayStats{
     topSpike = 0;
     tspins = 0;
     roundLength = 0.0;
-    clears = Clears(singles: 0, doubles: 0, triples: 0, quads: 0, pentas: 0, allClears: 0, tSpinZeros: 0, tSpinSingles: 0, tSpinDoubles: 0, tSpinTriples: 0, tSpinPentas: 0, tSpinQuads: 0, tSpinMiniZeros: 0, tSpinMiniSingles: 0, tSpinMiniDoubles: 0);
+    clears = Clears(singles: 0, doubles: 0, triples: 0, quads: 0, pentas: 0, allClears: 0, tSpinZeros: 0, tSpinSingles: 0, tSpinDoubles: 0, tSpinTriples: 0, tSpinPentas: 0, tSpinQuads: 0, tSpinMiniZeros: 0, tSpinMiniSingles: 0, tSpinMiniDoubles: 0, tSpinMiniTriples: 0, tSpinMiniQuads: 0);
     garbage = Garbage(sent: 0, recived: 0, attack: 0, cleared: 0);
     finesse = Finesse(combo: 0, faults: 0, perfectPieces: 0);
   }

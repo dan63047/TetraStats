@@ -42,7 +42,7 @@ class RecentSingleplayerGames extends StatelessWidget{
             },
           style: const TextStyle(fontSize: 18)),
           subtitle: Text(timestamp(record.timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
-          trailing: SpTrailingStats(record.stats, record.gamemode)
+          trailing: SpTrailingStats(record, record.gamemode)
         )
       ],
     );
