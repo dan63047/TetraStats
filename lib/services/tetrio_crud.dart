@@ -1140,6 +1140,8 @@ class TetrioService extends DB {
           // more exceptions to god of exceptions
           case 403:
             throw TetrioForbidden();
+          case 404:
+            throw TetrioPlayerNotExist();
           case 429:
             throw TetrioTooManyRequests();
           case 418:

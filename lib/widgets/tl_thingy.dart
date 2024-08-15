@@ -160,7 +160,7 @@ class _TLThingyState extends State<TLThingy> with TickerProviderStateMixin {
                   });
                 },
               ),
-              if (currentTl.gamesPlayed > 9) TLRatingThingy(userID: widget.userID, tlData: currentTl, oldTl: oldTl, topTR: widget.topTR, lastMatchPlayed: widget.lastMatchPlayed),
+              TLRatingThingy(userID: widget.userID, tlData: currentTl, oldTl: oldTl, topTR: widget.topTR, lastMatchPlayed: widget.lastMatchPlayed),
               if (currentTl.gamesPlayed > 9) TLProgress(
                 tlData: currentTl,
                 previousRankTRcutoff: widget.thatRankCutoff,
@@ -170,15 +170,6 @@ class _TLThingyState extends State<TLThingy> with TickerProviderStateMixin {
                 nextRankGlickoCutoff: widget.nextRankCutoffGlicko,
                 nextRankTRcutoffTarget: widget.nextRankTarget,
               ),
-              if (currentTl.gamesPlayed < 10)
-                Text(t.gamesUntilRanked(left: 10 - currentTl.gamesPlayed),
-                    softWrap: true,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: "Eurostile Round",
-                      fontSize: bigScreen ? 42 : 28,
-                      overflow: TextOverflow.visible,
-                    )),
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 16, 8, 48),
                 child: Wrap(

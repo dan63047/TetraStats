@@ -143,48 +143,6 @@ const Map<String, Color> rankColors = { // thanks osk for const rankColors at ht
 	'z': Color(0xFF375433)
 };
 
-// const Map<String, Duration> sprintAverages = { // old data, based on https://discord.com/channels/673303546107658242/917098364787650590/1214231970259673098 
-// 	'x': Duration(seconds: 25, milliseconds: 413),
-// 	'u': Duration(seconds: 34, milliseconds: 549),
-// 	'ss': Duration(seconds: 43, milliseconds: 373),
-// 	's+': Duration(seconds: 54, milliseconds: 027),
-// 	's': Duration(seconds: 60, milliseconds: 412),
-// 	's-': Duration(seconds: 67, milliseconds: 381),
-// 	'a+': Duration(seconds: 73, milliseconds: 694),
-// 	'a': Duration(seconds: 81, milliseconds: 166),
-// 	'a-': Duration(seconds: 88, milliseconds: 334),
-// 	'b+': Duration(seconds: 93, milliseconds: 741),
-// 	'b': Duration(seconds: 98, milliseconds: 354),
-// 	'b-': Duration(seconds: 109, milliseconds: 610),
-// 	'c+': Duration(seconds: 124, milliseconds: 641),
-// 	'c': Duration(seconds: 126, milliseconds: 104),
-// 	'c-': Duration(seconds: 145, milliseconds: 865),
-// 	'd+': Duration(seconds: 154, milliseconds: 338),
-// 	'd': Duration(seconds: 162, milliseconds: 063),
-// 	//'z': Duration(seconds: 66, milliseconds: 802)
-// };
-
-// const Map<String, int> blitzAverages = {
-//   'x': 626494,
-// 	'u': 406059,
-// 	'ss': 243166,
-// 	's+': 168636,
-// 	's': 121594,
-// 	's-': 107845,
-// 	'a+': 87142,
-// 	'a': 73413,
-// 	'a-': 60799,
-// 	'b+': 55417,
-// 	'b': 47608,
-// 	'b-': 40534,
-// 	'c+': 34200,
-// 	'c': 32535,
-// 	'c-': 25808,
-// 	'd+': 23345,
-// 	'd': 23063,
-// 	//'z': 72084
-// };
-
 const Map<String, Duration> sprintAverages = { // based on https://discord.com/channels/673303546107658242/674421736162197515/1244287342965952562
 	'x': Duration(seconds: 25, milliseconds: 144),
 	'u': Duration(seconds: 36, milliseconds: 115),
@@ -461,6 +419,7 @@ class Summaries{
   RecordSingle? blitz;
   RecordSingle? zenith;
   RecordSingle? zenithEx;
+  late List<Achievement> achievements;
   late TetraLeagueAlpha league;
   late TetrioZen zen;
 
@@ -472,6 +431,7 @@ class Summaries{
     if (json['blitz']['record'] != null) blitz = RecordSingle.fromJson(json['blitz']['record'], json['blitz']['rank'], json['40l']['rank_local']);
     if (json['zenith']['record'] != null) zenith = RecordSingle.fromJson(json['zenith']['record'], json['zenith']['rank'], json['zenith']['rank_local']);
     if (json['zenithex']['record'] != null) zenithEx = RecordSingle.fromJson(json['zenithex']['record'], json['zenithex']['rank'], json['zenithex']['rank_local']);
+    achievements = [for (var achievement in json['achievements']) Achievement.fromJson(achievement)];
     league = TetraLeagueAlpha.fromJson(json['league'], DateTime.now());
     zen = TetrioZen.fromJson(json['zen']);
   }
@@ -891,6 +851,104 @@ class EstTr {
     );
   }
 }
+
+class Achievement {
+  late int k;
+  int? o;
+  late int rt;
+  late int vt;
+  late int min;
+  late int deci;
+  late String name;
+  late String object;
+  late String category;
+  late bool hidden;
+  late int art;
+  late bool nolb;
+  late String desc;
+  late String n;
+  String? sId;
+  double? v;
+  late int? a;
+  DateTime? t;
+  int? pos;
+  int? total;
+  int? rank;
+
+  Achievement(
+      {required this.k,
+      this.o,
+      required this.rt,
+      required this.vt,
+      required this.min,
+      required this.deci,
+      required this.name,
+      required this.object,
+      required this.category,
+      required this.hidden,
+      required this.art,
+      required this.nolb,
+      required this.desc,
+      required this.n,
+      this.sId,
+      this.v,
+      required this.a,
+      this.t,
+      this.pos,
+      this.total,
+      this.rank});
+
+  Achievement.fromJson(Map<String, dynamic> json) {
+    k = json['k'];
+    o = json['o'];
+    rt = json['rt'];
+    vt = json['vt'];
+    min = json['min'];
+    deci = json['deci'];
+    name = json['name'];
+    object = json['object'];
+    category = json['category'];
+    hidden = json['hidden'];
+    art = json['art'];
+    nolb = json['nolb'];
+    desc = json['desc'];
+    n = json['n'];
+    sId = json['_id'];
+    v = json['v']?.toDouble();
+    a = json['a'];
+    t = json['t'] != null ? DateTime.parse(json['t']) : null;
+    pos = json['pos'];
+    total = json['total'];
+    rank = json['rank'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['k'] = k;
+    data['o'] = o;
+    data['rt'] = rt;
+    data['vt'] = vt;
+    data['min'] = min;
+    data['deci'] = deci;
+    data['name'] = name;
+    data['object'] = object;
+    data['category'] = category;
+    data['hidden'] = hidden;
+    data['art'] = art;
+    data['nolb'] = nolb;
+    data['desc'] = desc;
+    data['n'] = n;
+    data['_id'] = sId;
+    data['v'] = v;
+    data['a'] = a;
+    data['t'] = t.toString();
+    data['pos'] = pos;
+    data['total'] = total;
+    data['rank'] = rank;
+    return data;
+  }
+}
+
 
 class Playstyle {
   final double _apm;

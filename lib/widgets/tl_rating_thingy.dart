@@ -23,7 +23,7 @@ class TLRatingThingy extends StatelessWidget{
     bool bigScreen = MediaQuery.of(context).size.width >= 768;
     String decimalSeparator = f4.symbols.DECIMAL_SEP;
     List<String> formatedTR = f4.format(tlData.rating).split(decimalSeparator);
-    List<String> formatedGlicko = f4.format(tlData.glicko).split(decimalSeparator);
+    List<String> formatedGlicko = tlData.glicko != null ? f4.format(tlData.glicko).split(decimalSeparator) : ["---","--"];
     List<String> formatedPercentile = f4.format(tlData.percentile * 100).split(decimalSeparator);
     //DateTime now = DateTime.now();
     //bool beforeS1end = now.isBefore(seasonEnd);
@@ -43,7 +43,7 @@ class TLRatingThingy extends StatelessWidget{
             RichText(
               text: TextSpan(
                 style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 20, color: Colors.white),
-                children: switch(prefs.getInt("ratingMode")){
+                children: (tlData.gamesPlayed > 9) ? switch(prefs.getInt("ratingMode")){
                   1 => [
                     TextSpan(text: formatedGlicko[0], style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
                     if (formatedGlicko.elementAtOrNull(1) != null) TextSpan(text: decimalSeparator + formatedGlicko[1]),
@@ -59,7 +59,7 @@ class TLRatingThingy extends StatelessWidget{
                   if (formatedTR.elementAtOrNull(1) != null) TextSpan(text: decimalSeparator + formatedTR[1]),
                   TextSpan(text: " TR", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
                 ],
-                }
+                } : [TextSpan(text: "---\n", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28, color: Colors.grey)), TextSpan(text: t.gamesUntilRanked(left: 10-tlData.gamesPlayed), style: TextStyle(color: Colors.grey, fontSize: 14)),]
               )
             ),
             if (oldTl != null) Text(
@@ -75,7 +75,7 @@ class TLRatingThingy extends StatelessWidget{
                 Colors.green
               ),
             ),
-            Column(
+            if (tlData.gamesPlayed > 9) Column(
               children: [
                 RichText(
                   textAlign: TextAlign.center,
@@ -87,7 +87,7 @@ class TLRatingThingy extends StatelessWidget{
                       if (tlData.bestRank != "z") const TextSpan(text: " • "),
                       if (tlData.bestRank != "z") TextSpan(text: "${t.topRank}: ${tlData.bestRank.toUpperCase()}"),
                       if (topTR != null) TextSpan(text: " (${f2.format(topTR)} TR)"),
-                      TextSpan(text: " • ${prefs.getInt("ratingMode") == 1 ? "${f2.format(tlData.rating)} TR • RD: " : "Glicko: ${f2.format(tlData.glicko!)}±"}"),
+                      TextSpan(text: " • ${prefs.getInt("ratingMode") == 1 ? "${f2.format(tlData.rating)} TR • RD: " : "Glicko: ${tlData.glicko != null ? f2.format(tlData.glicko) : "---"}±"}"),
                       TextSpan(text: f2.format(tlData.rd!), style: tlData.decaying ? TextStyle(color: tlData.rd! > 98 ? Colors.red : Colors.yellow) : null),
                       if (tlData.decaying) WidgetSpan(child: Icon(Icons.trending_up, color: tlData.rd! > 98 ? Colors.red : Colors.yellow,), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic),
                       //if (beforeS1end) tlData.rd! <= safeRD ? TextSpan(text: " (Safe)", style: TextStyle(color: Colors.greenAccent)) : TextSpan(text: " (> ${safeRD} RD !!!)", style: TextStyle(color: Colors.redAccent))
