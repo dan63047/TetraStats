@@ -536,7 +536,7 @@ class TetrioService extends DB {
               supporterTier: 0,
               verified: false,
               connections: null,
-              tlSeason1: TetraLeagueAlpha(
+              tlSeason1: TetraLeague(
                 timestamp: DateTime.parse(entry[9]),
                 apm: entry[6] != '' ? entry[6] : null,
                 pps: entry[7] != '' ? entry[7] : null,
@@ -547,7 +547,8 @@ class TetrioService extends DB {
                 gamesWon: entry[2],
                 bestRank: "z",
                 decaying: false,
-                rating: entry[3],
+                tr: entry[3],
+                gxe: -1,
                 rank: entry[5],
                 percentileRank: entry[5],
                 percentile: rankCutoffs[entry[5]]!,

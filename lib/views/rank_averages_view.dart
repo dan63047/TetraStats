@@ -360,7 +360,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                                   trailing: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Text("${_f2.format(they[index].rating)} TR", style: bigScreen ? const TextStyle(fontSize: 28) : null),
+                                      Text("${_f2.format(they[index].tr)} TR", style: bigScreen ? const TextStyle(fontSize: 28) : null),
                                       Image.asset("res/tetrio_tl_alpha_ranks/${they[index].rank}.png", height: bigScreen ? 48 : 16),
                                     ],
                                   ),
@@ -412,7 +412,7 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                         Text(t.averageValues, style: TextStyle( fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
                         Expanded(
                             child: ListView(children: [
-                          _ListEntry(value: widget.rank[0].rating, label: t.statCellNum.tr.replaceAll(RegExp(r'\n'), " "), id: "", username: "", approximate: true, fractionDigits: 2),
+                          _ListEntry(value: widget.rank[0].tr, label: t.statCellNum.tr.replaceAll(RegExp(r'\n'), " "), id: "", username: "", approximate: true, fractionDigits: 2),
                           _ListEntry(value: widget.rank[0].glicko, label: "Glicko", id: "", username: "", approximate: true, fractionDigits: 2),
                           _ListEntry(value: widget.rank[0].rd, label: t.statCellNum.rd.replaceAll(RegExp(r'\n'), " "), id: "", username: "", approximate: true, fractionDigits: 3),
                           _ListEntry(value: widget.rank[0].gamesPlayed, label: t.statCellNum.gamesPlayed.replaceAll(RegExp(r'\n'), " "), id: "", username: "", approximate: true, fractionDigits: 0),

@@ -42,7 +42,7 @@
 //       expect(dan63047.tlSeason1.glicko != null, true);
 //       //expect(dan63047.tlSeason1.rank != "z", true); lol
 //       expect(dan63047.tlSeason1.percentileRank != "z", true);
-//       expect(dan63047.tlSeason1.rating > -1, true);
+//       expect(dan63047.tlSeason1.tr > -1, true);
 //       expect(dan63047.tlSeason1.gamesPlayed > 9, true);
 //       expect(dan63047.tlSeason1.gamesWon > 0, true);
 //       //expect(dan63047.tlSeason1.standing, -1);
@@ -70,7 +70,7 @@
 //       expect(osk.tlSeason1.glicko != null, true);
 //       expect(osk.tlSeason1.rank == "z", true);
 //       expect(osk.tlSeason1.percentileRank != "z", true);
-//       expect(osk.tlSeason1.rating > -1, true);
+//       expect(osk.tlSeason1.tr > -1, true);
 //       expect(osk.tlSeason1.gamesPlayed > 9, true);
 //       expect(osk.tlSeason1.gamesWon > 0, true);
 //       expect(osk.tlSeason1.standing, -1);
@@ -102,7 +102,7 @@
 //       expect(kagari.tlSeason1.glicko, null);
 //       expect(kagari.tlSeason1.rank, "z");
 //       expect(kagari.tlSeason1.percentileRank, "z");
-//       expect(kagari.tlSeason1.rating, -1);
+//       expect(kagari.tlSeason1.tr, -1);
 //       expect(kagari.tlSeason1.decaying, false);
 //       expect(kagari.tlSeason1.gamesPlayed, 0);
 //       expect(kagari.tlSeason1.gamesWon, 0);
@@ -133,7 +133,7 @@
 //       expect(furry.tlSeason1.glicko, null);
 //       expect(furry.tlSeason1.rank, "z");
 //       expect(furry.tlSeason1.percentileRank, "z");
-//       expect(furry.tlSeason1.rating, -1);
+//       expect(furry.tlSeason1.tr, -1);
 //       expect(furry.tlSeason1.decaying, false);
 //       expect(furry.tlSeason1.gamesPlayed, 0);
 //       expect(furry.tlSeason1.gamesWon, 0);
@@ -163,7 +163,7 @@
 //       expect(oskwarefan.tlSeason1.glicko, null);
 //       expect(oskwarefan.tlSeason1.rank, "z");
 //       expect(oskwarefan.tlSeason1.percentileRank, "z");
-//       expect(oskwarefan.tlSeason1.rating, -1);
+//       expect(oskwarefan.tlSeason1.tr, -1);
 //       expect(oskwarefan.tlSeason1.decaying, true); // ??? why true?
 //       expect(oskwarefan.tlSeason1.gamesPlayed, 0);
 //       expect(oskwarefan.tlSeason1.gamesWon, 0);

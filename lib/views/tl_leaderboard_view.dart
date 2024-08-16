@@ -74,7 +74,7 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
                   return const Center(child: CircularProgressIndicator());
                   case ConnectionState.done:
                     final allPlayers = snapshot.data?.getStatRanking(snapshot.data!.leaderboard, _sortBy, reversed: reversed, country: _country);
-                    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) windowManager.setTitle("Tetra Stats: ${t.tlLeaderboard} - ${t.players(n: allPlayers!.length)}");
+                    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) windowManager.setTitle("Tetra Stats: ${t.tlLeaderboard} - ${t.players(n: allPlayers != null ? allPlayers.length : 0)}");
                     bool bigScreen = MediaQuery.of(context).size.width > 768;
                     return NestedScrollView(
                         headerSliverBuilder: (context, value) {
@@ -189,7 +189,7 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
                                 trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text("${f2.format(allPlayers[index].rating)} TR", style: const TextStyle(fontSize: 28)),
+                                    Text("${f2.format(allPlayers[index].tr)} TR", style: const TextStyle(fontSize: 28)),
                                     Image.asset("res/tetrio_tl_alpha_ranks/${allPlayers[index].rank}.png", height: bigScreen ? 48 : 36),
                                   ],
                                 ),

@@ -20,16 +20,15 @@ import 'package:tetra_stats/widgets/tl_rating_thingy.dart';
 var intFDiff = NumberFormat("+#,###.000;-#,###.000");
 
 class TLThingy extends StatefulWidget {
-  final TetraLeagueAlpha tl;
+  final TetraLeague tl;
   final String userID;
   final List<TetrioPlayer> states;
   final bool showTitle;
   final bool bot;
-  final bool hidePreSeasonThingy;
   final bool guest;
   final double? topTR;
   final PlayerLeaderboardPosition? lbPositions;
-  final TetraLeagueAlpha? averages;
+  final TetraLeague? averages;
   final double? thatRankCutoff;
   final double? thatRankCutoffGlicko;
   final double? thatRankTarget;
@@ -37,7 +36,7 @@ class TLThingy extends StatefulWidget {
   final double? nextRankCutoffGlicko;
   final double? nextRankTarget;
   final DateTime? lastMatchPlayed;
-  const TLThingy({super.key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.bot=false, this.guest=false, this.hidePreSeasonThingy=false, this.topTR, this.lbPositions, this.averages, this.nextRankCutoff, this.thatRankCutoff, this.thatRankCutoffGlicko, this.nextRankCutoffGlicko, this.nextRankTarget, this.thatRankTarget, this.lastMatchPlayed});
+  const TLThingy({super.key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.bot=false, this.guest=false, this.topTR, this.lbPositions, this.averages, this.nextRankCutoff, this.thatRankCutoff, this.thatRankCutoffGlicko, this.nextRankCutoffGlicko, this.nextRankTarget, this.thatRankTarget, this.lastMatchPlayed});
 
   @override
   State<TLThingy> createState() => _TLThingyState();
@@ -45,13 +44,10 @@ class TLThingy extends StatefulWidget {
 
 class _TLThingyState extends State<TLThingy> with TickerProviderStateMixin {
   late bool oskKagariGimmick;
-  late TetraLeagueAlpha? oldTl;
-  late TetraLeagueAlpha currentTl;
+  late TetraLeague? oldTl;
+  late TetraLeague currentTl;
   late RangeValues _currentRangeValues;
   late List<TetrioPlayer> sortedStates;
-  late Timer _countdownTimer;
-  //Duration seasonLeft = seasonEnd.difference(DateTime.now());
-  Duration postSeasonLeft = seasonStart.difference(DateTime.now());
 
 @override
   void initState() {
@@ -60,20 +56,10 @@ class _TLThingyState extends State<TLThingy> with TickerProviderStateMixin {
     oldTl = sortedStates.elementAtOrNull(1)?.tlSeason1;
     currentTl = widget.tl;
     super.initState();
-    _countdownTimer = Timer.periodic(
-        Durations.extralong4,
-        (Timer timer) {
-          setState(() {
-            //seasonLeft = seasonEnd.difference(DateTime.now());
-            postSeasonLeft = seasonStart.difference(DateTime.now());
-          });
-        },
-    );
   }
 
   @override
   void dispose() {
-    _countdownTimer.cancel();
     super.dispose();
   }
 
@@ -84,47 +70,6 @@ class _TLThingyState extends State<TLThingy> with TickerProviderStateMixin {
   String decimalSeparator = f2.symbols.DECIMAL_SEP;
   List<String> estTRformated = currentTl.estTr != null ? f2.format(currentTl.estTr!.esttr).split(decimalSeparator) : [];
   List<String> estTRaccFormated = currentTl.esttracc != null ? intFDiff.format(currentTl.esttracc!).split(".") : [];
-    if (DateTime.now().isBefore(seasonStart) && !widget.hidePreSeasonThingy) {
-      return Center(child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(t.postSeason.toUpperCase(), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28), textAlign: TextAlign.center),
-        Text(t.seasonStarts, textAlign: TextAlign.center),
-        const Spacer(),
-        Text(countdown(postSeasonLeft), textAlign: TextAlign.center, style: const TextStyle(fontSize: 36.0),),
-        if (prefs.getBool("hideDanMessadge") != true) const Spacer(),
-        if (prefs.getBool("hideDanMessadge") != true) Card(
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 450.0),
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      t.myMessadgeHeader,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.bold)
-                    ),
-                    const Spacer(),
-                    IconButton(onPressed: (){setState(() {
-                      prefs.setBool("hideDanMessadge", true); 
-                    });}, icon: const Icon(Icons.close))
-                  ],
-                ),
-                Text(t.myMessadgeBody, textAlign: TextAlign.center),
-              ],
-            ),
-          ),
-        ),
-        const Spacer(),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
-          child: Text(t.preSeasonMessage(n: postSeasonLeft.inDays >= 14 ? "1" : "2"), textAlign: TextAlign.center),
-        ),
-      ],
-          ));
-    }
     if (currentTl.gamesPlayed == 0) return Center(child: Text(widget.guest ? t.anonTL : widget.bot ? t.botTL : t.neverPlayedTL, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28), textAlign: TextAlign.center,));
     return LayoutBuilder(builder: (context, constraints) {
     bool bigScreen = constraints.maxWidth >= 768;

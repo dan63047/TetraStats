@@ -17,7 +17,7 @@ enum Mode{
   averages
 }
 Mode greenSideMode = Mode.player;
-List<dynamic> theGreenSide = [null, null, null]; // TetrioPlayer?, List<DropdownMenuItem<TetrioPlayer>>?, TetraLeagueAlpha?
+List<dynamic> theGreenSide = [null, null, null]; // TetrioPlayer?, List<DropdownMenuItem<TetrioPlayer>>?, TetraLeague?
 Mode redSideMode = Mode.player;
 List<dynamic> theRedSide = [null, null, null];
 final DateFormat dateFormat = DateFormat.yMd(LocaleSettings.currentLocale.languageCode).add_Hm();
@@ -82,7 +82,7 @@ class CompareState extends State<CompareView> {
         double vs = double.parse(threeNumbers[2][0]!);
         theRedSide = [null,
         null,
-        TetraLeagueAlpha(
+        TetraLeague(
           timestamp: DateTime.now(),
           apm: apm,
           pps: pps,
@@ -92,7 +92,8 @@ class CompareState extends State<CompareView> {
           gamesWon: -1,
           bestRank: "z",
           decaying: true,
-          rating: -1,
+          tr: -1,
+          gxe: -1,
           rank: "z",
           percentileRank: "z",
           percentile: 1,
@@ -156,7 +157,7 @@ class CompareState extends State<CompareView> {
         double vs = double.parse(threeNumbers[2][0]!);
         theGreenSide = [null,
         null,
-        TetraLeagueAlpha(
+        TetraLeague(
           timestamp: DateTime.now(),
           apm: apm,
           pps: pps,
@@ -166,7 +167,8 @@ class CompareState extends State<CompareView> {
           gamesWon: -1,
           bestRank: "z",
           decaying: true,
-          rating: -1,
+          tr: -1,
+          gxe: -1,
           rank: "z",
           percentileRank: "z",
           percentile: 1,
@@ -395,8 +397,8 @@ class CompareState extends State<CompareView> {
                             redSideMode != Mode.stats)
                           CompareThingy(
                             label: "TR",
-                            greenSide: theGreenSide[2].rating,
-                            redSide: theRedSide[2].rating,
+                            greenSide: theGreenSide[2].tr,
+                            redSide: theRedSide[2].tr,
                             fractionDigits: 2,
                             higherIsBetter: true,
                           ),

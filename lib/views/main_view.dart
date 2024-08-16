@@ -64,7 +64,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   Future<List> me = Future.delayed(const Duration(seconds: 60), () => [null, null, null, null, null, null]); // I love lists shut up
   TetrioPlayersLeaderboard? everyone;
   PlayerLeaderboardPosition? meAmongEveryone;
-  TetraLeagueAlpha? rankAverages;
+  TetraLeague? rankAverages;
   double? thatRankCutoff;
   double? nextRankCutoff;
   double? thatRankGlickoCutoff;
@@ -208,7 +208,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     // if (me.tlSeason1.gamesPlayed > 9) {
     //     thatRankCutoff = cutoffs?[me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank];
     //     thatRankGlickoCutoff = cutoffsGlicko?[me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank];
-    //     nextRankCutoff = (me.tlSeason1.rank != "z" ? me.tlSeason1.rank == "x" : me.tlSeason1.percentileRank == "x") ? topOne?.rating??25000 : cutoffs?[ranks.elementAtOrNull(ranks.indexOf(me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank)+1)];
+    //     nextRankCutoff = (me.tlSeason1.rank != "z" ? me.tlSeason1.rank == "x" : me.tlSeason1.percentileRank == "x") ? topOne?.tr??25000 : cutoffs?[ranks.elementAtOrNull(ranks.indexOf(me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank)+1)];
     //     nextRankGlickoCutoff = (me.tlSeason1.rank != "z" ? me.tlSeason1.rank == "x" : me.tlSeason1.percentileRank == "x") ? topOne?.glicko??double.infinity : cutoffsGlicko?[ranks.elementAtOrNull(ranks.indexOf(me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank)+1)];
     //   }
 
@@ -217,13 +217,13 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     // Making list of Tetra League matches
     bool isTracking = await teto.isPlayerTracking(me.userId);
     List<TetrioPlayer> states = [];
-    TetraLeagueAlpha? compareWith;
-    Set<TetraLeagueAlpha> uniqueTL = {};
+    TetraLeague? compareWith;
+    Set<TetraLeague> uniqueTL = {};
     List<TetraLeagueAlphaRecord> storedRecords = await teto.getTLMatchesbyPlayerID(me.userId); // get old matches
-    if (isTracking){ // if tracked - save data to local DB
-      await teto.storeState(me);
-      //await teto.saveTLMatchesFromStream(tlStream);
-    }
+    // if (isTracking){ // if tracked - save data to local DB
+    //   await teto.storeState(me);
+    //   //await teto.saveTLMatchesFromStream(tlStream);
+    // }
     TetraLeagueAlphaStream? oldMatches;
     // building list of TL matches
     if(fetchTLmatches) {
@@ -270,7 +270,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       }
     } 
 
-    states.addAll(await teto.getPlayer(me.userId));
+    //states.addAll(await teto.getPlayer(me.userId));
     for (var element in states) { // For graphs I need only unique entries
       if (element.tlSeason1 != null && uniqueTL.isNotEmpty && uniqueTL.last != element.tlSeason1) uniqueTL.add(element.tlSeason1!);
       if (uniqueTL.isEmpty) uniqueTL.add(element.tlSeason1!);
@@ -279,7 +279,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     if (uniqueTL.length >= 2){
       compareWith = uniqueTL.toList().elementAtOrNull(uniqueTL.length - 2);
       chartsData = <DropdownMenuItem<List<_HistoryChartSpot>>>[ // Dumping charts data into dropdown menu items, while cheking if every entry is valid
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.rating)], child: Text(t.statCellNum.tr)),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.tr)], child: Text(t.statCellNum.tr)),
         DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.glicko!)], child: const Text("Glicko")),
         DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.rd!)], child: const Text("Rating Deviation")),
         DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.apm != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.apm!)], child: Text(t.statCellNum.apm.replaceAll(RegExp(r'\n'), " "))),

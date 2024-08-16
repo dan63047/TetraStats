@@ -285,7 +285,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
 
   Future<List<DropdownMenuItem<List<_HistoryChartSpot>>>> getChartsData(bool fetchHistory) async {
     List<TetrioPlayer> states = [];
-    Set<TetraLeagueAlpha> uniqueTL = {};
+    Set<TetraLeague> uniqueTL = {};
 
     if(fetchHistory){
       try{
@@ -310,7 +310,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
 
     if (uniqueTL.length >= 2){
       chartsData = <DropdownMenuItem<List<_HistoryChartSpot>>>[ // Dumping charts data into dropdown menu items, while cheking if every entry is valid
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.rating)], child: Text(t.statCellNum.tr)),
+        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.tr)], child: Text(t.statCellNum.tr)),
         DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.glicko!)], child: const Text("Glicko")),
         DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.rd!)], child: const Text("Rating Deviation")),
         DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.apm != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.apm!)], child: Text(t.statCellNum.apm.replaceAll(RegExp(r'\n'), " "))),
@@ -837,7 +837,7 @@ class _DestinationHomeState extends State<DestinationHome> {
     );
   }
 
-  Widget getTetraLeagueCard(TetraLeagueAlpha data){
+  Widget getTetraLeagueCard(TetraLeague data){
     return Column(
       children: [
         Card(
@@ -2287,7 +2287,7 @@ class _SearchDrawerState extends State<SearchDrawer>  {
 }
 
 class TetraLeagueThingy extends StatelessWidget{
-  final TetraLeagueAlpha league;
+  final TetraLeague league;
 
   const TetraLeagueThingy({super.key, required this.league});
   
