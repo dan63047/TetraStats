@@ -648,7 +648,7 @@ class ResultsStats {
   late int piecesPlaced;
   late int lines;
   late int score;
-  int? seed;
+  double? seed;
   late Duration finalTime;
   late int tSpins;
   late Clears clears;
@@ -680,7 +680,7 @@ class ResultsStats {
       required this.finesse});
 
   ResultsStats.fromJson(Map<String, dynamic> json) {
-    seed = json['seed'];
+    seed = json['seed']?.toDouble();
     lines = json['lines'];
     inputs = json['inputs'];
     holds = json['holds'] ?? 0;
