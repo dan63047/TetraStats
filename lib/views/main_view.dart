@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:tetra_stats/data_objects/tetra_stats.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart' show prefs, teto;
@@ -156,8 +157,8 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) await windowManager.setTitle(title);
 
     // Requesting Tetra League (alpha), records, news and top TR of player
-    late List<dynamic> requests;
-    late Summaries summaries;
+    List<dynamic> requests;
+    Summaries summaries = await teto.fetchSummaries(_searchFor);
     late TetraLeagueBetaStream tlStream;
     late News news;
     // late SingleplayerStream recentSprint;
@@ -166,20 +167,20 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     // late SingleplayerStream blitz;
     late SingleplayerStream recentZenith;
     late SingleplayerStream recentZenithEX;
-    // late TetrioPlayerFromLeaderboard? topOne;
+    late TetrioPlayerFromLeaderboard? topOne;
     // late TopTr? topTR;
-    requests = await Future.wait([ // all at once (8 requests to oskware in total)
+    requests = await Future.wait([
       teto.fetchSummaries(_searchFor),
       teto.fetchTLStream(_searchFor),
       teto.fetchNews(_searchFor),
       teto.fetchStream(_searchFor, "zenith/recent"),
       teto.fetchStream(_searchFor, "zenithex/recent"),
-      //teto.fetchStream(_searchFor, "40l/top"),
-      //teto.fetchStream(_searchFor, "blitz/top"), 
+      teto.fetchCutoffs(),
+      (summaries.league.rank != "z" ? summaries.league.rank == "x+" : summaries.league.percentileRank == "x+") ? teto.fetchTopOneFromTheLeaderboard() : Future.delayed(Duration.zero, ()=>null),
     ]);
     //prefs.getBool("showPositions") != true ? teto.fetchCutoffs() : Future.delayed(Duration.zero, ()=><Map<String, double>>[]),
-    //(me.tlSeason1.rank != "z" ? me.tlSeason1.rank == "x" : me.tlSeason1.percentileRank == "x") ? teto.fetchTopOneFromTheLeaderboard() : Future.delayed(Duration.zero, ()=>null),
-    //(me.tlSeason1.gamesPlayed > 9) ? teto.fetchTopTR(_searchFor) : Future.delayed(Duration.zero, () => null) // can retrieve this only if player has TR
+    
+    //(summaries.league.gamesPlayed > 9) ? teto.fetchTopTR(_searchFor) : Future.delayed(Duration.zero, () => null) // can retrieve this only if player has TR
     summaries = requests[0] as Summaries;
     tlStream = requests[1] as TetraLeagueBetaStream;
     // records = requests[1] as UserRecords;
@@ -189,7 +190,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     // recent = requests[3] as SingleplayerStream;
     // sprint = requests[4] as SingleplayerStream;
     // blitz = requests[5] as SingleplayerStream;
-    // topOne = requests[7] as TetrioPlayerFromLeaderboard?;
+    topOne = requests[6] as TetrioPlayerFromLeaderboard?;
     // topTR = requests[8] as TopTr?; // No TR - no Top TR
 
     meAmongEveryone = teto.getCachedLeaderboardPositions(me.userId);
@@ -202,17 +203,17 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
         if (meAmongEveryone != null) teto.cacheLeaderboardPositions(me.userId, meAmongEveryone!); 
       }
     }
-    //Map<String, double>? cutoffs = prefs.getBool("showPositions") == true ? everyone!.cutoffs : (requests[6] as Cutoffs?)?.tr;
-    //Map<String, double>? cutoffsGlicko = prefs.getBool("showPositions") == true ? everyone!.cutoffsGlicko : (requests[6] as Cutoffs?)?.glicko;
+    Map<String, double>? cutoffs = (requests[5] as Cutoffs?)?.tr;
+    Map<String, double>? cutoffsGlicko = (requests[5] as Cutoffs?)?.glicko;
     
-    // if (me.tlSeason1.gamesPlayed > 9) {
-    //     thatRankCutoff = cutoffs?[me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank];
-    //     thatRankGlickoCutoff = cutoffsGlicko?[me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank];
-    //     nextRankCutoff = (me.tlSeason1.rank != "z" ? me.tlSeason1.rank == "x" : me.tlSeason1.percentileRank == "x") ? topOne?.tr??25000 : cutoffs?[ranks.elementAtOrNull(ranks.indexOf(me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank)+1)];
-    //     nextRankGlickoCutoff = (me.tlSeason1.rank != "z" ? me.tlSeason1.rank == "x" : me.tlSeason1.percentileRank == "x") ? topOne?.glicko??double.infinity : cutoffsGlicko?[ranks.elementAtOrNull(ranks.indexOf(me.tlSeason1.rank != "z" ? me.tlSeason1.rank : me.tlSeason1.percentileRank)+1)];
-    //   }
+    if (summaries.league.gamesPlayed > 9) {
+        thatRankCutoff = cutoffs?[summaries.league.rank != "z" ? summaries.league.rank : summaries.league.percentileRank];
+        thatRankGlickoCutoff = cutoffsGlicko?[summaries.league.rank != "z" ? summaries.league.rank : summaries.league.percentileRank];
+        nextRankCutoff = (summaries.league.rank != "z" ? summaries.league.rank == "x+" : summaries.league.percentileRank == "x+") ? topOne?.tr??25000 : cutoffs?[ranks.elementAtOrNull(ranks.indexOf(summaries.league.rank != "z" ? summaries.league.rank : summaries.league.percentileRank)+1)];
+        nextRankGlickoCutoff = (summaries.league.rank != "z" ? summaries.league.rank == "x+" : summaries.league.percentileRank == "x+") ? topOne?.glicko??double.infinity : cutoffsGlicko?[ranks.elementAtOrNull(ranks.indexOf(summaries.league.rank != "z" ? summaries.league.rank : summaries.league.percentileRank)+1)];
+      }
 
-    // if (everyone != null && me.tlSeason1.gamesPlayed > 9) rankAverages = everyone?.averages[me.tlSeason1.percentileRank]?[0];
+    // if (everyone != null && summaries.league.gamesPlayed > 9) rankAverages = everyone?.averages[summaries.league.percentileRank]?[0];
 
     // Making list of Tetra League matches
     bool isTracking = await teto.isPlayerTracking(me.userId);
@@ -270,7 +271,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       }
     } 
 
-    //states.addAll(await teto.getPlayer(me.userId));
+    states.addAll(await teto.getPlayer(me.userId));
     for (var element in states) { // For graphs I need only unique entries
       if (element.tlSeason1 != null && uniqueTL.isNotEmpty && uniqueTL.last != element.tlSeason1) uniqueTL.add(element.tlSeason1!);
       if (uniqueTL.isEmpty) uniqueTL.add(element.tlSeason1!);
@@ -475,12 +476,12 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                                 //lastMatchPlayed: snapshot.data![11],
                                 bot: snapshot.data![0].role == "bot",
                                 guest: snapshot.data![0].role == "anon",
-                                //thatRankCutoff: thatRankCutoff,
-                                //thatRankCutoffGlicko: thatRankGlickoCutoff,
-                                //thatRankTarget: snapshot.data![0].tlSeason1.rank != "z" ? rankTargets[snapshot.data![0].tlSeason1.rank] : null,
-                                //nextRankCutoff: nextRankCutoff,
-                                //nextRankCutoffGlicko: nextRankGlickoCutoff,
-                                //nextRankTarget: (snapshot.data![0].tlSeason1.rank != "z" && snapshot.data![0].tlSeason1.rank != "x") ? rankTargets[ranks.elementAtOrNull(ranks.indexOf(snapshot.data![0].tlSeason1.rank)+1)] : null,
+                                thatRankCutoff: thatRankCutoff,
+                                thatRankCutoffGlicko: thatRankGlickoCutoff,
+                                //thatRankTarget: snapshot.data![1].league.rank != "z" ? rankTargets[snapshot.data![1].league.rank] : null,
+                                nextRankCutoff: nextRankCutoff,
+                                nextRankCutoffGlicko: nextRankGlickoCutoff,
+                                //nextRankTarget: (snapshot.data![1].league.rank != "z" && snapshot.data![1].league.rank != "x") ? rankTargets[ranks.elementAtOrNull(ranks.indexOf(snapshot.data![1].league.rank)+1)] : null,
                                 //averages: rankAverages,
                                 //lbPositions: meAmongEveryone
                               ),
@@ -516,12 +517,12 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                             //lastMatchPlayed: snapshot.data![11],
                             bot: snapshot.data![0].role == "bot",
                             guest: snapshot.data![0].role == "anon",
-                            //thatRankCutoff: thatRankCutoff,
-                            //thatRankCutoffGlicko: thatRankGlickoCutoff,
-                            //thatRankTarget: snapshot.data![0].tlSeason1.rank != "z" ? rankTargets[snapshot.data![0].tlSeason1.rank] : null,
-                            //nextRankCutoff: nextRankCutoff,
-                            //nextRankCutoffGlicko: nextRankGlickoCutoff,
-                            //nextRankTarget: (snapshot.data![0].tlSeason1.rank != "z" && snapshot.data![0].tlSeason1.rank != "x") ? rankTargets[ranks.elementAtOrNull(ranks.indexOf(snapshot.data![0].tlSeason1.rank)+1)] : null,
+                            thatRankCutoff: thatRankCutoff,
+                            thatRankCutoffGlicko: thatRankGlickoCutoff,
+                            //thatRankTarget: snapshot.data![1].league.rank != "z" ? rankTargets[snapshot.data![1].league.rank] : null,
+                            nextRankCutoff: nextRankCutoff,
+                            nextRankCutoffGlicko: nextRankGlickoCutoff,
+                            //nextRankTarget: (snapshot.data![1].league.rank != "z" && snapshot.data![1].league.rank != "x") ? rankTargets[ranks.elementAtOrNull(ranks.indexOf(snapshot.data![1].league.rank)+1)] : null,
                             //averages: rankAverages,
                             //lbPositions: meAmongEveryone
                           ),

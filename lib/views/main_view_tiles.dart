@@ -170,7 +170,7 @@ class DestinationLeaderboards extends StatefulWidget{
 
 class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
   Cards rightCard = Cards.tetraLeague;
-  Duration postSeasonLeft = seasonStart.difference(DateTime.now());
+  //Duration postSeasonLeft = seasonStart.difference(DateTime.now());
   final List<String> leaderboards = ["Tetra League", "Quick Play", "Quick Play Expert"];
 
   @override
@@ -245,7 +245,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
   final List _historyShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR", "Opener", "Plonk", "Inf. DS", "Stride"];
   int _chartsIndex = 0;
   late List<DropdownMenuItem<List<_HistoryChartSpot>>> chartsData;
-  Duration postSeasonLeft = seasonStart.difference(DateTime.now());
+  //Duration postSeasonLeft = seasonStart.difference(DateTime.now());
 
   @override
   void initState(){
@@ -611,7 +611,7 @@ class RecordSummary extends StatelessWidget{
 class _DestinationHomeState extends State<DestinationHome> {
   Cards rightCard = Cards.overview;
   CardMod cardMod = CardMod.info;
-  Duration postSeasonLeft = seasonStart.difference(DateTime.now());
+  //Duration postSeasonLeft = seasonStart.difference(DateTime.now());
   late Map<Cards, List<ButtonSegment<CardMod>>> modeButtons;
   late MapEntry? closestAverageBlitz;
   late bool blitzBetterThanClosestAverage;
@@ -849,7 +849,7 @@ class _DestinationHomeState extends State<DestinationHome> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(t.tetraLeague, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
-                  Text("${t.seasonStarts} ${countdown(postSeasonLeft)}", textAlign: TextAlign.center)
+                  //Text("${t.seasonStarts} ${countdown(postSeasonLeft)}", textAlign: TextAlign.center)
                 ],
               ),
             ),
@@ -1021,7 +1021,7 @@ class _DestinationHomeState extends State<DestinationHome> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(t.quickPlay, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
-                  Text("Leaderboard reset in ${countdown(postSeasonLeft)}", textAlign: TextAlign.center),
+                  //Text("Leaderboard reset in ${countdown(postSeasonLeft)}", textAlign: TextAlign.center),
                 ],
               ),
             ),

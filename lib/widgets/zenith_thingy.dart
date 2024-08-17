@@ -148,7 +148,7 @@ class _ZenithThingyState extends State<ZenithThingy> {
                         const Positioned(left: 25, top: 20, child: Text("otal time", style: TextStyle(fontFamily: "Eurostile Round Extended"))),
                         Padding(
                           padding: const EdgeInsets.only(left: 10.0),
-                          child: Text("${getMoreNormalTime(record!.stats.finalTime)}%", style: TextStyle(
+                          child: Text("${getMoreNormalTime(record!.stats.finalTime)}", style: TextStyle(
                             shadows: textShadow,
                             fontFamily: "Eurostile Round Extended",
                             fontSize: 36,
@@ -158,7 +158,6 @@ class _ZenithThingyState extends State<ZenithThingy> {
                         )
                       ],
                     ),
-                    Text("Total time: ${getMoreNormalTime(record!.stats.finalTime)}", style: const TextStyle(color: Colors.white, fontFamily: "Eurostile Round Extended"), textAlign: TextAlign.center),
                     Table(
                       columnWidths: const {
                         0: FixedColumnWidth(36)

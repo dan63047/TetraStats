@@ -411,12 +411,7 @@ class TetrioService extends DB {
     Cutoffs? cached = _cache.get("", Cutoffs);
     if (cached != null) return cached;
 
-    Uri url;
-    if (kIsWeb) {
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLCutoffs"});
-    } else {
-      url = Uri.https('api.p1nkl0bst3r.xyz', 'rankcutoff', {"users": null});
-    }
+    Uri url = Uri.https('ts.dan63.by', 'beanserver_blaster/cutoffs.json', {"users": null});
 
     try{
       final response = await client.get(url);
@@ -424,13 +419,14 @@ class TetrioService extends DB {
       switch (response.statusCode) {
         case 200:
           Map<String, dynamic> rawData = jsonDecode(response.body);
-          Map<String, dynamic> data = rawData["cutoffs"] as Map<String, dynamic>;
-          Cutoffs result = Cutoffs({}, {});
+          Map<String, dynamic> data = rawData["data"] as Map<String, dynamic>;
+          Cutoffs result = Cutoffs(DateTime.fromMillisecondsSinceEpoch(rawData["created"]), {}, {}, {});
           for (String rank in data.keys){
-            result.tr[rank] = data[rank]["rating"];
+            result.tr[rank] = data[rank]["tr"];
             result.glicko[rank] = data[rank]["glicko"];
+            result.gxe[rank] = data[rank]["gxe"];
           }
-          _cache.store(result, rawData["ts"] + 300000);
+          _cache.store(result, rawData["cache_until"]);
           return result;
         case 404:
           developer.log("fetchCutoffs: Cutoffs are gone", name: "services/tetrio_crud", error: response.statusCode);
@@ -466,7 +462,7 @@ class TetrioService extends DB {
     if (kIsWeb) {
       url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLTopOne"});
     } else {
-      url = Uri.https('ch.tetr.io', 'api/users/lists/league', {"after": "25000", "limit": "1"});
+      url = Uri.https('ch.tetr.io', 'api/users/by/league', {"after": "25000:0:0", "limit": "1"});
     }
 
     try{
@@ -475,7 +471,7 @@ class TetrioService extends DB {
       switch (response.statusCode) {
         case 200:
           var rawJson = jsonDecode(response.body);
-          TetrioPlayerFromLeaderboard result = TetrioPlayerFromLeaderboard.fromJson(rawJson["data"]["users"][0], DateTime.fromMillisecondsSinceEpoch(rawJson["cache"]["cached_at"]));
+          TetrioPlayerFromLeaderboard result = TetrioPlayerFromLeaderboard.fromJson(rawJson["data"]["entries"][0], DateTime.fromMillisecondsSinceEpoch(rawJson["cache"]["cached_at"]));
           _cache.store(result, rawJson["cache"]["cached_until"]);
           return result;
         case 404:
@@ -640,15 +636,17 @@ class TetrioService extends DB {
   }
 
   /// Retrieves full Tetra League leaderboard from Tetra Channel api. Returns a leaderboard object. Throws an exception if fails to retrieve.
-  Future<TetrioPlayersLeaderboard> fetchTLLeaderboard() async {
-    TetrioPlayersLeaderboard? cached = _cache.get("league", TetrioPlayersLeaderboard);
+  Future<TetrioPlayersLeaderboard> fetchTLLeaderboard({double? after}) async {
+    TetrioPlayersLeaderboard? cached = _cache.get("league${after != null ? after.toString() : ""}", TetrioPlayersLeaderboard);
     if (cached != null) return cached;
-     
     Uri url;
     if (kIsWeb) {
       url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLLeaderboard"});
     } else {
-      url = Uri.https('ch.tetr.io', 'api/users/by/league');
+      url = Uri.https('ch.tetr.io', 'api/users/by/league', {
+        "limit": "100",
+        if (after != null) "after": "$after:0:0"
+      });
     }
     try{
       final response = await client.get(url);
@@ -685,6 +683,20 @@ class TetrioService extends DB {
     } on http.ClientException catch (e, s) {
       developer.log("$e, $s");
       throw http.ClientException(e.message, e.uri);
+    }
+  }
+
+  Stream<TetrioPlayersLeaderboard> fetchFullLeaderboard() async* {
+    late double after;
+    int lbLength = 100;
+    TetrioPlayersLeaderboard leaderboard = await fetchTLLeaderboard();
+    after = leaderboard.leaderboard.last.tr;
+    while (lbLength == 100){
+      TetrioPlayersLeaderboard pseudoLb = await fetchTLLeaderboard(after: after);
+      leaderboard.addPlayers(pseudoLb.leaderboard);
+      lbLength = pseudoLb.leaderboard.length;
+      after = pseudoLb.leaderboard.last.tr;
+      yield leaderboard;
     }
   }
 

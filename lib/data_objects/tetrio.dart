@@ -42,26 +42,26 @@ const Map<String, double> rankCutoffs = {
   "z": -1,
   "": 0.5
 };
-const Map<String, double> rankTargets = {
-  "x": 24503.75, // where that comes from?
-  "u": 23038,
-  "ss": 21583,
-  "s+": 20128,
-  "s": 18673,
-  "s-": 16975,
-  "a+": 15035,
-  "a": 13095,
-  "a-": 11155,
-  "b+": 9215,
-  "b": 7275,
-  "b-": 5335,
-  "c+": 3880,
-  "c": 2425,
-  "c-": 1213,
-  "d+": 606,
-  "d": 0,
-};
-DateTime seasonStart = DateTime.utc(2024, 08, 16, 18);
+// const Map<String, double> rankTargets = {
+//   "x": 24503.75, // where that comes from?
+//   "u": 23038,
+//   "ss": 21583,
+//   "s+": 20128,
+//   "s": 18673,
+//   "s-": 16975,
+//   "a+": 15035,
+//   "a": 13095,
+//   "a-": 11155,
+//   "b+": 9215,
+//   "b": 7275,
+//   "b-": 5335,
+//   "c+": 3880,
+//   "c": 2425,
+//   "c-": 1213,
+//   "d+": 606,
+//   "d": 0,
+// };
+// DateTime seasonStart = DateTime.utc(2024, 08, 16, 18);
 //DateTime seasonEnd = DateTime.utc(2024, 07, 26, 15);
 enum Stats {
   tr,
@@ -123,7 +123,8 @@ const Map<Stats, String> chartsShortTitles = {
   Stats.openerMinusInfDS: "Opener - Inf. DS" 
   };
 
-const Map<String, Color> rankColors = { // thanks osk for const rankColors at https://ch.tetr.io/res/js/base.js:418
+const Map<String, Color> rankColors = { // thanks osk for const rankColors at https://ch.tetr.io/res/js/base.js:458
+  'x+': Color(0xFF643C8D),
 	'x': Color(0xFFFF45FF),
 	'u': Color(0xFFFF3813),
 	'ss': Color(0xFFDB8B1F),
@@ -1422,10 +1423,10 @@ class TetraLeague {
     timestamp = ts;
     gamesPlayed = json['gamesplayed'] ?? 0;
     gamesWon = json['gameswon'] ?? 0;
-    tr = json['tr'] != null ? json['tr'].toDouble() : -1;
+    tr = json['tr'] != null ? json['tr'].toDouble() : json['rating'] != null ? json['rating'].toDouble() : -1;
     glicko = json['glicko']?.toDouble();
     rd = json['rd'] != null ? json['rd']!.toDouble() : noTrRd;
-    gxe = json['gxe'].toDouble();
+    gxe = json['gxe'] != null ? json['gxe'].toDouble() : -1;
     rank = json['rank'] != null ? json['rank']!.toString() : 'z';
     bestRank = json['bestrank'] != null ? json['bestrank']!.toString() : 'z';
     apm = json['apm']?.toDouble();
@@ -1720,6 +1721,11 @@ class TetrioPlayersLeaderboard {
   late List<TetrioPlayerFromLeaderboard> leaderboard;
 
   TetrioPlayersLeaderboard(this.type, this.leaderboard);
+
+  @override
+  String toString(){
+    return "$type leaderboard: ${leaderboard.length} players";
+  }
 
   List<TetrioPlayerFromLeaderboard> getStatRanking(List<TetrioPlayerFromLeaderboard> leaderboard, Stats stat, {bool reversed = false, String country = ""}){
     List<TetrioPlayerFromLeaderboard> lb = List.from(leaderboard);
@@ -2424,6 +2430,10 @@ class TetrioPlayersLeaderboard {
     for (Map<String, dynamic> entry in json) {
       leaderboard.add(TetrioPlayerFromLeaderboard.fromJson(entry, ts));
     }
+  }
+
+  addPlayers(List<TetrioPlayerFromLeaderboard> list){
+    leaderboard.addAll(list);
   }
 }
 
