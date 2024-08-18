@@ -108,7 +108,7 @@ class RanksAverages extends State<RankAveragesView> {
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(right: 8.0),
-                                      child: Text(f2.format(snapshot.data!.gxe[rank]), textAlign: TextAlign.right, style: TextStyle(fontFamily: bigScreen ? "Eurostile Round" : "Eurostile Round Condensed", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white, shadows: textShadow)),
+                                      child: Text(f3.format(snapshot.data!.gxe[rank]), textAlign: TextAlign.right, style: TextStyle(fontFamily: bigScreen ? "Eurostile Round" : "Eurostile Round Condensed", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white, shadows: textShadow)),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(right: 8.0),

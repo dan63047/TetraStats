@@ -199,7 +199,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       everyone = teto.getCachedLeaderboard();
       everyone ??= await teto.fetchTLLeaderboard();
       if (meAmongEveryone == null && everyone!.leaderboard.isNotEmpty){
-        meAmongEveryone = await compute(everyone!.getLeaderboardPosition, me);
+        meAmongEveryone = await compute(everyone!.getLeaderboardPosition, {me.userId: summaries.league});
         if (meAmongEveryone != null) teto.cacheLeaderboardPositions(me.userId, meAmongEveryone!); 
       }
     }
@@ -216,7 +216,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     // if (everyone != null && summaries.league.gamesPlayed > 9) rankAverages = everyone?.averages[summaries.league.percentileRank]?[0];
 
     // Making list of Tetra League matches
-    bool isTracking = await teto.isPlayerTracking(me.userId);
+    //bool isTracking = await teto.isPlayerTracking(me.userId);
     List<TetrioPlayer> states = [];
     TetraLeague? compareWith;
     Set<TetraLeague> uniqueTL = {};
@@ -274,7 +274,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     states.addAll(await teto.getPlayer(me.userId));
     for (var element in states) { // For graphs I need only unique entries
       if (element.tlSeason1 != null && uniqueTL.isNotEmpty && uniqueTL.last != element.tlSeason1) uniqueTL.add(element.tlSeason1!);
-      if (uniqueTL.isEmpty) uniqueTL.add(element.tlSeason1!);
+      if (uniqueTL.isEmpty) uniqueTL.add(summaries.league);
     }
     // Also i need previous Tetra League State for comparison if avaliable
     if (uniqueTL.length >= 2){

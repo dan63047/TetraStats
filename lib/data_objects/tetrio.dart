@@ -340,10 +340,6 @@ class TetrioPlayer {
     return tlSeason1!.lessStrictCheck(other.tlSeason1!);
   }
 
-  TetrioPlayerFromLeaderboard convertToPlayerFromLeaderboard() => TetrioPlayerFromLeaderboard(
-    userId, username, role, xp, country, state, gamesPlayed, gamesWon,
-    tlSeason1!.tr, tlSeason1!.glicko??0, tlSeason1!.rd??noTrRd, tlSeason1!.rank, tlSeason1!.bestRank, tlSeason1!.apm??0, tlSeason1!.pps??0, tlSeason1!.vs??0, tlSeason1!.decaying);
-
   @override
   String toString() {
     return "$username ($state)";
@@ -1453,6 +1449,10 @@ class TetraLeague {
 
   double? get esttracc => (estTr != null) ? estTr!.esttr - tr : null;
 
+  TetrioPlayerFromLeaderboard convertToPlayerFromLeaderboard(String id) => TetrioPlayerFromLeaderboard(
+    id, "", "user", -1, null, timestamp, gamesPlayed, gamesWon,
+    tr, glicko??0, rd??noTrRd, rank, bestRank, apm??0, pps??0, vs??0, decaying);
+
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     if (gamesPlayed > 0) data['gamesplayed'] = gamesPlayed;
@@ -2337,21 +2337,21 @@ class TetrioPlayersLeaderboard {
     }
   }
 
-  PlayerLeaderboardPosition? getLeaderboardPosition(TetrioPlayer user) {
-    if (user.tlSeason1?.gamesPlayed == 0) return null;
+  PlayerLeaderboardPosition? getLeaderboardPosition(Map<String, TetraLeague>league) {
+    if (league.values.first.gamesPlayed == 0) return null;
     bool fakePositions = false;
     late List<TetrioPlayerFromLeaderboard> copyOfLeaderboard;
-    if (leaderboard.indexWhere((element) => element.userId == user.userId) == -1){
+    if (leaderboard.indexWhere((element) => element.userId == league.keys.first) == -1){
       fakePositions =true;
       copyOfLeaderboard = List.of(leaderboard);
-      copyOfLeaderboard.add(user.convertToPlayerFromLeaderboard());
+      copyOfLeaderboard.add(league.values.first.convertToPlayerFromLeaderboard(league.keys.first));
     } 
     List<Stats> stats = [Stats.apm, Stats.pps, Stats.vs, Stats.gp, Stats.gw, Stats.wr,
     Stats.app, Stats.vsapm, Stats.dss, Stats.dsp, Stats.appdsp, Stats.cheese, Stats.gbe, Stats.nyaapp, Stats.area, Stats.eTR, Stats.acceTR];
     List<LeaderboardPosition?> results = [];
     for (Stats stat in stats) {
       List<TetrioPlayerFromLeaderboard> sortedLeaderboard = getStatRanking(fakePositions ? copyOfLeaderboard : leaderboard, stat, reversed: stat == Stats.cheese ? true : false);
-      int position = sortedLeaderboard.indexWhere((element) => element.userId == user.userId) + 1;
+      int position = sortedLeaderboard.indexWhere((element) => element.userId == league.keys.first) + 1;
       if (position == 0) {
         results.add(null);
       } else {

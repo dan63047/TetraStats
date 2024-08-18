@@ -411,7 +411,7 @@ class TetrioService extends DB {
     Cutoffs? cached = _cache.get("", Cutoffs);
     if (cached != null) return cached;
 
-    Uri url = Uri.https('ts.dan63.by', 'beanserver_blaster/cutoffs.json', {"users": null});
+    Uri url = Uri.https('ts.dan63.by', 'beanserver_blaster/cutoffs.json');
 
     try{
       final response = await client.get(url);
