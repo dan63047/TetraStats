@@ -66,6 +66,8 @@ const Map<String, double> rankCutoffs = {
 enum Stats {
   tr,
   glicko,
+  gxe,
+  s1tr,
   rd,
   gp,
   gw,
@@ -95,6 +97,8 @@ enum Stats {
 
 const Map<Stats, String> chartsShortTitles = {
   Stats.tr: "TR",
+  Stats.gxe: "Glixare",
+  Stats.s1tr: "S1 TR",
   Stats.glicko: "Glicko",
   Stats.rd: "RD",
   Stats.gp: "GP",
@@ -351,6 +355,10 @@ class TetrioPlayer {
         return tlSeason1?.tr;
       case Stats.glicko:
         return tlSeason1?.glicko;
+      case Stats.gxe:
+        return tlSeason1?.gxe;
+      case Stats.s1tr:
+        return tlSeason1?.s1tr;
       case Stats.rd:
         return tlSeason1?.rd;
       case Stats.gp:
@@ -1414,6 +1422,7 @@ class TetraLeague {
       }
 
   double get winrate => gamesWon / gamesPlayed;
+  double get s1tr => gxe * 250;
 
   TetraLeague.fromJson(Map<String, dynamic> json, ts) {
     timestamp = ts;
@@ -1451,7 +1460,7 @@ class TetraLeague {
 
   TetrioPlayerFromLeaderboard convertToPlayerFromLeaderboard(String id) => TetrioPlayerFromLeaderboard(
     id, "", "user", -1, null, timestamp, gamesPlayed, gamesWon,
-    tr, glicko??0, rd??noTrRd, rank, bestRank, apm??0, pps??0, vs??0, decaying);
+    tr, gxe, glicko??0, rd??noTrRd, rank, bestRank, apm??0, pps??0, vs??0, decaying);
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
@@ -1757,6 +1766,7 @@ class TetrioPlayersLeaderboard {
         avgPPS = 0,
         avgVS = 0,
         avgTR = 0,
+        avgGlixare = 0,
         avgGlicko = 0,
         avgRD = 0,
         avgAPP = 0,
@@ -1775,6 +1785,7 @@ class TetrioPlayersLeaderboard {
         avgStride = 0,
         avgInfDS = 0,
         lowestTR = 25000,
+        lowestGlixare = double.infinity,
         lowestGlicko = double.infinity,
         lowestRD = double.infinity,
         lowestWinrate = double.infinity,
@@ -1797,6 +1808,7 @@ class TetrioPlayersLeaderboard {
         lowestStride = double.infinity,
         lowestInfDS = double.infinity,
         highestTR = double.negativeInfinity,
+        highestGlixare = double.negativeInfinity,
         highestGlicko = double.negativeInfinity,
         highestRD = double.negativeInfinity,
         highestWinrate = double.negativeInfinity,
@@ -1827,6 +1839,7 @@ class TetrioPlayersLeaderboard {
         highestGamesPlayed = 0,
         highestGamesWon = 0;
       String lowestTRid = "", lowestTRnick = "",
+        lowestGlixareID = "", lowestGlixareNick = "",
         lowestGlickoID = "", lowestGlickoNick = "",
         lowestRdID = "", lowestRdNick = "",
         lowestGamesPlayedID = "", lowestGamesPlayedNick = "",
@@ -1851,6 +1864,7 @@ class TetrioPlayersLeaderboard {
         lowestStrideID = "", lowestStrideNick = "",
         lowestInfDSid = "", lowestInfDSnick = "",
         highestTRid = "", highestTRnick = "",
+        highestGlixareID = "", highestGlixareNick = "",
         highestGlickoID = "", highestGlickoNick = "",
         highestRdID = "", highestRdNick = "",
         highestGamesPlayedID = "", highestGamesPlayedNick = "",
@@ -1879,6 +1893,7 @@ class TetrioPlayersLeaderboard {
         avgPPS += entry.pps;
         avgVS += entry.vs;
         avgTR += entry.tr;
+        avgGlixare += entry.gxe;
         if (entry.glicko != null) avgGlicko += entry.glicko!;
         if (entry.rd != null) avgRD += entry.rd!;
         avgAPP += entry.nerdStats.app;
@@ -1902,6 +1917,11 @@ class TetrioPlayersLeaderboard {
           lowestTR = entry.tr;
           lowestTRid = entry.userId;
           lowestTRnick = entry.username;
+        }
+        if (entry.gxe < lowestGlixare){
+          lowestGlixare = entry.gxe;
+          lowestGlixareID = entry.userId;
+          lowestGlixareNick = entry.username;
         }
         if (entry.glicko != null && entry.glicko! < lowestGlicko){
           lowestGlicko = entry.glicko!;
@@ -2023,6 +2043,11 @@ class TetrioPlayersLeaderboard {
           highestTRid = entry.userId;
           highestTRnick = entry.username;
         }
+        if (entry.gxe > highestGlixare){
+          highestGlixare = entry.gxe;
+          highestGlixareID = entry.userId;
+          highestGlixareNick = entry.username;
+        }
         if (entry.glicko != null && entry.glicko! > highestGlicko){
           highestGlicko = entry.glicko!;
           highestGlickoID = entry.userId;
@@ -2143,6 +2168,7 @@ class TetrioPlayersLeaderboard {
       avgPPS /= filtredLeaderboard.length;
       avgVS /= filtredLeaderboard.length;
       avgTR /= filtredLeaderboard.length;
+      avgGlixare /= filtredLeaderboard.length;
       avgGlicko /= filtredLeaderboard.length;
       avgRD /= filtredLeaderboard.length;
       avgAPP /= filtredLeaderboard.length;
@@ -2162,7 +2188,7 @@ class TetrioPlayersLeaderboard {
       avgInfDS /= filtredLeaderboard.length;
       avgGamesPlayed = (totalGamesPlayed / filtredLeaderboard.length).floor();
       avgGamesWon = (totalGamesWon / filtredLeaderboard.length).floor();
-      return [TetraLeague(timestamp: DateTime.now(), apm: avgAPM, pps: avgPPS, vs: avgVS, glicko: avgGlicko, rd: avgRD, gamesPlayed: avgGamesPlayed, gamesWon: avgGamesWon, bestRank: rank, gxe: -1, decaying: false, tr: avgTR, rank: rank == "" ? "z" : rank, percentileRank: rank, percentile: rankCutoffs[rank]!, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1),
+      return [TetraLeague(timestamp: DateTime.now(), apm: avgAPM, pps: avgPPS, vs: avgVS, gxe: avgGlixare, glicko: avgGlicko, rd: avgRD, gamesPlayed: avgGamesPlayed, gamesWon: avgGamesWon, bestRank: rank, decaying: false, tr: avgTR, rank: rank == "" ? "z" : rank, percentileRank: rank, percentile: rankCutoffs[rank]!, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1),
       {
         "everyone": rank == "",
         "totalGamesPlayed": totalGamesPlayed,
@@ -2171,6 +2197,12 @@ class TetrioPlayersLeaderboard {
         "lowestTR": lowestTR,
         "lowestTRid": lowestTRid,
         "lowestTRnick": lowestTRnick,
+        "lowestGlixare": lowestGlixare,
+        "lowestGlixareID": lowestGlixareID,
+        "lowestGlixareNick": lowestGlixareNick,
+        "lowestS1tr": lowestGlixare * 250,
+        "lowestS1trID": lowestGlixareID,
+        "lowestS1trNick": lowestGlixareNick,
         "lowestGlicko": lowestGlicko,
         "lowestGlickoID": lowestGlickoID,
         "lowestGlickoNick": lowestGlickoNick,
@@ -2243,6 +2275,12 @@ class TetrioPlayersLeaderboard {
         "highestTR": highestTR,
         "highestTRid": highestTRid,
         "highestTRnick": highestTRnick,
+        "highestGlixare": highestGlixare,
+        "highestGlixareID": highestGlixareID,
+        "highestGlixareNick": highestGlixareNick,
+        "highestS1tr": highestGlixare * 250,
+        "highestS1trID": highestGlixareID,
+        "highestS1trNick": highestGlixareNick,
         "highestGlicko": highestGlicko,
         "highestGlickoID": highestGlickoID,
         "highestGlickoNick": highestGlickoNick,
@@ -2327,8 +2365,8 @@ class TetrioPlayersLeaderboard {
         "avgPlonk": avgPlonk,
         "avgStride": avgStride,
         "avgInfDS": avgInfDS,
-        "toEnterTR": rank.toLowerCase() != "z" ? leaderboard[(leaderboard.length * rankCutoffs[rank]!).floor()].tr : lowestTR,
-        "toEnterGlicko": rank.toLowerCase() != "z" ? leaderboard[(leaderboard.length * rankCutoffs[rank]!).floor()].glicko : 0,
+        "toEnterTR": rank.toLowerCase() != "z" ? leaderboard[(leaderboard.length * rankCutoffs[rank]!).floor()-1].tr : lowestTR,
+        "toEnterGlicko": rank.toLowerCase() != "z" ? leaderboard[(leaderboard.length * rankCutoffs[rank]!).floor()-1].glicko : 0,
         "entries": filtredLeaderboard
       }];
     }else{
@@ -2447,6 +2485,7 @@ class TetrioPlayerFromLeaderboard {
   late int gamesPlayed;
   late int gamesWon;
   late double tr;
+  late double gxe;
   late double? glicko;
   late double? rd;
   late String rank;
@@ -2469,6 +2508,7 @@ class TetrioPlayerFromLeaderboard {
     this.gamesPlayed,
     this.gamesWon,
     this.tr,
+    this.gxe,
     this.glicko,
     this.rd,
     this.rank,
@@ -2484,6 +2524,7 @@ class TetrioPlayerFromLeaderboard {
 
   double get winrate => gamesWon / gamesPlayed;
   double get esttracc => estTr.esttr - tr;
+  double get s1tr => gxe * 250;
 
   TetrioPlayerFromLeaderboard.fromJson(Map<String, dynamic> json, DateTime ts) {
     userId = json['_id'];
@@ -2495,6 +2536,7 @@ class TetrioPlayerFromLeaderboard {
     gamesPlayed = json['league']['gamesplayed'] as int;
     gamesWon = json['league']['gameswon'] as int;
     tr = json['league']['tr'] != null ? json['league']['tr'].toDouble() : 0;
+    gxe = json['league']['gxe']??-1;
     glicko = json['league']['glicko']?.toDouble();
     rd = json['league']['rd']?.toDouble();
     rank = json['league']['rank'];
@@ -2514,6 +2556,10 @@ class TetrioPlayerFromLeaderboard {
         return tr;
       case Stats.glicko:
         return glicko??-1;
+      case Stats.gxe:
+        return gxe;
+      case Stats.s1tr:
+        return s1tr;
       case Stats.rd:
         return rd??-1;
       case Stats.gp:

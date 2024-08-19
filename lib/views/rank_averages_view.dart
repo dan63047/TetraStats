@@ -379,6 +379,8 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                           child: ListView(
                             children: [
                               _ListEntry(value: widget.rank[1]["lowestTR"], label: t.statCellNum.tr.replaceAll(RegExp(r'\n'), " "), id: widget.rank[1]["lowestTRid"], username: widget.rank[1]["lowestTRnick"], approximate: false, fractionDigits: 2),
+                              _ListEntry(value: widget.rank[1]["lowestGlixare"], label: "Glixare", id: widget.rank[1]["lowestGlixareID"], username: widget.rank[1]["lowestGlixareNick"], approximate: false, fractionDigits: 3),
+                              _ListEntry(value: widget.rank[1]["lowestS1tr"], label: "S1 ${t.statCellNum.tr.replaceAll(RegExp(r'\n'), " ")}", id: widget.rank[1]["lowestS1trID"], username: widget.rank[1]["lowestS1trNick"], approximate: false, fractionDigits: 2),
                               _ListEntry(value: widget.rank[1]["lowestGlicko"], label: "Glicko", id: widget.rank[1]["lowestGlickoID"], username: widget.rank[1]["lowestGlickoNick"], approximate: false, fractionDigits: 2),
                               _ListEntry(value: widget.rank[1]["lowestRD"], label: t.statCellNum.rd.replaceAll(RegExp(r'\n'), " "), id: widget.rank[1]["lowestRdID"], username: widget.rank[1]["lowestRdNick"], approximate: false, fractionDigits: 3),
                               _ListEntry(value: widget.rank[1]["lowestGamesPlayed"], label: t.statCellNum.gamesPlayed.replaceAll(RegExp(r'\n'), " "), id: widget.rank[1]["lowestGamesPlayedID"], username: widget.rank[1]["lowestGamesPlayedNick"], approximate: false),
@@ -413,6 +415,8 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                         Expanded(
                             child: ListView(children: [
                           _ListEntry(value: widget.rank[0].tr, label: t.statCellNum.tr.replaceAll(RegExp(r'\n'), " "), id: "", username: "", approximate: true, fractionDigits: 2),
+                          _ListEntry(value: widget.rank[0].gxe, label: "Glixare", id: "", username: "", approximate: false, fractionDigits: 3),
+                          _ListEntry(value: widget.rank[0].s1tr, label: "S1 ${t.statCellNum.tr.replaceAll(RegExp(r'\n'), " ")}", id: "", username: "", approximate: false, fractionDigits: 2),
                           _ListEntry(value: widget.rank[0].glicko, label: "Glicko", id: "", username: "", approximate: true, fractionDigits: 2),
                           _ListEntry(value: widget.rank[0].rd, label: t.statCellNum.rd.replaceAll(RegExp(r'\n'), " "), id: "", username: "", approximate: true, fractionDigits: 3),
                           _ListEntry(value: widget.rank[0].gamesPlayed, label: t.statCellNum.gamesPlayed.replaceAll(RegExp(r'\n'), " "), id: "", username: "", approximate: true, fractionDigits: 0),
@@ -446,6 +450,8 @@ class RankState extends State<RankView> with SingleTickerProviderStateMixin {
                           child: ListView(
                             children: [
                               _ListEntry(value: widget.rank[1]["highestTR"], label: t.statCellNum.tr.replaceAll(RegExp(r'\n'), " "), id: widget.rank[1]["highestTRid"], username: widget.rank[1]["highestTRnick"], approximate: false, fractionDigits: 2),
+                              _ListEntry(value: widget.rank[1]["highestGlixare"], label: "Glixare", id: widget.rank[1]["highestGlixareID"], username: widget.rank[1]["highestGlixareNick"], approximate: false, fractionDigits: 3),
+                              _ListEntry(value: widget.rank[1]["highestS1tr"], label: "S1 ${t.statCellNum.tr.replaceAll(RegExp(r'\n'), " ")}", id: widget.rank[1]["highestS1trID"], username: widget.rank[1]["highestS1trNick"], approximate: false, fractionDigits: 2),
                               _ListEntry(value: widget.rank[1]["highestGlicko"], label: "Glicko", id: widget.rank[1]["highestGlickoID"], username: widget.rank[1]["highestGlickoNick"], approximate: false, fractionDigits: 2),
                               _ListEntry(value: widget.rank[1]["highestRD"], label: t.statCellNum.rd.replaceAll(RegExp(r'\n'), " "), id: widget.rank[1]["highestRdID"], username: widget.rank[1]["highestRdNick"], approximate: false, fractionDigits: 3),
                               _ListEntry(value: widget.rank[1]["highestGamesPlayed"], label: t.statCellNum.gamesPlayed.replaceAll(RegExp(r'\n'), " "), id: widget.rank[1]["highestGamesPlayedID"], username: widget.rank[1]["highestGamesPlayedNick"], approximate: false),
@@ -517,7 +523,7 @@ class _ListEntry extends StatelessWidget {
         children: [
           Text(f.format(value),
               style: const TextStyle(fontSize: 22, height: 0.9)),
-          if (id.isNotEmpty) Text(t.forPlayer(username: username))
+          if (id.isNotEmpty) Text(t.forPlayer(username: username), style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w100),)
         ],
       ),
       onTap: id.isNotEmpty

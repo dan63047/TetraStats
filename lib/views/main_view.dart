@@ -213,7 +213,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
         nextRankGlickoCutoff = (summaries.league.rank != "z" ? summaries.league.rank == "x+" : summaries.league.percentileRank == "x+") ? topOne?.glicko??double.infinity : cutoffsGlicko?[ranks.elementAtOrNull(ranks.indexOf(summaries.league.rank != "z" ? summaries.league.rank : summaries.league.percentileRank)+1)];
       }
 
-    // if (everyone != null && summaries.league.gamesPlayed > 9) rankAverages = everyone?.averages[summaries.league.percentileRank]?[0];
+    if (everyone != null && summaries.league.gamesPlayed > 9) rankAverages = everyone?.averages[summaries.league.percentileRank]?[0];
 
     // Making list of Tetra League matches
     //bool isTracking = await teto.isPlayerTracking(me.userId);
@@ -482,8 +482,8 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                                 nextRankCutoff: nextRankCutoff,
                                 nextRankCutoffGlicko: nextRankGlickoCutoff,
                                 //nextRankTarget: (snapshot.data![1].league.rank != "z" && snapshot.data![1].league.rank != "x") ? rankTargets[ranks.elementAtOrNull(ranks.indexOf(snapshot.data![1].league.rank)+1)] : null,
-                                //averages: rankAverages,
-                                //lbPositions: meAmongEveryone
+                                averages: rankAverages,
+                                lbPositions: meAmongEveryone
                               ),
                             ),
                             SizedBox(
@@ -523,8 +523,8 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                             nextRankCutoff: nextRankCutoff,
                             nextRankCutoffGlicko: nextRankGlickoCutoff,
                             //nextRankTarget: (snapshot.data![1].league.rank != "z" && snapshot.data![1].league.rank != "x") ? rankTargets[ranks.elementAtOrNull(ranks.indexOf(snapshot.data![1].league.rank)+1)] : null,
-                            //averages: rankAverages,
-                            //lbPositions: meAmongEveryone
+                            averages: rankAverages,
+                            lbPositions: meAmongEveryone
                           ),
                           _TLRecords(userID: snapshot.data![0].userId, changePlayer: changePlayer, data: snapshot.data![3].records, wasActiveInTL: true, oldMathcesHere: _TLHistoryWasFetched, separateScrollController: true),
                           _History(chartsData: chartsData, changePlayer: changePlayer, userID: _searchFor, update: _justUpdate, wasActiveInTL: snapshot.data![1].league.gamesPlayed > 0),

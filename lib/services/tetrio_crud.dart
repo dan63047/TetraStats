@@ -636,18 +636,12 @@ class TetrioService extends DB {
   }
 
   /// Retrieves full Tetra League leaderboard from Tetra Channel api. Returns a leaderboard object. Throws an exception if fails to retrieve.
-  Future<TetrioPlayersLeaderboard> fetchTLLeaderboard({double? after}) async {
-    TetrioPlayersLeaderboard? cached = _cache.get("league${after != null ? after.toString() : ""}", TetrioPlayersLeaderboard);
+  Future<TetrioPlayersLeaderboard> fetchTLLeaderboard() async {
+    TetrioPlayersLeaderboard? cached = _cache.get("league", TetrioPlayersLeaderboard);
     if (cached != null) return cached;
-    Uri url;
-    if (kIsWeb) {
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLLeaderboard"});
-    } else {
-      url = Uri.https('ch.tetr.io', 'api/users/by/league', {
-        "limit": "100",
-        if (after != null) "after": "$after:0:0"
-      });
-    }
+
+    Uri url = Uri.https('ts.dan63.by', 'beanserver_blaster/leaderboard.json');
+
     try{
       final response = await client.get(url);
 
@@ -655,16 +649,10 @@ class TetrioService extends DB {
         case 200:
           _lbPositions.clear();
           var rawJson = jsonDecode(response.body);
-          if (rawJson['success']) { // if api confirmed that everything ok
-            TetrioPlayersLeaderboard leaderboard = TetrioPlayersLeaderboard.fromJson(rawJson['data']['entries'], "league", DateTime.fromMillisecondsSinceEpoch(rawJson['cache']['cached_at']));
-            developer.log("fetchTLLeaderboard: Leaderboard retrieved and cached", name: "services/tetrio_crud");
-            //_leaderboardsCache[rawJson['cache']['cached_until'].toString()] = leaderboard;
-            _cache.store(leaderboard, rawJson['cache']['cached_until']);
-            return leaderboard;
-          } else { // idk how to hit that one
-            developer.log("fetchTLLeaderboard: Bruh", name: "services/tetrio_crud", error: rawJson);
-            throw Exception("Failed to get leaderboard (problems on the tetr.io side)"); // will it be on tetr.io side?
-          }
+          TetrioPlayersLeaderboard leaderboard = TetrioPlayersLeaderboard.fromJson(rawJson['data'], "league", DateTime.fromMillisecondsSinceEpoch(rawJson['created']));
+          developer.log("fetchTLLeaderboard: Leaderboard retrieved and cached", name: "services/tetrio_crud");
+          _cache.store(leaderboard, rawJson['cache_until']);
+          return leaderboard;
         case 403:
           throw TetrioForbidden();
         case 429:
@@ -686,19 +674,19 @@ class TetrioService extends DB {
     }
   }
 
-  Stream<TetrioPlayersLeaderboard> fetchFullLeaderboard() async* {
-    late double after;
-    int lbLength = 100;
-    TetrioPlayersLeaderboard leaderboard = await fetchTLLeaderboard();
-    after = leaderboard.leaderboard.last.tr;
-    while (lbLength == 100){
-      TetrioPlayersLeaderboard pseudoLb = await fetchTLLeaderboard(after: after);
-      leaderboard.addPlayers(pseudoLb.leaderboard);
-      lbLength = pseudoLb.leaderboard.length;
-      after = pseudoLb.leaderboard.last.tr;
-      yield leaderboard;
-    }
-  }
+  // Stream<TetrioPlayersLeaderboard> fetchFullLeaderboard() async* {
+  //   late double after;
+  //   int lbLength = 100;
+  //   TetrioPlayersLeaderboard leaderboard = await fetchTLLeaderboard();
+  //   after = leaderboard.leaderboard.last.tr;
+  //   while (lbLength == 100){
+  //     TetrioPlayersLeaderboard pseudoLb = await fetchTLLeaderboard(after: after);
+  //     leaderboard.addPlayers(pseudoLb.leaderboard);
+  //     lbLength = pseudoLb.leaderboard.length;
+  //     after = pseudoLb.leaderboard.last.tr;
+  //     yield leaderboard;
+  //   }
+  // }
 
   // i want to know progress, so i trying to figure out this thing:
   // Stream<TetrioPlayersLeaderboard> fetchTLLeaderboardAsStream() async {
