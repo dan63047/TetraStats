@@ -1103,10 +1103,10 @@ class _TwoRecordsThingy extends StatelessWidget {
   Widget build(BuildContext context) {
     late MapEntry closestAverageBlitz;
     late bool blitzBetterThanClosestAverage;
-    bool? blitzBetterThanRankAverage = (rank != null && rank != "z" && blitz != null) ? blitz!.stats.score > blitzAverages[rank]! : null;
+    bool? blitzBetterThanRankAverage = (rank != null && rank != "z" && rank != "x+" && blitz != null) ? blitz!.stats.score > blitzAverages[rank]! : null;
     late MapEntry closestAverageSprint;
     late bool sprintBetterThanClosestAverage;
-    bool? sprintBetterThanRankAverage = (rank != null && rank != "z" && sprint != null) ? sprint!.stats.finalTime < sprintAverages[rank]! : null;
+    bool? sprintBetterThanRankAverage = (rank != null && rank != "z" && rank != "x+" && sprint != null) ? sprint!.stats.finalTime < sprintAverages[rank]! : null;
     if (sprint != null) {
       closestAverageSprint = sprintAverages.entries.singleWhere((element) => element.value == sprintAverages.values.reduce((a, b) => (a-sprint!.stats.finalTime).abs() < (b -sprint!.stats.finalTime).abs() ? a : b));
       sprintBetterThanClosestAverage = sprint!.stats.finalTime < closestAverageSprint.value;
@@ -1144,7 +1144,7 @@ class _TwoRecordsThingy extends StatelessWidget {
                       text: "",
                       style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
                       children: [
-                        if (rank != null && rank != "z") TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(sprint!.stats.finalTime, sprintAverages[rank]!), verdict: sprintBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
+                        if (rank != null && rank != "z" && rank != "x+") TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(sprint!.stats.finalTime, sprintAverages[rank]!), verdict: sprintBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
                           color: sprintBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
                         ))
                         else TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(sprint!.stats.finalTime, closestAverageSprint.value), verdict: sprintBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageSprint.key.toUpperCase())}\n", style: TextStyle(
@@ -1227,7 +1227,7 @@ class _TwoRecordsThingy extends StatelessWidget {
                     text: "",
                     style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
                     children: [
-                      if (rank != null && rank != "z") TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(blitz!.stats.score, blitzAverages[rank]!), verdict: blitzBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
+                      if (rank != null && rank != "z" && rank != "x+") TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(blitz!.stats.score, blitzAverages[rank]!), verdict: blitzBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
                         color: blitzBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
                       ))
                       else TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(blitz!.stats.score, closestAverageBlitz.value), verdict: blitzBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageBlitz.key.toUpperCase())}\n", style: TextStyle(

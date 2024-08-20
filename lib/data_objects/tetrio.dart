@@ -18,7 +18,7 @@ const double vsapmWeight = 60;
 const double cheeseWeight = 1.25;
 const double gbeWeight = 315;
 const List<String> ranks = [
-  "d", "d+", "c-", "c", "c+", "b-", "b", "b+", "a-", "a", "a+", "s-", "s", "s+", "ss", "u", "x"
+  "d", "d+", "c-", "c", "c+", "b-", "b", "b+", "a-", "a", "a+", "s-", "s", "s+", "ss", "u", "x", "x+"
 ];
 const Map<String, double> rankCutoffs = {
   "x+": 0.002,
@@ -1502,7 +1502,6 @@ class RecordSingle {
   RecordSingle({required this.userId, required this.replayId, required this.ownId, required this.timestamp, required this.stats, required this.rank, required this.countryRank, required this.aggregateStats});
 
   RecordSingle.fromJson(Map<String, dynamic> json, int ran, int cran) {
-    //developer.log("RecordSingle.fromJson: $json", name: "data_objects/tetrio");
     ownId = json['_id'];
     gamemode = json['gamemode'];
     stats = ResultsStats.fromJson(json['results']['stats']);
