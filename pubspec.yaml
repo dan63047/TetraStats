@@ -2,7 +2,7 @@ name: tetra_stats
 description: Track your and other player stats in TETR.IO
 publish_to: 'none'
 
-version: 1.6.7+33
+version: 1.6.8+34
 
 environment:
   sdk: '>=3.0.0'

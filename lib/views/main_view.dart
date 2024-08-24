@@ -175,10 +175,10 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       teto.fetchNews(_searchFor),
       teto.fetchStream(_searchFor, "zenith/recent"),
       teto.fetchStream(_searchFor, "zenithex/recent"),
-      teto.fetchCutoffs(),
+      teto.fetchCutoffsBeanserver(),
       (summaries.league.rank != "z" ? summaries.league.rank == "x+" : summaries.league.percentileRank == "x+") ? teto.fetchTopOneFromTheLeaderboard() : Future.delayed(Duration.zero, ()=>null),
     ]);
-    //prefs.getBool("showPositions") != true ? teto.fetchCutoffs() : Future.delayed(Duration.zero, ()=><Map<String, double>>[]),
+    //prefs.getBool("showPositions") != true ? teto.fetchCutoffsBeanserver() : Future.delayed(Duration.zero, ()=><Map<String, double>>[]),
     
     //(summaries.league.gamesPlayed > 9) ? teto.fetchTopTR(_searchFor) : Future.delayed(Duration.zero, () => null) // can retrieve this only if player has TR
     summaries = requests[0] as Summaries;
@@ -478,10 +478,10 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                                 guest: snapshot.data![0].role == "anon",
                                 thatRankCutoff: thatRankCutoff,
                                 thatRankCutoffGlicko: thatRankGlickoCutoff,
-                                //thatRankTarget: snapshot.data![1].league.rank != "z" ? rankTargets[snapshot.data![1].league.rank] : null,
+                                thatRankTarget: snapshot.data![1].league.rank != "z" ? rankTargets[snapshot.data![1].league.rank] : null,
                                 nextRankCutoff: nextRankCutoff,
                                 nextRankCutoffGlicko: nextRankGlickoCutoff,
-                                //nextRankTarget: (snapshot.data![1].league.rank != "z" && snapshot.data![1].league.rank != "x") ? rankTargets[ranks.elementAtOrNull(ranks.indexOf(snapshot.data![1].league.rank)+1)] : null,
+                                nextRankTarget: (snapshot.data![1].league.rank != "z" && snapshot.data![1].league.rank != "x") ? rankTargets[ranks.elementAtOrNull(ranks.indexOf(snapshot.data![1].league.rank)+1)] : null,
                                 averages: rankAverages,
                                 lbPositions: meAmongEveryone
                               ),
@@ -519,10 +519,10 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                             guest: snapshot.data![0].role == "anon",
                             thatRankCutoff: thatRankCutoff,
                             thatRankCutoffGlicko: thatRankGlickoCutoff,
-                            //thatRankTarget: snapshot.data![1].league.rank != "z" ? rankTargets[snapshot.data![1].league.rank] : null,
+                            thatRankTarget: snapshot.data![1].league.rank != "z" ? rankTargets[snapshot.data![1].league.rank] : null,
                             nextRankCutoff: nextRankCutoff,
                             nextRankCutoffGlicko: nextRankGlickoCutoff,
-                            //nextRankTarget: (snapshot.data![1].league.rank != "z" && snapshot.data![1].league.rank != "x") ? rankTargets[ranks.elementAtOrNull(ranks.indexOf(snapshot.data![1].league.rank)+1)] : null,
+                            nextRankTarget: (snapshot.data![1].league.rank != "z" && snapshot.data![1].league.rank != "x") ? rankTargets[ranks.elementAtOrNull(ranks.indexOf(snapshot.data![1].league.rank)+1)] : null,
                             averages: rankAverages,
                             lbPositions: meAmongEveryone
                           ),

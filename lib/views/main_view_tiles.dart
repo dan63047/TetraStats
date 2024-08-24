@@ -40,7 +40,7 @@ class MainView extends StatefulWidget {
 
 enum Page {home, leaderboards, leagueAverages, calculator, settings}
 enum Cards {overview, tetraLeague, quickPlay, sprint, blitz}
-enum CardMod {info, recent, top, ex, exRecent, exTop}
+enum CardMod {info, records, ex, exRecords}
 Map<Cards, String> cardsTitles = {
   Cards.overview: "Overview",
   Cards.tetraLeague: t.tetraLeague,
@@ -574,7 +574,7 @@ class RecordSummary extends StatelessWidget{
             text: "",
             style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
             children: [
-              if (rank != null && rank != "z") TextSpan(text: "${t.verdictGeneral(n: switch(record!.gamemode){
+              if (rank != null && rank != "z" && rank != "x+") TextSpan(text: "${t.verdictGeneral(n: switch(record!.gamemode){
                 "40l" => readableTimeDifference(record!.stats.finalTime, sprintAverages[rank]!),
                 "blitz" => readableIntDifference(record!.stats.score, blitzAverages[rank]!),
                 _ => record!.stats.score.toString()
@@ -872,7 +872,7 @@ class _DestinationHomeState extends State<DestinationHome> {
     );
   }
 
-  Widget getListOfRecords(String stream, bool isTop, BoxConstraints constraints){
+  Widget getListOfRecords(String recentStream, String topStream, BoxConstraints constraints){
     return Column(
       children: [
         Card(
@@ -883,7 +883,8 @@ class _DestinationHomeState extends State<DestinationHome> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(isTop ? t.top : t.recent, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                  Text("Records", style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                  //Text("${t.seasonStarts} ${countdown(postSeasonLeft)}", textAlign: TextAlign.center)
                 ],
               ),
             ),
@@ -891,65 +892,137 @@ class _DestinationHomeState extends State<DestinationHome> {
         ),
         Card(
           clipBehavior: Clip.antiAlias,
-          child: FutureBuilder<SingleplayerStream>(
-            future: teto.fetchStream(widget.searchFor, stream),
-            builder: (context, snapshot) {
-              switch (snapshot.connectionState){
-              case ConnectionState.none:
-              case ConnectionState.waiting:
-              case ConnectionState.active:
-                return const Center(child: CircularProgressIndicator());
-              case ConnectionState.done:
-                if (snapshot.hasData){
-                  return Column(
+          child: DefaultTabController(length: 2,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TabBar(
+                  tabs: [
+                    Tab(text: "Recent"),
+                    Tab(text: "Top"),
+                  ],
+                ),
+                SizedBox(
+                  height: 400,
+                  child: TabBarView(
                     children: [
-                      for (int i = 0; i < snapshot.data!.records.length; i++) ListTile(
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SingleplayerRecordView(record: snapshot.data!.records[i]))),
-                      leading: Text(
-                        isTop ? "#${i+1}" : switch (snapshot.data!.records[i].gamemode){
-                          "40l" => "40L",
-                          "blitz" => "BLZ",
-                          "5mblast" => "5MB",
-                          "zenith" => "QP",
-                          "zenithex" => "QPE",
-                          String() => "huh",
+                      FutureBuilder<SingleplayerStream>(
+                        future: teto.fetchStream(widget.searchFor, recentStream),
+                        builder: (context, snapshot) {
+                          switch (snapshot.connectionState){
+                          case ConnectionState.none:
+                          case ConnectionState.waiting:
+                          case ConnectionState.active:
+                            return const Center(child: CircularProgressIndicator());
+                          case ConnectionState.done:
+                            if (snapshot.hasData){
+                              return Column(
+                                children: [
+                                  for (int i = 0; i < snapshot.data!.records.length; i++) ListTile(
+                                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SingleplayerRecordView(record: snapshot.data!.records[i]))),
+                                  leading: Text(
+                                    switch (snapshot.data!.records[i].gamemode){
+                                      "40l" => "40L",
+                                      "blitz" => "BLZ",
+                                      "5mblast" => "5MB",
+                                      "zenith" => "QP",
+                                      "zenithex" => "QPE",
+                                      String() => "huh",
+                                    },
+                                    style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, shadows: textShadow, height: 0.9)
+                                  ),
+                                  title: Text(
+                                    switch (snapshot.data!.records[i].gamemode){
+                                      "40l" => get40lTime(snapshot.data!.records[i].stats.finalTime.inMicroseconds),
+                                      "blitz" => t.blitzScore(p: NumberFormat.decimalPattern().format(snapshot.data!.records[i].stats.score)),
+                                      "5mblast" => get40lTime(snapshot.data!.records[i].stats.finalTime.inMicroseconds),
+                                      "zenith" => "${f2.format(snapshot.data!.records[i].stats.zenith!.altitude)} m${(snapshot.data!.records[i].extras as ZenithExtras).mods.isNotEmpty ? " (${t.withModsPlural(n: (snapshot.data!.records[i].extras as ZenithExtras).mods.length)})" : ""}",
+                                      "zenithex" => "${f2.format(snapshot.data!.records[i].stats.zenith!.altitude)} m${(snapshot.data!.records[i].extras as ZenithExtras).mods.isNotEmpty ? " (${t.withModsPlural(n: (snapshot.data!.records[i].extras as ZenithExtras).mods.length)})" : ""}",
+                                      String() => "huh",
+                                    },
+                                  style: const TextStyle(fontSize: 18)),
+                                  subtitle: Text(timestamp(snapshot.data!.records[i].timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
+                                  trailing: SpTrailingStats(snapshot.data!.records[i], snapshot.data!.records[i].gamemode)
+                                )
+                                ],
+                              );
+                            }
+                            if (snapshot.hasError){
+                              return Center(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(t.errors.noSuchUser, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Text(t.errors.noSuchUserSub, textAlign: TextAlign.center),
+                                    ),
+                                  ],
+                                )
+                              );
+                            }
+                          }
+                        return Text("what?");
                         },
-                        style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, shadows: textShadow, height: 0.9)
                       ),
-                      title: Text(
-                        switch (snapshot.data!.records[i].gamemode){
-                          "40l" => get40lTime(snapshot.data!.records[i].stats.finalTime.inMicroseconds),
-                          "blitz" => t.blitzScore(p: NumberFormat.decimalPattern().format(snapshot.data!.records[i].stats.score)),
-                          "5mblast" => get40lTime(snapshot.data!.records[i].stats.finalTime.inMicroseconds),
-                          "zenith" => "${f2.format(snapshot.data!.records[i].stats.zenith!.altitude)} m${(snapshot.data!.records[i].extras as ZenithExtras).mods.isNotEmpty ? " (${t.withModsPlural(n: (snapshot.data!.records[i].extras as ZenithExtras).mods.length)})" : ""}",
-                          "zenithex" => "${f2.format(snapshot.data!.records[i].stats.zenith!.altitude)} m${(snapshot.data!.records[i].extras as ZenithExtras).mods.isNotEmpty ? " (${t.withModsPlural(n: (snapshot.data!.records[i].extras as ZenithExtras).mods.length)})" : ""}",
-                          String() => "huh",
+                      FutureBuilder<SingleplayerStream>(
+                        future: teto.fetchStream(widget.searchFor, topStream),
+                        builder: (context, snapshot) {
+                          switch (snapshot.connectionState){
+                          case ConnectionState.none:
+                          case ConnectionState.waiting:
+                          case ConnectionState.active:
+                            return const Center(child: CircularProgressIndicator());
+                          case ConnectionState.done:
+                            if (snapshot.hasData){
+                              return Column(
+                                children: [
+                                  for (int i = 0; i < snapshot.data!.records.length; i++) ListTile(
+                                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SingleplayerRecordView(record: snapshot.data!.records[i]))),
+                                  leading: Text(
+                                    "#${i+1}",
+                                    style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, shadows: textShadow, height: 0.9)
+                                  ),
+                                  title: Text(
+                                    switch (snapshot.data!.records[i].gamemode){
+                                      "40l" => get40lTime(snapshot.data!.records[i].stats.finalTime.inMicroseconds),
+                                      "blitz" => t.blitzScore(p: NumberFormat.decimalPattern().format(snapshot.data!.records[i].stats.score)),
+                                      "5mblast" => get40lTime(snapshot.data!.records[i].stats.finalTime.inMicroseconds),
+                                      "zenith" => "${f2.format(snapshot.data!.records[i].stats.zenith!.altitude)} m${(snapshot.data!.records[i].extras as ZenithExtras).mods.isNotEmpty ? " (${t.withModsPlural(n: (snapshot.data!.records[i].extras as ZenithExtras).mods.length)})" : ""}",
+                                      "zenithex" => "${f2.format(snapshot.data!.records[i].stats.zenith!.altitude)} m${(snapshot.data!.records[i].extras as ZenithExtras).mods.isNotEmpty ? " (${t.withModsPlural(n: (snapshot.data!.records[i].extras as ZenithExtras).mods.length)})" : ""}",
+                                      String() => "huh",
+                                    },
+                                  style: const TextStyle(fontSize: 18)),
+                                  subtitle: Text(timestamp(snapshot.data!.records[i].timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
+                                  trailing: SpTrailingStats(snapshot.data!.records[i], snapshot.data!.records[i].gamemode)
+                                )
+                                ],
+                              );
+                            }
+                            if (snapshot.hasError){
+                              return Center(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(t.errors.noSuchUser, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Text(t.errors.noSuchUserSub, textAlign: TextAlign.center),
+                                    ),
+                                  ],
+                                )
+                              );
+                            }
+                          }
+                        return Text("what?");
                         },
-                      style: const TextStyle(fontSize: 18)),
-                      subtitle: Text(timestamp(snapshot.data!.records[i].timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
-                      trailing: SpTrailingStats(snapshot.data!.records[i], snapshot.data!.records[i].gamemode)
-                    )
-                    ],
-                  );
-                }
-                if (snapshot.hasError){
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(t.errors.noSuchUser, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Text(t.errors.noSuchUserSub, textAlign: TextAlign.center),
-                        ),
-                      ],
-                    )
-                  );
-                }
-              }
-            return Text("what?");
-            },
-          ),
+                      ),
+                    ]
+                  ),
+                )
+              ],
+            ),
+          ) 
         ),
       ],
     );
@@ -1296,14 +1369,14 @@ class _DestinationHomeState extends State<DestinationHome> {
         ),
       ],
       Cards.tetraLeague: [
-          const ButtonSegment<CardMod>(
-              value: CardMod.info,
-              label: Text('Standing'),
-            ),
-          const ButtonSegment<CardMod>(
-              value: CardMod.recent,
-              label: Text('Recent Matches'),
-            ),
+        const ButtonSegment<CardMod>(
+            value: CardMod.info,
+            label: Text('Standing'),
+          ),
+        const ButtonSegment<CardMod>(
+            value: CardMod.records,
+            label: Text('Recent Matches'),
+          ),
         ],
       Cards.quickPlay: [
         const ButtonSegment<CardMod>(
@@ -1311,25 +1384,17 @@ class _DestinationHomeState extends State<DestinationHome> {
             label: Text('Normal'),
         ),
         const ButtonSegment<CardMod>(
-            value: CardMod.recent,
-            label: Text('Recent Normal'),
-        ),
-        const ButtonSegment<CardMod>(
-            value: CardMod.top,
-            label: Text('Top Normal'),
+            value: CardMod.records,
+            label: Text('Records'),
         ),
         const ButtonSegment<CardMod>(
             value: CardMod.ex,
             label: Text('Expert'),
         ),
         const ButtonSegment<CardMod>(
-            value: CardMod.exRecent,
-            label: Text('Recent Expert'),
-        ),
-        const ButtonSegment<CardMod>(
-            value: CardMod.exTop,
-            label: Text('Top Expert'),
-        ),
+            value: CardMod.exRecords,
+            label: Text('Expert Records'),
+        )
       ],
       Cards.blitz: [
         const ButtonSegment<CardMod>(
@@ -1337,13 +1402,9 @@ class _DestinationHomeState extends State<DestinationHome> {
               label: Text('PB'),
         ),
         const ButtonSegment<CardMod>(
-            value: CardMod.recent,
-            label: Text('Recent'),
-        ),
-        const ButtonSegment<CardMod>(
-            value: CardMod.top,
-            label: Text('Top'),
-        ),
+            value: CardMod.records,
+            label: Text('Records'),
+        )
       ],
       Cards.sprint: [
         const ButtonSegment<CardMod>(
@@ -1351,13 +1412,9 @@ class _DestinationHomeState extends State<DestinationHome> {
               label: Text('PB'),
         ),
         const ButtonSegment<CardMod>(
-            value: CardMod.recent,
-            label: Text('Recent'),
-        ),
-        const ButtonSegment<CardMod>(
-            value: CardMod.top,
-            label: Text('Top'),
-        ),
+            value: CardMod.records,
+            label: Text('Records'),
+        )
       ]
     };
     super.initState();
@@ -1389,8 +1446,8 @@ class _DestinationHomeState extends State<DestinationHome> {
             );
           }
           if (snapshot.hasData){
-            blitzBetterThanRankAverage = (snapshot.data!.summaries!.league.rank != "z" && snapshot.data!.summaries!.blitz != null) ? snapshot.data!.summaries!.blitz!.stats.score > blitzAverages[snapshot.data!.summaries!.league.rank]! : null;
-            sprintBetterThanRankAverage = (snapshot.data!.summaries!.league.rank != "z" && snapshot.data!.summaries!.sprint != null) ? snapshot.data!.summaries!.sprint!.stats.finalTime < sprintAverages[snapshot.data!.summaries!.league.rank]! : null;
+            blitzBetterThanRankAverage = (snapshot.data!.summaries!.league.rank != "z" && snapshot.data!.summaries!.blitz != null && snapshot.data!.summaries!.league.rank != "x+") ? snapshot.data!.summaries!.blitz!.stats.score > blitzAverages[snapshot.data!.summaries!.league.rank]! : null;
+            sprintBetterThanRankAverage = (snapshot.data!.summaries!.league.rank != "z" && snapshot.data!.summaries!.sprint != null && snapshot.data!.summaries!.league.rank != "x+") ? snapshot.data!.summaries!.sprint!.stats.finalTime < sprintAverages[snapshot.data!.summaries!.league.rank]! : null;
               if (snapshot.data!.summaries!.sprint != null) {
               closestAverageSprint = sprintAverages.entries.singleWhere((element) => element.value == sprintAverages.values.reduce((a, b) => (a-snapshot.data!.summaries!.sprint!.stats.finalTime).abs() < (b -snapshot.data!.summaries!.sprint!.stats.finalTime).abs() ? a : b));
               sprintBetterThanClosestAverage = snapshot.data!.summaries!.sprint!.stats.finalTime < closestAverageSprint!.value;
@@ -1467,28 +1524,24 @@ class _DestinationHomeState extends State<DestinationHome> {
                             Cards.overview => getOverviewCard(snapshot.data!.summaries!),
                             Cards.tetraLeague => switch (cardMod){
                               CardMod.info => getTetraLeagueCard(snapshot.data!.summaries!.league),
-                              CardMod.recent => getRecentTLrecords(widget.constraints),
+                              CardMod.records => getRecentTLrecords(widget.constraints),
                               _ => Center(child: Text("huh?"))
                             },
                             Cards.quickPlay => switch (cardMod){
                               CardMod.info => getZenithCard(snapshot.data?.summaries!.zenith),
-                              CardMod.recent => getListOfRecords("zenith/recent", false, widget.constraints),
-                              CardMod.top => getListOfRecords("zenith/top", true, widget.constraints),
+                              CardMod.records => getListOfRecords("zenith/recent", "zenith/top", widget.constraints),
                               CardMod.ex => getZenithCard(snapshot.data?.summaries!.zenithEx),
-                              CardMod.exRecent => getListOfRecords("zenithex/recent", false, widget.constraints),
-                              CardMod.exTop => getListOfRecords("zenithex/top", true, widget.constraints),
+                              CardMod.exRecords => getListOfRecords("zenithex/recent", "zenithex/top", widget.constraints),
                               _ => Center(child: Text("huh?"))
                             },
                             Cards.sprint => switch (cardMod){
                               CardMod.info => getRecordCard(snapshot.data?.summaries!.sprint, sprintBetterThanRankAverage, closestAverageSprint, sprintBetterThanClosestAverage, snapshot.data!.summaries!.league.rank),
-                              CardMod.recent => getListOfRecords("40l/recent", false, widget.constraints),
-                              CardMod.top => getListOfRecords("40l/top", true, widget.constraints),
+                              CardMod.records => getListOfRecords("40l/recent", "40l/top", widget.constraints),
                               _ => Center(child: Text("huh?"))
                             },
                             Cards.blitz => switch (cardMod){
                               CardMod.info => getRecordCard(snapshot.data?.summaries!.blitz, blitzBetterThanRankAverage, closestAverageBlitz, blitzBetterThanClosestAverage, snapshot.data!.summaries!.league.rank),
-                              CardMod.recent => getListOfRecords("blitz/recent", false, widget.constraints),
-                              CardMod.top => getListOfRecords("blitz/top", true, widget.constraints),
+                              CardMod.records => getListOfRecords("blitz/recent", "blitz/top", widget.constraints),
                               _ => Center(child: Text("huh?"))
                             },
                           },
@@ -2333,12 +2386,13 @@ class TetraLeagueThingy extends StatelessWidget{
                     backgroundColor: Colors.black,
                     axes: [
                       RadialAxis(
-                        minimum: 0.4,
-                        maximum: 0.6,
+                        minimum: 0.0,
+                        maximum: 1.0,
                         radiusFactor: 1.01,
                         showTicks: true,
                         showLabels: false,
-                        interval: 0.1,
+                        interval: 0.25,
+                        minorTicksPerInterval: 0,
                         ranges:[
                           GaugeRange(startValue: 0, endValue: league.winrate, color: theme.colorScheme.primary)
                         ],

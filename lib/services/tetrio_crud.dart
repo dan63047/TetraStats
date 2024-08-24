@@ -407,7 +407,53 @@ class TetrioService extends DB {
   // Sidenote: as you can see, fetch functions looks and works pretty much same way, as described above,
   // so i'm going to document only unique differences between them
 
-  Future<Cutoffs?> fetchCutoffs() async {
+  Future<CutoffsTetrio?> fetchCutoffsTetrio() async {
+    CutoffsTetrio? cached = _cache.get("", CutoffsTetrio);
+    if (cached != null) return cached;
+
+    Uri url;
+    if (kIsWeb) {
+      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "cutoffs"});
+    } else {
+      url = Uri.https('ch.tetr.io', 'api/labs/league_ranks');
+    }
+
+    try{
+      final response = await client.get(url);
+
+      switch (response.statusCode) {
+        case 200:
+          Map<String, dynamic> rawData = jsonDecode(response.body);
+          CutoffsTetrio result = CutoffsTetrio.fromJson(rawData['data']);
+          _cache.store(result, rawData["cache"]["cached_until"]);
+          return result;
+        case 404:
+          developer.log("fetchCutoffsTetrio: Cutoffs are gone", name: "services/tetrio_crud", error: response.statusCode);
+          return null;
+        // if not 200 or 404 - throw a unique for each code exception  
+        case 403:
+          throw TetrioForbidden();
+        case 429:
+          throw TetrioTooManyRequests();
+        case 418:
+          throw TetrioOskwareBridgeProblem();
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+          developer.log("fetchCutoffsTetrio: Cutoffs are unavalable (${response.statusCode})", name: "services/tetrio_crud", error: response.statusCode);
+          return null;
+        default:
+          developer.log("fetchCutoffsTetrio: Failed to fetch top Cutoffs", name: "services/tetrio_crud", error: response.statusCode);
+          throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
+      }
+    } on http.ClientException catch (e, s) { // If local http client fails
+      developer.log("$e, $s");
+      throw http.ClientException(e.message, e.uri); // just assuming, that our end user don't have acess to the internet
+    }
+  }
+
+  Future<Cutoffs?> fetchCutoffsBeanserver() async {
     Cutoffs? cached = _cache.get("", Cutoffs);
     if (cached != null) return cached;
 
@@ -429,7 +475,7 @@ class TetrioService extends DB {
           _cache.store(result, rawData["cache_until"]);
           return result;
         case 404:
-          developer.log("fetchCutoffs: Cutoffs are gone", name: "services/tetrio_crud", error: response.statusCode);
+          developer.log("fetchCutoffsBeanserver: Cutoffs are gone", name: "services/tetrio_crud", error: response.statusCode);
           return null;
         // if not 200 or 404 - throw a unique for each code exception  
         case 403:
@@ -442,10 +488,10 @@ class TetrioService extends DB {
         case 502:
         case 503:
         case 504:
-          developer.log("fetchCutoffs: Cutoffs are unavalable (${response.statusCode})", name: "services/tetrio_crud", error: response.statusCode);
+          developer.log("fetchCutoffsBeanserver: Cutoffs are unavalable (${response.statusCode})", name: "services/tetrio_crud", error: response.statusCode);
           return null;
         default:
-          developer.log("fetchCutoffs: Failed to fetch top Cutoffs", name: "services/tetrio_crud", error: response.statusCode);
+          developer.log("fetchCutoffsBeanserver: Failed to fetch top Cutoffs", name: "services/tetrio_crud", error: response.statusCode);
           throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
       }
     } on http.ClientException catch (e, s) { // If local http client fails

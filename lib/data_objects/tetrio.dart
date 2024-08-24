@@ -3,6 +3,7 @@
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:tetra_stats/data_objects/tetra_stats.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:vector_math/vector_math.dart';
 
@@ -42,25 +43,26 @@ const Map<String, double> rankCutoffs = {
   "z": -1,
   "": 0.5
 };
-// const Map<String, double> rankTargets = {
-//   "x": 24503.75, // where that comes from?
-//   "u": 23038,
-//   "ss": 21583,
-//   "s+": 20128,
-//   "s": 18673,
-//   "s-": 16975,
-//   "a+": 15035,
-//   "a": 13095,
-//   "a-": 11155,
-//   "b+": 9215,
-//   "b": 7275,
-//   "b-": 5335,
-//   "c+": 3880,
-//   "c": 2425,
-//   "c-": 1213,
-//   "d+": 606,
-//   "d": 0,
-// };
+const Map<String, double> rankTargets = {
+  "x+": 24000.00,
+  "x": 22500.00,
+  "u": 20000.00,
+  "ss": 18000.00,
+  "s+": 16500.00,
+  "s": 15200.00,
+  "s-": 13800.00,
+  "a+": 12000.00,
+  "a": 10500.00,
+  "a-": 9000.00,
+  "b+": 7400.00,
+  "b": 5700.00,
+  "b-": 4200.00,
+  "c+": 3000.00,
+  "c": 2000.00,
+  "c-": 1300.00,
+  "d+": 800.00,
+  "d": 0.00,
+};
 // DateTime seasonStart = DateTime.utc(2024, 08, 16, 18);
 //DateTime seasonEnd = DateTime.utc(2024, 07, 26, 15);
 enum Stats {
@@ -424,7 +426,9 @@ class Summaries{
   RecordSingle? sprint;
   RecordSingle? blitz;
   RecordSingle? zenith;
+  RecordSingle? zenithCareerBest; // leaderboard best, not overall
   RecordSingle? zenithEx;
+  RecordSingle? zenithExCareerBest; // leaderboard best, not overall
   late List<Achievement> achievements;
   late TetraLeague league;
   late TetrioZen zen;
@@ -436,7 +440,9 @@ class Summaries{
     if (json['40l']['record'] != null) sprint = RecordSingle.fromJson(json['40l']['record'], json['40l']['rank'], json['40l']['rank_local']);
     if (json['blitz']['record'] != null) blitz = RecordSingle.fromJson(json['blitz']['record'], json['blitz']['rank'], json['40l']['rank_local']);
     if (json['zenith']['record'] != null) zenith = RecordSingle.fromJson(json['zenith']['record'], json['zenith']['rank'], json['zenith']['rank_local']);
+    if (json['zenith']['best']['record'] != null) zenithCareerBest = RecordSingle.fromJson(json['zenith']['best']['record'], json['zenith']['best']['rank'], -1);
     if (json['zenithex']['record'] != null) zenithEx = RecordSingle.fromJson(json['zenithex']['record'], json['zenithex']['rank'], json['zenithex']['rank_local']);
+    if (json['zenithex']['best']['record'] != null) zenithCareerBest = RecordSingle.fromJson(json['zenithex']['best']['record'], json['zenith']['best']['rank'], -1);
     achievements = [for (var achievement in json['achievements']) Achievement.fromJson(achievement)];
     league = TetraLeague.fromJson(json['league'], DateTime.now());
     zen = TetrioZen.fromJson(json['zen']);
@@ -2609,6 +2615,45 @@ class TetrioPlayerFromLeaderboard {
         return playstyle.stride - playstyle.plonk;
       case Stats.openerMinusInfDS:
         return playstyle.opener - playstyle.infds;
+    }
+  }
+}
+
+class CutoffTetrio {
+  late int pos;
+  late double percentile;
+  late double tr;
+  late double targetTr;
+  late double apm;
+  late double pps;
+  late double vs;
+  late int count;
+  late double countPercentile;
+
+  CutoffTetrio.fromJson(Map<String, dynamic> json, int total){
+    pos = json['pos'];
+    percentile = json['percentile'].toDouble();
+    tr = json['tr'].toDouble();
+    targetTr = json['targettr'].toDouble();
+    apm = json['apm'].toDouble();
+    pps = json['pps'].toDouble();
+    vs = json['vs'].toDouble();
+    count = json['count'];
+    countPercentile = count / total;
+  }
+}
+
+class CutoffsTetrio {
+  late DateTime timestamp;
+  late int total;
+  Map<String, CutoffTetrio> data = {};
+
+  CutoffsTetrio.fromJson(Map<String, dynamic> json){
+    timestamp = DateTime.parse(json['t']);
+    total = json['data']['total'];
+    json['data'].remove("total");
+    for (String rank in json['data'].keys){
+      data[rank] = CutoffTetrio.fromJson(json['data'][rank], total);
     }
   }
 }
