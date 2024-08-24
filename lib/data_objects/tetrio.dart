@@ -2644,11 +2644,13 @@ class CutoffTetrio {
 }
 
 class CutoffsTetrio {
+  late String id;
   late DateTime timestamp;
   late int total;
   Map<String, CutoffTetrio> data = {};
 
   CutoffsTetrio.fromJson(Map<String, dynamic> json){
+    id = json['s'];
     timestamp = DateTime.parse(json['t']);
     total = json['data']['total'];
     json['data'].remove("total");

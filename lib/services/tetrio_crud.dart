@@ -408,7 +408,7 @@ class TetrioService extends DB {
   // so i'm going to document only unique differences between them
 
   Future<CutoffsTetrio?> fetchCutoffsTetrio() async {
-    CutoffsTetrio? cached = _cache.get("", CutoffsTetrio);
+    CutoffsTetrio? cached = _cache.get("league_ranks", CutoffsTetrio);
     if (cached != null) return cached;
 
     Uri url;
