@@ -268,7 +268,7 @@ class TetrioPlayer {
     username = nick;
     state = stateTime;
     role = json['role'];
-    registrationTime = json['ts'] != null ? DateTime.parse(json['ts']) : null;
+    registrationTime = json['ts'] != null ? DateTime.parse(json['ts']) : DateTime.fromMillisecondsSinceEpoch(int.parse(id.substring(0, 8), radix: 16) * 1000);
     if (json['badges'] != null) {
       json['badges'].forEach((v) {
         badges.add(Badge.fromJson(v));

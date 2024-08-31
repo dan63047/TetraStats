@@ -239,7 +239,7 @@ class UserThingy extends StatelessWidget {
               crossAxisAlignment: WrapCrossAlignment.start,
               clipBehavior: Clip.hardEdge, // hard WHAT???
               children: [
-                StatCellNum(
+                if (!player.level.isNegative && !player.level.isNaN) StatCellNum(
                   playerStat: player.level,
                   playerStatLabel: t.statCellNum.xpLevel,
                   isScreenBig: bigScreen,
