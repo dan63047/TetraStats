@@ -210,7 +210,7 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
                   )
                 );
               }
-              return Text("end of FutureBuilder");
+              return const Text("end of FutureBuilder");
             }
           })),
     );

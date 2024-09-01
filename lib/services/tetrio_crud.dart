@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'package:sqflite/sql.dart';
 import 'package:tetra_stats/data_objects/tetra_stats.dart';
 import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
 import 'package:tetra_stats/main.dart' show packageInfo;
@@ -21,6 +22,7 @@ const String tetrioUsersTable = "tetrioUsers";
 const String tetrioUsersToTrackTable = "tetrioUsersToTrack";
 const String tetraLeagueMatchesTable = "tetrioAlphaLeagueMathces";
 const String tetrioTLReplayStatsTable = "tetrioTLReplayStats";
+const String tetrioLeagueTable = "tetrioLeague";
 const String idCol = "id";
 const String replayID = "replayId";
 const String nickCol = "nickname";
@@ -65,6 +67,33 @@ const String createTetrioTLReplayStats = '''
           "data"	TEXT NOT NULL,
           "freyhoe"	TEXT,
           PRIMARY KEY("id")
+        )
+''';
+const String createTetrioLeagueTable = '''
+        CREATE TABLE IF NOT EXISTS "tetrioLeague" (
+          "id"	TEXT NOT NULL,
+          "timestamp"	INTEGER NOT NULL,
+          "gamesplayed"	INTEGER NOT NULL DEFAULT 0,
+          "gameswon"	INTEGER NOT NULL DEFAULT 0,
+          "tr"	REAL,
+          "glicko"	REAL,
+          "rd"	REAL,
+          "gxe"	REAL,
+          "rank"	TEXT NOT NULL DEFAULT 'z',
+          "bestrank"	TEXT NOT NULL DEFAULT 'z',
+          "apm"	REAL,
+          "pps"	REAL,
+          "vs"	REAL,
+          "decaying"	INTEGER NOT NULL DEFAULT 0,
+          "standing"	INTEGER NOT NULL DEFAULT -1,
+          "standing_local"	INTEGER NOT NULL DEFAULT -1,
+          "percentile"	REAL NOT NULL,
+          "prev_rank"	TEXT,
+          "prev_at"	INTEGER NOT NULL DEFAULT -1,
+          "next_rank"	TEXT,
+          "next_at"	INTEGER NOT NULL DEFAULT -1,
+          "percentile_rank"	TEXT NOT NULL DEFAULT 'z',
+          "season"	INTEGER NOT NULL DEFAULT 1
         )
 ''';
 
@@ -546,7 +575,7 @@ class TetrioService extends DB {
 
   /// Retrieves Tetra League history from p1nkl0bst3r api for a player with given [id]. Returns a list of states
   /// (state = instance of [TetrioPlayer] at some point of time). Can throw an exception if fails to retrieve data.
-  Future<List<TetrioPlayer>> fetchAndsaveTLHistory(String id) async {
+  Future<List<TetraLeague>> fetchAndsaveTLHistory(String id) async {
     Uri url;
     if (kIsWeb) {
       url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLHistory", "user": id});
@@ -558,27 +587,14 @@ class TetrioService extends DB {
 
       switch (response.statusCode) {
         case 200:
+          await ensureDbIsOpen();
+          final db = getDatabaseOrThrow();
           // that one api returns csv instead of json
           List<List<dynamic>> csv = const CsvToListConverter().convert(response.body)..removeAt(0);
-          List<TetrioPlayer> history = [];
-          // doesn't return nickname, need to retrieve it separately
-          String nick = await getNicknameByID(id);
+          List<TetraLeague> history = [];
           for (List<dynamic> entry in csv){ // each entry is one state
-            TetrioPlayer state = TetrioPlayer(
-              userId: id,
-              username: nick,
-              role: "p1nkl0bst3r",
-              state: DateTime.parse(entry[9]),
-              badges: [],
-              friendCount: -1,
-              gamesPlayed: -1,
-              gamesWon: -1,
-              gameTime: const Duration(seconds: -1),
-              xp: -1,
-              supporterTier: 0,
-              verified: false,
-              connections: null,
-              tlSeason1: TetraLeague(
+            TetraLeague state = TetraLeague(
+                id: id, 
                 timestamp: DateTime.parse(entry[9]),
                 apm: entry[6] != '' ? entry[6] : null,
                 pps: entry[7] != '' ? entry[7] : null,
@@ -597,24 +613,12 @@ class TetrioService extends DB {
                 standing: -1,
                 standingLocal: -1,
                 nextAt: -1,
-                prevAt: -1
-              ),
+                prevAt: -1,
+                season: 1
               );
               history.add(state);
+              await db.insert(tetrioLeagueTable, state.toJson(), conflictAlgorithm: ConflictAlgorithm.replace);
           }
-
-          // trying to dump it to local DB
-          await ensureDbIsOpen();
-          final db = getDatabaseOrThrow();
-          List<TetrioPlayer> states = await getPlayer(id);
-          if (states.isEmpty) await createPlayer(history.first);
-          states.insertAll(0, history.reversed);
-          final Map<String, dynamic> statesJson = {};
-          for (var e in states) { // making one big json out of this list
-            statesJson.addEntries({(e.state.millisecondsSinceEpoch ~/ 1000).toString(): e.toJson()}.entries);
-          }
-          // and putting it to local DB
-          await db.update(tetrioUsersTable, {idCol: id, nickCol: nick, statesCol: jsonEncode(statesJson)}, where: '$idCol = ?', whereArgs: [id]);
           return history;
         case 404:
           developer.log("fetchTLHistory: Probably, history doesn't exist", name: "services/tetrio_crud", error: response.statusCode);
@@ -1057,7 +1061,10 @@ class TetrioService extends DB {
     if (results.isNotEmpty) {
       throw TetrioPlayerAlreadyExist();
     }
+    await db.insert(tetrioUsersTable, {idCol: tetrioPlayer.userId, nickCol: tetrioPlayer.username}, conflictAlgorithm: ConflictAlgorithm.replace);
     db.insert(tetrioUsersToTrackTable, {idCol: tetrioPlayer.userId});
+    _players[tetrioPlayer.userId] = tetrioPlayer.username;
+    _tetrioStreamController.add(_players);
   }
 
   /// Returns bool, which tells whether is given [id] is in [tetrioUsersToTrackTable].
@@ -1081,6 +1088,7 @@ class TetrioService extends DB {
     await ensureDbIsOpen();
     final db = getDatabaseOrThrow();
     final deletedPlayer = await db.delete(tetrioUsersToTrackTable, where: '$idCol = ?', whereArgs: [id.toLowerCase()]);
+    await db.delete(tetrioUsersTable, where: '$idCol = ?', whereArgs: [id.toLowerCase()]);
     if (deletedPlayer != 1) {
       throw CouldNotDeletePlayer();
     } else {
@@ -1089,72 +1097,67 @@ class TetrioService extends DB {
     }
   }
 
-  /// Saves state (which is [tetrioPlayer]) to the local database.
-  Future<void> storeState(TetrioPlayer tetrioPlayer) async {
-    // if tetrio player doesn't have entry in database - just calling different function
-    List<TetrioPlayer> states = await getPlayer(tetrioPlayer.userId);
-    if (states.isEmpty) {
-      await createPlayer(tetrioPlayer); 
-      return;
-    }
-
-    // we not going to add state, that is same, as the previous
-    if (!states.last.isSameState(tetrioPlayer)) states.add(tetrioPlayer);
-
-    // Making map of the states
-    final Map<String, dynamic> statesJson = {};
-    for (var e in states) {
-      // Saving in format: {"unix_seconds": json_of_state}
-      statesJson.addEntries({(e.state.millisecondsSinceEpoch ~/ 1000).toString(): e.toJson()}.entries);
-    }
-
-    // Rewrite our database
+  Future<List<TetraLeague>> getStates(String userID, int season) async {
     await ensureDbIsOpen();
     final db = getDatabaseOrThrow();
-    await db.update(tetrioUsersTable, {idCol: tetrioPlayer.userId, nickCol: tetrioPlayer.username, statesCol: jsonEncode(statesJson)},
-        where: '$idCol = ?', whereArgs: [tetrioPlayer.userId]);
+    List<Map> query = await db.query(tetrioLeagueTable, where: '"id" = ? AND "season" = ?', whereArgs: [userID, season]);
+    List<TetraLeague> result = [];
+    for (var entry in query){
+      result.add(TetraLeague.fromJson(entry as Map<String, dynamic>, entry["timestamp"], entry["season"], entry["id"]));
+    }
+    return result;
+  }
+
+  /// Saves state (which is [TetraLeague]) to the local database.
+  Future<void> storeState(TetraLeague league) async {
+    await ensureDbIsOpen();
+    final db = getDatabaseOrThrow();
+    List<Map> test = await db.query(tetrioLeagueTable, where: '"id" = ? AND "gamesplayed" = ? AND "rd" = ?', whereArgs: [league.id, league.gamesPlayed, league.rd]);
+    if (test.isEmpty) {
+      await db.insert(tetrioLeagueTable, league.toJson());
+    }
   }
 
   /// Remove state (which is [tetrioPlayer]) from the local database
-  Future<void> deleteState(TetrioPlayer tetrioPlayer) async {
-    await ensureDbIsOpen();
-    final db = getDatabaseOrThrow();
-    List<TetrioPlayer> states = await getPlayer(tetrioPlayer.userId);
-    // removing state from map that contain every state of each user
-    states.removeWhere((element) => element.state == tetrioPlayer.state);
+  // Future<void> deleteState(TetrioPlayer tetrioPlayer) async {
+  //   await ensureDbIsOpen();
+  //   final db = getDatabaseOrThrow();
+  //   //List<TetrioPlayer> states = await getPlayer(tetrioPlayer.userId);
+  //   // removing state from map that contain every state of each user
+  //   states.removeWhere((element) => element.state == tetrioPlayer.state);
 
-    // Making map of the states (without deleted one)
-    final Map<String, dynamic> statesJson = {};
-    for (var e in states) {
-      statesJson.addEntries({(e.state.millisecondsSinceEpoch ~/ 1000).toString(): e.toJson()}.entries);
-    }
-    // Rewriting database entry with new json
-    await db.update(tetrioUsersTable, {idCol: tetrioPlayer.userId, nickCol: tetrioPlayer.username, statesCol: jsonEncode(statesJson)},
-        where: '$idCol = ?', whereArgs: [tetrioPlayer.userId]);
-    _tetrioStreamController.add(_players);
-  }
+  //   // Making map of the states (without deleted one)
+  //   final Map<String, dynamic> statesJson = {};
+  //   // for (var e in states) {
+  //   //   statesJson.addEntries({(e.state.millisecondsSinceEpoch ~/ 1000).toString(): e.toJson()}.entries);
+  //   // }
+  //   // Rewriting database entry with new json
+  //   await db.update(tetrioUsersTable, {idCol: tetrioPlayer.userId, nickCol: tetrioPlayer.username, statesCol: jsonEncode(statesJson)},
+  //       where: '$idCol = ?', whereArgs: [tetrioPlayer.userId]);
+  //   _tetrioStreamController.add(_players);
+  // }
 
   /// Returns list of all states of player with given [id] from database. Can return empty list if player
   /// was not found.
-  Future<List<TetrioPlayer>> getPlayer(String id) async {
-    await ensureDbIsOpen();
-    final db = getDatabaseOrThrow();
-    List<TetrioPlayer> states = [];
-    final results = await db.query(tetrioUsersTable, limit: 1, where: '$idCol = ?', whereArgs: [id.toLowerCase()]);
-    if (results.isEmpty) {
-      return states; // it empty
-    } else {
-      dynamic rawStates = results.first['jsonStates'] as String;
-      rawStates = json.decode(rawStates);
-      // recreating objects of states
-      rawStates.forEach((k, v) => states.add(TetrioPlayer.fromJson(v, DateTime.fromMillisecondsSinceEpoch(int.parse(k) * 1000), id, results.first[nickCol] as String)));
-      // updating the stream
-      _players.removeWhere((key, value) => key == id);
-      _players.addEntries({states.last.userId: states.last.username}.entries);
-      _tetrioStreamController.add(_players);
-      return states;
-    }
-  }
+  // Future<List<TetrioPlayer>> getPlayer(String id) async {
+  //   await ensureDbIsOpen();
+  //   final db = getDatabaseOrThrow();
+  //   List<TetrioPlayer> states = [];
+  //   final results = await db.query(tetrioUsersTable, limit: 1, where: '$idCol = ?', whereArgs: [id.toLowerCase()]);
+  //   if (results.isEmpty) {
+  //     return states; // it empty
+  //   } else {
+  //     dynamic rawStates = results.first['jsonStates'] as String;
+  //     rawStates = json.decode(rawStates);
+  //     // recreating objects of states
+  //     rawStates.forEach((k, v) => states.add(TetrioPlayer.fromJson(v, DateTime.fromMillisecondsSinceEpoch(int.parse(k) * 1000), id, results.first[nickCol] as String)));
+  //     // updating the stream
+  //     _players.removeWhere((key, value) => key == id);
+  //     _players.addEntries({states.last.userId: states.last.username}.entries);
+  //     _tetrioStreamController.add(_players);
+  //     return states;
+  //   }
+  // }
 
   /// Retrieves general stats of [user] (nickname or id) from Tetra Channel api. Returns [TetrioPlayer] object of this user.
   /// If [isItDiscordID] is true, function expects [user] to be a discord user id. Throws an exception if fails to retrieve.

@@ -523,7 +523,7 @@ class _ListEntry extends StatelessWidget {
         children: [
           Text(f.format(value),
               style: const TextStyle(fontSize: 22, height: 0.9)),
-          if (id.isNotEmpty) Text(t.forPlayer(username: username), style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w100),)
+          if (id.isNotEmpty) Text(t.forPlayer(username: username), style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.w100),)
         ],
       ),
       onTap: id.isNotEmpty

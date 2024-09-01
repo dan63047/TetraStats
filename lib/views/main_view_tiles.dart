@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
+import 'package:tetra_stats/data_objects/tetra_stats.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/utils/colors_functions.dart';
@@ -286,11 +287,11 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
       }
     } 
 
-    states.addAll(await teto.getPlayer(widget.searchFor));
-    for (var element in states) {
-      if (element.tlSeason1 != null && uniqueTL.isNotEmpty && uniqueTL.last != element.tlSeason1) uniqueTL.add(element.tlSeason1!);
-      if (uniqueTL.isEmpty) uniqueTL.add(element.tlSeason1!);
-    }
+    //states.addAll(await teto.getPlayer(widget.searchFor));
+    // for (var element in states) {
+    //   if (element.tlSeason1 != null && uniqueTL.isNotEmpty && uniqueTL.last != element.tlSeason1) uniqueTL.add(element.tlSeason1!);
+    //   if (uniqueTL.isEmpty) uniqueTL.add(element.tlSeason1!);
+    // }
 
     if (uniqueTL.length >= 2){
       chartsData = <DropdownMenuItem<List<_HistoryChartSpot>>>[ // Dumping charts data into dropdown menu items, while cheking if every entry is valid
@@ -511,9 +512,10 @@ class FetchResults{
   bool success;
   TetrioPlayer? player;
   Summaries? summaries;
+  Cutoffs? cutoffs;
   Exception? exception;
 
-  FetchResults(this.success, this.player, this.summaries, this.exception);
+  FetchResults(this.success, this.player, this.summaries, this.cutoffs, this.exception);
 }
 
 class RecordSummary extends StatelessWidget{
@@ -613,10 +615,17 @@ class _DestinationHomeState extends State<DestinationHome> {
         player = await teto.fetchPlayer(widget.searchFor); // Otherwise it's probably a user id or username
       }
     }on TetrioPlayerNotExist{
-      return FetchResults(false, null, null, TetrioPlayerNotExist());
+      return FetchResults(false, null, null, null, TetrioPlayerNotExist());
     }
-    Summaries summaries = await teto.fetchSummaries(player.userId);
-    return FetchResults(true, player, summaries, null);
+    late Summaries summaries;
+    late Cutoffs cutoffs;
+    List<dynamic> requests = await Future.wait([
+      teto.fetchSummaries(player.userId),
+      teto.fetchCutoffsBeanserver(),
+    ]);
+    summaries = requests[0];
+    cutoffs = requests[1];
+    return FetchResults(true, player, summaries, cutoffs, null);
   }
 
   Widget getOverviewCard(Summaries summaries){
@@ -645,7 +654,7 @@ class _DestinationHomeState extends State<DestinationHome> {
                 children: [
                   const Text("Tetra League", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, height: 0.9)),
                   const Divider(color: Color.fromARGB(50, 158, 158, 158)),
-                  TLRatingThingy(userID: "", tlData: summaries.league),
+                  TLRatingThingy(userID: "", tlData: summaries.league, showPositions: true),
                   const Divider(color: Color.fromARGB(50, 158, 158, 158)),
                   Text("${summaries.league.apm != null ? f2.format(summaries.league.apm) : "-.--"} APM • ${summaries.league.pps != null ? f2.format(summaries.league.pps) : "-.--"} PPS • ${summaries.league.vs != null ? f2.format(summaries.league.vs) : "-.--"} VS • ${summaries.league.nerdStats != null ? f2.format(summaries.league.nerdStats!.app) : "-.--"} APP • ${summaries.league.nerdStats != null ? f2.format(summaries.league.nerdStats!.vsapm) : "-.--"} VS/APM", style: const TextStyle(color: Colors.grey))
                 ],
@@ -827,7 +836,7 @@ class _DestinationHomeState extends State<DestinationHome> {
     );
   }
 
-  Widget getTetraLeagueCard(TetraLeague data){
+  Widget getTetraLeagueCard(TetraLeague data, Cutoffs? cutoffs){
     return Column(
       children: [
         Card(
@@ -845,7 +854,7 @@ class _DestinationHomeState extends State<DestinationHome> {
             ),
           ),
         ),
-        TetraLeagueThingy(league: data),
+        TetraLeagueThingy(league: data, cutoffs: cutoffs),
         if (data.nerdStats != null) Card(
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -1514,7 +1523,7 @@ class _DestinationHomeState extends State<DestinationHome> {
                           child: switch (rightCard){
                             Cards.overview => getOverviewCard(snapshot.data!.summaries!),
                             Cards.tetraLeague => switch (cardMod){
-                              CardMod.info => getTetraLeagueCard(snapshot.data!.summaries!.league),
+                              CardMod.info => getTetraLeagueCard(snapshot.data!.summaries!.league, snapshot.data!.cutoffs),
                               CardMod.records => getRecentTLrecords(widget.constraints),
                               _ => const Center(child: Text("huh?"))
                             },
@@ -2340,8 +2349,9 @@ class _SearchDrawerState extends State<SearchDrawer>  {
 
 class TetraLeagueThingy extends StatelessWidget{
   final TetraLeague league;
+  final Cutoffs? cutoffs;
 
-  const TetraLeagueThingy({super.key, required this.league});
+  const TetraLeagueThingy({super.key, required this.league, this.cutoffs});
   
   @override
   Widget build(BuildContext context) {
@@ -2349,7 +2359,15 @@ class TetraLeagueThingy extends StatelessWidget{
       child: Column(
         children: [
           TLRatingThingy(userID: "w", tlData: league),
-          TLProgress(tlData: league,),
+          TLProgress(
+            tlData: league,
+            previousRankTRcutoff: cutoffs != null ? cutoffs!.tr[league.rank != "z" ? league.rank : league.percentileRank] : null,
+            nextRankTRcutoff: cutoffs != null ? (league.rank != "z" ? league.rank == "x+" : league.percentileRank == "x+") ? 25000 : cutoffs!.tr[ranks.elementAtOrNull(ranks.indexOf(league.rank != "z" ? league.rank : league.percentileRank)+1)] : null,
+            nextRankTRcutoffTarget: league.rank != "z" ? rankTargets[league.rank] : null,
+            previousRankTRcutoffTarget: (league.rank != "z" && league.rank != "x+") ? rankTargets[ranks.elementAtOrNull(ranks.indexOf(league.rank)+1)] : null,
+            previousGlickoCutoff: cutoffs != null ? cutoffs!.glicko[league.rank != "z" ? league.rank : league.percentileRank] : null,
+            nextRankGlickoCutoff: cutoffs != null ? (league.rank != "z" ? league.rank == "x+" : league.percentileRank == "x+") ? 25000 : cutoffs!.glicko[ranks.elementAtOrNull(ranks.indexOf(league.rank != "z" ? league.rank : league.percentileRank)+1)] : null,
+          ),
           Row(
             // spacing: 25.0,
             // alignment: WrapAlignment.spaceAround,
@@ -2809,9 +2827,10 @@ class TLRatingThingy extends StatelessWidget{
   final TetraLeague tlData;
   final TetraLeague? oldTl;
   final double? topTR;
+  final bool? showPositions;
   final DateTime? lastMatchPlayed;
 
-  const TLRatingThingy({super.key, required this.userID, required this.tlData, this.oldTl, this.topTR, this.lastMatchPlayed});
+  const TLRatingThingy({super.key, required this.userID, required this.tlData, this.oldTl, this.topTR, this.lastMatchPlayed, this.showPositions});
 
   @override
   Widget build(BuildContext context) {
@@ -2893,7 +2912,7 @@ class TLRatingThingy extends StatelessWidget{
                 ),
               ],
             ),
-            RichText(
+            if (showPositions == true) RichText(
               textAlign: TextAlign.start,
               text: TextSpan(
               text: "",

@@ -33,6 +33,7 @@ class DB {
       await db.execute(createTetrioUsersToTrack);
       await db.execute(createTetrioTLRecordsTable);
       await db.execute(createTetrioTLReplayStats);
+      await db.execute(createTetrioLeagueTable);
     } on MissingPlatformDirectoryException {
       throw UnableToGetDocuments();
     }

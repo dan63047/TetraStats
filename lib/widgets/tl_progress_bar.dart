@@ -51,7 +51,7 @@ class TLProgress extends StatelessWidget{
                   ]
                 )
               ),
-              Spacer(),
+              const Spacer(),
               RichText(
                 textAlign: TextAlign.right,
                 text: TextSpan(

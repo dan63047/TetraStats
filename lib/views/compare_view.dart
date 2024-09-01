@@ -85,6 +85,7 @@ class CompareState extends State<CompareView> {
         theRedSide = [null,
         null,
          Summaries(user, TetraLeague(
+          id: "",
           timestamp: DateTime.now(),
           apm: apm,
           pps: pps,
@@ -102,7 +103,7 @@ class CompareState extends State<CompareView> {
           standing: -1,
           standingLocal: -1,
           nextAt: -1,
-          prevAt: -1), TetrioZen(level: 0, score: 0))];
+          prevAt: -1, season: currentSeason), TetrioZen(level: 0, score: 0))];
         return setState(() {});
       }
       var player = await teto.fetchPlayer(user);
@@ -132,9 +133,11 @@ class CompareState extends State<CompareView> {
     _justUpdate();
   }
 
-  void changeRedSide(TetrioPlayer user) {
-    setState(() {theRedSide[0] = user;
-    theRedSide[2].league = user.tlSeason1;});
+  void changeRedSide(TetraLeague user) {
+    setState(() {
+      //theRedSide[0] = user;
+      theRedSide[2].league = user;
+      });
   }
 
   void fetchGreenSide(String user) async {
@@ -161,6 +164,7 @@ class CompareState extends State<CompareView> {
         theGreenSide = [null,
         null,
         Summaries(user, TetraLeague(
+          id: "",
           timestamp: DateTime.now(),
           apm: apm,
           pps: pps,
@@ -178,7 +182,7 @@ class CompareState extends State<CompareView> {
           standing: -1,
           standingLocal: -1,
           nextAt: -1,
-          prevAt: -1), TetrioZen(level: 0, score: 0))];
+          prevAt: -1, season: currentSeason), TetrioZen(level: 0, score: 0))];
         return setState(() {});
       }
       var player = await teto.fetchPlayer(user);
@@ -208,9 +212,11 @@ class CompareState extends State<CompareView> {
     _justUpdate();
   }
 
-  void changeGreenSide(TetrioPlayer user) {
-    setState(() {theGreenSide[0] = user;
-    theGreenSide[2].league = user.tlSeason1;});
+  void changeGreenSide(TetraLeague user) {
+    setState(() {
+      //theGreenSide[0] = user;
+      theGreenSide[2].league = user;
+    });
   }
 
   double getWinrateByTR(double yourGlicko, double yourRD, double notyourGlicko,double notyourRD) {
@@ -955,7 +961,7 @@ class CompareState extends State<CompareView> {
                     const Divider(),
                     Padding(
                       padding: const EdgeInsets.only(bottom: 16),
-                      child: Text("${t.quickPlay} ${t.expert} ${t.nerdStats}", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)),
+                      child: Text("${t.quickPlay} ${t.expert} ${t.nerdStats}", style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)),
                     ),
                     CompareThingy(
                       label: "APP",

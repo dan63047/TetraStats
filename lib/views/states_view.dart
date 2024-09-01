@@ -61,14 +61,14 @@ class StatesState extends State<StatesView> {
                 itemBuilder: (context, index) {
                   return ListTile(
                     title: Text(timestamp(widget.states[index].state)),
-                    subtitle: Text(t.statesViewEntry(level: widget.states[index].level.toStringAsFixed(2), gameTime: widget.states[index].gameTime, friends: widget.states[index].friendCount, rd: NumberFormat.compact().format(widget.states[index].tlSeason1?.rd??0))),
+                    subtitle: Text(t.statesViewEntry(level: widget.states[index].level.toStringAsFixed(2), gameTime: widget.states[index].gameTime, friends: widget.states[index].friendCount, rd: 0)),
                     trailing: IconButton(
                       icon: const Icon(Icons.delete_forever),
                       onPressed: () {
                         DateTime nn = widget.states[index].state;
-                        teto.deleteState(widget.states[index]).then((value) => setState(() {
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.stateRemoved(date: timestamp(nn)))));
-                            }));
+                        // teto.deleteState(widget.states[index]).then((value) => setState(() {
+                        //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.stateRemoved(date: timestamp(nn)))));
+                        //     }));
                       },
                     ),
                     onTap: () {

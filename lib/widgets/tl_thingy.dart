@@ -22,7 +22,7 @@ var intFDiff = NumberFormat("+#,###.000;-#,###.000");
 class TLThingy extends StatefulWidget {
   final TetraLeague tl;
   final String userID;
-  final List<TetrioPlayer> states;
+  final List<TetraLeague> states;
   final bool showTitle;
   final bool bot;
   final bool guest;
@@ -47,13 +47,13 @@ class _TLThingyState extends State<TLThingy> with TickerProviderStateMixin {
   late TetraLeague? oldTl;
   late TetraLeague currentTl;
   late RangeValues _currentRangeValues;
-  late List<TetrioPlayer> sortedStates;
+  late List<TetraLeague> sortedStates;
 
 @override
   void initState() {
     _currentRangeValues = const RangeValues(0, 1);
     sortedStates = widget.states.reversed.toList();
-    oldTl = sortedStates.elementAtOrNull(1)?.tlSeason1;
+    oldTl = sortedStates.elementAtOrNull(1);
     currentTl = widget.tl;
     super.initState();
   }
@@ -95,12 +95,12 @@ class _TLThingyState extends State<TLThingy> with TickerProviderStateMixin {
                     if (values.start.round() == 0){
                       currentTl = widget.tl;
                     }else{
-                      currentTl = sortedStates[values.start.round()-1].tlSeason1!;
+                      currentTl = sortedStates[values.start.round()-1]!;
                     }
                     if (values.end.round() == 0){
                       oldTl = widget.tl;
                     }else{
-                      oldTl = sortedStates[values.end.round()-1].tlSeason1;
+                      oldTl = sortedStates[values.end.round()-1];
                     }
                   });
                 },

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
-import 'package:tetra_stats/widgets/tl_thingy.dart';
+//import 'package:tetra_stats/widgets/tl_thingy.dart';
 import 'package:tetra_stats/widgets/user_thingy.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -58,6 +58,6 @@ class StateState extends State<StateView> {
                 headerSliverBuilder: (context, value) {
                   return [SliverToBoxAdapter(child: UserThingy(player: widget.state, showStateTimestamp: true, setState: _justUpdate))];
                 },
-                body: TLThingy(tl: widget.state.tlSeason1!, userID: widget.state.userId, states: const []))));
+                body: Container())));
   }
 }

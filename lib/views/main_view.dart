@@ -216,15 +216,15 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     if (everyone != null && summaries.league.gamesPlayed > 9) rankAverages = everyone?.averages[summaries.league.percentileRank]?[0];
 
     // Making list of Tetra League matches
-    //bool isTracking = await teto.isPlayerTracking(me.userId);
+    bool isTracking = await teto.isPlayerTracking(me.userId);
     List<TetrioPlayer> states = [];
     TetraLeague? compareWith;
     Set<TetraLeague> uniqueTL = {};
     List<TetraLeagueAlphaRecord> storedRecords = await teto.getTLMatchesbyPlayerID(me.userId); // get old matches
-    // if (isTracking){ // if tracked - save data to local DB
-    //   await teto.storeState(me);
-    //   //await teto.saveTLMatchesFromStream(tlStream);
-    // }
+    if (isTracking){ // if tracked - save data to local DB
+      await teto.storeState(summaries.league);
+      //await teto.saveTLMatchesFromStream(tlStream);
+    }
     TetraLeagueAlphaStream? oldMatches;
     // building list of TL matches
     if(fetchTLmatches) {
@@ -271,11 +271,11 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       }
     } 
 
-    states.addAll(await teto.getPlayer(me.userId));
-    for (var element in states) { // For graphs I need only unique entries
-      if (element.tlSeason1 != null && uniqueTL.isNotEmpty && uniqueTL.last != element.tlSeason1) uniqueTL.add(element.tlSeason1!);
-      if (uniqueTL.isEmpty) uniqueTL.add(summaries.league);
-    }
+    //states.addAll(await teto.getPlayer(me.userId));
+    // for (var element in states) { // For graphs I need only unique entries
+    //   if (element.tlSeason1 != null && uniqueTL.isNotEmpty && uniqueTL.last != element.tlSeason1) uniqueTL.add(element.tlSeason1!);
+    //   if (uniqueTL.isEmpty) uniqueTL.add(summaries.league);
+    // }
     // Also i need previous Tetra League State for comparison if avaliable
     if (uniqueTL.length >= 2){
       compareWith = uniqueTL.toList().elementAtOrNull(uniqueTL.length - 2);

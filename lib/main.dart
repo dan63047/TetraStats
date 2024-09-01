@@ -39,14 +39,14 @@ ThemeData theme = ThemeData(
     shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.horizontal(left: Radius.circular(12.0), right: Radius.circular(12.0)))),
     elevation: WidgetStatePropertyAll(8.0)
   ),
-  chipTheme: ChipThemeData(
+  chipTheme: const ChipThemeData(
     side: BorderSide(color: Colors.transparent),
   ),
   segmentedButtonTheme: SegmentedButtonThemeData(
     style: ButtonStyle(
-      side: WidgetStatePropertyAll(BorderSide(color: Colors.transparent)),
-      surfaceTintColor: WidgetStatePropertyAll(Colors.cyanAccent),
-      iconColor: WidgetStatePropertyAll(Colors.cyanAccent),
+      side: const WidgetStatePropertyAll(BorderSide(color: Colors.transparent)),
+      surfaceTintColor: const WidgetStatePropertyAll(Colors.cyanAccent),
+      iconColor: const WidgetStatePropertyAll(Colors.cyanAccent),
       shadowColor: WidgetStatePropertyAll(Colors.cyanAccent.shade200),
     )
   ),

@@ -3,10 +3,10 @@
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:tetra_stats/data_objects/tetra_stats.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:vector_math/vector_math.dart';
 
+const int currentSeason = 2;
 const double noTrRd = 60.9;
 const double apmWeight = 1;
 const double ppsWeight = 45;
@@ -228,7 +228,6 @@ class TetrioPlayer {
   bool? badstanding;
   String? botmaster;
   Connections? connections;
-  TetraLeague? tlSeason1;
   TetrioZen? zen;
   Distinguishment? distinguishment;
   DateTime? cachedUntil;
@@ -254,7 +253,6 @@ class TetrioPlayer {
     this.badstanding,
     this.botmaster,
     required this.connections,
-    required this.tlSeason1,
     this.zen,
     this.distinguishment,
     this.cachedUntil
@@ -281,7 +279,6 @@ class TetrioPlayer {
     country = json['country'];
     supporterTier = json['supporter_tier'] ?? 0;
     verified = json['verified'] ?? false;
-    tlSeason1 = json['league'] != null ? TetraLeague.fromJson(json['league'], stateTime) : null;
     avatarRevision = json['avatar_revision'];
     bannerRevision = json['banner_revision'];
     bio = json['bio'];
@@ -307,7 +304,6 @@ class TetrioPlayer {
     if (country != null) data['country'] = country;
     if (supporterTier > 0) data['supporter_tier'] = supporterTier;
     if (verified) data['verified'] = verified;
-    data['league'] = tlSeason1?.toJson();
     if (distinguishment != null) data['distinguishment'] = distinguishment?.toJson();
     if (avatarRevision != null) data['avatar_revision'] = avatarRevision;
     if (bannerRevision != null) data['banner_revision'] = bannerRevision;
@@ -337,81 +333,13 @@ class TetrioPlayer {
     if (badstanding != other.badstanding) return false;
     if (botmaster != other.botmaster) return false;
     if (connections != other.connections) return false;
-    if (tlSeason1 != other.tlSeason1) return false;
     if (distinguishment != other.distinguishment) return false;
     return true;
-  }
-
-  bool checkForRetrivedHistory(covariant TetrioPlayer other) {
-    return tlSeason1!.lessStrictCheck(other.tlSeason1!);
   }
 
   @override
   String toString() {
     return "$username ($state)";
-  }
-
-  num? getStatByEnum(Stats stat){
-    switch (stat) {
-      case Stats.tr:
-        return tlSeason1?.tr;
-      case Stats.glicko:
-        return tlSeason1?.glicko;
-      case Stats.gxe:
-        return tlSeason1?.gxe;
-      case Stats.s1tr:
-        return tlSeason1?.s1tr;
-      case Stats.rd:
-        return tlSeason1?.rd;
-      case Stats.gp:
-        return tlSeason1?.gamesPlayed;
-      case Stats.gw:
-        return tlSeason1?.gamesWon;
-      case Stats.wr:
-        return tlSeason1?.winrate;
-      case Stats.apm:
-        return tlSeason1?.apm;
-      case Stats.pps:
-        return tlSeason1?.pps;
-      case Stats.vs:
-        return tlSeason1?.vs;
-      case Stats.app:
-        return tlSeason1?.nerdStats?.app;
-      case Stats.dss:
-        return tlSeason1?.nerdStats?.dss;
-      case Stats.dsp:
-        return tlSeason1?.nerdStats?.dsp;
-      case Stats.appdsp:
-        return tlSeason1?.nerdStats?.appdsp;
-      case Stats.vsapm:
-        return tlSeason1?.nerdStats?.vsapm;
-      case Stats.cheese:
-        return tlSeason1?.nerdStats?.cheese;
-      case Stats.gbe:
-        return tlSeason1?.nerdStats?.gbe;
-      case Stats.nyaapp:
-        return tlSeason1?.nerdStats?.nyaapp;
-      case Stats.area:
-        return tlSeason1?.nerdStats?.area;
-      case Stats.eTR:
-        return tlSeason1?.estTr?.esttr;
-      case Stats.acceTR:
-        return tlSeason1?.esttracc;
-      case Stats.acceTRabs:
-        return tlSeason1?.esttracc?.abs();
-      case Stats.opener:
-        return tlSeason1?.playstyle?.opener;
-      case Stats.plonk:
-        return tlSeason1?.playstyle?.plonk;
-      case Stats.infDS:
-        return tlSeason1?.playstyle?.infds;
-      case Stats.stride:
-        return tlSeason1?.playstyle?.stride;
-      case Stats.stridemMinusPlonk:
-        return tlSeason1?.playstyle != null ? tlSeason1!.playstyle!.stride - tlSeason1!.playstyle!.plonk : null;
-      case Stats.openerMinusInfDS:
-        return tlSeason1?.playstyle != null ? tlSeason1!.playstyle!.opener - tlSeason1!.playstyle!.infds : null;
-    }
   }
 
   @override
@@ -444,7 +372,7 @@ class Summaries{
     if (json['zenithex']['record'] != null) zenithEx = RecordSingle.fromJson(json['zenithex']['record'], json['zenithex']['rank'], json['zenithex']['rank_local']);
     if (json['zenithex']['best']['record'] != null) zenithCareerBest = RecordSingle.fromJson(json['zenithex']['best']['record'], json['zenith']['best']['rank'], -1);
     achievements = [for (var achievement in json['achievements']) Achievement.fromJson(achievement)];
-    league = TetraLeague.fromJson(json['league'], DateTime.now());
+    league = TetraLeague.fromJson(json['league'], DateTime.now(), currentSeason, i);
     zen = TetrioZen.fromJson(json['zen']);
   }
 }
@@ -1373,6 +1301,7 @@ class EndContextMulti {
 }
 
 class TetraLeague {
+  late String id;
   late DateTime timestamp;
   late int gamesPlayed;
   late int gamesWon;
@@ -1397,10 +1326,11 @@ class TetraLeague {
   NerdStats? nerdStats;
   EstTr? estTr;
   Playstyle? playstyle;
-  List? records;
+  late int season;
 
   TetraLeague(
-      {required this.timestamp,
+      {required this.id,
+      required this.timestamp,
       required this.gamesPlayed,
       required this.gamesWon,
       required this.bestRank,
@@ -1421,7 +1351,7 @@ class TetraLeague {
       this.apm,
       this.pps,
       this.vs,
-      this.records}){
+      required this.season}){
         nerdStats = (apm != null && pps != null && vs != null) ? NerdStats(apm!, pps!, vs!) : null;
         estTr = (nerdStats != null) ? EstTr(apm!, pps!, vs!, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp, nerdStats!.gbe) : null;
         playstyle =(nerdStats != null) ? Playstyle(apm!, pps!, nerdStats!.app, nerdStats!.vsapm, nerdStats!.dsp, nerdStats!.gbe, estTr!.srarea, estTr!.statrank) : null;
@@ -1430,8 +1360,10 @@ class TetraLeague {
   double get winrate => gamesWon / gamesPlayed;
   double get s1tr => gxe * 250;
 
-  TetraLeague.fromJson(Map<String, dynamic> json, ts) {
+  TetraLeague.fromJson(Map<String, dynamic> json, ts, int s, String i) {
     timestamp = ts;
+    season = s;
+    id = i;
     gamesPlayed = json['gamesplayed'] ?? 0;
     gamesWon = json['gameswon'] ?? 0;
     tr = json['tr'] != null ? json['tr'].toDouble() : json['rating'] != null ? json['rating'].toDouble() : -1;
@@ -1470,25 +1402,29 @@ class TetraLeague {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['timestamp'] = timestamp.millisecondsSinceEpoch;
     if (gamesPlayed > 0) data['gamesplayed'] = gamesPlayed;
     if (gamesWon > 0) data['gameswon'] = gamesWon;
     if (tr >= 0) data['tr'] = tr;
     if (glicko != null) data['glicko'] = glicko;
+    if (gxe != -1) data['gxe'] = gxe;
     if (rd != null && rd != noTrRd) data['rd'] = rd;
     if (rank != 'z') data['rank'] = rank;
     if (bestRank != 'z') data['bestrank'] = bestRank;
     if (apm != null) data['apm'] = apm;
     if (pps != null) data['pps'] = pps;
     if (vs != null) data['vs'] = vs;
-    if (decaying) data['decaying'] = decaying;
+    if (decaying) data['decaying'] = decaying ? 1 : 0;
     if (standing >= 0) data['standing'] = standing;
-    if (!rankCutoffs.containsValue(percentile)) data['percentile'] = percentile;
+    data['percentile'] = percentile;
     if (standingLocal >= 0) data['standing_local'] = standingLocal;
     if (prevRank != null) data['prev_rank'] = prevRank;
     if (prevAt >= 0) data['prev_at'] = prevAt;
     if (nextRank != null) data['next_rank'] = nextRank;
     if (nextAt >= 0) data['next_at'] = nextAt;
-    if (percentileRank != rank) data['percentile_rank'] = percentileRank;
+    data['percentile_rank'] = percentileRank;
+    data['season'] = season;
     return data;
   }
 }
@@ -2193,7 +2129,7 @@ class TetrioPlayersLeaderboard {
       avgInfDS /= filtredLeaderboard.length;
       avgGamesPlayed = (totalGamesPlayed / filtredLeaderboard.length).floor();
       avgGamesWon = (totalGamesWon / filtredLeaderboard.length).floor();
-      return [TetraLeague(timestamp: DateTime.now(), apm: avgAPM, pps: avgPPS, vs: avgVS, gxe: avgGlixare, glicko: avgGlicko, rd: avgRD, gamesPlayed: avgGamesPlayed, gamesWon: avgGamesWon, bestRank: rank, decaying: false, tr: avgTR, rank: rank == "" ? "z" : rank, percentileRank: rank, percentile: rankCutoffs[rank]!, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1),
+      return [TetraLeague(id: "", timestamp: DateTime.now(), apm: avgAPM, pps: avgPPS, vs: avgVS, gxe: avgGlixare, glicko: avgGlicko, rd: avgRD, gamesPlayed: avgGamesPlayed, gamesWon: avgGamesWon, bestRank: rank, decaying: false, tr: avgTR, rank: rank == "" ? "z" : rank, percentileRank: rank, percentile: rankCutoffs[rank]!, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1, season: currentSeason),
       {
         "everyone": rank == "",
         "totalGamesPlayed": totalGamesPlayed,
@@ -2375,7 +2311,7 @@ class TetrioPlayersLeaderboard {
         "entries": filtredLeaderboard
       }];
     }else{
-      return [TetraLeague(timestamp: DateTime.now(), apm: 0, pps: 0, vs: 0, glicko: 0, rd: noTrRd, gamesPlayed: 0, gamesWon: 0, bestRank: rank, decaying: false, tr: 0, rank: rank, percentileRank: rank, gxe: -1, percentile: rankCutoffs[rank]!, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1),
+      return [TetraLeague(id: "", timestamp: DateTime.now(), apm: 0, pps: 0, vs: 0, glicko: 0, rd: noTrRd, gamesPlayed: 0, gamesWon: 0, bestRank: rank, decaying: false, tr: 0, rank: rank, percentileRank: rank, gxe: -1, percentile: rankCutoffs[rank]!, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1, season: currentSeason),
       {"players": filtredLeaderboard.length, "lowestTR": 0, "toEnterTR": 0, "toEnterGlicko": 0}];
     }
   }
