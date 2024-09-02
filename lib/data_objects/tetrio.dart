@@ -1375,7 +1375,11 @@ class TetraLeague {
     apm = json['apm']?.toDouble();
     pps = json['pps']?.toDouble();
     vs = json['vs']?.toDouble();
-    decaying = json['decaying'] ?? false;
+    decaying = switch(json['decaying'].runtimeType){
+      int => json['decaying'] == 1,
+      bool => json['decaying'],
+      _ => false
+    };
     standing = json['standing'] ?? -1;
     percentile = json['percentile'] != null ? json['percentile'].toDouble() : rankCutoffs[rank];
     standingLocal = json['standing_local'] ?? -1;
@@ -1402,8 +1406,7 @@ class TetraLeague {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['timestamp'] = timestamp.millisecondsSinceEpoch;
+    data['id'] = id+timestamp.millisecondsSinceEpoch.toRadixString(16);
     if (gamesPlayed > 0) data['gamesplayed'] = gamesPlayed;
     if (gamesWon > 0) data['gameswon'] = gamesWon;
     if (tr >= 0) data['tr'] = tr;

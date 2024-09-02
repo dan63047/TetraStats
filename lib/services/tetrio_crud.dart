@@ -6,6 +6,7 @@ import 'dart:developer' as developer;
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sql.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:tetra_stats/data_objects/tetra_stats.dart';
 import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
 import 'package:tetra_stats/main.dart' show packageInfo;
@@ -72,7 +73,6 @@ const String createTetrioTLReplayStats = '''
 const String createTetrioLeagueTable = '''
         CREATE TABLE IF NOT EXISTS "tetrioLeague" (
           "id"	TEXT NOT NULL,
-          "timestamp"	INTEGER NOT NULL,
           "gamesplayed"	INTEGER NOT NULL DEFAULT 0,
           "gameswon"	INTEGER NOT NULL DEFAULT 0,
           "tr"	REAL,
@@ -93,7 +93,8 @@ const String createTetrioLeagueTable = '''
           "next_rank"	TEXT,
           "next_at"	INTEGER NOT NULL DEFAULT -1,
           "percentile_rank"	TEXT NOT NULL DEFAULT 'z',
-          "season"	INTEGER NOT NULL DEFAULT 1
+          "season"	INTEGER NOT NULL DEFAULT 1,
+	        PRIMARY KEY("id")
         )
 ''';
 
@@ -592,6 +593,7 @@ class TetrioService extends DB {
           // that one api returns csv instead of json
           List<List<dynamic>> csv = const CsvToListConverter().convert(response.body)..removeAt(0);
           List<TetraLeague> history = [];
+          Batch batch = db.batch();
           for (List<dynamic> entry in csv){ // each entry is one state
             TetraLeague state = TetraLeague(
                 id: id, 
@@ -617,8 +619,9 @@ class TetrioService extends DB {
                 season: 1
               );
               history.add(state);
-              await db.insert(tetrioLeagueTable, state.toJson(), conflictAlgorithm: ConflictAlgorithm.replace);
+              batch.insert(tetrioLeagueTable, state.toJson(), conflictAlgorithm: ConflictAlgorithm.replace);
           }
+          batch.commit();
           return history;
         case 404:
           developer.log("fetchTLHistory: Probably, history doesn't exist", name: "services/tetrio_crud", error: response.statusCode);
@@ -1112,10 +1115,18 @@ class TetrioService extends DB {
   Future<void> storeState(TetraLeague league) async {
     await ensureDbIsOpen();
     final db = getDatabaseOrThrow();
-    List<Map> test = await db.query(tetrioLeagueTable, where: '"id" = ? AND "gamesplayed" = ? AND "rd" = ?', whereArgs: [league.id, league.gamesPlayed, league.rd]);
+    List<Map> test = await db.query(tetrioLeagueTable, where: '"id" LIKE ? AND "gamesplayed" = ? AND "rd" = ?', whereArgs: ["${league.id}%", league.gamesPlayed, league.rd]);
     if (test.isEmpty) {
       await db.insert(tetrioLeagueTable, league.toJson());
     }
+  }
+
+  Future<List<TetraLeague>> getHistory(String id, {int season = currentSeason}) async {
+    await ensureDbIsOpen();
+    final db = getDatabaseOrThrow();
+    List<Map> raw = await db.query(tetrioLeagueTable, where: '"id" = ? AND "season" = ?', whereArgs: [id, season]);
+    List<TetraLeague> result = [for (var entry in raw) TetraLeague.fromJson(entry as Map<String, dynamic>, DateTime.fromMillisecondsSinceEpoch(int.parse(entry["id"].substring(24), radix: 16)), entry["season"], entry["id"].substring(0, 24))];
+    return result;
   }
 
   /// Remove state (which is [tetrioPlayer]) from the local database

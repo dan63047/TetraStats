@@ -217,7 +217,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
 
     // Making list of Tetra League matches
     bool isTracking = await teto.isPlayerTracking(me.userId);
-    List<TetrioPlayer> states = [];
+    List<TetraLeague> states = await teto.getHistory(me.userId);
     TetraLeague? compareWith;
     Set<TetraLeague> uniqueTL = {};
     List<TetraLeagueAlphaRecord> storedRecords = await teto.getTLMatchesbyPlayerID(me.userId); // get old matches
@@ -277,8 +277,8 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     //   if (uniqueTL.isEmpty) uniqueTL.add(summaries.league);
     // }
     // Also i need previous Tetra League State for comparison if avaliable
-    if (uniqueTL.length >= 2){
-      compareWith = uniqueTL.toList().elementAtOrNull(uniqueTL.length - 2);
+    if (states.length >= 2){
+      compareWith = states.elementAtOrNull(states.length - 2);
       chartsData = <DropdownMenuItem<List<_HistoryChartSpot>>>[ // Dumping charts data into dropdown menu items, while cheking if every entry is valid
         DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.tr)], child: Text(t.statCellNum.tr)),
         DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.glicko!)], child: const Text("Glicko")),
@@ -312,7 +312,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
         changePlayer(me.userId);
       });
     }
-    return [me, summaries, news, tlStream, recentZenith, recentZenithEX];
+    return [me, summaries, news, tlStream, recentZenith, recentZenithEX, states];
     //return [me, records, states, tlMatches, compareWith, isTracking, news, topTR, recent, sprint, blitz, tlMatches.elementAtOrNull(0)?.timestamp];
   }
 
@@ -471,7 +471,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                               child: TLThingy(
                                 tl: snapshot.data![1].league,
                                 userID: snapshot.data![0].userId,
-                                states: const [], //snapshot.data![2],
+                                states: snapshot.data![6],
                                 //topTR: snapshot.data![7]?.tr,
                                 //lastMatchPlayed: snapshot.data![11],
                                 bot: snapshot.data![0].role == "bot",
