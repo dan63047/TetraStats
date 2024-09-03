@@ -576,7 +576,7 @@ class TetrioService extends DB {
 
   /// Retrieves Tetra League history from p1nkl0bst3r api for a player with given [id]. Returns a list of states
   /// (state = instance of [TetrioPlayer] at some point of time). Can throw an exception if fails to retrieve data.
-  Future<List<TetraLeague>> fetchAndsaveTLHistory(String id) async {
+  Future<List<TetraLeague>> fetchAndsaveTLHistory(String id) async { 
     Uri url;
     if (kIsWeb) {
       url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLHistory", "user": id});
@@ -1100,15 +1100,11 @@ class TetrioService extends DB {
     }
   }
 
-  Future<List<TetraLeague>> getStates(String userID, int season) async {
+  Future<List<TetraLeague>> getStates(String userID, {int? season}) async {
     await ensureDbIsOpen();
     final db = getDatabaseOrThrow();
-    List<Map> query = await db.query(tetrioLeagueTable, where: '"id" = ? AND "season" = ?', whereArgs: [userID, season]);
-    List<TetraLeague> result = [];
-    for (var entry in query){
-      result.add(TetraLeague.fromJson(entry as Map<String, dynamic>, entry["timestamp"], entry["season"], entry["id"]));
-    }
-    return result;
+    List<Map> query = await db.query(tetrioLeagueTable, where: season != null ? '"id" LIKE ? AND "season" = ?' : '"id" LIKE ?', whereArgs: season != null ? ["${userID}%", season] : ["${userID}%"], orderBy: '"id" ASC');
+    return [for (var entry in query) TetraLeague.fromJson(entry as Map<String, dynamic>, DateTime.fromMillisecondsSinceEpoch(int.parse(entry["id"].substring(24), radix: 16)), entry["season"], entry["id"].substring(0, 24))];
   }
 
   /// Saves state (which is [TetraLeague]) to the local database.
@@ -1119,14 +1115,6 @@ class TetrioService extends DB {
     if (test.isEmpty) {
       await db.insert(tetrioLeagueTable, league.toJson());
     }
-  }
-
-  Future<List<TetraLeague>> getHistory(String id, {int season = currentSeason}) async {
-    await ensureDbIsOpen();
-    final db = getDatabaseOrThrow();
-    List<Map> raw = await db.query(tetrioLeagueTable, where: '"id" = ? AND "season" = ?', whereArgs: [id, season]);
-    List<TetraLeague> result = [for (var entry in raw) TetraLeague.fromJson(entry as Map<String, dynamic>, DateTime.fromMillisecondsSinceEpoch(int.parse(entry["id"].substring(24), radix: 16)), entry["season"], entry["id"].substring(0, 24))];
-    return result;
   }
 
   /// Remove state (which is [tetrioPlayer]) from the local database

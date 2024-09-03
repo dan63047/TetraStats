@@ -11,7 +11,7 @@ import 'package:tetra_stats/widgets/text_timestamp.dart';
 import 'package:window_manager/window_manager.dart';
 
 class StatesView extends StatefulWidget {
-  final List<TetrioPlayer> states;
+  final List<TetraLeague> states;
   const StatesView({super.key, required this.states});
 
   @override
@@ -25,7 +25,7 @@ class StatesState extends State<StatesView> {
   void initState() {
     if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS){
       windowManager.getTitle().then((value) => oldWindowTitle = value);
-      windowManager.setTitle("Tetra Stats: ${t.statesViewTitle(number: widget.states.length, nickname: widget.states.last.username.toUpperCase())}");
+      windowManager.setTitle("Tetra Stats: ${t.statesViewTitle(number: widget.states.length, nickname: widget.states.last.id.toUpperCase())}");
     }
     super.initState();
   }
@@ -41,14 +41,14 @@ class StatesState extends State<StatesView> {
     final t = Translations.of(context);
     return Scaffold(
         appBar: AppBar(
-          title: Text(t.statesViewTitle(number: widget.states.length, nickname: widget.states.last.username.toUpperCase())),
+          title: Text(t.statesViewTitle(number: widget.states.length, nickname: widget.states.first.id)),
           actions: [
             IconButton(
               onPressed: (){
                 Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => MatchesView(userID: widget.states.first.userId, username: widget.states.first.username),
+                          builder: (context) => MatchesView(userID: widget.states.first.id, username: widget.states.first.id),
                         ),
                       );
                 }, icon: const Icon(Icons.list), tooltip: t.viewAllMatches)
@@ -60,24 +60,24 @@ class StatesState extends State<StatesView> {
                 itemCount: widget.states.length,
                 itemBuilder: (context, index) {
                   return ListTile(
-                    title: Text(timestamp(widget.states[index].state)),
-                    subtitle: Text(t.statesViewEntry(level: widget.states[index].level.toStringAsFixed(2), gameTime: widget.states[index].gameTime, friends: widget.states[index].friendCount, rd: 0)),
+                    title: Text(timestamp(widget.states[index].timestamp)),
+                    //subtitle: Text(t.statesViewEntry(level: widget.states[index].level.toStringAsFixed(2), gameTime: widget.states[index].gameTime, friends: widget.states[index].friendCount, rd: 0)),
                     trailing: IconButton(
                       icon: const Icon(Icons.delete_forever),
                       onPressed: () {
-                        DateTime nn = widget.states[index].state;
+                        //DateTime nn = widget.states[index].state;
                         // teto.deleteState(widget.states[index]).then((value) => setState(() {
                         //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.stateRemoved(date: timestamp(nn)))));
                         //     }));
                       },
                     ),
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => StateView(state: widget.states[index]),
-                        ),
-                      );
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => StateView(state: widget.states[index]),
+                      //   ),
+                      // );
                     },
                   );
                 })));

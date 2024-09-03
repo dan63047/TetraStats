@@ -119,12 +119,12 @@ class TrackedPlayersState extends State<TrackedPlayersView> {
                                   },
                                 ),
                                 onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => StatesView(states: allPlayers[keys[index]]!),
-                                    ),
-                                  );
+                                  // Navigator.push(
+                                  //   context,
+                                  //   MaterialPageRoute(
+                                  //     builder: (context) => StatesView(states: allPlayers[keys[index]]!),
+                                  //   ),
+                                  // );
                                 },
                               );
                             }));
