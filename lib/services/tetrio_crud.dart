@@ -213,6 +213,7 @@ class TetrioService extends DB {
       _players.removeWhere((key, value) => key == id);
       _tetrioStreamController.add(_players);
     }
+    await db.delete(tetrioLeagueTable, where: "id LIKE ?", whereArgs: ["$id%"]);
   }
 
   /// Gets nickname from database or requests it from API if missing.
@@ -1117,46 +1118,14 @@ class TetrioService extends DB {
     }
   }
 
-  /// Remove state (which is [tetrioPlayer]) from the local database
-  // Future<void> deleteState(TetrioPlayer tetrioPlayer) async {
-  //   await ensureDbIsOpen();
-  //   final db = getDatabaseOrThrow();
-  //   //List<TetrioPlayer> states = await getPlayer(tetrioPlayer.userId);
-  //   // removing state from map that contain every state of each user
-  //   states.removeWhere((element) => element.state == tetrioPlayer.state);
-
-  //   // Making map of the states (without deleted one)
-  //   final Map<String, dynamic> statesJson = {};
-  //   // for (var e in states) {
-  //   //   statesJson.addEntries({(e.state.millisecondsSinceEpoch ~/ 1000).toString(): e.toJson()}.entries);
-  //   // }
-  //   // Rewriting database entry with new json
-  //   await db.update(tetrioUsersTable, {idCol: tetrioPlayer.userId, nickCol: tetrioPlayer.username, statesCol: jsonEncode(statesJson)},
-  //       where: '$idCol = ?', whereArgs: [tetrioPlayer.userId]);
-  //   _tetrioStreamController.add(_players);
-  // }
-
-  /// Returns list of all states of player with given [id] from database. Can return empty list if player
-  /// was not found.
-  // Future<List<TetrioPlayer>> getPlayer(String id) async {
-  //   await ensureDbIsOpen();
-  //   final db = getDatabaseOrThrow();
-  //   List<TetrioPlayer> states = [];
-  //   final results = await db.query(tetrioUsersTable, limit: 1, where: '$idCol = ?', whereArgs: [id.toLowerCase()]);
-  //   if (results.isEmpty) {
-  //     return states; // it empty
-  //   } else {
-  //     dynamic rawStates = results.first['jsonStates'] as String;
-  //     rawStates = json.decode(rawStates);
-  //     // recreating objects of states
-  //     rawStates.forEach((k, v) => states.add(TetrioPlayer.fromJson(v, DateTime.fromMillisecondsSinceEpoch(int.parse(k) * 1000), id, results.first[nickCol] as String)));
-  //     // updating the stream
-  //     _players.removeWhere((key, value) => key == id);
-  //     _players.addEntries({states.last.userId: states.last.username}.entries);
-  //     _tetrioStreamController.add(_players);
-  //     return states;
-  //   }
-  // }
+  /// Remove state, which has [dbID] from the local database
+  /// ([dbid] is a concatenation of player id and UINX milliseconds in hex)
+  Future<void> deleteState(String dbID) async {
+    await ensureDbIsOpen();
+    final db = getDatabaseOrThrow();
+    int result = await db.delete(tetrioLeagueTable, where: "id = ?", whereArgs: [dbID]);
+    if (result == 0) throw Exception("Failed to remove a row $dbID - it's probably not exist");
+  }
 
   /// Retrieves general stats of [user] (nickname or id) from Tetra Channel api. Returns [TetrioPlayer] object of this user.
   /// If [isItDiscordID] is true, function expects [user] to be a discord user id. Throws an exception if fails to retrieve.
@@ -1256,17 +1225,14 @@ class TetrioService extends DB {
     }
   }
 
-  /// Retrieves whole [tetrioUsersTable] and returns Map with [TetrioPlayer] objects of everyone in database
-  Future<Map<String, List<TetrioPlayer>>> getAllPlayers() async {
+  /// Retrieves whole [tetrioUsersTable] and returns Map {id: nickname} of everyone in database
+  Future<Map<String, String>> getAllPlayers() async {
     await ensureDbIsOpen();
     final db = getDatabaseOrThrow();
     final players = await db.query(tetrioUsersTable);
-    Map<String, List<TetrioPlayer>> data = {};
+    Map<String, String> data = {};
     for (var entry in players){
-      var test = json.decode(entry['jsonStates'] as String);
-      List<TetrioPlayer> states = [];
-      test.forEach((k, v) => states.add(TetrioPlayer.fromJson(v, DateTime.fromMillisecondsSinceEpoch(int.parse(k) * 1000), entry[idCol] as String, entry[nickCol] as String)));
-      data.addEntries({states.last.userId: states}.entries);
+      data[entry[idCol] as String] = entry[nickCol] as String;
     }
     return data;
   }

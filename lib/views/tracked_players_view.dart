@@ -78,7 +78,7 @@ class TrackedPlayersState extends State<TrackedPlayersView> {
                   case ConnectionState.active:
                     return const Center(child: CircularProgressIndicator(color: Colors.white));
                   case ConnectionState.done:
-                    final allPlayers = (snapshot.data != null) ? snapshot.data as Map<String, List<TetrioPlayer>> : <String, List<TetrioPlayer>>{};
+                    final allPlayers = (snapshot.data != null) ? snapshot.data as Map<String, String> : <String, String>{};
                     List<String> keys = allPlayers.keys.toList();
                     return NestedScrollView(
                         headerSliverBuilder: (context, value) {
@@ -105,29 +105,29 @@ class TrackedPlayersState extends State<TrackedPlayersView> {
                           ];
                         },
                         body: ListView.builder(
-                            itemCount: allPlayers.length,
-                            itemBuilder: (context, index) {
-                              return ListTile(
-                                title: Text(t.trackedPlayersEntry(nickname: allPlayers[keys[index]]!.last.username, numberOfStates: allPlayers[keys[index]]!.length)),
-                                subtitle: Text(t.trackedPlayersDescription(firstStateDate: timestamp(allPlayers[keys[index]]!.first.state), lastStateDate: timestamp(allPlayers[keys[index]]!.last.state))),
-                                trailing: IconButton(
-                                  icon: const Icon(Icons.delete_forever),
-                                  onPressed: () {
-                                    String nn = allPlayers[keys[index]]!.last.username;
-                                    setState(() {teto.deletePlayer(keys[index]);});
-                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.trackedPlayersStatesDeleted(nickname: nn))));
-                                  },
-                                ),
-                                onTap: () {
-                                  // Navigator.push(
-                                  //   context,
-                                  //   MaterialPageRoute(
-                                  //     builder: (context) => StatesView(states: allPlayers[keys[index]]!),
-                                  //   ),
-                                  // );
+                          itemCount: allPlayers.length,
+                          itemBuilder: (context, index) {
+                            print(index);
+                            return ListTile(
+                              title: Text(allPlayers[keys[index]]??"No nickname (huh?)"),
+                              subtitle: Text(keys[index], style: TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.delete_forever),
+                                onPressed: () {
+                                  setState(() {teto.deletePlayer(keys[index]);});
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.trackedPlayersStatesDeleted(nickname: allPlayers[keys[index]]??"No nickname (huh?)"))));
                                 },
-                              );
-                            }));
+                              ),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => StatesView(nickname: allPlayers[keys[index]]!, id: keys[index]),
+                                  ),
+                                );
+                              },
+                            );
+                          }));
                 }
               })),
     );

@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 1216 (608 per locale)
+/// Strings: 1210 (605 per locale)
 ///
-/// Built on 2024-08-07 at 15:58 UTC
+/// Built on 2024-09-04 at 20:41 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -224,9 +224,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get smooth => 'Smooth';
 	String get postSeason => 'Off-season';
 	String get seasonStarts => 'Season starts in:';
-	String get myMessadgeHeader => 'A messadge from dan63';
-	String get myMessadgeBody => 'TETR.IO Tetra Channel API has been seriously modified after the last update, therefore, some functions may not work. I will try to catch up and add new stats (and return back the old ones) as soon, as public docs on new Tetra Channel API will be available.';
-	String preSeasonMessage({required Object n}) => 'Right now you can play unranked FT3 matches with hidden glicko (200 RD 🙂).\nSeason ${n} rules applied';
 	String get nanow => 'Not avaliable for now...';
 	String seasonEnds({required Object countdown}) => 'Season ends in ${countdown}';
 	String get seasonEnded => 'Season has ended';
@@ -293,7 +290,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String stateViewTitle({required Object nickname, required Object date}) => '${nickname} account on ${date}';
 	String statesViewTitle({required Object number, required Object nickname}) => '${number} states of ${nickname} account';
 	String matchesViewTitle({required Object nickname}) => '${nickname} TL matches';
-	String statesViewEntry({required Object level, required Object gameTime, required Object friends, required Object rd}) => 'Level ${level}, ${gameTime} of gametime, ${friends} friends, ${rd} RD';
+	String statesViewEntry({required Object level, required Object glicko, required Object rd, required Object games}) => '${level} TR, ${glicko}±${rd} Glicko, ${games} игр сыграно';
 	String stateRemoved({required Object date}) => '${date} state was removed from database!';
 	String matchRemoved({required Object date}) => '${date} match was removed from database!';
 	String get viewAllMatches => 'View all matches';
@@ -938,9 +935,6 @@ class _StringsRu implements Translations {
 	@override String get smooth => 'Гладкий';
 	@override String get postSeason => 'Внесезонье';
 	@override String get seasonStarts => 'Сезон начнётся через:';
-	@override String get myMessadgeHeader => 'Сообщение от dan63';
-	@override String get myMessadgeBody => 'TETR.IO Tetra Channel API был серьёзно изменён после последнего обновления, поэтому некоторый функционал может не работать. Я постараюсь добавить новую статистику (и вернуть старую) как только будут опубликована новая документация по данному API.';
-	@override String preSeasonMessage({required Object n}) => 'Прямо сейчас вы можете сыграть безранговый матч до трёх побед со скрытым Glicko (200 RD 🙂).\nПрименяются правила ${n} сезона';
 	@override String get nanow => 'Пока недоступно...';
 	@override String seasonEnds({required Object countdown}) => 'Сезон закончится через ${countdown}';
 	@override String get seasonEnded => 'Сезон закончился';
@@ -1007,7 +1001,7 @@ class _StringsRu implements Translations {
 	@override String stateViewTitle({required Object nickname, required Object date}) => 'Аккаунт ${nickname} ${date}';
 	@override String statesViewTitle({required Object number, required Object nickname}) => '${number} состояний аккаунта ${nickname}';
 	@override String matchesViewTitle({required Object nickname}) => 'Матчи аккаунта ${nickname}';
-	@override String statesViewEntry({required Object level, required Object gameTime, required Object friends, required Object rd}) => '${level} уровень, ${gameTime} сыграно, ${friends} друзей, ${rd} RD';
+	@override String statesViewEntry({required Object level, required Object glicko, required Object rd, required Object games}) => '${level} TR, ${glicko}±${rd} Glicko, ${games} игр сыграно';
 	@override String stateRemoved({required Object date}) => 'Состояние от ${date} было удалено из локальной базы данных!';
 	@override String matchRemoved({required Object date}) => 'Матч от ${date} был удален из локальной базы данных!';
 	@override String get viewAllMatches => 'Все матчи';
@@ -1644,9 +1638,6 @@ extension on Translations {
 			case 'smooth': return 'Smooth';
 			case 'postSeason': return 'Off-season';
 			case 'seasonStarts': return 'Season starts in:';
-			case 'myMessadgeHeader': return 'A messadge from dan63';
-			case 'myMessadgeBody': return 'TETR.IO Tetra Channel API has been seriously modified after the last update, therefore, some functions may not work. I will try to catch up and add new stats (and return back the old ones) as soon, as public docs on new Tetra Channel API will be available.';
-			case 'preSeasonMessage': return ({required Object n}) => 'Right now you can play unranked FT3 matches with hidden glicko (200 RD 🙂).\nSeason ${n} rules applied';
 			case 'nanow': return 'Not avaliable for now...';
 			case 'seasonEnds': return ({required Object countdown}) => 'Season ends in ${countdown}';
 			case 'seasonEnded': return 'Season has ended';
@@ -1713,7 +1704,7 @@ extension on Translations {
 			case 'stateViewTitle': return ({required Object nickname, required Object date}) => '${nickname} account on ${date}';
 			case 'statesViewTitle': return ({required Object number, required Object nickname}) => '${number} states of ${nickname} account';
 			case 'matchesViewTitle': return ({required Object nickname}) => '${nickname} TL matches';
-			case 'statesViewEntry': return ({required Object level, required Object gameTime, required Object friends, required Object rd}) => 'Level ${level}, ${gameTime} of gametime, ${friends} friends, ${rd} RD';
+			case 'statesViewEntry': return ({required Object level, required Object glicko, required Object rd, required Object games}) => '${level} TR, ${glicko}±${rd} Glicko, ${games} игр сыграно';
 			case 'stateRemoved': return ({required Object date}) => '${date} state was removed from database!';
 			case 'matchRemoved': return ({required Object date}) => '${date} match was removed from database!';
 			case 'viewAllMatches': return 'View all matches';
@@ -2274,9 +2265,6 @@ extension on _StringsRu {
 			case 'smooth': return 'Гладкий';
 			case 'postSeason': return 'Внесезонье';
 			case 'seasonStarts': return 'Сезон начнётся через:';
-			case 'myMessadgeHeader': return 'Сообщение от dan63';
-			case 'myMessadgeBody': return 'TETR.IO Tetra Channel API был серьёзно изменён после последнего обновления, поэтому некоторый функционал может не работать. Я постараюсь добавить новую статистику (и вернуть старую) как только будут опубликована новая документация по данному API.';
-			case 'preSeasonMessage': return ({required Object n}) => 'Прямо сейчас вы можете сыграть безранговый матч до трёх побед со скрытым Glicko (200 RD 🙂).\nПрименяются правила ${n} сезона';
 			case 'nanow': return 'Пока недоступно...';
 			case 'seasonEnds': return ({required Object countdown}) => 'Сезон закончится через ${countdown}';
 			case 'seasonEnded': return 'Сезон закончился';
@@ -2343,7 +2331,7 @@ extension on _StringsRu {
 			case 'stateViewTitle': return ({required Object nickname, required Object date}) => 'Аккаунт ${nickname} ${date}';
 			case 'statesViewTitle': return ({required Object number, required Object nickname}) => '${number} состояний аккаунта ${nickname}';
 			case 'matchesViewTitle': return ({required Object nickname}) => 'Матчи аккаунта ${nickname}';
-			case 'statesViewEntry': return ({required Object level, required Object gameTime, required Object friends, required Object rd}) => '${level} уровень, ${gameTime} сыграно, ${friends} друзей, ${rd} RD';
+			case 'statesViewEntry': return ({required Object level, required Object glicko, required Object rd, required Object games}) => '${level} TR, ${glicko}±${rd} Glicko, ${games} игр сыграно';
 			case 'stateRemoved': return ({required Object date}) => 'Состояние от ${date} было удалено из локальной базы данных!';
 			case 'matchRemoved': return ({required Object date}) => 'Матч от ${date} был удален из локальной базы данных!';
 			case 'viewAllMatches': return 'Все матчи';
