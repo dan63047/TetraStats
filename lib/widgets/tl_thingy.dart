@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/utils/colors_functions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
@@ -19,15 +20,15 @@ import 'package:tetra_stats/widgets/tl_rating_thingy.dart';
 var intFDiff = NumberFormat("+#,###.000;-#,###.000");
 
 class TLThingy extends StatefulWidget {
-  final TetraLeagueAlpha tl;
+  final TetraLeague tl;
   final String userID;
-  final List<TetrioPlayer> states;
+  final List<TetraLeague> states;
   final bool showTitle;
   final bool bot;
   final bool guest;
   final double? topTR;
   final PlayerLeaderboardPosition? lbPositions;
-  final TetraLeagueAlpha? averages;
+  final TetraLeague? averages;
   final double? thatRankCutoff;
   final double? thatRankCutoffGlicko;
   final double? thatRankTarget;
@@ -43,33 +44,22 @@ class TLThingy extends StatefulWidget {
 
 class _TLThingyState extends State<TLThingy> with TickerProviderStateMixin {
   late bool oskKagariGimmick;
-  late TetraLeagueAlpha? oldTl;
-  late TetraLeagueAlpha currentTl;
+  late TetraLeague? oldTl;
+  late TetraLeague currentTl;
   late RangeValues _currentRangeValues;
-  late List<TetrioPlayer> sortedStates;
-  late Timer _countdownTimer;
-  Duration seasonLeft = seasonEnd.difference(DateTime.now());
-  
+  late List<TetraLeague> sortedStates;
+
 @override
   void initState() {
     _currentRangeValues = const RangeValues(0, 1);
     sortedStates = widget.states.reversed.toList();
-    oldTl = sortedStates.elementAtOrNull(1)?.tlSeason1;
+    oldTl = sortedStates.elementAtOrNull(1);
     currentTl = widget.tl;
     super.initState();
-    _countdownTimer = Timer.periodic(
-        Durations.extralong4,
-        (Timer timer) {
-          setState(() {
-            seasonLeft = seasonEnd.difference(DateTime.now());
-          });
-        },
-    );
   }
 
   @override
   void dispose() {
-    _countdownTimer.cancel();
     super.dispose();
   }
 
@@ -90,8 +80,8 @@ class _TLThingyState extends State<TLThingy> with TickerProviderStateMixin {
           return Column(
             children: [
               if (widget.showTitle) Text(t.tetraLeague, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-              if (DateTime.now().isBefore(seasonEnd)) Text(t.seasonEnds(countdown: countdown(seasonLeft)))
-              else Text(t.seasonEnded),
+              //if (DateTime.now().isBefore(seasonEnd)) Text(t.seasonEnds(countdown: countdown(seasonLeft)))
+              //else Text(t.seasonEnded),
               if (oldTl != null) Text(t.comparingWith(newDate: timestamp(currentTl.timestamp), oldDate: timestamp(oldTl!.timestamp)),
               textAlign: TextAlign.center,),
               if (oldTl != null) RangeSlider(values: _currentRangeValues, max: widget.states.length.toDouble(),
@@ -105,37 +95,26 @@ class _TLThingyState extends State<TLThingy> with TickerProviderStateMixin {
                     if (values.start.round() == 0){
                       currentTl = widget.tl;
                     }else{
-                      currentTl = sortedStates[values.start.round()-1].tlSeason1;
+                      currentTl = sortedStates[values.start.round()-1]!;
                     }
                     if (values.end.round() == 0){
                       oldTl = widget.tl;
                     }else{
-                      oldTl = sortedStates[values.end.round()-1].tlSeason1;
+                      oldTl = sortedStates[values.end.round()-1];
                     }
                   });
                 },
               ),
-              if (currentTl.gamesPlayed > 9) TLRatingThingy(userID: widget.userID, tlData: currentTl, oldTl: oldTl, topTR: widget.topTR, lastMatchPlayed: widget.lastMatchPlayed),
+              TLRatingThingy(userID: widget.userID, tlData: currentTl, oldTl: oldTl, topTR: widget.topTR, lastMatchPlayed: widget.lastMatchPlayed),
               if (currentTl.gamesPlayed > 9) TLProgress(
                 tlData: currentTl,
                 previousRankTRcutoff: widget.thatRankCutoff,
                 previousGlickoCutoff: widget.thatRankCutoffGlicko,
-                previousRank: widget.tl.prevRank,
                 previousRankTRcutoffTarget: widget.thatRankTarget,
                 nextRankTRcutoff: widget.nextRankCutoff,
                 nextRankGlickoCutoff: widget.nextRankCutoffGlicko,
                 nextRankTRcutoffTarget: widget.nextRankTarget,
-                nextRank: widget.tl.nextRank
               ),
-              if (currentTl.gamesPlayed < 10)
-                Text(t.gamesUntilRanked(left: 10 - currentTl.gamesPlayed),
-                    softWrap: true,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: "Eurostile Round",
-                      fontSize: bigScreen ? 42 : 28,
-                      overflow: TextOverflow.visible,
-                    )),
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 16, 8, 48),
                 child: Wrap(

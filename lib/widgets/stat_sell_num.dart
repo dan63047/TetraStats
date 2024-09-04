@@ -11,7 +11,7 @@ class StatCellNum extends StatelessWidget {
       required this.playerStat,
       required this.playerStatLabel,
       required this.isScreenBig,
-      this.smallDecimal = true,
+      this.smallDecimal = false,
       this.alertWidgets,
       this.fractionDigits,
       this.oldPlayerStat,
@@ -52,7 +52,7 @@ class StatCellNum extends StatelessWidget {
         RichText(
           text: TextSpan(text: splited[0],
           children: [
-            if ((fractionDigits??0) > 0) TextSpan(text: f.symbols.DECIMAL_SEP+splited[1], style: smallDecimal ? const TextStyle(fontFamily: "Eurostile Round", fontSize: 16) : null)
+            if ((fractionDigits??0) > 0 && splited.elementAtOrNull(1) != null) TextSpan(text: f.symbols.DECIMAL_SEP+splited[1], style: smallDecimal ? const TextStyle(fontFamily: "Eurostile Round", fontSize: 16) : null)
           ],
           style: TextStyle(
             fontFamily: "Eurostile Round Extended",
@@ -88,25 +88,25 @@ class StatCellNum extends StatelessWidget {
             : TextButton(
                 onPressed: () {
                   showDialog(
-                      context: context,
-                      builder: (BuildContext context) => AlertDialog(
-                            title: Text(alertTitle??playerStatLabel.replaceAll(RegExp(r'\n'), " "),
-                                style: const TextStyle(
-                                    fontFamily: "Eurostile Round Extended")),
-                            content: SingleChildScrollView(
-                              child: ListBody(children: alertWidgets!),
-                            ),
-                            actions: <Widget>[
-                              TextButton(
-                                child: Text(okText??"OK"),
-                                onPressed: () {Navigator.of(context).pop();}
-                              )
-                      ],
-                    )
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                    title: Text(alertTitle??playerStatLabel.replaceAll(RegExp(r'\n'), " "),
+                        style: const TextStyle(
+                            fontFamily: "Eurostile Round Extended")),
+                    content: SingleChildScrollView(
+                      child: ListBody(children: alertWidgets!),
+                    ),
+                    actions: <Widget>[
+                      TextButton(
+                        child: Text(okText??"OK"),
+                        onPressed: () {Navigator.of(context).pop();}
+                      )
+                    ],
+                  )
                   );
                 },
                 style: ButtonStyle(
-                    padding: MaterialStateProperty.all(EdgeInsets.zero)),
+                    padding: WidgetStateProperty.all(EdgeInsets.zero)),
                 child: Text(
                   playerStatLabel,
                   textAlign: TextAlign.center,

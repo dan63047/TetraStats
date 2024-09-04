@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -11,8 +10,8 @@ var fDiff = NumberFormat("+#,###.####;-#,###.####");
 
 class TLRatingThingy extends StatelessWidget{
   final String userID;
-  final TetraLeagueAlpha tlData;
-  final TetraLeagueAlpha? oldTl;
+  final TetraLeague tlData;
+  final TetraLeague? oldTl;
   final double? topTR;
   final DateTime? lastMatchPlayed;
 
@@ -23,13 +22,13 @@ class TLRatingThingy extends StatelessWidget{
     bool oskKagariGimmick = prefs.getBool("oskKagariGimmick")??true;
     bool bigScreen = MediaQuery.of(context).size.width >= 768;
     String decimalSeparator = f4.symbols.DECIMAL_SEP;
-    List<String> formatedTR = f4.format(tlData.rating).split(decimalSeparator);
-    List<String> formatedGlicko = f4.format(tlData.glicko).split(decimalSeparator);
+    List<String> formatedTR = f4.format(tlData.tr).split(decimalSeparator);
+    List<String> formatedGlicko = tlData.glicko != null ? f4.format(tlData.glicko).split(decimalSeparator) : ["---","--"];
     List<String> formatedPercentile = f4.format(tlData.percentile * 100).split(decimalSeparator);
-    DateTime now = DateTime.now();
-    bool beforeS1end = now.isBefore(seasonEnd);
-    int daysLeft = seasonEnd.difference(now).inDays;
-    int safeRD = min(100, (100 + ((tlData.rd! >= 100 && tlData.decaying) ? 7 : max(0, 7 - (lastMatchPlayed != null ? now.difference(lastMatchPlayed!).inDays : 7))) - daysLeft).toInt());
+    //DateTime now = DateTime.now();
+    //bool beforeS1end = now.isBefore(seasonEnd);
+    //int daysLeft = seasonEnd.difference(now).inDays;
+    //int safeRD = min(100, (100 + ((tlData.rd! >= 100 && tlData.decaying) ? 7 : max(0, 7 - (lastMatchPlayed != null ? now.difference(lastMatchPlayed!).inDays : 7))) - daysLeft).toInt());
     return Wrap(
       direction: Axis.horizontal,
       alignment: WrapAlignment.spaceAround,
@@ -44,7 +43,7 @@ class TLRatingThingy extends StatelessWidget{
             RichText(
               text: TextSpan(
                 style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 20, color: Colors.white),
-                children: switch(prefs.getInt("ratingMode")){
+                children: (tlData.gamesPlayed > 9) ? switch(prefs.getInt("ratingMode")){
                   1 => [
                     TextSpan(text: formatedGlicko[0], style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
                     if (formatedGlicko.elementAtOrNull(1) != null) TextSpan(text: decimalSeparator + formatedGlicko[1]),
@@ -60,23 +59,23 @@ class TLRatingThingy extends StatelessWidget{
                   if (formatedTR.elementAtOrNull(1) != null) TextSpan(text: decimalSeparator + formatedTR[1]),
                   TextSpan(text: " TR", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
                 ],
-                }
+                } : [TextSpan(text: "---\n", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28, color: Colors.grey)), TextSpan(text: t.gamesUntilRanked(left: 10-tlData.gamesPlayed), style: const TextStyle(color: Colors.grey, fontSize: 14)),]
               )
             ),
             if (oldTl != null) Text(
               switch(prefs.getInt("ratingMode")){
                 1 => "${fDiff.format(tlData.glicko! - oldTl!.glicko!)} Glicko",
                 2 => "${fDiff.format(tlData.percentile * 100 - oldTl!.percentile * 100)} %",
-                _ => "${fDiff.format(tlData.rating - oldTl!.rating)} TR"
+                _ => "${fDiff.format(tlData.tr - oldTl!.tr)} TR"
               },
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: tlData.rating - oldTl!.rating < 0 ?
+                color: tlData.tr - oldTl!.tr < 0 ?
                 Colors.red :
                 Colors.green
               ),
             ),
-            Column(
+            if (tlData.gamesPlayed > 9) Column(
               children: [
                 RichText(
                   textAlign: TextAlign.center,
@@ -84,14 +83,14 @@ class TLRatingThingy extends StatelessWidget{
                   text: TextSpan(
                     style: DefaultTextStyle.of(context).style,
                     children: [
-                      TextSpan(text: prefs.getInt("ratingMode") == 2 ? "${f2.format(tlData.rating)} TR  • % ${t.rank}: ${tlData.percentileRank.toUpperCase()}" : "${t.top} ${f2.format(tlData.percentile * 100)}% (${tlData.percentileRank.toUpperCase()})"),
+                      TextSpan(text: prefs.getInt("ratingMode") == 2 ? "${f2.format(tlData.tr)} TR  • % ${t.rank}: ${tlData.percentileRank.toUpperCase()}" : "${t.top} ${f2.format(tlData.percentile * 100)}% (${tlData.percentileRank.toUpperCase()})"),
                       if (tlData.bestRank != "z") const TextSpan(text: " • "),
                       if (tlData.bestRank != "z") TextSpan(text: "${t.topRank}: ${tlData.bestRank.toUpperCase()}"),
                       if (topTR != null) TextSpan(text: " (${f2.format(topTR)} TR)"),
-                      TextSpan(text: " • ${prefs.getInt("ratingMode") == 1 ? "${f2.format(tlData.rating)} TR • RD: " : "Glicko: ${f2.format(tlData.glicko!)}±"}"),
+                      TextSpan(text: " • ${prefs.getInt("ratingMode") == 1 ? "${f2.format(tlData.tr)} TR • RD: " : "Glicko: ${tlData.glicko != null ? f2.format(tlData.glicko) : "---"}±"}"),
                       TextSpan(text: f2.format(tlData.rd!), style: tlData.decaying ? TextStyle(color: tlData.rd! > 98 ? Colors.red : Colors.yellow) : null),
                       if (tlData.decaying) WidgetSpan(child: Icon(Icons.trending_up, color: tlData.rd! > 98 ? Colors.red : Colors.yellow,), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic),
-                      if (beforeS1end) tlData.rd! <= safeRD ? TextSpan(text: " (Safe)", style: TextStyle(color: Colors.greenAccent)) : TextSpan(text: " (> ${safeRD} RD !!!)", style: TextStyle(color: Colors.redAccent))
+                      //if (beforeS1end) tlData.rd! <= safeRD ? TextSpan(text: " (Safe)", style: TextStyle(color: Colors.greenAccent)) : TextSpan(text: " (> ${safeRD} RD !!!)", style: TextStyle(color: Colors.redAccent))
                     ],
                   ),
                 ),

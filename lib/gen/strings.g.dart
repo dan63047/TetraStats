@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 1186 (593 per locale)
+/// Strings: 1210 (605 per locale)
 ///
-/// Built on 2024-07-20 at 13:24 UTC
+/// Built on 2024-09-04 at 20:41 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -222,6 +222,9 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get verdictBetter => 'better';
 	String get verdictWorse => 'worse';
 	String get smooth => 'Smooth';
+	String get postSeason => 'Off-season';
+	String get seasonStarts => 'Season starts in:';
+	String get nanow => 'Not avaliable for now...';
 	String seasonEnds({required Object countdown}) => 'Season ends in ${countdown}';
 	String get seasonEnded => 'Season has ended';
 	String gamesUntilRanked({required Object left}) => '${left} games until being ranked';
@@ -236,6 +239,17 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get neverPlayedTL => 'That user never played Tetra League';
 	String get botTL => 'Bots are not allowed to play Tetra League';
 	String get anonTL => 'Guests are not allowed to play Tetra League';
+	String get quickPlay => 'Quick Play';
+	String get expert => 'Expert';
+	String get withMods => 'With mods';
+	String withModsPlural({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		zero: 'with ${n} mods',
+		one: 'with ${n} mod',
+		two: 'with ${n} mods',
+		few: 'with ${n} mods',
+		many: 'with ${n} mods',
+		other: 'with ${n} mods',
+	);
 	String get exportDB => 'Export local database';
 	String get exportDBDescription => 'It contains states and Tetra League records of the tracked players and list of tracked players.';
 	String get desktopExportAlertTitle => 'Desktop export';
@@ -276,7 +290,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String stateViewTitle({required Object nickname, required Object date}) => '${nickname} account on ${date}';
 	String statesViewTitle({required Object number, required Object nickname}) => '${number} states of ${nickname} account';
 	String matchesViewTitle({required Object nickname}) => '${nickname} TL matches';
-	String statesViewEntry({required Object level, required Object gameTime, required Object friends, required Object rd}) => 'Level ${level}, ${gameTime} of gametime, ${friends} friends, ${rd} RD';
+	String statesViewEntry({required Object level, required Object glicko, required Object rd, required Object games}) => '${level} TR, ${glicko}±${rd} Glicko, ${games} игр сыграно';
 	String stateRemoved({required Object date}) => '${date} state was removed from database!';
 	String matchRemoved({required Object date}) => '${date} match was removed from database!';
 	String get viewAllMatches => 'View all matches';
@@ -703,7 +717,7 @@ class _StringsStatCellNumEn {
 	String get lbpcShort => '№ in local LB';
 	String get gamesPlayed => 'Games\nplayed';
 	String get gamesWonTL => 'Games\nWon';
-	String get winrate => 'Winrate\nprecentage';
+	String get winrate => 'Winrate';
 	String get level => 'Level';
 	String get score => 'Score';
 	String get spp => 'Score\nPer Piece';
@@ -919,6 +933,9 @@ class _StringsRu implements Translations {
 	@override String get verdictBetter => 'Лучше';
 	@override String get verdictWorse => 'Хуже';
 	@override String get smooth => 'Гладкий';
+	@override String get postSeason => 'Внесезонье';
+	@override String get seasonStarts => 'Сезон начнётся через:';
+	@override String get nanow => 'Пока недоступно...';
 	@override String seasonEnds({required Object countdown}) => 'Сезон закончится через ${countdown}';
 	@override String get seasonEnded => 'Сезон закончился';
 	@override String gamesUntilRanked({required Object left}) => '${left} матчей до получения рейтинга';
@@ -933,6 +950,17 @@ class _StringsRu implements Translations {
 	@override String get neverPlayedTL => 'Этот игрок никогда не играл в Тетра Лигу';
 	@override String get botTL => 'Ботам нельзя играть в Тетра Лигу';
 	@override String get anonTL => 'Гостям нельзя играть в Тетра Лигу';
+	@override String get quickPlay => 'Быстрая Игра';
+	@override String get expert => 'Эксперт';
+	@override String get withMods => 'С модами';
+	@override String withModsPlural({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
+		zero: 'с ${n} модами',
+		one: 'с ${n} модом',
+		two: 'с ${n} модами',
+		few: 'с ${n} модами',
+		many: 'с ${n} модами',
+		other: 'с ${n} модами',
+	);
 	@override String get exportDB => 'Экспортировать локальную базу данных';
 	@override String get exportDBDescription => 'Она содержит состояния аккаунтов и их матчей в Тетра Лиге для отслеживаемых игроков и список таких игроков.';
 	@override String get desktopExportAlertTitle => 'Экспорт на десктопе';
@@ -973,7 +1001,7 @@ class _StringsRu implements Translations {
 	@override String stateViewTitle({required Object nickname, required Object date}) => 'Аккаунт ${nickname} ${date}';
 	@override String statesViewTitle({required Object number, required Object nickname}) => '${number} состояний аккаунта ${nickname}';
 	@override String matchesViewTitle({required Object nickname}) => 'Матчи аккаунта ${nickname}';
-	@override String statesViewEntry({required Object level, required Object gameTime, required Object friends, required Object rd}) => '${level} уровень, ${gameTime} сыграно, ${friends} друзей, ${rd} RD';
+	@override String statesViewEntry({required Object level, required Object glicko, required Object rd, required Object games}) => '${level} TR, ${glicko}±${rd} Glicko, ${games} игр сыграно';
 	@override String stateRemoved({required Object date}) => 'Состояние от ${date} было удалено из локальной базы данных!';
 	@override String matchRemoved({required Object date}) => 'Матч от ${date} был удален из локальной базы данных!';
 	@override String get viewAllMatches => 'Все матчи';
@@ -1608,6 +1636,9 @@ extension on Translations {
 			case 'verdictBetter': return 'better';
 			case 'verdictWorse': return 'worse';
 			case 'smooth': return 'Smooth';
+			case 'postSeason': return 'Off-season';
+			case 'seasonStarts': return 'Season starts in:';
+			case 'nanow': return 'Not avaliable for now...';
 			case 'seasonEnds': return ({required Object countdown}) => 'Season ends in ${countdown}';
 			case 'seasonEnded': return 'Season has ended';
 			case 'gamesUntilRanked': return ({required Object left}) => '${left} games until being ranked';
@@ -1622,6 +1653,17 @@ extension on Translations {
 			case 'neverPlayedTL': return 'That user never played Tetra League';
 			case 'botTL': return 'Bots are not allowed to play Tetra League';
 			case 'anonTL': return 'Guests are not allowed to play Tetra League';
+			case 'quickPlay': return 'Quick Play';
+			case 'expert': return 'Expert';
+			case 'withMods': return 'With mods';
+			case 'withModsPlural': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+				zero: 'with ${n} mods',
+				one: 'with ${n} mod',
+				two: 'with ${n} mods',
+				few: 'with ${n} mods',
+				many: 'with ${n} mods',
+				other: 'with ${n} mods',
+			);
 			case 'exportDB': return 'Export local database';
 			case 'exportDBDescription': return 'It contains states and Tetra League records of the tracked players and list of tracked players.';
 			case 'desktopExportAlertTitle': return 'Desktop export';
@@ -1662,7 +1704,7 @@ extension on Translations {
 			case 'stateViewTitle': return ({required Object nickname, required Object date}) => '${nickname} account on ${date}';
 			case 'statesViewTitle': return ({required Object number, required Object nickname}) => '${number} states of ${nickname} account';
 			case 'matchesViewTitle': return ({required Object nickname}) => '${nickname} TL matches';
-			case 'statesViewEntry': return ({required Object level, required Object gameTime, required Object friends, required Object rd}) => 'Level ${level}, ${gameTime} of gametime, ${friends} friends, ${rd} RD';
+			case 'statesViewEntry': return ({required Object level, required Object glicko, required Object rd, required Object games}) => '${level} TR, ${glicko}±${rd} Glicko, ${games} игр сыграно';
 			case 'stateRemoved': return ({required Object date}) => '${date} state was removed from database!';
 			case 'matchRemoved': return ({required Object date}) => '${date} match was removed from database!';
 			case 'viewAllMatches': return 'View all matches';
@@ -1773,7 +1815,7 @@ extension on Translations {
 			case 'statCellNum.lbpcShort': return '№ in local LB';
 			case 'statCellNum.gamesPlayed': return 'Games\nplayed';
 			case 'statCellNum.gamesWonTL': return 'Games\nWon';
-			case 'statCellNum.winrate': return 'Winrate\nprecentage';
+			case 'statCellNum.winrate': return 'Winrate';
 			case 'statCellNum.level': return 'Level';
 			case 'statCellNum.score': return 'Score';
 			case 'statCellNum.spp': return 'Score\nPer Piece';
@@ -2221,6 +2263,9 @@ extension on _StringsRu {
 			case 'verdictBetter': return 'Лучше';
 			case 'verdictWorse': return 'Хуже';
 			case 'smooth': return 'Гладкий';
+			case 'postSeason': return 'Внесезонье';
+			case 'seasonStarts': return 'Сезон начнётся через:';
+			case 'nanow': return 'Пока недоступно...';
 			case 'seasonEnds': return ({required Object countdown}) => 'Сезон закончится через ${countdown}';
 			case 'seasonEnded': return 'Сезон закончился';
 			case 'gamesUntilRanked': return ({required Object left}) => '${left} матчей до получения рейтинга';
@@ -2235,6 +2280,17 @@ extension on _StringsRu {
 			case 'neverPlayedTL': return 'Этот игрок никогда не играл в Тетра Лигу';
 			case 'botTL': return 'Ботам нельзя играть в Тетра Лигу';
 			case 'anonTL': return 'Гостям нельзя играть в Тетра Лигу';
+			case 'quickPlay': return 'Быстрая Игра';
+			case 'expert': return 'Эксперт';
+			case 'withMods': return 'С модами';
+			case 'withModsPlural': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
+				zero: 'с ${n} модами',
+				one: 'с ${n} модом',
+				two: 'с ${n} модами',
+				few: 'с ${n} модами',
+				many: 'с ${n} модами',
+				other: 'с ${n} модами',
+			);
 			case 'exportDB': return 'Экспортировать локальную базу данных';
 			case 'exportDBDescription': return 'Она содержит состояния аккаунтов и их матчей в Тетра Лиге для отслеживаемых игроков и список таких игроков.';
 			case 'desktopExportAlertTitle': return 'Экспорт на десктопе';
@@ -2275,7 +2331,7 @@ extension on _StringsRu {
 			case 'stateViewTitle': return ({required Object nickname, required Object date}) => 'Аккаунт ${nickname} ${date}';
 			case 'statesViewTitle': return ({required Object number, required Object nickname}) => '${number} состояний аккаунта ${nickname}';
 			case 'matchesViewTitle': return ({required Object nickname}) => 'Матчи аккаунта ${nickname}';
-			case 'statesViewEntry': return ({required Object level, required Object gameTime, required Object friends, required Object rd}) => '${level} уровень, ${gameTime} сыграно, ${friends} друзей, ${rd} RD';
+			case 'statesViewEntry': return ({required Object level, required Object glicko, required Object rd, required Object games}) => '${level} TR, ${glicko}±${rd} Glicko, ${games} игр сыграно';
 			case 'stateRemoved': return ({required Object date}) => 'Состояние от ${date} было удалено из локальной базы данных!';
 			case 'matchRemoved': return ({required Object date}) => 'Матч от ${date} был удален из локальной базы данных!';
 			case 'viewAllMatches': return 'Все матчи';

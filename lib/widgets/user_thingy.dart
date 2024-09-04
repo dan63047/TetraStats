@@ -182,7 +182,6 @@ class UserThingy extends StatelessWidget {
                                                     ],),
                                                   onPressed: () {
                                                     teto.addPlayerToTrack(player).then((value) => setState());
-                                                    teto.storeState(player);
                                                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.becameTracked)));
                                                   },
                                                 ),
@@ -213,7 +212,7 @@ class UserThingy extends StatelessWidget {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => CompareView(greenSide: [player, null, player.tlSeason1], redSide: const [null, null, null], greenMode: Mode.player, redMode: Mode.player),
+                                            builder: (context) => CompareView(greenSide: [player, null, null], redSide: const [null, null, null], greenMode: Mode.player, redMode: Mode.player),
                                           ),
                                         );
                                       },
@@ -239,7 +238,7 @@ class UserThingy extends StatelessWidget {
               crossAxisAlignment: WrapCrossAlignment.start,
               clipBehavior: Clip.hardEdge, // hard WHAT???
               children: [
-                StatCellNum(
+                if (!player.level.isNegative && !player.level.isNaN) StatCellNum(
                   playerStat: player.level,
                   playerStatLabel: t.statCellNum.xpLevel,
                   isScreenBig: bigScreen,

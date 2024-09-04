@@ -1,10 +1,12 @@
 // p1nkl0bst3r data objects
 
 class Cutoffs{
+  DateTime ts;
   Map<String, double> tr;
   Map<String, double> glicko;
+  Map<String, double> gxe;
 
-  Cutoffs(this.tr, this.glicko);
+  Cutoffs(this.ts, this.tr, this.glicko, this.gxe);
 }
 
 class TopTr{

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/main.dart' show teto;
 import 'package:tetra_stats/gen/strings.g.dart';
-import 'package:tetra_stats/views/tl_match_view.dart';
 import 'package:window_manager/window_manager.dart';
 
 late String oldWindowTitle;
@@ -73,12 +72,6 @@ class MatchesState extends State<MatchesView> {
                                       }));
                                 },
                               ),
-                            onTap: (){Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => TlMatchResultView(record: value, initPlayerId: widget.userID),
-                                  ),
-                                );},
                           )]
                           : [Center(child: Text(t.noRecords, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)))],
                     );
