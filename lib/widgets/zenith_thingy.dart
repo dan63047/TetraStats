@@ -124,8 +124,9 @@ class _ZenithThingyState extends State<ZenithThingy> {
                 StatCellNum(playerStat: record!.aggregateStats.apm, playerStatLabel: t.statCellNum.apm, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: true),
                 StatCellNum(playerStat: record!.aggregateStats.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
                 StatCellNum(playerStat: record!.aggregateStats.vs, playerStatLabel: t.statCellNum.vs, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: true),
-                StatCellNum(playerStat: record!.stats.kills, playerStatLabel: "Kills", isScreenBig: bigScreen, higherIsBetter: true),
-                StatCellNum(playerStat: record!.stats.cps, playerStatLabel: "CPS\n(Peak: ${f2.format(record!.stats.zenith!.peakrank)})", fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true)
+                StatCellNum(playerStat: record!.stats.kills, playerStatLabel: "KO's", isScreenBig: bigScreen, higherIsBetter: true),
+                StatCellNum(playerStat: record!.stats.cps, playerStatLabel: "Climb speed\n(Peak: ${f2.format(record!.stats.zenith!.peakrank)})", fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true),
+                StatCellNum(playerStat: record!.stats.topBtB, playerStatLabel: "Top B2B\nchain", isScreenBig: bigScreen, higherIsBetter: true)
               ],
             ),
             FinesseThingy(record?.stats.finesse, record?.stats.finessePercentage),
