@@ -2,12 +2,10 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart' show teto;
 import 'package:tetra_stats/utils/filesizes_converter.dart';
 import 'package:tetra_stats/views/states_view.dart';
-import 'package:tetra_stats/widgets/text_timestamp.dart';
 import 'package:window_manager/window_manager.dart';
 
 late String oldWindowTitle;

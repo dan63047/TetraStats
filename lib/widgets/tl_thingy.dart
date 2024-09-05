@@ -1,14 +1,11 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:tetra_stats/data_objects/tetrio.dart';
+import 'package:tetra_stats/data_objects/player_leaderboard_position.dart';
+import 'package:tetra_stats/data_objects/tetra_league.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
-import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/utils/colors_functions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
-import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/widgets/gauget_num.dart';
 import 'package:tetra_stats/widgets/graphs.dart';
 import 'package:tetra_stats/widgets/stat_sell_num.dart';
@@ -80,8 +77,6 @@ class _TLThingyState extends State<TLThingy> with TickerProviderStateMixin {
           return Column(
             children: [
               if (widget.showTitle) Text(t.tetraLeague, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-              //if (DateTime.now().isBefore(seasonEnd)) Text(t.seasonEnds(countdown: countdown(seasonLeft)))
-              //else Text(t.seasonEnded),
               if (oldTl != null) Text(t.comparingWith(newDate: timestamp(currentTl.timestamp), oldDate: timestamp(oldTl!.timestamp)),
               textAlign: TextAlign.center,),
               if (oldTl != null) RangeSlider(values: _currentRangeValues, max: widget.states.length.toDouble(),
@@ -95,7 +90,7 @@ class _TLThingyState extends State<TLThingy> with TickerProviderStateMixin {
                     if (values.start.round() == 0){
                       currentTl = widget.tl;
                     }else{
-                      currentTl = sortedStates[values.start.round()-1]!;
+                      currentTl = sortedStates[values.start.round()-1];
                     }
                     if (values.end.round() == 0){
                       oldTl = widget.tl;
@@ -207,7 +202,6 @@ class _TLThingyState extends State<TLThingy> with TickerProviderStateMixin {
                                 oldPlayerStat: oldTl?.nerdStats?.appdsp,),
                             StatCellNum(playerStat: currentTl.nerdStats!.cheese, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.cheese,
                             pos: widget.lbPositions?.cheese,
-                            //averageStat: rankAverages?.nerdStats?.cheese, TODO: questonable
                             alertWidgets: [Text(t.statCellNum.cheeseDescription),
                                 Text("${t.formula}: (DS/P * 150) + ((VS/APM - 2) * 50) + (0.6 - APP) * 125"),
                                 Text("${t.exactValue}: ${currentTl.nerdStats!.cheese}"),],

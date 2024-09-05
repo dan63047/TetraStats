@@ -11,8 +11,25 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:tetra_stats/data_objects/tetra_stats.dart';
-import 'package:tetra_stats/data_objects/tetrio.dart';
+import 'package:tetra_stats/data_objects/beta_record.dart';
+import 'package:tetra_stats/data_objects/distinguishment.dart';
+import 'package:tetra_stats/data_objects/news.dart';
+import 'package:tetra_stats/data_objects/news_entry.dart';
+import 'package:tetra_stats/data_objects/player_leaderboard_position.dart';
+import 'package:tetra_stats/data_objects/record_extras.dart';
+import 'package:tetra_stats/data_objects/record_single.dart';
+import 'package:tetra_stats/data_objects/singleplayer_stream.dart';
+import 'package:tetra_stats/data_objects/summaries.dart';
+import 'package:tetra_stats/data_objects/tetra_league.dart';
+import 'package:tetra_stats/data_objects/tetra_league_alpha_record.dart';
+import 'package:tetra_stats/data_objects/tetra_league_alpha_stream.dart';
+import 'package:tetra_stats/data_objects/tetra_league_beta_stream.dart';
+import 'package:tetra_stats/data_objects/p1nkl0bst3r.dart';
+import 'package:tetra_stats/data_objects/tetrio_constants.dart';
+import 'package:tetra_stats/data_objects/tetrio_player.dart';
+import 'package:tetra_stats/data_objects/tetrio_player_from_leaderboard.dart';
+import 'package:tetra_stats/data_objects/tetrio_players_leaderboard.dart';
+import 'package:tetra_stats/data_objects/tetrio_zen.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart' show prefs, teto;
 import 'package:tetra_stats/services/crud_exceptions.dart';
@@ -338,7 +355,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       appBar: AppBar(
         title: _showSearchBar ? SearchBox(onSubmit: changePlayer, bigScreen: MediaQuery.of(context).size.width > 768) : Text(title, style: const TextStyle(shadows: textShadow)), 
         backgroundColor: Colors.black,
-        actions: widget.player == null ? [ // search bar and PopupMenuButton hidden if player provided TODO: Subject to change
+        actions: widget.player == null ? [ // search bar and PopupMenuButton hidden if player provided
           _showSearchBar
             ? IconButton(
                 onPressed: () {
@@ -1555,7 +1572,7 @@ class _OtherThingy extends StatelessWidget {
             child: Column(
               children: [
                 Text(t.bio, style: TextStyle(fontFamily: "Eurostile Round Extended",fontSize: bigScreen ? 42 : 28)),
-                MarkdownBody(data: bio!, styleSheet: MarkdownStyleSheet(textScaleFactor: 1.5, textAlign: WrapAlignment.center)) // Text(bio!, style: const TextStyle(fontSize: 18)),
+                MarkdownBody(data: bio!, styleSheet: MarkdownStyleSheet(textScaler: TextScaler.linear(1.5), textAlign: WrapAlignment.center)) // Text(bio!, style: const TextStyle(fontSize: 18)),
               ],
             ),
           ),

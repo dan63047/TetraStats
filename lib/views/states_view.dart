@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:tetra_stats/data_objects/tetrio.dart';
+import 'package:tetra_stats/data_objects/tetra_league.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart' show teto;
 import 'package:tetra_stats/utils/numers_formats.dart';

@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:go_router/go_router.dart';
-import 'package:tetra_stats/data_objects/tetrio.dart';
+import 'package:tetra_stats/data_objects/tetrio_player.dart';
 import 'package:tetra_stats/main.dart' show packageInfo, teto, prefs;
 import 'package:file_selector/file_selector.dart';
 import 'package:file_picker/file_picker.dart';

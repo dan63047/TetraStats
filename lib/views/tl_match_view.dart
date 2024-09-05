@@ -1,6 +1,9 @@
 // ignore_for_file: use_build_context_synchronously, type_literal_in_constant_pattern
 
 import 'dart:io';
+import 'package:tetra_stats/data_objects/beta_league_round.dart';
+import 'package:tetra_stats/data_objects/beta_league_stats.dart';
+import 'package:tetra_stats/data_objects/beta_record.dart';
 import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/views/compare_view.dart' show CompareThingy;
@@ -10,7 +13,6 @@ import 'package:tetra_stats/widgets/vs_graphs.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/open_in_browser.dart';
 import 'package:window_manager/window_manager.dart';

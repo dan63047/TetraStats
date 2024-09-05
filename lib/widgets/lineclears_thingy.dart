@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tetra_stats/data_objects/tetrio.dart';
+import 'package:tetra_stats/data_objects/clears.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 
 class LineclearsThingy extends StatelessWidget{

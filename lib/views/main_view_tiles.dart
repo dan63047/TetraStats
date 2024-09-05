@@ -6,7 +6,23 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
-import 'package:tetra_stats/data_objects/tetra_stats.dart';
+import 'package:tetra_stats/data_objects/badge.dart';
+import 'package:tetra_stats/data_objects/beta_record.dart';
+import 'package:tetra_stats/data_objects/distinguishment.dart';
+import 'package:tetra_stats/data_objects/est_tr.dart';
+import 'package:tetra_stats/data_objects/nerd_stats.dart';
+import 'package:tetra_stats/data_objects/news.dart';
+import 'package:tetra_stats/data_objects/news_entry.dart';
+import 'package:tetra_stats/data_objects/p1nkl0bst3r.dart';
+import 'package:tetra_stats/data_objects/playstyle.dart';
+import 'package:tetra_stats/data_objects/record_extras.dart';
+import 'package:tetra_stats/data_objects/record_single.dart';
+import 'package:tetra_stats/data_objects/singleplayer_stream.dart';
+import 'package:tetra_stats/data_objects/summaries.dart';
+import 'package:tetra_stats/data_objects/tetra_league.dart';
+import 'package:tetra_stats/data_objects/tetra_league_beta_stream.dart';
+import 'package:tetra_stats/data_objects/tetrio_constants.dart';
+import 'package:tetra_stats/data_objects/tetrio_player.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/utils/colors_functions.dart';
@@ -20,9 +36,7 @@ import 'package:tetra_stats/widgets/graphs.dart';
 import 'package:tetra_stats/widgets/lineclears_thingy.dart';
 import 'package:tetra_stats/widgets/list_tile_trailing_stats.dart';
 import 'package:tetra_stats/widgets/sp_trailing_stats.dart';
-import 'package:tetra_stats/widgets/stat_sell_num.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
-import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/widgets/tl_progress_bar.dart';
 import 'package:tetra_stats/widgets/user_thingy.dart';
@@ -594,6 +608,35 @@ class RecordSummary extends StatelessWidget{
   
 }
 
+class LeagueCard extends StatelessWidget{
+  final TetraLeague league;
+  final bool showSeasonNumber;
+
+  const LeagueCard({super.key, required this.league, this.showSeasonNumber = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20.0, 8.0, 20.0, 12.0),
+        child: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(showSeasonNumber ? "Season ${league.season}" : "Tetra League", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, height: 0.9)),
+              const Divider(color: Color.fromARGB(50, 158, 158, 158)),
+              TLRatingThingy(userID: "", tlData: league, showPositions: true),
+              const Divider(color: Color.fromARGB(50, 158, 158, 158)),
+              Text("${league.apm != null ? f2.format(league.apm) : "-.--"} APM • ${league.pps != null ? f2.format(league.pps) : "-.--"} PPS • ${league.vs != null ? f2.format(league.vs) : "-.--"} VS • ${league.nerdStats != null ? f2.format(league.nerdStats!.app) : "-.--"} APP • ${league.nerdStats != null ? f2.format(league.nerdStats!.vsapm) : "-.--"} VS/APM", style: const TextStyle(color: Colors.grey))
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+}
+
 class _DestinationHomeState extends State<DestinationHome> {
   Cards rightCard = Cards.overview;
   CardMod cardMod = CardMod.info;
@@ -645,23 +688,7 @@ class _DestinationHomeState extends State<DestinationHome> {
             ),
           ),
         ),
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20.0, 8.0, 20.0, 12.0),
-            child: Center(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Text("Tetra League", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, height: 0.9)),
-                  const Divider(color: Color.fromARGB(50, 158, 158, 158)),
-                  TLRatingThingy(userID: "", tlData: summaries.league, showPositions: true),
-                  const Divider(color: Color.fromARGB(50, 158, 158, 158)),
-                  Text("${summaries.league.apm != null ? f2.format(summaries.league.apm) : "-.--"} APM • ${summaries.league.pps != null ? f2.format(summaries.league.pps) : "-.--"} PPS • ${summaries.league.vs != null ? f2.format(summaries.league.vs) : "-.--"} VS • ${summaries.league.nerdStats != null ? f2.format(summaries.league.nerdStats!.app) : "-.--"} APP • ${summaries.league.nerdStats != null ? f2.format(summaries.league.nerdStats!.vsapm) : "-.--"} VS/APM", style: const TextStyle(color: Colors.grey))
-                ],
-              ),
-            ),
-          ),
-        ),
+        LeagueCard(league: summaries.league),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -840,6 +867,7 @@ class _DestinationHomeState extends State<DestinationHome> {
     return Column(
       children: [
         Card(
+          //surfaceTintColor: rankColors[data.rank],
           child: Padding(
             padding: const EdgeInsets.only(bottom: 4.0),
             child: Center(
@@ -856,6 +884,7 @@ class _DestinationHomeState extends State<DestinationHome> {
         ),
         TetraLeagueThingy(league: data, cutoffs: cutoffs),
         if (data.nerdStats != null) Card(
+          //surfaceTintColor: rankColors[data.rank],
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -867,6 +896,31 @@ class _DestinationHomeState extends State<DestinationHome> {
         ),
         if (data.nerdStats != null) NerdStatsThingy(nerdStats: data.nerdStats!),
         if (data.nerdStats != null) GraphsThingy(nerdStats: data.nerdStats!, playstyle: data.playstyle!, apm: data.apm!, pps: data.pps!, vs: data.vs!)
+      ],
+    );
+  }
+
+  Widget getPreviousSeasonsList(Map<int, TetraLeague> pastLeague){
+    return Column(
+      children: [
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 4.0),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text("Previous Seasons", style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                  //Text("${t.seasonStarts} ${countdown(postSeasonLeft)}", textAlign: TextAlign.center)
+                ],
+              ),
+            ),
+          ),
+        ),
+        for (var key in pastLeague.keys) Card(
+          child: LeagueCard(league: pastLeague[key]!, showSeasonNumber: true),
+        )
       ],
     );
   }
@@ -1374,6 +1428,10 @@ class _DestinationHomeState extends State<DestinationHome> {
             label: Text('Standing'),
           ),
         const ButtonSegment<CardMod>(
+            value: CardMod.ex, // yeah i misusing my own Enum shut the fuck up
+            label: Text('Previous Seasons'),
+          ),
+        const ButtonSegment<CardMod>(
             value: CardMod.records,
             label: Text('Recent Matches'),
           ),
@@ -1436,10 +1494,10 @@ class _DestinationHomeState extends State<DestinationHome> {
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(t.errors.noSuchUser, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                  Text(snapshot.error.toString(), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0),
-                    child: Text(t.errors.noSuchUserSub, textAlign: TextAlign.center),
+                    child: Text(snapshot.stackTrace.toString(), textAlign: TextAlign.center),
                   ),
                 ],
               )
@@ -1524,6 +1582,7 @@ class _DestinationHomeState extends State<DestinationHome> {
                             Cards.overview => getOverviewCard(snapshot.data!.summaries!),
                             Cards.tetraLeague => switch (cardMod){
                               CardMod.info => getTetraLeagueCard(snapshot.data!.summaries!.league, snapshot.data!.cutoffs),
+                              CardMod.ex => getPreviousSeasonsList(snapshot.data!.summaries!.pastLeague),
                               CardMod.records => getRecentTLrecords(widget.constraints),
                               _ => const Center(child: Text("huh?"))
                             },
@@ -1532,7 +1591,6 @@ class _DestinationHomeState extends State<DestinationHome> {
                               CardMod.records => getListOfRecords("zenith/recent", "zenith/top", widget.constraints),
                               CardMod.ex => getZenithCard(snapshot.data?.summaries!.zenithEx),
                               CardMod.exRecords => getListOfRecords("zenithex/recent", "zenithex/top", widget.constraints),
-                              _ => const Center(child: Text("huh?"))
                             },
                             Cards.sprint => switch (cardMod){
                               CardMod.info => getRecordCard(snapshot.data?.summaries!.sprint, sprintBetterThanRankAverage, closestAverageSprint, sprintBetterThanClosestAverage, snapshot.data!.summaries!.league.rank),
@@ -2356,6 +2414,7 @@ class TetraLeagueThingy extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return Card(
+      //surfaceTintColor: rankColors[league.rank],
       child: Column(
         children: [
           TLRatingThingy(userID: "w", tlData: league),

@@ -1,7 +1,12 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'tetrio.dart';
+import 'package:tetra_stats/data_objects/clears.dart';
+import 'package:tetra_stats/data_objects/end_context_multi.dart';
+import 'package:tetra_stats/data_objects/est_tr.dart';
+import 'package:tetra_stats/data_objects/finesse.dart';
+import 'package:tetra_stats/data_objects/nerd_stats.dart';
+import 'package:tetra_stats/data_objects/playstyle.dart';
 
 // I want to implement those fancy TWC stats
 // So, i'm going to read replay for things

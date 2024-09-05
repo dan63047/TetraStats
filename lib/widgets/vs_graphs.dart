@@ -1,7 +1,9 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:tetra_stats/data_objects/nerd_stats.dart';
+import 'package:tetra_stats/data_objects/playstyle.dart';
+import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 import 'package:tetra_stats/widgets/graphs.dart' show MyRadarChart;
-import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 
 class VsGraphs extends StatelessWidget{
