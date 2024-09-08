@@ -57,22 +57,35 @@ class TetraLeague {
       this.apm,
       this.pps,
       this.vs,
-      required this.season}){
-        nerdStats = (apm != null && pps != null && vs != null) ? NerdStats(apm!, pps!, vs!) : null;
-        estTr = (nerdStats != null) ? EstTr(apm!, pps!, vs!, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp, nerdStats!.gbe) : null;
-        playstyle =(nerdStats != null) ? Playstyle(apm!, pps!, nerdStats!.app, nerdStats!.vsapm, nerdStats!.dsp, nerdStats!.gbe, estTr!.srarea, estTr!.statrank) : null;
-      }
+      required this.season}) {
+    nerdStats = (apm != null && pps != null && vs != null)
+        ? NerdStats(apm!, pps!, vs!)
+        : null;
+    estTr = (nerdStats != null)
+        ? EstTr(apm!, pps!, vs!, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp,
+            nerdStats!.gbe)
+        : null;
+    playstyle = (nerdStats != null)
+        ? Playstyle(apm!, pps!, nerdStats!.app, nerdStats!.vsapm,
+            nerdStats!.dsp, nerdStats!.gbe, estTr!.srarea, estTr!.statrank)
+        : null;
+  }
 
   double get winrate => gamesWon / gamesPlayed;
   double get s1tr => gxe * 250;
 
-  TetraLeague.fromJson(Map<String, dynamic> json, ts, int s, String i) {
-    timestamp = ts;
+  TetraLeague.fromJson(
+      Map<String, dynamic> json, DateTime? ts, int s, String i) {
+    timestamp = ts != null ? ts : seasonEnds[s - 1];
     season = s;
     id = i;
     gamesPlayed = json['gamesplayed'] ?? 0;
     gamesWon = json['gameswon'] ?? 0;
-    tr = json['tr'] != null ? json['tr'].toDouble() : json['rating'] != null ? json['rating'].toDouble() : -1;
+    tr = json['tr'] != null
+        ? json['tr'].toDouble()
+        : json['rating'] != null
+            ? json['rating'].toDouble()
+            : -1;
     glicko = json['glicko']?.toDouble();
     rd = json['rd'] != null ? json['rd']!.toDouble() : noTrRd;
     gxe = json['gxe'] != null ? json['gxe'].toDouble() : -1;
@@ -81,38 +94,67 @@ class TetraLeague {
     apm = json['apm']?.toDouble();
     pps = json['pps']?.toDouble();
     vs = json['vs']?.toDouble();
-    decaying = switch(json['decaying'].runtimeType){
+    decaying = switch (json['decaying'].runtimeType) {
       int => json['decaying'] == 1,
       bool => json['decaying'],
       _ => false
     };
     standing = json['standing'] ?? json['placement'] ?? -1;
-    percentile = json['percentile'] != null ? json['percentile'].toDouble() : rankCutoffs[rank];
+    percentile = json['percentile'] != null
+        ? json['percentile'].toDouble()
+        : rankCutoffs[rank];
     standingLocal = json['standing_local'] ?? -1;
     prevRank = json['prev_rank'];
     prevAt = json['prev_at'] ?? -1;
     nextRank = json['next_rank'];
     nextAt = json['next_at'] ?? -1;
     percentileRank = json['percentile_rank'] ?? rank;
-    nerdStats = (apm != null && pps != null && vs != null) ? NerdStats(apm!, pps!, vs!) : null;
-    estTr = (nerdStats != null) ? EstTr(apm!, pps!, vs!, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp, nerdStats!.gbe) : null;
-    playstyle = (nerdStats != null) ? Playstyle(apm!, pps!, nerdStats!.app, nerdStats!.vsapm, nerdStats!.dsp, nerdStats!.gbe, estTr!.srarea, estTr!.statrank) : null;
+    nerdStats = (apm != null && pps != null && vs != null)
+        ? NerdStats(apm!, pps!, vs!)
+        : null;
+    estTr = (nerdStats != null)
+        ? EstTr(apm!, pps!, vs!, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp,
+            nerdStats!.gbe)
+        : null;
+    playstyle = (nerdStats != null)
+        ? Playstyle(apm!, pps!, nerdStats!.app, nerdStats!.vsapm,
+            nerdStats!.dsp, nerdStats!.gbe, estTr!.srarea, estTr!.statrank)
+        : null;
   }
 
   @override
-  bool operator ==(covariant TetraLeague other) => gamesPlayed == other.gamesPlayed && rd == other.rd;
+  bool operator ==(covariant TetraLeague other) =>
+      gamesPlayed == other.gamesPlayed && rd == other.rd;
 
-  bool lessStrictCheck (covariant TetraLeague other) => gamesPlayed == other.gamesPlayed && glicko == other.glicko;
+  bool lessStrictCheck(covariant TetraLeague other) =>
+      gamesPlayed == other.gamesPlayed && glicko == other.glicko;
 
   double? get esttracc => (estTr != null) ? estTr!.esttr - tr : null;
 
-  TetrioPlayerFromLeaderboard convertToPlayerFromLeaderboard(String id) => TetrioPlayerFromLeaderboard(
-    id, "", "user", -1, null, timestamp, gamesPlayed, gamesWon,
-    tr, gxe, glicko??0, rd??noTrRd, rank, bestRank, apm??0, pps??0, vs??0, decaying);
+  TetrioPlayerFromLeaderboard convertToPlayerFromLeaderboard(String id) =>
+      TetrioPlayerFromLeaderboard(
+          id,
+          "",
+          "user",
+          -1,
+          null,
+          timestamp,
+          gamesPlayed,
+          gamesWon,
+          tr,
+          gxe,
+          glicko ?? 0,
+          rd ?? noTrRd,
+          rank,
+          bestRank,
+          apm ?? 0,
+          pps ?? 0,
+          vs ?? 0,
+          decaying);
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id+timestamp.millisecondsSinceEpoch.toRadixString(16);
+    data['id'] = id + timestamp.millisecondsSinceEpoch.toRadixString(16);
     if (gamesPlayed > 0) data['gamesplayed'] = gamesPlayed;
     if (gamesWon > 0) data['gameswon'] = gamesWon;
     if (tr >= 0) data['tr'] = tr;

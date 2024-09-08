@@ -243,7 +243,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
   bool _smooth = false;
   final List _historyShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR", "Opener", "Plonk", "Inf. DS", "Stride"];
   int _chartsIndex = 0;
-  late List<DropdownMenuItem<List<_HistoryChartSpot>>> chartsData;
+  late List<List<DropdownMenuItem<List<_HistoryChartSpot>>>> historyData;
   //Duration postSeasonLeft = seasonStart.difference(DateTime.now());
 
   @override
@@ -282,10 +282,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
     super.initState();
   }
 
-  Future<List<DropdownMenuItem<List<_HistoryChartSpot>>>> getChartsData(bool fetchHistory) async {
-    List<TetrioPlayer> states = [];
-    Set<TetraLeague> uniqueTL = {};
-
+  Future<List<List<DropdownMenuItem<List<_HistoryChartSpot>>>>> getHistoryData(bool fetchHistory) async {
     if(fetchHistory){
       try{
         var history = await teto.fetchAndsaveTLHistory(widget.searchFor);
@@ -301,49 +298,47 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
       }
     } 
 
-    //states.addAll(await teto.getPlayer(widget.searchFor));
-    // for (var element in states) {
-    //   if (element.tlSeason1 != null && uniqueTL.isNotEmpty && uniqueTL.last != element.tlSeason1) uniqueTL.add(element.tlSeason1!);
-    //   if (uniqueTL.isEmpty) uniqueTL.add(element.tlSeason1!);
-    // }
+    List<List<TetraLeague>> states = await Future.wait<List<TetraLeague>>([
+      teto.getStates(widget.searchFor, season: 1), teto.getStates(widget.searchFor, season: 2),
+    ]);
 
-    if (uniqueTL.length >= 2){
-      chartsData = <DropdownMenuItem<List<_HistoryChartSpot>>>[ // Dumping charts data into dropdown menu items, while cheking if every entry is valid
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.tr)], child: Text(t.statCellNum.tr)),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.glicko!)], child: const Text("Glicko")),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.rd!)], child: const Text("Rating Deviation")),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.apm != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.apm!)], child: Text(t.statCellNum.apm.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.pps != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.pps!)], child: Text(t.statCellNum.pps.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.vs != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.vs!)], child: Text(t.statCellNum.vs.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.app)], child: Text(t.statCellNum.app.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.dss)], child: Text(t.statCellNum.dss.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.dsp)], child: Text(t.statCellNum.dsp.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.appdsp)], child: const Text("APP + DS/P")),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.vsapm)], child: const Text("VS/APM")),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.cheese)], child: Text(t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.gbe)], child: Text(t.statCellNum.gbe.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.nyaapp)], child: Text(t.statCellNum.nyaapp.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.area)], child: Text(t.statCellNum.area.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.estTr != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.estTr!.esttr)], child: Text(t.statCellNum.estOfTR.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.esttracc != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.esttracc!)], child: Text(t.statCellNum.accOfEst.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.playstyle!.opener)], child: const Text("Opener")),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.playstyle!.plonk)], child: const Text("Plonk")),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.playstyle!.infds)], child: const Text("Inf. DS")),
-        DropdownMenuItem(value: [for (var tl in uniqueTL) if (tl.playstyle != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.playstyle!.stride)], child: const Text("Stride")),
-      ];
+    if (states.length >= 2){
+      historyData = [for (List<TetraLeague> s in states) <DropdownMenuItem<List<_HistoryChartSpot>>>[ // Dumping charts data into dropdown menu items, while cheking if every entry is valid
+        DropdownMenuItem(value: [for (var tl in s) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.tr)], child: Text(t.statCellNum.tr)),
+        DropdownMenuItem(value: [for (var tl in s) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.glicko!)], child: const Text("Glicko")),
+        DropdownMenuItem(value: [for (var tl in s) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.rd!)], child: const Text("Rating Deviation")),
+        DropdownMenuItem(value: [for (var tl in s) if (tl.apm != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.apm!)], child: Text(t.statCellNum.apm.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in s) if (tl.pps != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.pps!)], child: Text(t.statCellNum.pps.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in s) if (tl.vs != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.vs!)], child: Text(t.statCellNum.vs.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in s) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.app)], child: Text(t.statCellNum.app.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in s) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.dss)], child: Text(t.statCellNum.dss.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in s) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.dsp)], child: Text(t.statCellNum.dsp.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in s) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.appdsp)], child: const Text("APP + DS/P")),
+        DropdownMenuItem(value: [for (var tl in s) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.vsapm)], child: const Text("VS/APM")),
+        DropdownMenuItem(value: [for (var tl in s) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.cheese)], child: Text(t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in s) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.gbe)], child: Text(t.statCellNum.gbe.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in s) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.nyaapp)], child: Text(t.statCellNum.nyaapp.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in s) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.area)], child: Text(t.statCellNum.area.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in s) if (tl.estTr != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.estTr!.esttr)], child: Text(t.statCellNum.estOfTR.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in s) if (tl.esttracc != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.esttracc!)], child: Text(t.statCellNum.accOfEst.replaceAll(RegExp(r'\n'), " "))),
+        DropdownMenuItem(value: [for (var tl in s) if (tl.playstyle != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.playstyle!.opener)], child: const Text("Opener")),
+        DropdownMenuItem(value: [for (var tl in s) if (tl.playstyle != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.playstyle!.plonk)], child: const Text("Plonk")),
+        DropdownMenuItem(value: [for (var tl in s) if (tl.playstyle != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.playstyle!.infds)], child: const Text("Inf. DS")),
+        DropdownMenuItem(value: [for (var tl in s) if (tl.playstyle != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.playstyle!.stride)], child: const Text("Stride")),
+      ]];
     }else{
-      chartsData = [];
+      historyData = [];
     }
 
     fetchData = false;
 
-    return chartsData;
+    return historyData;
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<DropdownMenuItem<List<_HistoryChartSpot>>>>(
-      future: getChartsData(fetchData),
+    return FutureBuilder<List<List<DropdownMenuItem<List<_HistoryChartSpot>>>>>(
+      future: getHistoryData(fetchData),
       builder: (context, snapshot) {
         switch (snapshot.connectionState){
           case ConnectionState.none:
@@ -352,7 +347,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
             return const Center(child: CircularProgressIndicator());
           case ConnectionState.done:
             if (snapshot.hasData && snapshot.data!.isNotEmpty){
-              List<_HistoryChartSpot> selectedGraph = snapshot.data![_chartsIndex].value!;
+              List<_HistoryChartSpot> selectedGraph = snapshot.data![currentSeason-1][_chartsIndex].value!;
               yAxisTitle = _historyShortTitles[_chartsIndex];
               return SingleChildScrollView(
               scrollDirection: Axis.vertical,
@@ -384,11 +379,11 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                             children: [
                               const Padding(padding: EdgeInsets.all(8.0), child: Text("Y:", style: TextStyle(fontSize: 22))),
                               DropdownButton(
-                                items: chartsData,
-                                value: chartsData[_chartsIndex].value,
+                                items: historyData[currentSeason-1],
+                                value: historyData[currentSeason-1][_chartsIndex].value,
                                 onChanged: (value) {
                                   setState(() {
-                                    _chartsIndex = chartsData.indexWhere((element) => element.value == value);
+                                    _chartsIndex = historyData[currentSeason-1].indexWhere((element) => element.value == value);
                                   });
                                 }
                               ),
@@ -411,7 +406,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                         ],
                       ),
                     ),
-                    if(chartsData[_chartsIndex].value!.length > 1) Card(
+                    if(historyData[currentSeason-1][_chartsIndex].value!.length > 1) Card(
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width - 88,
                         height: MediaQuery.of(context).size.height - 60,
@@ -427,7 +422,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                           series: <CartesianSeries>[
                             if (_gamesPlayedInsteadOfDateAndTime) StepLineSeries<_HistoryChartSpot, int>(
                               enableTooltip: true,
-                              dataSource: chartsData[_chartsIndex].value!,
+                              dataSource: historyData[currentSeason-1][_chartsIndex].value!,
                               animationDuration: 0,
                               opacity: _smooth ? 0 : 1,
                               xValueMapper: (_HistoryChartSpot data, _) => data.gamesPlayed,
@@ -436,14 +431,14 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                               trendlines:<Trendline>[
                                 Trendline(
                                   isVisible: _smooth,
-                                  period: (chartsData[_chartsIndex].value!.length/175).floor(),
+                                  period: (historyData[currentSeason-1][_chartsIndex].value!.length/175).floor(),
                                   type: TrendlineType.movingAverage,
                                   color: Theme.of(context).colorScheme.primary)
                               ],
                             )
                             else StepLineSeries<_HistoryChartSpot, DateTime>(
                               enableTooltip: true,
-                              dataSource: chartsData[_chartsIndex].value!,
+                              dataSource: historyData[currentSeason-1][_chartsIndex].value!,
                               animationDuration: 0,
                               opacity: _smooth ? 0 : 1,
                               xValueMapper: (_HistoryChartSpot data, _) => data.timestamp,
@@ -452,7 +447,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                               trendlines:<Trendline>[
                                 Trendline(
                                   isVisible: _smooth,
-                                  period: (chartsData[_chartsIndex].value!.length/175).floor(),
+                                  period: (historyData[currentSeason-1][_chartsIndex].value!.length/175).floor(),
                                   type: TrendlineType.movingAverage,
                                   color: Theme.of(context).colorScheme.primary)
                               ],
@@ -462,7 +457,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                         )
                       ),
                     )
-                    else if (chartsData[_chartsIndex].value!.length <= 1) Center(child: Column(
+                    else if (historyData[currentSeason-1][_chartsIndex].value!.length <= 1) Center(child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(t.notEnoughData, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
@@ -525,11 +520,12 @@ class DestinationHome extends StatefulWidget{
 class FetchResults{
   bool success;
   TetrioPlayer? player;
+  List<TetraLeague> states;
   Summaries? summaries;
   Cutoffs? cutoffs;
   Exception? exception;
 
-  FetchResults(this.success, this.player, this.summaries, this.cutoffs, this.exception);
+  FetchResults(this.success, this.player, this.states, this.summaries, this.cutoffs, this.exception);
 }
 
 class RecordSummary extends StatelessWidget{
@@ -623,7 +619,19 @@ class LeagueCard extends StatelessWidget{
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(showSeasonNumber ? "Season ${league.season}" : "Tetra League", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, height: 0.9)),
+              if (showSeasonNumber) Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text("Season ${league.season}", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, height: 0.9)),
+                  Spacer(),
+                  Text(
+                    "${seasonStarts.elementAtOrNull(league.season - 1) != null ? timestamp(seasonStarts[league.season - 1]) : "---"} — ${seasonEnds.elementAtOrNull(league.season - 1) != null ? timestamp(seasonEnds[league.season - 1]) : "---"}",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey)),
+                ],
+              )
+              else Text("Tetra League", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, height: 0.9)),
               const Divider(color: Color.fromARGB(50, 158, 158, 158)),
               TLRatingThingy(userID: "", tlData: league, showPositions: true),
               const Divider(color: Color.fromARGB(50, 158, 158, 158)),
@@ -658,7 +666,7 @@ class _DestinationHomeState extends State<DestinationHome> {
         player = await teto.fetchPlayer(widget.searchFor); // Otherwise it's probably a user id or username
       }
     }on TetrioPlayerNotExist{
-      return FetchResults(false, null, null, null, TetrioPlayerNotExist());
+      return FetchResults(false, null, [], null, null, TetrioPlayerNotExist());
     }
     late Summaries summaries;
     late Cutoffs cutoffs;
@@ -666,9 +674,16 @@ class _DestinationHomeState extends State<DestinationHome> {
       teto.fetchSummaries(player.userId),
       teto.fetchCutoffsBeanserver(),
     ]);
+    List<TetraLeague> states = await teto.getStates(player.userId, season: currentSeason);
     summaries = requests[0];
     cutoffs = requests[1];
-    return FetchResults(true, player, summaries, cutoffs, null);
+
+    bool isTracking = await teto.isPlayerTracking(player.userId);
+    if (isTracking){ // if tracked - save data to local DB
+      await teto.storeState(summaries.league);
+    }
+
+    return FetchResults(true, player, states, summaries, cutoffs, null);
   }
 
   Widget getOverviewCard(Summaries summaries){
@@ -863,7 +878,8 @@ class _DestinationHomeState extends State<DestinationHome> {
     );
   }
 
-  Widget getTetraLeagueCard(TetraLeague data, Cutoffs? cutoffs){
+  Widget getTetraLeagueCard(TetraLeague data, Cutoffs? cutoffs, List<TetraLeague> states){
+    TetraLeague? toCompare = states.length >= 2 ? states.elementAtOrNull(states.length-2) : null;
     return Column(
       children: [
         Card(
@@ -876,13 +892,13 @@ class _DestinationHomeState extends State<DestinationHome> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(t.tetraLeague, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
-                  //Text("${t.seasonStarts} ${countdown(postSeasonLeft)}", textAlign: TextAlign.center)
+                  //Text("${states.last.timestamp} ${states.last.tr}", textAlign: TextAlign.center)
                 ],
               ),
             ),
           ),
         ),
-        TetraLeagueThingy(league: data, cutoffs: cutoffs),
+        TetraLeagueThingy(league: data, toCompare: toCompare, cutoffs: cutoffs),
         if (data.nerdStats != null) Card(
           //surfaceTintColor: rankColors[data.rank],
           child: Row(
@@ -894,7 +910,7 @@ class _DestinationHomeState extends State<DestinationHome> {
             ],
           ),
         ),
-        if (data.nerdStats != null) NerdStatsThingy(nerdStats: data.nerdStats!),
+        if (data.nerdStats != null) NerdStatsThingy(nerdStats: data.nerdStats!, oldNerdStats: toCompare?.nerdStats),
         if (data.nerdStats != null) GraphsThingy(nerdStats: data.nerdStats!, playstyle: data.playstyle!, apm: data.apm!, pps: data.pps!, vs: data.vs!)
       ],
     );
@@ -1581,7 +1597,7 @@ class _DestinationHomeState extends State<DestinationHome> {
                           child: switch (rightCard){
                             Cards.overview => getOverviewCard(snapshot.data!.summaries!),
                             Cards.tetraLeague => switch (cardMod){
-                              CardMod.info => getTetraLeagueCard(snapshot.data!.summaries!.league, snapshot.data!.cutoffs),
+                              CardMod.info => getTetraLeagueCard(snapshot.data!.summaries!.league, snapshot.data!.cutoffs, snapshot.data!.states),
                               CardMod.ex => getPreviousSeasonsList(snapshot.data!.summaries!.pastLeague),
                               CardMod.records => getRecentTLrecords(widget.constraints),
                               _ => const Center(child: Text("huh?"))
@@ -2065,12 +2081,10 @@ class BadgesThingy extends StatelessWidget{
                     icon: Image.asset(
                       "res/tetrio_badges/${badge.badgeId}.png",
                       height: 32,
-                      width: 32,
                       errorBuilder: (context, error, stackTrace) {
                         return Image.network(
                           kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioBadge&badge=${badge.badgeId}" : "https://tetr.io/res/badges/${badge.badgeId}.png",
                           height: 32,
-                          width: 32,
                           errorBuilder:(context, error, stackTrace) {
                             return Image.asset("res/icons/kagari.png", height: 32, width: 32);
                           }
@@ -2407,9 +2421,10 @@ class _SearchDrawerState extends State<SearchDrawer>  {
 
 class TetraLeagueThingy extends StatelessWidget{
   final TetraLeague league;
+  final TetraLeague? toCompare;
   final Cutoffs? cutoffs;
 
-  const TetraLeagueThingy({super.key, required this.league, this.cutoffs});
+  const TetraLeagueThingy({super.key, required this.league, this.toCompare, this.cutoffs});
   
   @override
   Widget build(BuildContext context) {
@@ -2422,8 +2437,8 @@ class TetraLeagueThingy extends StatelessWidget{
             tlData: league,
             previousRankTRcutoff: cutoffs != null ? cutoffs!.tr[league.rank != "z" ? league.rank : league.percentileRank] : null,
             nextRankTRcutoff: cutoffs != null ? (league.rank != "z" ? league.rank == "x+" : league.percentileRank == "x+") ? 25000 : cutoffs!.tr[ranks.elementAtOrNull(ranks.indexOf(league.rank != "z" ? league.rank : league.percentileRank)+1)] : null,
-            nextRankTRcutoffTarget: league.rank != "z" ? rankTargets[league.rank] : null,
-            previousRankTRcutoffTarget: (league.rank != "z" && league.rank != "x+") ? rankTargets[ranks.elementAtOrNull(ranks.indexOf(league.rank)+1)] : null,
+            previousRankTRcutoffTarget: league.rank != "z" ? rankTargets[league.rank] : null,
+            nextRankTRcutoffTarget: (league.rank != "z" && league.rank != "x+") ? rankTargets[ranks.elementAtOrNull(ranks.indexOf(league.rank)+1)] : null,
             previousGlickoCutoff: cutoffs != null ? cutoffs!.glicko[league.rank != "z" ? league.rank : league.percentileRank] : null,
             nextRankGlickoCutoff: cutoffs != null ? (league.rank != "z" ? league.rank == "x+" : league.percentileRank == "x+") ? 25000 : cutoffs!.glicko[ranks.elementAtOrNull(ranks.indexOf(league.rank != "z" ? league.rank : league.percentileRank)+1)] : null,
           ),
@@ -2438,16 +2453,19 @@ class TetraLeagueThingy extends StatelessWidget{
                     defaultColumnWidth:const IntrinsicColumnWidth(),
                     children: [
                       TableRow(children: [
-                        const Text("APM: ", style: TextStyle(fontSize: 21)),
                         Text(f2.format(league.apm??0.00), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
+                        const Text(" APM", style: TextStyle(fontSize: 21)),
+                        if (toCompare != null) Text(" (${comparef2.format(league.apm!-toCompare!.apm!)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: getDifferenceColor(league.apm!-toCompare!.apm!)))
                       ]),
                       TableRow(children: [
-                        const Text("PPS: ", style: TextStyle(fontSize: 21)),
                         Text(f2.format(league.pps??0.00), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
+                        const Text(" PPS", style: TextStyle(fontSize: 21)),
+                        if (toCompare != null) Text(" (${comparef2.format(league.pps!-toCompare!.pps!)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: getDifferenceColor(league.pps!-toCompare!.pps!)))
                       ]),
                       TableRow(children: [
-                        const Text("VS: ", style: TextStyle(fontSize: 21)),
                         Text(f2.format(league.vs??0.00), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
+                        const Text(" VS", style: TextStyle(fontSize: 21)),
+                        if (toCompare != null) Text(" (${comparef2.format(league.vs!-toCompare!.vs!)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: getDifferenceColor(league.vs!-toCompare!.vs!)))
                       ])
                     ],
                   ),
@@ -2480,6 +2498,10 @@ class TetraLeagueThingy extends StatelessWidget{
                           GaugeAnnotation(widget: Container(child:
                           Text(t.statCellNum.winrate, textAlign: TextAlign.center)),
                           angle: 270,positionFactor: 0.4
+                          ),
+                          if (toCompare != null) GaugeAnnotation(widget: Container(child:
+                          Text(comparef2.format((league.winrate-toCompare!.winrate)*100), textAlign: TextAlign.center, style: TextStyle(color: getDifferenceColor(league.winrate-toCompare!.winrate)))),
+                          angle: 90,positionFactor: 0.45
                           )
                         ],
                       )
@@ -2495,17 +2517,20 @@ class TetraLeagueThingy extends StatelessWidget{
                       TableRow(children: [
                         //Text("VS: ", style: TextStyle(fontSize: 21)),
                         Text("№ ${league.standingLocal.isNegative ? "---" : intf.format(league.standingLocal)}", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: league.standingLocal.isNegative ? Colors.grey : Colors.white)),
-                        Text(" local", style: TextStyle(fontSize: 21, color: league.standingLocal.isNegative ? Colors.grey : Colors.white))
+                        Text(" local", style: TextStyle(fontSize: 21, color: league.standingLocal.isNegative ? Colors.grey : Colors.white)),
+                        if (toCompare != null) Text(" (${compareIntf.format(league.standingLocal-toCompare!.standingLocal)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: getDifferenceColor(league.standingLocal-toCompare!.standingLocal)))
                       ]),
                       TableRow(children: [
                         //Text("APM: ", style: TextStyle(fontSize: 21)),
                         Text(intf.format(league.gamesPlayed), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
-                        const Text(" Games", style: TextStyle(fontSize: 21))
+                        const Text(" Games", style: TextStyle(fontSize: 21)),
+                        if (toCompare != null) Text(" (${comparef2.format(league.gamesPlayed-toCompare!.gamesPlayed)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: Colors.grey))
                       ]),
                       TableRow(children: [
                         //Text("PPS: ", style: TextStyle(fontSize: 21)),
                         Text(intf.format(league.gamesWon), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
-                        const Text(" Won", style: TextStyle(fontSize: 21))
+                        const Text(" Won", style: TextStyle(fontSize: 21)),
+                        if (toCompare != null) Text(" (${comparef2.format(league.gamesWon-toCompare!.gamesWon)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: Colors.grey))
                       ])
                     ],
                   ),
@@ -2521,8 +2546,9 @@ class TetraLeagueThingy extends StatelessWidget{
 
 class NerdStatsThingy extends StatelessWidget{
   final NerdStats nerdStats;
+  final NerdStats? oldNerdStats;
 
-  const NerdStatsThingy({super.key, required this.nerdStats});
+  const NerdStatsThingy({super.key, required this.nerdStats, this.oldNerdStats});
 
   @override
   Widget build(BuildContext context) {
@@ -2530,7 +2556,7 @@ class NerdStatsThingy extends StatelessWidget{
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 0.0),
+            padding: const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 8.0),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
@@ -2565,7 +2591,7 @@ class NerdStatsThingy extends StatelessWidget{
                                 children: [
                                   const TextSpan(text: "APP\n"),
                                   TextSpan(text: f3.format(nerdStats.app), style: const TextStyle(fontSize: 25, fontFamily: "Eurostile Round Extended", fontWeight: FontWeight.w100)),
-                                //TextSpan(text: "\nAPP"),
+                                  if (oldNerdStats != null) TextSpan(text: "\n${comparef.format(nerdStats.app - oldNerdStats!.app)}", style: TextStyle(color: getDifferenceColor(nerdStats.app - oldNerdStats!.app))),
                                 ]
                             ))),
                             angle: 270,positionFactor: 0.5
@@ -2595,6 +2621,7 @@ class NerdStatsThingy extends StatelessWidget{
                                 children: [
                                   const TextSpan(text: "VS/APM\n"),
                                   TextSpan(text: f3.format(nerdStats.vsapm), style: const TextStyle(fontSize: 25, fontFamily: "Eurostile Round Extended", fontWeight: FontWeight.w100)),
+                                  if (oldNerdStats != null) TextSpan(text: "\n${comparef.format(nerdStats.vsapm - oldNerdStats!.vsapm)}", style: TextStyle(color: getDifferenceColor(nerdStats.vsapm - oldNerdStats!.vsapm))),
                                 ]
                             ))),
                             angle: 90,positionFactor: 0.5
@@ -2608,15 +2635,17 @@ class NerdStatsThingy extends StatelessWidget{
                 Expanded(
                   child: Wrap(
                     alignment: WrapAlignment.center,
-                    spacing: 10,
+                    spacing: 10.0,
+                    runSpacing: 10.0,
+                    runAlignment: WrapAlignment.start,
                     children: [
-                      GaugetThingy(value: nerdStats.dss, min: 0, max: 1.0, tickInterval: .2, label: "DS/S", sideSize: 128.0, fractionDigits: 3),
-                      GaugetThingy(value: nerdStats.dsp, min: 0, max: 1.0, tickInterval: .2, label: "DS/P", sideSize: 128.0, fractionDigits: 3),
-                      GaugetThingy(value: nerdStats.appdsp, min: 0, max: 1.2, tickInterval: .2, label: "APP+DS/P", sideSize: 128.0, fractionDigits: 3),
-                      GaugetThingy(value: nerdStats.cheese, min: -80, max: 80, tickInterval: 40, label: "Cheese", sideSize: 128.0, fractionDigits: 2),
-                      GaugetThingy(value: nerdStats.gbe, min: 0, max: 1.0, tickInterval: .2, label: "GbE", sideSize: 128.0, fractionDigits: 3),
-                      GaugetThingy(value: nerdStats.nyaapp, min: 0, max: 1.2, tickInterval: .2, label: "wAPP", sideSize: 128.0, fractionDigits: 3),
-                      GaugetThingy(value: nerdStats.area, min: 0, max: 1000, tickInterval: 100, label: "Area", sideSize: 128.0, fractionDigits: 1),
+                      GaugetThingy(value: nerdStats.dss, oldValue: oldNerdStats?.dss, min: 0, max: 1.0, tickInterval: .2, label: "DS/S", sideSize: 128.0, fractionDigits: 3, moreIsBetter: true),
+                      GaugetThingy(value: nerdStats.dsp, oldValue: oldNerdStats?.dsp, min: 0, max: 1.0, tickInterval: .2, label: "DS/P", sideSize: 128.0, fractionDigits: 3, moreIsBetter: true),
+                      GaugetThingy(value: nerdStats.appdsp, oldValue: oldNerdStats?.appdsp, min: 0, max: 1.2, tickInterval: .2, label: "APP+DS/P", sideSize: 128.0, fractionDigits: 3, moreIsBetter: true),
+                      GaugetThingy(value: nerdStats.cheese, oldValue: oldNerdStats?.cheese, min: -80, max: 80, tickInterval: 40, label: "Cheese", sideSize: 128.0, fractionDigits: 2, moreIsBetter: false),
+                      GaugetThingy(value: nerdStats.gbe, oldValue: oldNerdStats?.gbe, min: 0, max: 1.0, tickInterval: .2, label: "GbE", sideSize: 128.0, fractionDigits: 3, moreIsBetter: true),
+                      GaugetThingy(value: nerdStats.nyaapp, oldValue: oldNerdStats?.nyaapp, min: 0, max: 1.2, tickInterval: .2, label: "wAPP", sideSize: 128.0, fractionDigits: 3, moreIsBetter: true),
+                      GaugetThingy(value: nerdStats.area, oldValue: oldNerdStats?.area, min: 0, max: 1000, tickInterval: 100, label: "Area", sideSize: 128.0, fractionDigits: 1, moreIsBetter: true),
                     ],
                   ),
                 )
@@ -2667,12 +2696,14 @@ class GaugetThingy extends StatelessWidget{
   final double value;
   final double min;
   final double max;
+  final double? oldValue;
+  final bool moreIsBetter;
   final double tickInterval;
   final String label;
   final double sideSize;
   final int fractionDigits;
 
-  GaugetThingy({super.key, required this.value, required this.min, required this.max, required this.tickInterval, required this.label, required this.sideSize, required this.fractionDigits});
+  GaugetThingy({super.key, required this.value, required this.min, required this.max, this.oldValue, required this.tickInterval, required this.label, required this.sideSize, required this.fractionDigits, required this.moreIsBetter});
 
   @override
   Widget build(BuildContext context) {
@@ -2704,6 +2735,10 @@ class GaugetThingy extends StatelessWidget{
                 GaugeAnnotation(widget: Container(child:
                 Text(label, textAlign: TextAlign.center, style: const TextStyle(height: .9))),
                 angle: 270,positionFactor: 0.4
+                ),
+                if (oldValue != null) GaugeAnnotation(widget: Container(child:
+                Text(comparef2.format(value-oldValue!), textAlign: TextAlign.center, style: TextStyle(color: getDifferenceColor(moreIsBetter ? value-oldValue! : oldValue!-value)))),
+                angle: 90,positionFactor: 0.45
                 )
               ],
             )

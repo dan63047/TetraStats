@@ -166,17 +166,17 @@ class MyRadarChartPainter extends RadarChartPainter{
           );
         }
 
-        _ticksTextPaint
-          ..text = TextSpan(
-            text: percentage.format(tick),
-            style: Utils().getThemeAwareTextStyle(context, data.ticksTextStyle),
-          )
-          ..textDirection = TextDirection.ltr
-          ..layout(maxWidth: size.width);
-        canvasWrapper.drawText(
-          _ticksTextPaint,
-          Offset(centerX + 5, centerY - tickRadius - _ticksTextPaint.height/2),
-        );
+        // _ticksTextPaint
+        //   ..text = TextSpan(
+        //     text: percentage.format(tick),
+        //     style: Utils().getThemeAwareTextStyle(context, data.ticksTextStyle),
+        //   )
+        //   ..textDirection = TextDirection.ltr
+        //   ..layout(maxWidth: size.width);
+        // canvasWrapper.drawText(
+        //   _ticksTextPaint,
+        //   Offset(centerX + 5, centerY - tickRadius - _ticksTextPaint.height/2),
+        // );
       },
     );
   }
@@ -302,12 +302,12 @@ class Graphs extends StatelessWidget{
             width: 310,
             child: MyRadarChart(
               RadarChartData(
-                radarShape: RadarShape.polygon,
+                radarShape: RadarShape.circle,
                 tickCount: 4,
-                ticksTextStyle: const TextStyle(color: Colors.transparent, fontSize: 10),
-                radarBorderData: const BorderSide(color: Colors.transparent, width: 1),
+                radarBackgroundColor: Colors.black.withAlpha(170),
+                radarBorderData: const BorderSide(color: Colors.white24, width: 1),
                 gridBorderData: const BorderSide(color: Colors.white24, width: 1),
-                tickBorderData: const BorderSide(color: Colors.transparent, width: 1),
+                tickBorderData: const BorderSide(color: Colors.white24, width: 1),
                 getTitle: (index, angle) {
                   switch (index) {
                     case 0:
@@ -336,7 +336,7 @@ class Graphs extends StatelessWidget{
                 },
                 dataSets: [
                   RadarDataSet(
-                    fillColor: Theme.of(context).colorScheme.primary.withAlpha(100),
+                    fillColor: Theme.of(context).colorScheme.primary.withAlpha(170),
                     borderColor: Theme.of(context).colorScheme.primary,
                     dataEntries: [
                       RadarEntry(value: apm * apmWeight),
@@ -381,12 +381,12 @@ class Graphs extends StatelessWidget{
             width: 310,
             child: MyRadarChart(
               RadarChartData(
-                radarShape: RadarShape.polygon,
+                radarShape: RadarShape.circle,
                 tickCount: 4,
-                ticksTextStyle: const TextStyle(color: Colors.white24, fontSize: 10),
-                radarBorderData: const BorderSide(color: Colors.transparent, width: 1),
+                radarBackgroundColor: Colors.black.withAlpha(170),
+                radarBorderData: const BorderSide(color: Colors.white24, width: 1),
                 gridBorderData: const BorderSide(color: Colors.white24, width: 1),
-                tickBorderData: const BorderSide(color: Colors.transparent, width: 1),
+                tickBorderData: const BorderSide(color: Colors.white24, width: 1),
                 titleTextStyle: const TextStyle(height: 1.1),
                 radarTouchData: RadarTouchData(),
                 getTitle: (index, angle) {
@@ -405,7 +405,7 @@ class Graphs extends StatelessWidget{
                 },
                 dataSets: [
                   RadarDataSet(
-                    fillColor: Theme.of(context).colorScheme.primary.withAlpha(100),
+                    fillColor: Theme.of(context).colorScheme.primary.withAlpha(170),
                     borderColor: Theme.of(context).colorScheme.primary,
                     dataEntries: [
                       RadarEntry(value: playstyle.opener),
@@ -438,12 +438,12 @@ class Graphs extends StatelessWidget{
             width: 310,
             child: MyRadarChart(
               RadarChartData(
-                radarShape: RadarShape.polygon,
+                radarShape: RadarShape.circle,
                 tickCount: 4,
-                ticksTextStyle: const TextStyle(color: Colors.white24, fontSize: 10),
-                radarBorderData: const BorderSide(color: Colors.transparent, width: 1),
+                radarBackgroundColor: Colors.black.withAlpha(170),
+                radarBorderData: const BorderSide(color: Colors.white24, width: 1),
                 gridBorderData: const BorderSide(color: Colors.white24, width: 1),
-                tickBorderData: const BorderSide(color: Colors.transparent, width: 1),
+                tickBorderData: const BorderSide(color: Colors.white24, width: 1),
                 titleTextStyle: const TextStyle(height: 1.1),
                 radarTouchData: RadarTouchData(),
                 getTitle: (index, angle) {
@@ -462,7 +462,7 @@ class Graphs extends StatelessWidget{
                 },
                 dataSets: [
                   RadarDataSet(
-                    fillColor: Theme.of(context).colorScheme.primary.withAlpha(100),
+                    fillColor: Theme.of(context).colorScheme.primary.withAlpha(170),
                     borderColor: Theme.of(context).colorScheme.primary,
                     dataEntries: [
                       RadarEntry(value: attack),

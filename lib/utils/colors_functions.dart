@@ -8,3 +8,7 @@ Color getColorOfRank(int rank){
     if (rank <= 99) return Colors.greenAccent;
     return Colors.grey;
 }
+
+Color getDifferenceColor(num diff){
+  return diff.isNegative ? Colors.redAccent : Colors.greenAccent;
+}
