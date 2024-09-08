@@ -1154,7 +1154,7 @@ class TetrioService extends DB {
       if (kIsWeb) {
         dUrl = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "tetrioUserByDiscordID", "user": user.toLowerCase().trim()});
       } else {
-        dUrl = Uri.https('ch.tetr.io', 'api/users/search/${user.toLowerCase().trim()}');
+        dUrl = Uri.https('ch.tetr.io', 'api/users/search/discord:${user.toLowerCase().trim()}');
       }
       try{
         final response = await client.get(dUrl);
