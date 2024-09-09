@@ -233,8 +233,13 @@ class DestinationGraphs extends StatefulWidget{
   State<DestinationGraphs> createState() => _DestinationGraphsState();
 }
 
+enum Graph{
+  history,
+  leagueState,
+  leagueCutoffs
+}
+
 class _DestinationGraphsState extends State<DestinationGraphs> {
-  Cards rightCard = Cards.tetraLeague;
   bool fetchData = false;
   bool _gamesPlayedInsteadOfDateAndTime = false;
   late ZoomPanBehavior _zoomPanBehavior;
@@ -242,7 +247,9 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
   String yAxisTitle = "";
   bool _smooth = false;
   final List _historyShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR", "Opener", "Plonk", "Inf. DS", "Stride"];
+  Graph _graph = Graph.history;
   int _chartsIndex = 0;
+  int _season = currentSeason-1;
   late List<List<DropdownMenuItem<List<_HistoryChartSpot>>>> historyData;
   //Duration postSeasonLeft = seasonStart.difference(DateTime.now());
 
@@ -337,163 +344,202 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<List<DropdownMenuItem<List<_HistoryChartSpot>>>>>(
-      future: getHistoryData(fetchData),
-      builder: (context, snapshot) {
-        switch (snapshot.connectionState){
-          case ConnectionState.none:
-          case ConnectionState.waiting:
-          case ConnectionState.active:
-            return const Center(child: CircularProgressIndicator());
-          case ConnectionState.done:
-            if (snapshot.hasData && snapshot.data!.isNotEmpty){
-              List<_HistoryChartSpot> selectedGraph = snapshot.data![currentSeason-1][_chartsIndex].value!;
-              yAxisTitle = _historyShortTitles[_chartsIndex];
-              return SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Card(
-                      child: Wrap(
-                        spacing: 20,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Padding(padding: EdgeInsets.all(8.0), child: Text("X:", style: TextStyle(fontSize: 22))),
-                              DropdownButton(
-                                items: const [DropdownMenuItem(value: false, child: Text("Date & Time")), DropdownMenuItem(value: true, child: Text("Games Played"))],
-                                value: _gamesPlayedInsteadOfDateAndTime,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _gamesPlayedInsteadOfDateAndTime = value!;
-                                  });
-                                }
-                              ),
-                              ],
-                          ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Padding(padding: EdgeInsets.all(8.0), child: Text("Y:", style: TextStyle(fontSize: 22))),
-                              DropdownButton(
-                                items: historyData[currentSeason-1],
-                                value: historyData[currentSeason-1][_chartsIndex].value,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _chartsIndex = historyData[currentSeason-1].indexWhere((element) => element.value == value);
-                                  });
-                                }
-                              ),
-                            ],
-                          ),
-                          if (selectedGraph.length > 300) Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Checkbox(value: _smooth,
-                                checkColor: Colors.black,
-                                onChanged: ((value) {
-                                  setState(() {
-                                    _smooth = value!;
-                                  });
-                                })),
-                                Text(t.smooth, style: const TextStyle(color: Colors.white, fontSize: 22))
-                            ],
-                          ),
-                          IconButton(onPressed: () => _zoomPanBehavior.reset(), icon: const Icon(Icons.refresh), alignment: Alignment.center,)
-                        ],
-                      ),
-                    ),
-                    if(historyData[currentSeason-1][_chartsIndex].value!.length > 1) Card(
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width - 88,
-                        height: MediaQuery.of(context).size.height - 60,
-                        child: Padding( padding: const EdgeInsets.fromLTRB(40, 30, 40, 30),
-                        child: SfCartesianChart(
-                          tooltipBehavior: _tooltipBehavior,
-                          zoomPanBehavior: _zoomPanBehavior,
-                          primaryXAxis: _gamesPlayedInsteadOfDateAndTime ? const NumericAxis() : const DateTimeAxis(),
-                          primaryYAxis: const NumericAxis(
-                            rangePadding: ChartRangePadding.additional,
-                          ),
-                          margin: const EdgeInsets.all(0),
-                          series: <CartesianSeries>[
-                            if (_gamesPlayedInsteadOfDateAndTime) StepLineSeries<_HistoryChartSpot, int>(
-                              enableTooltip: true,
-                              dataSource: historyData[currentSeason-1][_chartsIndex].value!,
-                              animationDuration: 0,
-                              opacity: _smooth ? 0 : 1,
-                              xValueMapper: (_HistoryChartSpot data, _) => data.gamesPlayed,
-                              yValueMapper: (_HistoryChartSpot data, _) => data.stat,
-                              color: Theme.of(context).colorScheme.primary,
-                              trendlines:<Trendline>[
-                                Trendline(
-                                  isVisible: _smooth,
-                                  period: (historyData[currentSeason-1][_chartsIndex].value!.length/175).floor(),
-                                  type: TrendlineType.movingAverage,
-                                  color: Theme.of(context).colorScheme.primary)
-                              ],
-                            )
-                            else StepLineSeries<_HistoryChartSpot, DateTime>(
-                              enableTooltip: true,
-                              dataSource: historyData[currentSeason-1][_chartsIndex].value!,
-                              animationDuration: 0,
-                              opacity: _smooth ? 0 : 1,
-                              xValueMapper: (_HistoryChartSpot data, _) => data.timestamp,
-                              yValueMapper: (_HistoryChartSpot data, _) => data.stat,
-                              color: Theme.of(context).colorScheme.primary,
-                              trendlines:<Trendline>[
-                                Trendline(
-                                  isVisible: _smooth,
-                                  period: (historyData[currentSeason-1][_chartsIndex].value!.length/175).floor(),
-                                  type: TrendlineType.movingAverage,
-                                  color: Theme.of(context).colorScheme.primary)
-                              ],
-                            ),
-                          ],
-                        ),
-                        )
-                      ),
-                    )
-                    else if (historyData[currentSeason-1][_chartsIndex].value!.length <= 1) Center(child: Column(
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        FutureBuilder<List<List<DropdownMenuItem<List<_HistoryChartSpot>>>>>(
+          future: getHistoryData(fetchData),
+          builder: (context, snapshot) {
+            switch (snapshot.connectionState){
+              case ConnectionState.none:
+              case ConnectionState.waiting:
+              case ConnectionState.active:
+                return const Center(child: CircularProgressIndicator());
+              case ConnectionState.done:
+                if (snapshot.hasData && snapshot.data!.isNotEmpty){
+                  List<_HistoryChartSpot> selectedGraph = snapshot.data![_season][_chartsIndex].value!;
+                  yAxisTitle = _historyShortTitles[_chartsIndex];
+                  return SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(t.notEnoughData, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
-                        Text(t.errors.actionSuggestion),
-                        TextButton(onPressed: (){setState(() {
-                          fetchData = true;
-                        });}, child: Text(t.fetchAndsaveTLHistory))
+                        Card(
+                          child: Wrap(
+                            spacing: 20,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Padding(padding: EdgeInsets.all(8.0), child: Text("Season:", style: TextStyle(fontSize: 22))),
+                                  DropdownButton(
+                                    items: [for (int i = 1; i <= currentSeason; i++) DropdownMenuItem(value: i-1, child: Text("$i"))],
+                                    value: _season,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _season = value!;
+                                      });
+                                    }
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Padding(padding: EdgeInsets.all(8.0), child: Text("X:", style: TextStyle(fontSize: 22))),
+                                  DropdownButton(
+                                    items: const [DropdownMenuItem(value: false, child: Text("Date & Time")), DropdownMenuItem(value: true, child: Text("Games Played"))],
+                                    value: _gamesPlayedInsteadOfDateAndTime,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _gamesPlayedInsteadOfDateAndTime = value!;
+                                      });
+                                    }
+                                  ),
+                                  ],
+                              ),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Padding(padding: EdgeInsets.all(8.0), child: Text("Y:", style: TextStyle(fontSize: 22))),
+                                  DropdownButton(
+                                    items: historyData[_season],
+                                    value: historyData[_season][_chartsIndex].value,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _chartsIndex = historyData[_season].indexWhere((element) => element.value == value);
+                                      });
+                                    }
+                                  ),
+                                ],
+                              ),
+                              if (selectedGraph.length > 300) Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Checkbox(value: _smooth,
+                                    checkColor: Colors.black,
+                                    onChanged: ((value) {
+                                      setState(() {
+                                        _smooth = value!;
+                                      });
+                                    })),
+                                    Text(t.smooth, style: const TextStyle(color: Colors.white, fontSize: 22))
+                                ],
+                              ),
+                              IconButton(onPressed: () => _zoomPanBehavior.reset(), icon: const Icon(Icons.refresh), alignment: Alignment.center,)
+                            ],
+                          ),
+                        ),
+                        if(historyData[_season][_chartsIndex].value!.length > 1) Card(
+                          child: SizedBox(
+                            width: MediaQuery.of(context).size.width - 88,
+                            height: MediaQuery.of(context).size.height - 96,
+                            child: Padding( padding: const EdgeInsets.fromLTRB(40, 30, 40, 30),
+                            child: SfCartesianChart(
+                              tooltipBehavior: _tooltipBehavior,
+                              zoomPanBehavior: _zoomPanBehavior,
+                              primaryXAxis: _gamesPlayedInsteadOfDateAndTime ? const NumericAxis() : const DateTimeAxis(),
+                              primaryYAxis: const NumericAxis(
+                                rangePadding: ChartRangePadding.additional,
+                              ),
+                              margin: const EdgeInsets.all(0),
+                              series: <CartesianSeries>[
+                                if (_gamesPlayedInsteadOfDateAndTime) StepLineSeries<_HistoryChartSpot, int>(
+                                  enableTooltip: true,
+                                  dataSource: historyData[_season][_chartsIndex].value!,
+                                  animationDuration: 0,
+                                  opacity: _smooth ? 0 : 1,
+                                  xValueMapper: (_HistoryChartSpot data, _) => data.gamesPlayed,
+                                  yValueMapper: (_HistoryChartSpot data, _) => data.stat,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  trendlines:<Trendline>[
+                                    Trendline(
+                                      isVisible: _smooth,
+                                      period: (historyData[_season][_chartsIndex].value!.length/175).floor(),
+                                      type: TrendlineType.movingAverage,
+                                      color: Theme.of(context).colorScheme.primary)
+                                  ],
+                                )
+                                else StepLineSeries<_HistoryChartSpot, DateTime>(
+                                  enableTooltip: true,
+                                  dataSource: historyData[_season][_chartsIndex].value!,
+                                  animationDuration: 0,
+                                  opacity: _smooth ? 0 : 1,
+                                  xValueMapper: (_HistoryChartSpot data, _) => data.timestamp,
+                                  yValueMapper: (_HistoryChartSpot data, _) => data.stat,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  trendlines:<Trendline>[
+                                    Trendline(
+                                      isVisible: _smooth,
+                                      period: (historyData[_season][_chartsIndex].value!.length/175).floor(),
+                                      type: TrendlineType.movingAverage,
+                                      color: Theme.of(context).colorScheme.primary)
+                                  ],
+                                ),
+                              ],
+                            ),
+                            )
+                          ),
+                        )
+                        else if (historyData[_season][_chartsIndex].value!.length <= 1) Center(child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(t.notEnoughData, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
+                            Text(t.errors.actionSuggestion),
+                            TextButton(onPressed: (){setState(() {
+                              fetchData = true;
+                            });}, child: Text(t.fetchAndsaveTLHistory))
+                          ],
+                        ))
                       ],
-                    ))
-                  ],
-                ),
-            );
-          }
-          if (snapshot.hasError || snapshot.data!.isEmpty){
-            return Center(child: 
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(snapshot.error != null ? snapshot.error.toString() : t.noHistorySaved, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Text(snapshot.stackTrace != null ? snapshot.stackTrace.toString() : "lol", textAlign: TextAlign.center),
-                  ),
-                ],
-              )
-            );
-          }
-        }
-        return const Center(child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text("lol", style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
-        ],
-      ));
-      },
+                    ),
+                );
+              }
+              if (snapshot.hasError || snapshot.data!.isEmpty){
+                return Center(child: 
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(snapshot.error != null ? snapshot.error.toString() : t.noHistorySaved, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(snapshot.stackTrace != null ? snapshot.stackTrace.toString() : "lol", textAlign: TextAlign.center),
+                      ),
+                    ],
+                  )
+                );
+              }
+            }
+            return const Center(child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("lol", style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
+            ],
+          ));
+          },
+        ),
+        SegmentedButton<Graph>(
+          showSelectedIcon: false,
+          segments: <ButtonSegment<Graph>>[
+            const ButtonSegment<Graph>(
+              value: Graph.history,
+              label: Text('Player History')),
+            ButtonSegment<Graph>(
+              value: Graph.leagueState,
+              label: Text('League State')),
+            ButtonSegment<Graph>(
+              value: Graph.leagueCutoffs,
+              label: Text('League Cutoffs'),
+            ),
+          ],
+          selected: <Graph>{_graph},
+          onSelectionChanged: (Set<Graph> newSelection) {
+            setState(() {
+              _graph = newSelection.first;
+            });})
+      ],
     ); 
   }
 }
@@ -2432,7 +2478,7 @@ class TetraLeagueThingy extends StatelessWidget{
       //surfaceTintColor: rankColors[league.rank],
       child: Column(
         children: [
-          TLRatingThingy(userID: "w", tlData: league),
+          TLRatingThingy(userID: "w", tlData: league, oldTl: toCompare, showPositions: true),
           TLProgress(
             tlData: league,
             previousRankTRcutoff: cutoffs != null ? cutoffs!.tr[league.rank != "z" ? league.rank : league.percentileRank] : null,
@@ -2515,12 +2561,6 @@ class TetraLeagueThingy extends StatelessWidget{
                     defaultColumnWidth:const IntrinsicColumnWidth(),
                     children: [
                       TableRow(children: [
-                        //Text("VS: ", style: TextStyle(fontSize: 21)),
-                        Text("№ ${league.standingLocal.isNegative ? "---" : intf.format(league.standingLocal)}", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: league.standingLocal.isNegative ? Colors.grey : Colors.white)),
-                        Text(" local", style: TextStyle(fontSize: 21, color: league.standingLocal.isNegative ? Colors.grey : Colors.white)),
-                        if (toCompare != null) Text(" (${compareIntf.format(league.standingLocal-toCompare!.standingLocal)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: getDifferenceColor(league.standingLocal-toCompare!.standingLocal)))
-                      ]),
-                      TableRow(children: [
                         //Text("APM: ", style: TextStyle(fontSize: 21)),
                         Text(intf.format(league.gamesPlayed), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
                         const Text(" Games", style: TextStyle(fontSize: 21)),
@@ -2531,7 +2571,13 @@ class TetraLeagueThingy extends StatelessWidget{
                         Text(intf.format(league.gamesWon), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
                         const Text(" Won", style: TextStyle(fontSize: 21)),
                         if (toCompare != null) Text(" (${comparef2.format(league.gamesWon-toCompare!.gamesWon)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: Colors.grey))
-                      ])
+                      ]),
+                      TableRow(children: [
+                        //Text("VS: ", style: TextStyle(fontSize: 21)),
+                        Tooltip(child: Text("${league.gxe.isNegative ? "---" : f3.format(league.gxe)}", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: league.standingLocal.isNegative ? Colors.grey : Colors.white)), message: "${f2.format(league.s1tr)}",),
+                        Text(" GLIXARE", style: TextStyle(fontSize: 21, color: league.standingLocal.isNegative ? Colors.grey : Colors.white)),
+                        if (toCompare != null) Text(" (${comparef.format(league.gxe-toCompare!.gxe)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: getDifferenceColor(league.standingLocal-toCompare!.standingLocal)))
+                      ]),
                     ],
                   ),
                 ),
@@ -2952,7 +2998,7 @@ class TLRatingThingy extends StatelessWidget{
           children: [
             RichText(
               text: TextSpan(
-                style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 20, color: Colors.white),
+                style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 20, color: Colors.white, height: 0.9),
                 children: (tlData.gamesPlayed > 9) ? switch(prefs.getInt("ratingMode")){
                   1 => [
                     TextSpan(text: formatedGlicko[0], style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
@@ -2972,17 +3018,43 @@ class TLRatingThingy extends StatelessWidget{
                 } : [TextSpan(text: "---\n", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28, color: Colors.grey)), TextSpan(text: t.gamesUntilRanked(left: 10-tlData.gamesPlayed), style: const TextStyle(color: Colors.grey, fontSize: 14)),]
               )
             ),
-            if (oldTl != null) Text(
-              switch(prefs.getInt("ratingMode")){
-                1 => "${fDiff.format(tlData.glicko! - oldTl!.glicko!)} Glicko",
-                2 => "${fDiff.format(tlData.percentile * 100 - oldTl!.percentile * 100)} %",
-                _ => "${fDiff.format(tlData.tr - oldTl!.tr)} TR"
-              },
+            if (oldTl != null) RichText(
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: tlData.tr - oldTl!.tr < 0 ?
-                Colors.red :
-                Colors.green
+              softWrap: true,
+              text: TextSpan(
+                style: DefaultTextStyle.of(context).style,
+                children: [
+                  TextSpan(text: switch(prefs.getInt("ratingMode")){
+                    1 => "${fDiff.format(tlData.glicko! - oldTl!.glicko!)} Glicko",
+                    2 => "${fDiff.format(tlData.percentile * 100 - oldTl!.percentile * 100)} %",
+                    _ => "${fDiff.format(tlData.tr - oldTl!.tr)} TR"
+                  },
+                  style: TextStyle(
+                      color: getDifferenceColor(switch(prefs.getInt("ratingMode")){
+                      1 => tlData.glicko! - oldTl!.glicko!,
+                      2 => tlData.percentile - oldTl!.percentile,
+                      _ => tlData.tr - oldTl!.tr
+                    })
+                    ),
+                  ),
+                  const TextSpan(text: " • ", style: TextStyle(color: Colors.grey)),
+                  TextSpan(text: switch(prefs.getInt("ratingMode")){
+                    1 => "${fDiff.format(tlData.tr - oldTl!.tr)} TR",
+                    _ => "${fDiff.format(tlData.glicko! - oldTl!.glicko!)} Glicko"
+                  },
+                  style: TextStyle(
+                      color: getDifferenceColor(switch(prefs.getInt("ratingMode")){
+                      1 => tlData.tr - oldTl!.tr,
+                      _ => tlData.glicko! - oldTl!.glicko!
+                    })
+                    ),
+                  ),
+                  const TextSpan(text: " • ", style: TextStyle(color: Colors.grey)),
+                  TextSpan(
+                    text: "${fDiff.format(tlData.rd! - oldTl!.rd!)} RD",
+                    style: TextStyle(color: getDifferenceColor(oldTl!.rd! - tlData.rd!))
+                  )
+                ],
               ),
             ),
             if (tlData.gamesPlayed > 9) Column(
