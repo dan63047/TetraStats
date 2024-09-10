@@ -42,6 +42,8 @@ import 'package:tetra_stats/widgets/tl_progress_bar.dart';
 import 'package:tetra_stats/widgets/user_thingy.dart';
 
 var fDiff = NumberFormat("+#,###.####;-#,###.####");
+late Future<FetchResults> _data;
+late Future<News> _newsData;
 
 class MainView extends StatefulWidget {
   final String? player;
@@ -78,12 +80,44 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   void initState() {
     teto.open();
     controller = ScrollController();
+    changePlayer(_searchFor);
     super.initState();
+  }
+
+  Future<FetchResults> _getData() async {
+    TetrioPlayer player;
+    try{
+      if (_searchFor.startsWith("ds:")){
+        player = await teto.fetchPlayer(_searchFor.substring(3), isItDiscordID: true); // we trying to get him with that 
+      }else{
+        player = await teto.fetchPlayer(_searchFor); // Otherwise it's probably a user id or username
+      }
+    }on TetrioPlayerNotExist{
+      return FetchResults(false, null, [], null, null, TetrioPlayerNotExist());
+    }
+    late Summaries summaries;
+    late Cutoffs cutoffs;
+    List<dynamic> requests = await Future.wait([
+      teto.fetchSummaries(player.userId),
+      teto.fetchCutoffsBeanserver(),
+    ]);
+    List<TetraLeague> states = await teto.getStates(player.userId, season: currentSeason);
+    summaries = requests[0];
+    cutoffs = requests[1];
+
+    bool isTracking = await teto.isPlayerTracking(player.userId);
+    if (isTracking){ // if tracked - save data to local DB
+      await teto.storeState(summaries.league);
+    }
+
+    return FetchResults(true, player, states, summaries, cutoffs, null);
   }
 
   void changePlayer(String player) {
     setState(() {
       _searchFor = player;
+      _data = _getData();
+      _newsData = teto.fetchNews(_searchFor);
     });
   }
 
@@ -114,36 +148,47 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
           return Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            NavigationRail(
-              leading: FloatingActionButton(
-                    elevation: 0,
-                    onPressed: () {
-                      Scaffold.of(context).openDrawer();
-                    },
-                    child: const Icon(Icons.search),
-                  ),
-              trailing: IconButton(
-                    onPressed: () {
-                      // Add your onPressed code here!
-                    },
-                    icon: const Icon(Icons.more_horiz_rounded),
-                  ),
-              destinations: [
-                getDestinationButton(Icons.home, "Home"),
-                getDestinationButton(Icons.data_thresholding_outlined, "Graphs"),
-                getDestinationButton(Icons.leaderboard, "Leaderboards"),
-                getDestinationButton(Icons.compress, "Cutoffs"),
-                getDestinationButton(Icons.calculate, "Calc"),
-                getDestinationButton(Icons.storage, "Saved Data"),
-                getDestinationButton(Icons.settings, "Settings"),
-              ],
-              selectedIndex: destination,
-              onDestinationSelected: (value) {
-                setState(() {
-                  destination = value;
-                });
-              },
-              ),
+            TweenAnimationBuilder(
+              child: NavigationRail(
+                leading: FloatingActionButton(
+                      elevation: 0,
+                      onPressed: () {
+                        Scaffold.of(context).openDrawer();
+                      },
+                      child: const Icon(Icons.search),
+                    ),
+                trailing: IconButton(
+                      onPressed: () {
+                        // Add your onPressed code here!
+                      },
+                      icon: const Icon(Icons.more_horiz_rounded),
+                    ),
+                destinations: [
+                  getDestinationButton(Icons.home, "Home"),
+                  getDestinationButton(Icons.data_thresholding_outlined, "Graphs"),
+                  getDestinationButton(Icons.leaderboard, "Leaderboards"),
+                  getDestinationButton(Icons.compress, "Cutoffs"),
+                  getDestinationButton(Icons.calculate, "Calc"),
+                  getDestinationButton(Icons.storage, "Saved Data"),
+                  getDestinationButton(Icons.settings, "Settings"),
+                ],
+                selectedIndex: destination,
+                onDestinationSelected: (value) {
+                  setState(() {
+                    destination = value;
+                  });
+                },
+                ),
+                duration: Durations.long4,
+                tween: Tween<double>(begin: 0, end: 1),
+                curve: Easing.emphasizedDecelerate,
+                builder: (context, value, child) {
+                  return Container(
+                    transform: Matrix4.translationValues(-80+value*80, 0, 0),
+                    child: child,
+                  );
+                },
+            ),
             Expanded(
               child: switch (destination){
                 0 => DestinationHome(searchFor: _searchFor, constraints: constraints),
@@ -691,7 +736,7 @@ class LeagueCard extends StatelessWidget{
 
 }
 
-class _DestinationHomeState extends State<DestinationHome> {
+class _DestinationHomeState extends State<DestinationHome> with SingleTickerProviderStateMixin {
   Cards rightCard = Cards.overview;
   CardMod cardMod = CardMod.info;
   //Duration postSeasonLeft = seasonStart.difference(DateTime.now());
@@ -700,37 +745,9 @@ class _DestinationHomeState extends State<DestinationHome> {
   late bool blitzBetterThanClosestAverage;
   late MapEntry? closestAverageSprint;
   late bool sprintBetterThanClosestAverage;
+  late AnimationController _transition;
   bool? sprintBetterThanRankAverage;
   bool? blitzBetterThanRankAverage;
-
-  Future<FetchResults> _getData() async {
-    TetrioPlayer player;
-    try{
-      if (widget.searchFor.startsWith("ds:")){
-        player = await teto.fetchPlayer(widget.searchFor.substring(3), isItDiscordID: true); // we trying to get him with that 
-      }else{
-        player = await teto.fetchPlayer(widget.searchFor); // Otherwise it's probably a user id or username
-      }
-    }on TetrioPlayerNotExist{
-      return FetchResults(false, null, [], null, null, TetrioPlayerNotExist());
-    }
-    late Summaries summaries;
-    late Cutoffs cutoffs;
-    List<dynamic> requests = await Future.wait([
-      teto.fetchSummaries(player.userId),
-      teto.fetchCutoffsBeanserver(),
-    ]);
-    List<TetraLeague> states = await teto.getStates(player.userId, season: currentSeason);
-    summaries = requests[0];
-    cutoffs = requests[1];
-
-    bool isTracking = await teto.isPlayerTracking(player.userId);
-    if (isTracking){ // if tracked - save data to local DB
-      await teto.storeState(summaries.league);
-    }
-
-    return FetchResults(true, player, states, summaries, cutoffs, null);
-  }
 
   Widget getOverviewCard(Summaries summaries){
     return Column(
@@ -1537,13 +1554,22 @@ class _DestinationHomeState extends State<DestinationHome> {
         )
       ]
     };
+
+    _transition = AnimationController(vsync: this, value: 0, duration: Durations.long4);
+
+    _transition.addListener((){
+      setState(() {
+        
+      });
+    });
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<FetchResults>(
-      future: _getData(),
+      future: _data,
       builder: (context, snapshot) {
         switch (snapshot.connectionState){
           case ConnectionState.none:
@@ -1576,141 +1602,169 @@ class _DestinationHomeState extends State<DestinationHome> {
               closestAverageBlitz = blitzAverages.entries.singleWhere((element) => element.value == blitzAverages.values.reduce((a, b) => (a-snapshot.data!.summaries!.blitz!.stats.score).abs() < (b -snapshot.data!.summaries!.blitz!.stats.score).abs() ? a : b));
               blitzBetterThanClosestAverage = snapshot.data!.summaries!.blitz!.stats.score > closestAverageBlitz!.value;
             }
-            return Row(
-              children: [
-                SizedBox(
-                  width: 450,
-                  child: Column(
-                    children: [
-                      NewUserThingy(player: snapshot.data!.player!, showStateTimestamp: false, setState: setState),
-                      if (snapshot.data!.player!.badges.isNotEmpty) BadgesThingy(badges: snapshot.data!.player!.badges),
-                      if (snapshot.data!.player!.distinguishment != null) DistinguishmentThingy(snapshot.data!.player!.distinguishment!),
-                      if (snapshot.data!.player!.role == "bot") FakeDistinguishmentThingy(bot: true, botMaintainers: snapshot.data!.player!.botmaster),
-                      if (snapshot.data!.player!.role == "banned") FakeDistinguishmentThingy(banned: true)
-                      else if (snapshot.data!.player!.badstanding == true) FakeDistinguishmentThingy(badStanding: true),
-                      if (snapshot.data!.player!.bio != null) Card(
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                const Spacer(), 
-                                Text(t.bio, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
-                                const Spacer()
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 8.0),
-                              child: MarkdownBody(data: snapshot.data!.player!.bio!, styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.center)),
-                            )
-                          ],
+            return TweenAnimationBuilder(
+              duration: Durations.long4,
+              tween: Tween<double>(begin: 0, end: 1),
+              curve: Easing.emphasizedDecelerate,
+              builder: (context, value, child) {
+                return Container(
+                  transform: Matrix4.translationValues(0, 600-value*600, 0),
+                  child: child,
+                );
+              },
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 450,
+                    child: Column(
+                      children: [
+                        NewUserThingy(player: snapshot.data!.player!, showStateTimestamp: false, setState: setState),
+                        if (snapshot.data!.player!.badges.isNotEmpty) BadgesThingy(badges: snapshot.data!.player!.badges),
+                        if (snapshot.data!.player!.distinguishment != null) DistinguishmentThingy(snapshot.data!.player!.distinguishment!),
+                        if (snapshot.data!.player!.role == "bot") FakeDistinguishmentThingy(bot: true, botMaintainers: snapshot.data!.player!.botmaster),
+                        if (snapshot.data!.player!.role == "banned") FakeDistinguishmentThingy(banned: true)
+                        else if (snapshot.data!.player!.badstanding == true) FakeDistinguishmentThingy(badStanding: true),
+                        if (snapshot.data!.player!.bio != null) Card(
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  const Spacer(), 
+                                  Text(t.bio, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
+                                  const Spacer()
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: MarkdownBody(data: snapshot.data!.player!.bio!, styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.center)),
+                              )
+                            ],
+                          ),
                         ),
-                      ),
-                        //if (testNews != null && testNews!.news.isNotEmpty)
-                      Expanded(
-                        child: FutureBuilder<News>(
-                          future: teto.fetchNews(widget.searchFor),
-                          builder: (context, snapshot) {
-                            switch (snapshot.connectionState){
-                              case ConnectionState.none:
-                              case ConnectionState.waiting:
-                              case ConnectionState.active:
-                                return const Card(child: Center(child: CircularProgressIndicator()));
-                              case ConnectionState.done:
-                                if (snapshot.hasData){
-                                  return NewsThingy(snapshot.data!);
-                                }else if (snapshot.hasError){
-                                  return Card(child: Column(children: [
-                                    Text(snapshot.error.toString(), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                                    Text(snapshot.stackTrace.toString())
-                                  ]
-                                ));
+                          //if (testNews != null && testNews!.news.isNotEmpty)
+                        Expanded(
+                          child: FutureBuilder<News>(
+                            future: _newsData,
+                            builder: (context, snapshot) {
+                              switch (snapshot.connectionState){
+                                case ConnectionState.none:
+                                case ConnectionState.waiting:
+                                case ConnectionState.active:
+                                  return const Card(child: Center(child: CircularProgressIndicator()));
+                                case ConnectionState.done:
+                                  if (snapshot.hasData){
+                                    return NewsThingy(snapshot.data!);
+                                  }else if (snapshot.hasError){
+                                    return Card(child: Column(children: [
+                                      Text(snapshot.error.toString(), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                                      Text(snapshot.stackTrace.toString())
+                                    ]
+                                  ));
+                                }
                               }
+                              return const Text("what?");
                             }
-                            return const Text("what?");
-                          }
+                          ),
+                        )
+                        ],
+                      ),
+                  ),
+                  SizedBox(
+                    width: widget.constraints.maxWidth - 450 - 80,
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: rightCard != Cards.overview ? widget.constraints.maxHeight - 64 : widget.constraints.maxHeight - 32,
+                          child: SingleChildScrollView(
+                            child: DualTransitionBuilder(
+                              animation: _transition,
+                              forwardBuilder: (context, animation, child){
+                                print(animation);
+                                return Container(
+                                  transform: Matrix4.translationValues(600-animation.value*600, 0, 0),
+                                  child: child!
+                                );
+                              },
+                              reverseBuilder: (context, animation, child){
+                                return Container(
+                                  transform: Matrix4.translationValues(-600+animation.value*600, 0, 0),
+                                  child: child!
+                                );
+                              },
+                              child: switch (rightCard){
+                                Cards.overview => getOverviewCard(snapshot.data!.summaries!),
+                                Cards.tetraLeague => switch (cardMod){
+                                  CardMod.info => getTetraLeagueCard(snapshot.data!.summaries!.league, snapshot.data!.cutoffs, snapshot.data!.states),
+                                  CardMod.ex => getPreviousSeasonsList(snapshot.data!.summaries!.pastLeague),
+                                  CardMod.records => getRecentTLrecords(widget.constraints),
+                                  _ => const Center(child: Text("huh?"))
+                                },
+                                Cards.quickPlay => switch (cardMod){
+                                  CardMod.info => getZenithCard(snapshot.data?.summaries!.zenith),
+                                  CardMod.records => getListOfRecords("zenith/recent", "zenith/top", widget.constraints),
+                                  CardMod.ex => getZenithCard(snapshot.data?.summaries!.zenithEx),
+                                  CardMod.exRecords => getListOfRecords("zenithex/recent", "zenithex/top", widget.constraints),
+                                },
+                                Cards.sprint => switch (cardMod){
+                                  CardMod.info => getRecordCard(snapshot.data?.summaries!.sprint, sprintBetterThanRankAverage, closestAverageSprint, sprintBetterThanClosestAverage, snapshot.data!.summaries!.league.rank),
+                                  CardMod.records => getListOfRecords("40l/recent", "40l/top", widget.constraints),
+                                  _ => const Center(child: Text("huh?"))
+                                },
+                                Cards.blitz => switch (cardMod){
+                                  CardMod.info => getRecordCard(snapshot.data?.summaries!.blitz, blitzBetterThanRankAverage, closestAverageBlitz, blitzBetterThanClosestAverage, snapshot.data!.summaries!.league.rank),
+                                  CardMod.records => getListOfRecords("blitz/recent", "blitz/top", widget.constraints),
+                                  _ => const Center(child: Text("huh?"))
+                                },
+                              },
+                            ),
+                          ),
                         ),
-                      )
-                      ],
-                    ),
-                ),
-                SizedBox(
-                  width: widget.constraints.maxWidth - 450 - 80,
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: rightCard != Cards.overview ? widget.constraints.maxHeight - 64 : widget.constraints.maxHeight - 32,
-                        child: SingleChildScrollView(
-                          child: switch (rightCard){
-                            Cards.overview => getOverviewCard(snapshot.data!.summaries!),
-                            Cards.tetraLeague => switch (cardMod){
-                              CardMod.info => getTetraLeagueCard(snapshot.data!.summaries!.league, snapshot.data!.cutoffs, snapshot.data!.states),
-                              CardMod.ex => getPreviousSeasonsList(snapshot.data!.summaries!.pastLeague),
-                              CardMod.records => getRecentTLrecords(widget.constraints),
-                              _ => const Center(child: Text("huh?"))
-                            },
-                            Cards.quickPlay => switch (cardMod){
-                              CardMod.info => getZenithCard(snapshot.data?.summaries!.zenith),
-                              CardMod.records => getListOfRecords("zenith/recent", "zenith/top", widget.constraints),
-                              CardMod.ex => getZenithCard(snapshot.data?.summaries!.zenithEx),
-                              CardMod.exRecords => getListOfRecords("zenithex/recent", "zenithex/top", widget.constraints),
-                            },
-                            Cards.sprint => switch (cardMod){
-                              CardMod.info => getRecordCard(snapshot.data?.summaries!.sprint, sprintBetterThanRankAverage, closestAverageSprint, sprintBetterThanClosestAverage, snapshot.data!.summaries!.league.rank),
-                              CardMod.records => getListOfRecords("40l/recent", "40l/top", widget.constraints),
-                              _ => const Center(child: Text("huh?"))
-                            },
-                            Cards.blitz => switch (cardMod){
-                              CardMod.info => getRecordCard(snapshot.data?.summaries!.blitz, blitzBetterThanRankAverage, closestAverageBlitz, blitzBetterThanClosestAverage, snapshot.data!.summaries!.league.rank),
-                              CardMod.records => getListOfRecords("blitz/recent", "blitz/top", widget.constraints),
-                              _ => const Center(child: Text("huh?"))
-                            },
+                        if (modeButtons[rightCard]!.length > 1) SegmentedButton<CardMod>(
+                          showSelectedIcon: false,
+                          selected: <CardMod>{cardMod},
+                          segments: modeButtons[rightCard]!,
+                          onSelectionChanged: (p0) {
+                            setState(() {
+                              cardMod = p0.first;
+                              //_transition.;
+                            });
                           },
                         ),
-                      ),
-                      if (modeButtons[rightCard]!.length > 1) SegmentedButton<CardMod>(
-                        showSelectedIcon: false,
-                        selected: <CardMod>{cardMod},
-                        segments: modeButtons[rightCard]!,
-                        onSelectionChanged: (p0) {
-                          setState(() {
-                            cardMod = p0.first;
-                          });
-                        },
-                      ),
-                      SegmentedButton<Cards>(
-                        showSelectedIcon: false,
-                        segments: <ButtonSegment<Cards>>[
-                          const ButtonSegment<Cards>(
-                              value: Cards.overview,
-                              //label: Text('Overview'),
-                              icon: Icon(Icons.calendar_view_day)),
-                          ButtonSegment<Cards>(
-                              value: Cards.tetraLeague,
-                              //label: Text('Tetra League'),
-                              icon: SvgPicture.asset("res/icons/league.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
-                          ButtonSegment<Cards>(
-                              value: Cards.quickPlay,
-                              //label: Text('Quick Play'),
-                              icon: SvgPicture.asset("res/icons/qp.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
-                          ButtonSegment<Cards>(
-                              value: Cards.sprint,
-                              //label: Text('40 Lines'),
-                              icon: SvgPicture.asset("res/icons/40l.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
-                          ButtonSegment<Cards>(
-                              value: Cards.blitz,
-                              //label: Text('Blitz'),
-                              icon: SvgPicture.asset("res/icons/blitz.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
-                        ],
-                        selected: <Cards>{rightCard},
-                        onSelectionChanged: (Set<Cards> newSelection) {
-                          setState(() {
-                            cardMod = CardMod.info;
-                            rightCard = newSelection.first;
-                          });})
-                    ],
+                        SegmentedButton<Cards>(
+                          showSelectedIcon: false,
+                          segments: <ButtonSegment<Cards>>[
+                            const ButtonSegment<Cards>(
+                                value: Cards.overview,
+                                //label: Text('Overview'),
+                                icon: Icon(Icons.calendar_view_day)),
+                            ButtonSegment<Cards>(
+                                value: Cards.tetraLeague,
+                                //label: Text('Tetra League'),
+                                icon: SvgPicture.asset("res/icons/league.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
+                            ButtonSegment<Cards>(
+                                value: Cards.quickPlay,
+                                //label: Text('Quick Play'),
+                                icon: SvgPicture.asset("res/icons/qp.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
+                            ButtonSegment<Cards>(
+                                value: Cards.sprint,
+                                //label: Text('40 Lines'),
+                                icon: SvgPicture.asset("res/icons/40l.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
+                            ButtonSegment<Cards>(
+                                value: Cards.blitz,
+                                //label: Text('Blitz'),
+                                icon: SvgPicture.asset("res/icons/blitz.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
+                          ],
+                          selected: <Cards>{rightCard},
+                          onSelectionChanged: (Set<Cards> newSelection) {
+                            setState(() {
+                              cardMod = CardMod.info;
+                              rightCard = newSelection.first;
+                            });})
+                      ],
+                    )
                   )
-                )
-              ],
+                ],
+              ),
             );
           }
         }
