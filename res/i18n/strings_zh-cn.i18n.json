@@ -299,7 +299,7 @@
         "nyaapp": "加权\nAPP",
         "nyaappDescription": "(Weighted APP, 简称wAPP) 在本质上是在衡量您在保持高 APP 的同时发送奶酪的能力。\n由 Wertj 发明。",
         "area": "面积",
-        "areaDescription": 如果排除 Cheese 和 vs/apm 部分，您的形状在图表上占据了多少空间",
+        "areaDescription": "如果排除 Cheese 和 vs/apm 部分，您的形状在图表上占据了多少空间",
         "estOfTR": "预测 TR",
         "estOfTRShort": "预测 TR",
         "accOfEst": "预测实际差量",
