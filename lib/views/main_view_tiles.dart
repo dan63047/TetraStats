@@ -40,6 +40,7 @@ import 'package:tetra_stats/widgets/text_timestamp.dart';
 import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/widgets/tl_progress_bar.dart';
 import 'package:tetra_stats/widgets/user_thingy.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 var fDiff = NumberFormat("+#,###.####;-#,###.####");
 late Future<FetchResults> _data;
@@ -181,11 +182,11 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                 ),
                 duration: Durations.long4,
                 tween: Tween<double>(begin: 0, end: 1),
-                curve: Easing.emphasizedDecelerate,
+                curve: Easing.standard,
                 builder: (context, value, child) {
                   return Container(
                     transform: Matrix4.translationValues(-80+value*80, 0, 0),
-                    child: child,
+                    child: Opacity(opacity: value, child: child),
                   );
                 },
             ),
@@ -746,6 +747,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
   late MapEntry? closestAverageSprint;
   late bool sprintBetterThanClosestAverage;
   late AnimationController _transition;
+  late final Animation<Offset> _offsetAnimation;
   bool? sprintBetterThanRankAverage;
   bool? blitzBetterThanRankAverage;
 
@@ -1555,13 +1557,21 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
       ]
     };
 
-    _transition = AnimationController(vsync: this, value: 0, duration: Durations.long4);
+    _transition = AnimationController(vsync: this, duration: Durations.long4);
 
-    _transition.addListener((){
-      setState(() {
+    // _transition.addListener((){
+    //   setState(() {
         
-      });
-    });
+    //   });
+    // });
+
+    _offsetAnimation = Tween<Offset>(
+    begin: Offset.zero,
+    end: const Offset(1.5, 0.0),
+  ).animate(CurvedAnimation(
+    parent: _transition,
+    curve: Curves.elasticIn,
+  ));
 
     super.initState();
   }
@@ -1605,11 +1615,11 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
             return TweenAnimationBuilder(
               duration: Durations.long4,
               tween: Tween<double>(begin: 0, end: 1),
-              curve: Easing.emphasizedDecelerate,
+              curve: Easing.standard,
               builder: (context, value, child) {
                 return Container(
                   transform: Matrix4.translationValues(0, 600-value*600, 0),
-                  child: child,
+                  child: Opacity(opacity: value, child: child),
                 );
               },
               child: Row(
@@ -1676,21 +1686,8 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                         SizedBox(
                           height: rightCard != Cards.overview ? widget.constraints.maxHeight - 64 : widget.constraints.maxHeight - 32,
                           child: SingleChildScrollView(
-                            child: DualTransitionBuilder(
-                              animation: _transition,
-                              forwardBuilder: (context, animation, child){
-                                print(animation);
-                                return Container(
-                                  transform: Matrix4.translationValues(600-animation.value*600, 0, 0),
-                                  child: child!
-                                );
-                              },
-                              reverseBuilder: (context, animation, child){
-                                return Container(
-                                  transform: Matrix4.translationValues(-600+animation.value*600, 0, 0),
-                                  child: child!
-                                );
-                              },
+                            child: SlideTransition(
+                              position: _offsetAnimation,
                               child: switch (rightCard){
                                 Cards.overview => getOverviewCard(snapshot.data!.summaries!),
                                 Cards.tetraLeague => switch (cardMod){
@@ -2257,12 +2254,11 @@ class NewUserThingy extends StatelessWidget {
                 //clipBehavior: Clip.none,
                 children: [
                   // TODO: osk banner can cause memory leak
-                  if (player.bannerRevision != null) Image.network(kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioBanner&user=${player.userId}&rv=${player.bannerRevision}" : "https://tetr.io/user-content/banners/${player.userId}.jpg?rv=${player.bannerRevision}",
+                  if (player.bannerRevision != null) FadeInImage.memoryNetwork(image: kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioBanner&user=${player.userId}&rv=${player.bannerRevision}" : "https://tetr.io/user-content/banners/${player.userId}.jpg?rv=${player.bannerRevision}",
+                    placeholder: kTransparentImage,
                     fit: BoxFit.cover,
                     height: 120,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container();
-                    },
+                    fadeInCurve: Easing.standard, fadeInDuration: Durations.long4
                   ),
                   Positioned(
                     top: player.bannerRevision != null ? 90.0 : 10.0,
@@ -2272,10 +2268,8 @@ class NewUserThingy extends StatelessWidget {
                       child: player.role == "banned"
                         ? Image.asset("res/avatars/tetrio_banned.png", fit: BoxFit.fitHeight, height: pfpHeight,)
                         : player.avatarRevision != null
-                          ? Image.network(kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioProfilePicture&user=${player.userId}&rv=${player.avatarRevision}" : "https://tetr.io/user-content/avatars/${player.userId}.jpg?rv=${player.avatarRevision}",
-                      fit: BoxFit.fitHeight, height: 128, errorBuilder: (context, error, stackTrace) {
-                        return Image.asset("res/avatars/tetrio_anon.png", fit: BoxFit.fitHeight, height: pfpHeight);
-                        })
+                          ? FadeInImage.memoryNetwork(image: kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioProfilePicture&user=${player.userId}&rv=${player.avatarRevision}" : "https://tetr.io/user-content/avatars/${player.userId}.jpg?rv=${player.avatarRevision}",
+                            fit: BoxFit.fitHeight, height: 128, placeholder: kTransparentImage, fadeInCurve: Easing.emphasizedDecelerate, fadeInDuration: Durations.long4)
                           : Image.asset("res/avatars/tetrio_anon.png", fit: BoxFit.fitHeight, height: pfpHeight),
                     )
                   ),
