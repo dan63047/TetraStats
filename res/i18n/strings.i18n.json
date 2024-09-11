@@ -2,7 +2,7 @@
     "locales(map)": {
         "en": "English",
         "ru": "Russian (Русский)",
-        "zh": "Chinese (简体中文)"
+        "zh-cn": "Simplified Chinese (简体中文)"
     },
     "tetraLeague": "Tetra League",
     "tlRecords": "TL Records",
