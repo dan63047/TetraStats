@@ -21,6 +21,7 @@ You can [download an app](https://github.com/dan63047/TetraStats/releases), or [
 # Special thanks
 - **kerrmunism** — formulas
 - **p1nkl0bst3r** — providing players history and peak TR
+- **neko_ab4093** — Simplified Chinese localization
 - **osk** and his team — TETR.IO
 
 ## Legal note

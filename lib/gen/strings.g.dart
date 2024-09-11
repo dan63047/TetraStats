@@ -3,10 +3,10 @@
 /// Original: res/i18n
 /// To regenerate, run: `dart run slang`
 ///
-/// Locales: 2
-/// Strings: 1210 (605 per locale)
+/// Locales: 3
+/// Strings: 1818 (606 per locale)
 ///
-/// Built on 2024-09-04 at 20:41 UTC
+/// Built on 2024-09-11 at 14:14 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -26,7 +26,8 @@ const AppLocale _baseLocale = AppLocale.en;
 /// - if (LocaleSettings.currentLocale == AppLocale.en) // locale check
 enum AppLocale with BaseAppLocale<AppLocale, Translations> {
 	en(languageCode: 'en', build: Translations.build),
-	ru(languageCode: 'ru', build: _StringsRu.build);
+	ru(languageCode: 'ru', build: _StringsRu.build),
+	zhCn(languageCode: 'zh', countryCode: 'CN', build: _StringsZhCn.build);
 
 	const AppLocale({required this.languageCode, this.scriptCode, this.countryCode, required this.build}); // ignore: unused_element
 
@@ -151,6 +152,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	Map<String, String> get locales => {
 		'en': 'English',
 		'ru': 'Russian (Русский)',
+		'zh-CN': 'Simplified Chinese (简体中文)',
 	};
 	String get tetraLeague => 'Tetra League';
 	String get tlRecords => 'TL Records';
@@ -862,6 +864,7 @@ class _StringsRu implements Translations {
 	@override Map<String, String> get locales => {
 		'en': 'Английский (English)',
 		'ru': 'Русский',
+		'zh-CN': 'Упрощенный Китайский (简体中文)',
 	};
 	@override String get tetraLeague => 'Тетра Лига';
 	@override String get tlRecords => 'Матчи ТЛ';
@@ -1546,6 +1549,718 @@ class _StringsErrorsRu implements _StringsErrorsEn {
 	@override String get replayRejected => 'Стороннее API заблокировало ваш IP адрес';
 }
 
+// Path: <root>
+class _StringsZhCn implements Translations {
+	/// You can call this constructor and build your own translation instance of this locale.
+	/// Constructing via the enum [AppLocale.build] is preferred.
+	_StringsZhCn.build({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver})
+		: assert(overrides == null, 'Set "translation_overrides: true" in order to enable this feature.'),
+		  $meta = TranslationMetadata(
+		    locale: AppLocale.zhCn,
+		    overrides: overrides ?? {},
+		    cardinalResolver: cardinalResolver,
+		    ordinalResolver: ordinalResolver,
+		  ) {
+		$meta.setFlatMapFunction(_flatMapFunction);
+	}
+
+	/// Metadata for the translations of <zh-CN>.
+	@override final TranslationMetadata<AppLocale, Translations> $meta;
+
+	/// Access flat map
+	@override dynamic operator[](String key) => $meta.getTranslation(key);
+
+	@override late final _StringsZhCn _root = this; // ignore: unused_field
+
+	// Translations
+	@override Map<String, String> get locales => {
+		'en': '英语 (English)',
+		'ru': '俄语 (Русский)',
+		'zh-CN': '简体中文',
+	};
+	@override String get tetraLeague => 'Tetra联赛';
+	@override String get tlRecords => 'Tetra联赛记录';
+	@override String get history => '历史';
+	@override String get sprint => '40行竞速';
+	@override String get blitz => '闪电战';
+	@override String get recent => '最近';
+	@override String get recentRuns => '最近游玩局数';
+	@override String blitzScore({required Object p}) => '${p} 分';
+	@override String get openSPreplay => '在TETR.IO打开回放';
+	@override String get downloadSPreplay => '下载回放';
+	@override String get other => '其他';
+	@override String get distinguishment => '区别';
+	@override String get zen => '禅意模式';
+	@override String get bio => '个人简介';
+	@override String get news => '新闻';
+	@override late final _StringsNewsPartsZhCn newsParts = _StringsNewsPartsZhCn._(_root);
+	@override String get openSearch => '搜索玩家';
+	@override String get closeSearch => '关闭搜索';
+	@override String get searchHint => '昵称，ID或Discord用户ID（需要 "ds:" 前缀）';
+	@override String get refresh => '刷新';
+	@override String get fetchAndsaveTLHistory => '获取玩家历史';
+	@override String get fetchAndSaveOldTLmatches => '获取玩家Tetra联赛历史';
+	@override String fetchAndsaveTLHistoryResult({required Object number}) => '找到 ${number} 个状态';
+	@override String fetchAndSaveOldTLmatchesResult({required Object number}) => '找到 ${number} 场Tetra联赛比赛';
+	@override String get showStoredData => '显示获得的数据';
+	@override String get statsCalc => '统计计算器';
+	@override String get settings => '设置';
+	@override String get track => '添加到\n跟踪列表';
+	@override String get stopTracking => '从跟踪列表\n中移除';
+	@override String get becameTracked => '已添加到跟踪列表！';
+	@override String get compare => '对比';
+	@override String get stoppedBeingTracked => '已从跟踪列表中移除！';
+	@override String get tlLeaderboard => 'Tetra联赛排行榜';
+	@override String get noRecords => '无记录';
+	@override String noOldRecords({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		zero: '无记录',
+		one: '只有 ${n} 个记录',
+		two: '只有 ${n} 个记录',
+		few: '只有 ${n} 个记录',
+		many: '只有 ${n} 个记录',
+		other: '只有 ${n} 个记录',
+	);
+	@override String get noRecord => '只有 个记录';
+	@override String get botRecord => '机器人不予参加排位赛';
+	@override String get anonRecord => '匿名用户不予参加排位赛';
+	@override String get notEnoughData => '没有足够的数据';
+	@override String get noHistorySaved => '没有保存历史';
+	@override String get pseudoTooltipHeaderInit => '将鼠标放在点上';
+	@override String get pseudoTooltipFooterInit => '以查看详细信息';
+	@override String obtainDate({required Object date}) => '在 ${date} 获得';
+	@override String fetchDate({required Object date}) => 'Fetched ${date}';
+	@override String get exactGametime => '实际游玩时长';
+	@override String get bigRedBanned => '该账号封禁中';
+	@override String get normalBanned => '封禁';
+	@override String get bigRedBadStanding => '信誉不佳';
+	@override String get copiedToClipboard => '已复制';
+	@override String get playerRoleAccount => '账号';
+	@override String get wasFromBeginning => '在很久很久以前';
+	@override String get created => '创建于';
+	@override String get botCreatedBy => '';
+	@override String get notSupporter => '非会员';
+	@override String get assignedManualy => '该勋章由 TETR.IO 管理员手动分配';
+	@override String supporter({required Object tier}) => '会员等级 ${tier}';
+	@override String comparingWith({required Object newDate, required Object oldDate}) => '${newDate} 时的数据与 ${oldDate} 比较';
+	@override String get top => '前';
+	@override String get topRank => '最高段位';
+	@override String verdictGeneral({required Object rank, required Object verdict, required Object n}) => '比 ${rank} 段平均数据${verdict} ${n}';
+	@override String get verdictBetter => '好';
+	@override String get verdictWorse => '差';
+	@override String get smooth => '平滑';
+	@override String get postSeason => '淡季';
+	@override String get seasonStarts => '下一赛即将开始于：';
+	@override String get nanow => '暂未完成，敬请等待！';
+	@override String seasonEnds({required Object countdown}) => '赛季将会在 ${countdown} 后结束';
+	@override String get seasonEnded => 'Season has ended';
+	@override String gamesUntilRanked({required Object left}) => '还有 ${left} 场比赛获取段位';
+	@override String numOfVictories({required Object wins}) => '~${wins} 场胜局';
+	@override String get promotionOnNextWin => '下一次胜利即可升段';
+	@override String numOfdefeats({required Object losses}) => '~${losses} 场败局';
+	@override String get demotionOnNextLoss => '下一次失败即可掉段';
+	@override String get nerdStats => '详细信息';
+	@override String get playersYouTrack => '跟踪';
+	@override String get formula => '公式';
+	@override String get exactValue => '实际值';
+	@override String get neverPlayedTL => '此用户没有参与Tetra联赛';
+	@override String get botTL => '机器人不予参加Tetra联赛';
+	@override String get anonTL => '匿名用户不予参加Tetra联赛';
+	@override String get quickPlay => '快速游戏';
+	@override String get expert => '专家';
+	@override String get withMods => '带着模组';
+	@override String withModsPlural({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		zero: '带着 ${n} 个模组',
+		one: '带着 ${n} 个模组',
+		two: '带着 ${n} 个模组',
+		few: '带着 ${n} 个模组',
+		many: '带着 ${n} 个模组',
+		other: '带着 ${n} 个模组',
+	);
+	@override String get exportDB => '导出本地数据';
+	@override String get exportDBDescription => '它包含跟踪的玩家的状态和Tetra联赛记录和跟踪列表。';
+	@override String get desktopExportAlertTitle => '桌面导出';
+	@override String get desktopExportText => '您好像在使用桌面版。请查看你的“文档”文件夹，你应该能找到“TetraStats.db”。把它复制到一个地方';
+	@override String get androidExportAlertTitle => '安卓导出';
+	@override String androidExportText({required Object exportedDB}) => '导出成功\n${exportedDB}';
+	@override String get importDB => '导入本地数据';
+	@override String get importDBDescription => '恢复您的备份。请注意，已存储的数据库将被覆盖。';
+	@override String get importWrongFileType => '文件类型错误';
+	@override String get importCancelled => '已取消';
+	@override String get importSuccess => '导入成功';
+	@override String get yourID => '你的 TETR.IO 用户';
+	@override String get yourIDAlertTitle => '你的 TETR.IO 昵称';
+	@override String get yourIDText => '当程序加载，它将显示此用户的数据';
+	@override String get language => '语言';
+	@override String get updateInBackground => '自动升级数据';
+	@override String get updateInBackgroundDescription => '当 Tetra Stats 运行时，它可以在缓存过期时更新当前玩家的统计数据';
+	@override String get customization => '自定义';
+	@override String get customizationDescription => '更改 Tetra Stats UI 中不同事物的外观';
+	@override String get oskKagari => 'osk 特有的 Kagari 段位';
+	@override String get oskKagariDescription => '如果打开，主视图上的 osk 段位将显示为 :kagari:';
+	@override String get AccentColor => '主题色';
+	@override String get AccentColorDescription => '几乎所有交互式 UI 元素都用此颜色突出显示';
+	@override String get timestamps => '时间';
+	@override String get timestampsDescription => '您可以选择显示时间的方式';
+	@override String get timestampsAbsoluteGMT => '绝对 (GMT)';
+	@override String get timestampsAbsoluteLocalTime => '绝对 (你的时区)';
+	@override String get timestampsRelative => '相对';
+	@override String get rating => '评级主要表现';
+	@override String get ratingDescription => 'TR 不是线性的，而 Glicko 没有边界，百分位数易挥发';
+	@override String get ratingLBposition => 'LB 位置';
+	@override String get sheetbotGraphs => 'Sheetbot式雷达图';
+	@override String get sheetbotGraphsDescription => '若开启，雷达图上的点为负时可以出现在对面';
+	@override String get lbStats => '显示基于排行榜的数据';
+	@override String get lbStatsDescription => '这会影响加载时间，但允许您通过统计数据查看排行榜上的位置并与平均值进行比较';
+	@override String get aboutApp => '关于';
+	@override String aboutAppText({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) ${version} 版 Build ${buildNumber}\n\n由 dan63047 制作\n由 kerrmunism 提供公式\n由 p1nkl0bst3r 提供历史\nTETR.IO 回放抓取器 API 由 szy 制作';
+	@override String stateViewTitle({required Object nickname, required Object date}) => '${nickname} 在 ${date}';
+	@override String statesViewTitle({required Object nickname, required Object number}) => '${nickname} 的 ${number} 个状态';
+	@override String matchesViewTitle({required Object nickname}) => '${nickname} 的Tetra联赛历史';
+	@override String statesViewEntry({required Object level, required Object glicko, required Object rd, required Object games}) => '${level} TR, ${glicko}±${rd} Glicko, ${games} 次游戏';
+	@override String stateRemoved({required Object date}) => '成功移除 ${date} 的状态！';
+	@override String matchRemoved({required Object date}) => '成功移除 ${date} 的比赛！';
+	@override String get viewAllMatches => '查看所有比赛';
+	@override String get trackedPlayersViewTitle => '获取的数据';
+	@override String get trackedPlayersZeroEntrys => '列表为空。 点击 “添加到跟踪列表” 可以将玩家放在这里';
+	@override String get trackedPlayersOneEntry => '只有 1 个玩家';
+	@override String trackedPlayersManyEntrys({required Object numberOfPlayers}) => '${numberOfPlayers} 个玩家';
+	@override String trackedPlayersEntry({required Object nickname, required Object numberOfStates}) => '${nickname}：${numberOfStates} 个状态';
+	@override String trackedPlayersDescription({required Object firstStateDate, required Object lastStateDate}) => '从 ${firstStateDate} 到 ${lastStateDate}';
+	@override String trackedPlayersStatesDeleted({required Object nickname}) => '成功从数据库中移除 ${nickname} 个状态！';
+	@override String get duplicatedFix => '删除重复的 TL 匹配项';
+	@override String get compressDB => '压缩数据库';
+	@override String SpaceSaved({required Object size}) => '保存空白：${size}';
+	@override String averageXrank({required Object rankLetter}) => '平均 ${rankLetter} 段';
+	@override String get vs => 'vs';
+	@override String get inTLmatch => '在Tetra联赛中';
+	@override String get downloadReplay => '下载 .ttrm 回放';
+	@override String get openReplay => '在 TETR.IO 打开回放';
+	@override String replaySaved({required Object path}) => '已保存回放至 ${path}';
+	@override String get match => '比赛';
+	@override String get timeWeightedmatch => '比赛（时间加权）';
+	@override String roundNumber({required Object n}) => '第 ${n} 回合';
+	@override String get statsFor => '数据：';
+	@override String get numberOfRounds => '回合数';
+	@override String get matchLength => '比赛时长';
+	@override String get roundLength => '回合时长';
+	@override String get matchStats => '比赛数据';
+	@override String get timeWeightedmatchStats => '时间加权比赛数据';
+	@override String get replayIssue => '无法处理回放';
+	@override String get matchIsTooOld => '无回放';
+	@override String get winner => '赢家';
+	@override String get registred => '注册日期';
+	@override String get playedTL => '游玩过Tetra联赛';
+	@override String get winChance => '胜利机会';
+	@override String get byGlicko => '靠Glicko';
+	@override String get byEstTR => '靠预测TR';
+	@override String compareViewNoValues({required Object avgR}) => '请输入用户名，用户IO，APM-PPS-VS值 （分隔符不重要，只需要顺序）或者${avgR}（R是一个段位）到两个字段';
+	@override String compareViewWrongValue({required Object value}) => '获取 ${value} 失败';
+	@override String get mostRecentOne => '最接近的';
+	@override String get yes => '是';
+	@override String get no => '否';
+	@override String get daysLater => '天后';
+	@override String get dayseBefore => '天前';
+	@override String get fromBeginning => '开服';
+	@override String get calc => '计算器';
+	@override String get calcViewNoValues => '输入值以计算数据';
+	@override String get rankAveragesViewTitle => '段位分隔符';
+	@override String get sprintAndBlitsViewTitle => '竞速与闪电战平均数据';
+	@override String sprintAndBlitsRelevance({required Object date}) => '数据来自${date}';
+	@override String get rank => '段位';
+	@override String get averages => '平均';
+	@override String get lbViewZeroEntrys => '空';
+	@override String get lbViewOneEntry => '只有一个玩家';
+	@override String lbViewManyEntrys({required Object numberOfPlayers}) => '有 ${numberOfPlayers}';
+	@override String get everyoneAverages => 'Tetra联赛散点图';
+	@override String get sortBy => '排序依据';
+	@override String get reversed => '反向';
+	@override String get country => '地区';
+	@override String rankAverages({required Object rank}) => '${rank}段位散点图';
+	@override String players({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		zero: '${n} 个玩家',
+		one: '${n} 个玩家',
+		two: '${n} 个玩家',
+		few: '${n} 个玩家',
+		many: '${n} 个玩家',
+		other: '${n} 个玩家',
+	);
+	@override String games({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		zero: '${n} 场游戏',
+		one: '${n} 场游戏',
+		two: '${n} 场游戏',
+		few: '${n} 场游戏',
+		many: '${n} 场游戏',
+		other: '${n} 场游戏',
+	);
+	@override String gamesPlayed({required Object games}) => '${games} 场游戏';
+	@override String get chart => '列表';
+	@override String get entries => '条目';
+	@override String get minimums => '最小值';
+	@override String get maximums => '最大值';
+	@override String get lowestValues => '最小值';
+	@override String get averageValues => '平均值';
+	@override String get highestValues => '最大值';
+	@override String forPlayer({required Object username}) => '来自用户 ${username}';
+	@override String currentAxis({required Object axis}) => '${axis} 轴：';
+	@override String get p1nkl0bst3rAlert => '该数据是从 p1nkl0bst3r 维护的第三方 API 中检索的';
+	@override String get notForWeb => '浏览器版本暂不支持函数';
+	@override late final _StringsGraphsZhCn graphs = _StringsGraphsZhCn._(_root);
+	@override late final _StringsStatCellNumZhCn statCellNum = _StringsStatCellNumZhCn._(_root);
+	@override Map<String, String> get playerRole => {
+		'user': '用户',
+		'banned': '封禁',
+		'bot': '机器人',
+		'sysop': '系统管理员',
+		'admin': '管理员',
+		'mod': '管理员',
+		'halfmod': '社区管理员',
+		'anon': '匿名',
+	};
+	@override late final _StringsNumOfGameActionsZhCn numOfGameActions = _StringsNumOfGameActionsZhCn._(_root);
+	@override late final _StringsPopupActionsZhCn popupActions = _StringsPopupActionsZhCn._(_root);
+	@override late final _StringsErrorsZhCn errors = _StringsErrorsZhCn._(_root);
+	@override Map<String, String> get countries => {
+		'': '无',
+		'AF': '阿富汗',
+		'AX': '奥兰群岛',
+		'AL': '阿尔巴尼亚',
+		'DZ': '阿尔及利亚',
+		'AS': '美属萨摩亚',
+		'AD': '安道尔',
+		'AO': '安哥拉',
+		'AI': '安圭拉',
+		'AQ': '南极洲',
+		'AG': '安提瓜和巴布达',
+		'AR': '阿根廷',
+		'AM': '亚美尼亚',
+		'AW': '阿鲁巴',
+		'AU': '澳大利亚',
+		'AT': '奥地利',
+		'AZ': '阿塞拜疆',
+		'BS': '巴哈马',
+		'BH': '巴林',
+		'BD': '孟加拉国',
+		'BB': '巴巴多斯',
+		'BY': '白俄罗斯',
+		'BE': '比利时',
+		'BZ': '伯利兹',
+		'BJ': '贝宁',
+		'BM': '百慕大',
+		'BT': '不丹',
+		'BO': '玻利维亚多民族国',
+		'BA': '波斯尼亚和黑塞哥维那',
+		'BW': '博茨瓦纳',
+		'BV': '布韦岛',
+		'BR': '巴西',
+		'IO': '英属印度洋领地',
+		'BN': '文莱达鲁萨兰国',
+		'BG': '保加利亚',
+		'BF': '布基纳法索',
+		'BI': '布隆迪',
+		'KH': '柬埔寨',
+		'CM': '喀麦隆',
+		'CA': '加拿大',
+		'CV': '佛得角',
+		'BQ': '荷兰加勒比区',
+		'KY': '开曼群岛',
+		'CF': '中非',
+		'TD': '乍得',
+		'CL': '智利',
+		'CN': '中国',
+		'CX': '圣诞岛',
+		'CC': '科科斯（基林）群岛',
+		'CO': '哥伦比亚',
+		'KM': '科摩罗',
+		'CG': '刚果（布）/刚果共和国',
+		'CD': '刚果（金）/刚果民主共和国',
+		'CK': '库克群岛',
+		'CR': '哥斯达黎加',
+		'CI': '科特迪瓦',
+		'HR': '克罗地亚',
+		'CU': '古巴',
+		'CW': '库拉索',
+		'CY': '塞浦路斯',
+		'CZ': '捷克',
+		'DK': '丹麦',
+		'DJ': '吉布提',
+		'DM': '多米尼加',
+		'DO': '多米尼加共和国',
+		'EC': '厄瓜多尔',
+		'EG': '埃及',
+		'SV': '萨尔瓦多',
+		'GB-ENG': '英格兰',
+		'GQ': '赤道几内亚',
+		'ER': '厄立特里亚',
+		'EE': '爱沙尼亚',
+		'ET': '埃塞俄比亚',
+		'EU': '欧洲',
+		'FK': '福克兰群岛/马尔维纳斯群岛',
+		'FO': '法罗群岛',
+		'FJ': '斐济',
+		'FI': '芬兰',
+		'FR': '法国',
+		'GF': '法属圭亚那',
+		'PF': '法属波利尼西亚',
+		'TF': '法属南部领地',
+		'GA': '加蓬',
+		'GM': '冈比亚',
+		'GE': '格鲁吉亚',
+		'DE': '德国',
+		'GH': '加纳',
+		'GI': '直布罗陀',
+		'GR': '希腊',
+		'GL': '格陵兰岛',
+		'GD': '格林纳达',
+		'GP': '瓜德罗普岛',
+		'GU': '关岛',
+		'GT': '危地马拉',
+		'GG': '根西岛',
+		'GN': '几内亚',
+		'GW': '几内亚比绍',
+		'GY': '圭亚那',
+		'HT': '海地',
+		'HM': '赫德岛和麦克唐纳群岛',
+		'VA': '梵蒂冈',
+		'HN': '洪都拉斯',
+		'HK': '中国香港',
+		'HU': '匈牙利',
+		'IS': '冰岛',
+		'IN': '印度',
+		'ID': '印度尼西亚',
+		'IR': '伊朗',
+		'IQ': '伊拉克',
+		'IE': '爱尔兰',
+		'IM': '马恩岛',
+		'IL': '以色列',
+		'IT': '意大利',
+		'JM': '牙买加',
+		'JP': '日本',
+		'JE': 'Jersey',
+		'JO': '约旦',
+		'KZ': '哈萨克斯坦',
+		'KE': '肯尼亚',
+		'KI': '基里巴斯',
+		'KP': '朝鲜',
+		'KR': '韩国',
+		'XK': '科索沃',
+		'KW': '科威特',
+		'KG': '吉尔吉斯斯坦',
+		'LA': '老挝',
+		'LV': '拉脱维亚',
+		'LB': '黎巴嫩',
+		'LS': '莱索托',
+		'LR': '利比里亚',
+		'LY': '利比亚',
+		'LI': '列支敦士登',
+		'LT': '立陶宛',
+		'LU': '卢森堡',
+		'MO': '中国澳门',
+		'MK': '马其顿',
+		'MG': '马达加斯加',
+		'MW': '马拉维',
+		'MY': '马来西亚',
+		'MV': '马尔代夫',
+		'ML': '马里',
+		'MT': '马耳他',
+		'MH': '马绍尔群岛',
+		'MQ': '马提尼克岛',
+		'MR': '毛里塔尼亚',
+		'MU': '毛里求斯',
+		'YT': '马约特岛',
+		'MX': '墨西哥',
+		'FM': '密克罗尼西亚联邦',
+		'MD': '摩尔多瓦共和国',
+		'MC': '摩纳哥',
+		'ME': '黑山',
+		'MA': '摩洛哥',
+		'MN': '蒙古',
+		'MS': '蒙特塞拉特',
+		'MZ': '莫桑比克',
+		'MM': '缅甸',
+		'NA': '纳米比亚',
+		'NR': '瑙鲁',
+		'NP': '尼泊尔',
+		'NL': '尼德兰',
+		'AN': '荷属安的列斯',
+		'NC': '新喀里多尼亚',
+		'NZ': '新西兰',
+		'NI': '尼加拉瓜',
+		'NE': '尼日尔',
+		'NG': '尼日利亚',
+		'NU': '纽埃',
+		'NF': '诺福克岛',
+		'GB-NIR': '北爱尔兰',
+		'MP': '北马里亚纳群岛',
+		'NO': '挪威',
+		'OM': '阿曼',
+		'PK': '巴基斯坦',
+		'PW': '帕劳',
+		'PS': '巴勒斯坦',
+		'PA': '巴拿马',
+		'PG': '巴布亚新几内亚',
+		'PY': '巴拉圭',
+		'PE': '秘鲁',
+		'PH': '菲律宾',
+		'PN': '皮特凯恩',
+		'PL': '波兰',
+		'PT': '葡萄牙',
+		'PR': '波多黎各',
+		'QA': '卡塔尔',
+		'RE': '留尼汪',
+		'RO': '罗马尼亚',
+		'RU': '俄罗斯联邦',
+		'RW': '卢旺达',
+		'BL': '圣巴泰勒米',
+		'SH': '圣赫勒拿,阿森松和特里斯坦-达库尼亚',
+		'KN': '圣基茨和尼维斯',
+		'LC': '圣卢西亚',
+		'MF': '圣马丁',
+		'PM': '圣皮埃尔和密克隆群岛',
+		'VC': '圣文森特和格林纳丁斯',
+		'WS': '萨摩亚',
+		'SM': '圣马力诺',
+		'ST': '圣多美和普林西比',
+		'SA': '沙特阿拉伯',
+		'GB-SCT': '苏格兰',
+		'SN': '塞内加尔',
+		'RS': '塞尔维亚',
+		'SC': '塞舌尔',
+		'SL': '塞拉利昂',
+		'SG': '新加坡',
+		'SX': '荷属圣马丁',
+		'SK': '斯洛伐克',
+		'SI': '斯洛文尼亚',
+		'SB': '所罗门群岛',
+		'SO': '索马里',
+		'ZA': '南非',
+		'GS': '南乔治亚和南桑威奇群岛',
+		'SS': '南苏丹',
+		'ES': '西班牙',
+		'LK': '斯里兰卡',
+		'SD': '苏丹',
+		'SR': '苏里南',
+		'SJ': '斯瓦尔巴和扬马延群岛',
+		'SZ': '斯威士兰',
+		'SE': '瑞典',
+		'CH': '瑞士',
+		'SY': '叙利亚',
+		'TW': '中国台湾',
+		'TJ': '塔吉克斯坦',
+		'TZ': '坦桑尼亚',
+		'TH': '泰国',
+		'TL': '东帝汶',
+		'TG': '多哥',
+		'TK': '托克劳',
+		'TO': '汤加',
+		'TT': '特立尼达和多巴哥',
+		'TN': '突尼斯',
+		'TR': '土耳其',
+		'TM': '土库曼斯坦',
+		'TC': '特克斯和凯科斯群岛',
+		'TV': '图瓦卢',
+		'UG': '乌干达',
+		'UA': '乌克兰',
+		'AE': '阿拉伯联合酋长国',
+		'GB': '英国',
+		'US': '美国',
+		'UY': '乌拉圭',
+		'UM': '美国小岛屿',
+		'UZ': '乌兹别克斯坦',
+		'VU': '瓦努阿图',
+		'VE': '委内瑞拉玻利瓦尔共和国',
+		'VN': '越南',
+		'VG': '英属维尔京群岛',
+		'VI': '美属维尔京群岛',
+		'GB-WLS': '威尔士',
+		'WF': '瓦利斯和富图纳群岛',
+		'EH': '西撒哈拉',
+		'YE': '也门',
+		'ZM': '赞比亚',
+		'ZW': '津巴布韦',
+		'XX': '未知',
+		'XM': '月球',
+	};
+}
+
+// Path: newsParts
+class _StringsNewsPartsZhCn implements _StringsNewsPartsEn {
+	_StringsNewsPartsZhCn._(this._root);
+
+	@override final _StringsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get leaderboardStart => '取得 ';
+	@override String get leaderboardMiddle => '于 ';
+	@override String get personalbest => '在 ';
+	@override String get personalbestMiddle => ' 中取得了新的个人最好成绩 ';
+	@override String get badgeStart => '获得勋章 ';
+	@override String get badgeEnd => '';
+	@override String get rankupStart => '达成 ';
+	@override String rankupMiddle({required Object r}) => '${r} 段位 ';
+	@override String get rankupEnd => '';
+	@override String get tetoSupporter => 'TETR.IO 会员';
+	@override String get supporterStart => '成为了 ';
+	@override String get supporterGiftStart => '被赠送了 ';
+	@override String unknownNews({required Object type}) => '未知新闻 ${type}';
+}
+
+// Path: graphs
+class _StringsGraphsZhCn implements _StringsGraphsEn {
+	_StringsGraphsZhCn._(this._root);
+
+	@override final _StringsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get attack => '攻击';
+	@override String get speed => '速度';
+	@override String get defense => '防御';
+	@override String get cheese => '奶酪层';
+}
+
+// Path: statCellNum
+class _StringsStatCellNumZhCn implements _StringsStatCellNumEn {
+	_StringsStatCellNumZhCn._(this._root);
+
+	@override final _StringsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get xpLevel => 'XP等级';
+	@override String get xpProgress => '到下一等级的进度';
+	@override String xpFrom0ToLevel({required Object n}) => '从 0 到 ${n} 等级的进度';
+	@override String get xpLeft => 'XP 还有';
+	@override String get hoursPlayed => '小时游玩';
+	@override String get onlineGames => '在线游戏场次';
+	@override String get gamesWon => '获胜场次';
+	@override String get totalGames => '总在线游戏场次';
+	@override String get totalWon => '总在线游戏获胜场次';
+	@override String get friends => '好友';
+	@override String get apm => '每分\n发送垃圾行';
+	@override String get vs => 'VS\n分数';
+	@override String get recordLB => '名次';
+	@override String get lbp => '名次';
+	@override String get lbpShort => '名次';
+	@override String get lbpc => '地区\n名次';
+	@override String get lbpcShort => '地区名次';
+	@override String get gamesPlayed => '游戏\n场次';
+	@override String get gamesWonTL => '获胜\n场次';
+	@override String get winrate => '胜率';
+	@override String get level => '等级';
+	@override String get score => '分数';
+	@override String get spp => '每块\n得分';
+	@override String get pieces => '放置\n块数';
+	@override String get pps => '每秒\n放置块数';
+	@override String get finesseFaults => '非极简\n操作';
+	@override String get finessePercentage => '极简率';
+	@override String get keys => '按键';
+	@override String get kpp => '每块\n按键';
+	@override String get kps => '每秒\n按键';
+	@override String get tr => 'Tetra分数';
+	@override String get rd => '偏移值';
+	@override String get app => '每块发送垃圾行数';
+	@override String get appDescription => '(Attack per Piece, 简称APP) 主要效率指标。表示玩家每块可以发动多少次攻击';
+	@override String get vsapmDescription => '基本上可以告诉你在攻击中利用垃圾行的效率';
+	@override String get dss => '每秒\n挖掘';
+	@override String get dssDescription => '(Downstack per Second, 简称 DS/S) 测量一秒钟内清除多少条垃圾行。';
+	@override String get dsp => '每块\n挖掘';
+	@override String get dspDescription => '(Downstack per Piece, 简称 DS/P) 测量每一块清除多少条垃圾行。';
+	@override String get appdsp => 'APP + DS/P';
+	@override String get appdspDescription => '只是每块发送垃圾行数与每块挖掘之和。';
+	@override String get cheese => '垃圾行\n混乱指数';
+	@override String get cheeseDescription => '(Cheese Index, 简称Cheese) 是玩家发出的垃圾行有多整齐/混乱的近似值。低数据代表整齐，高数据代表混乱。\n由 kerrmunism 发明';
+	@override String get gbe => '垃圾行\n效率';
+	@override String get gbeDescription => '(Garbage Efficity, 简称Gb Eff.) 测量玩家如何很好地利用他们收到的垃圾行。高数据代表更好或者他们更多地用TA的垃圾行，低数据代表TA大多将垃圾行送回奶酪层，或者很少清理垃圾行。\n由 Zepheniah 与 Dragonboy 发明。';
+	@override String get nyaapp => '加权\nAPP';
+	@override String get nyaappDescription => '(Weighted APP, 简称wAPP) 在本质上是在衡量您在保持高 APP 的同时发送奶酪的能力。\n由 Wertj 发明。';
+	@override String get area => '面积';
+	@override String get areaDescription => '如果排除 Cheese 和 vs/apm 部分，您的形状在图表上占据了多少空间';
+	@override String get estOfTR => '预测 TR';
+	@override String get estOfTRShort => '预测 TR';
+	@override String get accOfEst => '预测实际差量';
+	@override String get accOfEstShort => '预测实际差量';
+}
+
+// Path: numOfGameActions
+class _StringsNumOfGameActionsZhCn implements _StringsNumOfGameActionsEn {
+	_StringsNumOfGameActionsZhCn._(this._root);
+
+	@override final _StringsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get pc => '全消数';
+	@override String get hold => '暂存数';
+	@override String inputs({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		zero: '${n} 次按键',
+		one: '${n} 次按键',
+		two: '${n} 次按键',
+		few: '${n} 次按键',
+		many: '${n} 次按键',
+		other: '${n} 次按键',
+	);
+	@override String tspinsTotal({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		zero: '共 ${n} 次T旋',
+		one: '共 ${n} 次T旋',
+		two: '共 ${n} 次T旋',
+		few: '共 ${n} 次T旋',
+		many: '共 ${n} 次T旋',
+		other: '共 ${n} 次T旋',
+	);
+	@override String lineClears({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+		zero: '清除了 ${n} 行',
+		one: '清除了 ${n} 行',
+		two: '清除了 ${n} 行',
+		few: '清除了 ${n} 行',
+		many: '清除了 ${n} 行',
+		other: '清除了 ${n} 行',
+	);
+}
+
+// Path: popupActions
+class _StringsPopupActionsZhCn implements _StringsPopupActionsEn {
+	_StringsPopupActionsZhCn._(this._root);
+
+	@override final _StringsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get cancel => '取消';
+	@override String get submit => '确定';
+	@override String get ok => '彳亍';
+}
+
+// Path: errors
+class _StringsErrorsZhCn implements _StringsErrorsEn {
+	_StringsErrorsZhCn._(this._root);
+
+	@override final _StringsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String connection({required Object code, required Object message}) => '连接错误： ${code} ${message}';
+	@override String get noSuchUser => '没有这样的用户';
+	@override String get noSuchUserSub => '检查用户名的拼写是否错误，也许用户不存在';
+	@override String get discordNotAssigned => '没有用户绑定到该Discord ID';
+	@override String get discordNotAssignedSub => '您必须输入合法的ID';
+	@override String get history => '此玩家没有历史';
+	@override String get actionSuggestion => '你也许想';
+	@override String get p1nkl0bst3rTLmatches => '没有比赛';
+	@override String get clientException => '连接不到网络';
+	@override String get forbidden => '你的IP地址被封禁';
+	@override String forbiddenSub({required Object nickname}) => '请关闭您的VPN。若问题仍然存在，请联系 ${nickname}';
+	@override String get tooManyRequests => '您申请的请求过多';
+	@override String get tooManyRequestsSub => '等一会再试吧';
+	@override String get internal => 'tetr.io 似乎出错了';
+	@override String get internalSub => 'osk，也许，要被';
+	@override String get internalWebVersion => 'tetr.io 或者 oskware_bridge 似乎出错了';
+	@override String get internalWebVersionSub => '如果 osk 说没有什么问题，请让dan63047知道';
+	@override String get oskwareBridge => 'oskware_bridge 似乎出错了';
+	@override String get oskwareBridgeSub => '请让 dan63047 知道';
+	@override String get p1nkl0bst3rForbidden => '第三方API封禁了你的IP地址';
+	@override String get p1nkl0bst3rTooManyRequests => '第三方API……太多请求了。';
+	@override String get p1nkl0bst3rinternal => 'p1nkl0bst3r 那边似乎出错了';
+	@override String get p1nkl0bst3rinternalWebVersion => 'p1nkl0bst3r (或 on oskware_bridge, 其实我并不知道) 那边似乎出错了';
+	@override String get replayAlreadySaved => '你已保存此回放';
+	@override String get replayExpired => '回放已过期';
+	@override String get replayRejected => '第三方API封禁了你的IP地址';
+}
+
 /// Flat map(s) containing all translations.
 /// Only for edge cases! For simple maps, use the map function of this library.
 
@@ -1554,6 +2269,7 @@ extension on Translations {
 		switch (path) {
 			case 'locales.en': return 'English';
 			case 'locales.ru': return 'Russian (Русский)';
+			case 'locales.zh-CN': return 'Simplified Chinese (简体中文)';
 			case 'tetraLeague': return 'Tetra League';
 			case 'tlRecords': return 'TL Records';
 			case 'history': return 'History';
@@ -2181,6 +2897,7 @@ extension on _StringsRu {
 		switch (path) {
 			case 'locales.en': return 'Английский (English)';
 			case 'locales.ru': return 'Русский';
+			case 'locales.zh-CN': return 'Упрощенный Китайский (简体中文)';
 			case 'tetraLeague': return 'Тетра Лига';
 			case 'tlRecords': return 'Матчи ТЛ';
 			case 'history': return 'История';
@@ -2798,6 +3515,634 @@ extension on _StringsRu {
 			case 'countries.ZW': return 'Зимбабве';
 			case 'countries.XX': return 'Неизвестно';
 			case 'countries.XM': return 'Луна';
+			default: return null;
+		}
+	}
+}
+
+extension on _StringsZhCn {
+	dynamic _flatMapFunction(String path) {
+		switch (path) {
+			case 'locales.en': return '英语 (English)';
+			case 'locales.ru': return '俄语 (Русский)';
+			case 'locales.zh-CN': return '简体中文';
+			case 'tetraLeague': return 'Tetra联赛';
+			case 'tlRecords': return 'Tetra联赛记录';
+			case 'history': return '历史';
+			case 'sprint': return '40行竞速';
+			case 'blitz': return '闪电战';
+			case 'recent': return '最近';
+			case 'recentRuns': return '最近游玩局数';
+			case 'blitzScore': return ({required Object p}) => '${p} 分';
+			case 'openSPreplay': return '在TETR.IO打开回放';
+			case 'downloadSPreplay': return '下载回放';
+			case 'other': return '其他';
+			case 'distinguishment': return '区别';
+			case 'zen': return '禅意模式';
+			case 'bio': return '个人简介';
+			case 'news': return '新闻';
+			case 'newsParts.leaderboardStart': return '取得 ';
+			case 'newsParts.leaderboardMiddle': return '于 ';
+			case 'newsParts.personalbest': return '在 ';
+			case 'newsParts.personalbestMiddle': return ' 中取得了新的个人最好成绩 ';
+			case 'newsParts.badgeStart': return '获得勋章 ';
+			case 'newsParts.badgeEnd': return '';
+			case 'newsParts.rankupStart': return '达成 ';
+			case 'newsParts.rankupMiddle': return ({required Object r}) => '${r} 段位 ';
+			case 'newsParts.rankupEnd': return '';
+			case 'newsParts.tetoSupporter': return 'TETR.IO 会员';
+			case 'newsParts.supporterStart': return '成为了 ';
+			case 'newsParts.supporterGiftStart': return '被赠送了 ';
+			case 'newsParts.unknownNews': return ({required Object type}) => '未知新闻 ${type}';
+			case 'openSearch': return '搜索玩家';
+			case 'closeSearch': return '关闭搜索';
+			case 'searchHint': return '昵称，ID或Discord用户ID（需要 "ds:" 前缀）';
+			case 'refresh': return '刷新';
+			case 'fetchAndsaveTLHistory': return '获取玩家历史';
+			case 'fetchAndSaveOldTLmatches': return '获取玩家Tetra联赛历史';
+			case 'fetchAndsaveTLHistoryResult': return ({required Object number}) => '找到 ${number} 个状态';
+			case 'fetchAndSaveOldTLmatchesResult': return ({required Object number}) => '找到 ${number} 场Tetra联赛比赛';
+			case 'showStoredData': return '显示获得的数据';
+			case 'statsCalc': return '统计计算器';
+			case 'settings': return '设置';
+			case 'track': return '添加到\n跟踪列表';
+			case 'stopTracking': return '从跟踪列表\n中移除';
+			case 'becameTracked': return '已添加到跟踪列表！';
+			case 'compare': return '对比';
+			case 'stoppedBeingTracked': return '已从跟踪列表中移除！';
+			case 'tlLeaderboard': return 'Tetra联赛排行榜';
+			case 'noRecords': return '无记录';
+			case 'noOldRecords': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+				zero: '无记录',
+				one: '只有 ${n} 个记录',
+				two: '只有 ${n} 个记录',
+				few: '只有 ${n} 个记录',
+				many: '只有 ${n} 个记录',
+				other: '只有 ${n} 个记录',
+			);
+			case 'noRecord': return ({required Object n}) => '只有 ${n} 个记录';
+			case 'botRecord': return '机器人不予参加排位赛';
+			case 'anonRecord': return '匿名用户不予参加排位赛';
+			case 'notEnoughData': return '没有足够的数据';
+			case 'noHistorySaved': return '没有保存历史';
+			case 'pseudoTooltipHeaderInit': return '将鼠标放在点上';
+			case 'pseudoTooltipFooterInit': return '以查看详细信息';
+			case 'obtainDate': return ({required Object date}) => '在 ${date} 获得';
+			case 'fetchDate': return ({required Object date}) => 'Fetched ${date}';
+			case 'exactGametime': return '实际游玩时长';
+			case 'bigRedBanned': return '该账号封禁中';
+			case 'normalBanned': return '封禁';
+			case 'bigRedBadStanding': return '信誉不佳';
+			case 'copiedToClipboard': return '已复制';
+			case 'playerRoleAccount': return '账号';
+			case 'wasFromBeginning': return '在很久很久以前';
+			case 'created': return '创建于';
+			case 'botCreatedBy': return '';
+			case 'notSupporter': return '非会员';
+			case 'assignedManualy': return '该勋章由 TETR.IO 管理员手动分配';
+			case 'supporter': return ({required Object tier}) => '会员等级 ${tier}';
+			case 'comparingWith': return ({required Object newDate, required Object oldDate}) => '${newDate} 时的数据与 ${oldDate} 比较';
+			case 'top': return '前';
+			case 'topRank': return '最高段位';
+			case 'verdictGeneral': return ({required Object rank, required Object verdict, required Object n}) => '比 ${rank} 段平均数据${verdict} ${n}';
+			case 'verdictBetter': return '好';
+			case 'verdictWorse': return '差';
+			case 'smooth': return '平滑';
+			case 'postSeason': return '淡季';
+			case 'seasonStarts': return '下一赛即将开始于：';
+			case 'nanow': return '暂未完成，敬请等待！';
+			case 'seasonEnds': return ({required Object countdown}) => '赛季将会在 ${countdown} 后结束';
+			case 'seasonEnded': return 'Season has ended';
+			case 'gamesUntilRanked': return ({required Object left}) => '还有 ${left} 场比赛获取段位';
+			case 'numOfVictories': return ({required Object wins}) => '~${wins} 场胜局';
+			case 'promotionOnNextWin': return '下一次胜利即可升段';
+			case 'numOfdefeats': return ({required Object losses}) => '~${losses} 场败局';
+			case 'demotionOnNextLoss': return '下一次失败即可掉段';
+			case 'nerdStats': return '详细信息';
+			case 'playersYouTrack': return '跟踪';
+			case 'formula': return '公式';
+			case 'exactValue': return '实际值';
+			case 'neverPlayedTL': return '此用户没有参与Tetra联赛';
+			case 'botTL': return '机器人不予参加Tetra联赛';
+			case 'anonTL': return '匿名用户不予参加Tetra联赛';
+			case 'quickPlay': return '快速游戏';
+			case 'expert': return '专家';
+			case 'withMods': return '带着模组';
+			case 'withModsPlural': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+				zero: '带着 ${n} 个模组',
+				one: '带着 ${n} 个模组',
+				two: '带着 ${n} 个模组',
+				few: '带着 ${n} 个模组',
+				many: '带着 ${n} 个模组',
+				other: '带着 ${n} 个模组',
+			);
+			case 'exportDB': return '导出本地数据';
+			case 'exportDBDescription': return '它包含跟踪的玩家的状态和Tetra联赛记录和跟踪列表。';
+			case 'desktopExportAlertTitle': return '桌面导出';
+			case 'desktopExportText': return '您好像在使用桌面版。请查看你的“文档”文件夹，你应该能找到“TetraStats.db”。把它复制到一个地方';
+			case 'androidExportAlertTitle': return '安卓导出';
+			case 'androidExportText': return ({required Object exportedDB}) => '导出成功\n${exportedDB}';
+			case 'importDB': return '导入本地数据';
+			case 'importDBDescription': return '恢复您的备份。请注意，已存储的数据库将被覆盖。';
+			case 'importWrongFileType': return '文件类型错误';
+			case 'importCancelled': return '已取消';
+			case 'importSuccess': return '导入成功';
+			case 'yourID': return '你的 TETR.IO 用户';
+			case 'yourIDAlertTitle': return '你的 TETR.IO 昵称';
+			case 'yourIDText': return '当程序加载，它将显示此用户的数据';
+			case 'language': return '语言';
+			case 'updateInBackground': return '自动升级数据';
+			case 'updateInBackgroundDescription': return '当 Tetra Stats 运行时，它可以在缓存过期时更新当前玩家的统计数据';
+			case 'customization': return '自定义';
+			case 'customizationDescription': return '更改 Tetra Stats UI 中不同事物的外观';
+			case 'oskKagari': return 'osk 特有的 Kagari 段位';
+			case 'oskKagariDescription': return '如果打开，主视图上的 osk 段位将显示为 :kagari:';
+			case 'AccentColor': return '主题色';
+			case 'AccentColorDescription': return '几乎所有交互式 UI 元素都用此颜色突出显示';
+			case 'timestamps': return '时间';
+			case 'timestampsDescription': return '您可以选择显示时间的方式';
+			case 'timestampsAbsoluteGMT': return '绝对 (GMT)';
+			case 'timestampsAbsoluteLocalTime': return '绝对 (你的时区)';
+			case 'timestampsRelative': return '相对';
+			case 'rating': return '评级主要表现';
+			case 'ratingDescription': return 'TR 不是线性的，而 Glicko 没有边界，百分位数易挥发';
+			case 'ratingLBposition': return 'LB 位置';
+			case 'sheetbotGraphs': return 'Sheetbot式雷达图';
+			case 'sheetbotGraphsDescription': return '若开启，雷达图上的点为负时可以出现在对面';
+			case 'lbStats': return '显示基于排行榜的数据';
+			case 'lbStatsDescription': return '这会影响加载时间，但允许您通过统计数据查看排行榜上的位置并与平均值进行比较';
+			case 'aboutApp': return '关于';
+			case 'aboutAppText': return ({required Object appName, required Object packageName, required Object version, required Object buildNumber}) => '${appName} (${packageName}) ${version} 版 Build ${buildNumber}\n\n由 dan63047 制作\n由 kerrmunism 提供公式\n由 p1nkl0bst3r 提供历史\nTETR.IO 回放抓取器 API 由 szy 制作';
+			case 'stateViewTitle': return ({required Object nickname, required Object date}) => '${nickname} 在 ${date}';
+			case 'statesViewTitle': return ({required Object nickname, required Object number}) => '${nickname} 的 ${number} 个状态';
+			case 'matchesViewTitle': return ({required Object nickname}) => '${nickname} 的Tetra联赛历史';
+			case 'statesViewEntry': return ({required Object level, required Object glicko, required Object rd, required Object games}) => '${level} TR, ${glicko}±${rd} Glicko, ${games} 次游戏';
+			case 'stateRemoved': return ({required Object date}) => '成功移除 ${date} 的状态！';
+			case 'matchRemoved': return ({required Object date}) => '成功移除 ${date} 的比赛！';
+			case 'viewAllMatches': return '查看所有比赛';
+			case 'trackedPlayersViewTitle': return '获取的数据';
+			case 'trackedPlayersZeroEntrys': return '列表为空。 点击 “添加到跟踪列表” 可以将玩家放在这里';
+			case 'trackedPlayersOneEntry': return '只有 1 个玩家';
+			case 'trackedPlayersManyEntrys': return ({required Object numberOfPlayers}) => '${numberOfPlayers} 个玩家';
+			case 'trackedPlayersEntry': return ({required Object nickname, required Object numberOfStates}) => '${nickname}：${numberOfStates} 个状态';
+			case 'trackedPlayersDescription': return ({required Object firstStateDate, required Object lastStateDate}) => '从 ${firstStateDate} 到 ${lastStateDate}';
+			case 'trackedPlayersStatesDeleted': return ({required Object nickname}) => '成功从数据库中移除 ${nickname} 个状态！';
+			case 'duplicatedFix': return '删除重复的 TL 匹配项';
+			case 'compressDB': return '压缩数据库';
+			case 'SpaceSaved': return ({required Object size}) => '保存空白：${size}';
+			case 'averageXrank': return ({required Object rankLetter}) => '平均 ${rankLetter} 段';
+			case 'vs': return 'vs';
+			case 'inTLmatch': return '在Tetra联赛中';
+			case 'downloadReplay': return '下载 .ttrm 回放';
+			case 'openReplay': return '在 TETR.IO 打开回放';
+			case 'replaySaved': return ({required Object path}) => '已保存回放至 ${path}';
+			case 'match': return '比赛';
+			case 'timeWeightedmatch': return '比赛（时间加权）';
+			case 'roundNumber': return ({required Object n}) => '第 ${n} 回合';
+			case 'statsFor': return '数据：';
+			case 'numberOfRounds': return '回合数';
+			case 'matchLength': return '比赛时长';
+			case 'roundLength': return '回合时长';
+			case 'matchStats': return '比赛数据';
+			case 'timeWeightedmatchStats': return '时间加权比赛数据';
+			case 'replayIssue': return '无法处理回放';
+			case 'matchIsTooOld': return '无回放';
+			case 'winner': return '赢家';
+			case 'registred': return '注册日期';
+			case 'playedTL': return '游玩过Tetra联赛';
+			case 'winChance': return '胜利机会';
+			case 'byGlicko': return '靠Glicko';
+			case 'byEstTR': return '靠预测TR';
+			case 'compareViewNoValues': return ({required Object avgR}) => '请输入用户名，用户IO，APM-PPS-VS值 （分隔符不重要，只需要顺序）或者${avgR}（R是一个段位）到两个字段';
+			case 'compareViewWrongValue': return ({required Object value}) => '获取 ${value} 失败';
+			case 'mostRecentOne': return '最接近的';
+			case 'yes': return '是';
+			case 'no': return '否';
+			case 'daysLater': return '天后';
+			case 'dayseBefore': return '天前';
+			case 'fromBeginning': return '开服';
+			case 'calc': return '计算器';
+			case 'calcViewNoValues': return '输入值以计算数据';
+			case 'rankAveragesViewTitle': return '段位分隔符';
+			case 'sprintAndBlitsViewTitle': return '竞速与闪电战平均数据';
+			case 'sprintAndBlitsRelevance': return ({required Object date}) => '数据来自${date}';
+			case 'rank': return '段位';
+			case 'averages': return '平均';
+			case 'lbViewZeroEntrys': return '空';
+			case 'lbViewOneEntry': return '只有一个玩家';
+			case 'lbViewManyEntrys': return ({required Object numberOfPlayers}) => '有 ${numberOfPlayers}';
+			case 'everyoneAverages': return 'Tetra联赛散点图';
+			case 'sortBy': return '排序依据';
+			case 'reversed': return '反向';
+			case 'country': return '地区';
+			case 'rankAverages': return ({required Object rank}) => '${rank}段位散点图';
+			case 'players': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+				zero: '${n} 个玩家',
+				one: '${n} 个玩家',
+				two: '${n} 个玩家',
+				few: '${n} 个玩家',
+				many: '${n} 个玩家',
+				other: '${n} 个玩家',
+			);
+			case 'games': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+				zero: '${n} 场游戏',
+				one: '${n} 场游戏',
+				two: '${n} 场游戏',
+				few: '${n} 场游戏',
+				many: '${n} 场游戏',
+				other: '${n} 场游戏',
+			);
+			case 'gamesPlayed': return ({required Object games}) => '${games} 场游戏';
+			case 'chart': return '列表';
+			case 'entries': return '条目';
+			case 'minimums': return '最小值';
+			case 'maximums': return '最大值';
+			case 'lowestValues': return '最小值';
+			case 'averageValues': return '平均值';
+			case 'highestValues': return '最大值';
+			case 'forPlayer': return ({required Object username}) => '来自用户 ${username}';
+			case 'currentAxis': return ({required Object axis}) => '${axis} 轴：';
+			case 'p1nkl0bst3rAlert': return '该数据是从 p1nkl0bst3r 维护的第三方 API 中检索的';
+			case 'notForWeb': return '浏览器版本暂不支持函数';
+			case 'graphs.attack': return '攻击';
+			case 'graphs.speed': return '速度';
+			case 'graphs.defense': return '防御';
+			case 'graphs.cheese': return '奶酪层';
+			case 'statCellNum.xpLevel': return 'XP等级';
+			case 'statCellNum.xpProgress': return '到下一等级的进度';
+			case 'statCellNum.xpFrom0ToLevel': return ({required Object n}) => '从 0 到 ${n} 等级的进度';
+			case 'statCellNum.xpLeft': return 'XP 还有';
+			case 'statCellNum.hoursPlayed': return '小时游玩';
+			case 'statCellNum.onlineGames': return '在线游戏场次';
+			case 'statCellNum.gamesWon': return '获胜场次';
+			case 'statCellNum.totalGames': return '总在线游戏场次';
+			case 'statCellNum.totalWon': return '总在线游戏获胜场次';
+			case 'statCellNum.friends': return '好友';
+			case 'statCellNum.apm': return '每分\n发送垃圾行';
+			case 'statCellNum.vs': return 'VS\n分数';
+			case 'statCellNum.recordLB': return '名次';
+			case 'statCellNum.lbp': return '名次';
+			case 'statCellNum.lbpShort': return '名次';
+			case 'statCellNum.lbpc': return '地区\n名次';
+			case 'statCellNum.lbpcShort': return '地区名次';
+			case 'statCellNum.gamesPlayed': return '游戏\n场次';
+			case 'statCellNum.gamesWonTL': return '获胜\n场次';
+			case 'statCellNum.winrate': return '胜率';
+			case 'statCellNum.level': return '等级';
+			case 'statCellNum.score': return '分数';
+			case 'statCellNum.spp': return '每块\n得分';
+			case 'statCellNum.pieces': return '放置\n块数';
+			case 'statCellNum.pps': return '每秒\n放置块数';
+			case 'statCellNum.finesseFaults': return '非极简\n操作';
+			case 'statCellNum.finessePercentage': return '极简率';
+			case 'statCellNum.keys': return '按键';
+			case 'statCellNum.kpp': return '每块\n按键';
+			case 'statCellNum.kps': return '每秒\n按键';
+			case 'statCellNum.tr': return 'Tetra分数';
+			case 'statCellNum.rd': return '偏移值';
+			case 'statCellNum.app': return '每块发送垃圾行数';
+			case 'statCellNum.appDescription': return '(Attack per Piece, 简称APP) 主要效率指标。表示玩家每块可以发动多少次攻击';
+			case 'statCellNum.vsapmDescription': return '基本上可以告诉你在攻击中利用垃圾行的效率';
+			case 'statCellNum.dss': return '每秒\n挖掘';
+			case 'statCellNum.dssDescription': return '(Downstack per Second, 简称 DS/S) 测量一秒钟内清除多少条垃圾行。';
+			case 'statCellNum.dsp': return '每块\n挖掘';
+			case 'statCellNum.dspDescription': return '(Downstack per Piece, 简称 DS/P) 测量每一块清除多少条垃圾行。';
+			case 'statCellNum.appdsp': return 'APP + DS/P';
+			case 'statCellNum.appdspDescription': return '只是每块发送垃圾行数与每块挖掘之和。';
+			case 'statCellNum.cheese': return '垃圾行\n混乱指数';
+			case 'statCellNum.cheeseDescription': return '(Cheese Index, 简称Cheese) 是玩家发出的垃圾行有多整齐/混乱的近似值。低数据代表整齐，高数据代表混乱。\n由 kerrmunism 发明';
+			case 'statCellNum.gbe': return '垃圾行\n效率';
+			case 'statCellNum.gbeDescription': return '(Garbage Efficity, 简称Gb Eff.) 测量玩家如何很好地利用他们收到的垃圾行。高数据代表更好或者他们更多地用TA的垃圾行，低数据代表TA大多将垃圾行送回奶酪层，或者很少清理垃圾行。\n由 Zepheniah 与 Dragonboy 发明。';
+			case 'statCellNum.nyaapp': return '加权\nAPP';
+			case 'statCellNum.nyaappDescription': return '(Weighted APP, 简称wAPP) 在本质上是在衡量您在保持高 APP 的同时发送奶酪的能力。\n由 Wertj 发明。';
+			case 'statCellNum.area': return '面积';
+			case 'statCellNum.areaDescription': return '如果排除 Cheese 和 vs/apm 部分，您的形状在图表上占据了多少空间';
+			case 'statCellNum.estOfTR': return '预测 TR';
+			case 'statCellNum.estOfTRShort': return '预测 TR';
+			case 'statCellNum.accOfEst': return '预测实际差量';
+			case 'statCellNum.accOfEstShort': return '预测实际差量';
+			case 'playerRole.user': return '用户';
+			case 'playerRole.banned': return '封禁';
+			case 'playerRole.bot': return '机器人';
+			case 'playerRole.sysop': return '系统管理员';
+			case 'playerRole.admin': return '管理员';
+			case 'playerRole.mod': return '管理员';
+			case 'playerRole.halfmod': return '社区管理员';
+			case 'playerRole.anon': return '匿名';
+			case 'numOfGameActions.pc': return '全消数';
+			case 'numOfGameActions.hold': return '暂存数';
+			case 'numOfGameActions.inputs': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+				zero: '${n} 次按键',
+				one: '${n} 次按键',
+				two: '${n} 次按键',
+				few: '${n} 次按键',
+				many: '${n} 次按键',
+				other: '${n} 次按键',
+			);
+			case 'numOfGameActions.tspinsTotal': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+				zero: '共 ${n} 次T旋',
+				one: '共 ${n} 次T旋',
+				two: '共 ${n} 次T旋',
+				few: '共 ${n} 次T旋',
+				many: '共 ${n} 次T旋',
+				other: '共 ${n} 次T旋',
+			);
+			case 'numOfGameActions.lineClears': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
+				zero: '清除了 ${n} 行',
+				one: '清除了 ${n} 行',
+				two: '清除了 ${n} 行',
+				few: '清除了 ${n} 行',
+				many: '清除了 ${n} 行',
+				other: '清除了 ${n} 行',
+			);
+			case 'popupActions.cancel': return '取消';
+			case 'popupActions.submit': return '确定';
+			case 'popupActions.ok': return '彳亍';
+			case 'errors.connection': return ({required Object code, required Object message}) => '连接错误： ${code} ${message}';
+			case 'errors.noSuchUser': return '没有这样的用户';
+			case 'errors.noSuchUserSub': return '检查用户名的拼写是否错误，也许用户不存在';
+			case 'errors.discordNotAssigned': return '没有用户绑定到该Discord ID';
+			case 'errors.discordNotAssignedSub': return '您必须输入合法的ID';
+			case 'errors.history': return '此玩家没有历史';
+			case 'errors.actionSuggestion': return '你也许想';
+			case 'errors.p1nkl0bst3rTLmatches': return '没有比赛';
+			case 'errors.clientException': return '连接不到网络';
+			case 'errors.forbidden': return '你的IP地址被封禁';
+			case 'errors.forbiddenSub': return ({required Object nickname}) => '请关闭您的VPN。若问题仍然存在，请联系 ${nickname}';
+			case 'errors.tooManyRequests': return '您申请的请求过多';
+			case 'errors.tooManyRequestsSub': return '等一会再试吧';
+			case 'errors.internal': return 'tetr.io 似乎出错了';
+			case 'errors.internalSub': return 'osk，也许，要被';
+			case 'errors.internalWebVersion': return 'tetr.io 或者 oskware_bridge 似乎出错了';
+			case 'errors.internalWebVersionSub': return '如果 osk 说没有什么问题，请让dan63047知道';
+			case 'errors.oskwareBridge': return 'oskware_bridge 似乎出错了';
+			case 'errors.oskwareBridgeSub': return '请让 dan63047 知道';
+			case 'errors.p1nkl0bst3rForbidden': return '第三方API封禁了你的IP地址';
+			case 'errors.p1nkl0bst3rTooManyRequests': return '第三方API……太多请求了。';
+			case 'errors.p1nkl0bst3rinternal': return 'p1nkl0bst3r 那边似乎出错了';
+			case 'errors.p1nkl0bst3rinternalWebVersion': return 'p1nkl0bst3r (或 on oskware_bridge, 其实我并不知道) 那边似乎出错了';
+			case 'errors.replayAlreadySaved': return '你已保存此回放';
+			case 'errors.replayExpired': return '回放已过期';
+			case 'errors.replayRejected': return '第三方API封禁了你的IP地址';
+			case 'countries.': return '无';
+			case 'countries.AF': return '阿富汗';
+			case 'countries.AX': return '奥兰群岛';
+			case 'countries.AL': return '阿尔巴尼亚';
+			case 'countries.DZ': return '阿尔及利亚';
+			case 'countries.AS': return '美属萨摩亚';
+			case 'countries.AD': return '安道尔';
+			case 'countries.AO': return '安哥拉';
+			case 'countries.AI': return '安圭拉';
+			case 'countries.AQ': return '南极洲';
+			case 'countries.AG': return '安提瓜和巴布达';
+			case 'countries.AR': return '阿根廷';
+			case 'countries.AM': return '亚美尼亚';
+			case 'countries.AW': return '阿鲁巴';
+			case 'countries.AU': return '澳大利亚';
+			case 'countries.AT': return '奥地利';
+			case 'countries.AZ': return '阿塞拜疆';
+			case 'countries.BS': return '巴哈马';
+			case 'countries.BH': return '巴林';
+			case 'countries.BD': return '孟加拉国';
+			case 'countries.BB': return '巴巴多斯';
+			case 'countries.BY': return '白俄罗斯';
+			case 'countries.BE': return '比利时';
+			case 'countries.BZ': return '伯利兹';
+			case 'countries.BJ': return '贝宁';
+			case 'countries.BM': return '百慕大';
+			case 'countries.BT': return '不丹';
+			case 'countries.BO': return '玻利维亚多民族国';
+			case 'countries.BA': return '波斯尼亚和黑塞哥维那';
+			case 'countries.BW': return '博茨瓦纳';
+			case 'countries.BV': return '布韦岛';
+			case 'countries.BR': return '巴西';
+			case 'countries.IO': return '英属印度洋领地';
+			case 'countries.BN': return '文莱达鲁萨兰国';
+			case 'countries.BG': return '保加利亚';
+			case 'countries.BF': return '布基纳法索';
+			case 'countries.BI': return '布隆迪';
+			case 'countries.KH': return '柬埔寨';
+			case 'countries.CM': return '喀麦隆';
+			case 'countries.CA': return '加拿大';
+			case 'countries.CV': return '佛得角';
+			case 'countries.BQ': return '荷兰加勒比区';
+			case 'countries.KY': return '开曼群岛';
+			case 'countries.CF': return '中非';
+			case 'countries.TD': return '乍得';
+			case 'countries.CL': return '智利';
+			case 'countries.CN': return '中国';
+			case 'countries.CX': return '圣诞岛';
+			case 'countries.CC': return '科科斯（基林）群岛';
+			case 'countries.CO': return '哥伦比亚';
+			case 'countries.KM': return '科摩罗';
+			case 'countries.CG': return '刚果（布）/刚果共和国';
+			case 'countries.CD': return '刚果（金）/刚果民主共和国';
+			case 'countries.CK': return '库克群岛';
+			case 'countries.CR': return '哥斯达黎加';
+			case 'countries.CI': return '科特迪瓦';
+			case 'countries.HR': return '克罗地亚';
+			case 'countries.CU': return '古巴';
+			case 'countries.CW': return '库拉索';
+			case 'countries.CY': return '塞浦路斯';
+			case 'countries.CZ': return '捷克';
+			case 'countries.DK': return '丹麦';
+			case 'countries.DJ': return '吉布提';
+			case 'countries.DM': return '多米尼加';
+			case 'countries.DO': return '多米尼加共和国';
+			case 'countries.EC': return '厄瓜多尔';
+			case 'countries.EG': return '埃及';
+			case 'countries.SV': return '萨尔瓦多';
+			case 'countries.GB-ENG': return '英格兰';
+			case 'countries.GQ': return '赤道几内亚';
+			case 'countries.ER': return '厄立特里亚';
+			case 'countries.EE': return '爱沙尼亚';
+			case 'countries.ET': return '埃塞俄比亚';
+			case 'countries.EU': return '欧洲';
+			case 'countries.FK': return '福克兰群岛/马尔维纳斯群岛';
+			case 'countries.FO': return '法罗群岛';
+			case 'countries.FJ': return '斐济';
+			case 'countries.FI': return '芬兰';
+			case 'countries.FR': return '法国';
+			case 'countries.GF': return '法属圭亚那';
+			case 'countries.PF': return '法属波利尼西亚';
+			case 'countries.TF': return '法属南部领地';
+			case 'countries.GA': return '加蓬';
+			case 'countries.GM': return '冈比亚';
+			case 'countries.GE': return '格鲁吉亚';
+			case 'countries.DE': return '德国';
+			case 'countries.GH': return '加纳';
+			case 'countries.GI': return '直布罗陀';
+			case 'countries.GR': return '希腊';
+			case 'countries.GL': return '格陵兰岛';
+			case 'countries.GD': return '格林纳达';
+			case 'countries.GP': return '瓜德罗普岛';
+			case 'countries.GU': return '关岛';
+			case 'countries.GT': return '危地马拉';
+			case 'countries.GG': return '根西岛';
+			case 'countries.GN': return '几内亚';
+			case 'countries.GW': return '几内亚比绍';
+			case 'countries.GY': return '圭亚那';
+			case 'countries.HT': return '海地';
+			case 'countries.HM': return '赫德岛和麦克唐纳群岛';
+			case 'countries.VA': return '梵蒂冈';
+			case 'countries.HN': return '洪都拉斯';
+			case 'countries.HK': return '中国香港';
+			case 'countries.HU': return '匈牙利';
+			case 'countries.IS': return '冰岛';
+			case 'countries.IN': return '印度';
+			case 'countries.ID': return '印度尼西亚';
+			case 'countries.IR': return '伊朗';
+			case 'countries.IQ': return '伊拉克';
+			case 'countries.IE': return '爱尔兰';
+			case 'countries.IM': return '马恩岛';
+			case 'countries.IL': return '以色列';
+			case 'countries.IT': return '意大利';
+			case 'countries.JM': return '牙买加';
+			case 'countries.JP': return '日本';
+			case 'countries.JE': return 'Jersey';
+			case 'countries.JO': return '约旦';
+			case 'countries.KZ': return '哈萨克斯坦';
+			case 'countries.KE': return '肯尼亚';
+			case 'countries.KI': return '基里巴斯';
+			case 'countries.KP': return '朝鲜';
+			case 'countries.KR': return '韩国';
+			case 'countries.XK': return '科索沃';
+			case 'countries.KW': return '科威特';
+			case 'countries.KG': return '吉尔吉斯斯坦';
+			case 'countries.LA': return '老挝';
+			case 'countries.LV': return '拉脱维亚';
+			case 'countries.LB': return '黎巴嫩';
+			case 'countries.LS': return '莱索托';
+			case 'countries.LR': return '利比里亚';
+			case 'countries.LY': return '利比亚';
+			case 'countries.LI': return '列支敦士登';
+			case 'countries.LT': return '立陶宛';
+			case 'countries.LU': return '卢森堡';
+			case 'countries.MO': return '中国澳门';
+			case 'countries.MK': return '马其顿';
+			case 'countries.MG': return '马达加斯加';
+			case 'countries.MW': return '马拉维';
+			case 'countries.MY': return '马来西亚';
+			case 'countries.MV': return '马尔代夫';
+			case 'countries.ML': return '马里';
+			case 'countries.MT': return '马耳他';
+			case 'countries.MH': return '马绍尔群岛';
+			case 'countries.MQ': return '马提尼克岛';
+			case 'countries.MR': return '毛里塔尼亚';
+			case 'countries.MU': return '毛里求斯';
+			case 'countries.YT': return '马约特岛';
+			case 'countries.MX': return '墨西哥';
+			case 'countries.FM': return '密克罗尼西亚联邦';
+			case 'countries.MD': return '摩尔多瓦共和国';
+			case 'countries.MC': return '摩纳哥';
+			case 'countries.ME': return '黑山';
+			case 'countries.MA': return '摩洛哥';
+			case 'countries.MN': return '蒙古';
+			case 'countries.MS': return '蒙特塞拉特';
+			case 'countries.MZ': return '莫桑比克';
+			case 'countries.MM': return '缅甸';
+			case 'countries.NA': return '纳米比亚';
+			case 'countries.NR': return '瑙鲁';
+			case 'countries.NP': return '尼泊尔';
+			case 'countries.NL': return '尼德兰';
+			case 'countries.AN': return '荷属安的列斯';
+			case 'countries.NC': return '新喀里多尼亚';
+			case 'countries.NZ': return '新西兰';
+			case 'countries.NI': return '尼加拉瓜';
+			case 'countries.NE': return '尼日尔';
+			case 'countries.NG': return '尼日利亚';
+			case 'countries.NU': return '纽埃';
+			case 'countries.NF': return '诺福克岛';
+			case 'countries.GB-NIR': return '北爱尔兰';
+			case 'countries.MP': return '北马里亚纳群岛';
+			case 'countries.NO': return '挪威';
+			case 'countries.OM': return '阿曼';
+			case 'countries.PK': return '巴基斯坦';
+			case 'countries.PW': return '帕劳';
+			case 'countries.PS': return '巴勒斯坦';
+			case 'countries.PA': return '巴拿马';
+			case 'countries.PG': return '巴布亚新几内亚';
+			case 'countries.PY': return '巴拉圭';
+			case 'countries.PE': return '秘鲁';
+			case 'countries.PH': return '菲律宾';
+			case 'countries.PN': return '皮特凯恩';
+			case 'countries.PL': return '波兰';
+			case 'countries.PT': return '葡萄牙';
+			case 'countries.PR': return '波多黎各';
+			case 'countries.QA': return '卡塔尔';
+			case 'countries.RE': return '留尼汪';
+			case 'countries.RO': return '罗马尼亚';
+			case 'countries.RU': return '俄罗斯联邦';
+			case 'countries.RW': return '卢旺达';
+			case 'countries.BL': return '圣巴泰勒米';
+			case 'countries.SH': return '圣赫勒拿,阿森松和特里斯坦-达库尼亚';
+			case 'countries.KN': return '圣基茨和尼维斯';
+			case 'countries.LC': return '圣卢西亚';
+			case 'countries.MF': return '圣马丁';
+			case 'countries.PM': return '圣皮埃尔和密克隆群岛';
+			case 'countries.VC': return '圣文森特和格林纳丁斯';
+			case 'countries.WS': return '萨摩亚';
+			case 'countries.SM': return '圣马力诺';
+			case 'countries.ST': return '圣多美和普林西比';
+			case 'countries.SA': return '沙特阿拉伯';
+			case 'countries.GB-SCT': return '苏格兰';
+			case 'countries.SN': return '塞内加尔';
+			case 'countries.RS': return '塞尔维亚';
+			case 'countries.SC': return '塞舌尔';
+			case 'countries.SL': return '塞拉利昂';
+			case 'countries.SG': return '新加坡';
+			case 'countries.SX': return '荷属圣马丁';
+			case 'countries.SK': return '斯洛伐克';
+			case 'countries.SI': return '斯洛文尼亚';
+			case 'countries.SB': return '所罗门群岛';
+			case 'countries.SO': return '索马里';
+			case 'countries.ZA': return '南非';
+			case 'countries.GS': return '南乔治亚和南桑威奇群岛';
+			case 'countries.SS': return '南苏丹';
+			case 'countries.ES': return '西班牙';
+			case 'countries.LK': return '斯里兰卡';
+			case 'countries.SD': return '苏丹';
+			case 'countries.SR': return '苏里南';
+			case 'countries.SJ': return '斯瓦尔巴和扬马延群岛';
+			case 'countries.SZ': return '斯威士兰';
+			case 'countries.SE': return '瑞典';
+			case 'countries.CH': return '瑞士';
+			case 'countries.SY': return '叙利亚';
+			case 'countries.TW': return '中国台湾';
+			case 'countries.TJ': return '塔吉克斯坦';
+			case 'countries.TZ': return '坦桑尼亚';
+			case 'countries.TH': return '泰国';
+			case 'countries.TL': return '东帝汶';
+			case 'countries.TG': return '多哥';
+			case 'countries.TK': return '托克劳';
+			case 'countries.TO': return '汤加';
+			case 'countries.TT': return '特立尼达和多巴哥';
+			case 'countries.TN': return '突尼斯';
+			case 'countries.TR': return '土耳其';
+			case 'countries.TM': return '土库曼斯坦';
+			case 'countries.TC': return '特克斯和凯科斯群岛';
+			case 'countries.TV': return '图瓦卢';
+			case 'countries.UG': return '乌干达';
+			case 'countries.UA': return '乌克兰';
+			case 'countries.AE': return '阿拉伯联合酋长国';
+			case 'countries.GB': return '英国';
+			case 'countries.US': return '美国';
+			case 'countries.UY': return '乌拉圭';
+			case 'countries.UM': return '美国小岛屿';
+			case 'countries.UZ': return '乌兹别克斯坦';
+			case 'countries.VU': return '瓦努阿图';
+			case 'countries.VE': return '委内瑞拉玻利瓦尔共和国';
+			case 'countries.VN': return '越南';
+			case 'countries.VG': return '英属维尔京群岛';
+			case 'countries.VI': return '美属维尔京群岛';
+			case 'countries.GB-WLS': return '威尔士';
+			case 'countries.WF': return '瓦利斯和富图纳群岛';
+			case 'countries.EH': return '西撒哈拉';
+			case 'countries.YE': return '也门';
+			case 'countries.ZM': return '赞比亚';
+			case 'countries.ZW': return '津巴布韦';
+			case 'countries.XX': return '未知';
+			case 'countries.XM': return '月球';
 			default: return null;
 		}
 	}
