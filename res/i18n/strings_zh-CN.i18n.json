@@ -60,7 +60,7 @@
         "many": "只有 $n 个记录",
         "other": "只有 $n 个记录"
     },
-    "noRecord": "只有 $n 个记录",
+    "noRecord": "没有记录",
     "botRecord": "机器人不予参加排位赛",
     "anonRecord": "匿名用户不予参加排位赛",
     "notEnoughData": "没有足够的数据",
