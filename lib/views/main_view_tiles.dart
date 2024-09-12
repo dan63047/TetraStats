@@ -23,6 +23,8 @@ import 'package:tetra_stats/data_objects/tetra_league.dart';
 import 'package:tetra_stats/data_objects/tetra_league_beta_stream.dart';
 import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 import 'package:tetra_stats/data_objects/tetrio_player.dart';
+import 'package:tetra_stats/data_objects/tetrio_player_from_leaderboard.dart';
+import 'package:tetra_stats/data_objects/tetrio_players_leaderboard.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/utils/colors_functions.dart';
@@ -289,19 +291,22 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
   bool fetchData = false;
   bool _gamesPlayedInsteadOfDateAndTime = false;
   late ZoomPanBehavior _zoomPanBehavior;
+  late TooltipBehavior _historyTooltipBehavior;
   late TooltipBehavior _tooltipBehavior;
   String yAxisTitle = "";
   bool _smooth = false;
-  final List _historyShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR", "Opener", "Plonk", "Inf. DS", "Stride"];
+  //final List _historyShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR", "Opener", "Plonk", "Inf. DS", "Stride"];
+  final List<DropdownMenuItem<Stats>> _yAxis = [for (MapEntry e in chartsShortTitles.entries) DropdownMenuItem(value: e.key, child: Text(e.value))];
   Graph _graph = Graph.history;
-  int _chartsIndex = 0;
+  Stats _Ychart = Stats.tr;
+  Stats _Xchart = Stats.tr;
   int _season = currentSeason-1;
-  late List<List<DropdownMenuItem<List<_HistoryChartSpot>>>> historyData;
+  //late List<List<DropdownMenuItem<List<_HistoryChartSpot>>>> historyData;
   //Duration postSeasonLeft = seasonStart.difference(DateTime.now());
 
   @override
   void initState(){
-    _tooltipBehavior = TooltipBehavior(
+    _historyTooltipBehavior = TooltipBehavior(
       color: Colors.black,
       borderColor: Colors.white,
       enable: true,
@@ -326,6 +331,31 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
           );
       }
     );
+    _tooltipBehavior = TooltipBehavior(
+      color: Colors.black,
+      borderColor: Colors.white,
+      enable: true,
+      animationDuration: 0,
+      builder: (dynamic data, dynamic point, dynamic series,
+        int pointIndex, int seriesIndex) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Text(
+                    "${data.nickname} (${data.rank.toUpperCase()})",
+                    style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 20),
+                  ),
+                ),
+                Text('${f4.format(data.x)} ${chartsShortTitles[_Xchart]}\n${f4.format(data.y)} ${chartsShortTitles[_Ychart]}')
+              ],
+            ),
+          );
+      }
+    );
     _zoomPanBehavior = ZoomPanBehavior(
       enablePinching: true,
       enableSelectionZooming: true,
@@ -335,7 +365,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
     super.initState();
   }
 
-  Future<List<List<DropdownMenuItem<List<_HistoryChartSpot>>>>> getHistoryData(bool fetchHistory) async {
+  Future<List<Map<Stats, List<_HistoryChartSpot>>>> getHistoryData(bool fetchHistory) async {
     if(fetchHistory){
       try{
         var history = await teto.fetchAndsaveTLHistory(widget.searchFor);
@@ -354,38 +384,161 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
     List<List<TetraLeague>> states = await Future.wait<List<TetraLeague>>([
       teto.getStates(widget.searchFor, season: 1), teto.getStates(widget.searchFor, season: 2),
     ]);
-
-    if (states.length >= 2){
-      historyData = [for (List<TetraLeague> s in states) <DropdownMenuItem<List<_HistoryChartSpot>>>[ // Dumping charts data into dropdown menu items, while cheking if every entry is valid
-        DropdownMenuItem(value: [for (var tl in s) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.tr)], child: Text(t.statCellNum.tr)),
-        DropdownMenuItem(value: [for (var tl in s) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.glicko!)], child: const Text("Glicko")),
-        DropdownMenuItem(value: [for (var tl in s) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.rd!)], child: const Text("Rating Deviation")),
-        DropdownMenuItem(value: [for (var tl in s) if (tl.apm != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.apm!)], child: Text(t.statCellNum.apm.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in s) if (tl.pps != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.pps!)], child: Text(t.statCellNum.pps.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in s) if (tl.vs != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.vs!)], child: Text(t.statCellNum.vs.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in s) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.app)], child: Text(t.statCellNum.app.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in s) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.dss)], child: Text(t.statCellNum.dss.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in s) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.dsp)], child: Text(t.statCellNum.dsp.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in s) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.appdsp)], child: const Text("APP + DS/P")),
-        DropdownMenuItem(value: [for (var tl in s) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.vsapm)], child: const Text("VS/APM")),
-        DropdownMenuItem(value: [for (var tl in s) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.cheese)], child: Text(t.statCellNum.cheese.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in s) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.gbe)], child: Text(t.statCellNum.gbe.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in s) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.nyaapp)], child: Text(t.statCellNum.nyaapp.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in s) if (tl.nerdStats != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.nerdStats!.area)], child: Text(t.statCellNum.area.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in s) if (tl.estTr != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.estTr!.esttr)], child: Text(t.statCellNum.estOfTR.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in s) if (tl.esttracc != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.esttracc!)], child: Text(t.statCellNum.accOfEst.replaceAll(RegExp(r'\n'), " "))),
-        DropdownMenuItem(value: [for (var tl in s) if (tl.playstyle != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.playstyle!.opener)], child: const Text("Opener")),
-        DropdownMenuItem(value: [for (var tl in s) if (tl.playstyle != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.playstyle!.plonk)], child: const Text("Plonk")),
-        DropdownMenuItem(value: [for (var tl in s) if (tl.playstyle != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.playstyle!.infds)], child: const Text("Inf. DS")),
-        DropdownMenuItem(value: [for (var tl in s) if (tl.playstyle != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.playstyle!.stride)], child: const Text("Stride")),
-      ]];
-    }else{
-      historyData = [];
+    List<Map<Stats, List<_HistoryChartSpot>>> historyData = []; // [season][metric][spot]
+    for (int season = 0; season < currentSeason; season++){
+      if (states[season].length >= 2){
+      Map<Stats, List<_HistoryChartSpot>> statsMap = {};
+        for (var stat in Stats.values) statsMap[stat] = [for (var tl in states[season]) if (tl.getStatByEnum(stat) != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.getStatByEnum(stat)!.toDouble())];
+        historyData.add(statsMap);
+      }else{
+        historyData.add({});
+        break;
+      }
     }
-
     fetchData = false;
 
     return historyData;
+  }
+
+  Future<List<_MyScatterSpot>> getTetraLeagueData(Stats x, Stats y) async {
+    TetrioPlayersLeaderboard leaderboard = await teto.fetchTLLeaderboard();
+    List<_MyScatterSpot> _spots = [
+      for (TetrioPlayerFromLeaderboard entry in leaderboard.leaderboard)
+        _MyScatterSpot(
+          entry.getStatByEnum(x).toDouble(),
+          entry.getStatByEnum(y).toDouble(),
+          entry.userId,
+          entry.username,
+          entry.rank,
+          rankColors[entry.rank]??Colors.white
+        )
+    ];
+    return _spots;
+  }
+
+  Widget getHistoryGraph(){
+   return FutureBuilder<List<Map<Stats, List<_HistoryChartSpot>>>>(
+    future: getHistoryData(fetchData),
+    builder: (context, snapshot) {
+      switch (snapshot.connectionState){
+        case ConnectionState.none:
+        case ConnectionState.waiting:
+        case ConnectionState.active:
+          return const Center(child: CircularProgressIndicator());
+        case ConnectionState.done:
+        if (snapshot.hasData && snapshot.data!.isNotEmpty){
+          List<_HistoryChartSpot> selectedGraph = snapshot.data![_season][_Ychart]!;
+          yAxisTitle = chartsShortTitles[_Ychart]!;
+          return SfCartesianChart(
+            tooltipBehavior: _historyTooltipBehavior,
+            zoomPanBehavior: _zoomPanBehavior,
+            primaryXAxis: _gamesPlayedInsteadOfDateAndTime ? const NumericAxis() : const DateTimeAxis(),
+            primaryYAxis: const NumericAxis(
+              rangePadding: ChartRangePadding.additional,
+            ),
+            margin: const EdgeInsets.all(0),
+            series: <CartesianSeries>[
+              if (_gamesPlayedInsteadOfDateAndTime) StepLineSeries<_HistoryChartSpot, int>(
+                enableTooltip: true,
+                dataSource: selectedGraph,
+                animationDuration: 0,
+                opacity: _smooth ? 0 : 1,
+                xValueMapper: (_HistoryChartSpot data, _) => data.gamesPlayed,
+                yValueMapper: (_HistoryChartSpot data, _) => data.stat,
+                color: Theme.of(context).colorScheme.primary,
+                trendlines:<Trendline>[
+                  Trendline(
+                    isVisible: _smooth,
+                    period: (selectedGraph.length/175).floor(),
+                    type: TrendlineType.movingAverage,
+                    color: Theme.of(context).colorScheme.primary)
+                  ],
+                )
+                else StepLineSeries<_HistoryChartSpot, DateTime>(
+                  enableTooltip: true,
+                  dataSource: selectedGraph,
+                  animationDuration: 0,
+                  opacity: _smooth ? 0 : 1,
+                  xValueMapper: (_HistoryChartSpot data, _) => data.timestamp,
+                  yValueMapper: (_HistoryChartSpot data, _) => data.stat,
+                  color: Theme.of(context).colorScheme.primary,
+                  trendlines:<Trendline>[
+                    Trendline(
+                      isVisible: _smooth,
+                      period: (selectedGraph.length/175).floor(),
+                      type: TrendlineType.movingAverage,
+                      color: Theme.of(context).colorScheme.primary)
+                  ],
+                ),
+              ],
+            );
+        }else{
+          return Center(child: 
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(snapshot.error.toString(), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(snapshot.stackTrace.toString(), textAlign: TextAlign.center),
+                ),
+              ],
+            )
+          );
+        }
+      }
+     }
+   ); 
+  }
+
+  Widget getLeagueState (){
+    return FutureBuilder<List<_MyScatterSpot>>(
+      future: getTetraLeagueData(_Xchart, _Ychart),
+      builder: (context, snapshot) {
+      switch (snapshot.connectionState){
+        case ConnectionState.none:
+        case ConnectionState.waiting:
+        case ConnectionState.active:
+          return const Center(child: CircularProgressIndicator());
+        case ConnectionState.done:
+        if (snapshot.hasData){
+          return SfCartesianChart(
+            tooltipBehavior: _tooltipBehavior,
+            zoomPanBehavior: _zoomPanBehavior,
+            //primaryXAxis: CategoryAxis(),
+            series: [
+              ScatterSeries(
+                enableTooltip: true,
+                dataSource: snapshot.data,
+                animationDuration: 0,
+                pointColorMapper: (data, _) => data.color,
+                xValueMapper: (data, _) => data.x,
+                yValueMapper: (data, _) => data.y,
+                onPointTap: (point) => Navigator.push(context, MaterialPageRoute(builder: (context) => MainView(player: snapshot.data![point.pointIndex!].nickname), maintainState: false)),
+              )
+            ],
+          );
+        }else{
+          return Center(child: 
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(snapshot.error.toString(), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(snapshot.stackTrace.toString(), textAlign: TextAlign.center),
+                ),
+              ],
+            )
+          );
+        }
+      }
+     }
+    );
+  }
+
+  Widget getCutoffsHistory(){
+    return Container(); // TODO
   }
 
   @override
@@ -393,178 +546,99 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        FutureBuilder<List<List<DropdownMenuItem<List<_HistoryChartSpot>>>>>(
-          future: getHistoryData(fetchData),
-          builder: (context, snapshot) {
-            switch (snapshot.connectionState){
-              case ConnectionState.none:
-              case ConnectionState.waiting:
-              case ConnectionState.active:
-                return const Center(child: CircularProgressIndicator());
-              case ConnectionState.done:
-                if (snapshot.hasData && snapshot.data!.isNotEmpty){
-                  List<_HistoryChartSpot> selectedGraph = snapshot.data![_season][_chartsIndex].value!;
-                  yAxisTitle = _historyShortTitles[_chartsIndex];
-                  return SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Card(
-                          child: Wrap(
-                            spacing: 20,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Padding(padding: EdgeInsets.all(8.0), child: Text("Season:", style: TextStyle(fontSize: 22))),
-                                  DropdownButton(
-                                    items: [for (int i = 1; i <= currentSeason; i++) DropdownMenuItem(value: i-1, child: Text("$i"))],
-                                    value: _season,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _season = value!;
-                                      });
-                                    }
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Padding(padding: EdgeInsets.all(8.0), child: Text("X:", style: TextStyle(fontSize: 22))),
-                                  DropdownButton(
-                                    items: const [DropdownMenuItem(value: false, child: Text("Date & Time")), DropdownMenuItem(value: true, child: Text("Games Played"))],
-                                    value: _gamesPlayedInsteadOfDateAndTime,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _gamesPlayedInsteadOfDateAndTime = value!;
-                                      });
-                                    }
-                                  ),
-                                  ],
-                              ),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Padding(padding: EdgeInsets.all(8.0), child: Text("Y:", style: TextStyle(fontSize: 22))),
-                                  DropdownButton(
-                                    items: historyData[_season],
-                                    value: historyData[_season][_chartsIndex].value,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _chartsIndex = historyData[_season].indexWhere((element) => element.value == value);
-                                      });
-                                    }
-                                  ),
-                                ],
-                              ),
-                              if (selectedGraph.length > 300) Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Checkbox(value: _smooth,
-                                    checkColor: Colors.black,
-                                    onChanged: ((value) {
-                                      setState(() {
-                                        _smooth = value!;
-                                      });
-                                    })),
-                                    Text(t.smooth, style: const TextStyle(color: Colors.white, fontSize: 22))
-                                ],
-                              ),
-                              IconButton(onPressed: () => _zoomPanBehavior.reset(), icon: const Icon(Icons.refresh), alignment: Alignment.center,)
-                            ],
-                          ),
-                        ),
-                        if(historyData[_season][_chartsIndex].value!.length > 1) Card(
-                          child: SizedBox(
-                            width: MediaQuery.of(context).size.width - 88,
-                            height: MediaQuery.of(context).size.height - 96,
-                            child: Padding( padding: const EdgeInsets.fromLTRB(40, 30, 40, 30),
-                            child: SfCartesianChart(
-                              tooltipBehavior: _tooltipBehavior,
-                              zoomPanBehavior: _zoomPanBehavior,
-                              primaryXAxis: _gamesPlayedInsteadOfDateAndTime ? const NumericAxis() : const DateTimeAxis(),
-                              primaryYAxis: const NumericAxis(
-                                rangePadding: ChartRangePadding.additional,
-                              ),
-                              margin: const EdgeInsets.all(0),
-                              series: <CartesianSeries>[
-                                if (_gamesPlayedInsteadOfDateAndTime) StepLineSeries<_HistoryChartSpot, int>(
-                                  enableTooltip: true,
-                                  dataSource: historyData[_season][_chartsIndex].value!,
-                                  animationDuration: 0,
-                                  opacity: _smooth ? 0 : 1,
-                                  xValueMapper: (_HistoryChartSpot data, _) => data.gamesPlayed,
-                                  yValueMapper: (_HistoryChartSpot data, _) => data.stat,
-                                  color: Theme.of(context).colorScheme.primary,
-                                  trendlines:<Trendline>[
-                                    Trendline(
-                                      isVisible: _smooth,
-                                      period: (historyData[_season][_chartsIndex].value!.length/175).floor(),
-                                      type: TrendlineType.movingAverage,
-                                      color: Theme.of(context).colorScheme.primary)
-                                  ],
-                                )
-                                else StepLineSeries<_HistoryChartSpot, DateTime>(
-                                  enableTooltip: true,
-                                  dataSource: historyData[_season][_chartsIndex].value!,
-                                  animationDuration: 0,
-                                  opacity: _smooth ? 0 : 1,
-                                  xValueMapper: (_HistoryChartSpot data, _) => data.timestamp,
-                                  yValueMapper: (_HistoryChartSpot data, _) => data.stat,
-                                  color: Theme.of(context).colorScheme.primary,
-                                  trendlines:<Trendline>[
-                                    Trendline(
-                                      isVisible: _smooth,
-                                      period: (historyData[_season][_chartsIndex].value!.length/175).floor(),
-                                      type: TrendlineType.movingAverage,
-                                      color: Theme.of(context).colorScheme.primary)
-                                  ],
-                                ),
-                              ],
-                            ),
-                            )
-                          ),
-                        )
-                        else if (historyData[_season][_chartsIndex].value!.length <= 1) Center(child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(t.notEnoughData, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
-                            Text(t.errors.actionSuggestion),
-                            TextButton(onPressed: (){setState(() {
-                              fetchData = true;
-                            });}, child: Text(t.fetchAndsaveTLHistory))
-                          ],
-                        ))
-                      ],
-                    ),
-                );
-              }
-              if (snapshot.hasError || snapshot.data!.isEmpty){
-                return Center(child: 
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
+        SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Card(
+                  child: Wrap(
+                    spacing: 20,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      Text(snapshot.error != null ? snapshot.error.toString() : t.noHistorySaved, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Text(snapshot.stackTrace != null ? snapshot.stackTrace.toString() : "lol", textAlign: TextAlign.center),
+                      if (_graph == Graph.history) Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Padding(padding: EdgeInsets.all(8.0), child: Text("Season:", style: TextStyle(fontSize: 22))),
+                          DropdownButton(
+                            items: [for (int i = 1; i <= currentSeason; i++) DropdownMenuItem(value: i-1, child: Text("$i"))],
+                            value: _season,
+                            onChanged: (value) {
+                              setState(() {
+                                _season = value!;
+                              });
+                            }
+                          ),
+                        ],
                       ),
+                      if (_graph != Graph.leagueCutoffs) Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Padding(padding: EdgeInsets.all(8.0), child: Text("X:", style: TextStyle(fontSize: 22))),
+                          DropdownButton(
+                            items: switch (_graph){
+                              Graph.history => [DropdownMenuItem(value: false, child: Text("Date & Time")), DropdownMenuItem(value: true, child: Text("Games Played"))],
+                              Graph.leagueState => _yAxis,
+                              Graph.leagueCutoffs => [],
+                            },
+                            value: _graph == Graph.history ? _gamesPlayedInsteadOfDateAndTime :  _Xchart,
+                            onChanged: (value) {
+                              setState(() {
+                                if (_graph == Graph.history)
+                                _gamesPlayedInsteadOfDateAndTime = value! as bool;
+                                else _Xchart = value! as Stats;
+                              });
+                            }
+                          ),
+                          ],
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Padding(padding: EdgeInsets.all(8.0), child: Text("Y:", style: TextStyle(fontSize: 22))),
+                          DropdownButton<Stats>(
+                            items: _yAxis,
+                            value: _Ychart,
+                            onChanged: (value) {
+                              setState(() {
+                                _Ychart = value!;
+                              });
+                            }
+                          ),
+                        ],
+                      ),
+                      if (_graph != Graph.leagueState) Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Checkbox(value: _smooth,
+                            checkColor: Colors.black,
+                            onChanged: ((value) {
+                              setState(() {
+                                _smooth = value!;
+                              });
+                            })),
+                            Text(t.smooth, style: const TextStyle(color: Colors.white, fontSize: 22))
+                        ],
+                      ),
+                      IconButton(onPressed: () => _zoomPanBehavior.reset(), icon: const Icon(Icons.refresh), alignment: Alignment.center,)
                     ],
-                  )
-                );
-              }
-            }
-            return const Center(child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text("lol", style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
-            ],
-          ));
-          },
+                  ),
+                ),
+                Card(
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width - 88,
+                    height: MediaQuery.of(context).size.height - 96,
+                    child: Padding( padding: const EdgeInsets.fromLTRB(40, 30, 40, 30),
+                    child: switch (_graph){
+                      Graph.history => getHistoryGraph(),
+                      Graph.leagueState => getLeagueState(),
+                      Graph.leagueCutoffs => getCutoffsHistory()
+                    },
+                    )
+                  ),
+                )
+              ],
+            ),
         ),
         SegmentedButton<Graph>(
           showSelectedIcon: false,
@@ -584,6 +658,13 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
           onSelectionChanged: (Set<Graph> newSelection) {
             setState(() {
               _graph = newSelection.first;
+              switch (newSelection.first){
+                case Graph.leagueCutoffs:
+                case Graph.history:
+                  _Ychart = Stats.tr;
+                case Graph.leagueState:
+                  _Ychart = Stats.apm;
+              }
             });})
       ],
     ); 
@@ -596,6 +677,16 @@ class _HistoryChartSpot{
   final String rank;
   final double stat;
   const _HistoryChartSpot(this.timestamp, this.gamesPlayed, this.rank, this.stat);
+}
+
+class _MyScatterSpot{
+  num x;
+  num y;
+  String id;
+  String nickname;
+  String rank;
+  Color color;
+  _MyScatterSpot(this.x, this.y, this.id, this.nickname, this.rank, this.color);
 }
 
 class DestinationHome extends StatefulWidget{

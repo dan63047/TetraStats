@@ -6,7 +6,7 @@
 /// Locales: 3
 /// Strings: 1818 (606 per locale)
 ///
-/// Built on 2024-09-11 at 14:14 UTC
+/// Built on 2024-09-12 at 20:23 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -1620,7 +1620,7 @@ class _StringsZhCn implements Translations {
 		many: '只有 ${n} 个记录',
 		other: '只有 ${n} 个记录',
 	);
-	@override String get noRecord => '只有 个记录';
+	@override String get noRecord => '没有记录';
 	@override String get botRecord => '机器人不予参加排位赛';
 	@override String get anonRecord => '匿名用户不予参加排位赛';
 	@override String get notEnoughData => '没有足够的数据';
@@ -3580,7 +3580,7 @@ extension on _StringsZhCn {
 				many: '只有 ${n} 个记录',
 				other: '只有 ${n} 个记录',
 			);
-			case 'noRecord': return ({required Object n}) => '只有 ${n} 个记录';
+			case 'noRecord': return '没有记录';
 			case 'botRecord': return '机器人不予参加排位赛';
 			case 'anonRecord': return '匿名用户不予参加排位赛';
 			case 'notEnoughData': return '没有足够的数据';

@@ -546,6 +546,61 @@ class TetrioService extends DB {
     }
   }
 
+  Future<List<Cutoffs>> fetchCutoffsHistory() async {
+    Uri url = Uri.https('ts.dan63.by', 'beanserver_blaster/history.csv');
+
+    try{
+      final response = await client.get(url);
+
+      switch (response.statusCode) {
+        case 200:
+          List<List<dynamic>> csv = const CsvToListConverter().convert(response.body)..removeAt(0);
+          List<Cutoffs> history = [];
+          for (List<dynamic> entry in csv){
+            Map<String, double> tr = {};
+            Map<String, double> glicko = {};
+            Map<String, double> gxe = {};
+            for(int i = 0; i < ranks.length; i++){
+              tr[ranks[ranks.length + i - ranks.length]] = entry[1 + i*3];
+              glicko[ranks[ranks.length + i - ranks.length]] = entry[2 + i*3];
+              glicko[ranks[ranks.length + i - ranks.length]] = entry[3 + i*3];
+            }
+            history.add(
+              Cutoffs(
+                DateTime.fromMillisecondsSinceEpoch(entry[0]),
+                tr,
+                glicko,
+                gxe
+              )
+            );
+          }
+          return history;
+        case 404:
+          developer.log("fetchCutoffsHistory: Cutoffs are gone", name: "services/tetrio_crud", error: response.statusCode);
+          return [];
+        // if not 200 or 404 - throw a unique for each code exception  
+        case 403:
+          throw P1nkl0bst3rForbidden();
+        case 429:
+          throw P1nkl0bst3rTooManyRequests();
+        case 418:
+          throw TetrioOskwareBridgeProblem();
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+          developer.log("fetchCutoffsHistory: Cutoffs are unavalable (${response.statusCode})", name: "services/tetrio_crud", error: response.statusCode);
+          return [];
+        default:
+          developer.log("fetchCutoffsHistory: Failed to fetch top Cutoffs", name: "services/tetrio_crud", error: response.statusCode);
+          throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
+      }
+    } on http.ClientException catch (e, s) { // If local http client fails
+      developer.log("$e, $s");
+      throw http.ClientException(e.message, e.uri); // just assuming, that our end user don't have acess to the internet
+    }
+  }
+
   Future<TetrioPlayerFromLeaderboard> fetchTopOneFromTheLeaderboard() async {
     TetrioPlayerFromLeaderboard? cached = _cache.get("topone", TetrioPlayerFromLeaderboard);
     if (cached != null) return cached;

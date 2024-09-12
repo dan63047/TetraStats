@@ -151,6 +151,69 @@ class TetraLeague {
           pps ?? 0,
           vs ?? 0,
           decaying);
+  
+  num? getStatByEnum(Stats stat){
+    switch (stat) {
+      case Stats.tr:
+        return tr;
+      case Stats.glicko:
+        return glicko;
+      case Stats.gxe:
+        return gxe;
+      case Stats.s1tr:
+        return s1tr;
+      case Stats.rd:
+        return rd;
+      case Stats.gp:
+        return gamesPlayed;
+      case Stats.gw:
+        return gamesWon;
+      case Stats.wr:
+        return winrate*100;
+      case Stats.apm:
+        return apm;
+      case Stats.pps:
+        return pps;
+      case Stats.vs:
+        return vs;
+      case Stats.app:
+        return nerdStats?.app;
+      case Stats.dss:
+        return nerdStats?.dss;
+      case Stats.dsp:
+        return nerdStats?.dsp;
+      case Stats.appdsp:
+        return nerdStats?.appdsp;
+      case Stats.vsapm:
+        return nerdStats?.vsapm;
+      case Stats.cheese:
+        return nerdStats?.cheese;
+      case Stats.gbe:
+        return nerdStats?.gbe;
+      case Stats.nyaapp:
+        return nerdStats?.nyaapp;
+      case Stats.area:
+        return nerdStats?.area;
+      case Stats.eTR:
+        return estTr?.esttr;
+      case Stats.acceTR:
+        return esttracc;
+      case Stats.acceTRabs:
+        return esttracc?.abs();
+      case Stats.opener:
+        return playstyle?.opener;
+      case Stats.plonk:
+        return playstyle?.plonk;
+      case Stats.infDS:
+        return playstyle?.infds;
+      case Stats.stride:
+        return playstyle?.stride;
+      case Stats.stridemMinusPlonk:
+        return (playstyle?.stride??0.00) - (playstyle?.plonk??0.00);
+      case Stats.openerMinusInfDS:
+        return (playstyle?.opener??0.00) - (playstyle?.infds??0.00);
+    }
+  }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};

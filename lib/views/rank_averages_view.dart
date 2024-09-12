@@ -11,7 +11,7 @@ import 'package:tetra_stats/views/main_view.dart' show MainView;
 import 'package:window_manager/window_manager.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-var _chartsShortTitlesDropdowns = <DropdownMenuItem>[for (MapEntry e in chartsShortTitles.entries) DropdownMenuItem(value: e.key, child: Text(e.value),)];
+var _chartsShortTitlesDropdowns = <DropdownMenuItem>[for (MapEntry e in chartsShortTitles.entries) DropdownMenuItem(value: e.key, child: Text(e.value))];
 Stats _chartsX = Stats.tr;
 Stats _chartsY = Stats.apm;
 late TooltipBehavior _tooltipBehavior;
