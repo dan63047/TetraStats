@@ -554,20 +554,20 @@ class TetrioService extends DB {
 
       switch (response.statusCode) {
         case 200:
-          List<List<dynamic>> csv = const CsvToListConverter().convert(response.body)..removeAt(0);
+          List<List<dynamic>> csv = const CsvToListConverter().convert(response.body, eol: "\n")..removeAt(0);
           List<Cutoffs> history = [];
           for (List<dynamic> entry in csv){
             Map<String, double> tr = {};
             Map<String, double> glicko = {};
             Map<String, double> gxe = {};
             for(int i = 0; i < ranks.length; i++){
-              tr[ranks[ranks.length + i - ranks.length]] = entry[1 + i*3];
-              glicko[ranks[ranks.length + i - ranks.length]] = entry[2 + i*3];
-              glicko[ranks[ranks.length + i - ranks.length]] = entry[3 + i*3];
+              tr[ranks[ranks.length - 1 - i]] = entry[1 + i*3];
+              glicko[ranks[ranks.length - 1 - i]] = entry[2 + i*3];
+              gxe[ranks[ranks.length - 1 - i]] = entry[3 + i*3];
             }
             history.add(
               Cutoffs(
-                DateTime.fromMillisecondsSinceEpoch(entry[0]),
+                DateTime.fromMillisecondsSinceEpoch(entry[0]*1000),
                 tr,
                 glicko,
                 gxe

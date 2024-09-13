@@ -172,6 +172,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                   getDestinationButton(Icons.leaderboard, "Leaderboards"),
                   getDestinationButton(Icons.compress, "Cutoffs"),
                   getDestinationButton(Icons.calculate, "Calc"),
+                  getDestinationButton(Icons.info_outline, "Information"),
                   getDestinationButton(Icons.storage, "Saved Data"),
                   getDestinationButton(Icons.settings, "Settings"),
                 ],
@@ -293,6 +294,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
   late ZoomPanBehavior _zoomPanBehavior;
   late TooltipBehavior _historyTooltipBehavior;
   late TooltipBehavior _tooltipBehavior;
+  late TooltipBehavior _leagueTooltipBehavior;
   String yAxisTitle = "";
   bool _smooth = false;
   //final List _historyShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR", "Opener", "Plonk", "Inf. DS", "Stride"];
@@ -351,6 +353,32 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                   ),
                 ),
                 Text('${f4.format(data.x)} ${chartsShortTitles[_Xchart]}\n${f4.format(data.y)} ${chartsShortTitles[_Ychart]}')
+              ],
+            ),
+          );
+      }
+    );
+    _leagueTooltipBehavior = TooltipBehavior(
+      color: Colors.black,
+      borderColor: Colors.white,
+      enable: true,
+      animationDuration: 0,
+      builder: (dynamic data, dynamic point, dynamic series,
+        int pointIndex, int seriesIndex) {
+          print(point);
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Text(
+                    "${f4.format(point.y)} $yAxisTitle",
+                    style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 20),
+                  ),
+                ),
+                Text(timestamp(data.ts))
               ],
             ),
           );
@@ -538,7 +566,61 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
   }
 
   Widget getCutoffsHistory(){
-    return Container(); // TODO
+    return FutureBuilder<List<Cutoffs>>(
+    future: teto.fetchCutoffsHistory(),
+    builder: (context, snapshot) {
+      switch (snapshot.connectionState){
+        case ConnectionState.none:
+        case ConnectionState.waiting:
+        case ConnectionState.active:
+          return const Center(child: CircularProgressIndicator());
+        case ConnectionState.done:
+        if (snapshot.hasData){
+          yAxisTitle = chartsShortTitles[_Ychart]!;
+          return SfCartesianChart(
+            tooltipBehavior: _leagueTooltipBehavior,
+            zoomPanBehavior: _zoomPanBehavior,
+            primaryXAxis: _gamesPlayedInsteadOfDateAndTime ? const NumericAxis() : const DateTimeAxis(),
+            primaryYAxis: const NumericAxis(
+              rangePadding: ChartRangePadding.additional,
+            ),
+            margin: const EdgeInsets.all(0),
+            series: <CartesianSeries>[
+              for (String rank in ranks) StepLineSeries<Cutoffs, DateTime>(
+                enableTooltip: true,
+                dataSource: snapshot.data,
+                animationDuration: 0,
+                //opacity: _smooth ? 0 : 1,
+                xValueMapper: (Cutoffs data, _) => data.ts,
+                yValueMapper: (Cutoffs data, _) => data.tr[rank],
+                color: rankColors[rank],
+                // trendlines:<Trendline>[
+                //   Trendline(
+                //     isVisible: _smooth,
+                //     period: (selectedGraph.length/175).floor(),
+                //     type: TrendlineType.movingAverage,
+                //     color: Theme.of(context).colorScheme.primary)
+                //   ],
+                )
+              ],
+            );
+        }else{
+          return Center(child: 
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(snapshot.error.toString(), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(snapshot.stackTrace.toString(), textAlign: TextAlign.center),
+                ),
+              ],
+            )
+          );
+        }
+      }
+     }
+   ); 
   }
 
   @override
