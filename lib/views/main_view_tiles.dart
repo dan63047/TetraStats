@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide Badge;
@@ -207,6 +209,23 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   }
 }
 
+class DestinationCutoffs extends StatefulWidget{
+  final BoxConstraints constraints;
+
+  const DestinationCutoffs({super.key, required this.constraints});
+
+  @override
+  State<DestinationLeaderboards> createState() => _DestinationCutoffsState();
+}
+
+class _DestinationCutoffsState extends State<DestinationLeaderboards> {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    throw UnimplementedError();
+  }
+}
+
 class DestinationLeaderboards extends StatefulWidget{
   final BoxConstraints constraints;
 
@@ -216,10 +235,72 @@ class DestinationLeaderboards extends StatefulWidget{
   State<DestinationLeaderboards> createState() => _DestinationLeaderboardsState();
 }
 
+enum Leaderboards{
+  tl,
+  xp,
+  ar
+}
+
 class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
-  Cards rightCard = Cards.tetraLeague;
   //Duration postSeasonLeft = seasonStart.difference(DateTime.now());
-  final List<String> leaderboards = ["Tetra League", "Quick Play", "Quick Play Expert"];
+  final Map<Leaderboards, String> leaderboards = {Leaderboards.tl: "Tetra League", Leaderboards.xp: "XP", Leaderboards.ar: "Acievement Points"};
+  Leaderboards _currentLb = Leaderboards.tl;
+  final StreamController<List<TetrioPlayerFromLeaderboard>> _dataStreamController = StreamController<List<TetrioPlayerFromLeaderboard>>();
+  late final ScrollController _scrollController;
+  Stream<List<TetrioPlayerFromLeaderboard>> get dataStream => _dataStreamController.stream;
+  List<TetrioPlayerFromLeaderboard> list = [];
+  bool _isFetchingData = false;
+  double after = 25000.00;
+
+  Future<void> _fetchData() async {
+    if (_isFetchingData) {
+      // Avoid fetching new data while already fetching
+      return;
+    }
+    try {
+      _isFetchingData = true;
+      setState(() {});
+
+      final items = switch(_currentLb){
+        Leaderboards.tl => await teto.fetchTetrioLeaderboard(after: after),
+        Leaderboards.xp => await teto.fetchTetrioLeaderboard(after: after, lb: "xp"),
+        Leaderboards.ar => await teto.fetchTetrioLeaderboard(after: after, lb: "ar"),
+      };
+
+      list.addAll(items);
+
+      _dataStreamController.add(list);
+      after = switch (_currentLb){
+        Leaderboards.tl => list.last.tr,
+        Leaderboards.xp => list.last.xp,
+        Leaderboards.ar => list.last.ar.toDouble(),
+      };
+    } catch (e) {
+      _dataStreamController.addError(e);
+    } finally {
+      // Set to false when data fetching is complete
+      _isFetchingData = false;
+      setState(() {});
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _fetchData();
+    _scrollController.addListener(() {
+      _scrollController.addListener(() {
+        final maxScroll = _scrollController.position.maxScrollExtent;
+        final currentScroll = _scrollController.position.pixels;
+
+        if (currentScroll == maxScroll) {
+          // When the last item is fully visible, load the next page.
+          _fetchData();
+        }
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -247,7 +328,17 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                     return Card(
                       surfaceTintColor: theme.colorScheme.primary,
                       child: ListTile(
-                        title: Text(leaderboards[index]),
+                        title: Text(leaderboards.values.elementAt(index)),
+                        onTap: () {
+                          _currentLb = leaderboards.keys.elementAt(index);
+                          list.clear();
+                          after = switch (_currentLb){
+                            Leaderboards.tl => 25000.00,
+                            Leaderboards.xp => -1.00,
+                            Leaderboards.ar => -1.00,
+                          };
+                          _fetchData();
+                        },
                       ),
                     );
                   }
@@ -258,11 +349,45 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
         ),
         SizedBox(
           width: widget.constraints.maxWidth - 350 - 88,
-          child: const Card(
-            child: Column(
-              children: [
-                
-              ],
+          child: Card(
+            child: StreamBuilder<List<TetrioPlayerFromLeaderboard>>(
+              stream: dataStream,
+              builder:(context, snapshot) {
+                switch (snapshot.connectionState){
+                  case ConnectionState.none:
+                  case ConnectionState.waiting:
+                    return const Center(child: CircularProgressIndicator());
+                  case ConnectionState.active:
+                  case ConnectionState.done:
+                    if (snapshot.hasData){
+                      return Column(
+                        children: [
+                          Text(leaderboards[_currentLb]!, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, height: 0.9)),
+                          const Divider(color: Color.fromARGB(50, 158, 158, 158)),
+                          Expanded(
+                            child: ListView.builder(
+                              controller: _scrollController,
+                              itemCount: list.length,
+                              itemBuilder: (BuildContext context, int index){
+                                return ListTile(
+                                  leading: Text(intf.format(index+1)),
+                                  title: Text(snapshot.data![index].username),
+                                  trailing: Text(switch (_currentLb){
+                                    Leaderboards.tl => f2.format(snapshot.data![index].tr),
+                                    Leaderboards.xp => f2.format(snapshot.data![index].level),
+                                    Leaderboards.ar => intf.format(snapshot.data![index].ar),
+                                  }),
+                                );
+                              }
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                    if (snapshot.hasError){ return FutureError(snapshot); }
+                  }
+                return Text("huh?");
+              },
             ),
           ),
         ),
@@ -297,13 +422,11 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
   late TooltipBehavior _leagueTooltipBehavior;
   String yAxisTitle = "";
   bool _smooth = false;
-  //final List _historyShortTitles = ["TR", "Glicko", "RD", "APM", "PPS", "VS", "APP", "DS/S", "DS/P", "APP + DS/P", "VS/APM", "Cheese", "GbE", "wAPP", "Area", "eTR", "±eTR", "Opener", "Plonk", "Inf. DS", "Stride"];
   final List<DropdownMenuItem<Stats>> _yAxis = [for (MapEntry e in chartsShortTitles.entries) DropdownMenuItem(value: e.key, child: Text(e.value))];
   Graph _graph = Graph.history;
   Stats _Ychart = Stats.tr;
   Stats _Xchart = Stats.tr;
   int _season = currentSeason-1;
-  //late List<List<DropdownMenuItem<List<_HistoryChartSpot>>>> historyData;
   //Duration postSeasonLeft = seasonStart.difference(DateTime.now());
 
   @override
@@ -365,7 +488,6 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
       animationDuration: 0,
       builder: (dynamic data, dynamic point, dynamic series,
         int pointIndex, int seriesIndex) {
-          print(point);
           return Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
@@ -454,7 +576,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
         case ConnectionState.active:
           return const Center(child: CircularProgressIndicator());
         case ConnectionState.done:
-        if (snapshot.hasData && snapshot.data!.isNotEmpty){
+        if (snapshot.hasData){
           List<_HistoryChartSpot> selectedGraph = snapshot.data![_season][_Ychart]!;
           yAxisTitle = chartsShortTitles[_Ychart]!;
           return SfCartesianChart(
@@ -500,20 +622,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                 ),
               ],
             );
-        }else{
-          return Center(child: 
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(snapshot.error.toString(), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: Text(snapshot.stackTrace.toString(), textAlign: TextAlign.center),
-                ),
-              ],
-            )
-          );
-        }
+        }else{ return FutureError(snapshot); }
       }
      }
    ); 
@@ -546,20 +655,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
               )
             ],
           );
-        }else{
-          return Center(child: 
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(snapshot.error.toString(), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: Text(snapshot.stackTrace.toString(), textAlign: TextAlign.center),
-                ),
-              ],
-            )
-          );
-        }
+        }else{ return FutureError(snapshot); }
       }
      }
     );
@@ -580,9 +676,14 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
           return SfCartesianChart(
             tooltipBehavior: _leagueTooltipBehavior,
             zoomPanBehavior: _zoomPanBehavior,
-            primaryXAxis: _gamesPlayedInsteadOfDateAndTime ? const NumericAxis() : const DateTimeAxis(),
-            primaryYAxis: const NumericAxis(
-              rangePadding: ChartRangePadding.additional,
+            primaryXAxis: const DateTimeAxis(),
+            primaryYAxis: NumericAxis(
+              // isInversed: true,
+              maximum: switch (_Ychart){
+                Stats.tr => 25000.0,
+                Stats.gxe => 100.00,
+                _ => null
+              },
             ),
             margin: const EdgeInsets.all(0),
             series: <CartesianSeries>[
@@ -590,34 +691,18 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                 enableTooltip: true,
                 dataSource: snapshot.data,
                 animationDuration: 0,
-                //opacity: _smooth ? 0 : 1,
+                //opacity: 0.5,
                 xValueMapper: (Cutoffs data, _) => data.ts,
-                yValueMapper: (Cutoffs data, _) => data.tr[rank],
-                color: rankColors[rank],
-                // trendlines:<Trendline>[
-                //   Trendline(
-                //     isVisible: _smooth,
-                //     period: (selectedGraph.length/175).floor(),
-                //     type: TrendlineType.movingAverage,
-                //     color: Theme.of(context).colorScheme.primary)
-                //   ],
+                yValueMapper: (Cutoffs data, _) => switch (_Ychart){
+                  Stats.glicko => data.glicko[rank],
+                  Stats.gxe => data.gxe[rank],
+                  _ => data.tr[rank]
+                },
+                color: rankColors[rank]!
                 )
               ],
             );
-        }else{
-          return Center(child: 
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(snapshot.error.toString(), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: Text(snapshot.stackTrace.toString(), textAlign: TextAlign.center),
-                ),
-              ],
-            )
-          );
-        }
+        }else{ return FutureError(snapshot); }
       }
      }
    ); 
@@ -679,7 +764,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                         children: [
                           const Padding(padding: EdgeInsets.all(8.0), child: Text("Y:", style: TextStyle(fontSize: 22))),
                           DropdownButton<Stats>(
-                            items: _yAxis,
+                            items: _graph == Graph.leagueCutoffs ? [DropdownMenuItem(value: Stats.tr, child: Text(chartsShortTitles[Stats.tr]!)), DropdownMenuItem(value: Stats.glicko, child: Text(chartsShortTitles[Stats.glicko]!)), DropdownMenuItem(value: Stats.gxe, child: Text(chartsShortTitles[Stats.gxe]!))] : _yAxis,
                             value: _Ychart,
                             onChanged: (value) {
                               setState(() {
@@ -1254,20 +1339,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                                 ],
                               );
                             }
-                            if (snapshot.hasError){
-                              return Center(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(t.errors.noSuchUser, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Text(t.errors.noSuchUserSub, textAlign: TextAlign.center),
-                                    ),
-                                  ],
-                                )
-                              );
-                            }
+                            if (snapshot.hasError){ return FutureError(snapshot); }
                           }
                         return const Text("what?");
                         },
@@ -1306,20 +1378,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                                 ],
                               );
                             }
-                            if (snapshot.hasError){
-                              return Center(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(t.errors.noSuchUser, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Text(t.errors.noSuchUserSub, textAlign: TextAlign.center),
-                                    ),
-                                  ],
-                                )
-                              );
-                            }
+                            if (snapshot.hasError){ return FutureError(snapshot); }
                           }
                         return const Text("what?");
                         },
@@ -1366,20 +1425,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 if (snapshot.hasData){
                   return SizedBox(height: constraints.maxHeight - 145, child: _TLRecords(userID: widget.searchFor, changePlayer: (){}, data: snapshot.data!.records, wasActiveInTL: snapshot.data!.records.isNotEmpty, oldMathcesHere: false));
                 }
-                if (snapshot.hasError){
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(t.errors.noSuchUser, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Text(t.errors.noSuchUserSub, textAlign: TextAlign.center),
-                        ),
-                      ],
-                    )
-                  );
-                }
+                if (snapshot.hasError){ return FutureError(snapshot); }
               }
             return const Text("what?");
             },
@@ -1760,20 +1806,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
           case ConnectionState.active:
             return const Center(child: CircularProgressIndicator());
           case ConnectionState.done:
-          if (snapshot.hasError){
-            return Center(child: 
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(snapshot.error.toString(), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Text(snapshot.stackTrace.toString(), textAlign: TextAlign.center),
-                  ),
-                ],
-              )
-            );
-          }
+          if (snapshot.hasError){ return FutureError(snapshot); }
           if (snapshot.hasData){
             blitzBetterThanRankAverage = (snapshot.data!.summaries!.league.rank != "z" && snapshot.data!.summaries!.blitz != null && snapshot.data!.summaries!.league.rank != "x+") ? snapshot.data!.summaries!.blitz!.stats.score > blitzAverages[snapshot.data!.summaries!.league.rank]! : null;
             sprintBetterThanRankAverage = (snapshot.data!.summaries!.league.rank != "z" && snapshot.data!.summaries!.sprint != null && snapshot.data!.summaries!.league.rank != "x+") ? snapshot.data!.summaries!.sprint!.stats.finalTime < sprintAverages[snapshot.data!.summaries!.league.rank]! : null;
@@ -1837,13 +1870,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                                 case ConnectionState.done:
                                   if (snapshot.hasData){
                                     return NewsThingy(snapshot.data!);
-                                  }else if (snapshot.hasError){
-                                    return Card(child: Column(children: [
-                                      Text(snapshot.error.toString(), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                                      Text(snapshot.stackTrace.toString())
-                                    ]
-                                  ));
-                                }
+                                  }else if (snapshot.hasError){ return FutureError(snapshot); }
                               }
                               return const Text("what?");
                             }
@@ -3316,6 +3343,28 @@ class TLRatingThingy extends StatelessWidget{
           ],
         ),
       ],
+    );
+  }
+}
+
+class FutureError extends StatelessWidget{
+  final AsyncSnapshot snapshot;
+
+  FutureError(this.snapshot);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(child: 
+      Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(snapshot.error.toString(), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text(snapshot.stackTrace.toString(), textAlign: TextAlign.center),
+          ),
+        ],
+      )
     );
   }
 }

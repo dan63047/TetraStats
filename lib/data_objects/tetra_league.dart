@@ -150,7 +150,11 @@ class TetraLeague {
           apm ?? 0,
           pps ?? 0,
           vs ?? 0,
-          decaying);
+          decaying,
+          -1,
+          -1,
+          Duration(seconds: -1),
+          -1);
   
   num? getStatByEnum(Stats stat){
     switch (stat) {

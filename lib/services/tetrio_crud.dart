@@ -798,34 +798,60 @@ class TetrioService extends DB {
     }
   }
 
-  // Stream<TetrioPlayersLeaderboard> fetchFullLeaderboard() async* {
-  //   late double after;
-  //   int lbLength = 100;
-  //   TetrioPlayersLeaderboard leaderboard = await fetchTLLeaderboard();
-  //   after = leaderboard.leaderboard.last.tr;
-  //   while (lbLength == 100){
-  //     TetrioPlayersLeaderboard pseudoLb = await fetchTLLeaderboard(after: after);
-  //     leaderboard.addPlayers(pseudoLb.leaderboard);
-  //     lbLength = pseudoLb.leaderboard.length;
-  //     after = pseudoLb.leaderboard.last.tr;
-  //     yield leaderboard;
-  //   }
-  // }
-
-  // i want to know progress, so i trying to figure out this thing:
-  // Stream<TetrioPlayersLeaderboard> fetchTLLeaderboardAsStream() async {
-  //   TetrioPlayersLeaderboard? cached = _cache.get("league", TetrioPlayersLeaderboard);
-  //   if (cached != null) return cached;
+  Future<List<TetrioPlayerFromLeaderboard>> fetchTetrioLeaderboard({double? after, String? lb}) async {
+    const int lbLength = 100;
+    // TetrioPlayersLeaderboard? cached = _cache.get("league", TetrioPlayersLeaderboard);
+    // if (cached != null) return cached;
      
-  //   Uri url;
-  //   if (kIsWeb) {
-  //     url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLLeaderboard"});
-  //   } else {
-  //     url = Uri.https('ch.tetr.io', 'api/users/lists/league/all');
-  //   }
+    Uri url;
+    if (kIsWeb) {
+      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLLeaderboard"});
+    } else {
+      url = Uri.https('ch.tetr.io', 'api/users/by/${lb??"league"}', {
+        "limit": "100",
+        if (after != null && after != -1) "after": "$after:0:0"
+      });
+    }
+    try{
+      final response = await client.get(url);
 
-  //   Stream<TetrioPlayersLeaderboard> stream = http.StreamedRequest("GET", url);
-  // }
+      switch (response.statusCode) {
+        case 200:
+          _lbPositions.clear();
+          var rawJson = jsonDecode(response.body);
+          if (rawJson['success']) { // if api confirmed that everything ok
+            List<TetrioPlayerFromLeaderboard> leaderboard = [];
+            for (Map<String, dynamic> entry in rawJson['data']['entries']) {
+              leaderboard.add(TetrioPlayerFromLeaderboard.fromJson(entry, DateTime.fromMillisecondsSinceEpoch(rawJson['cache']['cached_at'])));
+            }
+            developer.log("fetchTLLeaderboard: Leaderboard retrieved and cached", name: "services/tetrio_crud");
+            //_leaderboardsCache[rawJson['cache']['cached_until'].toString()] = leaderboard;
+            //_cache.store(leaderboard, rawJson['cache']['cached_until']);
+            return leaderboard;
+          } else { // idk how to hit that one
+            developer.log("fetchTLLeaderboard: Bruh", name: "services/tetrio_crud", error: rawJson);
+            throw Exception("Failed to get leaderboard (problems on the tetr.io side)"); // will it be on tetr.io side?
+          }
+        case 403:
+          throw TetrioForbidden();
+        case 429:
+          throw TetrioTooManyRequests();
+        case 418:
+          throw TetrioOskwareBridgeProblem();
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+          throw TetrioInternalProblem();
+        default:
+          developer.log("fetchTLLeaderboard: Failed to fetch leaderboard", name: "services/tetrio_crud", error: response.statusCode);
+          throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
+      }
+    } on http.ClientException catch (e, s) {
+      developer.log("$e, $s");
+      throw http.ClientException(e.message, e.uri);
+    }
+  }
 
   TetrioPlayersLeaderboard? getCachedLeaderboard(){
     return _cache.get("league", TetrioPlayersLeaderboard);
