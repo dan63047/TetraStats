@@ -200,6 +200,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                 0 => DestinationHome(searchFor: _searchFor, constraints: constraints),
                 1 => DestinationGraphs(searchFor: _searchFor, constraints: constraints),
                 2 => DestinationLeaderboards(constraints: constraints),
+                3 => DestinationCutoffs(constraints: constraints),
                 _ => Text("Unknown destination $destination")
               },
             )
@@ -215,14 +216,17 @@ class DestinationCutoffs extends StatefulWidget{
   const DestinationCutoffs({super.key, required this.constraints});
 
   @override
-  State<DestinationLeaderboards> createState() => _DestinationCutoffsState();
+  State<DestinationCutoffs> createState() => _DestinationCutoffsState();
 }
 
-class _DestinationCutoffsState extends State<DestinationLeaderboards> {
+class _DestinationCutoffsState extends State<DestinationCutoffs> {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
+    return Column(
+      children: [
+        Card(), 
+      ] 
+    );
   }
 }
 
@@ -238,19 +242,31 @@ class DestinationLeaderboards extends StatefulWidget{
 enum Leaderboards{
   tl,
   xp,
-  ar
+  ar,
+  sprint,
+  blitz,
+  zenith,
+  zenithex,
 }
 
 class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
   //Duration postSeasonLeft = seasonStart.difference(DateTime.now());
-  final Map<Leaderboards, String> leaderboards = {Leaderboards.tl: "Tetra League", Leaderboards.xp: "XP", Leaderboards.ar: "Acievement Points"};
+  final Map<Leaderboards, String> leaderboards = {
+    Leaderboards.tl: "Tetra League",
+    Leaderboards.xp: "XP",
+    Leaderboards.ar: "Acievement Points",
+    Leaderboards.sprint: "40 Lines",
+    Leaderboards.blitz: "Blitz",
+    Leaderboards.zenith: "Quick Play",
+    Leaderboards.zenithex: "Quick Play Expert",
+    };
   Leaderboards _currentLb = Leaderboards.tl;
-  final StreamController<List<TetrioPlayerFromLeaderboard>> _dataStreamController = StreamController<List<TetrioPlayerFromLeaderboard>>();
+  final StreamController<List<dynamic>> _dataStreamController = StreamController<List<dynamic>>();
   late final ScrollController _scrollController;
-  Stream<List<TetrioPlayerFromLeaderboard>> get dataStream => _dataStreamController.stream;
-  List<TetrioPlayerFromLeaderboard> list = [];
+  Stream<List<dynamic>> get dataStream => _dataStreamController.stream;
+  List<dynamic> list = [];
   bool _isFetchingData = false;
-  double after = 25000.00;
+  String? prisecter;
 
   Future<void> _fetchData() async {
     if (_isFetchingData) {
@@ -262,19 +278,19 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
       setState(() {});
 
       final items = switch(_currentLb){
-        Leaderboards.tl => await teto.fetchTetrioLeaderboard(after: after),
-        Leaderboards.xp => await teto.fetchTetrioLeaderboard(after: after, lb: "xp"),
-        Leaderboards.ar => await teto.fetchTetrioLeaderboard(after: after, lb: "ar"),
+        Leaderboards.tl => await teto.fetchTetrioLeaderboard(prisecter: prisecter),
+        Leaderboards.xp => await teto.fetchTetrioLeaderboard(prisecter: prisecter, lb: "xp"),
+        Leaderboards.ar => await teto.fetchTetrioLeaderboard(prisecter: prisecter, lb: "ar"),
+        Leaderboards.sprint => await teto.fetchTetrioRecordsLeaderboard(prisecter: prisecter),
+        Leaderboards.blitz => await teto.fetchTetrioRecordsLeaderboard(prisecter: prisecter, lb: "blitz_global"),
+        Leaderboards.zenith => await teto.fetchTetrioRecordsLeaderboard(prisecter: prisecter, lb: "zenith_global"),
+        Leaderboards.zenithex => await teto.fetchTetrioRecordsLeaderboard(prisecter: prisecter, lb: "zenithex_global"),
       };
 
       list.addAll(items);
 
       _dataStreamController.add(list);
-      after = switch (_currentLb){
-        Leaderboards.tl => list.last.tr,
-        Leaderboards.xp => list.last.xp,
-        Leaderboards.ar => list.last.ar.toDouble(),
-      };
+      prisecter = list.last.prisecter.toString();
     } catch (e) {
       _dataStreamController.addError(e);
     } finally {
@@ -332,11 +348,7 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                         onTap: () {
                           _currentLb = leaderboards.keys.elementAt(index);
                           list.clear();
-                          after = switch (_currentLb){
-                            Leaderboards.tl => 25000.00,
-                            Leaderboards.xp => -1.00,
-                            Leaderboards.ar => -1.00,
-                          };
+                          prisecter = null;
                           _fetchData();
                         },
                       ),
@@ -350,7 +362,7 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
         SizedBox(
           width: widget.constraints.maxWidth - 350 - 88,
           child: Card(
-            child: StreamBuilder<List<TetrioPlayerFromLeaderboard>>(
+            child: StreamBuilder<List<dynamic>>(
               stream: dataStream,
               builder:(context, snapshot) {
                 switch (snapshot.connectionState){
@@ -371,12 +383,25 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                               itemBuilder: (BuildContext context, int index){
                                 return ListTile(
                                   leading: Text(intf.format(index+1)),
-                                  title: Text(snapshot.data![index].username),
+                                  title: Text(snapshot.data![index].username, style: TextStyle(fontSize: 22)),
                                   trailing: Text(switch (_currentLb){
-                                    Leaderboards.tl => f2.format(snapshot.data![index].tr),
-                                    Leaderboards.xp => f2.format(snapshot.data![index].level),
-                                    Leaderboards.ar => intf.format(snapshot.data![index].ar),
-                                  }),
+                                    Leaderboards.tl => "${f2.format(snapshot.data![index].tr)} TR",
+                                    Leaderboards.xp => "LVL ${f2.format(snapshot.data![index].level)}",
+                                    Leaderboards.ar => "${intf.format(snapshot.data![index].ar)} AR",
+                                    Leaderboards.sprint => get40lTime(snapshot.data![index].stats.finalTime.inMicroseconds),
+                                    Leaderboards.blitz => intf.format(snapshot.data![index].stats.score),
+                                    Leaderboards.zenith => "${f2.format(snapshot.data![index].stats.zenith!.altitude)} m",
+                                    Leaderboards.zenithex => "${f2.format(snapshot.data![index].stats.zenith!.altitude)} m"
+                                  }, style: TextStyle(fontSize: 28)),
+                                  subtitle: Text(switch (_currentLb){
+                                    Leaderboards.tl => "${f2.format(snapshot.data![index].apm)} APM, ${f2.format(snapshot.data![index].pps)} PPS, ${f2.format(snapshot.data![index].vs)} VS, ${f2.format(snapshot.data![index].nerdStats.app)} APP, ${f2.format(snapshot.data![index].nerdStats.vsapm)} VS/APM",
+                                    Leaderboards.xp => "${f2.format(snapshot.data![index].xp)} XP${snapshot.data![index].playtime.isNegative ? "" : ", ${playtime(snapshot.data![index].playtime)} of gametime"}",
+                                    Leaderboards.ar => "${snapshot.data![index].ar_counts}",
+                                    Leaderboards.sprint => "${intf.format(snapshot.data![index].stats.finesse.faults)} FF, ${f2.format(snapshot.data![index].stats.kpp)} KPP, ${f2.format(snapshot.data![index].stats.pps)} PPS, ${intf.format(snapshot.data![index].stats.piecesPlaced)} P",
+                                    Leaderboards.blitz => "lvl ${snapshot.data![index].stats.level}, ${f2.format(snapshot.data![index].stats.pps)} PPS, ${f2.format(snapshot.data![index].stats.spp)} SPP",
+                                    Leaderboards.zenith => "${f2.format(snapshot.data![index].aggregateStats.apm)} APM, ${f2.format(snapshot.data![index].aggregateStats.pps)} PPS, ${intf.format(snapshot.data![index].stats.kills)} KO's, ${f2.format(snapshot.data![index].stats.cps)} climb speed (${f2.format(snapshot.data![index].stats.zenith!.peakrank)} peak), ${intf.format(snapshot.data![index].stats.topBtB)} B2B",
+                                    Leaderboards.zenithex => "${f2.format(snapshot.data![index].aggregateStats.apm)} APM, ${f2.format(snapshot.data![index].aggregateStats.pps)} PPS, ${intf.format(snapshot.data![index].stats.kills)} KO's, ${f2.format(snapshot.data![index].stats.cps)} climb speed (${f2.format(snapshot.data![index].stats.zenith!.peakrank)} peak), ${intf.format(snapshot.data![index].stats.topBtB)} B2B"
+                                  }, style: TextStyle(color: Colors.grey, fontSize: 12)),
                                 );
                               }
                             ),

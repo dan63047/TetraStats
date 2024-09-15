@@ -6,6 +6,7 @@ import 'package:tetra_stats/data_objects/est_tr.dart';
 import 'package:tetra_stats/data_objects/nerd_stats.dart';
 import 'package:tetra_stats/data_objects/playstyle.dart';
 import 'package:tetra_stats/data_objects/tetrio_constants.dart';
+import 'package:tetra_stats/data_objects/tetrio_prisecter.dart';
 
 class TetrioPlayerFromLeaderboard {
   late String userId;
@@ -33,6 +34,8 @@ class TetrioPlayerFromLeaderboard {
   late int gamesWonTotal;
   late Duration playtime;
   late int ar;
+  late Map<String, int> ar_counts;
+  late Prisecter prisecter;
 
   TetrioPlayerFromLeaderboard(
     this.userId,
@@ -91,6 +94,11 @@ class TetrioPlayerFromLeaderboard {
     gamesWonTotal = json['gameswon'] as int;
     playtime = Duration(microseconds: (json['gametime'].toDouble() * 1000000).floor());
     ar = json['ar'];
+    ar_counts = {};
+    for (var entry in json['ar_counts'].keys){
+      ar_counts[entry.toString()] = json['ar_counts'][entry];
+    }
+    prisecter = Prisecter.fromJson(json['p']);
     nerdStats =  NerdStats(apm, pps, vs);
     estTr = EstTr(apm, pps, vs, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
     playstyle = Playstyle(apm, pps, nerdStats.app, nerdStats.vsapm, nerdStats.dsp, nerdStats.gbe, estTr.srarea, estTr.statrank);
