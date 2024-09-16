@@ -5,20 +5,32 @@ class CutoffTetrio {
   late double percentile;
   late double tr;
   late double targetTr;
-  late double apm;
-  late double pps;
-  late double vs;
+  late double? apm;
+  late double? pps;
+  late double? vs;
   late int count;
   late double countPercentile;
+
+  CutoffTetrio({
+    required this.pos,
+    required this.percentile,
+    required this.tr,
+    required this.targetTr,
+    required this.apm,
+    required this.pps,
+    required this.vs,
+    required this.count,
+    required this.countPercentile
+  });
 
   CutoffTetrio.fromJson(Map<String, dynamic> json, int total){
     pos = json['pos'];
     percentile = json['percentile'].toDouble();
     tr = json['tr'].toDouble();
     targetTr = json['targettr'].toDouble();
-    apm = json['apm'].toDouble();
-    pps = json['pps'].toDouble();
-    vs = json['vs'].toDouble();
+    apm = json['apm']?.toDouble();
+    pps = json['pps']?.toDouble();
+    vs = json['vs']?.toDouble();
     count = json['count'];
     countPercentile = count / total;
   }

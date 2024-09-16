@@ -10,6 +10,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/data_objects/badge.dart';
 import 'package:tetra_stats/data_objects/beta_record.dart';
+import 'package:tetra_stats/data_objects/cutoff_tetrio.dart';
 import 'package:tetra_stats/data_objects/distinguishment.dart';
 import 'package:tetra_stats/data_objects/est_tr.dart';
 import 'package:tetra_stats/data_objects/nerd_stats.dart';
@@ -210,6 +211,14 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   }
 }
 
+class FetchCutoffsResults{
+  late bool success;
+  CutoffsTetrio? cutoffs;
+  Exception? exception;
+
+  FetchCutoffsResults(this.success, this.cutoffs, this.exception);
+}
+
 class DestinationCutoffs extends StatefulWidget{
   final BoxConstraints constraints;
 
@@ -220,12 +229,92 @@ class DestinationCutoffs extends StatefulWidget{
 }
 
 class _DestinationCutoffsState extends State<DestinationCutoffs> {
+
+  Future<CutoffsTetrio> fetch() async {
+    TetrioPlayerFromLeaderboard top1;
+    CutoffsTetrio cutoffs;
+    List<dynamic> requests = await Future.wait([
+      teto.fetchCutoffsTetrio(),
+      teto.fetchTopOneFromTheLeaderboard(),
+    ]);
+    cutoffs = requests[0];
+    top1 = requests[1];
+    cutoffs.data["top1"] = CutoffTetrio(
+      pos: 1,
+      percentile: 0.00,
+      tr: top1.tr,
+      targetTr: 25000,
+      apm: top1.apm,
+      pps: top1.pps,
+      vs: top1.vs,
+      count: 1,
+      countPercentile: 0.0 
+      );
+    return cutoffs;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Card(), 
-      ] 
+    return FutureBuilder<CutoffsTetrio>(
+      future: fetch(),
+      builder: (context, snapshot) {
+                switch (snapshot.connectionState){
+                  case ConnectionState.none:
+                  case ConnectionState.waiting:
+                    return const Center(child: CircularProgressIndicator());
+                  case ConnectionState.active:
+                  case ConnectionState.done:
+                    if (snapshot.hasData){
+                      return Column(
+                        children: [
+                          Card(
+                            child: Center(child: Text("Tetra League State")),
+                          ), 
+                          Card(
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(20.0, 8.0, 20.0, 8.0),
+                              child: SfLinearGauge(
+                                minimum: 0.00000000,
+                                maximum: 25000.0000,
+                                showTicks: false,
+                                showLabels: false,
+                                ranges: [
+                                  for (var cutoff in snapshot.data!.data.keys) LinearGaugeRange(
+                                    position: LinearElementPosition.outside,
+                                    startValue: snapshot.data!.data[cutoff]!.tr,
+                                    startWidth: 20.0,
+                                    endWidth: 20.0,
+                                    endValue: switch (cutoff){
+                                      "top1" => 25000.00,
+                                      "x+" => snapshot.data!.data["top1"]!.tr,
+                                      _ => snapshot.data!.data[ranks[ranks.indexOf(cutoff)+1]]!.tr
+                                    },
+                                    color: cutoff != "top1" ? rankColors[cutoff] : null,
+                                    //shaderCallback: (bounds) {
+                                      // make shader blyat
+                                   // },
+                                  ),
+                                  for (var cutoff in snapshot.data!.data.keys) LinearGaugeRange(
+                                    position: LinearElementPosition.inside,
+                                    startValue: snapshot.data!.data[cutoff]!.targetTr,
+                                    endValue: switch (cutoff){
+                                      "top1" => 25000.00,
+                                      "x+" => snapshot.data!.data["top1"]!.targetTr,
+                                      _ => snapshot.data!.data[ranks[ranks.indexOf(cutoff)+1]]!.targetTr
+                                    },
+                                    color: cutoff != "top1" ? rankColors[cutoff] : null,
+                                  )
+                                ],
+                              ),
+                            ),
+                          ), 
+                        ] 
+                      );
+                    }
+                    if (snapshot.hasError){ return FutureError(snapshot); }
+                  }
+                return Text("huh?");
+              }
     );
   }
 }

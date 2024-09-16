@@ -114,19 +114,19 @@ class RanksAverages extends State<RankAveragesView> {
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(right: 8.0),
-                                      child: Text(f2.format(snapshot.data!.data[rank]!.apm), textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w100, color: Colors.white, shadows: textShadow)),
+                                      child: Text(snapshot.data?.data[rank]?.apm != null ? f2.format(snapshot.data!.data[rank]!.apm) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w100, color: snapshot.data?.data[rank]?.apm != null ? Colors.white : Colors.grey, shadows: textShadow)),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(right: 8.0),
-                                      child: Text(f2.format(snapshot.data!.data[rank]!.pps), textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w100, color: Colors.white, shadows: textShadow)),
+                                      child: Text(snapshot.data?.data[rank]?.pps != null ? f2.format(snapshot.data!.data[rank]!.pps) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w100, color: snapshot.data?.data[rank]?.pps != null ? Colors.white : Colors.grey, shadows: textShadow)),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(right: 8.0),
-                                      child: Text(f2.format(snapshot.data!.data[rank]!.vs), textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w100, color: Colors.white, shadows: textShadow)),
+                                      child: Text(snapshot.data?.data[rank]?.vs != null ? f2.format(snapshot.data!.data[rank]!.vs) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w100, color: snapshot.data?.data[rank]?.vs != null ? Colors.white : Colors.grey, shadows: textShadow)),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(right: 8.0),
-                                      child: Text("${f3.format(snapshot.data!.data[rank]!.apm / (snapshot.data!.data[rank]!.pps * 60))} APP\n${f3.format(snapshot.data!.data[rank]!.vs / snapshot.data!.data[rank]!.apm)} VS/APM", textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100, color: Colors.white, shadows: textShadow)),
+                                      child: Text("${snapshot.data?.data[rank]?.apm != null && snapshot.data?.data[rank]?.pps != null ? f3.format(snapshot.data!.data[rank]!.apm! / (snapshot.data!.data[rank]!.pps! * 60)) : "-.---"} APP\n${snapshot.data?.data[rank]?.apm != null && snapshot.data?.data[rank]?.vs != null ? f3.format(snapshot.data!.data[rank]!.vs! / snapshot.data!.data[rank]!.apm!) : "-.---"} VS/APM", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100, color: snapshot.data?.data[rank]?.apm != null && snapshot.data?.data[rank]?.pps != null && snapshot.data?.data[rank]?.vs != null ? Colors.white : Colors.grey, shadows: textShadow)),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(right: 8.0),
