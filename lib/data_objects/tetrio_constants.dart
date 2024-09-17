@@ -161,7 +161,8 @@ const Map<String, Color> rankColors = {
   'c-': Color(0xFF79558C),
   'd+': Color(0xFF8E6091),
   'd': Color(0xFF907591),
-  'z': Color(0xFF375433)
+  'z': Color(0xFF375433),
+  'top1': Colors.yellowAccent
 };
 
 const Map<String, Duration> sprintAverages = {

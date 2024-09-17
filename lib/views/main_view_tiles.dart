@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide Badge;
@@ -258,63 +258,196 @@ class _DestinationCutoffsState extends State<DestinationCutoffs> {
     return FutureBuilder<CutoffsTetrio>(
       future: fetch(),
       builder: (context, snapshot) {
-                switch (snapshot.connectionState){
-                  case ConnectionState.none:
-                  case ConnectionState.waiting:
-                    return const Center(child: CircularProgressIndicator());
-                  case ConnectionState.active:
-                  case ConnectionState.done:
-                    if (snapshot.hasData){
-                      return Column(
-                        children: [
-                          Card(
-                            child: Center(child: Text("Tetra League State")),
-                          ), 
-                          Card(
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(20.0, 8.0, 20.0, 8.0),
-                              child: SfLinearGauge(
-                                minimum: 0.00000000,
-                                maximum: 25000.0000,
-                                showTicks: false,
-                                showLabels: false,
-                                ranges: [
-                                  for (var cutoff in snapshot.data!.data.keys) LinearGaugeRange(
-                                    position: LinearElementPosition.outside,
-                                    startValue: snapshot.data!.data[cutoff]!.tr,
-                                    startWidth: 20.0,
-                                    endWidth: 20.0,
-                                    endValue: switch (cutoff){
-                                      "top1" => 25000.00,
-                                      "x+" => snapshot.data!.data["top1"]!.tr,
-                                      _ => snapshot.data!.data[ranks[ranks.indexOf(cutoff)+1]]!.tr
-                                    },
-                                    color: cutoff != "top1" ? rankColors[cutoff] : null,
-                                    //shaderCallback: (bounds) {
-                                      // make shader blyat
-                                   // },
-                                  ),
-                                  for (var cutoff in snapshot.data!.data.keys) LinearGaugeRange(
-                                    position: LinearElementPosition.inside,
-                                    startValue: snapshot.data!.data[cutoff]!.targetTr,
-                                    endValue: switch (cutoff){
-                                      "top1" => 25000.00,
-                                      "x+" => snapshot.data!.data["top1"]!.targetTr,
-                                      _ => snapshot.data!.data[ranks[ranks.indexOf(cutoff)+1]]!.targetTr
-                                    },
-                                    color: cutoff != "top1" ? rankColors[cutoff] : null,
-                                  )
-                                ],
-                              ),
+        switch (snapshot.connectionState){
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+            return const Center(child: CircularProgressIndicator());
+          case ConnectionState.active:
+          case ConnectionState.done:
+            if (snapshot.hasData){
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Card(
+                      child: Center(child: Text("Tetra League State")),
+                    ), 
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(20.0, 8.0, 20.0, 8.0),
+                        child: SfLinearGauge(
+                          minimum: 0.00000000,
+                          maximum: 25000.0000,
+                          showTicks: false,
+                          showLabels: false,
+                          ranges: [
+                            for (var cutoff in snapshot.data!.data.keys) LinearGaugeRange(
+                              position: LinearElementPosition.outside,
+                              startValue: snapshot.data!.data[cutoff]!.tr,
+                              startWidth: 20.0,
+                              endWidth: 20.0,
+                              endValue: switch (cutoff){
+                                "top1" => 25000.00,
+                                "x+" => snapshot.data!.data["top1"]!.tr,
+                                _ => snapshot.data!.data[ranks[ranks.indexOf(cutoff)+1]]!.tr
+                              },
+                              color: cutoff != "top1" ? rankColors[cutoff] : null,
+                            //   shaderCallback: (bounds) {
+                            //     return ImageShader(Image.file(""), TileMode.repeated, TileMode.repeated, Matrix4.identity().storage);
+                            //  },
                             ),
-                          ), 
-                        ] 
-                      );
-                    }
-                    if (snapshot.hasError){ return FutureError(snapshot); }
-                  }
-                return Text("huh?");
-              }
+                            for (var cutoff in snapshot.data!.data.keys) LinearGaugeRange(
+                              position: LinearElementPosition.inside,
+                              startValue: snapshot.data!.data[cutoff]!.targetTr,
+                              endValue: switch (cutoff){
+                                "top1" => 25000.00,
+                                "x+" => snapshot.data!.data["top1"]!.targetTr,
+                                _ => snapshot.data!.data[ranks[ranks.indexOf(cutoff)+1]]!.targetTr
+                              },
+                              color: cutoff != "top1" ? rankColors[cutoff] : null,
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    Card(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Table(
+                            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                            border: TableBorder.all(color: Colors.grey.shade900),
+                            columnWidths: const {
+                              0: FixedColumnWidth(48),
+                              1: FixedColumnWidth(155),
+                              2: FixedColumnWidth(140),
+                              3: FixedColumnWidth(160),
+                              4: FixedColumnWidth(150),
+                              5: FixedColumnWidth(90),
+                              6: FixedColumnWidth(130),
+                              7: FixedColumnWidth(120),
+                              8: FixedColumnWidth(125),
+                              9: FixedColumnWidth(70),
+                              },
+                            children: [
+                              TableRow(
+                                children: [
+                                  Text("Rank", textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
+                                  const Padding(
+                                    padding: EdgeInsets.only(right: 8.0),
+                                    child: Text("Cutoff TR", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white)),
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.only(right: 8.0),
+                                    child: Text("Target TR", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 24, fontWeight: FontWeight.w100, color: Colors.white)),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: Text("State", textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.only(right: 8.0),
+                                    child: Text("APM", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white)),
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.only(right: 8.0),
+                                    child: Text("PPS", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white)),
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.only(right: 8.0),
+                                    child: Text("VS", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white)),
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.only(right: 8.0),
+                                    child: Text("Advanced", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: Text("Players (${intf.format(snapshot.data!.total)})", textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: Text("More info", textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
+                                  ),
+                                ]
+                              ),
+                              for (String rank in snapshot.data!.data.keys) if (rank != "top1") TableRow(
+                                decoration: BoxDecoration(gradient: LinearGradient(colors: [rankColors[rank]!.withAlpha(200), rankColors[rank]!.withAlpha(100)])),
+                                children: [
+                                  Container(decoration: BoxDecoration(boxShadow: [BoxShadow(color: Colors.black.withAlpha(132), blurRadius: 32.0, blurStyle: BlurStyle.inner)]), child: Image.asset("res/tetrio_tl_alpha_ranks/$rank.png", height: 48)),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: Text(f2.format(snapshot.data!.data[rank]!.tr), textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white, shadows: textShadow)),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: Text(f2.format(snapshot.data!.data[rank]!.targetTr), textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 24, fontWeight: FontWeight.w100, color: Colors.white, shadows: textShadow)),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: RichText(
+                                      textAlign: TextAlign.right,
+                                      text: TextSpan(
+                                      style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100, color: Colors.white, shadows: textShadow),
+                                      children: [
+                                        if (rank == "x+") TextSpan(text: "№ 1 is ${f2.format(snapshot.data!.data["top1"]!.tr)} TR", style: const TextStyle(color: Colors.white60, shadows: null))
+                                        else TextSpan(text: snapshot.data!.data[ranks[ranks.indexOf(rank)+1]]!.tr > snapshot.data!.data[ranks[ranks.indexOf(rank)+1]]!.targetTr ? "Inflated from ${NumberFormat.compact().format(snapshot.data!.data[rank]!.targetTr)} TR" : "Not inflated", style: TextStyle(color: snapshot.data!.data[ranks[ranks.indexOf(rank)+1]]!.tr > snapshot.data!.data[ranks[ranks.indexOf(rank)+1]]!.targetTr ? Colors.white :Colors.white60, shadows: null)),
+                                        TextSpan(text: "\n", style: const TextStyle(color: Colors.white60, shadows: null)),
+                                        if (rank == "d") TextSpan(text: "Well...", style: const TextStyle(color: Colors.white60, shadows: null))
+                                        else TextSpan(text: snapshot.data!.data[rank]!.tr < snapshot.data!.data[rank]!.targetTr ? "Deflated untill ${NumberFormat.compact().format(snapshot.data!.data[rank]!.targetTr)} TR" : "Not deflated", style: TextStyle(color: snapshot.data!.data[rank]!.tr < snapshot.data!.data[rank]!.targetTr ? Colors.white : Colors.white60, shadows: null))
+                                      ]
+                                    )),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: Text(snapshot.data?.data[rank]?.apm != null ? f2.format(snapshot.data!.data[rank]!.apm) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w100, color: snapshot.data?.data[rank]?.apm != null ? Colors.white : Colors.grey, shadows: textShadow)),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: Text(snapshot.data?.data[rank]?.pps != null ? f2.format(snapshot.data!.data[rank]!.pps) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w100, color: snapshot.data?.data[rank]?.pps != null ? Colors.white : Colors.grey, shadows: textShadow)),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: Text(snapshot.data?.data[rank]?.vs != null ? f2.format(snapshot.data!.data[rank]!.vs) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w100, color: snapshot.data?.data[rank]?.vs != null ? Colors.white : Colors.grey, shadows: textShadow)),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: Text("${snapshot.data?.data[rank]?.apm != null && snapshot.data?.data[rank]?.pps != null ? f3.format(snapshot.data!.data[rank]!.apm! / (snapshot.data!.data[rank]!.pps! * 60)) : "-.---"} APP\n${snapshot.data?.data[rank]?.apm != null && snapshot.data?.data[rank]?.vs != null ? f3.format(snapshot.data!.data[rank]!.vs! / snapshot.data!.data[rank]!.apm!) : "-.---"} VS/APM", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100, color: snapshot.data?.data[rank]?.apm != null && snapshot.data?.data[rank]?.pps != null && snapshot.data?.data[rank]?.vs != null ? Colors.white : Colors.grey, shadows: textShadow)),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: RichText(
+                                      textAlign: TextAlign.right,
+                                      text: TextSpan(
+                                      style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100, color: Colors.white, shadows: textShadow),
+                                      children: [
+                                        TextSpan(text: intf.format(snapshot.data!.data[rank]!.count)),
+                                        TextSpan(text: " (${f2.format(snapshot.data!.data[rank]!.countPercentile * 100)}%)", style: const TextStyle(color: Colors.white60, shadows: null)),
+                                        TextSpan(text: "\n(from № ${intf.format(snapshot.data!.data[rank]!.pos)})", style: const TextStyle(color: Colors.white60, shadows: null))
+                                      ]
+                                    ))
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: TextButton(child: Text("View", textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)), onPressed: () {
+                                      
+                                    },),
+                                  ),
+                                ]
+                              )
+                            ],
+                          ),
+                          Text(t.sprintAndBlitsRelevance(date: timestamp(snapshot.data!.timestamp)))
+                        ],
+                      ),
+                    )
+                  ] 
+                ),
+              );
+            }
+            if (snapshot.hasError){ return FutureError(snapshot); }
+          }
+        return Text("huh?");
+      }
     );
   }
 }
