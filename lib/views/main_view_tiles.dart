@@ -46,6 +46,7 @@ import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/widgets/tl_progress_bar.dart';
 import 'package:tetra_stats/widgets/user_thingy.dart';
 import 'package:transparent_image/transparent_image.dart';
+import 'package:vector_math/vector_math_64.dart' hide Colors;
 
 var fDiff = NumberFormat("+#,###.####;-#,###.####");
 late Future<FetchResults> _data;
@@ -202,6 +203,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                 1 => DestinationGraphs(searchFor: _searchFor, constraints: constraints),
                 2 => DestinationLeaderboards(constraints: constraints),
                 3 => DestinationCutoffs(constraints: constraints),
+                4 => DestinationCalculator(constraints: constraints),
                 _ => Text("Unknown destination $destination")
               },
             )
@@ -209,6 +211,120 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
         },
       ));
   }
+}
+
+class DestinationCalculator extends StatefulWidget{
+  final BoxConstraints constraints;
+
+  const DestinationCalculator({super.key, required this.constraints});
+
+  @override
+  State<DestinationCalculator> createState() => _DestinationCalculatorState();
+}
+
+class _DestinationCalculatorState extends State<DestinationCalculator> {
+  double? apm;
+  double? pps;
+  double? vs;
+  NerdStats? nerdStats;
+  EstTr? estTr;
+  Playstyle? playstyle;
+  TextEditingController ppsController = TextEditingController();
+  TextEditingController apmController = TextEditingController();
+  TextEditingController vsController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  void calc() {
+    apm = double.tryParse(apmController.text);
+    pps = double.tryParse(ppsController.text);
+    vs = double.tryParse(vsController.text);
+    if (apm != null && pps != null && vs != null) {
+      nerdStats = NerdStats(apm!, pps!, vs!);
+      estTr = EstTr(apm!, pps!, vs!, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp, nerdStats!.gbe);
+      playstyle = Playstyle(apm!, pps!, nerdStats!.app, nerdStats!.vsapm, nerdStats!.dsp, nerdStats!.gbe, estTr!.srarea, estTr!.statrank);
+      setState(() {});
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please, enter valid values")));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Card(
+            child: Center(child: Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Column(
+                children: [
+                  Text("Stats Calucator", style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                ],
+              ),
+            )),
+          ),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Expanded(
+                      child: Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: TextField(
+                      onSubmitted: (value) => calc(),
+                      controller: apmController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(suffix: Text("APM"), alignLabelWithHint: true, hintText: "Enter your APM"),
+                    ),
+                  )),
+                  Expanded(
+                      child: TextField(
+                    onSubmitted: (value) => calc(),
+                    controller: ppsController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(suffix: Text("PPS"), alignLabelWithHint: true, hintText: "Enter your PPS"),
+                  )),
+                  Expanded(
+                      child: Padding(
+                    padding: const EdgeInsets.only(left: 12),
+                    child: TextField(
+                      onSubmitted: (value) => calc(),
+                      controller: vsController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(suffix: Text("VS"), alignLabelWithHint: true, hintText: "Enter your VS"),
+                    ),
+                  )),
+                  TextButton(
+                    onPressed: () => calc(),
+                    child: Text(t.calc),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (nerdStats != null && playstyle != null) Card(
+            child: Row(
+              children: [
+                Expanded(child: NerdStatsThingy(nerdStats: nerdStats!)),
+                Expanded(child: GraphsThingy(nerdStats: nerdStats!, playstyle: playstyle!, apm: apm!, pps: pps!, vs: vs!))
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
 }
 
 class FetchCutoffsResults{
@@ -269,176 +385,214 @@ class _DestinationCutoffsState extends State<DestinationCutoffs> {
                 child: Column(
                   children: [
                     Card(
-                      child: Center(child: Text("Tetra League State")),
+                      child: Center(child: Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Column(
+                          children: [
+                            Text("Tetra League State", style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                            Text("as of ${timestamp(snapshot.data!.timestamp)}"),
+                          ],
+                        ),
+                      )),
                     ), 
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(20.0, 8.0, 20.0, 8.0),
-                        child: SfLinearGauge(
-                          minimum: 0.00000000,
-                          maximum: 25000.0000,
-                          showTicks: false,
-                          showLabels: false,
-                          ranges: [
-                            for (var cutoff in snapshot.data!.data.keys) LinearGaugeRange(
-                              position: LinearElementPosition.outside,
-                              startValue: snapshot.data!.data[cutoff]!.tr,
-                              startWidth: 20.0,
-                              endWidth: 20.0,
-                              endValue: switch (cutoff){
-                                "top1" => 25000.00,
-                                "x+" => snapshot.data!.data["top1"]!.tr,
-                                _ => snapshot.data!.data[ranks[ranks.indexOf(cutoff)+1]]!.tr
-                              },
-                              color: cutoff != "top1" ? rankColors[cutoff] : null,
-                            //   shaderCallback: (bounds) {
-                            //     return ImageShader(Image.file(""), TileMode.repeated, TileMode.repeated, Matrix4.identity().storage);
-                            //  },
+                    Padding(
+                      padding: const EdgeInsets.only(bottom:4.0),
+                      child: Card(
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 12.0),
+                                        child: Text("Actual"),
+                                      ),
+                                      Text("Target")
+                                    ]  
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 8.0),
+                                    child: SfLinearGauge(
+                                      minimum: 0.00000000,
+                                      maximum: 25000.0000,
+                                      showTicks: false,
+                                      showLabels: false,
+                                      ranges: [
+                                        for (var cutoff in snapshot.data!.data.keys) LinearGaugeRange(
+                                          position: LinearElementPosition.outside,
+                                          startValue: snapshot.data!.data[cutoff]!.tr,
+                                          startWidth: 20.0,
+                                          endWidth: 20.0,
+                                          endValue: switch (cutoff){
+                                            "top1" => 25000.00,
+                                            "x+" => snapshot.data!.data["top1"]!.tr,
+                                            _ => snapshot.data!.data[ranks[ranks.indexOf(cutoff)+1]]!.tr
+                                          },
+                                          color: cutoff != "top1" ? rankColors[cutoff] : Colors.grey.shade800,
+                                        ),
+                                        for (var cutoff in snapshot.data!.data.keys) LinearGaugeRange(
+                                          position: LinearElementPosition.inside,
+                                          startValue: snapshot.data!.data[cutoff]!.targetTr,
+                                          endValue: switch (cutoff){
+                                            "top1" => 25000.00,
+                                            "x+" => snapshot.data!.data["top1"]!.targetTr,
+                                            _ => snapshot.data!.data[ranks[ranks.indexOf(cutoff)+1]]!.targetTr
+                                          },
+                                          color: cutoff != "top1" ? rankColors[cutoff] : null,
+                                        ),
+                                        for (var cutoff in snapshot.data!.data.keys.skip(1)) if (snapshot.data!.data[cutoff]!.tr < snapshot.data!.data[cutoff]!.targetTr) LinearGaugeRange(
+                                          position: LinearElementPosition.cross,
+                                          startValue: snapshot.data!.data[cutoff]!.tr,
+                                          endValue: snapshot.data!.data[cutoff]!.targetTr,
+                                          color: Colors.green,
+                                        ),
+                                        for (var cutoff in snapshot.data!.data.keys.skip(1)) if (snapshot.data!.data[ranks[ranks.indexOf(cutoff)+1]]!.tr > snapshot.data!.data[ranks[ranks.indexOf(cutoff)+1]]!.targetTr)LinearGaugeRange(
+                                          position: LinearElementPosition.cross,
+                                          startValue: snapshot.data!.data[ranks[ranks.indexOf(cutoff)+1]]!.targetTr,
+                                          endValue: snapshot.data!.data[ranks[ranks.indexOf(cutoff)+1]]!.tr,
+                                          color: Colors.red,
+                                        ),
+                                      ],
+                                      markerPointers: [
+                                        for (var cutoff in snapshot.data!.data.keys) LinearWidgetPointer(child: Container(child: Text(intf.format(snapshot.data!.data[cutoff]!.tr), style: TextStyle(fontSize: 12)), transform: Matrix4.compose(Vector3(0, 35, 0), Quaternion.axisAngle(Vector3(0, 0, 1), -1), Vector3(1, 1, 1)), height: 45.0), value: snapshot.data!.data[cutoff]!.tr, position: LinearElementPosition.outside, offset: 20),
+                                        for (var cutoff in snapshot.data!.data.keys) LinearWidgetPointer(child: Container(child: Text(intf.format(snapshot.data!.data[cutoff]!.targetTr), textAlign: ui.TextAlign.right, style: TextStyle(fontSize: 12)), transform: Matrix4.compose(Vector3(-15, 0, 0), Quaternion.axisAngle(Vector3(0, 0, 1), -1), Vector3(1, 1, 1)), height: 45.0, transformAlignment: Alignment.topRight), value: snapshot.data!.data[cutoff]!.targetTr, position: LinearElementPosition.inside, offset: 6)
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            for (var cutoff in snapshot.data!.data.keys) LinearGaugeRange(
-                              position: LinearElementPosition.inside,
-                              startValue: snapshot.data!.data[cutoff]!.targetTr,
-                              endValue: switch (cutoff){
-                                "top1" => 25000.00,
-                                "x+" => snapshot.data!.data["top1"]!.targetTr,
-                                _ => snapshot.data!.data[ranks[ranks.indexOf(cutoff)+1]]!.targetTr
-                              },
-                              color: cutoff != "top1" ? rankColors[cutoff] : null,
-                            )
                           ],
                         ),
                       ),
                     ),
-                    Card(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Table(
-                            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                            border: TableBorder.all(color: Colors.grey.shade900),
-                            columnWidths: const {
-                              0: FixedColumnWidth(48),
-                              1: FixedColumnWidth(155),
-                              2: FixedColumnWidth(140),
-                              3: FixedColumnWidth(160),
-                              4: FixedColumnWidth(150),
-                              5: FixedColumnWidth(90),
-                              6: FixedColumnWidth(130),
-                              7: FixedColumnWidth(120),
-                              8: FixedColumnWidth(125),
-                              9: FixedColumnWidth(70),
-                              },
-                            children: [
-                              TableRow(
+                    Table(
+                      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                      border: TableBorder.all(color: Colors.grey.shade900),
+                      columnWidths: const {
+                        0: FixedColumnWidth(48),
+                        1: FixedColumnWidth(155),
+                        2: FixedColumnWidth(140),
+                        3: FixedColumnWidth(160),
+                        4: FixedColumnWidth(150),
+                        5: FixedColumnWidth(90),
+                        6: FixedColumnWidth(130),
+                        7: FixedColumnWidth(120),
+                        8: FixedColumnWidth(125),
+                        9: FixedColumnWidth(70),
+                        },
+                      children: [
+                        TableRow(
+                          children: [
+                            Text("Rank", textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
+                            const Padding(
+                              padding: EdgeInsets.only(right: 8.0),
+                              child: Text("Cutoff TR", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white)),
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.only(right: 8.0),
+                              child: Text("Target TR", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 24, fontWeight: FontWeight.w100, color: Colors.white)),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Text("State", textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.only(right: 8.0),
+                              child: Text("APM", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white)),
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.only(right: 8.0),
+                              child: Text("PPS", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white)),
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.only(right: 8.0),
+                              child: Text("VS", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white)),
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.only(right: 8.0),
+                              child: Text("Advanced", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Text("Players (${intf.format(snapshot.data!.total)})", textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Text("More info", textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
+                            ),
+                          ]
+                        ),
+                        for (String rank in snapshot.data!.data.keys) if (rank != "top1") TableRow(
+                          decoration: BoxDecoration(gradient: LinearGradient(colors: [rankColors[rank]!.withAlpha(200), rankColors[rank]!.withAlpha(100)])),
+                          children: [
+                            Container(decoration: BoxDecoration(boxShadow: [BoxShadow(color: Colors.black.withAlpha(132), blurRadius: 32.0, blurStyle: BlurStyle.inner)]), child: Image.asset("res/tetrio_tl_alpha_ranks/$rank.png", height: 48)),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Text(f2.format(snapshot.data!.data[rank]!.tr), textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white, shadows: textShadow)),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Text(f2.format(snapshot.data!.data[rank]!.targetTr), textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 24, fontWeight: FontWeight.w100, color: Colors.white, shadows: textShadow)),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: RichText(
+                                textAlign: TextAlign.right,
+                                text: TextSpan(
+                                style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100, color: Colors.white, shadows: textShadow),
                                 children: [
-                                  Text("Rank", textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
-                                  const Padding(
-                                    padding: EdgeInsets.only(right: 8.0),
-                                    child: Text("Cutoff TR", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white)),
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.only(right: 8.0),
-                                    child: Text("Target TR", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 24, fontWeight: FontWeight.w100, color: Colors.white)),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: Text("State", textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.only(right: 8.0),
-                                    child: Text("APM", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white)),
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.only(right: 8.0),
-                                    child: Text("PPS", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white)),
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.only(right: 8.0),
-                                    child: Text("VS", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white)),
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.only(right: 8.0),
-                                    child: Text("Advanced", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: Text("Players (${intf.format(snapshot.data!.total)})", textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: Text("More info", textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
-                                  ),
+                                  if (rank == "x+") TextSpan(text: "№ 1 is ${f2.format(snapshot.data!.data["top1"]!.tr)} TR", style: const TextStyle(color: Colors.white60, shadows: null))
+                                  else TextSpan(text: snapshot.data!.data[ranks[ranks.indexOf(rank)+1]]!.tr > snapshot.data!.data[ranks[ranks.indexOf(rank)+1]]!.targetTr ? "Inflated from ${NumberFormat.compact().format(snapshot.data!.data[rank]!.targetTr)} TR" : "Not inflated", style: TextStyle(color: snapshot.data!.data[ranks[ranks.indexOf(rank)+1]]!.tr > snapshot.data!.data[ranks[ranks.indexOf(rank)+1]]!.targetTr ? Colors.white :Colors.white60, shadows: null)),
+                                  TextSpan(text: "\n", style: const TextStyle(color: Colors.white60, shadows: null)),
+                                  if (rank == "d") TextSpan(text: "Well...", style: const TextStyle(color: Colors.white60, shadows: null))
+                                  else TextSpan(text: snapshot.data!.data[rank]!.tr < snapshot.data!.data[rank]!.targetTr ? "Deflated untill ${NumberFormat.compact().format(snapshot.data!.data[rank]!.targetTr)} TR" : "Not deflated", style: TextStyle(color: snapshot.data!.data[rank]!.tr < snapshot.data!.data[rank]!.targetTr ? Colors.white : Colors.white60, shadows: null))
                                 ]
-                              ),
-                              for (String rank in snapshot.data!.data.keys) if (rank != "top1") TableRow(
-                                decoration: BoxDecoration(gradient: LinearGradient(colors: [rankColors[rank]!.withAlpha(200), rankColors[rank]!.withAlpha(100)])),
+                              )),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Text(snapshot.data?.data[rank]?.apm != null ? f2.format(snapshot.data!.data[rank]!.apm) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w100, color: snapshot.data?.data[rank]?.apm != null ? Colors.white : Colors.grey, shadows: textShadow)),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Text(snapshot.data?.data[rank]?.pps != null ? f2.format(snapshot.data!.data[rank]!.pps) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w100, color: snapshot.data?.data[rank]?.pps != null ? Colors.white : Colors.grey, shadows: textShadow)),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Text(snapshot.data?.data[rank]?.vs != null ? f2.format(snapshot.data!.data[rank]!.vs) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w100, color: snapshot.data?.data[rank]?.vs != null ? Colors.white : Colors.grey, shadows: textShadow)),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Text("${snapshot.data?.data[rank]?.apm != null && snapshot.data?.data[rank]?.pps != null ? f3.format(snapshot.data!.data[rank]!.apm! / (snapshot.data!.data[rank]!.pps! * 60)) : "-.---"} APP\n${snapshot.data?.data[rank]?.apm != null && snapshot.data?.data[rank]?.vs != null ? f3.format(snapshot.data!.data[rank]!.vs! / snapshot.data!.data[rank]!.apm!) : "-.---"} VS/APM", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100, color: snapshot.data?.data[rank]?.apm != null && snapshot.data?.data[rank]?.pps != null && snapshot.data?.data[rank]?.vs != null ? Colors.white : Colors.grey, shadows: textShadow)),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: RichText(
+                                textAlign: TextAlign.right,
+                                text: TextSpan(
+                                style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100, color: Colors.white, shadows: textShadow),
                                 children: [
-                                  Container(decoration: BoxDecoration(boxShadow: [BoxShadow(color: Colors.black.withAlpha(132), blurRadius: 32.0, blurStyle: BlurStyle.inner)]), child: Image.asset("res/tetrio_tl_alpha_ranks/$rank.png", height: 48)),
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: Text(f2.format(snapshot.data!.data[rank]!.tr), textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white, shadows: textShadow)),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: Text(f2.format(snapshot.data!.data[rank]!.targetTr), textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 24, fontWeight: FontWeight.w100, color: Colors.white, shadows: textShadow)),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: RichText(
-                                      textAlign: TextAlign.right,
-                                      text: TextSpan(
-                                      style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100, color: Colors.white, shadows: textShadow),
-                                      children: [
-                                        if (rank == "x+") TextSpan(text: "№ 1 is ${f2.format(snapshot.data!.data["top1"]!.tr)} TR", style: const TextStyle(color: Colors.white60, shadows: null))
-                                        else TextSpan(text: snapshot.data!.data[ranks[ranks.indexOf(rank)+1]]!.tr > snapshot.data!.data[ranks[ranks.indexOf(rank)+1]]!.targetTr ? "Inflated from ${NumberFormat.compact().format(snapshot.data!.data[rank]!.targetTr)} TR" : "Not inflated", style: TextStyle(color: snapshot.data!.data[ranks[ranks.indexOf(rank)+1]]!.tr > snapshot.data!.data[ranks[ranks.indexOf(rank)+1]]!.targetTr ? Colors.white :Colors.white60, shadows: null)),
-                                        TextSpan(text: "\n", style: const TextStyle(color: Colors.white60, shadows: null)),
-                                        if (rank == "d") TextSpan(text: "Well...", style: const TextStyle(color: Colors.white60, shadows: null))
-                                        else TextSpan(text: snapshot.data!.data[rank]!.tr < snapshot.data!.data[rank]!.targetTr ? "Deflated untill ${NumberFormat.compact().format(snapshot.data!.data[rank]!.targetTr)} TR" : "Not deflated", style: TextStyle(color: snapshot.data!.data[rank]!.tr < snapshot.data!.data[rank]!.targetTr ? Colors.white : Colors.white60, shadows: null))
-                                      ]
-                                    )),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: Text(snapshot.data?.data[rank]?.apm != null ? f2.format(snapshot.data!.data[rank]!.apm) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w100, color: snapshot.data?.data[rank]?.apm != null ? Colors.white : Colors.grey, shadows: textShadow)),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: Text(snapshot.data?.data[rank]?.pps != null ? f2.format(snapshot.data!.data[rank]!.pps) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w100, color: snapshot.data?.data[rank]?.pps != null ? Colors.white : Colors.grey, shadows: textShadow)),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: Text(snapshot.data?.data[rank]?.vs != null ? f2.format(snapshot.data!.data[rank]!.vs) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 28, fontWeight: FontWeight.w100, color: snapshot.data?.data[rank]?.vs != null ? Colors.white : Colors.grey, shadows: textShadow)),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: Text("${snapshot.data?.data[rank]?.apm != null && snapshot.data?.data[rank]?.pps != null ? f3.format(snapshot.data!.data[rank]!.apm! / (snapshot.data!.data[rank]!.pps! * 60)) : "-.---"} APP\n${snapshot.data?.data[rank]?.apm != null && snapshot.data?.data[rank]?.vs != null ? f3.format(snapshot.data!.data[rank]!.vs! / snapshot.data!.data[rank]!.apm!) : "-.---"} VS/APM", textAlign: TextAlign.right, style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100, color: snapshot.data?.data[rank]?.apm != null && snapshot.data?.data[rank]?.pps != null && snapshot.data?.data[rank]?.vs != null ? Colors.white : Colors.grey, shadows: textShadow)),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: RichText(
-                                      textAlign: TextAlign.right,
-                                      text: TextSpan(
-                                      style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100, color: Colors.white, shadows: textShadow),
-                                      children: [
-                                        TextSpan(text: intf.format(snapshot.data!.data[rank]!.count)),
-                                        TextSpan(text: " (${f2.format(snapshot.data!.data[rank]!.countPercentile * 100)}%)", style: const TextStyle(color: Colors.white60, shadows: null)),
-                                        TextSpan(text: "\n(from № ${intf.format(snapshot.data!.data[rank]!.pos)})", style: const TextStyle(color: Colors.white60, shadows: null))
-                                      ]
-                                    ))
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: TextButton(child: Text("View", textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)), onPressed: () {
-                                      
-                                    },),
-                                  ),
+                                  TextSpan(text: intf.format(snapshot.data!.data[rank]!.count)),
+                                  TextSpan(text: " (${f2.format(snapshot.data!.data[rank]!.countPercentile * 100)}%)", style: const TextStyle(color: Colors.white60, shadows: null)),
+                                  TextSpan(text: "\n(from № ${intf.format(snapshot.data!.data[rank]!.pos)})", style: const TextStyle(color: Colors.white60, shadows: null))
                                 ]
-                              )
-                            ],
-                          ),
-                          Text(t.sprintAndBlitsRelevance(date: timestamp(snapshot.data!.timestamp)))
-                        ],
-                      ),
+                              ))
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: TextButton(child: Text("View", textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)), onPressed: () {
+                                
+                              },),
+                            ),
+                          ]
+                        )
+                      ],
                     )
                   ] 
                 ),

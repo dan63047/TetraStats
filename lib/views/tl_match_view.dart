@@ -358,9 +358,9 @@ class TlMatchResultState extends State<TlMatchResultView> {
                           CompareThingy(
                             label: "Plonk",
                             greenSide: roundSelector == -2 ? timeWeightedStats[0].playstyle.plonk :
-                            roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.playstyle.opener : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.playstyle.plonk,
+                            roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.playstyle.plonk : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.playstyle.plonk,
                             redSide: roundSelector == -2 ? timeWeightedStats[1].playstyle.plonk :
-                            roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.playstyle.opener : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.playstyle.plonk,
+                            roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.playstyle.plonk : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.playstyle.plonk,
                             fractionDigits: 3,
                             higherIsBetter: true,
                           ),
