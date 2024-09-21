@@ -217,3 +217,63 @@ List<DateTime> seasonStarts = [
 List<DateTime> seasonEnds = [
   DateTime.utc(2024, DateTime.july, 26, 15) // Source - TETR.IO discord guild
 ];
+
+/// Stolen directly from TETR.IO, redone for the sake of me
+
+enum Lineclears{
+  ZERO,
+  SINGLE,
+  DOUBLE,
+  TRIPLE,
+  QUAD,
+  PENTA,
+  TSPIN_MINI,
+  TSPIN,
+  TSPIN_MINI_SINGLE,
+  TSPIN_SINGLE,
+  TSPIN_MINI_DOUBLE,
+  TSPIN_DOUBLE,
+  TSPIN_MINI_TRIPLE,
+  TSPIN_TRIPLE,
+  TSPIN_MINI_QUAD,
+  TSPIN_QUAD,
+  TSPIN_PENTA,
+}
+
+enum ComboTables{
+  none,
+  classic,
+  modern
+}
+
+const int BACKTOBACK_BONUS = 1;
+const double BACKTOBACK_BONUS_LOG = .8;
+const int COMBO_MINIFIER = 1;
+const double COMBO_MINIFIER_LOG = 1.25;
+const double COMBO_BONUS = .25;
+// const int ALL_CLEAR = 10; lol
+
+const Map<Lineclears, int> garbage = {
+  Lineclears.SINGLE: 0,
+  Lineclears.DOUBLE: 1,
+  Lineclears.TRIPLE: 2,
+  Lineclears.QUAD: 4,
+  Lineclears.PENTA: 5,
+  Lineclears.TSPIN_MINI: 0,
+  Lineclears.TSPIN: 0,
+  Lineclears.TSPIN_MINI_SINGLE: 0,
+  Lineclears.TSPIN_SINGLE: 2,
+  Lineclears.TSPIN_MINI_DOUBLE: 1,
+  Lineclears.TSPIN_DOUBLE: 4,
+  Lineclears.TSPIN_MINI_TRIPLE: 2,
+  Lineclears.TSPIN_TRIPLE: 6,
+  Lineclears.TSPIN_MINI_QUAD: 4,
+  Lineclears.TSPIN_QUAD: 10,
+  Lineclears.TSPIN_PENTA: 12
+};
+
+const Map<ComboTables, List<int>> combotable = {
+    ComboTables.none: [0],
+    ComboTables.classic: [0, 1, 1, 2, 2, 3, 3, 4, 4, 4, 5],
+    ComboTables.modern: [0, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4]
+};

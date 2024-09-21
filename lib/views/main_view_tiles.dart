@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:ui' as ui;
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide Badge;
@@ -222,6 +223,76 @@ class DestinationCalculator extends StatefulWidget{
   State<DestinationCalculator> createState() => _DestinationCalculatorState();
 }
 
+enum CalcCards{
+  calc,
+  damage
+}
+
+class ClearData{
+  final String title;
+  final Lineclears lineclear;
+  final int lines;
+  final bool miniSpin;
+  final bool spin;
+  bool perfectClear = false;
+
+  ClearData(this.title, this.lineclear, this.lines, this.miniSpin, this.spin);
+
+  bool get difficultClear {
+    if (lines == 0) return false;
+    if (lines >= 4 || miniSpin || spin) return true;
+    else return false;
+  }
+
+  void togglePC(){
+    perfectClear = !perfectClear;
+  }
+
+  int dealsDamage(int combo, int b2b, ComboTables table,){
+    if (lines == 0) return 0;
+    double damage = 0;
+    if (spin){
+      if (lines <= 5) damage += garbage[lineclear]!;
+      else damage += garbage[Lineclears.TSPIN_PENTA]! + 2 * (lines - 5);
+    } else if (miniSpin){
+      damage += garbage[lineclear]!;
+    } else {
+      if (lines <= 5) damage += garbage[lineclear]!;
+      else damage += garbage[Lineclears.PENTA]! + (lines - 5);
+    }
+    if (difficultClear && b2b > 0){
+      damage += BACKTOBACK_BONUS * ((1 + log((b2b - 1) * BACKTOBACK_BONUS_LOG)).floor() + (b2b - 1 == 1 ? 0 : (1 + log((b2b - 1) * BACKTOBACK_BONUS_LOG) % 1) / 3));;
+    }
+    if (combo > 1){
+      damage += combotable[table]![max(0, min(combo - 2, combotable[table]!.length - 1))];
+    }
+    return damage.floor();
+  }
+}
+
+Map<String, List<ClearData>> clearsExisting = {
+  "No Spin Clears": [
+    ClearData("No lineclear (Break Combo)", Lineclears.ZERO, 0, false, false),
+    ClearData("Single", Lineclears.SINGLE, 1, false, false),
+    ClearData("Double", Lineclears.DOUBLE, 2, false, false),
+    ClearData("Triple", Lineclears.TRIPLE, 3, false, false),
+    ClearData("Quad", Lineclears.QUAD, 4, false, false)
+  ],
+  "Spins": [
+    ClearData("Spin Zero", Lineclears.TSPIN, 0, false, true),
+    ClearData("Spin Single", Lineclears.TSPIN_SINGLE, 1, false, true),
+    ClearData("Spin Double", Lineclears.TSPIN_DOUBLE, 2, false, true),
+    ClearData("Spin Spin Triple", Lineclears.TSPIN_TRIPLE, 3, false, true),
+    ClearData("Spin Spin Quad", Lineclears.TSPIN_QUAD, 4, false, true),
+  ],
+  "Mini spins": [
+    ClearData("Mini Spin Zero", Lineclears.TSPIN_MINI, 0, true, false),
+    ClearData("Mini Spin Single", Lineclears.TSPIN_MINI_SINGLE, 1, true, false),
+    ClearData("Mini Spin Double", Lineclears.TSPIN_MINI_DOUBLE, 2, true, false),
+    ClearData("Mini Spin Spin Triple", Lineclears.TSPIN_MINI_TRIPLE, 3, true, false),
+  ]
+};
+
 class _DestinationCalculatorState extends State<DestinationCalculator> {
   double? apm;
   double? pps;
@@ -232,6 +303,10 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
   TextEditingController ppsController = TextEditingController();
   TextEditingController apmController = TextEditingController();
   TextEditingController vsController = TextEditingController();
+
+  List<ClearData> clears = [];
+  int combo = -1;
+  int b2b = -1;
 
   @override
   void initState() {
@@ -257,8 +332,13 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
+  void calcDamage(){
+    for (ClearData lineclear in clears){
+
+    }
+  }
+
+  Widget getCalculator(){
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -274,36 +354,42 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
           ),
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
               child: Row(
                 children: [
                   Expanded(
-                      child: Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: TextField(
-                      onSubmitted: (value) => calc(),
-                      controller: apmController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(suffix: Text("APM"), alignLabelWithHint: true, hintText: "Enter your APM"),
-                    ),
-                  )),
-                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 0.0),
                       child: TextField(
-                    onSubmitted: (value) => calc(),
-                    controller: ppsController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(suffix: Text("PPS"), alignLabelWithHint: true, hintText: "Enter your PPS"),
-                  )),
+                        onSubmitted: (value) => calc(),
+                        controller: apmController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(suffix: Text("APM"), alignLabelWithHint: true, hintText: "Enter your APM"),
+                      ),
+                    )
+                  ),
                   Expanded(
-                      child: Padding(
-                    padding: const EdgeInsets.only(left: 12),
-                    child: TextField(
-                      onSubmitted: (value) => calc(),
-                      controller: vsController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(suffix: Text("VS"), alignLabelWithHint: true, hintText: "Enter your VS"),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 0.0),
+                      child: TextField(
+                        onSubmitted: (value) => calc(),
+                        controller: ppsController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(suffix: Text("PPS"), alignLabelWithHint: true, hintText: "Enter your PPS"),
+                      ),
+                    )
                     ),
-                  )),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 0.0),
+                      child: TextField(
+                        onSubmitted: (value) => calc(),
+                        controller: vsController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(suffix: Text("VS"), alignLabelWithHint: true, hintText: "Enter your VS"),
+                      ),
+                    )
+                  ),
                   TextButton(
                     onPressed: () => calc(),
                     child: Text(t.calc),
@@ -312,16 +398,139 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
               ),
             ),
           ),
-          if (nerdStats != null && playstyle != null) Card(
-            child: Row(
-              children: [
-                Expanded(child: NerdStatsThingy(nerdStats: nerdStats!)),
-                Expanded(child: GraphsThingy(nerdStats: nerdStats!, playstyle: playstyle!, apm: apm!, pps: pps!, vs: vs!))
-              ],
-            ),
+          if (nerdStats != null) Card(
+            child: NerdStatsThingy(nerdStats: nerdStats!)
+          ),
+          if (playstyle != null) Card(
+            child: GraphsThingy(nerdStats: nerdStats!, playstyle: playstyle!, apm: apm!, pps: pps!, vs: vs!)
           )
         ],
       ),
+    );
+  }
+
+  Widget getDamageCalculator(){
+    List<Widget> rSideWidgets = [];
+    for (var key in clearsExisting.keys){
+      rSideWidgets.add(Text(key));
+      for (ClearData data in clearsExisting[key]!) rSideWidgets.add(Card(
+        child: ListTile(
+            title: Text(data.title),
+            subtitle: Text("${data.dealsDamage(0, 0, ComboTables.modern)} damage${data.difficultClear ? ", difficult" : ""}", style: TextStyle(color: Colors.grey)),
+            trailing: Icon(Icons.arrow_forward_ios),
+            onTap: (){
+              setState((){
+                clears.add(data);
+              });
+            },
+          ),
+      ));
+      rSideWidgets.add(Text("Custom"));
+      rSideWidgets.add(const Divider(color: Color.fromARGB(50, 158, 158, 158)));
+    }
+    return Column(
+      children: [
+        Card(
+          child: Center(child: Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Column(
+              children: [
+                Text("Damage Calucator", style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+              ],
+            ),
+          )),
+        ),
+        Row(
+          children: [
+            SizedBox(
+              width: 350.0,
+              child: DefaultTabController(length: 2,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Card(
+                      child: TabBar(tabs: [
+                        Tab(text: "Actions"),
+                        Tab(text: "Rules"),
+                      ]),
+                    ),
+                    SizedBox(
+                      height: widget.constraints.maxHeight - 164,
+                      child: TabBarView(children: [
+                        SingleChildScrollView(
+                          child: Column(
+                            children: rSideWidgets,
+                          ),
+                        ),
+                        SingleChildScrollView(
+                          child: Card(
+                            child: Column(
+                              children: [
+                                ListTile(
+                                  title: Text("Doubles"),
+                                )
+                              ],
+                            ),
+                          ),
+                        )
+                      ]),
+                    )
+                  ],
+                )
+              ),
+            ),
+            SizedBox(
+              width: widget.constraints.maxWidth - 350 - 80,
+              child: Card(
+                child: Column(
+                  children: [
+                    Column(
+                      children: [for (ClearData data in clears) ListTile(
+                        title: Text(data.title),
+                        subtitle: Text("${data.dealsDamage(0, 0, ComboTables.modern)} damage${data.difficultClear ? ", difficult" : ""}", style: TextStyle(color: Colors.grey)),
+                        trailing: Text(data.dealsDamage(0, 0, ComboTables.modern).toString()),
+                        onTap: (){
+                          clears.add(data);
+                        },
+                      )],
+                    )
+                  ],
+                ),
+              ),
+            )
+          ],
+        )
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          height: widget.constraints.maxHeight -32,
+          child: getDamageCalculator(),
+        ),
+        SegmentedButton<CalcCards>(
+          showSelectedIcon: false,
+          segments: <ButtonSegment<CalcCards>>[
+            const ButtonSegment<CalcCards>(
+                value: CalcCards.calc,
+                label: Text('Stats Calculator'),
+                ),
+            ButtonSegment<CalcCards>(
+                value: CalcCards.damage,
+                label: Text('Damage Calculator'),
+                ),
+          ],
+          selected: <CalcCards>{CalcCards.damage},
+          onSelectionChanged: (Set<CalcCards> newSelection) {
+            setState(() {
+              // cardMod = CardMod.info;
+              // rightCard = newSelection.first;
+            });})
+      ],
     );
   }
 
