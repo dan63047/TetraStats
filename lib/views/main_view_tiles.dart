@@ -235,8 +235,14 @@ class ClearData{
   final bool miniSpin;
   final bool spin;
   bool perfectClear = false;
+  int id = -1;
 
   ClearData(this.title, this.lineclear, this.lines, this.miniSpin, this.spin);
+
+  ClearData cloneWith(int i){
+    ClearData newOne = ClearData(title, lineclear, lines, miniSpin, spin)..id = i;
+    return newOne;
+  }
 
   bool get difficultClear {
     if (lines == 0) return false;
@@ -251,6 +257,7 @@ class ClearData{
   int dealsDamage(int combo, int b2b, ComboTables table,){
     if (lines == 0) return 0;
     double damage = 0;
+
     if (spin){
       if (lines <= 5) damage += garbage[lineclear]!;
       else damage += garbage[Lineclears.TSPIN_PENTA]! + 2 * (lines - 5);
@@ -260,12 +267,37 @@ class ClearData{
       if (lines <= 5) damage += garbage[lineclear]!;
       else damage += garbage[Lineclears.PENTA]! + (lines - 5);
     }
-    if (difficultClear && b2b > 0){
-      damage += BACKTOBACK_BONUS * ((1 + log((b2b - 1) * BACKTOBACK_BONUS_LOG)).floor() + (b2b - 1 == 1 ? 0 : (1 + log((b2b - 1) * BACKTOBACK_BONUS_LOG) % 1) / 3));;
+
+    // Ok i can't figure out how b2b and combo works
+
+    // From tetrio.js:
+    // const n = e.cm.constants.garbage.BACKTOBACK_BONUS * (Math.floor(1 + Math.log1p((t.stats.btb - 1) * e.cm.constants.garbage.BACKTOBACK_BONUS_LOG)) + (t.stats.btb - 1 == 1 ? 0 : (1 + Math.log1p((t.stats.btb - 1) * e.cm.constants.garbage.BACKTOBACK_BONUS_LOG) % 1) / 3));
+    // if (h && (d += n),
+
+    if (difficultClear && b2b >= 1){
+      if (true) damage += BACKTOBACK_BONUS * ((1 + log((b2b+1) * BACKTOBACK_BONUS_LOG)).floor() + (b2b+1 == 1 ? 0 : (1 + log((b2b+1) * BACKTOBACK_BONUS_LOG) % 1) / 3)); // but it should be b2b-1 ???
+      else damage += 1; // if b2b chaining off
     }
-    if (combo > 1){
-      damage += combotable[table]![max(0, min(combo - 2, combotable[table]!.length - 1))];
+
+    // From tetrio.js:
+    // if (t.stats.combo > 1)
+    //   if (p += e.cm.constants.scoring.COMBO * (t.stats.combo - 1),
+    //   "multiplier" === t.setoptions.combotable)
+    //       d *= 1 + e.cm.constants.garbage.COMBO_BONUS * (t.stats.combo - 1),
+    //       t.stats.combo > 2 && (d = Math.max(Math.log1p(e.cm.constants.garbage.COMBO_MINIFIER * (t.stats.combo - 1) * e.cm.constants.garbage.COMBO_MINIFIER_LOG), d));
+    //   else {
+    //       const n = e.cm.constants.garbage.combotable[t.setoptions.combotable] || [0];
+    //       d += n[Math.max(0, Math.min(t.stats.combo - 2, n.length - 1))]
+    //   }
+
+    if (combo >= 1){
+      if (lines == 1) damage += combotable[table]![max(0, min(combo - 1, combotable[table]!.length - 1))];
+      else damage *= 1 + COMBO_BONUS * (combo - 1);
     }
+    if (combo > 2) {
+      damage = max(log(COMBO_MINIFIER * (combo - 1) * COMBO_MINIFIER_LOG), damage);
+    }
+
     return damage.floor();
   }
 }
@@ -282,14 +314,14 @@ Map<String, List<ClearData>> clearsExisting = {
     ClearData("Spin Zero", Lineclears.TSPIN, 0, false, true),
     ClearData("Spin Single", Lineclears.TSPIN_SINGLE, 1, false, true),
     ClearData("Spin Double", Lineclears.TSPIN_DOUBLE, 2, false, true),
-    ClearData("Spin Spin Triple", Lineclears.TSPIN_TRIPLE, 3, false, true),
-    ClearData("Spin Spin Quad", Lineclears.TSPIN_QUAD, 4, false, true),
+    ClearData("Spin Triple", Lineclears.TSPIN_TRIPLE, 3, false, true),
+    ClearData("Spin Quad", Lineclears.TSPIN_QUAD, 4, false, true),
   ],
   "Mini spins": [
     ClearData("Mini Spin Zero", Lineclears.TSPIN_MINI, 0, true, false),
     ClearData("Mini Spin Single", Lineclears.TSPIN_MINI_SINGLE, 1, true, false),
     ClearData("Mini Spin Double", Lineclears.TSPIN_MINI_DOUBLE, 2, true, false),
-    ClearData("Mini Spin Spin Triple", Lineclears.TSPIN_MINI_TRIPLE, 3, true, false),
+    ClearData("Mini Spin Triple", Lineclears.TSPIN_MINI_TRIPLE, 3, true, false),
   ]
 };
 
@@ -305,8 +337,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
   TextEditingController vsController = TextEditingController();
 
   List<ClearData> clears = [];
-  int combo = -1;
-  int b2b = -1;
+  int idCounter = 0;
 
   @override
   void initState() {
@@ -411,23 +442,71 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
 
   Widget getDamageCalculator(){
     List<Widget> rSideWidgets = [];
+    List<Widget> lSideWidgets = [];
+
     for (var key in clearsExisting.keys){
       rSideWidgets.add(Text(key));
       for (ClearData data in clearsExisting[key]!) rSideWidgets.add(Card(
         child: ListTile(
-            title: Text(data.title),
-            subtitle: Text("${data.dealsDamage(0, 0, ComboTables.modern)} damage${data.difficultClear ? ", difficult" : ""}", style: TextStyle(color: Colors.grey)),
-            trailing: Icon(Icons.arrow_forward_ios),
-            onTap: (){
-              setState((){
-                clears.add(data);
-              });
-            },
-          ),
+          title: Text(data.title),
+          subtitle: Text("${data.dealsDamage(0, 0, ComboTables.modern)} damage${data.difficultClear ? ", difficult" : ""}", style: TextStyle(color: Colors.grey)),
+          trailing: Icon(Icons.arrow_forward_ios),
+          onTap: (){
+            setState((){
+              clears.add(data.cloneWith(idCounter));
+            });
+            idCounter++;
+          },
+        ),
       ));
-      rSideWidgets.add(Text("Custom"));
+      if (key != "Mini spins") rSideWidgets.add(Text("Custom"));
       rSideWidgets.add(const Divider(color: Color.fromARGB(50, 158, 158, 158)));
     }
+
+    int combo = -1;
+    int b2b = -1;
+    double totalDamage = 0;
+
+    for (ClearData lineclear in clears){
+      if (lineclear.difficultClear) b2b++; else if (lineclear.lines > 0) b2b = -1;
+      if (lineclear.lines > 0) combo++; else combo = -1;
+      int dmg = lineclear.dealsDamage(combo, b2b, ComboTables.modern);
+      lSideWidgets.add(
+        ListTile(
+          leading: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(onPressed: (){ setState((){clears.removeWhere((element) => element.id == lineclear.id,);}); }, icon: Icon(Icons.clear)),
+              IconButton(onPressed: (){ setState((){clears.removeWhere((element) => element.id == lineclear.id,);}); }, icon: Icon(Icons.pregnant_woman)),
+            ],
+          ),
+          title: Text("${lineclear.title}${combo > 0 ? ", ${combo} combo" : ""}${b2b > 0 ? ", B2Bx${b2b}" : ""}"),
+          subtitle: Text("${dmg} damage${lineclear.difficultClear ? ", difficult" : ""}", style: TextStyle(color: Colors.grey)),
+          trailing: Text(dmg.toString(), style: TextStyle(fontSize: 36, fontWeight: ui.FontWeight.w100)),
+        )
+      );
+      totalDamage += dmg;
+    }
+    lSideWidgets.add(Divider());
+    lSideWidgets.add(
+      Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16.0, 0.0, 24.0, 0.0),
+            child: Row(
+              children: [
+                Text("Total damage:"),
+                Spacer(),
+                Text(totalDamage.floor().toString(), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: ui.FontWeight.w100))
+              ],
+            ),
+          ),
+          ElevatedButton.icon(onPressed: (){setState((){clears.clear();});}, icon: const Icon(Icons.clear), label: Text("Clear all"), style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))))))
+        ],
+      )
+    );
+
     return Column(
       children: [
         Card(
@@ -441,6 +520,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
           )),
         ),
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
               width: 350.0,
@@ -481,20 +561,17 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
             ),
             SizedBox(
               width: widget.constraints.maxWidth - 350 - 80,
-              child: Card(
-                child: Column(
-                  children: [
-                    Column(
-                      children: [for (ClearData data in clears) ListTile(
-                        title: Text(data.title),
-                        subtitle: Text("${data.dealsDamage(0, 0, ComboTables.modern)} damage${data.difficultClear ? ", difficult" : ""}", style: TextStyle(color: Colors.grey)),
-                        trailing: Text(data.dealsDamage(0, 0, ComboTables.modern).toString()),
-                        onTap: (){
-                          clears.add(data);
-                        },
-                      )],
-                    )
-                  ],
+              height: widget.constraints.maxHeight - 148,
+              child: clears.isEmpty ? Center(child: Text("Click on the actions on the left to add them here", textAlign: ui.TextAlign.center)) :
+              SingleChildScrollView(
+                child: Card(
+                  child: Column(
+                    children: [
+                      Column(
+                        children: lSideWidgets,
+                      )
+                    ],
+                  ),
                 ),
               ),
             )
