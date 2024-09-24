@@ -298,6 +298,8 @@ class ClearData{
       damage = max(log(COMBO_MINIFIER * (combo - 1) * COMBO_MINIFIER_LOG), damage);
     }
 
+    if (perfectClear) damage += 10;
+
     return damage.floor();
   }
 }
@@ -473,39 +475,24 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
       int dmg = lineclear.dealsDamage(combo, b2b, ComboTables.modern);
       lSideWidgets.add(
         ListTile(
+          key: ValueKey(lineclear.id),
           leading: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(onPressed: (){ setState((){clears.removeWhere((element) => element.id == lineclear.id,);}); }, icon: Icon(Icons.clear)),
-              IconButton(onPressed: (){ setState((){clears.removeWhere((element) => element.id == lineclear.id,);}); }, icon: Icon(Icons.pregnant_woman)),
+              IconButton(onPressed: (){ setState((){lineclear.togglePC();}); }, icon: Icon(Icons.pregnant_woman)),
             ],
           ),
-          title: Text("${lineclear.title}${combo > 0 ? ", ${combo} combo" : ""}${b2b > 0 ? ", B2Bx${b2b}" : ""}"),
+          title: Text("${lineclear.title}${lineclear.perfectClear ? " PC" : ""}${combo > 0 ? ", ${combo} combo" : ""}${b2b > 0 ? ", B2Bx${b2b}" : ""}"),
           subtitle: Text("${dmg} damage${lineclear.difficultClear ? ", difficult" : ""}", style: TextStyle(color: Colors.grey)),
-          trailing: Text(dmg.toString(), style: TextStyle(fontSize: 36, fontWeight: ui.FontWeight.w100)),
+          trailing: Padding(
+            padding: const EdgeInsets.only(right: 10.0),
+            child: Text(dmg.toString(), style: TextStyle(fontSize: 36, fontWeight: ui.FontWeight.w100)),
+          ),
         )
       );
       totalDamage += dmg;
     }
-    lSideWidgets.add(Divider());
-    lSideWidgets.add(
-      Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 0.0, 24.0, 0.0),
-            child: Row(
-              children: [
-                Text("Total damage:"),
-                Spacer(),
-                Text(totalDamage.floor().toString(), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: ui.FontWeight.w100))
-              ],
-            ),
-          ),
-          ElevatedButton.icon(onPressed: (){setState((){clears.clear();});}, icon: const Icon(Icons.clear), label: Text("Clear all"), style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))))))
-        ],
-      )
-    );
 
     return Column(
       children: [
@@ -563,15 +550,41 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
               width: widget.constraints.maxWidth - 350 - 80,
               height: widget.constraints.maxHeight - 148,
               child: clears.isEmpty ? Center(child: Text("Click on the actions on the left to add them here", textAlign: ui.TextAlign.center)) :
-              SingleChildScrollView(
-                child: Card(
-                  child: Column(
-                    children: [
-                      Column(
+              Card(
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: ReorderableListView(
+                        onReorder: (oldIndex, newIndex) {
+                          setState((){
+                            if (oldIndex < newIndex) {
+                              newIndex -= 1;
+                            }
+                            final ClearData item = clears.removeAt(oldIndex);
+                            clears.insert(newIndex, item);
+                          });
+                        },
                         children: lSideWidgets,
-                      )
-                    ],
-                  ),
+                      ),
+                    ),
+                    Divider(),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16.0, 0.0, 34.0, 0.0),
+                          child: Row(
+                            children: [
+                              Text("Total damage:"),
+                              Spacer(),
+                              Text(totalDamage.floor().toString(), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: ui.FontWeight.w100))
+                            ],
+                          ),
+                        ),
+                        ElevatedButton.icon(onPressed: (){setState((){clears.clear();});}, icon: const Icon(Icons.clear), label: Text("Clear all"), style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))))))
+                      ],
+                    )
+                  ],
                 ),
               ),
             )
