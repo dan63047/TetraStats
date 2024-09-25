@@ -220,6 +220,8 @@ List<DateTime> seasonEnds = [
 
 /// Stolen directly from TETR.IO, redone for the sake of me
 
+const List<String> clearNames = ["Zero", "Single", "Double", "Triple", "Quad", "Penta", "Hexa", "Hepta", "Octa", "Ennea", "Deca", "Hendeca", "Dodeca", "Triadeca", "Tessaradeca", "Pentedeca", "Hexadeca", "Heptadeca", "Octadeca", "Enneadeca", "Eicosa", "Kagaris"];
+
 enum Lineclears{
   ZERO,
   SINGLE,
@@ -243,7 +245,8 @@ enum Lineclears{
 enum ComboTables{
   none,
   classic,
-  modern
+  modern,
+  multiplier
 }
 
 const int BACKTOBACK_BONUS = 1;

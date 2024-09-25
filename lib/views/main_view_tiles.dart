@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide Badge;
+import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
@@ -228,6 +229,27 @@ enum CalcCards{
   damage
 }
 
+// class Damage{
+//   final int clear;
+//   final int combo;
+//   final int b2b;
+//   final int surge;
+//   final int pc;
+
+
+
+//   const Damage(this.clear, this.combo, this.b2b, this.surge, this.pc);
+
+//   Damage operator+(Damage other){
+//     return Damage(
+//       clear+other.clear,
+//       combo+other.combo,
+//       b2b+other.b2b,
+//       surge+other.b2b,
+//       pc+other.pc);
+//   }
+// }
+
 class ClearData{
   final String title;
   final Lineclears lineclear;
@@ -254,7 +276,7 @@ class ClearData{
     perfectClear = !perfectClear;
   }
 
-  int dealsDamage(int combo, int b2b, ComboTables table,){
+  int dealsDamage(int combo, int b2b, Rules rules){
     if (lines == 0) return 0;
     double damage = 0;
 
@@ -274,8 +296,8 @@ class ClearData{
     // const n = e.cm.constants.garbage.BACKTOBACK_BONUS * (Math.floor(1 + Math.log1p((t.stats.btb - 1) * e.cm.constants.garbage.BACKTOBACK_BONUS_LOG)) + (t.stats.btb - 1 == 1 ? 0 : (1 + Math.log1p((t.stats.btb - 1) * e.cm.constants.garbage.BACKTOBACK_BONUS_LOG) % 1) / 3));
     // if (h && (d += n),
 
-    if (difficultClear && b2b >= 1){
-      if (true) damage += BACKTOBACK_BONUS * ((1 + log((b2b+1) * BACKTOBACK_BONUS_LOG)).floor() + (b2b+1 == 1 ? 0 : (1 + log((b2b+1) * BACKTOBACK_BONUS_LOG) % 1) / 3)); // but it should be b2b-1 ???
+    if (difficultClear && b2b >= 1 && rules.b2b){
+      if (rules.b2bChaining) damage += BACKTOBACK_BONUS * ((1 + log((b2b+1) * BACKTOBACK_BONUS_LOG)).floor() + (b2b+1 == 1 ? 0 : (1 + log((b2b+1) * BACKTOBACK_BONUS_LOG) % 1) / 3)); // but it should be b2b-1 ???
       else damage += 1; // if b2b chaining off
     }
 
@@ -290,17 +312,19 @@ class ClearData{
     //       d += n[Math.max(0, Math.min(t.stats.combo - 2, n.length - 1))]
     //   }
 
-    if (combo >= 1){
-      if (lines == 1) damage += combotable[table]![max(0, min(combo - 1, combotable[table]!.length - 1))];
-      else damage *= 1 + COMBO_BONUS * (combo - 1);
-    }
-    if (combo > 2) {
-      damage = max(log(COMBO_MINIFIER * (combo - 1) * COMBO_MINIFIER_LOG), damage);
+    if (rules.combo) {
+      if (combo >= 1){
+        if (lines == 1) damage += combotable[rules.comboTable]![max(0, min(combo - 1, combotable[rules.comboTable]!.length - 1))];
+        else damage *= 1 + COMBO_BONUS * (combo - 1);
+      }
+      if (combo > 2) {
+        damage = max(log(COMBO_MINIFIER * (combo - 1) * COMBO_MINIFIER_LOG), damage);
+      }
     }
 
-    if (perfectClear) damage += 10;
+    if (perfectClear) damage += rules.pcDamage;
 
-    return damage.floor();
+    return (damage * rules.multiplier).floor();
   }
 }
 
@@ -327,6 +351,21 @@ Map<String, List<ClearData>> clearsExisting = {
   ]
 };
 
+class Rules{
+  bool combo = true;
+  bool b2b = true;
+  bool b2bChaining = false;
+  bool surge = true;
+  int surgeInitAmount = 4;
+  int surgeInitAtB2b = 4;
+  ComboTables comboTable = ComboTables.multiplier;
+  int pcDamage = 5;
+  int pcB2B = 1;
+  double multiplier = 1.0;
+}
+
+const TextStyle mainToggleInRules = TextStyle(fontSize: 18, fontWeight: ui.FontWeight.w800);
+
 class _DestinationCalculatorState extends State<DestinationCalculator> {
   double? apm;
   double? pps;
@@ -339,7 +378,12 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
   TextEditingController vsController = TextEditingController();
 
   List<ClearData> clears = [];
+  Map<String, int> customClearsChoice = {
+    "No Spin Clears": 5,
+    "Spins": 5
+  };
   int idCounter = 0;
+  Rules rules = Rules();
 
   @override
   void initState() {
@@ -451,7 +495,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
       for (ClearData data in clearsExisting[key]!) rSideWidgets.add(Card(
         child: ListTile(
           title: Text(data.title),
-          subtitle: Text("${data.dealsDamage(0, 0, ComboTables.modern)} damage${data.difficultClear ? ", difficult" : ""}", style: TextStyle(color: Colors.grey)),
+          subtitle: Text("${data.dealsDamage(0, 0, rules)} damage${data.difficultClear ? ", difficult" : ""}", style: TextStyle(color: Colors.grey)),
           trailing: Icon(Icons.arrow_forward_ios),
           onTap: (){
             setState((){
@@ -461,18 +505,41 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
           },
         ),
       ));
-      if (key != "Mini spins") rSideWidgets.add(Text("Custom"));
+      if (key != "Mini spins") rSideWidgets.add(Card(
+        child: ListTile(
+          title: Text("Custom"),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(width: 30.0, child: TextField(
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                decoration: InputDecoration(hintText: "5"),
+                onChanged: (value) => customClearsChoice[key] = int.parse(value),
+              )),
+              Text(" Lines", style: TextStyle(fontSize: 18)),
+              Icon(Icons.arrow_forward_ios)
+            ],
+          ),
+          onTap: (){
+            setState((){
+              clears.add(ClearData("${key == "Spins" ? "Spin " : ""}${clearNames[min(customClearsChoice[key]!, clearNames.length-1)]} (${customClearsChoice[key]!} Lines)", key == "Spins" ? Lineclears.TSPIN_PENTA : Lineclears.PENTA, customClearsChoice[key]!, false, key == "Spins").cloneWith(idCounter));
+            });
+            idCounter++;
+          },
+        ),
+      ));
       rSideWidgets.add(const Divider(color: Color.fromARGB(50, 158, 158, 158)));
     }
 
     int combo = -1;
     int b2b = -1;
-    double totalDamage = 0;
+    int totalDamage = 0;
 
     for (ClearData lineclear in clears){
       if (lineclear.difficultClear) b2b++; else if (lineclear.lines > 0) b2b = -1;
       if (lineclear.lines > 0) combo++; else combo = -1;
-      int dmg = lineclear.dealsDamage(combo, b2b, ComboTables.modern);
+      int dmg = lineclear.dealsDamage(combo, b2b, rules);
       lSideWidgets.add(
         ListTile(
           key: ValueKey(lineclear.id),
@@ -480,15 +547,15 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(onPressed: (){ setState((){clears.removeWhere((element) => element.id == lineclear.id,);}); }, icon: Icon(Icons.clear)),
-              IconButton(onPressed: (){ setState((){lineclear.togglePC();}); }, icon: Icon(Icons.pregnant_woman)),
+              if (lineclear.lines > 0) IconButton(onPressed: (){ setState((){lineclear.togglePC();}); }, icon: Icon(Icons.local_parking_outlined, color: lineclear.perfectClear ? Colors.white : Colors.grey.shade800)),
             ],
           ),
           title: Text("${lineclear.title}${lineclear.perfectClear ? " PC" : ""}${combo > 0 ? ", ${combo} combo" : ""}${b2b > 0 ? ", B2Bx${b2b}" : ""}"),
-          subtitle: Text("${dmg} damage${lineclear.difficultClear ? ", difficult" : ""}", style: TextStyle(color: Colors.grey)),
-          trailing: Padding(
+          subtitle: lineclear.lines > 0 ? Text("${dmg} damage${lineclear.difficultClear ? ", difficult" : ""}", style: TextStyle(color: Colors.grey)) : null,
+          trailing: lineclear.lines > 0 ? Padding(
             padding: const EdgeInsets.only(right: 10.0),
             child: Text(dmg.toString(), style: TextStyle(fontSize: 36, fontWeight: ui.FontWeight.w100)),
-          ),
+          ) : null,
         )
       );
       totalDamage += dmg;
@@ -530,14 +597,75 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                           ),
                         ),
                         SingleChildScrollView(
-                          child: Card(
-                            child: Column(
-                              children: [
-                                ListTile(
-                                  title: Text("Doubles"),
-                                )
-                              ],
-                            ),
+                          child: Column(
+                            children: [
+                              Card(
+                                child: ListTile(
+                                  title: Text("Multiplier", style: mainToggleInRules),
+                                  trailing: SizedBox(width: 90.0, child: TextField(
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
+                                    decoration: InputDecoration(hintText: rules.multiplier.toString()),
+                                    onChanged: (value) => setState((){rules.multiplier = double.parse(value);}),
+                                  )),
+                                ),
+                              ),
+                              Card(
+                                child: Column(
+                                  children: [
+                                    ListTile(
+                                      title: Text("Combo", style: mainToggleInRules),
+                                      trailing: Switch(value: rules.combo, onChanged: (v) => setState((){rules.combo = v;})),
+                                    ),
+                                    if (rules.combo) ListTile(
+                                      title: Text("Combo Table"),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              Card(
+                                child: Column(
+                                  children: [
+                                    ListTile(
+                                      title: Text("Back-To-Back (B2B)", style: mainToggleInRules),
+                                      trailing: Switch(value: rules.b2b, onChanged: (v) => setState((){rules.b2b = v;})),
+                                    ),
+                                    if (rules.b2b) ListTile(
+                                      title: Text("Back-To-Back Chaining"),
+                                      trailing: Switch(value: rules.b2bChaining, onChanged: (v) => setState((){rules.b2bChaining = v;})),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Card(
+                                child: Column(
+                                  children: [
+                                    ListTile(
+                                      title: Text("Surge", style: mainToggleInRules),
+                                      trailing: Switch(value: rules.surge, onChanged: (v) => setState((){rules.surge = v;})),
+                                    ),
+                                    if (rules.surge) ListTile(
+                                      title: Text("Starts at B2B"),
+                                      trailing: SizedBox(width: 90.0, child: TextField(
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                        decoration: InputDecoration(hintText: rules.surgeInitAtB2b.toString()),
+                                        onChanged: (value) => setState((){rules.surgeInitAtB2b = int.parse(value);}),
+                                      )),
+                                    ),
+                                    if (rules.surge) ListTile(
+                                      title: Text("Start amount"),
+                                      trailing: SizedBox(width: 90.0, child: TextField(
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                        decoration: InputDecoration(hintText: rules.surgeInitAmount.toString()),
+                                        onChanged: (value) => setState((){rules.surgeInitAmount = int.parse(value);}),
+                                      )),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
                           ),
                         )
                       ]),
@@ -575,7 +703,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                           padding: const EdgeInsets.fromLTRB(16.0, 0.0, 34.0, 0.0),
                           child: Row(
                             children: [
-                              Text("Total damage:"),
+                              Text("Total damage:", style: TextStyle(fontSize: 36, fontWeight: ui.FontWeight.w100)),
                               Spacer(),
                               Text(totalDamage.floor().toString(), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: ui.FontWeight.w100))
                             ],
