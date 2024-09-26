@@ -328,7 +328,7 @@ class ClearData{
     //   }
 
     double comboDamage = 0;
-    
+
     if (rules.combo) {
       if (combo > 1){
         if (lines == 1 && rules.comboTable != ComboTables.multiplier) comboDamage += combotable[rules.comboTable]![max(0, min(combo - 1, combotable[rules.comboTable]!.length - 1))];
@@ -403,6 +403,8 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
   };
   int idCounter = 0;
   Rules rules = Rules();
+
+  CalcCards card = CalcCards.calc;
 
   @override
   void initState() {
@@ -750,7 +752,10 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
       children: [
         SizedBox(
           height: widget.constraints.maxHeight -32,
-          child: getDamageCalculator(),
+          child: switch (card){
+            CalcCards.calc => getCalculator(),
+            CalcCards.damage => getDamageCalculator()
+          } 
         ),
         SegmentedButton<CalcCards>(
           showSelectedIcon: false,
@@ -764,11 +769,10 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                 label: Text('Damage Calculator'),
                 ),
           ],
-          selected: <CalcCards>{CalcCards.damage},
+          selected: <CalcCards>{card},
           onSelectionChanged: (Set<CalcCards> newSelection) {
             setState(() {
-              // cardMod = CardMod.info;
-              // rightCard = newSelection.first;
+              card = newSelection.first;
             });})
       ],
     );
