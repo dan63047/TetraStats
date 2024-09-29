@@ -7,6 +7,7 @@ import 'package:flutter/material.dart' hide Badge;
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
@@ -1070,6 +1071,7 @@ class DestinationLeaderboards extends StatefulWidget{
 
 enum Leaderboards{
   tl,
+  fullTL,
   xp,
   ar,
   sprint,
@@ -1081,7 +1083,8 @@ enum Leaderboards{
 class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
   //Duration postSeasonLeft = seasonStart.difference(DateTime.now());
   final Map<Leaderboards, String> leaderboards = {
-    Leaderboards.tl: "Tetra League",
+    Leaderboards.tl: "Tetra League (Current Season)",
+    Leaderboards.fullTL: "Tetra League (Current Season, full one)",
     Leaderboards.xp: "XP",
     Leaderboards.ar: "Acievement Points",
     Leaderboards.sprint: "40 Lines",
@@ -1090,7 +1093,7 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
     Leaderboards.zenithex: "Quick Play Expert",
     };
   Leaderboards _currentLb = Leaderboards.tl;
-  final StreamController<List<dynamic>> _dataStreamController = StreamController<List<dynamic>>();
+  final StreamController<List<dynamic>> _dataStreamController = StreamController<List<dynamic>>.broadcast();
   late final ScrollController _scrollController;
   Stream<List<dynamic>> get dataStream => _dataStreamController.stream;
   List<dynamic> list = [];
@@ -1108,6 +1111,7 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
 
       final items = switch(_currentLb){
         Leaderboards.tl => await teto.fetchTetrioLeaderboard(prisecter: prisecter),
+        Leaderboards.fullTL => (await teto.fetchTLLeaderboard()).leaderboard,
         Leaderboards.xp => await teto.fetchTetrioLeaderboard(prisecter: prisecter, lb: "xp"),
         Leaderboards.ar => await teto.fetchTetrioLeaderboard(prisecter: prisecter, lb: "ar"),
         Leaderboards.sprint => await teto.fetchTetrioRecordsLeaderboard(prisecter: prisecter),
@@ -1139,13 +1143,15 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
         final maxScroll = _scrollController.position.maxScrollExtent;
         final currentScroll = _scrollController.position.pixels;
 
-        if (currentScroll == maxScroll) {
+        if (currentScroll == maxScroll && _currentLb != Leaderboards.fullTL) {
           // When the last item is fully visible, load the next page.
           _fetchData();
         }
       });
     });
   }
+
+  static TextStyle trailingStyle = TextStyle(fontSize: 28);
 
   @override
   Widget build(BuildContext context) {
@@ -1171,9 +1177,10 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                   itemCount: leaderboards.length,
                   itemBuilder: (BuildContext context, int index) { 
                     return Card(
-                      surfaceTintColor: theme.colorScheme.primary,
+                      surfaceTintColor: index == 1 ? Colors.redAccent : theme.colorScheme.primary,
                       child: ListTile(
                         title: Text(leaderboards.values.elementAt(index)),
+                        subtitle: index == 1 ? Text("Heavy, but allows you to sort players by their stats", style: TextStyle(color: Colors.grey, fontSize: 12)) : null,
                         onTap: () {
                           _currentLb = leaderboards.keys.elementAt(index);
                           list.clear();
@@ -1209,24 +1216,44 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                             child: ListView.builder(
                               controller: _scrollController,
                               itemCount: list.length,
+                              prototypeItem: ListTile(
+                                leading: Text("0"),
+                                title: Text("ehhh...", style: TextStyle(fontSize: 22)),
+                                trailing: SizedBox(height: 36, width: 1),
+                                subtitle: const Text("eh...", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                              ),
                               itemBuilder: (BuildContext context, int index){
                                 return ListTile(
                                   leading: Text(intf.format(index+1)),
                                   title: Text(snapshot.data![index].username, style: TextStyle(fontSize: 22)),
-                                  trailing: Text(switch (_currentLb){
-                                    Leaderboards.tl => "${f2.format(snapshot.data![index].tr)} TR",
-                                    Leaderboards.xp => "LVL ${f2.format(snapshot.data![index].level)}",
-                                    Leaderboards.ar => "${intf.format(snapshot.data![index].ar)} AR",
-                                    Leaderboards.sprint => get40lTime(snapshot.data![index].stats.finalTime.inMicroseconds),
-                                    Leaderboards.blitz => intf.format(snapshot.data![index].stats.score),
-                                    Leaderboards.zenith => "${f2.format(snapshot.data![index].stats.zenith!.altitude)} m",
-                                    Leaderboards.zenithex => "${f2.format(snapshot.data![index].stats.zenith!.altitude)} m"
-                                  }, style: TextStyle(fontSize: 28)),
+                                  trailing: switch (_currentLb){
+                                    Leaderboards.tl => Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text("${f2.format(snapshot.data![index].tr)} TR", style: trailingStyle),
+                                        Image.asset("res/tetrio_tl_alpha_ranks/${snapshot.data![index].rank}.png", height: 36)
+                                      ],
+                                    ),
+                                    Leaderboards.fullTL => Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text("${f2.format(snapshot.data![index].tr)} TR", style: trailingStyle),
+                                        Image.asset("res/tetrio_tl_alpha_ranks/${snapshot.data![index].rank}.png", height: 36)
+                                      ],
+                                    ),
+                                    Leaderboards.xp => Text("LVL ${f2.format(snapshot.data![index].level)}", style: trailingStyle),
+                                    Leaderboards.ar => Text("${intf.format(snapshot.data![index].ar)} AR", style: trailingStyle),
+                                    Leaderboards.sprint => Text(get40lTime(snapshot.data![index].stats.finalTime.inMicroseconds), style: trailingStyle),
+                                    Leaderboards.blitz => Text(intf.format(snapshot.data![index].stats.score), style: trailingStyle),
+                                    Leaderboards.zenith => Text("${f2.format(snapshot.data![index].stats.zenith!.altitude)} m", style: trailingStyle),
+                                    Leaderboards.zenithex => Text("${f2.format(snapshot.data![index].stats.zenith!.altitude)} m", style: trailingStyle)
+                                  },
                                   subtitle: Text(switch (_currentLb){
                                     Leaderboards.tl => "${f2.format(snapshot.data![index].apm)} APM, ${f2.format(snapshot.data![index].pps)} PPS, ${f2.format(snapshot.data![index].vs)} VS, ${f2.format(snapshot.data![index].nerdStats.app)} APP, ${f2.format(snapshot.data![index].nerdStats.vsapm)} VS/APM",
+                                    Leaderboards.fullTL => "${f2.format(snapshot.data![index].apm)} APM, ${f2.format(snapshot.data![index].pps)} PPS, ${f2.format(snapshot.data![index].vs)} VS, ${f2.format(snapshot.data![index].nerdStats.app)} APP, ${f2.format(snapshot.data![index].nerdStats.vsapm)} VS/APM",
                                     Leaderboards.xp => "${f2.format(snapshot.data![index].xp)} XP${snapshot.data![index].playtime.isNegative ? "" : ", ${playtime(snapshot.data![index].playtime)} of gametime"}",
                                     Leaderboards.ar => "${snapshot.data![index].ar_counts}",
-                                    Leaderboards.sprint => "${intf.format(snapshot.data![index].stats.finesse.faults)} FF, ${f2.format(snapshot.data![index].stats.kpp)} KPP, ${f2.format(snapshot.data![index].stats.pps)} PPS, ${intf.format(snapshot.data![index].stats.piecesPlaced)} P",
+                                    Leaderboards.sprint => "${intf.format(snapshot.data![index].stats.finesse.faults)} FF, ${f2.format(snapshot.data![index].stats.kpp)} KPP, ${f2.format(snapshot.data![index].stats.kps)} KPS, ${f2.format(snapshot.data![index].stats.pps)} PPS, ${intf.format(snapshot.data![index].stats.piecesPlaced)} P",
                                     Leaderboards.blitz => "lvl ${snapshot.data![index].stats.level}, ${f2.format(snapshot.data![index].stats.pps)} PPS, ${f2.format(snapshot.data![index].stats.spp)} SPP",
                                     Leaderboards.zenith => "${f2.format(snapshot.data![index].aggregateStats.apm)} APM, ${f2.format(snapshot.data![index].aggregateStats.pps)} PPS, ${intf.format(snapshot.data![index].stats.kills)} KO's, ${f2.format(snapshot.data![index].stats.cps)} climb speed (${f2.format(snapshot.data![index].stats.zenith!.peakrank)} peak), ${intf.format(snapshot.data![index].stats.topBtB)} B2B",
                                     Leaderboards.zenithex => "${f2.format(snapshot.data![index].aggregateStats.apm)} APM, ${f2.format(snapshot.data![index].aggregateStats.pps)} PPS, ${intf.format(snapshot.data![index].stats.kills)} KO's, ${f2.format(snapshot.data![index].stats.cps)} climb speed (${f2.format(snapshot.data![index].stats.zenith!.peakrank)} peak), ${intf.format(snapshot.data![index].stats.topBtB)} B2B"
@@ -2662,6 +2689,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
           case ConnectionState.done:
           if (snapshot.hasError){ return FutureError(snapshot); }
           if (snapshot.hasData){
+            if (!snapshot.data!.success) return FetchResultError(snapshot.data!);
             blitzBetterThanRankAverage = (snapshot.data!.summaries!.league.rank != "z" && snapshot.data!.summaries!.blitz != null && snapshot.data!.summaries!.league.rank != "x+") ? snapshot.data!.summaries!.blitz!.stats.score > blitzAverages[snapshot.data!.summaries!.league.rank]! : null;
             sprintBetterThanRankAverage = (snapshot.data!.summaries!.league.rank != "z" && snapshot.data!.summaries!.sprint != null && snapshot.data!.summaries!.league.rank != "x+") ? snapshot.data!.summaries!.sprint!.stats.finalTime < sprintAverages[snapshot.data!.summaries!.league.rank]! : null;
               if (snapshot.data!.summaries!.sprint != null) {
@@ -4208,17 +4236,109 @@ class FutureError extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: 
-      Column(
+    return TweenAnimationBuilder(
+      duration: Durations.medium3,
+      tween: Tween<double>(begin: 0, end: 1),
+      curve: Easing.standard,
+      builder: (context, value, child) {
+        return Container(
+          transform: Matrix4.translationValues(0, 50-value*50, 0),
+          child: Opacity(opacity: value, child: child),
+        );
+      },
+      child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          Spacer(),
+          Icon(Icons.error_outline, size: 128.0, color: Colors.red, shadows: [
+            Shadow(offset: Offset(0.0, 0.0), blurRadius: 30.0, color: Colors.red),
+            Shadow(offset: Offset(0.0, 0.0), blurRadius: 80.0, color: Colors.red),
+          ]),
           Text(snapshot.error.toString(), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Text(snapshot.stackTrace.toString(), textAlign: TextAlign.center),
           ),
+          Spacer()
         ],
-      )
+      ),
+    );
+  }
+}
+
+class FetchResultError extends StatelessWidget{
+  final FetchResults data;
+
+  FetchResultError(this.data);
+
+  @override
+  Widget build(BuildContext context) {
+    IconData icon = Icons.error_outline;
+    String errText = "";
+    String? subText;
+    switch (data.exception.runtimeType){
+      case TetrioPlayerNotExist:
+      icon = Icons.search_off;
+      errText = t.errors.noSuchUser;
+      subText = t.errors.noSuchUserSub;
+      break;
+      case TetrioDiscordNotExist:
+      icon = Icons.search_off;
+      errText = t.errors.discordNotAssigned;
+      subText = t.errors.discordNotAssignedSub;
+      case ConnectionIssue:
+      var err = data.exception as ConnectionIssue;
+      errText = t.errors.connection(code: err.code, message: err.message);
+      break;
+      case TetrioForbidden:
+      icon = Icons.remove_circle;
+      errText = t.errors.forbidden;
+      subText = t.errors.forbiddenSub(nickname: 'osk');
+      break;
+      case TetrioTooManyRequests:
+      errText = t.errors.tooManyRequests;
+      subText = t.errors.tooManyRequestsSub;
+      break;
+      case TetrioOskwareBridgeProblem:
+      errText = t.errors.oskwareBridge;
+      subText = t.errors.oskwareBridgeSub;
+      break;
+      case TetrioInternalProblem:
+      errText = kIsWeb ? t.errors.internalWebVersion : t.errors.internal;
+      subText = kIsWeb ? t.errors.internalWebVersionSub : t.errors.internalSub;
+      break;
+      case ClientException:
+      errText = t.errors.clientException;
+      break;
+      default:
+      errText = data.exception.toString();
+    }
+    return TweenAnimationBuilder(
+      duration: Durations.medium3,
+      tween: Tween<double>(begin: 0, end: 1),
+      curve: Easing.standard,
+      builder: (context, value, child) {
+        return Container(
+          transform: Matrix4.translationValues(0, 50-value*50, 0),
+          child: Opacity(opacity: value, child: child),
+        );
+      },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Spacer(),
+          Icon(icon, size: 128.0, color: Colors.red, shadows: [
+            Shadow(offset: Offset(0.0, 0.0), blurRadius: 30.0, color: Colors.red),
+            Shadow(offset: Offset(0.0, 0.0), blurRadius: 80.0, color: Colors.red),
+          ]),
+          Text(errText, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+          if (subText != null) Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text(subText, textAlign: TextAlign.center),
+          ),
+          Spacer()
+        ],
+      ),
     );
   }
 }

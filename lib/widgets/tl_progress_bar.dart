@@ -79,7 +79,7 @@ class TLProgress extends StatelessWidget{
             ],
             markerPointers: [
               LinearShapePointer(value: (previousRankTRcutoff != null && nextRankTRcutoff != null) ? getBarTR(tlData.tr)! : getBarPosition(), position: LinearElementPosition.cross, shapeType: LinearShapePointerType.diamond, color: Colors.white, height: 20),
-              //if (tlData.standing != -1) LinearWidgetPointer(offset: 4, position: LinearElementPosition.outside, value: (previousRankTRcutoff != null && nextRankTRcutoff != null) ? getBarTR(tlData.tr)! : getBarPosition(), child: Text("№ ${NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 0).format(tlData.standing)}", style: const TextStyle(fontSize: 14),))
+              if (tlData.standing != -1) LinearWidgetPointer(offset: 4, position: LinearElementPosition.outside, value: (previousRankTRcutoff != null && nextRankTRcutoff != null) ? getBarTR(tlData.tr)! : getBarPosition(), child: Text("№ ${NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 0).format(tlData.standing)}", style: const TextStyle(fontSize: 14),))
             ],
             isMirrored: true,
             showTicks: true,

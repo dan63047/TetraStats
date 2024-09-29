@@ -798,7 +798,7 @@ class TetrioService extends DB {
     }
   }
 
-  Future<List<TetrioPlayerFromLeaderboard>> fetchTetrioLeaderboard({String? prisecter, String? lb}) async {
+  Future<List<TetrioPlayerFromLeaderboard>> fetchTetrioLeaderboard({String? prisecter, String? lb, String? country}) async {
     // TetrioPlayersLeaderboard? cached = _cache.get("league", TetrioPlayersLeaderboard);
     // if (cached != null) return cached;
      
@@ -808,7 +808,8 @@ class TetrioService extends DB {
     } else {
       url = Uri.https('ch.tetr.io', 'api/users/by/${lb??"league"}', {
         "limit": "100",
-        if (prisecter != null) "after": prisecter
+        if (prisecter != null) "after": prisecter,
+        if (country != null) "country": country
       });
     }
     try{
@@ -1337,7 +1338,7 @@ class TetrioService extends DB {
 
       switch (response.statusCode) {
         case 200:
-          var json = jsonDecode(response.body);
+          var json = jsonDecode(utf8.decode(response.bodyBytes));
           if (json['success']) {
             // parse and count stats
             TetrioPlayer player = TetrioPlayer.fromJson(json['data'], DateTime.fromMillisecondsSinceEpoch(json['cache']['cached_at'], isUtc: true), json['data']['_id'], json['data']['username'], DateTime.fromMillisecondsSinceEpoch(json['cache']['cached_until'], isUtc: true));
