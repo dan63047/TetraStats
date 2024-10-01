@@ -38,6 +38,25 @@ class TetrioPlayersLeaderboard {
     return lb;
   }
 
+  List<TetrioPlayerFromLeaderboard> getStatRankingFromLB(Stats stat, {bool reversed = false, String country = ""}){
+    List<TetrioPlayerFromLeaderboard> lb = List.from(leaderboard);
+    if (country.isNotEmpty){
+      lb.removeWhere((element) => element.country != country);
+    }
+    lb.sort(((a, b) {
+      if (a.getStatByEnum(stat).isNaN) return 1;
+      if (b.getStatByEnum(stat).isNaN) return -1;
+      if (a.getStatByEnum(stat) > b.getStatByEnum(stat)){
+        return reversed ? 1 : -1;
+      }else if (a.getStatByEnum(stat) == b.getStatByEnum(stat)){
+        return 0;
+      }else{
+        return reversed ? -1 : 1;
+      }
+    }));
+    return lb;
+  }
+
   List<dynamic> getAverageOfRank(String rank){ // i tried to refactor it and that's was terrible
     if (rank.isNotEmpty && !rankCutoffs.keys.contains(rank)) throw Exception("Invalid rank");
     List<TetrioPlayerFromLeaderboard> filtredLeaderboard = List.from(leaderboard); 

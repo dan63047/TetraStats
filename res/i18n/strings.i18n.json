@@ -377,7 +377,7 @@
         "replayRejected": "Third party API blocked your IP address"
     },
     "countries(map)": {
-        "": "Not selected",
+        "": "Worldwide",
 
         "AF": "Afghanistan",
         "AX": "\u00c5land Islands",

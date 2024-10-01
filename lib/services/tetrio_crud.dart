@@ -853,14 +853,15 @@ class TetrioService extends DB {
     }
   }
 
-  Future<List<RecordSingle>> fetchTetrioRecordsLeaderboard({String? prisecter, String? lb}) async{
+  Future<List<RecordSingle>> fetchTetrioRecordsLeaderboard({String? prisecter, String? lb, String? country}) async{
     Uri url;
     if (kIsWeb) {
       url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLLeaderboard"});
     } else {
       url = Uri.https('ch.tetr.io', 'api/records/${lb??"40l_global"}', {
         "limit": "100",
-        if (prisecter != null) "after": prisecter
+        if (prisecter != null) "after": prisecter,
+        if (country != null) "country": country
       });
     }
     try{

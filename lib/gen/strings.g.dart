@@ -6,7 +6,7 @@
 /// Locales: 3
 /// Strings: 1818 (606 per locale)
 ///
-/// Built on 2024-09-12 at 20:23 UTC
+/// Built on 2024-09-30 at 21:23 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -396,7 +396,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	late final _StringsPopupActionsEn popupActions = _StringsPopupActionsEn._(_root);
 	late final _StringsErrorsEn errors = _StringsErrorsEn._(_root);
 	Map<String, String> get countries => {
-		'': 'Not selected',
+		'': 'Worldwide',
 		'AF': 'Afghanistan',
 		'AX': 'Åland Islands',
 		'AL': 'Albania',
@@ -1108,7 +1108,7 @@ class _StringsRu implements Translations {
 	@override late final _StringsPopupActionsRu popupActions = _StringsPopupActionsRu._(_root);
 	@override late final _StringsErrorsRu errors = _StringsErrorsRu._(_root);
 	@override Map<String, String> get countries => {
-		'': 'Не выбрана',
+		'': 'Во всём мире',
 		'AF': 'Афганистан',
 		'AX': 'Аландские острова',
 		'AL': 'Албания',
@@ -2628,7 +2628,7 @@ extension on Translations {
 			case 'errors.replayAlreadySaved': return 'Replay already saved';
 			case 'errors.replayExpired': return 'Replay expired and not available anymore';
 			case 'errors.replayRejected': return 'Third party API blocked your IP address';
-			case 'countries.': return 'Not selected';
+			case 'countries.': return 'Worldwide';
 			case 'countries.AF': return 'Afghanistan';
 			case 'countries.AX': return 'Åland Islands';
 			case 'countries.AL': return 'Albania';
@@ -3256,7 +3256,7 @@ extension on _StringsRu {
 			case 'errors.replayAlreadySaved': return 'Повтор уже сохранён';
 			case 'errors.replayExpired': return 'Повтор истёк и больше недоступен';
 			case 'errors.replayRejected': return 'Стороннее API заблокировало ваш IP адрес';
-			case 'countries.': return 'Не выбрана';
+			case 'countries.': return 'Во всём мире';
 			case 'countries.AF': return 'Афганистан';
 			case 'countries.AX': return 'Аландские острова';
 			case 'countries.AL': return 'Албания';

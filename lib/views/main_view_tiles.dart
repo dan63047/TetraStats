@@ -1099,6 +1099,10 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
   List<dynamic> list = [];
   bool _isFetchingData = false;
   String? prisecter;
+  List<DropdownMenuEntry> _countries = [for (MapEntry e in t.countries.entries) DropdownMenuEntry(value: e.key, label: e.value)];
+  List<DropdownMenuEntry> _stats = [for (MapEntry e in chartsShortTitles.entries) DropdownMenuEntry(value: e.key, label: e.value)];
+  String? _country;
+  Stats stat = Stats.tr;
 
   Future<void> _fetchData() async {
     if (_isFetchingData) {
@@ -1110,14 +1114,14 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
       setState(() {});
 
       final items = switch(_currentLb){
-        Leaderboards.tl => await teto.fetchTetrioLeaderboard(prisecter: prisecter),
-        Leaderboards.fullTL => (await teto.fetchTLLeaderboard()).leaderboard,
-        Leaderboards.xp => await teto.fetchTetrioLeaderboard(prisecter: prisecter, lb: "xp"),
-        Leaderboards.ar => await teto.fetchTetrioLeaderboard(prisecter: prisecter, lb: "ar"),
-        Leaderboards.sprint => await teto.fetchTetrioRecordsLeaderboard(prisecter: prisecter),
-        Leaderboards.blitz => await teto.fetchTetrioRecordsLeaderboard(prisecter: prisecter, lb: "blitz_global"),
-        Leaderboards.zenith => await teto.fetchTetrioRecordsLeaderboard(prisecter: prisecter, lb: "zenith_global"),
-        Leaderboards.zenithex => await teto.fetchTetrioRecordsLeaderboard(prisecter: prisecter, lb: "zenithex_global"),
+        Leaderboards.tl => await teto.fetchTetrioLeaderboard(prisecter: prisecter, country: _country),
+        Leaderboards.fullTL => (await teto.fetchTLLeaderboard()).getStatRankingFromLB(stat, country: _country??""),
+        Leaderboards.xp => await teto.fetchTetrioLeaderboard(prisecter: prisecter, lb: "xp", country: _country),
+        Leaderboards.ar => await teto.fetchTetrioLeaderboard(prisecter: prisecter, lb: "ar", country: _country),
+        Leaderboards.sprint => await teto.fetchTetrioRecordsLeaderboard(prisecter: prisecter, country: _country),
+        Leaderboards.blitz => await teto.fetchTetrioRecordsLeaderboard(prisecter: prisecter, lb: "blitz_global", country: _country),
+        Leaderboards.zenith => await teto.fetchTetrioRecordsLeaderboard(prisecter: prisecter, lb: "zenith_global", country: _country),
+        Leaderboards.zenithex => await teto.fetchTetrioRecordsLeaderboard(prisecter: prisecter, lb: "zenithex_global", country: _country),
       };
 
       list.addAll(items);
@@ -1211,6 +1215,44 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                       return Column(
                         children: [
                           Text(leaderboards[_currentLb]!, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, height: 0.9)),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              DropdownMenu(
+                                leadingIcon: Icon(Icons.public),
+                                  inputDecorationTheme: InputDecorationTheme(
+                                    isDense: true,
+                                  ),
+                                  textStyle: TextStyle(fontSize: 14, height: 0.9),
+                                  dropdownMenuEntries: _countries,
+                                  initialSelection: "",
+                                  onSelected: ((value) {
+                                  _country = value as String?;
+                                  list.clear();
+                                  prisecter = null;
+                                  _isFetchingData = false;
+                                  setState((){_fetchData();});
+                                })
+                              ),
+                              if (_currentLb == Leaderboards.fullTL) SizedBox(width: 5.0),
+                              if (_currentLb == Leaderboards.fullTL) DropdownMenu(
+                                leadingIcon: Icon(Icons.sort),
+                                  inputDecorationTheme: InputDecorationTheme(
+                                    isDense: true,
+                                  ),
+                                  textStyle: TextStyle(fontSize: 14, height: 0.9),
+                                  dropdownMenuEntries: _stats,
+                                  initialSelection: stat,
+                                  onSelected: ((value) {
+                                  stat = value;
+                                  list.clear();
+                                  prisecter = null;
+                                  _isFetchingData = false;
+                                  setState((){_fetchData();});
+                                })
+                              )
+                            ],
+                          ),
                           const Divider(color: Color.fromARGB(50, 158, 158, 158)),
                           Expanded(
                             child: ListView.builder(
@@ -4257,7 +4299,7 @@ class FutureError extends StatelessWidget{
           Text(snapshot.error.toString(), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
-            child: Text(snapshot.stackTrace.toString(), textAlign: TextAlign.center),
+            child: Text(snapshot.stackTrace.toString(), textAlign: TextAlign.left, style: TextStyle(fontFamily: "Monospace")),
           ),
           Spacer()
         ],
