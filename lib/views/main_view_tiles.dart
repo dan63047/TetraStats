@@ -39,6 +39,7 @@ import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
 import 'package:tetra_stats/views/singleplayer_record_view.dart';
 import 'package:tetra_stats/views/tl_match_view.dart';
+import 'package:tetra_stats/views/compare_view_tiles.dart';
 import 'package:tetra_stats/widgets/finesse_thingy.dart';
 import 'package:tetra_stats/widgets/graphs.dart';
 import 'package:tetra_stats/widgets/lineclears_thingy.dart';
@@ -3548,7 +3549,19 @@ class NewUserThingy extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(child: ElevatedButton.icon(onPressed: (){print("ok, and?");}, icon: const Icon(Icons.person_add), label: Text(t.track), style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12.0))))))),
-                Expanded(child: ElevatedButton.icon(onPressed: (){print("ok, and?");}, icon: const Icon(Icons.balance), label: Text(t.compare), style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomRight: Radius.circular(12.0)))))))
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: (){
+                      Navigator.push(context, MaterialPageRoute(
+                        builder: (context) => CompareView(player),
+                      ),
+                      );
+                    },
+                    icon: const Icon(Icons.balance),
+                    label: Text(t.compare),
+                    style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomRight: Radius.circular(12.0)))))
+                  )
+                )
               ],
             )
           ],
