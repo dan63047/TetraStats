@@ -552,7 +552,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
           },
         ),
       ));
-      rSideWidgets.add(const Divider(color: Color.fromARGB(50, 158, 158, 158)));
+      rSideWidgets.add(const Divider());
     }
 
     int combo = -1;
@@ -1254,7 +1254,7 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                               )
                             ],
                           ),
-                          const Divider(color: Color.fromARGB(50, 158, 158, 158)),
+                          const Divider(),
                           Expanded(
                             child: ListView.builder(
                               controller: _scrollController,
@@ -1906,9 +1906,9 @@ class LeagueCard extends StatelessWidget{
                 ],
               )
               else Text("Tetra League", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, height: 0.9)),
-              const Divider(color: Color.fromARGB(50, 158, 158, 158)),
+              const Divider(),
               TLRatingThingy(userID: "", tlData: league, showPositions: true),
-              const Divider(color: Color.fromARGB(50, 158, 158, 158)),
+              const Divider(),
               Text("${league.apm != null ? f2.format(league.apm) : "-.--"} APM • ${league.pps != null ? f2.format(league.pps) : "-.--"} PPS • ${league.vs != null ? f2.format(league.vs) : "-.--"} VS • ${league.nerdStats != null ? f2.format(league.nerdStats!.app) : "-.--"} APP • ${league.nerdStats != null ? f2.format(league.nerdStats!.vsapm) : "-.--"} VS/APM", style: const TextStyle(color: Colors.grey))
             ],
           ),
@@ -1962,9 +1962,9 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const Text("40 Lines", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, height: 0.9)),
-                      const Divider(color: Color.fromARGB(50, 158, 158, 158)),
+                      const Divider(),
                       RecordSummary(record: summaries.sprint, betterThanClosestAverage: sprintBetterThanClosestAverage, betterThanRankAverage: sprintBetterThanRankAverage, closestAverage: closestAverageSprint, rank: summaries.league.percentileRank),
-                      const Divider(color: Color.fromARGB(50, 158, 158, 158)),
+                      const Divider(),
                       Text("${summaries.sprint != null ? intf.format(summaries.sprint!.stats.piecesPlaced) : "---"} P • ${summaries.sprint != null ? f2.format(summaries.sprint!.stats.pps) : "---"} PPS • ${summaries.sprint != null ? f2.format(summaries.sprint!.stats.kpp) : "---"} KPP", style: const TextStyle(color: Colors.grey))
                     ],
                   ),
@@ -1979,9 +1979,9 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const Text("Blitz", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, height: 0.9)),
-                      const Divider(color: Color.fromARGB(50, 158, 158, 158)),
+                      const Divider(),
                       RecordSummary(record: summaries.blitz, betterThanClosestAverage: blitzBetterThanClosestAverage, betterThanRankAverage: blitzBetterThanRankAverage, closestAverage: closestAverageBlitz, rank: summaries.league.percentileRank),
-                      const Divider(color: Color.fromARGB(50, 158, 158, 158)),
+                      const Divider(),
                       Text("Level ${summaries.blitz != null ? intf.format(summaries.blitz!.stats.level): "--"} • ${summaries.blitz != null ? f2.format(summaries.blitz!.stats.spp) : "-.--"} SPP • ${summaries.blitz != null ? f2.format(summaries.blitz!.stats.pps) : "---"} PPS", style: const TextStyle(color: Colors.grey))
                     ],
                   ),
@@ -2001,9 +2001,9 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const Text("QP", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, height: 0.9)),
-                      const Divider(color: Color.fromARGB(50, 158, 158, 158)),
+                      const Divider(),
                       RecordSummary(record: summaries.zenith, hideRank: true),
-                      const Divider(color: Color.fromARGB(50, 158, 158, 158)),
+                      const Divider(),
                       Text("Overall PB: ${(summaries.achievements.isNotEmpty && summaries.achievements.firstWhere((e) => e.k == 18).v != null) ? f2.format(summaries.achievements.firstWhere((e) => e.k == 18).v!) : "-.--"} m", style: const TextStyle(color: Colors.grey))
                     ],
                   ),
@@ -2018,9 +2018,9 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const Text("QP Expert", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, height: 0.9)),
-                      const Divider(color: Color.fromARGB(50, 158, 158, 158)),
+                      const Divider(),
                       RecordSummary(record: summaries.zenithEx, hideRank: true,),
-                      const Divider(color: Color.fromARGB(50, 158, 158, 158)),
+                      const Divider(),
                       Text("Overall PB: ${(summaries.achievements.isNotEmpty && summaries.achievements.firstWhere((e) => e.k == 19).v != null) ? f2.format(summaries.achievements.firstWhere((e) => e.k == 19).v!) : "-.--"} m", style: const TextStyle(color: Colors.grey))
                     ],
                   ),

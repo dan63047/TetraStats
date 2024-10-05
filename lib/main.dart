@@ -50,6 +50,8 @@ ThemeData theme = ThemeData(
       shadowColor: WidgetStatePropertyAll(Colors.cyanAccent.shade200),
     )
   ),
+  dividerColor: Color.fromARGB(50, 158, 158, 158),
+  dividerTheme: DividerThemeData(color: Color.fromARGB(50, 158, 158, 158)),
   scaffoldBackgroundColor: Colors.black
 );
 
