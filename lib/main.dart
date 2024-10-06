@@ -52,6 +52,10 @@ ThemeData theme = ThemeData(
   ),
   dividerColor: Color.fromARGB(50, 158, 158, 158),
   dividerTheme: DividerThemeData(color: Color.fromARGB(50, 158, 158, 158)),
+  expansionTileTheme: ExpansionTileThemeData(
+    expansionAnimationStyle: AnimationStyle(curve: Easing.standard, reverseCurve: Easing.standard),
+    expandedAlignment: Alignment.bottomCenter,
+  ),
   scaffoldBackgroundColor: Colors.black
 );
 

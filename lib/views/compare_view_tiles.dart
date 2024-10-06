@@ -42,6 +42,7 @@ class CompareState extends State<CompareView> {
   late ScrollController _scrollController;
   List<TetrioPlayer> players = [];
   List<Summaries> summaries = [];
+  TextStyle _expansionTileTitleTextStyle = TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 24.0);
 
   @override
   void initState() {
@@ -113,207 +114,314 @@ class CompareState extends State<CompareView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  SizedBox(
-                    width: 200.0, height: 175.0, child: Expanded(child: Card(child: Padding(
-                    padding: const EdgeInsets.fromLTRB(80.0, 10.0, 5.0, 0),
-                    child: Text("Comparison", style: TextStyle(fontSize: 20)),
-                    ),
-                  ))
-                ),
-                  for (var p in players) SizedBox(width: 350.0, child: HeaderCard(p)),
-                  SizedBox(width: 350.0, child: AddNewColumnCard(addPlayer))
-                ]
-              ),
-              Table(
-                border: TableBorder(verticalInside: BorderSide(color: Colors.grey)),
-                defaultColumnWidth: FixedColumnWidth(350),
-                columnWidths: {
-                  0: FixedColumnWidth(200.000)
-                },
-                children: [
-                  TableRow(
-                    children: [
-                      Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Account Created")),
-                      for (var p in players) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(timestamp(p.registrationTime!)))
-                    ]
-                  ),
-                  TableRow(
-                    children: [
-                      Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("XP")),
-                      for (var p in players) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: RichText(text: p.xp.isNegative ? TextSpan(text: "hidden", style: TextStyle(fontFamily: "Eurostile Round", color: Colors.grey)) : TextSpan(text: intf.format(p.xp), style: TextStyle(fontFamily: "Eurostile Round"), children: [TextSpan(text: " (lvl ${intf.format(p.level.floor())})", style: TextStyle(color: Colors.grey))])))
-                    ]
-                  ),
-                  TableRow(
-                    children: [
-                      Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Time Played")),
-                      for (var p in players) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(p.gameTime.isNegative ? "hidden" : playtime(p.gameTime), style: TextStyle(color: p.gameTime.isNegative ? Colors.grey : Colors.white)))
-                    ]
-                  ),
-                  TableRow(
-                    children: [
-                      Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Online Games Played")),
-                      for (var p in players) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(p.gamesPlayed.isNegative ? "hidden" : intf.format(p.gamesPlayed), style: TextStyle(color: p.gamesPlayed.isNegative ? Colors.grey : Colors.white))),
-                    ]
-                  ),
-                  TableRow(
-                    children: [
-                      Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Online Games Won")),
-                      for (var p in players) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(p.gamesWon.isNegative ? "hidden" : intf.format(p.gamesWon), style: TextStyle(color: p.gamesWon.isNegative ? Colors.grey : Colors.white))),
-                    ]
-                  ),
-                  TableRow(
-                    children: [
-                      Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Followers")),
-                      for (var p in players) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(intf.format(p.friendCount))),
-                    ]
-                  ),
-                ],
-              ),
+              Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+          Row(
+            children: [
               SizedBox(
-              width: 200+(summaries.length*350),
-              child: ExpansionTile(
-                title: Text("Tetra League"),
-                children: [
-                  Table(
-                    border: TableBorder(verticalInside: BorderSide(color: Colors.grey)),
-                    defaultColumnWidth: FixedColumnWidth(350),
-                    columnWidths: {
-                      0: FixedColumnWidth(200.000)
-                    },
+                height: 175.0,
+                width: 300.0,
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(90.0, 18.0, 5.0, 0),
+                    child: Text("Comparison", style: TextStyle(fontSize: 28)),
+                  ),
+                ),
+              ),
+              for (var p in players) SizedBox(
+                width: 300.0,
+                child: HeaderCard(p),
+              ),
+              SizedBox(width: 300, child: AddNewColumnCard(addPlayer))
+            ]
+          ),
+          Row(
+            children: [
+              SizedBox(
+                width: 300.0,
+                child: Card(
+                  child: Column(children: [
+                    Text("Registration Date"),
+                    Text("XP"),
+                    Text("Time Played"),
+                    Text("Online Games Played"),
+                    Text("Online Games Won"),
+                    Text("Followers"),
+                  ]),
+                ),
+              ),
+              for (var p in players) SizedBox(
+                width: 300.0,
+                child: Card(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      TableRow(
-                        children: [
-                          Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Tetra Rating")),
-                          for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.tr.isNegative ? "---" : f4.format(s.league.tr))),
-                        ]
-                      ),
-                      TableRow(
-                        children: [
-                          Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Glicko")),
-                          for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.glicko!.isNegative ? "---" : f4.format(s.league.glicko))),
-                        ]
-                      ),
-                      TableRow(
-                        children: [
-                          Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("RD")),
-                          for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.rd!.isNegative ? "---" : f4.format(s.league.rd))),
-                        ]
-                      ),
-                      TableRow(
-                        children: [
-                          Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("GLIXARE")),
-                          for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.gxe.isNegative ? "---" : f4.format(s.league.gxe))),
-                        ]
-                      ),
-                      TableRow(
-                        children: [
-                          Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("S1-like TR")),
-                          for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.s1tr.isNegative ? "---" : f4.format(s.league.s1tr))),
-                        ]
-                      ),
-                      TableRow(
-                        children: [
-                          Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Games Played")),
-                          for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(intf.format(s.league.gamesPlayed))),
-                        ]
-                      ),
-                      TableRow(
-                        children: [
-                          Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Games Won")),
-                          for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(intf.format(s.league.gamesWon))),
-                        ]
-                      ),
-                      TableRow(
-                        children: [
-                          Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Winrate")),
-                          for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.winrate.isNaN ? "---" : f4.format(s.league.winrate*100)+"%")),
-                        ]
-                      ),
-                      TableRow(
-                        children: [
-                          Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Attack Per Minute")),
-                          for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.apm != null ? f2.format(s.league.apm) : "---")),
-                        ]
-                      ),
-                      TableRow(
-                        children: [
-                          Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Pieces Per Second")),
-                          for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.apm != null ? f2.format(s.league.pps) : "---")),
-                        ]
-                      ),
-                      TableRow(
-                        children: [
-                          Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Versus Score")),
-                          for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.apm != null ? f2.format(s.league.vs) : "---")),
-                        ]
-                      ),
-                      TableRow(
-                        children: [
-                          Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Nerd Stats")),
-                          for (var _ in summaries) Container(),
-                        ]
-                      ),
-                      TableRow(
-                        children: [
-                          Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Attack Per Piece")),
-                          for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.app) : "---")),
-                        ]
-                      ),
-                      TableRow(
-                        children: [
-                          Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("VS / APM")),
-                          for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.vsapm) : "---")),
-                        ]
-                      ),
-                      TableRow(
-                        children: [
-                          Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Downstack Per Second")),
-                          for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.dss) : "---")),
-                        ]
-                      ),
-                      TableRow(
-                        children: [
-                          Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Downstack Per Piece")),
-                          for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.dsp) : "---")),
-                        ]
-                      ),
-                      TableRow(
-                        children: [
-                          Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("APP + DSP")),
-                          for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.appdsp) : "---")),
-                        ]
-                      ),
-                      TableRow(
-                        children: [
-                          Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Cheese Index")),
-                          for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.cheese) : "---")),
-                        ]
-                      ),
-                      TableRow(
-                        children: [
-                          Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Garbage Efficiency")),
-                          for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.gbe) : "---")),
-                        ]
-                      ),
-                      TableRow(
-                        children: [
-                          Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Weighted APP")),
-                          for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.nyaapp) : "---")),
-                        ]
-                      ),
-                      TableRow(
-                        children: [
-                          Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Area")),
-                          for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.area) : "---")),
-                        ]
-                      ),
+                      Text(timestamp(p.registrationTime!)),
+                      RichText(text: p.xp.isNegative ? TextSpan(text: "hidden", style: TextStyle(fontFamily: "Eurostile Round", color: Colors.grey)) : TextSpan(text: intf.format(p.xp), style: TextStyle(fontFamily: "Eurostile Round"), children: [TextSpan(text: " (lvl ${intf.format(p.level.floor())})", style: TextStyle(color: Colors.grey))])),
+                      Text(p.gameTime.isNegative ? "hidden" : playtime(p.gameTime), style: TextStyle(color: p.gameTime.isNegative ? Colors.grey : Colors.white)),
+                      Text(p.gamesPlayed.isNegative ? "hidden" : intf.format(p.gamesPlayed), style: TextStyle(color: p.gamesPlayed.isNegative ? Colors.grey : Colors.white)),
+                      Text(p.gamesWon.isNegative ? "hidden" : intf.format(p.gamesWon), style: TextStyle(color: p.gamesWon.isNegative ? Colors.grey : Colors.white)),
+                      Text(intf.format(p.friendCount))
                     ],
                   ),
-                ],
+                ),
+              ),
+            ]
+          ),
+          SizedBox(
+            width: 300+300*summaries.length.toDouble(),
+            child: ExpansionTile(
+              title: Text("Tetra League", style: _expansionTileTitleTextStyle),
+              children: [
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 300.0,
+                      child: Card(
+                        child: Column(children: [
+                          Text("Tetra Rating"),
+                          Text("Glicko"),
+                          Text("RD"),
+                          Text("GLIXARE"),
+                          Text("S1-like TR"),
+                          Text("Position"),
+                          Text("Position (Country)"),
+                          Text("Games Played"),
+                          Text("Games Won"),
+                          Text("Winrate"),
+                          Text("Attack Per Minute"),
+                          Text("Pieces Per Second"),
+                          Text("Versus Score"),
+                          Text("Nerd Stats"),
+                          Text("Attack Per Piece"),
+                          Text("VS / APM"),
+                          Text("Downstack Per Second"),
+                          Text("Downstack Per Piece"),
+                          Text("APP + DSP"),
+                          Text("Cheese Index"),
+                          Text("Garbage Efficiency"),
+                          Text("Weighted APP"),
+                          Text("Area"),
+                          Text("Playstyle"),
+                          Text("Opener"),
+                          Text("Plonk"),
+                          Text("Stride"),
+                          Text("Infinite Downstack"),
+                        ]),
+                      ),
+                    ),
+                    for (var s in summaries) SizedBox(
+                      width: 300.0,
+                      child: Card(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(s.league.tr.isNegative ? "---" : f4.format(s.league.tr)),
+                            Text(s.league.glicko!.isNegative ? "---" : f4.format(s.league.glicko)),
+                            Text(s.league.rd!.isNegative ? "---" : f4.format(s.league.rd), style: TextStyle(color: s.league.rd!.isNegative ? Colors.grey : Colors.white)),
+                            Text(s.league.gxe.isNegative ? "---" : f4.format(s.league.gxe)),
+                            Text(s.league.s1tr.isNegative ? "---" : f4.format(s.league.s1tr)),
+                            Text(s.league.standing.isNegative ? "---" : "№ "+intf.format(s.league.standing)),
+                            Text(s.league.standingLocal.isNegative ? "---" : "№ "+intf.format(s.league.standingLocal)),
+                           // RichText(text: s.league.standingLocal.isNegative ? TextSpan(text: "---", style: TextStyle(fontFamily: "Eurostile Round", color: Colors.grey)) : TextSpan(text: intf.format(s.league.standingLocal), style: TextStyle(fontFamily: "Eurostile Round"), children: [TextSpan(text: " (in ${s.league.})", style: TextStyle(color: Colors.grey))]))
+                            Text(intf.format(s.league.gamesPlayed)),
+                            Text(intf.format(s.league.gamesWon)),
+                            Text(s.league.winrate.isNaN ? "---" : f4.format(s.league.winrate*100)+"%"),
+                            Text(s.league.apm != null ? f2.format(s.league.apm) : "---"),
+                            Text(s.league.pps != null ? f2.format(s.league.pps) : "---"),
+                            Text(s.league.vs != null ? f2.format(s.league.vs) : "---"),
+                            Text(""),
+                            Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.app) : "---"),
+                            Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.vsapm) : "---"),
+                            Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.dss) : "---"),
+                            Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.dsp) : "---"),
+                            Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.appdsp) : "---"),
+                            Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.cheese) : "---"),
+                            Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.gbe) : "---"),
+                            Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.nyaapp) : "---"),
+                            Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.area) : "---"),
+                            Text(""),
+                            Text(s.league.playstyle != null ? f4.format(s.league.playstyle!.opener) : "---"),
+                            Text(s.league.playstyle != null ? f4.format(s.league.playstyle!.plonk) : "---"),
+                            Text(s.league.playstyle != null ? f4.format(s.league.playstyle!.stride) : "---"),
+                            Text(s.league.playstyle != null ? f4.format(s.league.playstyle!.infds) : "---"),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ]
                 )
-              )
+              ],
+            ),
+          ),
+          SizedBox(
+            width: 300+300*summaries.length.toDouble(),
+            child: ExpansionTile(
+              title: Text("Quick Play", style: _expansionTileTitleTextStyle),
+              children: [
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 300.0,
+                      child: Card(
+                        child: Column(children: [
+                          Text("Altitude"),
+                          Text("Position"),
+                          Text("Position (Country)"),
+                          Text("Attack Per Minute"),
+                          Text("Pieces Per Second"),
+                          Text("Versus Score"),
+                          Text("KO's"),
+                          Text("Top B2B"),
+                          Text("Climb Speed"),
+                          Text("Peak Climb Speed"),
+                          Text("Time Spend"),
+                          Text("Finesse"),
+                          Text("Nerd Stats"),
+                          Text("Attack Per Piece"),
+                          Text("VS / APM"),
+                          Text("Downstack Per Second"),
+                          Text("Downstack Per Piece"),
+                          Text("APP + DSP"),
+                          Text("Cheese Index"),
+                          Text("Garbage Efficiency"),
+                          Text("Weighted APP"),
+                          Text("Area"),
+                          Text("Playstyle"),
+                          Text("Opener"),
+                          Text("Plonk"),
+                          Text("Stride"),
+                          Text("Infinite Downstack"),
+                        ]),
+                      ),
+                    ),
+                    for (var s in summaries) SizedBox(
+                      width: 300.0,
+                      child: Card(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(s.zenith != null ? f4.format(s.zenith!.stats.zenith!.altitude) : "---"),
+                            Text(s.zenith != null ? "№ "+intf.format(s.zenith!.rank) : "---"),
+                            Text((s.zenith != null && !s.zenith!.countryRank.isNegative) ? "№ "+intf.format(s.zenith!.countryRank) : "---"),
+                            Text(s.zenith != null ? f2.format(s.zenith!.aggregateStats.apm) : "---"),
+                            Text(s.zenith != null ? f2.format(s.zenith!.aggregateStats.pps) : "---"),
+                            Text(s.zenith != null ? f2.format(s.zenith!.aggregateStats.vs) : "---"),
+                            Text(s.zenith != null ? intf.format(s.zenith!.stats.kills) : "---"),
+                            Text(s.zenith != null ? intf.format(s.zenith!.stats.topBtB) : "---"),
+                            Text(s.zenith != null ? f4.format(s.zenith!.stats.cps) : "---"),
+                            Text(s.zenith != null ? f4.format(s.zenith!.stats.zenith!.peakrank) : "---"),
+                            Text(s.zenith != null ? getMoreNormalTime(s.zenith!.stats.finalTime) : "---"),
+                            Text(s.zenith != null ? f2.format(s.zenith!.stats.finessePercentage*100)+"%" : "---"),
+                            Text(""),
+                            Text(s.zenith?.aggregateStats.nerdStats != null ? f4.format(s.zenith!.aggregateStats.nerdStats.app) : "---"),
+                            Text(s.zenith?.aggregateStats.nerdStats != null ? f4.format(s.zenith!.aggregateStats.nerdStats.vsapm) : "---"),
+                            Text(s.zenith?.aggregateStats.nerdStats != null ? f4.format(s.zenith!.aggregateStats.nerdStats.dss) : "---"),
+                            Text(s.zenith?.aggregateStats.nerdStats != null ? f4.format(s.zenith!.aggregateStats.nerdStats.dsp) : "---"),
+                            Text(s.zenith?.aggregateStats.nerdStats != null ? f4.format(s.zenith!.aggregateStats.nerdStats.appdsp) : "---"),
+                            Text(s.zenith?.aggregateStats.nerdStats != null ? f4.format(s.zenith!.aggregateStats.nerdStats.cheese) : "---"),
+                            Text(s.zenith?.aggregateStats.nerdStats != null ? f4.format(s.zenith!.aggregateStats.nerdStats.gbe) : "---"),
+                            Text(s.zenith?.aggregateStats.nerdStats != null ? f4.format(s.zenith!.aggregateStats.nerdStats.nyaapp) : "---"),
+                            Text(s.zenith?.aggregateStats.nerdStats != null ? f4.format(s.zenith!.aggregateStats.nerdStats.area) : "---"),
+                            Text(""),
+                            Text(s.zenith?.aggregateStats.playstyle != null ? f4.format(s.zenith!.aggregateStats.playstyle.opener) : "---"),
+                            Text(s.zenith?.aggregateStats.playstyle != null ? f4.format(s.zenith!.aggregateStats.playstyle.plonk) : "---"),
+                            Text(s.zenith?.aggregateStats.playstyle != null ? f4.format(s.zenith!.aggregateStats.playstyle.stride) : "---"),
+                            Text(s.zenith?.aggregateStats.playstyle != null ? f4.format(s.zenith!.aggregateStats.playstyle.infds) : "---"),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ]
+                )
+              ],
+            ),
+          ),
+          SizedBox(
+            width: 300+300*summaries.length.toDouble(),
+            child: ExpansionTile(
+              title: Text("Quick Play Expert", style: _expansionTileTitleTextStyle),
+              children: [
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 300.0,
+                      child: Card(
+                        child: Column(children: [
+                          Text("Altitude"),
+                          Text("Position"),
+                          Text("Position (Country)"),
+                          Text("Attack Per Minute"),
+                          Text("Pieces Per Second"),
+                          Text("Versus Score"),
+                          Text("KO's"),
+                          Text("Top B2B"),
+                          Text("Climb Speed"),
+                          Text("Peak Climb Speed"),
+                          Text("Time Spend"),
+                          Text("Finesse"),
+                          Text("Nerd Stats"),
+                          Text("Attack Per Piece"),
+                          Text("VS / APM"),
+                          Text("Downstack Per Second"),
+                          Text("Downstack Per Piece"),
+                          Text("APP + DSP"),
+                          Text("Cheese Index"),
+                          Text("Garbage Efficiency"),
+                          Text("Weighted APP"),
+                          Text("Area"),
+                          Text("Playstyle"),
+                          Text("Opener"),
+                          Text("Plonk"),
+                          Text("Stride"),
+                          Text("Infinite Downstack"),
+                        ]),
+                      ),
+                    ),
+                    for (var s in summaries) SizedBox(
+                      width: 300.0,
+                      child: Card(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(s.zenithEx != null ? f4.format(s.zenithEx!.stats.zenith!.altitude) : "---"),
+                            Text(s.zenithEx != null ? "№ "+intf.format(s.zenithEx!.rank) : "---"),
+                            Text((s.zenithEx != null && !s.zenithEx!.countryRank.isNegative) ? "№ "+intf.format(s.zenithEx!.countryRank) : "---"),
+                            Text(s.zenithEx != null ? f2.format(s.zenithEx!.aggregateStats.apm) : "---"),
+                            Text(s.zenithEx != null ? f2.format(s.zenithEx!.aggregateStats.pps) : "---"),
+                            Text(s.zenithEx != null ? f2.format(s.zenithEx!.aggregateStats.vs) : "---"),
+                            Text(s.zenithEx != null ? intf.format(s.zenithEx!.stats.kills) : "---"),
+                            Text(s.zenithEx != null ? intf.format(s.zenithEx!.stats.topBtB) : "---"),
+                            Text(s.zenithEx != null ? f4.format(s.zenithEx!.stats.cps) : "---"),
+                            Text(s.zenithEx != null ? f4.format(s.zenithEx!.stats.zenith!.peakrank) : "---"),
+                            Text(s.zenithEx != null ? getMoreNormalTime(s.zenithEx!.stats.finalTime) : "---"),
+                            Text(s.zenithEx != null ? f2.format(s.zenithEx!.stats.finessePercentage*100)+"%" : "---"),
+                            Text(""),
+                            Text(s.zenithEx?.aggregateStats.nerdStats != null ? f4.format(s.zenithEx!.aggregateStats.nerdStats.app) : "---"),
+                            Text(s.zenithEx?.aggregateStats.nerdStats != null ? f4.format(s.zenithEx!.aggregateStats.nerdStats.vsapm) : "---"),
+                            Text(s.zenithEx?.aggregateStats.nerdStats != null ? f4.format(s.zenithEx!.aggregateStats.nerdStats.dss) : "---"),
+                            Text(s.zenithEx?.aggregateStats.nerdStats != null ? f4.format(s.zenithEx!.aggregateStats.nerdStats.dsp) : "---"),
+                            Text(s.zenithEx?.aggregateStats.nerdStats != null ? f4.format(s.zenithEx!.aggregateStats.nerdStats.appdsp) : "---"),
+                            Text(s.zenithEx?.aggregateStats.nerdStats != null ? f4.format(s.zenithEx!.aggregateStats.nerdStats.cheese) : "---"),
+                            Text(s.zenithEx?.aggregateStats.nerdStats != null ? f4.format(s.zenithEx!.aggregateStats.nerdStats.gbe) : "---"),
+                            Text(s.zenithEx?.aggregateStats.nerdStats != null ? f4.format(s.zenithEx!.aggregateStats.nerdStats.nyaapp) : "---"),
+                            Text(s.zenithEx?.aggregateStats.nerdStats != null ? f4.format(s.zenithEx!.aggregateStats.nerdStats.area) : "---"),
+                            Text(""),
+                            Text(s.zenithEx?.aggregateStats.playstyle != null ? f4.format(s.zenithEx!.aggregateStats.playstyle.opener) : "---"),
+                            Text(s.zenithEx?.aggregateStats.playstyle != null ? f4.format(s.zenithEx!.aggregateStats.playstyle.plonk) : "---"),
+                            Text(s.zenithEx?.aggregateStats.playstyle != null ? f4.format(s.zenithEx!.aggregateStats.playstyle.stride) : "---"),
+                            Text(s.zenithEx?.aggregateStats.playstyle != null ? f4.format(s.zenithEx!.aggregateStats.playstyle.infds) : "---"),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ]
+                )
+              ],
+            ),
+          )
+        ]),
             ],
           ),
         ),
@@ -323,87 +431,188 @@ class CompareState extends State<CompareView> {
 }
 
 
-// Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//           Row(
-//             children: [
-//               SizedBox(
-//                 height: 175.0,
-//                 width: 300.0,
-//                 child: Expanded(
-//                   child: Card(
-//                     child: Padding(
-//                       padding: const EdgeInsets.fromLTRB(80.0, 10.0, 5.0, 0),
-//                       child: Text("Comparison", style: TextStyle(fontSize: 28)),
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//               for (var p in players) SizedBox(
-//                 width: 300.0,
-//                 child: Column(
-//                   mainAxisSize: MainAxisSize.min,
-//                   children: [
-//                     HeaderCard(p),
-                    
-//                   ],
-//                 ),
-//               ),
-//               SizedBox(width: 300, child: AddNewColumnCard(addPlayer))
-//             ]
-//           ),
-//           Row(
-//             children: [
-//               SizedBox(
-//                 width: 300.0,
-//                 child: Card(
-//                   child: Column(children: [
-//                     Text("Registration Date"),
-//                     const Divider(),
-//                     Text("XP"),
-//                     const Divider(),
-//                     Text("Time Played"),
-//                     const Divider(),
-//                     Text("Online Games Played"),
-//                     const Divider(),
-//                     Text("Online Games Won"),
-//                     const Divider(),
-//                     Text("Followers"),
-//                   ]),
-//                 ),
-//               ),
-//               for (var p in players) SizedBox(
-//                 width: 300.0,
-//                 child: Card(
-//                   child: Column(
-//                     mainAxisSize: MainAxisSize.min,
+// Table(
+//                 border: TableBorder(verticalInside: BorderSide(color: Colors.grey)),
+//                 defaultColumnWidth: FixedColumnWidth(350),
+//                 columnWidths: {
+//                   0: FixedColumnWidth(200.000)
+//                 },
+//                 children: [
+//                   TableRow(
+//                     decoration: BoxDecoration(color: Color.fromARGB(255, 10, 10, 10)),
 //                     children: [
-//                       Text(timestamp(p.registrationTime!)),
-//                       const Divider(),
-//                       RichText(text: p.xp.isNegative ? TextSpan(text: "hidden", style: TextStyle(fontFamily: "Eurostile Round", color: Colors.grey)) : TextSpan(text: intf.format(p.xp), style: TextStyle(fontFamily: "Eurostile Round"), children: [TextSpan(text: " (lvl ${intf.format(p.level.floor())})", style: TextStyle(color: Colors.grey))])),
-//                       const Divider(),
-//                       Text(p.gameTime.isNegative ? "hidden" : playtime(p.gameTime), style: TextStyle(color: p.gameTime.isNegative ? Colors.grey : Colors.white)),
-//                       const Divider(),
-//                       Text(p.gamesPlayed.isNegative ? "hidden" : intf.format(p.gamesPlayed), style: TextStyle(color: p.gamesPlayed.isNegative ? Colors.grey : Colors.white)),
-//                       const Divider(),
-//                       Text(p.gamesWon.isNegative ? "hidden" : intf.format(p.gamesWon), style: TextStyle(color: p.gamesWon.isNegative ? Colors.grey : Colors.white)),
-//                       const Divider(),
-//                       Text(intf.format(p.friendCount))
-//                     ],
+//                       Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Account Created")),
+//                       for (var p in players) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(timestamp(p.registrationTime!)))
+//                     ]
 //                   ),
-//                 ),
-//               ),
-//             ]
-//           ),
-//           SizedBox(
-//             width: 500,
-//             child: ExpansionTile(
-//               title: Text("Test"),
-//               children: [Text("test1"), Text("test2")],
-//             ),
-//           )
-//         ])
+//                   TableRow(
+//                     children: [
+//                       Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("XP")),
+//                       for (var p in players) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: RichText(text: p.xp.isNegative ? TextSpan(text: "hidden", style: TextStyle(fontFamily: "Eurostile Round", color: Colors.grey)) : TextSpan(text: intf.format(p.xp), style: TextStyle(fontFamily: "Eurostile Round"), children: [TextSpan(text: " (lvl ${intf.format(p.level.floor())})", style: TextStyle(color: Colors.grey))])))
+//                     ]
+//                   ),
+//                   TableRow(
+//                     children: [
+//                       Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Time Played")),
+//                       for (var p in players) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(p.gameTime.isNegative ? "hidden" : playtime(p.gameTime), style: TextStyle(color: p.gameTime.isNegative ? Colors.grey : Colors.white)))
+//                     ]
+//                   ),
+//                   TableRow(
+//                     children: [
+//                       Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Online Games Played")),
+//                       for (var p in players) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(p.gamesPlayed.isNegative ? "hidden" : intf.format(p.gamesPlayed), style: TextStyle(color: p.gamesPlayed.isNegative ? Colors.grey : Colors.white))),
+//                     ]
+//                   ),
+//                   TableRow(
+//                     children: [
+//                       Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Online Games Won")),
+//                       for (var p in players) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(p.gamesWon.isNegative ? "hidden" : intf.format(p.gamesWon), style: TextStyle(color: p.gamesWon.isNegative ? Colors.grey : Colors.white))),
+//                     ]
+//                   ),
+//                   TableRow(
+//                     children: [
+//                       Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Followers")),
+//                       for (var p in players) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(intf.format(p.friendCount))),
+//                     ]
+//                   ),
+//                 ],
+//               )
+// Table(
+//                     border: TableBorder(verticalInside: BorderSide(color: Colors.grey)),
+//                     defaultColumnWidth: FixedColumnWidth(350),
+//                     columnWidths: {
+//                       0: FixedColumnWidth(200.000)
+//                     },
+//                     children: [
+//                       TableRow(
+//                         children: [
+//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Tetra Rating")),
+//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.tr.isNegative ? "---" : f4.format(s.league.tr))),
+//                         ]
+//                       ),
+//                       TableRow(
+//                         children: [
+//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Glicko")),
+//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.glicko!.isNegative ? "---" : f4.format(s.league.glicko))),
+//                         ]
+//                       ),
+//                       TableRow(
+//                         children: [
+//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("RD")),
+//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.rd!.isNegative ? "---" : f4.format(s.league.rd))),
+//                         ]
+//                       ),
+//                       TableRow(
+//                         children: [
+//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("GLIXARE")),
+//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.gxe.isNegative ? "---" : f4.format(s.league.gxe))),
+//                         ]
+//                       ),
+//                       TableRow(
+//                         children: [
+//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("S1-like TR")),
+//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.s1tr.isNegative ? "---" : f4.format(s.league.s1tr))),
+//                         ]
+//                       ),
+//                       TableRow(
+//                         children: [
+//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Games Played")),
+//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(intf.format(s.league.gamesPlayed))),
+//                         ]
+//                       ),
+//                       TableRow(
+//                         children: [
+//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Games Won")),
+//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(intf.format(s.league.gamesWon))),
+//                         ]
+//                       ),
+//                       TableRow(
+//                         children: [
+//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Winrate")),
+//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.winrate.isNaN ? "---" : f4.format(s.league.winrate*100)+"%")),
+//                         ]
+//                       ),
+//                       TableRow(
+//                         children: [
+//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Attack Per Minute")),
+//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.apm != null ? f2.format(s.league.apm) : "---")),
+//                         ]
+//                       ),
+//                       TableRow(
+//                         children: [
+//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Pieces Per Second")),
+//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.apm != null ? f2.format(s.league.pps) : "---")),
+//                         ]
+//                       ),
+//                       TableRow(
+//                         children: [
+//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Versus Score")),
+//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.apm != null ? f2.format(s.league.vs) : "---")),
+//                         ]
+//                       ),
+//                       TableRow(
+//                         children: [
+//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Nerd Stats")),
+//                           for (var _ in summaries) Container(),
+//                         ]
+//                       ),
+//                       TableRow(
+//                         children: [
+//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Attack Per Piece")),
+//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.app) : "---")),
+//                         ]
+//                       ),
+//                       TableRow(
+//                         children: [
+//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("VS / APM")),
+//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.vsapm) : "---")),
+//                         ]
+//                       ),
+//                       TableRow(
+//                         children: [
+//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Downstack Per Second")),
+//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.dss) : "---")),
+//                         ]
+//                       ),
+//                       TableRow(
+//                         children: [
+//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Downstack Per Piece")),
+//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.dsp) : "---")),
+//                         ]
+//                       ),
+//                       TableRow(
+//                         children: [
+//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("APP + DSP")),
+//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.appdsp) : "---")),
+//                         ]
+//                       ),
+//                       TableRow(
+//                         children: [
+//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Cheese Index")),
+//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.cheese) : "---")),
+//                         ]
+//                       ),
+//                       TableRow(
+//                         children: [
+//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Garbage Efficiency")),
+//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.gbe) : "---")),
+//                         ]
+//                       ),
+//                       TableRow(
+//                         children: [
+//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Weighted APP")),
+//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.nyaapp) : "---")),
+//                         ]
+//                       ),
+//                       TableRow(
+//                         children: [
+//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Area")),
+//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.area) : "---")),
+//                         ]
+//                       ),
+//                     ],
+//                   )
+
 
 
 class HeaderCard extends StatelessWidget{
