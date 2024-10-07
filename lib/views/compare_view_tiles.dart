@@ -2,9 +2,13 @@
 
 import 'dart:io';
 import 'dart:math';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:tetra_stats/data_objects/aggregate_stats.dart';
+import 'package:tetra_stats/data_objects/nerd_stats.dart';
+import 'package:tetra_stats/data_objects/playstyle.dart';
 import 'package:tetra_stats/data_objects/summaries.dart';
 import 'package:tetra_stats/data_objects/tetra_league.dart';
 import 'package:tetra_stats/data_objects/tetrio_constants.dart';
@@ -15,6 +19,7 @@ import 'package:tetra_stats/main.dart' show teto;
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
+import 'package:tetra_stats/widgets/graphs.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
 import 'package:tetra_stats/widgets/vs_graphs.dart';
 import 'package:transparent_image/transparent_image.dart';
@@ -42,6 +47,7 @@ class CompareState extends State<CompareView> {
   late ScrollController _scrollController;
   List<TetrioPlayer> players = [];
   List<Summaries> summaries = [];
+  List<String> nicknames = [];
   TextStyle _expansionTileTitleTextStyle = TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 24.0);
 
   @override
@@ -63,6 +69,7 @@ class CompareState extends State<CompareView> {
 
   void getSummariesForInit() async {
     summaries.add(await teto.fetchSummaries(widget.initPlayer.userId));
+    nicknames.add(players[0].username);
     setState(() {
       
     });
@@ -71,6 +78,7 @@ class CompareState extends State<CompareView> {
   void addPlayer(String nickname) async {
     players.add(await teto.fetchPlayer(nickname));
     summaries.add(await teto.fetchSummaries(players.last.userId));
+    nicknames.add(players.last.username);
     setState(() {
       
     });
@@ -251,7 +259,8 @@ class CompareState extends State<CompareView> {
                       ),
                     ),
                   ]
-                )
+                ),
+                VsGraphs(stats: [for (var s in summaries) AggregateStats.precalculated(s.league.apm??0, s.league.pps??0, s.league.vs??0, s.league.nerdStats??NerdStats(0, 0, 0), s.league.playstyle??Playstyle(0, 0, 0, 0, 0, 0, 0.0001, 0))], nicknames: nicknames)
               ],
             ),
           ),
@@ -417,7 +426,7 @@ class CompareState extends State<CompareView> {
                       ),
                     ),
                   ]
-                )
+                ),
               ],
             ),
           )
@@ -429,191 +438,6 @@ class CompareState extends State<CompareView> {
     );
   }
 }
-
-
-// Table(
-//                 border: TableBorder(verticalInside: BorderSide(color: Colors.grey)),
-//                 defaultColumnWidth: FixedColumnWidth(350),
-//                 columnWidths: {
-//                   0: FixedColumnWidth(200.000)
-//                 },
-//                 children: [
-//                   TableRow(
-//                     decoration: BoxDecoration(color: Color.fromARGB(255, 10, 10, 10)),
-//                     children: [
-//                       Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Account Created")),
-//                       for (var p in players) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(timestamp(p.registrationTime!)))
-//                     ]
-//                   ),
-//                   TableRow(
-//                     children: [
-//                       Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("XP")),
-//                       for (var p in players) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: RichText(text: p.xp.isNegative ? TextSpan(text: "hidden", style: TextStyle(fontFamily: "Eurostile Round", color: Colors.grey)) : TextSpan(text: intf.format(p.xp), style: TextStyle(fontFamily: "Eurostile Round"), children: [TextSpan(text: " (lvl ${intf.format(p.level.floor())})", style: TextStyle(color: Colors.grey))])))
-//                     ]
-//                   ),
-//                   TableRow(
-//                     children: [
-//                       Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Time Played")),
-//                       for (var p in players) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(p.gameTime.isNegative ? "hidden" : playtime(p.gameTime), style: TextStyle(color: p.gameTime.isNegative ? Colors.grey : Colors.white)))
-//                     ]
-//                   ),
-//                   TableRow(
-//                     children: [
-//                       Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Online Games Played")),
-//                       for (var p in players) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(p.gamesPlayed.isNegative ? "hidden" : intf.format(p.gamesPlayed), style: TextStyle(color: p.gamesPlayed.isNegative ? Colors.grey : Colors.white))),
-//                     ]
-//                   ),
-//                   TableRow(
-//                     children: [
-//                       Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Online Games Won")),
-//                       for (var p in players) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(p.gamesWon.isNegative ? "hidden" : intf.format(p.gamesWon), style: TextStyle(color: p.gamesWon.isNegative ? Colors.grey : Colors.white))),
-//                     ]
-//                   ),
-//                   TableRow(
-//                     children: [
-//                       Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Followers")),
-//                       for (var p in players) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(intf.format(p.friendCount))),
-//                     ]
-//                   ),
-//                 ],
-//               )
-// Table(
-//                     border: TableBorder(verticalInside: BorderSide(color: Colors.grey)),
-//                     defaultColumnWidth: FixedColumnWidth(350),
-//                     columnWidths: {
-//                       0: FixedColumnWidth(200.000)
-//                     },
-//                     children: [
-//                       TableRow(
-//                         children: [
-//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Tetra Rating")),
-//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.tr.isNegative ? "---" : f4.format(s.league.tr))),
-//                         ]
-//                       ),
-//                       TableRow(
-//                         children: [
-//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Glicko")),
-//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.glicko!.isNegative ? "---" : f4.format(s.league.glicko))),
-//                         ]
-//                       ),
-//                       TableRow(
-//                         children: [
-//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("RD")),
-//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.rd!.isNegative ? "---" : f4.format(s.league.rd))),
-//                         ]
-//                       ),
-//                       TableRow(
-//                         children: [
-//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("GLIXARE")),
-//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.gxe.isNegative ? "---" : f4.format(s.league.gxe))),
-//                         ]
-//                       ),
-//                       TableRow(
-//                         children: [
-//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("S1-like TR")),
-//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.s1tr.isNegative ? "---" : f4.format(s.league.s1tr))),
-//                         ]
-//                       ),
-//                       TableRow(
-//                         children: [
-//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Games Played")),
-//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(intf.format(s.league.gamesPlayed))),
-//                         ]
-//                       ),
-//                       TableRow(
-//                         children: [
-//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Games Won")),
-//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(intf.format(s.league.gamesWon))),
-//                         ]
-//                       ),
-//                       TableRow(
-//                         children: [
-//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Winrate")),
-//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.winrate.isNaN ? "---" : f4.format(s.league.winrate*100)+"%")),
-//                         ]
-//                       ),
-//                       TableRow(
-//                         children: [
-//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Attack Per Minute")),
-//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.apm != null ? f2.format(s.league.apm) : "---")),
-//                         ]
-//                       ),
-//                       TableRow(
-//                         children: [
-//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Pieces Per Second")),
-//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.apm != null ? f2.format(s.league.pps) : "---")),
-//                         ]
-//                       ),
-//                       TableRow(
-//                         children: [
-//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Versus Score")),
-//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.apm != null ? f2.format(s.league.vs) : "---")),
-//                         ]
-//                       ),
-//                       TableRow(
-//                         children: [
-//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Nerd Stats")),
-//                           for (var _ in summaries) Container(),
-//                         ]
-//                       ),
-//                       TableRow(
-//                         children: [
-//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Attack Per Piece")),
-//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.app) : "---")),
-//                         ]
-//                       ),
-//                       TableRow(
-//                         children: [
-//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("VS / APM")),
-//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.vsapm) : "---")),
-//                         ]
-//                       ),
-//                       TableRow(
-//                         children: [
-//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Downstack Per Second")),
-//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.dss) : "---")),
-//                         ]
-//                       ),
-//                       TableRow(
-//                         children: [
-//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Downstack Per Piece")),
-//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.dsp) : "---")),
-//                         ]
-//                       ),
-//                       TableRow(
-//                         children: [
-//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("APP + DSP")),
-//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.appdsp) : "---")),
-//                         ]
-//                       ),
-//                       TableRow(
-//                         children: [
-//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Cheese Index")),
-//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.cheese) : "---")),
-//                         ]
-//                       ),
-//                       TableRow(
-//                         children: [
-//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Garbage Efficiency")),
-//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.gbe) : "---")),
-//                         ]
-//                       ),
-//                       TableRow(
-//                         children: [
-//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Weighted APP")),
-//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.nyaapp) : "---")),
-//                         ]
-//                       ),
-//                       TableRow(
-//                         children: [
-//                           Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text("Area")),
-//                           for (var s in summaries) Container(padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0), child: Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.area) : "---")),
-//                         ]
-//                       ),
-//                     ],
-//                   )
-
-
 
 class HeaderCard extends StatelessWidget{
   final TetrioPlayer player;
@@ -747,6 +571,255 @@ class _AddNewColumnCardState extends State<AddNewColumnCard> with SingleTickerPr
           }
         )
       )
+    );
+  }
+}
+
+class VsGraphs extends StatelessWidget{
+  final List<AggregateStats> stats;
+  final List<String> nicknames;
+  const VsGraphs({super.key, required this.stats, required this.nicknames});
+
+  static const List<Color> colorsForGraphs = [
+    Colors.cyanAccent,
+    Colors.redAccent,
+    Colors.purpleAccent,
+    Colors.amberAccent,
+    Colors.pinkAccent,
+    Colors.tealAccent,
+    Colors.deepOrangeAccent,
+  ];
+  
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Wrap(
+          direction: Axis.horizontal,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 20,
+          children: [
+            for (int i = 0; i < stats.length; i++) Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+                  child: Container(width: 20.0, height: 10.0, decoration: BoxDecoration(color: colorsForGraphs[i%colorsForGraphs.length].withAlpha(128), border: Border.all(color: colorsForGraphs[i%colorsForGraphs.length])),),
+                ),
+                Text(nicknames[i], style: TextStyle(fontFamily: "Eurostile Round Extended"))
+              ],
+            )
+          ],
+        ),
+        Wrap(
+          direction: Axis.horizontal,
+          alignment: WrapAlignment.center,
+          spacing: 25,
+          crossAxisAlignment: WrapCrossAlignment.start,
+          clipBehavior: Clip.hardEdge,
+          children: [
+            Padding(
+          padding: const EdgeInsets.fromLTRB(18, 0, 18, 44),
+          child: SizedBox(
+            height: 310,
+            width: 310,
+            child: MyRadarChart(
+              RadarChartData(
+                radarShape: RadarShape.polygon,
+                tickCount: 4,
+                ticksTextStyle: const TextStyle(color: Colors.transparent, fontSize: 10),
+                radarBorderData: const BorderSide(color: Colors.transparent, width: 1),
+                gridBorderData: const BorderSide(color: Colors.white24, width: 1),
+                tickBorderData: const BorderSide(color: Colors.transparent, width: 1),
+                getTitle: (index, angle) {
+                  switch (index) {
+                    case 0:
+                      return RadarChartTitle(
+                        text: 'APM',
+                        angle: angle,
+                        positionPercentageOffset: 0.05
+                      );
+                    case 1:
+                      return RadarChartTitle(
+                        text: 'PPS',
+                        angle: angle,
+                        positionPercentageOffset: 0.05
+                      );
+                    case 2:
+                      return RadarChartTitle(text: 'VS', angle: angle, positionPercentageOffset: 0.05);
+                    case 3:
+                      return RadarChartTitle(text: 'APP', angle: angle + 180, positionPercentageOffset: 0.05);
+                    case 4:
+                      return RadarChartTitle(text: 'DS/S', angle: angle + 180, positionPercentageOffset: 0.05);
+                    case 5:
+                      return RadarChartTitle(text: 'DS/P', angle: angle + 180, positionPercentageOffset: 0.05);
+                    case 6:
+                      return RadarChartTitle(text: 'APP+DS/P', angle: angle + 180, positionPercentageOffset: 0.05);
+                    case 7:
+                      return RadarChartTitle(text: 'VS/APM', angle: angle + 180, positionPercentageOffset: 0.05);
+                    case 8:
+                      return RadarChartTitle(text: 'Cheese', angle: angle, positionPercentageOffset: 0.05);
+                    case 9:
+                      return RadarChartTitle(text: 'Gb Eff.', angle: angle, positionPercentageOffset: 0.05);
+                    default:
+                      return const RadarChartTitle(text: '');
+                  }
+                    },
+                    dataSets: [
+                      for (int i = 0; i < stats.length; i++) RadarDataSet(
+                        fillColor: colorsForGraphs[i%colorsForGraphs.length].withAlpha(128),
+                        borderColor: colorsForGraphs[i%colorsForGraphs.length],
+                        dataEntries: [
+                          RadarEntry(value: stats[i].apm * apmWeight),
+                          RadarEntry(value: stats[i].pps * ppsWeight),
+                          RadarEntry(value: stats[i].vs * vsWeight),
+                          RadarEntry(value: stats[i].nerdStats.app * appWeight),
+                          RadarEntry(value: stats[i].nerdStats.dss * dssWeight),
+                          RadarEntry(value: stats[i].nerdStats.dsp * dspWeight),
+                          RadarEntry(value: stats[i].nerdStats.appdsp * appdspWeight),
+                          RadarEntry(value: stats[i].nerdStats.vsapm * vsapmWeight),
+                          RadarEntry(value: stats[i].nerdStats.cheese * cheeseWeight),
+                          RadarEntry(value: stats[i].nerdStats.gbe * gbeWeight),
+                        ],
+                      ),
+                      RadarDataSet(
+                        fillColor: Colors.transparent,
+                        borderColor: Colors.transparent,
+                        dataEntries: [
+                          const RadarEntry(value: 0),
+                          const RadarEntry(value: 0),
+                          const RadarEntry(value: 0),
+                          const RadarEntry(value: 0),
+                          const RadarEntry(value: 0),
+                          const RadarEntry(value: 0),
+                          const RadarEntry(value: 0),
+                          const RadarEntry(value: 0),
+                          const RadarEntry(value: 0),
+                          const RadarEntry(value: 0),
+                        ],
+                      )
+                    ],
+                  ),
+                  swapAnimationDuration: const Duration(milliseconds: 150),
+                  swapAnimationCurve: Curves.linear,
+                ),
+              ),
+            ),
+            Padding(
+          padding: const EdgeInsets.fromLTRB(18, 0, 18, 44),
+          child: SizedBox(
+            height: 310,
+            width: 310,
+            child: MyRadarChart(
+              RadarChartData(
+                radarShape: RadarShape.polygon,
+                tickCount: 4,
+                ticksTextStyle: const TextStyle(color: Colors.white24, fontSize: 10),
+                radarBorderData: const BorderSide(color: Colors.transparent, width: 1),
+                gridBorderData: const BorderSide(color: Colors.white24, width: 1),
+                tickBorderData: const BorderSide(color: Colors.transparent, width: 1),
+                titleTextStyle: const TextStyle(height: 1.1),
+                radarTouchData: RadarTouchData(),
+                    getTitle: (index, angle) {
+                      switch (index) {
+                        case 0:
+                          return RadarChartTitle(text: 'Opener',angle: angle, positionPercentageOffset: 0.05);
+                        case 1:
+                          return RadarChartTitle(text: 'Stride', angle: angle, positionPercentageOffset: 0.05);
+                        case 2:
+                          return RadarChartTitle(text: 'Inf Ds', angle: angle + 180, positionPercentageOffset: 0.05);
+                        case 3:
+                          return RadarChartTitle(text: 'Plonk', angle: angle, positionPercentageOffset: 0.05);
+                        default:
+                          return const RadarChartTitle(text: '');
+                      }
+                    },
+                    dataSets: [
+                      for (int i = 0; i < stats.length; i++) RadarDataSet(
+                        fillColor: colorsForGraphs[i%colorsForGraphs.length].withAlpha(128),
+                        borderColor: colorsForGraphs[i%colorsForGraphs.length],
+                        dataEntries: [
+                          RadarEntry(value: stats[i].playstyle.opener),
+                          RadarEntry(value: stats[i].playstyle.stride),
+                          RadarEntry(value: stats[i].playstyle.infds),
+                          RadarEntry(value: stats[i].playstyle.plonk),
+                        ],
+                      ),
+                      RadarDataSet(
+                        fillColor: Colors.transparent,
+                        borderColor: Colors.transparent,
+                        dataEntries: [
+                          const RadarEntry(value: 0),
+                          const RadarEntry(value: 1),
+                          const RadarEntry(value: 0),
+                          const RadarEntry(value: 0),
+                        ],
+                      ),
+                    ],
+                  ),
+                  swapAnimationDuration: const Duration(milliseconds: 150), // Optional
+                  swapAnimationCurve: Curves.linear, // Optional
+                ),
+              ),
+            ),
+            Padding( // sq graph
+              padding: const EdgeInsets.fromLTRB(18, 0, 18, 44),
+              child: SizedBox(
+                height: 310,
+                width: 310,
+                child: MyRadarChart(
+                  RadarChartData(
+                    radarShape: RadarShape.polygon,
+                    tickCount: 4,
+                    ticksTextStyle: const TextStyle(color: Colors.white24, fontSize: 10),
+                    radarBorderData: const BorderSide(color: Colors.transparent, width: 1),
+                    gridBorderData: const BorderSide(color: Colors.white24, width: 1),
+                    tickBorderData: const BorderSide(color: Colors.transparent, width: 1),
+                    titleTextStyle: const TextStyle(height: 1.1),
+                    radarTouchData: RadarTouchData(),
+                    getTitle: (index, angle) {
+                      switch (index) {
+                        case 0:
+                          return RadarChartTitle(text: t.graphs.attack, angle: 0, positionPercentageOffset: 0.05);
+                        case 1:
+                          return RadarChartTitle(text: t.graphs.speed, angle: 0, positionPercentageOffset: 0.05);
+                        case 2:
+                          return RadarChartTitle(text: t.graphs.defense, angle: angle + 180, positionPercentageOffset: 0.05);
+                        case 3:
+                          return RadarChartTitle(text: t.graphs.cheese, angle: 0, positionPercentageOffset: 0.05);
+                        default:
+                          return const RadarChartTitle(text: '');
+                      }
+                    },
+                    dataSets: [
+                      for (int i = 0; i < stats.length; i++) RadarDataSet(
+                        fillColor: colorsForGraphs[i%colorsForGraphs.length].withAlpha(128),
+                        borderColor: colorsForGraphs[i%colorsForGraphs.length],
+                        dataEntries: [
+                          RadarEntry(value: stats[i].apm / 60 * 0.4),
+                          RadarEntry(value: stats[i].pps / 3.75),
+                          RadarEntry(value: stats[i].nerdStats.dss * 1.15),
+                          RadarEntry(value: stats[i].nerdStats.cheese / 110),
+                        ],
+                      ),
+                      RadarDataSet(
+                        fillColor: Colors.transparent,
+                        borderColor: Colors.transparent,
+                        dataEntries: [
+                          const RadarEntry(value: 0),
+                          const RadarEntry(value: 1.2),
+                          const RadarEntry(value: 0),
+                          const RadarEntry(value: 0),
+                        ],
+                      )
+                    ],
+                  )
+                )
+              )
+            )
+          ],
+        ),
+      ],
     );
   }
 }

@@ -18,6 +18,8 @@ class AggregateStats{
     playstyle = Playstyle(apm, pps, nerdStats.app, nerdStats.vsapm, nerdStats.dsp, nerdStats.gbe, estTr.srarea, estTr.statrank);
   }
 
+  AggregateStats.precalculated(this.apm, this.pps, this.vs, this.nerdStats, this.playstyle);
+
   AggregateStats.fromJson(Map<String, dynamic> json){
     apm = json['apm'] != null ? json['apm'].toDouble() : 0.00;
     pps = json['apm'] != null ? json['pps'].toDouble() : 0.00;
