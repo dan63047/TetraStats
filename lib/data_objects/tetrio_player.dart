@@ -14,7 +14,7 @@ class TetrioPlayer {
   late String role;
   int? avatarRevision;
   int? bannerRevision;
-  DateTime? registrationTime;
+  late DateTime registrationTime;
   List<Badge> badges = [];
   String? bio;
   String? country;
@@ -39,7 +39,7 @@ class TetrioPlayer {
     required this.state,
     this.avatarRevision,
     this.bannerRevision,
-    this.registrationTime,
+    required this.registrationTime,
     required this.badges,
     this.bio,
     this.country,
