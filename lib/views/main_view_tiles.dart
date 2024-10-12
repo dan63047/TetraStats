@@ -285,67 +285,42 @@ class ClearData{
     perfectClear = !perfectClear;
   }
 
-  Damage dealsDamage(int combo, int b2b, Rules rules){
-    if (lines == 0) return Damage(0,0,0,0,0,rules.multiplier);
-    int clearDamage = 0;
+  int dealsDamage(int combo, int b2b, int previousB2B, Rules rules){
+    if (lines == 0) return 0;
+    double damage = 0;
 
     if (spin){
-      if (lines <= 5) clearDamage += garbage[lineclear]!;
-      else clearDamage += garbage[Lineclears.TSPIN_PENTA]! + 2 * (lines - 5);
+      if (lines <= 5) damage += garbage[lineclear]!;
+      else damage += garbage[Lineclears.TSPIN_PENTA]! + 2 * (lines - 5);
     } else if (miniSpin){
-      clearDamage += garbage[lineclear]!;
+      damage += garbage[lineclear]!;
     } else {
-      if (lines <= 5) clearDamage += garbage[lineclear]!;
-      else clearDamage += garbage[Lineclears.PENTA]! + (lines - 5);
+      if (lines <= 5) damage += garbage[lineclear]!;
+      else damage += garbage[Lineclears.PENTA]! + (lines - 5);
     }
-
-    // Ok i can't figure out how b2b and combo works
-
-    // From tetrio.js:
-    // const n = e.cm.constants.garbage.BACKTOBACK_BONUS * (Math.floor(1 + Math.log1p((t.stats.btb - 1) * e.cm.constants.garbage.BACKTOBACK_BONUS_LOG)) + (t.stats.btb - 1 == 1 ? 0 : (1 + Math.log1p((t.stats.btb - 1) * e.cm.constants.garbage.BACKTOBACK_BONUS_LOG) % 1) / 3));
-    // if (h && (d += n),
-
-    double b2bDamage = 0;
 
     if (difficultClear && b2b >= 1 && rules.b2b){
-      if (rules.b2bChaining) b2bDamage += BACKTOBACK_BONUS * ((1 + log((b2b+1) * BACKTOBACK_BONUS_LOG)).floor() + (b2b+1 == 1 ? 0 : (1 + log((b2b+1) * BACKTOBACK_BONUS_LOG) % 1) / 3)); // but it should be b2b-1 ???
-      else b2bDamage += 1; // if b2b chaining off
+      if (rules.b2bChaining) damage += BACKTOBACK_BONUS * ((1 + log(1 + (b2b) * BACKTOBACK_BONUS_LOG)).floor() + (b2b == 1 ? 0 : (1 + log(1 +(b2b) * BACKTOBACK_BONUS_LOG) % 1) / 3)); // but it should be b2b-1 ???
+      else damage += 1; // if b2b chaining off
     }
 
-    int surgeDamage = 0;
-
-    if (!difficultClear && rules.surge){
-
-    }
-
-    // From tetrio.js:
-    // if (t.stats.combo > 1)
-    //   if (p += e.cm.constants.scoring.COMBO * (t.stats.combo - 1),
-    //   "multiplier" === t.setoptions.combotable)
-    //       d *= 1 + e.cm.constants.garbage.COMBO_BONUS * (t.stats.combo - 1),
-    //       t.stats.combo > 2 && (d = Math.max(Math.log1p(e.cm.constants.garbage.COMBO_MINIFIER * (t.stats.combo - 1) * e.cm.constants.garbage.COMBO_MINIFIER_LOG), d));
-    //   else {
-    //       const n = e.cm.constants.garbage.combotable[t.setoptions.combotable] || [0];
-    //       d += n[Math.max(0, Math.min(t.stats.combo - 2, n.length - 1))]
-    //   }
-
-    double comboDamage = 0;
-
-    if (rules.combo) {
-      if (combo > 1){
-        if (lines == 1 && rules.comboTable != ComboTables.multiplier) comboDamage += combotable[rules.comboTable]![max(0, min(combo - 1, combotable[rules.comboTable]!.length - 1))];
-        else comboDamage = (clearDamage + b2bDamage) * (1 + COMBO_BONUS * (combo-1));
+    if (rules.combo && rules.comboTable != ComboTables.none) {
+      if (combo >= 1){
+        if (lines == 1 && rules.comboTable != ComboTables.multiplier) damage += combotable[rules.comboTable]![max(0, min(combo - 1, combotable[rules.comboTable]!.length - 1))];
+        else damage *= (1 + COMBO_BONUS * (combo));
       }
-      if (combo > 2) {
-        comboDamage = max(log(COMBO_MINIFIER * (combo-1) * COMBO_MINIFIER_LOG), comboDamage);
+      if (combo >= 2) {
+        damage = max(log(1 + COMBO_MINIFIER * (combo) * COMBO_MINIFIER_LOG), damage);
       }
     }
 
-    int pcDamage = 0;
+    if (!difficultClear && rules.surge && previousB2B >= rules.surgeInitAtB2b && b2b == -1){
+      damage += rules.surgeInitAmount + (previousB2B - rules.surgeInitAtB2b);
+    }
 
-    if (perfectClear) pcDamage += rules.pcDamage;
+    if (perfectClear) damage += rules.pcDamage;
 
-    return Damage(clearDamage, comboDamage, b2bDamage, surgeDamage, pcDamage, rules.multiplier);
+    return (damage * rules.multiplier).floor();
   }
 }
 
@@ -518,7 +493,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
       for (ClearData data in clearsExisting[key]!) rSideWidgets.add(Card(
         child: ListTile(
           title: Text(data.title),
-          subtitle: Text("${data.dealsDamage(0, 0, rules)} damage${data.difficultClear ? ", difficult" : ""}", style: TextStyle(color: Colors.grey)),
+          subtitle: Text("${data.dealsDamage(0, 0, 0, rules)} damage${data.difficultClear ? ", difficult" : ""}", style: TextStyle(color: Colors.grey)),
           trailing: Icon(Icons.arrow_forward_ios),
           onTap: (){
             setState((){
@@ -557,13 +532,14 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
 
     int combo = -1;
     int b2b = -1;
-    Damage totalDamage = Damage(0,0,0,0,0,rules.multiplier);
-    int totalDamageNumber = 0;
+    int previousB2B = -1;
+    int totalDamage = 0;
 
     for (ClearData lineclear in clears){
+      previousB2B = b2b;
       if (lineclear.difficultClear) b2b++; else if (lineclear.lines > 0) b2b = -1;
       if (lineclear.lines > 0) combo++; else combo = -1;
-      Damage dmg = lineclear.dealsDamage(combo, b2b, rules);
+      int dmg = lineclear.dealsDamage(combo, b2b, previousB2B, rules);
       lSideWidgets.add(
         ListTile(
           key: ValueKey(lineclear.id),
@@ -575,7 +551,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
             ],
           ),
           title: Text("${lineclear.title}${lineclear.perfectClear ? " PC" : ""}${combo > 0 ? ", ${combo} combo" : ""}${b2b > 0 ? ", B2Bx${b2b}" : ""}"),
-          subtitle: lineclear.lines > 0 ? Text("${dmg.clear} from clear, ${dmg.combo} from combo, ${dmg.b2b} from B2B, ${dmg.surge} from Surge and ${dmg.pc} from PC", style: TextStyle(color: Colors.grey)) : null,
+          subtitle: lineclear.lines > 0 ? Text("What should i write here?", style: TextStyle(color: Colors.grey)) : null,
           trailing: lineclear.lines > 0 ? Padding(
             padding: const EdgeInsets.only(right: 10.0),
             child: Text(dmg.toString(), style: TextStyle(fontSize: 36, fontWeight: ui.FontWeight.w100)),
@@ -583,7 +559,6 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
         )
       );
       totalDamage += dmg;
-      totalDamageNumber += dmg.total;
     }
 
     return Column(
@@ -644,6 +619,11 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                                     ),
                                     if (rules.combo) ListTile(
                                       title: Text("Combo Table"),
+                                      trailing: DropdownButton(
+                                        items: [for (var v in ComboTables.values) DropdownMenuItem(value: v.index, child: Text(v.name))],
+                                        value: rules.comboTable.index,
+                                        onChanged: (v) => setState((){rules.comboTable = ComboTables.values[v!];}),
+                                      ),
                                     )
                                   ],
                                 ),
@@ -730,11 +710,10 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                             children: [
                               Text("Total damage:", style: TextStyle(fontSize: 36, fontWeight: ui.FontWeight.w100)),
                               Spacer(),
-                              Text(totalDamageNumber.toString(), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: ui.FontWeight.w100))
+                              Text(totalDamage.toString(), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: ui.FontWeight.w100))
                             ],
                           ),
                         ),
-                        Text(totalDamage.toString(), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: ui.FontWeight.w100)),
                         ElevatedButton.icon(onPressed: (){setState((){clears.clear();});}, icon: const Icon(Icons.clear), label: Text("Clear all"), style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))))))
                       ],
                     )

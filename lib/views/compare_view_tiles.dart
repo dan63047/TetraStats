@@ -640,7 +640,7 @@ class CompareState extends State<CompareView> {
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  for (int l = 0; l < formattedValues[i][k].length; l++) Container(decoration: BoxDecoration(color: (rawValues[i][k][l] != null && best[i][l] == rawValues[i][k][l]) ? Colors.cyanAccent.withAlpha(96) : null), child: formattedValues[i][k][l]),
+                                  for (int l = 0; l < formattedValues[i][k].length; l++) Container(decoration: BoxDecoration(color: (rawValues[0].length > 1 && rawValues[i][k][l] != null && best[i][l] == rawValues[i][k][l]) ? Colors.cyanAccent.withAlpha(96) : null), child: formattedValues[i][k][l]),
                                 ],
                               ),
                             ),
