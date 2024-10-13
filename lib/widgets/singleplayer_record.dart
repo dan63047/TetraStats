@@ -30,10 +30,10 @@ class SingleplayerRecord extends StatelessWidget {
     if (record == null) return Center(child: Text(t.noRecord, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)));
     late MapEntry closestAverageBlitz;
     late bool blitzBetterThanClosestAverage;
-    bool? blitzBetterThanRankAverage = (rank != null && rank != "z" && rank != "x+") ? record!.stats.score > blitzAverages[rank]! : null;
+    bool? blitzBetterThanRankAverage = (rank != null && rank != "z") ? record!.stats.score > blitzAverages[rank]! : null;
     late MapEntry closestAverageSprint;
     late bool sprintBetterThanClosestAverage;
-    bool? sprintBetterThanRankAverage = (rank != null && rank != "z" && rank != "x+") ? record!.stats.finalTime < sprintAverages[rank]! : null;
+    bool? sprintBetterThanRankAverage = (rank != null && rank != "z") ? record!.stats.finalTime < sprintAverages[rank]! : null;
     if (record!.gamemode == "40l") {
       closestAverageSprint = sprintAverages.entries.singleWhere((element) => element.value == sprintAverages.values.reduce((a, b) => (a-record!.stats.finalTime).abs() < (b -record!.stats.finalTime).abs() ? a : b));
       sprintBetterThanClosestAverage = record!.stats.finalTime < closestAverageSprint.value;
@@ -76,13 +76,13 @@ class SingleplayerRecord extends StatelessWidget {
                         text: "",
                         style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
                         children: [
-                          if (record!.gamemode == "40l" && (rank != null && rank != "z" && rank != "x+")) TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(record!.stats.finalTime, sprintAverages[rank]!), verdict: sprintBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
+                          if (record!.gamemode == "40l" && (rank != null && rank != "z")) TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(record!.stats.finalTime, sprintAverages[rank]!), verdict: sprintBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
                             color: sprintBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
                           ))
                           else if (record!.gamemode == "40l" && (rank == null || rank == "z" || rank != "x+")) TextSpan(text: "${t.verdictGeneral(n: readableTimeDifference(record!.stats.finalTime, closestAverageSprint.value), verdict: sprintBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageSprint.key.toUpperCase())}\n", style: TextStyle(
                             color: sprintBetterThanClosestAverage ? Colors.greenAccent : Colors.redAccent
                           ))
-                          else if (record!.gamemode == "blitz" && (rank != null && rank != "z" && rank != "x+")) TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(record!.stats.score, blitzAverages[rank]!), verdict: blitzBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
+                          else if (record!.gamemode == "blitz" && (rank != null && rank != "z")) TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(record!.stats.score, blitzAverages[rank]!), verdict: blitzBetterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
                             color: blitzBetterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
                           ))
                           else if (record!.gamemode == "blitz" && (rank == null || rank == "z" || rank != "x+")) TextSpan(text: "${t.verdictGeneral(n: readableIntDifference(record!.stats.score, closestAverageBlitz.value), verdict: blitzBetterThanClosestAverage ? t.verdictBetter : t.verdictWorse, rank: closestAverageBlitz.key.toUpperCase())}\n", style: TextStyle(

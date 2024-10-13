@@ -81,7 +81,7 @@ class SprintAndBlitzState extends State<SprintAndBlitzView> {
                           Container(decoration: BoxDecoration(boxShadow: [BoxShadow(color: Colors.black.withAlpha(132), blurRadius: 32.0, blurStyle: BlurStyle.inner)]), child: Image.asset("res/tetrio_tl_alpha_ranks/${sprintEntry.key}.png", height: 48)),
                           Padding(
                             padding: const EdgeInsets.only(right: 8.0),
-                            child: Text(get40lTime(sprintEntry.value.inMicroseconds), textAlign: TextAlign.right, style: TextStyle(fontFamily: bigScreen ? "Eurostile Round" : "Eurostile Round Condensed", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white, shadows: textShadow)),
+                            child: Text(getALittleBitMoreNormalTime(sprintEntry.value), textAlign: TextAlign.right, style: TextStyle(fontFamily: bigScreen ? "Eurostile Round" : "Eurostile Round Condensed", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white, shadows: textShadow)),
                           ),
                           Padding(
                             padding: const EdgeInsets.only(right: 8.0),
@@ -91,7 +91,7 @@ class SprintAndBlitzState extends State<SprintAndBlitzView> {
                       )
                     ],
                   ),
-                  Text(t.sprintAndBlitsRelevance(date: dateFormat.format(DateTime(2024, 5, 26))))
+                  Text(t.sprintAndBlitsRelevance(date: dateFormat.format(DateTime(2024, 8, 25))))
                 ],
               ),
             ),

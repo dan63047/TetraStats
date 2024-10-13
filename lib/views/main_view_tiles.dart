@@ -1823,7 +1823,7 @@ class RecordSummary extends StatelessWidget{
             text: "",
             style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
             children: [
-              if (rank != null && rank != "z" && rank != "x+") TextSpan(text: "${t.verdictGeneral(n: switch(record!.gamemode){
+              if (rank != null && rank != "z") TextSpan(text: "${t.verdictGeneral(n: switch(record!.gamemode){
                 "40l" => readableTimeDifference(record!.stats.finalTime, sprintAverages[rank]!),
                 "blitz" => readableIntDifference(record!.stats.score, blitzAverages[rank]!),
                 _ => record!.stats.score.toString()
@@ -2500,7 +2500,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                       text: "",
                       style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
                       children: [
-                        if (rank != null && rank != "z" && rank != "x+") TextSpan(text: "${t.verdictGeneral(n: switch(record.gamemode){
+                        if (rank != null && rank != "z") TextSpan(text: "${t.verdictGeneral(n: switch(record.gamemode){
                           "40l" => readableTimeDifference(record.stats.finalTime, sprintAverages[rank]!),
                           "blitz" => readableIntDifference(record.stats.score, blitzAverages[rank]!),
                           _ => record.stats.score.toString()
