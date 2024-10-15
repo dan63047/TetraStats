@@ -95,7 +95,7 @@ class TetrioPlayer {
     // data['_id'] = userId;
     // data['username'] = username;
     data['role'] = role;
-    if (registrationTime != null) data['ts'] = registrationTime?.toString();
+    data['ts'] = registrationTime.toString();
     if (badges.isNotEmpty) data['badges'] = badges.map((v) => v.toJson()).toList();
     if (xp >= 0) data['xp'] = xp;
     if (gamesPlayed >= 0) data['gamesplayed'] = gamesPlayed;

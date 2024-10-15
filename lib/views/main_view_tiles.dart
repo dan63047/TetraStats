@@ -26,6 +26,7 @@ import 'package:tetra_stats/data_objects/record_single.dart';
 import 'package:tetra_stats/data_objects/singleplayer_stream.dart';
 import 'package:tetra_stats/data_objects/summaries.dart';
 import 'package:tetra_stats/data_objects/tetra_league.dart';
+import 'package:tetra_stats/data_objects/tetra_league_alpha_record.dart';
 import 'package:tetra_stats/data_objects/tetra_league_beta_stream.dart';
 import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 import 'package:tetra_stats/data_objects/tetrio_player.dart';
@@ -208,12 +209,146 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                 2 => DestinationLeaderboards(constraints: constraints),
                 3 => DestinationCutoffs(constraints: constraints),
                 4 => DestinationCalculator(constraints: constraints),
+                6 => DestinationSavedData(constraints: constraints),
                 _ => Text("Unknown destination $destination")
               },
             )
           ]);
         },
       ));
+  }
+}
+
+class DestinationSavedData extends StatefulWidget{
+  final BoxConstraints constraints;
+
+  const DestinationSavedData({super.key, required this.constraints});
+
+  @override
+  State<DestinationSavedData> createState() => _DestinationSavedData();
+}
+
+class _DestinationSavedData extends State<DestinationSavedData> {
+  String? selectedID;
+
+  Future<(List<TetraLeague>, List<TetraLeague>, List<TetraLeagueAlphaRecord>)> getDataAbout(String id) async {
+    return (await teto.getStates(id), await teto.getStates(id, season: 1), await teto.getTLMatchesbyPlayerID(id));
+  }
+
+  Widget getTetraLeagueListTile(TetraLeague data){
+    return ListTile(
+      title: Text(timestamp(data.timestamp)),
+      subtitle: Text("${intf.format(data.gamesPlayed)} games"),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Map<String, String>>(
+      future: teto.getAllPlayers(),
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState){
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+          case ConnectionState.active:
+            return const Center(child: CircularProgressIndicator());
+          case ConnectionState.done:
+          if (snapshot.hasError){ return FutureError(snapshot); }
+          if (snapshot.hasData){
+            return Row(
+              children: [
+                SizedBox(
+                  width: 450,
+                  child: Column(
+                    children: [
+                      const Card(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Spacer(),
+                            Text("Saved Data", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36)),
+                            Spacer()
+                          ],
+                        ),
+                      ),
+                      for (String id in snapshot.data!.keys) Card(
+                        child: ListTile(
+                          title: Text(snapshot.data![id]!),
+                          subtitle: Text("NaN states, NaN TL records", style: TextStyle(color: Colors.grey)),
+                          onTap: () => setState(() {
+                            selectedID = id;
+                          }),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  width: widget.constraints.maxWidth - 450 - 80,
+                  child: selectedID != null ? FutureBuilder<(List<TetraLeague>, List<TetraLeague>, List<TetraLeagueAlphaRecord>)>(
+                    future: getDataAbout(selectedID!),
+                    builder: (context, snapshot) {
+                      switch(snapshot.connectionState){
+                        case ConnectionState.none:
+                        case ConnectionState.waiting:
+                        case ConnectionState.active:
+                          return const Center(child: CircularProgressIndicator());
+                        case ConnectionState.done:
+                        if (snapshot.hasError){ return FutureError(snapshot); }
+                        if (snapshot.hasData){
+                          return DefaultTabController(
+                            length: 3,
+                            child: Card(
+                              child: Column(
+                                children: [
+                                  Card(
+                                    child: TabBar(tabs: [
+                                      Tab(text: "S${currentSeason} TL States"),
+                                      Tab(text: "S1 TL States"),
+                                      Tab(text: "TL Records")
+                                    ]),
+                                  ),
+                                  SizedBox(
+                                    height: widget.constraints.maxHeight - 164,
+                                    child: TabBarView(children: [
+                                      ListView.builder(
+                                        itemCount: snapshot.data!.$1.length,
+                                        itemBuilder: (context, index) {
+                                        return getTetraLeagueListTile(snapshot.data!.$1[index]);
+                                      },),
+                                      ListView.builder(
+                                        itemCount: snapshot.data!.$2.length,
+                                        itemBuilder: (context, index) {
+                                        return getTetraLeagueListTile(snapshot.data!.$2[index]);
+                                      },),
+                                      ListView.builder(
+                                        itemCount: snapshot.data!.$3.length,
+                                        itemBuilder: (context, index) {
+                                        return ListTile(
+                                          title: Text(snapshot.data!.$3[index].toString()),
+                                        );
+                                      },),
+                                      ]
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+                        return Text("what?");
+                      }
+                    }
+                  ) : 
+                  Text("Select nickname on the left to see data assosiated with it")
+                )
+              ],
+            );
+          }
+        }
+        return const Text("End of FutureBuilder<FetchResults>");
+      },
+    );
   }
 }
 
@@ -682,7 +817,13 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
             SizedBox(
               width: widget.constraints.maxWidth - 350 - 80,
               height: widget.constraints.maxHeight - 148,
-              child: clears.isEmpty ? Center(child: Text("Click on the actions on the left to add them here", textAlign: ui.TextAlign.center)) :
+              child: clears.isEmpty ? Center(child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.info_outline, size: 128.0, color: Colors.grey.shade800),
+                  Text("Click on the actions on the left to add them here", textAlign: ui.TextAlign.center),
+                ],
+              )) :
               Card(
                 child: Column(
                   children: [
