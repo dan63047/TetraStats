@@ -7,13 +7,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/aggregate_stats.dart';
-import 'package:tetra_stats/data_objects/nerd_stats.dart';
-import 'package:tetra_stats/data_objects/playstyle.dart';
 import 'package:tetra_stats/data_objects/summaries.dart';
-import 'package:tetra_stats/data_objects/tetra_league.dart';
 import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 import 'package:tetra_stats/data_objects/tetrio_player.dart';
-import 'package:tetra_stats/data_objects/tetrio_zen.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart' show teto;
 import 'package:tetra_stats/utils/numers_formats.dart';
@@ -21,9 +17,7 @@ import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
 import 'package:tetra_stats/widgets/graphs.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
-import 'package:tetra_stats/widgets/vs_graphs.dart';
 import 'package:transparent_image/transparent_image.dart';
-import 'package:vector_math/vector_math_64.dart' hide Colors;
 import 'package:window_manager/window_manager.dart';
 
 enum Mode{
@@ -308,7 +302,7 @@ class CompareState extends State<CompareView> {
         s.zen.level
       ]);
       formattedValues[0].add([
-        Text(timestamp(p.registrationTime!)),
+        Text(timestamp(p.registrationTime)),
         RichText(text: p.xp.isNegative ? TextSpan(text: "hidden", style: TextStyle(fontFamily: "Eurostile Round", color: Colors.grey)) : TextSpan(text: intf.format(p.xp), style: TextStyle(fontFamily: "Eurostile Round"), children: [TextSpan(text: " (lvl ${intf.format(p.level.floor())})", style: TextStyle(color: Colors.grey))])),
         Text(p.gameTime.isNegative ? "hidden" : playtime(p.gameTime), style: TextStyle(color: p.gameTime.isNegative ? Colors.grey : Colors.white)),
         Text(p.gamesPlayed.isNegative ? "hidden" : intf.format(p.gamesPlayed), style: TextStyle(color: p.gamesPlayed.isNegative ? Colors.grey : Colors.white)),
@@ -573,14 +567,14 @@ class CompareState extends State<CompareView> {
     ));
   }
 
-  void _justUpdate() {
-    setState(() {});
-  }
+  // void _justUpdate() {
+  //   setState(() {});
+  // }
 
   @override
   Widget build(BuildContext context) {
-    final t = Translations.of(context);
-    bool bigScreen = MediaQuery.of(context).size.width > 768;
+    // final t = Translations.of(context);
+    // bool bigScreen = MediaQuery.of(context).size.width > 768;
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
       floatingActionButton: Padding(
@@ -757,7 +751,6 @@ class _AddNewColumnCardState extends State<AddNewColumnCard> with SingleTickerPr
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return SizedBox(
       height: 175.0,
       child: Card(

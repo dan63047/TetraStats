@@ -7,7 +7,6 @@ import 'package:fl_chart/src/chart/radar_chart/radar_chart_painter.dart';
 import 'package:fl_chart/src/chart/radar_chart/radar_chart_renderer.dart';
 import 'package:fl_chart/src/chart/base/base_chart/base_chart_painter.dart';
 import 'package:fl_chart/src/utils/canvas_wrapper.dart';
-import 'package:fl_chart/src/utils/utils.dart';
 import 'package:tetra_stats/data_objects/nerd_stats.dart';
 import 'package:tetra_stats/data_objects/playstyle.dart';
 import 'package:tetra_stats/data_objects/tetrio_constants.dart';

@@ -500,7 +500,7 @@ class TetrioService extends DB {
   }
 
   Future<Cutoffs?> fetchCutoffsBeanserver() async {
-    Cutoffs? cached = _cache.get("", Cutoffs);
+    Cutoffs? cached = _cache.get("CutoffsTetrioleague_ranks", Cutoffs);
     if (cached != null) return cached;
 
     Uri url = Uri.https('ts.dan63.by', 'beanserver_blaster/cutoffs.json');

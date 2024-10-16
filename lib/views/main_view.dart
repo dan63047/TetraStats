@@ -295,10 +295,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     //   if (element.tlSeason1 != null && uniqueTL.isNotEmpty && uniqueTL.last != element.tlSeason1) uniqueTL.add(element.tlSeason1!);
     //   if (uniqueTL.isEmpty) uniqueTL.add(summaries.league);
     // }
-    // Also i need previous Tetra League State for comparison if avaliable
-    TetraLeague? compareWith;
     if (states[1].length >= 2 || states[0].length >= 2){
-      compareWith = states[1].length >= 2 ? states[1].elementAtOrNull(states.length - 2) : null;
       chartsData = [for (List<TetraLeague> s in states) <DropdownMenuItem<List<_HistoryChartSpot>>>[ // Dumping charts data into dropdown menu items, while cheking if every entry is valid
         DropdownMenuItem(value: [for (var tl in s) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.tr)], child: Text(t.statCellNum.tr)),
         DropdownMenuItem(value: [for (var tl in s) if (tl.gamesPlayed > 9) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.glicko!)], child: const Text("Glicko")),
@@ -323,7 +320,6 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
         DropdownMenuItem(value: [for (var tl in s) if (tl.playstyle != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.playstyle!.stride)], child: const Text("Stride")),
       ]];
     }else{
-      compareWith = null;
       chartsData = [];
     }
 

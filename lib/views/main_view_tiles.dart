@@ -53,6 +53,8 @@ import 'package:tetra_stats/widgets/user_thingy.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
 
+// TODO: Refactor it
+
 var fDiff = NumberFormat("+#,###.####;-#,###.####");
 late Future<FetchResults> _data;
 late Future<News> _newsData;
@@ -232,13 +234,28 @@ class _DestinationSavedData extends State<DestinationSavedData> {
   String? selectedID;
 
   Future<(List<TetraLeague>, List<TetraLeague>, List<TetraLeagueAlphaRecord>)> getDataAbout(String id) async {
-    return (await teto.getStates(id), await teto.getStates(id, season: 1), await teto.getTLMatchesbyPlayerID(id));
+    return (await teto.getStates(id, season: currentSeason), await teto.getStates(id, season: 1), await teto.getTLMatchesbyPlayerID(id));
   }
 
   Widget getTetraLeagueListTile(TetraLeague data){
     return ListTile(
-      title: Text(timestamp(data.timestamp)),
-      subtitle: Text("${intf.format(data.gamesPlayed)} games"),
+      title: Text("${timestamp(data.timestamp)}"),
+      subtitle: Text("${f2.format(data.apm)} APM, ${f2.format(data.pps)} PPS, ${f2.format(data.vs)} VS, ${intf.format(data.gamesPlayed)} games", style: TextStyle(color: Colors.grey)),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text("${f2.format(data.tr)} TR", style: TextStyle(fontSize: 28)),
+          Image.asset("res/tetrio_tl_alpha_ranks/${data.rank}.png", height: 36)
+        ],
+      ),
+      leading: IconButton(
+        onPressed: () {
+          teto.deleteState(data.id+data.timestamp.millisecondsSinceEpoch.toRadixString(16)).then((value) => setState(() {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.stateRemoved(date: timestamp(data.timestamp)))));
+          }));
+        },
+        icon: Icon(Icons.delete_forever)
+      ),
     );
   }
 
@@ -274,7 +291,7 @@ class _DestinationSavedData extends State<DestinationSavedData> {
                       for (String id in snapshot.data!.keys) Card(
                         child: ListTile(
                           title: Text(snapshot.data![id]!),
-                          subtitle: Text("NaN states, NaN TL records", style: TextStyle(color: Colors.grey)),
+                          //subtitle: Text("NaN states, NaN TL records", style: TextStyle(color: Colors.grey)),
                           onTap: () => setState(() {
                             selectedID = id;
                           }),
@@ -309,7 +326,7 @@ class _DestinationSavedData extends State<DestinationSavedData> {
                                     ]),
                                   ),
                                   SizedBox(
-                                    height: widget.constraints.maxHeight - 164,
+                                    height: widget.constraints.maxHeight - 64,
                                     child: TabBarView(children: [
                                       ListView.builder(
                                         itemCount: snapshot.data!.$1.length,
@@ -364,34 +381,6 @@ class DestinationCalculator extends StatefulWidget{
 enum CalcCards{
   calc,
   damage
-}
-
-class Damage{
-  final int clear;
-  final double combo;
-  final double b2b;
-  final int surge;
-  final int pc;
-  final double multiplier;
-
-  int get total => ((clear + combo + b2b + surge + pc) * multiplier).floor();
-
-  const Damage(this.clear, this.combo, this.b2b, this.surge, this.pc, this.multiplier);
-
-  @override
-  String toString(){
-    return total.toString();
-  }
-
-  Damage operator+(Damage other){
-    return Damage(
-      clear+other.clear,
-      combo+other.combo,
-      b2b+other.b2b,
-      surge+other.surge,
-      pc+other.pc,
-      multiplier);
-  }
 }
 
 class ClearData{
@@ -542,11 +531,11 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
     }
   }
 
-  void calcDamage(){
-    for (ClearData lineclear in clears){
+  // void calcDamage(){
+  //   for (ClearData lineclear in clears){
 
-    }
-  }
+  //   }
+  // }
 
   Widget getCalculator(){
     return SingleChildScrollView(
@@ -669,12 +658,22 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
     int b2b = -1;
     int previousB2B = -1;
     int totalDamage = 0;
+    int normalDamage = 0;
+    int comboDamage = 0;
+    int b2bDamage = 0;
+    int surgeDamage = 0;
+    int pcDamage = 0;
 
     for (ClearData lineclear in clears){
       previousB2B = b2b;
       if (lineclear.difficultClear) b2b++; else if (lineclear.lines > 0) b2b = -1;
       if (lineclear.lines > 0) combo++; else combo = -1;
+      int pcDmg = lineclear.perfectClear ? (rules.pcDamage * rules.multiplier).floor() : 0;
+      int normalDmg = lineclear.dealsDamage(0, 0, 0, rules) - pcDmg;
+      int surgeDmg = (!lineclear.difficultClear && rules.surge && previousB2B >= rules.surgeInitAtB2b && b2b == -1) ? rules.surgeInitAmount + (previousB2B - rules.surgeInitAtB2b) : 0;
+      int b2bDmg = lineclear.dealsDamage(0, b2b, b2b-1, rules) - normalDmg - pcDmg;
       int dmg = lineclear.dealsDamage(combo, b2b, previousB2B, rules);
+      int comboDmg = dmg - normalDmg - b2bDmg - surgeDmg - pcDmg;
       lSideWidgets.add(
         ListTile(
           key: ValueKey(lineclear.id),
@@ -686,7 +685,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
             ],
           ),
           title: Text("${lineclear.title}${lineclear.perfectClear ? " PC" : ""}${combo > 0 ? ", ${combo} combo" : ""}${b2b > 0 ? ", B2Bx${b2b}" : ""}"),
-          subtitle: lineclear.lines > 0 ? Text("What should i write here?", style: TextStyle(color: Colors.grey)) : null,
+          subtitle: lineclear.lines > 0 ? Text("${dmg == normalDmg ? "No bonuses" : ""}${b2bDmg > 0 ? "+${intf.format(b2bDmg)} for B2B" : ""}${(b2bDmg > 0 && comboDmg > 0) ? ", " : ""}${comboDmg > 0 ? "+${intf.format(comboDmg)} for combo" : ""}${(comboDmg > 0 && lineclear.perfectClear) ? ", " : ""}${lineclear.perfectClear ? "+${intf.format(pcDmg)} for PC" : ""}${(surgeDmg > 0 && (lineclear.perfectClear || comboDmg > 0)) ? ", " : ""}${surgeDmg > 0 ? "Surge released: +${intf.format(surgeDmg)}" : ""}", style: TextStyle(color: Colors.grey)) : null,
           trailing: lineclear.lines > 0 ? Padding(
             padding: const EdgeInsets.only(right: 10.0),
             child: Text(dmg.toString(), style: TextStyle(fontSize: 36, fontWeight: ui.FontWeight.w100)),
@@ -694,8 +693,17 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
         )
       );
       totalDamage += dmg;
+      normalDamage += normalDmg;
+      comboDamage += comboDmg;
+      b2bDamage += b2bDmg;
+      surgeDamage += surgeDmg;
+      pcDamage += pcDmg;
     }
-
+    // values for "the bar"
+    double sec2end = normalDamage.toDouble()+comboDamage.toDouble();
+    double sec3end = normalDamage.toDouble()+comboDamage.toDouble()+b2bDamage.toDouble();
+    double sec4end = normalDamage.toDouble()+comboDamage.toDouble()+b2bDamage.toDouble()+surgeDamage.toDouble();
+    double sec5end = normalDamage.toDouble()+comboDamage.toDouble()+b2bDamage.toDouble()+surgeDamage.toDouble()+pcDamage.toDouble();
     return Column(
       children: [
         Card(
@@ -816,11 +824,12 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
             ),
             SizedBox(
               width: widget.constraints.maxWidth - 350 - 80,
-              height: widget.constraints.maxHeight - 148,
+              height: widget.constraints.maxHeight - 108,
               child: clears.isEmpty ? Center(child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.info_outline, size: 128.0, color: Colors.grey.shade800),
+                  SizedBox(height: 5.0),
                   Text("Click on the actions on the left to add them here", textAlign: ui.TextAlign.center),
                 ],
               )) :
@@ -851,9 +860,57 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                             children: [
                               Text("Total damage:", style: TextStyle(fontSize: 36, fontWeight: ui.FontWeight.w100)),
                               Spacer(),
-                              Text(totalDamage.toString(), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: ui.FontWeight.w100))
+                              Text(intf.format(totalDamage), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: ui.FontWeight.w100))
                             ],
                           ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Text("Lineclears: ${intf.format(normalDamage)}"),
+                            Text("Combo: ${intf.format(comboDamage)}"),
+                            Text("B2B: ${intf.format(b2bDamage)}"),
+                            Text("Surge: ${intf.format(surgeDamage)}"),
+                            Text("PC's: ${intf.format(pcDamage)}")
+                          ],
+                        ),
+                        SfLinearGauge(
+                          minimum: 0,
+                          maximum: totalDamage.toDouble(),
+                          showLabels: false,
+                          showTicks: false,
+                          ranges: [
+                            LinearGaugeRange(
+                              color: Colors.green,
+                              startValue: 0,
+                              endValue: normalDamage.toDouble(),
+                              position: LinearElementPosition.cross,
+                            ),
+                            LinearGaugeRange(
+                              color: Colors.yellow,
+                              startValue: normalDamage.toDouble(),
+                              endValue: sec2end,
+                              position: LinearElementPosition.cross,
+                            ),
+                            LinearGaugeRange(
+                              color: Colors.blue,
+                              startValue: sec2end,
+                              endValue: sec3end,
+                              position: LinearElementPosition.cross,
+                            ),
+                            LinearGaugeRange(
+                              color: Colors.red,
+                              startValue: sec3end,
+                              endValue: sec4end,
+                              position: LinearElementPosition.cross,
+                            ),
+                            LinearGaugeRange(
+                              color: Colors.orange,
+                              startValue: sec4end,
+                              endValue: sec5end,
+                              position: LinearElementPosition.cross,
+                            ),
+                          ],
                         ),
                         ElevatedButton.icon(onPressed: (){setState((){clears.clear();});}, icon: const Icon(Icons.clear), label: Text("Clear all"), style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))))))
                       ],
@@ -1387,6 +1444,7 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                               ),
                               itemBuilder: (BuildContext context, int index){
                                 return ListTile(
+                                  // TODO: make it clickable
                                   leading: Text(intf.format(index+1)),
                                   title: Text(snapshot.data![index].username, style: TextStyle(fontSize: 22)),
                                   trailing: switch (_currentLb){
@@ -1623,6 +1681,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
         if (snapshot.hasData){
           List<_HistoryChartSpot> selectedGraph = snapshot.data![_season][_Ychart]!;
           yAxisTitle = chartsShortTitles[_Ychart]!;
+          // TODO: this graph can Krash
           return SfCartesianChart(
             tooltipBehavior: _historyTooltipBehavior,
             zoomPanBehavior: _zoomPanBehavior,
@@ -3569,7 +3628,7 @@ class NewUserThingy extends StatelessWidget {
                           style: const TextStyle(fontFamily: "Eurostile Round"),
                           children: [
                             if (player.country != null) TextSpan(text: "${t.countries[player.country]} • "),
-                            TextSpan(text: player.registrationTime == null ? t.wasFromBeginning : timestamp(player.registrationTime!), style: const TextStyle(color: Colors.grey))
+                            TextSpan(text: timestamp(player.registrationTime), style: const TextStyle(color: Colors.grey))
                           ]
                         )
                       ),
@@ -4203,11 +4262,10 @@ class _TLRecords extends StatelessWidget {
   final List<BetaRecord> data;
   final bool wasActiveInTL;
   final bool oldMathcesHere;
-  final bool separateScrollController;
 
   /// Widget, that displays Tetra League records.
   /// Accepts list of TL records ([data]) and [userID] of player from the view
-  const _TLRecords({required this.userID, required this.changePlayer, required this.data, required this.wasActiveInTL, required this.oldMathcesHere, this.separateScrollController = false});
+  const _TLRecords({required this.userID, required this.changePlayer, required this.data, required this.wasActiveInTL, required this.oldMathcesHere});
 
   @override
   Widget build(BuildContext context) {
@@ -4225,7 +4283,7 @@ class _TLRecords extends StatelessWidget {
     int length = data.length;
     return ListView.builder(
       physics: const AlwaysScrollableScrollPhysics(),
-      controller: separateScrollController ? ScrollController() : null,
+      //controller: separateScrollController ? ScrollController() : null,
       itemCount: oldMathcesHere ? length : length + 1,
       itemBuilder: (BuildContext context, int index) {
         if (index == length) {
