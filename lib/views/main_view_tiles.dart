@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide Badge;
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
@@ -24,6 +26,7 @@ import 'package:tetra_stats/data_objects/tetrio_player.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/utils/colors_functions.dart';
+import 'package:tetra_stats/utils/filesizes_converter.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
@@ -202,12 +205,463 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                 3 => DestinationCutoffs(constraints: constraints),
                 4 => DestinationCalculator(constraints: constraints),
                 6 => DestinationSavedData(constraints: constraints),
+                7 => DestinationSettings(constraints: constraints),
                 _ => Text("Unknown destination $destination")
               },
             )
           ]);
         },
       ));
+  }
+}
+
+class DestinationSettings extends StatefulWidget{
+  final BoxConstraints constraints;
+
+  const DestinationSettings({super.key, required this.constraints});
+
+  @override
+  State<DestinationSettings> createState() => _DestinationSettings();
+}
+
+enum SettingsCardMod{
+  general("General"),
+  customization("Custonization"),
+  database("Local database");
+
+  const SettingsCardMod(this.title);
+
+  final String title;
+}
+
+const TextStyle settingsTitlesStyle = TextStyle(fontSize: 18);
+const EdgeInsets descriptionPadding = EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 8.0);
+
+class _DestinationSettings extends State<DestinationSettings> {
+  SettingsCardMod mod = SettingsCardMod.general;
+  List<DropdownMenuItem<AppLocale>> locales = <DropdownMenuItem<AppLocale>>[];
+  String defaultNickname = "Checking...";
+  late bool oskKagariGimmick;
+  late bool sheetbotRadarGraphs;
+  late int ratingMode;
+  late int timestampMode;
+  late bool showPositions;
+  late bool showAverages;
+  late bool updateInBG;
+  final TextEditingController _playertext = TextEditingController();
+
+  @override
+  void initState() {
+    // if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS){
+    //   windowManager.getTitle().then((value) => oldWindowTitle = value);
+    //   windowManager.setTitle("Tetra Stats: ${t.settings}");
+    // }
+    _getPreferences();
+    super.initState();
+  }
+
+  @override
+  void dispose(){
+    // if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
+    super.dispose();
+  }
+
+  void _getPreferences() {
+    showPositions = prefs.getBool("showPositions") ?? false;
+    showAverages = prefs.getBool("showAverages") ?? true;
+    updateInBG = prefs.getBool("updateInBG") ?? false;
+    oskKagariGimmick = prefs.getBool("oskKagariGimmick") ?? true;
+    sheetbotRadarGraphs = prefs.getBool("sheetbotRadarGraphs")?? false;
+    ratingMode = prefs.getInt("ratingMode") ?? 0;
+    timestampMode = prefs.getInt("timestampMode") ?? 0;
+    _setDefaultNickname(prefs.getString("player"));
+  }
+
+  Future<void> _setDefaultNickname(String? n) async {
+    if (n != null) {
+      try {
+        defaultNickname = await teto.getNicknameByID(n);
+      } on TetrioPlayerNotExist {
+        defaultNickname = n;
+      }
+    } else {
+      defaultNickname = "dan63047";
+    }
+    setState(() {});
+  }
+
+  Future<void> _setPlayer(String player) async {
+    await prefs.setString('player', player);
+    await _setDefaultNickname(player);
+  }
+
+  Future<void> _removePlayer() async {
+    await prefs.remove('player');
+    await _setDefaultNickname("6098518e3d5155e6ec429cdc");
+  }
+
+  Widget getGeneralSettings(){
+    return Column(
+      children: [
+        Card(
+          child: Center(child: Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Column(
+              children: [
+                Text(SettingsCardMod.general.title, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+              ],
+            ),
+          )),
+        ),
+        Card(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text("Your account in TETR.IO", style: settingsTitlesStyle),
+                trailing: SizedBox(width: 150.0, child: TextField(
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(hintText: defaultNickname),
+                  //onChanged: (value) => setState((){rules.surgeInitAtB2b = int.parse(value);}),
+                )),
+              ),
+              Divider(),
+              Padding(
+                padding: descriptionPadding,
+                child: Text("Stats of that player will be loaded initially right after launching this app. By default it loads my (dan63) stats. To change that, enter your nickname here."),
+              )
+            ],
+          ),
+        ),
+        Card(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text("Language", style: settingsTitlesStyle),
+                trailing: DropdownButton(
+                  items: locales,
+                  value: LocaleSettings.currentLocale,
+                  onChanged: (value){
+                    LocaleSettings.setLocale(value!);
+                    if(value.languageCode == Platform.localeName.substring(0, 2)){
+                      prefs.remove('locale');
+                    }else{
+                      prefs.setString('locale', value.languageCode);
+                    }
+                  },
+                ),
+              ),
+              Divider(),
+              Padding(
+                padding: descriptionPadding,
+                child: Text("Tetra Stats was translated on ${locales.length} languages. By default, app will pick your system one or English, if locale of your system isn't avaliable."),
+              )
+            ],
+          ),
+        ),
+        Card(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text("Update data in the background", style: settingsTitlesStyle),
+                trailing: Switch(value: updateInBG, onChanged: (bool value){
+                prefs.setBool("updateInBG", value);
+                setState(() {
+                  updateInBG = value;
+                });
+                })
+              ),
+              Divider(),
+              Padding(
+                padding: descriptionPadding,
+                child: Text("If on, Tetra Stats will attempt to retrieve new info once cache expires. Usually that happen every 5 minutes"),
+              )
+            ],
+          ),
+        ),
+        Card(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text("Show leaderboard based stats", style: settingsTitlesStyle),
+                trailing: Switch(value: showAverages, onChanged: (bool value){
+                  prefs.setBool("showAverages", value);
+                  setState(() {
+                    showAverages = value;
+                  });
+                }),
+              ),
+              Divider(),
+              Padding(
+                padding: descriptionPadding,
+                child: Text("If on, Tetra Stats gonnna provide additional metrics, which will allow you to compare yourself with average player on your rank. The way you'll see it — stats will be highlited with corresponding color, hover over them with cursor for more info."),
+              )
+            ],
+          ),
+        ),
+        Card(
+          surfaceTintColor: Colors.redAccent,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text("Show position on leaderboard by stats", style: settingsTitlesStyle),
+                trailing: Switch(value: showPositions, onChanged: (bool value){
+                  prefs.setBool("showPositions", value);
+                  setState(() {
+                    showPositions = value;
+                  });
+                }),
+              ),
+              Divider(),
+              Padding(
+                padding: descriptionPadding,
+                child: Text("This can take some time (and traffic) to load, but will allow you to see your position on the leaderboard, sorted by a stat"),
+              )
+            ],
+          ),
+        )
+      ]
+    );
+  }
+
+  Widget getCustomizationSettings(){
+    return Column(
+      children: [
+        Card(
+          child: Center(child: Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Column(
+              children: [
+                Text(SettingsCardMod.customization.title, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+              ],
+            ),
+          )),
+        ),
+        Card(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text("Accent color", style: settingsTitlesStyle),
+                trailing: ColorIndicator(HSVColor.fromColor(Theme.of(context).colorScheme.primary), width: 25, height: 25),
+              ),
+              Divider(),
+              Padding(
+                padding: descriptionPadding,
+                child: Text("That color is seen across this app and usually highlites interactive UI elements."),
+              )
+            ],
+          ),
+        ),
+        Card(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ListTile(
+                title: Text("Timestamps format", style: settingsTitlesStyle),
+                trailing:  DropdownButton(
+                  value: timestampMode,
+                  items: <DropdownMenuItem>[
+                    DropdownMenuItem(value: 0, child: Text(t.timestampsAbsoluteGMT)),
+                    DropdownMenuItem(value: 1, child: Text(t.timestampsAbsoluteLocalTime)),
+                    DropdownMenuItem(value: 2, child: Text(t.timestampsRelative))
+                  ],
+                  onChanged: (dynamic value){
+                    prefs.setInt("timestampMode", value);
+                    setState(() {
+                      timestampMode = value;
+                    });
+                  },
+                ),
+              ),
+              Divider(),
+              Padding(
+                padding: descriptionPadding,
+                child: Text("You can choose, in which way timestamps shows time. By default, they show time in GMT timezone, formatted according to chosen locale, example: ${DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms().format(DateTime.utc(2023, DateTime.july, 20, 21, 03, 19))}."),
+              ),
+              Padding(
+                padding: descriptionPadding,
+                child: Text("There is also:\n• Locale formatted in your timezone: ${DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms().format(DateTime.utc(2023, DateTime.july, 20, 21, 03, 19).toLocal())}\n• Relative timestamp: ${relativeDateTime(DateTime.utc(2023, DateTime.july, 20, 21, 03, 19))}"),
+              )
+            ],
+          ),
+        ),
+        Card(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text("Sheetbot-like behavior for radar graphs", style: settingsTitlesStyle),
+                trailing: Switch(value: sheetbotRadarGraphs, onChanged: (bool value){
+                  prefs.setBool("sheetbotRadarGraphs", value);
+                  setState(() {
+                    sheetbotRadarGraphs = value;
+                  });
+                }),
+              ),
+              Divider(),
+              Padding(
+                padding: descriptionPadding,
+                child: Text("Altough it was considered by me, that the way graphs work in SheetBot is not very correct, some people were confused to see, that -0.5 stride dosen't look the way it looks on SheetBot graph. Hence, he we are: if this toggle is on, points on the graphs can appear on the opposite half of the graph if value is negative."),
+              )
+            ],
+          ),
+        ),
+        Card(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text("Osk-Kagari gimmick", style: settingsTitlesStyle),
+                trailing: Switch(value: oskKagariGimmick, onChanged: (bool value){
+                  prefs.setBool("oskKagariGimmick", value);
+                  setState(() {
+                    oskKagariGimmick = value;
+                  });
+                }),
+              ),
+              Divider(),
+              Padding(
+                padding: descriptionPadding,
+                child: Text("If on, instead of osk's rank, :kagari: will be rendered."),
+              )
+            ],
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget getDatabaseSettings(){
+    return Column(
+      children: [
+        Card(
+          child: Center(child: Column(
+            children: [
+              Text(SettingsCardMod.database.title, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+              Divider(),
+              FutureBuilder<(int, int, int)>(future: teto.getDatabaseData(),
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState){
+                    case ConnectionState.none:
+                    case ConnectionState.waiting:
+                      return const Center(child: CircularProgressIndicator());
+                    case ConnectionState.active:
+                    case ConnectionState.done:
+                      if (snapshot.hasData){
+                        return RichText(
+                          text: TextSpan(
+                            style: TextStyle(fontFamily: "Eurostile Round", color: Colors.white),
+                            children: [
+                              TextSpan(text: "${bytesToSize(snapshot.data!.$1)} ", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)),
+                              TextSpan(text: "of data stored\n"),
+                              TextSpan(text: "${intf.format(snapshot.data!.$2)} ", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)),
+                              TextSpan(text: "Tetra League records saved\n"),
+                              TextSpan(text: "${intf.format(snapshot.data!.$3)} ", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)),
+                              TextSpan(text: "Tetra League playerstates saved"),
+                            ]
+                          )
+                        );
+                      }
+                      if (snapshot.hasError){ return FutureError(snapshot); }
+                    }
+                  return Text("huh?");
+                }
+              ),
+              Divider(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: (){teto.removeDuplicatesFromTLMatches().then((_) => setState((){}));},
+                      icon: const Icon(Icons.build),
+                      label: Text("Fix"),
+                      style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12.0)))))
+                    )
+                  ),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: (){teto.compressDB().then((_) => setState((){}));},
+                      icon: const Icon(Icons.compress),
+                      label: Text("Compress"),
+                      style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomRight: Radius.circular(12.0)))))
+                    )
+                  )
+                ],
+                )
+            ],
+          )),
+        ),
+        Card(
+          child: ListTile(
+            title: Text("Export Database", style: settingsTitlesStyle),
+          ),
+        ),
+        Card(
+          child: ListTile(
+            title: Text("Import Database", style: settingsTitlesStyle),
+          ),
+        )
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Translations.of(context);
+    if (locales.isEmpty) for (var v in AppLocale.values){
+      locales.add(DropdownMenuItem<AppLocale>(
+        value: v, child: Text(t.locales[v.languageTag]!)));
+    }
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 450,
+          child: Column(
+            children: [
+              const Card(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Spacer(),
+                    Text("Settings", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36)),
+                    Spacer()
+                  ],
+                ),
+              ),
+              for (SettingsCardMod m in SettingsCardMod.values) Card(
+                child: ListTile(
+                  title: Text(m.title),
+                  trailing: Icon(Icons.arrow_right, color: mod == m ? Colors.white : Colors.grey),
+                  onTap: () {
+                    setState(() {
+                      mod = m;
+                    });
+                  },
+                ),
+              )
+            ],
+          ),
+        ),
+        SizedBox(
+          width: widget.constraints.maxWidth - 450 - 80,
+          child: SingleChildScrollView(
+            child: switch (mod){
+              SettingsCardMod.general => getGeneralSettings(),
+              SettingsCardMod.customization => getCustomizationSettings(),
+              SettingsCardMod.database => getDatabaseSettings(),
+            },
+          )
+        )
+      ],
+    );
   }
 }
 
@@ -638,12 +1092,43 @@ class BadgesThingy extends StatelessWidget{
   }
 }
 
-class NewUserThingy extends StatelessWidget {
+class NewUserThingy extends StatefulWidget {
   final TetrioPlayer player;
   final bool showStateTimestamp;
   final Function setState;
   
   const NewUserThingy({super.key, required this.player, required this.showStateTimestamp, required this.setState});
+
+  @override
+  State<NewUserThingy> createState() => _NewUserThingyState();
+}
+
+class _NewUserThingyState extends State<NewUserThingy> with SingleTickerProviderStateMixin {
+  late AnimationController _addToTrackAnimController;
+  late Animation _addToTrackAnim;
+
+  @override
+  void initState(){
+    _addToTrackAnimController = AnimationController(
+      duration: Durations.medium3,
+      vsync: this,
+    );
+    _addToTrackAnim = new Tween(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(new CurvedAnimation(
+      parent: _addToTrackAnimController,
+      curve: Easing.standardDecelerate,
+      reverseCurve: Easing.standardAccelerate
+    ));
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _addToTrackAnimController.dispose();
+    super.dispose();
+  }
 
   Color roleColor(String role){
     switch (role){
@@ -677,7 +1162,7 @@ class NewUserThingy extends StatelessWidget {
       double pfpHeight = 128;
       int xpTableID = 0;
 
-      while (player.xp > xpTableScuffed.values.toList()[xpTableID]) {
+      while (widget.player.xp > xpTableScuffed.values.toList()[xpTableID]) {
         xpTableID++;
       }
 
@@ -689,41 +1174,41 @@ class NewUserThingy extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 4.0),
               child: Container(
                 constraints: const BoxConstraints(maxWidth: 960),
-                height: player.bannerRevision != null ? 218.0 : 138.0,
+                height: widget.player.bannerRevision != null ? 218.0 : 138.0,
                 child: Stack(
                 //clipBehavior: Clip.none,
                 children: [
                   // TODO: osk banner can cause memory leak
-                  if (player.bannerRevision != null) FadeInImage.memoryNetwork(image: kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioBanner&user=${player.userId}&rv=${player.bannerRevision}" : "https://tetr.io/user-content/banners/${player.userId}.jpg?rv=${player.bannerRevision}",
+                  if (widget.player.bannerRevision != null) FadeInImage.memoryNetwork(image: kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioBanner&user=${widget.player.userId}&rv=${widget.player.bannerRevision}" : "https://tetr.io/user-content/banners/${widget.player.userId}.jpg?rv=${widget.player.bannerRevision}",
                     placeholder: kTransparentImage,
                     fit: BoxFit.cover,
                     height: 120,
                     fadeInCurve: Easing.standard, fadeInDuration: Durations.long4
                   ),
                   Positioned(
-                    top: player.bannerRevision != null ? 90.0 : 10.0,
+                    top: widget.player.bannerRevision != null ? 90.0 : 10.0,
                     left: 16.0,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(1000),
-                      child: player.role == "banned"
+                      child: widget.player.role == "banned"
                         ? Image.asset("res/avatars/tetrio_banned.png", fit: BoxFit.fitHeight, height: pfpHeight,)
-                        : player.avatarRevision != null
-                          ? FadeInImage.memoryNetwork(image: kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioProfilePicture&user=${player.userId}&rv=${player.avatarRevision}" : "https://tetr.io/user-content/avatars/${player.userId}.jpg?rv=${player.avatarRevision}",
+                        : widget.player.avatarRevision != null
+                          ? FadeInImage.memoryNetwork(image: kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioProfilePicture&user=${widget.player.userId}&rv=${widget.player.avatarRevision}" : "https://tetr.io/user-content/avatars/${widget.player.userId}.jpg?rv=${widget.player.avatarRevision}",
                             fit: BoxFit.fitHeight, height: 128, placeholder: kTransparentImage, fadeInCurve: Easing.emphasizedDecelerate, fadeInDuration: Durations.long4)
                           : Image.asset("res/avatars/tetrio_anon.png", fit: BoxFit.fitHeight, height: pfpHeight),
                     )
                   ),
                   Positioned(
-                    top: player.bannerRevision != null ? 120.0 : 40.0,
+                    top: widget.player.bannerRevision != null ? 120.0 : 40.0,
                     left: 160.0,
                     child: Tooltip(
-                      message: "${player.userId}\n(Click to copy user ID)",
-                      child: RichText(text: TextSpan(text: player.username, style: TextStyle(
-                          fontFamily: fontStyle(player.username.length),
+                      message: "${widget.player.userId}\n(Click to copy user ID)",
+                      child: RichText(text: TextSpan(text: widget.player.username, style: TextStyle(
+                          fontFamily: fontStyle(widget.player.username.length),
                           fontSize: 28,
                         ),
                         recognizer: TapGestureRecognizer()..onTap = (){
-                            copyToClipboard(player.userId);
+                            copyToClipboard(widget.player.userId);
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.copiedToClipboard)));
                           }
                         )
@@ -731,23 +1216,23 @@ class NewUserThingy extends StatelessWidget {
                     ),
                   ),
                   Positioned(
-                    top: player.bannerRevision != null ? 160.0 : 80.0,
+                    top: widget.player.bannerRevision != null ? 160.0 : 80.0,
                     left: 160.0,
                     child: Row(
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(right: 4.0),
-                          child: Chip(label: Text(player.role.toUpperCase(), style: const TextStyle(shadows: textShadow),), padding: const EdgeInsets.all(0.0), color: WidgetStatePropertyAll(roleColor(player.role))),
+                          child: Chip(label: Text(widget.player.role.toUpperCase(), style: const TextStyle(shadows: textShadow),), padding: const EdgeInsets.all(0.0), color: WidgetStatePropertyAll(roleColor(widget.player.role))),
                         ),
                         RichText(
                           text: TextSpan(
                             style: const TextStyle(fontFamily: "Eurostile Round"),
                             children:
                             [
-                            if (player.friendCount > 0) const WidgetSpan(child: Icon(Icons.person), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic),
-                            if (player.friendCount > 0) TextSpan(text: "${intf.format(player.friendCount)} "),
-                            if (player.supporterTier > 0) WidgetSpan(child: Icon(player.supporterTier > 1 ? Icons.star : Icons.star_border, color: player.supporterTier > 1 ? Colors.yellowAccent : Colors.white), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic),
-                            if (player.supporterTier > 0) TextSpan(text: player.supporterTier.toString(), style: TextStyle(color: player.supporterTier > 1 ? Colors.yellowAccent : Colors.white)),
+                            if (widget.player.friendCount > 0) const WidgetSpan(child: Icon(Icons.person), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic),
+                            if (widget.player.friendCount > 0) TextSpan(text: "${intf.format(widget.player.friendCount)} "),
+                            if (widget.player.supporterTier > 0) WidgetSpan(child: Icon(widget.player.supporterTier > 1 ? Icons.star : Icons.star_border, color: widget.player.supporterTier > 1 ? Colors.yellowAccent : Colors.white), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic),
+                            if (widget.player.supporterTier > 0) TextSpan(text: widget.player.supporterTier.toString(), style: TextStyle(color: widget.player.supporterTier > 1 ? Colors.yellowAccent : Colors.white)),
                             ] 
                           ) 
                         )
@@ -755,7 +1240,7 @@ class NewUserThingy extends StatelessWidget {
                     ),
                   ),
                   Positioned(
-                    top: player.bannerRevision != null ? 193.0 : 113.0,
+                    top: widget.player.bannerRevision != null ? 193.0 : 113.0,
                     left: 160.0,
                     child: SizedBox(
                       width: 270,
@@ -763,30 +1248,30 @@ class NewUserThingy extends StatelessWidget {
                         text: TextSpan(
                           style: const TextStyle(fontFamily: "Eurostile Round"),
                           children: [
-                            if (player.country != null) TextSpan(text: "${t.countries[player.country]} • "),
-                            TextSpan(text: timestamp(player.registrationTime), style: const TextStyle(color: Colors.grey))
+                            if (widget.player.country != null) TextSpan(text: "${t.countries[widget.player.country]} • "),
+                            TextSpan(text: timestamp(widget.player.registrationTime), style: const TextStyle(color: Colors.grey))
                           ]
                         )
                       ),
                     )
                   ),
                   Positioned(
-                    top: player.bannerRevision != null ? 126.0 : 46.0,
+                    top: widget.player.bannerRevision != null ? 126.0 : 46.0,
                     right: 16.0,
                     child: RichText(
                       textAlign: TextAlign.end,
                       text: TextSpan(
                         style: const TextStyle(fontFamily: "Eurostile Round"),
                         children: [
-                          TextSpan(text: "Level ${(player.level.isNegative || player.level.isNaN) ? "---" : intf.format(player.level.floor())}", style: TextStyle(decoration: (player.level.isNegative || player.level.isNaN) ? null : TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted, color: (player.level.isNegative || player.level.isNaN) ? Colors.grey : Colors.white), recognizer: (player.level.isNegative || player.level.isNaN) ? null : TapGestureRecognizer()?..onTap = (){
+                          TextSpan(text: "Level ${(widget.player.level.isNegative || widget.player.level.isNaN) ? "---" : intf.format(widget.player.level.floor())}", style: TextStyle(decoration: (widget.player.level.isNegative || widget.player.level.isNaN) ? null : TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted, color: (widget.player.level.isNegative || widget.player.level.isNaN) ? Colors.grey : Colors.white), recognizer: (widget.player.level.isNegative || widget.player.level.isNaN) ? null : TapGestureRecognizer()?..onTap = (){
                             showDialog(
                               context: context,
                               builder: (BuildContext context) => AlertDialog(
-                                title: Text("Level ${intf.format(player.level.floor())}", textAlign: TextAlign.center),  
+                                title: Text("Level ${intf.format(widget.player.level.floor())}", textAlign: TextAlign.center),  
                                 content: SingleChildScrollView(
                                   child: ListBody(children: [
                                     Text(
-                                      "${NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2).format(player.xp)} XP",
+                                      "${NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2).format(widget.player.xp)} XP",
                                       style: const TextStyle(fontFamily: "Eurostile Round", fontWeight: FontWeight.bold)
                                       ),
                                     Padding(
@@ -796,15 +1281,15 @@ class NewUserThingy extends StatelessWidget {
                                         maximum: 1,
                                         interval: 1, 
                                         ranges: [
-                                          LinearGaugeRange(startValue: 0, endValue: player.level - player.level.floor(), color: Colors.cyanAccent),
-                                          LinearGaugeRange(startValue: 0, endValue: (player.xp / xpTableScuffed.values.toList()[xpTableID]), color: Colors.redAccent, position: LinearElementPosition.cross)
+                                          LinearGaugeRange(startValue: 0, endValue: widget.player.level - widget.player.level.floor(), color: Colors.cyanAccent),
+                                          LinearGaugeRange(startValue: 0, endValue: (widget.player.xp / xpTableScuffed.values.toList()[xpTableID]), color: Colors.redAccent, position: LinearElementPosition.cross)
                                           ],
                                         showTicks: true,
                                         showLabels: false
                                         ),
                                     ),
-                                    Text("${t.statCellNum.xpProgress}: ${((player.level - player.level.floor()) * 100).toStringAsFixed(2)} %"),
-                                    Text("${t.statCellNum.xpFrom0ToLevel(n: xpTableScuffed.keys.toList()[xpTableID])}: ${((player.xp / xpTableScuffed.values.toList()[xpTableID]) * 100).toStringAsFixed(2)} % (${NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 0).format(xpTableScuffed.values.toList()[xpTableID] - player.xp)} ${t.statCellNum.xpLeft})")
+                                    Text("${t.statCellNum.xpProgress}: ${((widget.player.level - widget.player.level.floor()) * 100).toStringAsFixed(2)} %"),
+                                    Text("${t.statCellNum.xpFrom0ToLevel(n: xpTableScuffed.keys.toList()[xpTableID])}: ${((widget.player.xp / xpTableScuffed.values.toList()[xpTableID]) * 100).toStringAsFixed(2)} % (${NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 0).format(xpTableScuffed.values.toList()[xpTableID] - widget.player.xp)} ${t.statCellNum.xpLeft})")
                                     ]
                                     ),
                                 ),
@@ -818,7 +1303,7 @@ class NewUserThingy extends StatelessWidget {
                             );
                           }),
                           const TextSpan(text:"\n"),
-                          TextSpan(text: player.gameTime.isNegative ? "-h --m" : playtime(player.gameTime), style: TextStyle(color: player.gameTime.isNegative ? Colors.grey : Colors.white, decoration: player.gameTime.isNegative ? null : TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted), recognizer: !player.gameTime.isNegative ? (TapGestureRecognizer()..onTap = (){
+                          TextSpan(text: widget.player.gameTime.isNegative ? "-h --m" : playtime(widget.player.gameTime), style: TextStyle(color: widget.player.gameTime.isNegative ? Colors.grey : Colors.white, decoration: widget.player.gameTime.isNegative ? null : TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted), recognizer: !widget.player.gameTime.isNegative ? (TapGestureRecognizer()..onTap = (){
                             showDialog(
                               context: context,
                               builder: (BuildContext context) => AlertDialog(
@@ -826,17 +1311,17 @@ class NewUserThingy extends StatelessWidget {
                                 content: SingleChildScrollView(
                                   child: ListBody(children: [
                                     Text(
-                                      "${intf.format(player.gameTime.inDays)}d ${nonsecs.format(player.gameTime.inHours%24)}h ${nonsecs.format(player.gameTime.inMinutes%60)}m ${nonsecs.format(player.gameTime.inSeconds%60)}s ${nonsecs3.format(player.gameTime.inMilliseconds%1000)}ms ${nonsecs3.format(player.gameTime.inMicroseconds%1000)}μs",
+                                      "${intf.format(widget.player.gameTime.inDays)}d ${nonsecs.format(widget.player.gameTime.inHours%24)}h ${nonsecs.format(widget.player.gameTime.inMinutes%60)}m ${nonsecs.format(widget.player.gameTime.inSeconds%60)}s ${nonsecs3.format(widget.player.gameTime.inMilliseconds%1000)}ms ${nonsecs3.format(widget.player.gameTime.inMicroseconds%1000)}μs",
                                       style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 24)
                                       ),
                                     Padding(
                                       padding: const EdgeInsets.only(top: 8.0),
-                                      child: Text("It's ${f4.format(player.gameTime.inSeconds/31536000)} years,"),
+                                      child: Text("It's ${f4.format(widget.player.gameTime.inSeconds/31536000)} years,"),
                                     ),
-                                    Text("${f4.format(player.gameTime.inSeconds/2628000)} monts,"),
-                                    Text("${f4.format(player.gameTime.inSeconds/3600)} hours,"),
-                                    Text("${f2.format(player.gameTime.inMilliseconds/60000)} minutes,"),
-                                    Text("${intf.format(player.gameTime.inSeconds)} seconds"),
+                                    Text("${f4.format(widget.player.gameTime.inSeconds/2628000)} monts,"),
+                                    Text("${f4.format(widget.player.gameTime.inSeconds/3600)} hours,"),
+                                    Text("${f2.format(widget.player.gameTime.inMilliseconds/60000)} minutes,"),
+                                    Text("${intf.format(widget.player.gameTime.inSeconds)} seconds"),
                                     ]
                                     ),
                                 ),
@@ -850,8 +1335,8 @@ class NewUserThingy extends StatelessWidget {
                             );
                           }) : null),
                           const TextSpan(text:"\n"),
-                          TextSpan(text: player.gamesWon > -1 ? intf.format(player.gamesWon) : "---", style: TextStyle(color: player.gamesWon > -1 ? Colors.white : Colors.grey)),
-                          TextSpan(text: "/${player.gamesPlayed > -1 ? intf.format(player.gamesPlayed) : "---"}", style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
+                          TextSpan(text: widget.player.gamesWon > -1 ? intf.format(widget.player.gamesWon) : "---", style: TextStyle(color: widget.player.gamesWon > -1 ? Colors.white : Colors.grey)),
+                          TextSpan(text: "/${widget.player.gamesPlayed > -1 ? intf.format(widget.player.gamesPlayed) : "---"}", style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
                         ]
                       )
                     )
@@ -863,12 +1348,52 @@ class NewUserThingy extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Expanded(child: ElevatedButton.icon(onPressed: (){print("ok, and?");}, icon: const Icon(Icons.person_add), label: Text(t.track), style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12.0))))))),
+                Expanded(
+                  child: AnimatedBuilder(
+                    animation: _addToTrackAnim,
+                    builder: (context, child) {
+                      double firstButtonPosition = 0-(_addToTrackAnim.value as double)*25;
+                      double secondButtonPosition = 25-(_addToTrackAnim.value as double)*25;
+                      double firstButtonOpacity = 1-(_addToTrackAnim.value as double)*2;
+                      double secondButtonOpacity = _addToTrackAnim.value*2-1;
+                      return ElevatedButton.icon(
+                      onPressed: (){
+                        _addToTrackAnim.isCompleted ? _addToTrackAnimController.reverse() : _addToTrackAnimController.forward();
+                      },
+                      icon: _addToTrackAnim.value < 0.5 ? Container(
+                        transform: Matrix4.translationValues(0, firstButtonPosition, 0),
+                        child: Opacity(
+                          opacity: firstButtonOpacity,
+                          child: const Icon(Icons.person_add)
+                        )
+                      ) : Container(
+                        transform: Matrix4.translationValues(0, secondButtonPosition, 0),
+                        child: Opacity(
+                          opacity: secondButtonOpacity,
+                          child: const Icon(Icons.person_remove)
+                        )
+                      ),
+                      label: _addToTrackAnim.value < 0.5 ? Container(
+                        transform: Matrix4.translationValues(0, firstButtonPosition, 0),
+                        child: Opacity(
+                          opacity: firstButtonOpacity,
+                          child: Text(t.track)
+                        )
+                      ) : Container(
+                        transform: Matrix4.translationValues(0, secondButtonPosition, 0),
+                        child: Opacity(
+                          opacity: secondButtonOpacity,
+                          child: Text(t.stopTracking)
+                        )
+                      ),
+                      style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12.0))))));
+                    },
+                  )),
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: (){
                       Navigator.push(context, MaterialPageRoute(
-                        builder: (context) => CompareView(player),
+                        builder: (context) => CompareView(widget.player),
                       ),
                       );
                     },

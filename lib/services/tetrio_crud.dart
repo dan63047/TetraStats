@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
+import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:tetra_stats/data_objects/cutoff_tetrio.dart';
@@ -350,6 +351,25 @@ class TetrioService extends DB {
     ReplayData data = ReplayData.fromJson(toAnalyze);
     saveReplayStats(data); // saving to DB for later
     return data;
+  }
+
+
+  /// Returns three integers, representing size of the database in bytes, amount of TL records in it and amount of TL states in it
+  Future<(int, int, int)> getDatabaseData() async {
+    await ensureDbIsOpen();
+    final db = getDatabaseOrThrow();
+    String dbPath;
+    if (kIsWeb) {
+      dbPath = dbName;
+    } else {
+      final docsPath = await getApplicationDocumentsDirectory();
+      dbPath = join(docsPath.path, dbName);
+    }
+    var dbFile = File(dbPath);
+    var dbSize = (await dbFile.stat()).size;
+    var dbTLRecordsQuery = (await db.rawQuery('SELECT COUNT(*) FROM `${tetraLeagueMatchesTable}`')).first['COUNT(*)']! as int;
+    var dbTLStatesQuery = (await db.rawQuery('SELECT COUNT(*) FROM `${tetrioLeagueTable}`')).first['COUNT(*)']! as int;
+    return (dbSize, dbTLRecordsQuery, dbTLStatesQuery);
   }
 
   /// Retrieves avaliable Tetra League matches from Tetra Channel api. Returns stream object (fake stream).

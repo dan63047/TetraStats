@@ -748,7 +748,6 @@ class _AddNewColumnCardState extends State<AddNewColumnCard> with SingleTickerPr
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return SizedBox(
