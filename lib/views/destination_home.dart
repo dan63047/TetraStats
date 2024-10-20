@@ -44,9 +44,10 @@ class FetchResults{
   List<TetraLeague> states;
   Summaries? summaries;
   Cutoffs? cutoffs;
+  bool isTracked;
   Exception? exception;
 
-  FetchResults(this.success, this.player, this.states, this.summaries, this.cutoffs, this.exception);
+  FetchResults(this.success, this.player, this.states, this.summaries, this.cutoffs, this.isTracked, this.exception);
 }
 
 class RecordSummary extends StatelessWidget{
@@ -1006,7 +1007,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                     width: 450,
                     child: Column(
                       children: [
-                        NewUserThingy(player: snapshot.data!.player!, showStateTimestamp: false, setState: setState),
+                        NewUserThingy(player: snapshot.data!.player!, initIsTracking: snapshot.data!.isTracked, showStateTimestamp: false, setState: setState),
                         if (snapshot.data!.player!.badges.isNotEmpty) BadgesThingy(badges: snapshot.data!.player!.badges),
                         if (snapshot.data!.player!.distinguishment != null) DistinguishmentThingy(snapshot.data!.player!.distinguishment!),
                         if (snapshot.data!.player!.role == "bot") FakeDistinguishmentThingy(bot: true, botMaintainers: snapshot.data!.player!.botmaster),

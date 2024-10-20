@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide Badge;
@@ -45,6 +46,7 @@ import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/widgets/tl_progress_bar.dart';
 import 'package:tetra_stats/widgets/user_thingy.dart';
 import 'package:transparent_image/transparent_image.dart';
+import 'package:vector_math/vector_math_64.dart' hide Colors;
 
 // TODO: Refactor it
 
@@ -61,7 +63,7 @@ Future<FetchResults> getData(String searchFor) async {
         player = await teto.fetchPlayer(searchFor); // Otherwise it's probably a user id or username
       }
     }on TetrioPlayerNotExist{
-      return FetchResults(false, null, [], null, null, TetrioPlayerNotExist());
+      return FetchResults(false, null, [], null, null, false, TetrioPlayerNotExist());
     }
     late Summaries summaries;
     late Cutoffs cutoffs;
@@ -78,7 +80,7 @@ Future<FetchResults> getData(String searchFor) async {
       await teto.storeState(summaries.league);
     }
 
-    return FetchResults(true, player, states, summaries, cutoffs, null);
+    return FetchResults(true, player, states, summaries, cutoffs, isTracking, null);
   }
 
 class MainView extends StatefulWidget {
@@ -1095,9 +1097,10 @@ class BadgesThingy extends StatelessWidget{
 class NewUserThingy extends StatefulWidget {
   final TetrioPlayer player;
   final bool showStateTimestamp;
+  final bool initIsTracking;
   final Function setState;
   
-  const NewUserThingy({super.key, required this.player, required this.showStateTimestamp, required this.setState});
+  const NewUserThingy({super.key, required this.player, required this.initIsTracking, required this.showStateTimestamp, required this.setState});
 
   @override
   State<NewUserThingy> createState() => _NewUserThingyState();
@@ -1110,7 +1113,8 @@ class _NewUserThingyState extends State<NewUserThingy> with SingleTickerProvider
   @override
   void initState(){
     _addToTrackAnimController = AnimationController(
-      duration: Durations.medium3,
+      value: widget.initIsTracking ? 1.0 : 0.0,
+      duration: Durations.extralong4,
       vsync: this,
     );
     _addToTrackAnim = new Tween(
@@ -1118,9 +1122,10 @@ class _NewUserThingyState extends State<NewUserThingy> with SingleTickerProvider
       end: 1.0,
     ).animate(new CurvedAnimation(
       parent: _addToTrackAnimController,
-      curve: Easing.standardDecelerate,
-      reverseCurve: Easing.standardAccelerate
+      curve: Cubic(.15,-0.40,.86,-0.39),
+      reverseCurve: Cubic(0,.99,.99,1.01)
     ));
+    
     super.initState();
   }
 
@@ -1352,38 +1357,42 @@ class _NewUserThingyState extends State<NewUserThingy> with SingleTickerProvider
                   child: AnimatedBuilder(
                     animation: _addToTrackAnim,
                     builder: (context, child) {
-                      double firstButtonPosition = 0-(_addToTrackAnim.value as double)*25;
-                      double secondButtonPosition = 25-(_addToTrackAnim.value as double)*25;
+                      double firstButtonPosition = 0+(_addToTrackAnim.value as double)*25;
+                      double secondButtonPosition = -25+(_addToTrackAnim.value as double)*25;
                       double firstButtonOpacity = 1-(_addToTrackAnim.value as double)*2;
                       double secondButtonOpacity = _addToTrackAnim.value*2-1;
                       return ElevatedButton.icon(
                       onPressed: (){
+                        _addToTrackAnimController.value == 1 ? teto.deletePlayerToTrack(widget.player.userId) : teto.addPlayerToTrack(widget.player); 
                         _addToTrackAnim.isCompleted ? _addToTrackAnimController.reverse() : _addToTrackAnimController.forward();
                       },
-                      icon: _addToTrackAnim.value < 0.5 ? Container(
-                        transform: Matrix4.translationValues(0, firstButtonPosition, 0),
-                        child: Opacity(
-                          opacity: firstButtonOpacity,
-                          child: const Icon(Icons.person_add)
-                        )
+                      icon: _addToTrackAnim.value < 0.5 ? Opacity(
+                        opacity: min(1, firstButtonOpacity),
+                        child: Transform.translate(
+                          offset: Offset(0, _addToTrackAnim.status == AnimationStatus.forward ? firstButtonPosition*4 : firstButtonPosition),
+                          child: Transform.rotate(
+                            angle:_addToTrackAnim.status == AnimationStatus.forward ? (_addToTrackAnim.value as double)*2 : 0,
+                            child: const Icon(Icons.person_add),
+                          ),
+                        ),
                       ) : Container(
                         transform: Matrix4.translationValues(0, secondButtonPosition, 0),
                         child: Opacity(
-                          opacity: secondButtonOpacity,
+                          opacity: max(0, secondButtonOpacity),
                           child: const Icon(Icons.person_remove)
                         )
                       ),
                       label: _addToTrackAnim.value < 0.5 ? Container(
                         transform: Matrix4.translationValues(0, firstButtonPosition, 0),
                         child: Opacity(
-                          opacity: firstButtonOpacity,
-                          child: Text(t.track)
+                          opacity: min(1, firstButtonOpacity),
+                          child: Text(_addToTrackAnimController.isAnimating && _addToTrackAnim.status == AnimationStatus.forward ? "Done!" : "Track")
                         )
                       ) : Container(
                         transform: Matrix4.translationValues(0, secondButtonPosition, 0),
                         child: Opacity(
-                          opacity: secondButtonOpacity,
-                          child: Text(t.stopTracking)
+                          opacity: max(0, secondButtonOpacity),
+                          child: Text("Stop tracking")
                         )
                       ),
                       style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12.0))))));
