@@ -10,6 +10,7 @@ import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
+import 'package:tetra_stats/views/destination_home.dart';
 import 'package:tetra_stats/views/main_view_tiles.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
 
@@ -132,7 +133,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
     super.initState();
   }
 
-  Future<List<Map<Stats, List<_HistoryChartSpot>>>> getHistoryData(bool fetchHistory) async {
+  Future<Map<int, Map<Stats, List<_HistoryChartSpot>>>> getHistoryData(bool fetchHistory) async {
     if(fetchHistory){
       try{
         var history = await teto.fetchAndsaveTLHistory(widget.searchFor);
@@ -151,15 +152,12 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
     List<List<TetraLeague>> states = await Future.wait<List<TetraLeague>>([
       teto.getStates(widget.searchFor, season: 1), teto.getStates(widget.searchFor, season: 2),
     ]);
-    List<Map<Stats, List<_HistoryChartSpot>>> historyData = []; // [season][metric][spot]
+    Map<int, Map<Stats, List<_HistoryChartSpot>>> historyData = {}; // [season][metric][spot]
     for (int season = 0; season < currentSeason; season++){
       if (states[season].length >= 2){
       Map<Stats, List<_HistoryChartSpot>> statsMap = {};
         for (var stat in Stats.values) statsMap[stat] = [for (var tl in states[season]) if (tl.getStatByEnum(stat) != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.getStatByEnum(stat)!.toDouble())];
-        historyData.add(statsMap);
-      }else{
-        historyData.add({});
-        break;
+        historyData[season] = statsMap;
       }
     }
     fetchData = false;
@@ -184,7 +182,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
   }
 
   Widget getHistoryGraph(){
-   return FutureBuilder<List<Map<Stats, List<_HistoryChartSpot>>>>(
+   return FutureBuilder<Map<int, Map<Stats, List<_HistoryChartSpot>>>>(
     future: getHistoryData(fetchData),
     builder: (context, snapshot) {
       switch (snapshot.connectionState){
@@ -194,7 +192,8 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
           return const Center(child: CircularProgressIndicator());
         case ConnectionState.done:
         if (snapshot.hasData){
-          List<_HistoryChartSpot> selectedGraph = snapshot.data![_season][_Ychart]!;
+          if (snapshot.data!.isEmpty || !snapshot.data!.containsKey(_season)) return ErrorThingy(eText: "Not enough data");
+          List<_HistoryChartSpot> selectedGraph = snapshot.data![_season]![_Ychart]!;
           yAxisTitle = chartsShortTitles[_Ychart]!;
           // TODO: this graph can Krash
           return SfCartesianChart(

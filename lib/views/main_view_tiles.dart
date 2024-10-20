@@ -1385,7 +1385,7 @@ class _NewUserThingyState extends State<NewUserThingy> with SingleTickerProvider
                       label: _addToTrackAnim.value < 0.5 ? Container(
                         transform: Matrix4.translationValues(0, firstButtonPosition, 0),
                         child: Opacity(
-                          opacity: min(1, firstButtonOpacity),
+                          opacity: max(min(1, firstButtonOpacity), 0),
                           child: Text(_addToTrackAnimController.isAnimating && _addToTrackAnim.status == AnimationStatus.forward ? "Done!" : "Track")
                         )
                       ) : Container(
@@ -2169,17 +2169,18 @@ class FutureError extends StatelessWidget{
   }
 }
 
-class FetchResultError extends StatelessWidget{
-  final FetchResults data;
+class ErrorThingy extends StatelessWidget{
+  final FetchResults? data;
+  final String? eText;
 
-  FetchResultError(this.data);
+  ErrorThingy({this.data, this.eText});
 
   @override
   Widget build(BuildContext context) {
     IconData icon = Icons.error_outline;
-    String errText = "";
+    String errText = eText??"";
     String? subText;
-    switch (data.exception.runtimeType){
+    if (data?.exception != null) switch (data!.exception!.runtimeType){
       case TetrioPlayerNotExist:
       icon = Icons.search_off;
       errText = t.errors.noSuchUser;
@@ -2190,7 +2191,7 @@ class FetchResultError extends StatelessWidget{
       errText = t.errors.discordNotAssigned;
       subText = t.errors.discordNotAssignedSub;
       case ConnectionIssue:
-      var err = data.exception as ConnectionIssue;
+      var err = data!.exception as ConnectionIssue;
       errText = t.errors.connection(code: err.code, message: err.message);
       break;
       case TetrioForbidden:
@@ -2214,7 +2215,7 @@ class FetchResultError extends StatelessWidget{
       errText = t.errors.clientException;
       break;
       default:
-      errText = data.exception.toString();
+      errText = data!.exception.toString();
     }
     return TweenAnimationBuilder(
       duration: Durations.medium3,

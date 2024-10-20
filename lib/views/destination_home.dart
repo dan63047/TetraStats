@@ -980,7 +980,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
           case ConnectionState.done:
           if (snapshot.hasError){ return FutureError(snapshot); }
           if (snapshot.hasData){
-            if (!snapshot.data!.success) return FetchResultError(snapshot.data!);
+            if (!snapshot.data!.success) return ErrorThingy(data: snapshot.data!);
             blitzBetterThanRankAverage = (snapshot.data!.summaries!.league.rank != "z" && snapshot.data!.summaries!.blitz != null && snapshot.data!.summaries!.league.rank != "x+") ? snapshot.data!.summaries!.blitz!.stats.score > blitzAverages[snapshot.data!.summaries!.league.rank]! : null;
             sprintBetterThanRankAverage = (snapshot.data!.summaries!.league.rank != "z" && snapshot.data!.summaries!.sprint != null && snapshot.data!.summaries!.league.rank != "x+") ? snapshot.data!.summaries!.sprint!.stats.finalTime < sprintAverages[snapshot.data!.summaries!.league.rank]! : null;
               if (snapshot.data!.summaries!.sprint != null) {
