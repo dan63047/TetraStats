@@ -43,15 +43,32 @@ class UserState extends State<UserView> {
   Widget build(BuildContext context) {
     //final t = Translations.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Search For"),
-      ),
       backgroundColor: Colors.black,
+      floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: FloatingActionButton(
+          onPressed: () => Navigator.pop(context),
+          tooltip: 'Fuck go back',
+          child: const Icon(Icons.arrow_back),
+        ),
+      ),
       body: SafeArea(
-          child: LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints constraints) { 
-              return DestinationHome(searchFor: widget.searchFor, dataFuture: getData(widget.searchFor), newsFuture: teto.fetchNews(widget.searchFor), constraints: constraints);
-            }
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) { 
+            return Row(
+              children: [
+                Card(
+                  child: Column(
+                    children: [
+                      Text("Pornograph", style: TextStyle(),)
+                    ]
+                  ),
+                ),
+                DestinationHome(searchFor: widget.searchFor, dataFuture: getData(widget.searchFor), newsFuture: teto.fetchNews(widget.searchFor), constraints: constraints),
+              ],
+            );
+          }
         )
       )
     );

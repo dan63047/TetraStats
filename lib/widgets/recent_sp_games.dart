@@ -41,7 +41,7 @@ class RecentSingleplayerGames extends StatelessWidget{
               "5mblast" => get40lTime(record.stats.finalTime.inMicroseconds),
               String() => "huh",
             },
-          style: const TextStyle(fontSize: 18)),
+          style: Theme.of(context).textTheme.displayLarge),
           subtitle: Text(timestamp(record.timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
           trailing: SpTrailingStats(record, record.gamemode)
         )

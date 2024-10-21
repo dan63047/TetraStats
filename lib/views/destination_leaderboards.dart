@@ -114,12 +114,12 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
           height: widget.constraints.maxHeight,
           child: Column(
             children: [
-              const Card(
+              Card(
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Spacer(),
-                    Text("Leaderboards", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36)),
+                    Text("Leaderboards", style: Theme.of(context).textTheme.headlineMedium),
                     Spacer()
                   ],
                 ),
@@ -162,7 +162,7 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                     if (snapshot.hasData){
                       return Column(
                         children: [
-                          Text(leaderboards[_currentLb]!, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, height: 0.9)),
+                          Text(leaderboards[_currentLb]!, style: Theme.of(context).textTheme.titleSmall),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

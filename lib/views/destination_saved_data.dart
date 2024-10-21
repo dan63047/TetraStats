@@ -75,12 +75,12 @@ class _DestinationSavedData extends State<DestinationSavedData> {
                   width: 450,
                   child: Column(
                     children: [
-                      const Card(
+                      Card(
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Spacer(),
-                            Text("Saved Data", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36)),
+                            Text("Saved Data", style: Theme.of(context).textTheme.headlineMedium),
                             Spacer()
                           ],
                         ),

@@ -236,10 +236,9 @@ enum SettingsCardMod{
   final String title;
 }
 
-const TextStyle settingsTitlesStyle = TextStyle(fontSize: 18);
 const EdgeInsets descriptionPadding = EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 8.0);
 
-class _DestinationSettings extends State<DestinationSettings> {
+class _DestinationSettings extends State<DestinationSettings> with SingleTickerProviderStateMixin {
   SettingsCardMod mod = SettingsCardMod.general;
   List<DropdownMenuItem<AppLocale>> locales = <DropdownMenuItem<AppLocale>>[];
   String defaultNickname = "Checking...";
@@ -251,6 +250,8 @@ class _DestinationSettings extends State<DestinationSettings> {
   late bool showAverages;
   late bool updateInBG;
   final TextEditingController _playertext = TextEditingController();
+  late AnimationController _defaultNicknameAnimController;
+  late Animation _defaultNicknameAnim;
 
   @override
   void initState() {
@@ -258,6 +259,18 @@ class _DestinationSettings extends State<DestinationSettings> {
     //   windowManager.getTitle().then((value) => oldWindowTitle = value);
     //   windowManager.setTitle("Tetra Stats: ${t.settings}");
     // }
+    _defaultNicknameAnimController = AnimationController(
+      duration: Durations.extralong4,
+      vsync: this,
+    );
+    _defaultNicknameAnim = new Tween(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(new CurvedAnimation(
+      parent: _defaultNicknameAnimController,
+      curve: Cubic(.15,-0.40,.86,-0.39),
+      reverseCurve: Cubic(0,.99,.99,1.01)
+    ));
     _getPreferences();
     super.initState();
   }
@@ -279,22 +292,26 @@ class _DestinationSettings extends State<DestinationSettings> {
     _setDefaultNickname(prefs.getString("player"));
   }
 
-  Future<void> _setDefaultNickname(String? n) async {
+  Future<bool> _setDefaultNickname(String? n) async {
     if (n != null) {
       try {
         defaultNickname = await teto.getNicknameByID(n);
+        return true;
       } on TetrioPlayerNotExist {
         defaultNickname = n;
+        return false;
       }
     } else {
       defaultNickname = "dan63047";
+      return true;
     }
-    setState(() {});
+    //setState(() {});
   }
 
-  Future<void> _setPlayer(String player) async {
-    await prefs.setString('player', player);
-    await _setDefaultNickname(player);
+  Future<bool> _setPlayer(String player) async {
+    bool success = await _setDefaultNickname(player);
+    if (success) await prefs.setString('player', player); 
+    return success;
   }
 
   Future<void> _removePlayer() async {
@@ -310,7 +327,7 @@ class _DestinationSettings extends State<DestinationSettings> {
             padding: const EdgeInsets.only(bottom: 8.0),
             child: Column(
               children: [
-                Text(SettingsCardMod.general.title, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                Text(SettingsCardMod.general.title, style: Theme.of(context).textTheme.titleLarge),
               ],
             ),
           )),
@@ -320,11 +337,21 @@ class _DestinationSettings extends State<DestinationSettings> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Text("Your account in TETR.IO", style: settingsTitlesStyle),
-                trailing: SizedBox(width: 150.0, child: TextField(
-                  keyboardType: TextInputType.text,
-                  decoration: InputDecoration(hintText: defaultNickname),
-                  //onChanged: (value) => setState((){rules.surgeInitAtB2b = int.parse(value);}),
+                title: Text("Your account in TETR.IO", style: Theme.of(context).textTheme.displayLarge),
+                trailing: SizedBox(width: 150.0, child: AnimatedBuilder(
+                  animation: _defaultNicknameAnim,
+                  builder: (context, child) {
+                    return TextField(
+                      keyboardType: TextInputType.text,
+                      decoration: InputDecoration(
+                        hintText: defaultNickname,
+                        helper: Text("Press Enter to submit", style: TextStyle(color: Colors.grey, height: 0.2)),
+                      ),
+                      onChanged: (value) {
+                        _setPlayer(value).then((v) {});
+                      },
+                    );
+                  },
                 )),
               ),
               Divider(),
@@ -340,7 +367,7 @@ class _DestinationSettings extends State<DestinationSettings> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Text("Language", style: settingsTitlesStyle),
+                title: Text("Language", style: Theme.of(context).textTheme.displayLarge),
                 trailing: DropdownButton(
                   items: locales,
                   value: LocaleSettings.currentLocale,
@@ -367,7 +394,7 @@ class _DestinationSettings extends State<DestinationSettings> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Text("Update data in the background", style: settingsTitlesStyle),
+                title: Text("Update data in the background", style: Theme.of(context).textTheme.displayLarge),
                 trailing: Switch(value: updateInBG, onChanged: (bool value){
                 prefs.setBool("updateInBG", value);
                 setState(() {
@@ -388,7 +415,7 @@ class _DestinationSettings extends State<DestinationSettings> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Text("Show leaderboard based stats", style: settingsTitlesStyle),
+                title: Text("Show leaderboard based stats", style: Theme.of(context).textTheme.displayLarge),
                 trailing: Switch(value: showAverages, onChanged: (bool value){
                   prefs.setBool("showAverages", value);
                   setState(() {
@@ -410,7 +437,7 @@ class _DestinationSettings extends State<DestinationSettings> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Text("Show position on leaderboard by stats", style: settingsTitlesStyle),
+                title: Text("Show position on leaderboard by stats", style: Theme.of(context).textTheme.displayLarge),
                 trailing: Switch(value: showPositions, onChanged: (bool value){
                   prefs.setBool("showPositions", value);
                   setState(() {
@@ -438,7 +465,7 @@ class _DestinationSettings extends State<DestinationSettings> {
             padding: const EdgeInsets.only(bottom: 8.0),
             child: Column(
               children: [
-                Text(SettingsCardMod.customization.title, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                Text(SettingsCardMod.customization.title, style: Theme.of(context).textTheme.titleLarge),
               ],
             ),
           )),
@@ -448,7 +475,7 @@ class _DestinationSettings extends State<DestinationSettings> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Text("Accent color", style: settingsTitlesStyle),
+                title: Text("Accent color", style: Theme.of(context).textTheme.displayLarge),
                 trailing: ColorIndicator(HSVColor.fromColor(Theme.of(context).colorScheme.primary), width: 25, height: 25),
               ),
               Divider(),
@@ -465,7 +492,7 @@ class _DestinationSettings extends State<DestinationSettings> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ListTile(
-                title: Text("Timestamps format", style: settingsTitlesStyle),
+                title: Text("Timestamps format", style: Theme.of(context).textTheme.displayLarge),
                 trailing:  DropdownButton(
                   value: timestampMode,
                   items: <DropdownMenuItem>[
@@ -498,7 +525,7 @@ class _DestinationSettings extends State<DestinationSettings> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Text("Sheetbot-like behavior for radar graphs", style: settingsTitlesStyle),
+                title: Text("Sheetbot-like behavior for radar graphs", style: Theme.of(context).textTheme.displayLarge),
                 trailing: Switch(value: sheetbotRadarGraphs, onChanged: (bool value){
                   prefs.setBool("sheetbotRadarGraphs", value);
                   setState(() {
@@ -519,7 +546,7 @@ class _DestinationSettings extends State<DestinationSettings> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Text("Osk-Kagari gimmick", style: settingsTitlesStyle),
+                title: Text("Osk-Kagari gimmick", style: Theme.of(context).textTheme.displayLarge),
                 trailing: Switch(value: oskKagariGimmick, onChanged: (bool value){
                   prefs.setBool("oskKagariGimmick", value);
                   setState(() {
@@ -545,7 +572,7 @@ class _DestinationSettings extends State<DestinationSettings> {
         Card(
           child: Center(child: Column(
             children: [
-              Text(SettingsCardMod.database.title, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+              Text(SettingsCardMod.database.title, style: Theme.of(context).textTheme.titleLarge),
               Divider(),
               FutureBuilder<(int, int, int)>(future: teto.getDatabaseData(),
                 builder: (context, snapshot) {
@@ -602,12 +629,12 @@ class _DestinationSettings extends State<DestinationSettings> {
         ),
         Card(
           child: ListTile(
-            title: Text("Export Database", style: settingsTitlesStyle),
+            title: Text("Export Database", style: Theme.of(context).textTheme.displayLarge),
           ),
         ),
         Card(
           child: ListTile(
-            title: Text("Import Database", style: settingsTitlesStyle),
+            title: Text("Import Database", style: Theme.of(context).textTheme.displayLarge),
           ),
         )
       ],
@@ -628,12 +655,12 @@ class _DestinationSettings extends State<DestinationSettings> {
           width: 450,
           child: Column(
             children: [
-              const Card(
+              Card(
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Spacer(),
-                    Text("Settings", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36)),
+                    Text("Settings", style: Theme.of(context).textTheme.headlineMedium),
                     Spacer()
                   ],
                 ),
@@ -939,7 +966,7 @@ class DistinguishmentThingy extends StatelessWidget{
               children: getDistinguishmentTitle(distinguishment.header),
             ),
           ),
-          Text(getDistinguishmentSubtitle(distinguishment.footer), style: const TextStyle(fontSize: 18), textAlign: TextAlign.center),
+          Text(getDistinguishmentSubtitle(distinguishment.footer), style: Theme.of(context).textTheme.displayLarge, textAlign: TextAlign.center),
         ],
       ),
     );
@@ -1001,7 +1028,7 @@ class FakeDistinguishmentThingy extends StatelessWidget{
                 ),
               ),
             ),
-            Text(getDistinguishmentSubtitle(), style: const TextStyle(fontSize: 18), textAlign: TextAlign.center),
+            Text(getDistinguishmentSubtitle(), style: Theme.of(context).textTheme.displayLarge, textAlign: TextAlign.center),
           ],
         ),
       ),
@@ -1376,10 +1403,13 @@ class _NewUserThingyState extends State<NewUserThingy> with SingleTickerProvider
                           ),
                         ),
                       ) : Container(
-                        transform: Matrix4.translationValues(0, secondButtonPosition, 0),
+                        transform: Matrix4.translationValues(secondButtonPosition*5, -secondButtonPosition*25, 0),
                         child: Opacity(
-                          opacity: max(0, secondButtonOpacity),
-                          child: const Icon(Icons.person_remove)
+                          opacity: max(0, min(1, secondButtonOpacity)),
+                          child: Transform.rotate(
+                            angle:_addToTrackAnim.status == AnimationStatus.reverse ? (1-_addToTrackAnim.value as double)*-20 : 0,
+                            child: const Icon(Icons.person_remove)
+                          )
                         )
                       ),
                       label: _addToTrackAnim.value < 0.5 ? Container(
@@ -1391,8 +1421,8 @@ class _NewUserThingyState extends State<NewUserThingy> with SingleTickerProvider
                       ) : Container(
                         transform: Matrix4.translationValues(0, secondButtonPosition, 0),
                         child: Opacity(
-                          opacity: max(0, secondButtonOpacity),
-                          child: Text("Stop tracking")
+                          opacity: max(0, min(1, secondButtonOpacity)),
+                          child: Text(_addToTrackAnimController.isAnimating && _addToTrackAnim.status == AnimationStatus.reverse ? "Done!             " : "Stop tracking")
                         )
                       ),
                       style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12.0))))));

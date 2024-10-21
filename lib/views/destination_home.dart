@@ -145,7 +145,7 @@ class LeagueCard extends StatelessWidget{
                 crossAxisAlignment: CrossAxisAlignment.baseline,
                 textBaseline: TextBaseline.alphabetic,
                 children: [
-                  Text("Season ${league.season}", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, height: 0.9)),
+                  Text("Season ${league.season}", style: Theme.of(context).textTheme.titleSmall),
                   Spacer(),
                   Text(
                     "${seasonStarts.elementAtOrNull(league.season - 1) != null ? timestamp(seasonStarts[league.season - 1]) : "---"} — ${seasonEnds.elementAtOrNull(league.season - 1) != null ? timestamp(seasonEnds[league.season - 1]) : "---"}",
@@ -153,7 +153,7 @@ class LeagueCard extends StatelessWidget{
                     style: TextStyle(color: Colors.grey)),
                 ],
               )
-              else Text("Tetra League", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, height: 0.9)),
+              else Text("Tetra League", style: Theme.of(context).textTheme.titleSmall),
               const Divider(),
               TLRatingThingy(userID: "", tlData: league, showPositions: true),
               const Divider(),
@@ -209,7 +209,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Text("40 Lines", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, height: 0.9)),
+                      Text("40 Lines", style: Theme.of(context).textTheme.titleSmall),
                       const Divider(),
                       RecordSummary(record: summaries.sprint, betterThanClosestAverage: sprintBetterThanClosestAverage, betterThanRankAverage: sprintBetterThanRankAverage, closestAverage: closestAverageSprint, rank: summaries.league.percentileRank),
                       const Divider(),
@@ -226,7 +226,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Text("Blitz", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, height: 0.9)),
+                      Text("Blitz", style: Theme.of(context).textTheme.titleSmall),
                       const Divider(),
                       RecordSummary(record: summaries.blitz, betterThanClosestAverage: blitzBetterThanClosestAverage, betterThanRankAverage: blitzBetterThanRankAverage, closestAverage: closestAverageBlitz, rank: summaries.league.percentileRank),
                       const Divider(),
@@ -248,7 +248,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Text("QP", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, height: 0.9)),
+                      Text("QP", style: Theme.of(context).textTheme.titleSmall),
                       const Divider(),
                       RecordSummary(record: summaries.zenith, hideRank: true),
                       const Divider(),
@@ -265,7 +265,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Text("QP Expert", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, height: 0.9)),
+                      Text("QP Expert", style: Theme.of(context).textTheme.titleSmall),
                       const Divider(),
                       RecordSummary(record: summaries.zenithEx, hideRank: true,),
                       const Divider(),
@@ -287,7 +287,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Text("Zen", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, height: 0.9)),
+                      Text("Zen", style: Theme.of(context).textTheme.titleSmall),
                       Text("Level ${intf.format(summaries.zen.level)}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 36, fontWeight: FontWeight.w500, color: Colors.white)),
                       Text("Score ${intf.format(summaries.zen.score)}"),
                       Text("Level up requirement: ${intf.format(summaries.zen.scoreRequirement)}", style: const TextStyle(color: Colors.grey))
@@ -386,7 +386,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(t.tetraLeague, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                  Text(t.tetraLeague, style: Theme.of(context).textTheme.titleLarge),
                   //Text("${states.last.timestamp} ${states.last.tr}", textAlign: TextAlign.center)
                 ],
               ),
@@ -400,7 +400,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
             mainAxisSize: MainAxisSize.min,
             children: [
               const Spacer(),
-              Text(t.nerdStats, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+              Text(t.nerdStats, style: Theme.of(context).textTheme.titleLarge),
               const Spacer()
             ],
           ),
@@ -422,7 +422,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text("Previous Seasons", style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                  Text("Previous Seasons", style: Theme.of(context).textTheme.titleLarge),
                   //Text("${t.seasonStarts} ${countdown(postSeasonLeft)}", textAlign: TextAlign.center)
                 ],
               ),
@@ -504,7 +504,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                                       "zenithex" => "${f2.format(snapshot.data!.records[i].stats.zenith!.altitude)} m${(snapshot.data!.records[i].extras as ZenithExtras).mods.isNotEmpty ? " (${t.withModsPlural(n: (snapshot.data!.records[i].extras as ZenithExtras).mods.length)})" : ""}",
                                       String() => "huh",
                                     },
-                                  style: const TextStyle(fontSize: 18)),
+                                  style: Theme.of(context).textTheme.displayLarge),
                                   subtitle: Text(timestamp(snapshot.data!.records[i].timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
                                   trailing: SpTrailingStats(snapshot.data!.records[i], snapshot.data!.records[i].gamemode)
                                 )
@@ -543,7 +543,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                                       "zenithex" => "${f2.format(snapshot.data!.records[i].stats.zenith!.altitude)} m${(snapshot.data!.records[i].extras as ZenithExtras).mods.isNotEmpty ? " (${t.withModsPlural(n: (snapshot.data!.records[i].extras as ZenithExtras).mods.length)})" : ""}",
                                       String() => "huh",
                                     },
-                                  style: const TextStyle(fontSize: 18)),
+                                  style: Theme.of(context).textTheme.displayLarge),
                                   subtitle: Text(timestamp(snapshot.data!.records[i].timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
                                   trailing: SpTrailingStats(snapshot.data!.records[i], snapshot.data!.records[i].gamemode)
                                 )
@@ -577,7 +577,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(t.recent, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                  Text(t.recent, style: Theme.of(context).textTheme.titleLarge),
                 ],
               ),
             ),
@@ -618,7 +618,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(t.quickPlay, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                  Text(t.quickPlay, style: Theme.of(context).textTheme.titleLarge),
                   //Text("Leaderboard reset in ${countdown(postSeasonLeft)}", textAlign: TextAlign.center),
                 ],
               ),
@@ -704,7 +704,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
             mainAxisSize: MainAxisSize.min,
             children: [
               const Spacer(),
-              Text(t.nerdStats, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+              Text(t.nerdStats, style: Theme.of(context).textTheme.titleLarge),
               const Spacer()
             ],
           ),
@@ -736,7 +736,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                     "blitz" => t.blitz,
                     "5mblast" => "5,000,000 Blast",
                     _ => record.gamemode
-                  }, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42))
+                  }, style: Theme.of(context).textTheme.titleLarge)
                 ],
               ),
             ),
@@ -986,10 +986,16 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
               if (snapshot.data!.summaries!.sprint != null) {
               closestAverageSprint = sprintAverages.entries.singleWhere((element) => element.value == sprintAverages.values.reduce((a, b) => (a-snapshot.data!.summaries!.sprint!.stats.finalTime).abs() < (b -snapshot.data!.summaries!.sprint!.stats.finalTime).abs() ? a : b));
               sprintBetterThanClosestAverage = snapshot.data!.summaries!.sprint!.stats.finalTime < closestAverageSprint!.value;
+            } else {
+              closestAverageSprint = sprintAverages.entries.last;
+              sprintBetterThanClosestAverage = false;
             }
             if (snapshot.data!.summaries!.blitz != null){
               closestAverageBlitz = blitzAverages.entries.singleWhere((element) => element.value == blitzAverages.values.reduce((a, b) => (a-snapshot.data!.summaries!.blitz!.stats.score).abs() < (b -snapshot.data!.summaries!.blitz!.stats.score).abs() ? a : b));
               blitzBetterThanClosestAverage = snapshot.data!.summaries!.blitz!.stats.score > closestAverageBlitz!.value;
+            } else {
+              closestAverageBlitz = blitzAverages.entries.last;
+              blitzBetterThanClosestAverage = false;
             }
             return TweenAnimationBuilder(
               duration: Durations.long4,

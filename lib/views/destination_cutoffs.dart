@@ -75,7 +75,7 @@ class _DestinationCutoffsState extends State<DestinationCutoffs> {
                         padding: const EdgeInsets.only(bottom: 8.0),
                         child: Column(
                           children: [
-                            Text("Tetra League State", style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                            Text("Tetra League State", style: Theme.of(context).textTheme.titleLarge),
                             Text("as of ${timestamp(snapshot.data!.timestamp)}"),
                           ],
                         ),

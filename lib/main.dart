@@ -32,6 +32,12 @@ ThemeData theme = ThemeData(
     surface: Color.fromARGB(255, 10, 10, 10),
     secondary: Color(0xFF00838F),
   ),
+  textTheme: TextTheme(
+    titleLarge: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42),
+    titleSmall: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, height: 0.9, fontWeight: FontWeight.w200),
+    headlineMedium: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36),
+    displayLarge: TextStyle(fontSize: 18),
+  ),
   cardTheme: const CardTheme(surfaceTintColor: Color.fromARGB(255, 10, 10, 10)),
   drawerTheme: const DrawerThemeData(surfaceTintColor: Color.fromARGB(255, 10, 10, 10)),
   searchBarTheme: const SearchBarThemeData(
@@ -56,6 +62,7 @@ ThemeData theme = ThemeData(
     expansionAnimationStyle: AnimationStyle(curve: Easing.standard, reverseCurve: Easing.standard),
     expandedAlignment: Alignment.bottomCenter,
   ),
+  dropdownMenuTheme: DropdownMenuThemeData(textStyle: TextStyle(fontFamily: "Eurostile Round", fontSize: 18)),
   scaffoldBackgroundColor: Colors.black
 );
 

@@ -188,7 +188,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
               padding: const EdgeInsets.only(bottom: 8.0),
               child: Column(
                 children: [
-                  Text("Stats Calucator", style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                  Text("Stats Calucator", style: Theme.of(context).textTheme.titleLarge),
                 ],
               ),
             )),
@@ -281,7 +281,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                 decoration: InputDecoration(hintText: "5"),
                 onChanged: (value) => customClearsChoice[key] = int.parse(value),
               )),
-              Text(" Lines", style: TextStyle(fontSize: 18)),
+              Text(" Lines", style: Theme.of(context).textTheme.displayLarge),
               Icon(Icons.arrow_forward_ios)
             ],
           ),
@@ -353,7 +353,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
             padding: const EdgeInsets.only(bottom: 8.0),
             child: Column(
               children: [
-                Text("Damage Calucator", style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                Text("Damage Calucator", style: Theme.of(context).textTheme.titleLarge),
               ],
             ),
           )),

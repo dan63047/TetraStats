@@ -1220,7 +1220,7 @@ class _TwoRecordsThingy extends StatelessWidget {
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SingleplayerRecordView(record: sprintStream.records[i]))),
                     leading: Text("#${i+1}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, shadows: textShadow, height: 0.9) ),
                     title: Text(get40lTime(sprintStream.records[i].stats.finalTime.inMicroseconds),
-                    style: const TextStyle(fontSize: 18)),
+                    style: Theme.of(context).textTheme.displayLarge),
                     subtitle: Text(timestamp(sprintStream.records[i].timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
                     trailing: SpTrailingStats(sprintStream.records[i], sprintStream.records[i].gamemode)
                   )
@@ -1306,7 +1306,7 @@ class _TwoRecordsThingy extends StatelessWidget {
                         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SingleplayerRecordView(record: blitzStream.records[i]))),
                         leading: Text("#${i+1}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, shadows: textShadow, height: 0.9) ),
                         title: Text("${NumberFormat.decimalPattern().format(blitzStream.records[i].stats.score)} points",
-                        style: const TextStyle(fontSize: 18)),
+                        style: Theme.of(context).textTheme.displayLarge),
                         subtitle: Text(timestamp(blitzStream.records[i].timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
                         trailing: SpTrailingStats(blitzStream.records[i], blitzStream.records[i].gamemode)
                       )
@@ -1558,7 +1558,7 @@ class _OtherThingy extends StatelessWidget {
                     children: getDistinguishmentTitle(distinguishment?.header),
                   ),
                 ),
-                Text(getDistinguishmentSubtitle(distinguishment?.footer), style: const TextStyle(fontSize: 18), textAlign: TextAlign.center),
+                Text(getDistinguishmentSubtitle(distinguishment?.footer), style: Theme.of(context).textTheme.displayLarge, textAlign: TextAlign.center),
               ],
             ),
           ),
@@ -1568,7 +1568,7 @@ class _OtherThingy extends StatelessWidget {
             child: Column(
               children: [
                 Text(t.bio, style: TextStyle(fontFamily: "Eurostile Round Extended",fontSize: bigScreen ? 42 : 28)),
-                MarkdownBody(data: bio!, styleSheet: MarkdownStyleSheet(textScaler: TextScaler.linear(1.5), textAlign: WrapAlignment.center)) // Text(bio!, style: const TextStyle(fontSize: 18)),
+                MarkdownBody(data: bio!, styleSheet: MarkdownStyleSheet(textScaler: TextScaler.linear(1.5), textAlign: WrapAlignment.center)) // Text(bio!, style: const Theme.of(context).textTheme.displayLarge),
               ],
             ),
           ),
@@ -1579,7 +1579,7 @@ class _OtherThingy extends StatelessWidget {
               children: [
                 Text(t.zen, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
                 Text("${t.statCellNum.level} ${NumberFormat.decimalPattern().format(zen!.level)}", style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-                Text("${t.statCellNum.score} ${NumberFormat.decimalPattern().format(zen!.score)}", style: const TextStyle(fontSize: 18)),
+                Text("${t.statCellNum.score} ${NumberFormat.decimalPattern().format(zen!.score)}", style: Theme.of(context).textTheme.displayLarge),
                 Container(
                   constraints: const BoxConstraints(maxWidth: 300.0),
                   child: Row(children: [
@@ -1609,7 +1609,7 @@ class _OtherThingy extends StatelessWidget {
               physics: const AlwaysScrollableScrollPhysics(),
               itemCount: newsletter!.news.length+1,
               itemBuilder: (BuildContext context, int index) {
-                return index == 0 ? Center(child: Text(t.news, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42))) : getNewsTile(newsletter!.news[index-1]);
+                return index == 0 ? Center(child: Text(t.news, style: Theme.of(context).textTheme.titleLarge)) : getNewsTile(newsletter!.news[index-1]);
               }
             ))
           ]
