@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/data_objects/badge.dart';
 import 'package:tetra_stats/data_objects/beta_record.dart';
+import 'package:tetra_stats/data_objects/cutoff_tetrio.dart';
 import 'package:tetra_stats/data_objects/distinguishment.dart';
 import 'package:tetra_stats/data_objects/est_tr.dart';
 import 'package:tetra_stats/data_objects/nerd_stats.dart';
@@ -63,24 +64,32 @@ Future<FetchResults> getData(String searchFor) async {
         player = await teto.fetchPlayer(searchFor); // Otherwise it's probably a user id or username
       }
     }on TetrioPlayerNotExist{
-      return FetchResults(false, null, [], null, null, false, TetrioPlayerNotExist());
+      return FetchResults(false, null, [], null, null, null, false, TetrioPlayerNotExist());
     }
     late Summaries summaries;
     late Cutoffs cutoffs;
-    List<dynamic> requests = await Future.wait([
-      teto.fetchSummaries(player.userId),
-      teto.fetchCutoffsBeanserver(),
-    ]);
+    late CutoffsTetrio averages;
+    try {
+      List<dynamic> requests = await Future.wait([
+        teto.fetchSummaries(player.userId),
+        teto.fetchCutoffsBeanserver(),
+        teto.fetchCutoffsTetrio()
+      ]);
+
+      summaries = requests[0];
+      cutoffs = requests.elementAtOrNull(1);
+      averages = requests.elementAtOrNull(2);
+    } on Exception catch (e) {
+      return FetchResults(false, null, [], null, null, null, false, e);
+    }
     List<TetraLeague> states = await teto.getStates(player.userId, season: currentSeason);
-    summaries = requests[0];
-    cutoffs = requests[1];
 
     bool isTracking = await teto.isPlayerTracking(player.userId);
     if (isTracking){ // if tracked - save data to local DB
       await teto.storeState(summaries.league);
     }
 
-    return FetchResults(true, player, states, summaries, cutoffs, isTracking, null);
+    return FetchResults(true, player, states, summaries, cutoffs, averages, isTracking, null);
   }
 
 class MainView extends StatefulWidget {
@@ -242,6 +251,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
   SettingsCardMod mod = SettingsCardMod.general;
   List<DropdownMenuItem<AppLocale>> locales = <DropdownMenuItem<AppLocale>>[];
   String defaultNickname = "Checking...";
+  String defaultID = "";
   late bool oskKagariGimmick;
   late bool sheetbotRadarGraphs;
   late int ratingMode;
@@ -251,7 +261,11 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
   late bool updateInBG;
   final TextEditingController _playertext = TextEditingController();
   late AnimationController _defaultNicknameAnimController;
-  late Animation _defaultNicknameAnim;
+  late Animation _goodDefaultNicknameAnim;
+  late Animation _badDefaultNicknameAnim;
+  late Animation _defaultNicknameAnim = _goodDefaultNicknameAnim;
+  double helperTextOpacity = 0;
+  String helperText = "Press Enter to submit";
 
   @override
   void initState() {
@@ -260,17 +274,30 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
     //   windowManager.setTitle("Tetra Stats: ${t.settings}");
     // }
     _defaultNicknameAnimController = AnimationController(
+      value: 1.0,
       duration: Durations.extralong4,
       vsync: this,
     );
-    _defaultNicknameAnim = new Tween(
-      begin: 0.0,
-      end: 1.0,
+    _goodDefaultNicknameAnim = new ColorTween(
+      begin: Colors.greenAccent,
+      end: Colors.grey,
     ).animate(new CurvedAnimation(
       parent: _defaultNicknameAnimController,
-      curve: Cubic(.15,-0.40,.86,-0.39),
-      reverseCurve: Cubic(0,.99,.99,1.01)
-    ));
+      curve: Easing.emphasizedAccelerate,
+      //reverseCurve: Cubic(0,.99,.99,1.01)
+    ))..addStatusListener((status) {
+      if (status.index == 3) setState((){helperText = "Press Enter to submit"; helperTextOpacity = 0;});
+    });
+    _badDefaultNicknameAnim = new ColorTween(
+      begin: Colors.redAccent,
+      end: Colors.grey,
+    ).animate(new CurvedAnimation(
+      parent: _defaultNicknameAnimController,
+      curve: Easing.emphasizedAccelerate,
+      //reverseCurve: Cubic(0,.99,.99,1.01)
+    ))..addStatusListener((status) {
+      if (status.index == 3) setState((){helperText = "Press Enter to submit"; helperTextOpacity = 0;});
+    });
     _getPreferences();
     super.initState();
   }
@@ -289,34 +316,33 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
     sheetbotRadarGraphs = prefs.getBool("sheetbotRadarGraphs")?? false;
     ratingMode = prefs.getInt("ratingMode") ?? 0;
     timestampMode = prefs.getInt("timestampMode") ?? 0;
-    _setDefaultNickname(prefs.getString("player"));
+    _setDefaultNickname(prefs.getString("player")??"").then((v){setState((){});});
+    defaultID = prefs.getString("playerID")??"";
   }
 
-  Future<bool> _setDefaultNickname(String? n) async {
-    if (n != null) {
+  Future<bool> _setDefaultNickname(String n) async {
+    if (n.isNotEmpty) {
       try {
-        defaultNickname = await teto.getNicknameByID(n);
+        if (n.length > 16){
+          defaultNickname = await teto.getNicknameByID(n);
+          await prefs.setString('playerID', n);
+        }else{
+          TetrioPlayer player = await teto.fetchPlayer(n);
+          defaultNickname = player.username;
+          await prefs.setString('playerID', player.userId);
+        }
+        await prefs.setString('player', defaultNickname);
         return true;
-      } on TetrioPlayerNotExist {
-        defaultNickname = n;
+      } catch (e) {
         return false;
       }
     } else {
-      defaultNickname = "dan63047";
+      defaultNickname = "dan63";
+      await prefs.setString('player', "dan63");
+      await prefs.setString('playerID', "6098518e3d5155e6ec429cdc");
       return true;
     }
     //setState(() {});
-  }
-
-  Future<bool> _setPlayer(String player) async {
-    bool success = await _setDefaultNickname(player);
-    if (success) await prefs.setString('player', player); 
-    return success;
-  }
-
-  Future<void> _removePlayer() async {
-    await prefs.remove('player');
-    await _setDefaultNickname("6098518e3d5155e6ec429cdc");
   }
 
   Widget getGeneralSettings(){
@@ -341,15 +367,30 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
                 trailing: SizedBox(width: 150.0, child: AnimatedBuilder(
                   animation: _defaultNicknameAnim,
                   builder: (context, child) {
-                    return TextField(
-                      keyboardType: TextInputType.text,
-                      decoration: InputDecoration(
-                        hintText: defaultNickname,
-                        helper: Text("Press Enter to submit", style: TextStyle(color: Colors.grey, height: 0.2)),
-                      ),
-                      onChanged: (value) {
-                        _setPlayer(value).then((v) {});
+                    return Focus(
+                      onFocusChange: (value) {
+                        setState((){helperTextOpacity = ((value || helperText != "Press Enter to submit")) ? 1 : 0;});
                       },
+                      child: TextField(
+                        keyboardType: TextInputType.text,
+                        decoration: InputDecoration(
+                          hintText: defaultNickname,
+                          helper: AnimatedOpacity(
+                            opacity: helperTextOpacity,
+                            duration: Durations.long1,
+                            curve: Easing.standardDecelerate,
+                            child: Text(helperText, style: TextStyle(color: _defaultNicknameAnim.value, height: 0.2))
+                          ),
+                        ),
+                        onSubmitted: (value) {
+                          helperText = "Checking...";
+                          _setDefaultNickname(value).then((v) {
+                            _defaultNicknameAnim = v ? _goodDefaultNicknameAnim : _badDefaultNicknameAnim;
+                            _defaultNicknameAnimController.forward(from: 0);
+                            setState((){ helperText = v ? "Done!" : "Fuck";});
+                          });
+                        },
+                      ),
                     );
                   },
                 )),
@@ -415,7 +456,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Text("Show leaderboard based stats", style: Theme.of(context).textTheme.displayLarge),
+                title: Text("Compare TL stats with rank averages", style: Theme.of(context).textTheme.displayLarge),
                 trailing: Switch(value: showAverages, onChanged: (bool value){
                   prefs.setBool("showAverages", value);
                   setState(() {
@@ -426,7 +467,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
               Divider(),
               Padding(
                 padding: descriptionPadding,
-                child: Text("If on, Tetra Stats gonnna provide additional metrics, which will allow you to compare yourself with average player on your rank. The way you'll see it — stats will be highlited with corresponding color, hover over them with cursor for more info."),
+                child: Text("If on, Tetra Stats will provide additional metrics, which allow you to compare yourself with average player on your rank. The way you'll see it — stats will be highlited with corresponding color, hover over them with cursor for more info."),
               )
             ],
           ),
@@ -1474,7 +1515,7 @@ class _SearchDrawerState extends State<SearchDrawer>  {
             final allPlayers = (snapshot.data != null)
                 ? snapshot.data as Map<String, String>
                 : <String, String>{};
-            allPlayers.remove(prefs.getString("player") ?? "6098518e3d5155e6ec429cdc"); // player from the home button will be delisted
+            allPlayers.remove(prefs.getString("playerID") ?? "6098518e3d5155e6ec429cdc"); // player from the home button will be delisted
             List<String> keys = allPlayers.keys.toList();
             return NestedScrollView(
               headerSliverBuilder: (BuildContext context, bool value){
@@ -1502,7 +1543,7 @@ class _SearchDrawerState extends State<SearchDrawer>  {
                     child: ListTile(
                     title: Text(prefs.getString("player") ?? "dan63"),
                     onTap: () {
-                      widget.changePlayer("6098518e3d5155e6ec429cdc");
+                      widget.changePlayer(prefs.getString("playerID") ?? "6098518e3d5155e6ec429cdc");
                       Navigator.of(context).pop();
                     },
                   ),
@@ -1533,8 +1574,9 @@ class TetraLeagueThingy extends StatelessWidget{
   final TetraLeague league;
   final TetraLeague? toCompare;
   final Cutoffs? cutoffs;
+  final CutoffTetrio? averages;
 
-  const TetraLeagueThingy({super.key, required this.league, this.toCompare, this.cutoffs});
+  const TetraLeagueThingy({super.key, required this.league, this.toCompare, this.cutoffs, this.averages});
   
   @override
   Widget build(BuildContext context) {
@@ -1563,18 +1605,18 @@ class TetraLeagueThingy extends StatelessWidget{
                     defaultColumnWidth:const IntrinsicColumnWidth(),
                     children: [
                       TableRow(children: [
-                        Text(f2.format(league.apm??0.00), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
-                        const Text(" APM", style: TextStyle(fontSize: 21)),
+                        Text(f2.format(league.apm??0.00), textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: league.apm != null ? getStatColor(league.apm!, averages?.apm, true) : null)),
+                        Text(" APM", style: TextStyle(fontSize: 21, color: league.apm != null ? getStatColor(league.apm!, averages?.apm, true) : null)),
                         if (toCompare != null) Text(" (${comparef2.format(league.apm!-toCompare!.apm!)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: getDifferenceColor(league.apm!-toCompare!.apm!)))
                       ]),
                       TableRow(children: [
-                        Text(f2.format(league.pps??0.00), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
-                        const Text(" PPS", style: TextStyle(fontSize: 21)),
+                        Text(f2.format(league.pps??0.00), textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: league.pps != null ? getStatColor(league.pps!, averages?.pps, true) : null)),
+                        Text(" PPS", style: TextStyle(fontSize: 21, color: league.pps != null ? getStatColor(league.pps!, averages?.pps, true) : null)),
                         if (toCompare != null) Text(" (${comparef2.format(league.pps!-toCompare!.pps!)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: getDifferenceColor(league.pps!-toCompare!.pps!)))
                       ]),
                       TableRow(children: [
-                        Text(f2.format(league.vs??0.00), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
-                        const Text(" VS", style: TextStyle(fontSize: 21)),
+                        Text(f2.format(league.vs??0.00), textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: league.vs != null ? getStatColor(league.vs!, averages?.vs, true) : null)),
+                        Text(" VS", style: TextStyle(fontSize: 21, color: league.vs != null ? getStatColor(league.vs!, averages?.vs, true) : null)),
                         if (toCompare != null) Text(" (${comparef2.format(league.vs!-toCompare!.vs!)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: getDifferenceColor(league.vs!-toCompare!.vs!)))
                       ])
                     ],
@@ -1657,8 +1699,9 @@ class TetraLeagueThingy extends StatelessWidget{
 class NerdStatsThingy extends StatelessWidget{
   final NerdStats nerdStats;
   final NerdStats? oldNerdStats;
+  final CutoffTetrio? averages;
 
-  const NerdStatsThingy({super.key, required this.nerdStats, this.oldNerdStats});
+  const NerdStatsThingy({super.key, required this.nerdStats, this.oldNerdStats, this.averages});
 
   @override
   Widget build(BuildContext context) {
@@ -1700,7 +1743,7 @@ class NerdStatsThingy extends StatelessWidget{
                                 style: const TextStyle(fontFamily: "Eurostile Round"),
                                 children: [
                                   const TextSpan(text: "APP\n"),
-                                  TextSpan(text: f3.format(nerdStats.app), style: const TextStyle(fontSize: 25, fontFamily: "Eurostile Round Extended", fontWeight: FontWeight.w100)),
+                                  TextSpan(text: f3.format(nerdStats.app), style: TextStyle(fontSize: 25, fontFamily: "Eurostile Round Extended", fontWeight: FontWeight.w100, color: getStatColor(nerdStats.app, averages?.nerdStats?.app, true))),
                                   if (oldNerdStats != null) TextSpan(text: "\n${comparef.format(nerdStats.app - oldNerdStats!.app)}", style: TextStyle(color: getDifferenceColor(nerdStats.app - oldNerdStats!.app))),
                                 ]
                             ))),
@@ -1730,7 +1773,7 @@ class NerdStatsThingy extends StatelessWidget{
                                 style: const TextStyle(fontFamily: "Eurostile Round"),
                                 children: [
                                   const TextSpan(text: "VS/APM\n"),
-                                  TextSpan(text: f3.format(nerdStats.vsapm), style: const TextStyle(fontSize: 25, fontFamily: "Eurostile Round Extended", fontWeight: FontWeight.w100)),
+                                  TextSpan(text: f3.format(nerdStats.vsapm), style: TextStyle(fontSize: 25, fontFamily: "Eurostile Round Extended", fontWeight: FontWeight.w100, color: getStatColor(nerdStats.vsapm, averages?.nerdStats?.vsapm, true))),
                                   if (oldNerdStats != null) TextSpan(text: "\n${comparef.format(nerdStats.vsapm - oldNerdStats!.vsapm)}", style: TextStyle(color: getDifferenceColor(nerdStats.vsapm - oldNerdStats!.vsapm))),
                                 ]
                             ))),
@@ -1749,13 +1792,13 @@ class NerdStatsThingy extends StatelessWidget{
                     runSpacing: 10.0,
                     runAlignment: WrapAlignment.start,
                     children: [
-                      GaugetThingy(value: nerdStats.dss, oldValue: oldNerdStats?.dss, min: 0, max: 1.0, tickInterval: .2, label: "DS/S", sideSize: 128.0, fractionDigits: 3, moreIsBetter: true),
-                      GaugetThingy(value: nerdStats.dsp, oldValue: oldNerdStats?.dsp, min: 0, max: 1.0, tickInterval: .2, label: "DS/P", sideSize: 128.0, fractionDigits: 3, moreIsBetter: true),
-                      GaugetThingy(value: nerdStats.appdsp, oldValue: oldNerdStats?.appdsp, min: 0, max: 1.2, tickInterval: .2, label: "APP+DS/P", sideSize: 128.0, fractionDigits: 3, moreIsBetter: true),
+                      GaugetThingy(value: nerdStats.dss, oldValue: oldNerdStats?.dss, min: 0, max: 1.0, tickInterval: .2, label: "DS/S", sideSize: 128.0, fractionDigits: 3, moreIsBetter: true, avgValue: averages?.nerdStats?.dss),
+                      GaugetThingy(value: nerdStats.dsp, oldValue: oldNerdStats?.dsp, min: 0, max: 1.0, tickInterval: .2, label: "DS/P", sideSize: 128.0, fractionDigits: 3, moreIsBetter: true, avgValue: averages?.nerdStats?.dsp),
+                      GaugetThingy(value: nerdStats.appdsp, oldValue: oldNerdStats?.appdsp, min: 0, max: 1.2, tickInterval: .2, label: "APP+DS/P", sideSize: 128.0, fractionDigits: 3, moreIsBetter: true, avgValue: averages?.nerdStats?.appdsp),
                       GaugetThingy(value: nerdStats.cheese, oldValue: oldNerdStats?.cheese, min: -80, max: 80, tickInterval: 40, label: "Cheese", sideSize: 128.0, fractionDigits: 2, moreIsBetter: false),
-                      GaugetThingy(value: nerdStats.gbe, oldValue: oldNerdStats?.gbe, min: 0, max: 1.0, tickInterval: .2, label: "GbE", sideSize: 128.0, fractionDigits: 3, moreIsBetter: true),
-                      GaugetThingy(value: nerdStats.nyaapp, oldValue: oldNerdStats?.nyaapp, min: 0, max: 1.2, tickInterval: .2, label: "wAPP", sideSize: 128.0, fractionDigits: 3, moreIsBetter: true),
-                      GaugetThingy(value: nerdStats.area, oldValue: oldNerdStats?.area, min: 0, max: 1000, tickInterval: 100, label: "Area", sideSize: 128.0, fractionDigits: 1, moreIsBetter: true),
+                      GaugetThingy(value: nerdStats.gbe, oldValue: oldNerdStats?.gbe, min: 0, max: 1.0, tickInterval: .2, label: "GbE", sideSize: 128.0, fractionDigits: 3, moreIsBetter: true, avgValue: averages?.nerdStats?.gbe),
+                      GaugetThingy(value: nerdStats.nyaapp, oldValue: oldNerdStats?.nyaapp, min: 0, max: 1.2, tickInterval: .2, label: "wAPP", sideSize: 128.0, fractionDigits: 3, moreIsBetter: true, avgValue: averages?.nerdStats?.nyaapp),
+                      GaugetThingy(value: nerdStats.area, oldValue: oldNerdStats?.area, min: 0, max: 1000, tickInterval: 100, label: "Area", sideSize: 128.0, fractionDigits: 1, moreIsBetter: true, avgValue: averages?.nerdStats?.area),
                     ],
                   ),
                 )
@@ -1807,13 +1850,14 @@ class GaugetThingy extends StatelessWidget{
   final double min;
   final double max;
   final double? oldValue;
+  final double? avgValue;
   final bool moreIsBetter;
   final double tickInterval;
   final String label;
   final double sideSize;
   final int fractionDigits;
 
-  GaugetThingy({super.key, required this.value, required this.min, required this.max, this.oldValue, required this.tickInterval, required this.label, required this.sideSize, required this.fractionDigits, required this.moreIsBetter});
+  GaugetThingy({super.key, required this.value, required this.min, required this.max, this.oldValue, this.avgValue, required this.tickInterval, required this.label, required this.sideSize, required this.fractionDigits, required this.moreIsBetter});
 
   @override
   Widget build(BuildContext context) {
@@ -1839,7 +1883,7 @@ class GaugetThingy extends StatelessWidget{
               ],
               annotations: [
                 GaugeAnnotation(widget: Container(child:
-                Text(f.format(value), textAlign: TextAlign.center, style: const TextStyle(fontSize: 25,fontWeight: FontWeight.bold))),
+                Text(f.format(value), textAlign: TextAlign.center, style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: getStatColor(value, avgValue, moreIsBetter)))),
                 angle: 90,positionFactor: 0.10
                 ),
                 GaugeAnnotation(widget: Container(child:

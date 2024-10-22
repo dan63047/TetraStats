@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:tetra_stats/data_objects/cutoff_tetrio.dart';
 import 'package:tetra_stats/data_objects/news.dart';
 import 'package:tetra_stats/data_objects/p1nkl0bst3r.dart';
 import 'package:tetra_stats/data_objects/record_extras.dart';
@@ -44,10 +45,11 @@ class FetchResults{
   List<TetraLeague> states;
   Summaries? summaries;
   Cutoffs? cutoffs;
+  CutoffsTetrio? averages;
   bool isTracked;
   Exception? exception;
 
-  FetchResults(this.success, this.player, this.states, this.summaries, this.cutoffs, this.isTracked, this.exception);
+  FetchResults(this.success, this.player, this.states, this.summaries, this.cutoffs, this.averages, this.isTracked, this.exception);
 }
 
 class RecordSummary extends StatelessWidget{
@@ -128,9 +130,10 @@ class RecordSummary extends StatelessWidget{
 
 class LeagueCard extends StatelessWidget{
   final TetraLeague league;
+  final CutoffTetrio? averages;
   final bool showSeasonNumber;
 
-  const LeagueCard({super.key, required this.league, this.showSeasonNumber = false});
+  const LeagueCard({super.key, required this.league, this.averages, this.showSeasonNumber = false});
 
   @override
   Widget build(BuildContext context) {
@@ -157,7 +160,20 @@ class LeagueCard extends StatelessWidget{
               const Divider(),
               TLRatingThingy(userID: "", tlData: league, showPositions: true),
               const Divider(),
-              Text("${league.apm != null ? f2.format(league.apm) : "-.--"} APM • ${league.pps != null ? f2.format(league.pps) : "-.--"} PPS • ${league.vs != null ? f2.format(league.vs) : "-.--"} VS • ${league.nerdStats != null ? f2.format(league.nerdStats!.app) : "-.--"} APP • ${league.nerdStats != null ? f2.format(league.nerdStats!.vsapm) : "-.--"} VS/APM", style: const TextStyle(color: Colors.grey))
+              RichText(text: TextSpan(
+                style: const TextStyle(fontFamily: "Eurostile Round", color: Colors.grey),
+                children: [
+                  TextSpan(text: "${league.apm != null ? f2.format(league.apm) : "-.--"} APM", style: TextStyle(color: league.apm != null ? getStatColor(league.apm!, averages?.apm, true) : null)),
+                  TextSpan(text: " • "),
+                  TextSpan(text: "${league.pps != null ? f2.format(league.pps) : "-.--"} PPS", style: TextStyle(color: league.pps != null ? getStatColor(league.pps!, averages?.pps, true) : null)),
+                  TextSpan(text: " • "),
+                  TextSpan(text: "${league.vs != null ? f2.format(league.vs) : "-.--"} VS", style: TextStyle(color: league.vs != null ? getStatColor(league.vs!, averages?.vs, true) : null)),
+                  TextSpan(text: " • "),
+                  TextSpan(text: "${league.nerdStats != null ? f2.format(league.nerdStats!.app) : "-.--"} APP", style: TextStyle(color: league.nerdStats != null ? getStatColor(league.nerdStats!.app, averages?.nerdStats?.app, true) : null)),
+                  TextSpan(text: " • "),
+                  TextSpan(text: "${league.nerdStats != null ? f2.format(league.nerdStats!.vsapm) : "-.--"} VS/APM", style: TextStyle(color: league.nerdStats != null ? getStatColor(league.nerdStats!.vsapm, averages?.nerdStats?.vsapm, true) : null)),
+                ]
+              )),
             ],
           ),
         ),
@@ -181,7 +197,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
   bool? sprintBetterThanRankAverage;
   bool? blitzBetterThanRankAverage;
 
-  Widget getOverviewCard(Summaries summaries){
+  Widget getOverviewCard(Summaries summaries, CutoffTetrio? averages){
     return Column(
       children: [
         const Card(
@@ -198,7 +214,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
             ),
           ),
         ),
-        LeagueCard(league: summaries.league),
+        LeagueCard(league: summaries.league, averages: averages),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -373,7 +389,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
     );
   }
 
-  Widget getTetraLeagueCard(TetraLeague data, Cutoffs? cutoffs, List<TetraLeague> states){
+  Widget getTetraLeagueCard(TetraLeague data, Cutoffs? cutoffs, CutoffTetrio? averages, List<TetraLeague> states){
     TetraLeague? toCompare = states.length >= 2 ? states.elementAtOrNull(states.length-2) : null;
     return Column(
       children: [
@@ -393,7 +409,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
             ),
           ),
         ),
-        TetraLeagueThingy(league: data, toCompare: toCompare, cutoffs: cutoffs),
+        TetraLeagueThingy(league: data, toCompare: toCompare, cutoffs: cutoffs, averages: averages),
         if (data.nerdStats != null) Card(
           //surfaceTintColor: rankColors[data.rank],
           child: Row(
@@ -405,7 +421,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
             ],
           ),
         ),
-        if (data.nerdStats != null) NerdStatsThingy(nerdStats: data.nerdStats!, oldNerdStats: toCompare?.nerdStats),
+        if (data.nerdStats != null) NerdStatsThingy(nerdStats: data.nerdStats!, oldNerdStats: toCompare?.nerdStats, averages: averages),
         if (data.nerdStats != null) GraphsThingy(nerdStats: data.nerdStats!, playstyle: data.playstyle!, apm: data.apm!, pps: data.pps!, vs: data.vs!)
       ],
     );
@@ -1068,9 +1084,9 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                             child: SlideTransition(
                               position: _offsetAnimation,
                               child: switch (rightCard){
-                                Cards.overview => getOverviewCard(snapshot.data!.summaries!),
+                                Cards.overview => getOverviewCard(snapshot.data!.summaries!, (snapshot.data!.averages != null && snapshot.data!.summaries!.league.rank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.rank] : (snapshot.data!.averages != null && snapshot.data!.summaries!.league.percentileRank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.rank] : null),
                                 Cards.tetraLeague => switch (cardMod){
-                                  CardMod.info => getTetraLeagueCard(snapshot.data!.summaries!.league, snapshot.data!.cutoffs, snapshot.data!.states),
+                                  CardMod.info => getTetraLeagueCard(snapshot.data!.summaries!.league, snapshot.data!.cutoffs, (snapshot.data!.averages != null && snapshot.data!.summaries!.league.rank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.rank] : (snapshot.data!.averages != null && snapshot.data!.summaries!.league.percentileRank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.rank] : null, snapshot.data!.states),
                                   CardMod.ex => getPreviousSeasonsList(snapshot.data!.summaries!.pastLeague),
                                   CardMod.records => getRecentTLrecords(widget.constraints),
                                   _ => const Center(child: Text("huh?"))

@@ -61,7 +61,7 @@ class UserState extends State<UserView> {
                 Card(
                   child: Column(
                     children: [
-                      Text("Pornograph", style: TextStyle(),)
+                      Text("oskagalove", style: TextStyle(),)
                     ]
                   ),
                 ),

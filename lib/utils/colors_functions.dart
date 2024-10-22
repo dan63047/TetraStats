@@ -9,6 +9,16 @@ Color getColorOfRank(int rank){
     return Colors.grey;
 }
 
+Color? getStatColor(num value, num? avgValue, bool higherIsBetter){
+    if (avgValue == null) return null;
+    num percentile = (higherIsBetter ? value / avgValue : avgValue / value).abs();
+    if (percentile > 1.50) return Colors.purpleAccent;
+    if (percentile > 1.20) return Colors.blueAccent;
+    if (percentile > 0.90) return Colors.greenAccent;
+    if (percentile > 0.70) return Colors.yellowAccent;
+    return Colors.redAccent;
+  }
+
 Color getDifferenceColor(num diff){
   return diff.isNegative ? Colors.redAccent : Colors.greenAccent;
 }

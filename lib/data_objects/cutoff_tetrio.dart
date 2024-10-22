@@ -1,4 +1,4 @@
-// ignore_for_file: hash_and_equals
+import 'package:tetra_stats/data_objects/nerd_stats.dart';
 
 class CutoffTetrio {
   late int pos;
@@ -8,6 +8,7 @@ class CutoffTetrio {
   late double? apm;
   late double? pps;
   late double? vs;
+  NerdStats? nerdStats;
   late int count;
   late double countPercentile;
 
@@ -21,7 +22,9 @@ class CutoffTetrio {
     required this.vs,
     required this.count,
     required this.countPercentile
-  });
+  }){
+    if (apm != null && pps != null && vs != null) nerdStats = NerdStats(apm!, pps!, vs!);
+  }
 
   CutoffTetrio.fromJson(Map<String, dynamic> json, int total){
     pos = json['pos'];
@@ -33,6 +36,7 @@ class CutoffTetrio {
     vs = json['vs']?.toDouble();
     count = json['count'];
     countPercentile = count / total;
+    if (apm != null && pps != null && vs != null) nerdStats = NerdStats(apm!, pps!, vs!);
   }
 }
 
