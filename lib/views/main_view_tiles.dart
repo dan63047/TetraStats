@@ -38,6 +38,7 @@ import 'package:tetra_stats/views/destination_graphs.dart';
 import 'package:tetra_stats/views/destination_home.dart';
 import 'package:tetra_stats/views/destination_leaderboards.dart';
 import 'package:tetra_stats/views/destination_saved_data.dart';
+import 'package:tetra_stats/views/destination_settings.dart';
 import 'package:tetra_stats/views/tl_match_view.dart';
 import 'package:tetra_stats/views/compare_view_tiles.dart';
 import 'package:tetra_stats/widgets/graphs.dart';
@@ -103,7 +104,6 @@ class MainView extends StatefulWidget {
   State<MainView> createState() => _MainState();
 }
 
-enum Page {home, leaderboards, leagueAverages, calculator, settings}
 enum Cards {overview, tetraLeague, quickPlay, sprint, blitz}
 enum CardMod {info, records, ex, exRecords}
 Map<Cards, String> cardsTitles = {
@@ -215,6 +215,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                 2 => DestinationLeaderboards(constraints: constraints),
                 3 => DestinationCutoffs(constraints: constraints),
                 4 => DestinationCalculator(constraints: constraints),
+                5 => DestinationInfo(constraints: constraints),
                 6 => DestinationSavedData(constraints: constraints),
                 7 => DestinationSettings(constraints: constraints),
                 _ => Text("Unknown destination $destination")
@@ -226,509 +227,81 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   }
 }
 
-class DestinationSettings extends StatefulWidget{
+class DestinationInfo extends StatefulWidget{
   final BoxConstraints constraints;
 
-  const DestinationSettings({super.key, required this.constraints});
+  const DestinationInfo({super.key, required this.constraints});
 
   @override
-  State<DestinationSettings> createState() => _DestinationSettings();
+  State<DestinationInfo> createState() => _DestinationInfo();  
 }
 
-enum SettingsCardMod{
-  general("General"),
-  customization("Custonization"),
-  database("Local database");
-
-  const SettingsCardMod(this.title);
-
+class InfoCard extends StatelessWidget {
+  final double height;
+  final String assetLink;
   final String title;
-}
+  final String description;
 
-const EdgeInsets descriptionPadding = EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 8.0);
-
-class _DestinationSettings extends State<DestinationSettings> with SingleTickerProviderStateMixin {
-  SettingsCardMod mod = SettingsCardMod.general;
-  List<DropdownMenuItem<AppLocale>> locales = <DropdownMenuItem<AppLocale>>[];
-  String defaultNickname = "Checking...";
-  String defaultID = "";
-  late bool oskKagariGimmick;
-  late bool sheetbotRadarGraphs;
-  late int ratingMode;
-  late int timestampMode;
-  late bool showPositions;
-  late bool showAverages;
-  late bool updateInBG;
-  final TextEditingController _playertext = TextEditingController();
-  late AnimationController _defaultNicknameAnimController;
-  late Animation _goodDefaultNicknameAnim;
-  late Animation _badDefaultNicknameAnim;
-  late Animation _defaultNicknameAnim = _goodDefaultNicknameAnim;
-  double helperTextOpacity = 0;
-  String helperText = "Press Enter to submit";
-
-  @override
-  void initState() {
-    // if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS){
-    //   windowManager.getTitle().then((value) => oldWindowTitle = value);
-    //   windowManager.setTitle("Tetra Stats: ${t.settings}");
-    // }
-    _defaultNicknameAnimController = AnimationController(
-      value: 1.0,
-      duration: Durations.extralong4,
-      vsync: this,
-    );
-    _goodDefaultNicknameAnim = new ColorTween(
-      begin: Colors.greenAccent,
-      end: Colors.grey,
-    ).animate(new CurvedAnimation(
-      parent: _defaultNicknameAnimController,
-      curve: Easing.emphasizedAccelerate,
-      //reverseCurve: Cubic(0,.99,.99,1.01)
-    ))..addStatusListener((status) {
-      if (status.index == 3) setState((){helperText = "Press Enter to submit"; helperTextOpacity = 0;});
-    });
-    _badDefaultNicknameAnim = new ColorTween(
-      begin: Colors.redAccent,
-      end: Colors.grey,
-    ).animate(new CurvedAnimation(
-      parent: _defaultNicknameAnimController,
-      curve: Easing.emphasizedAccelerate,
-      //reverseCurve: Cubic(0,.99,.99,1.01)
-    ))..addStatusListener((status) {
-      if (status.index == 3) setState((){helperText = "Press Enter to submit"; helperTextOpacity = 0;});
-    });
-    _getPreferences();
-    super.initState();
-  }
-
-  @override
-  void dispose(){
-    // if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
-    super.dispose();
-  }
-
-  void _getPreferences() {
-    showPositions = prefs.getBool("showPositions") ?? false;
-    showAverages = prefs.getBool("showAverages") ?? true;
-    updateInBG = prefs.getBool("updateInBG") ?? false;
-    oskKagariGimmick = prefs.getBool("oskKagariGimmick") ?? true;
-    sheetbotRadarGraphs = prefs.getBool("sheetbotRadarGraphs")?? false;
-    ratingMode = prefs.getInt("ratingMode") ?? 0;
-    timestampMode = prefs.getInt("timestampMode") ?? 0;
-    _setDefaultNickname(prefs.getString("player")??"").then((v){setState((){});});
-    defaultID = prefs.getString("playerID")??"";
-  }
-
-  Future<bool> _setDefaultNickname(String n) async {
-    if (n.isNotEmpty) {
-      try {
-        if (n.length > 16){
-          defaultNickname = await teto.getNicknameByID(n);
-          await prefs.setString('playerID', n);
-        }else{
-          TetrioPlayer player = await teto.fetchPlayer(n);
-          defaultNickname = player.username;
-          await prefs.setString('playerID', player.userId);
-        }
-        await prefs.setString('player', defaultNickname);
-        return true;
-      } catch (e) {
-        return false;
-      }
-    } else {
-      defaultNickname = "dan63";
-      await prefs.setString('player', "dan63");
-      await prefs.setString('playerID', "6098518e3d5155e6ec429cdc");
-      return true;
-    }
-    //setState(() {});
-  }
-
-  Widget getGeneralSettings(){
-    return Column(
-      children: [
-        Card(
-          child: Center(child: Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: Column(
-              children: [
-                Text(SettingsCardMod.general.title, style: Theme.of(context).textTheme.titleLarge),
-              ],
-            ),
-          )),
-        ),
-        Card(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: Text("Your account in TETR.IO", style: Theme.of(context).textTheme.displayLarge),
-                trailing: SizedBox(width: 150.0, child: AnimatedBuilder(
-                  animation: _defaultNicknameAnim,
-                  builder: (context, child) {
-                    return Focus(
-                      onFocusChange: (value) {
-                        setState((){helperTextOpacity = ((value || helperText != "Press Enter to submit")) ? 1 : 0;});
-                      },
-                      child: TextField(
-                        keyboardType: TextInputType.text,
-                        decoration: InputDecoration(
-                          hintText: defaultNickname,
-                          helper: AnimatedOpacity(
-                            opacity: helperTextOpacity,
-                            duration: Durations.long1,
-                            curve: Easing.standardDecelerate,
-                            child: Text(helperText, style: TextStyle(color: _defaultNicknameAnim.value, height: 0.2))
-                          ),
-                        ),
-                        onSubmitted: (value) {
-                          helperText = "Checking...";
-                          _setDefaultNickname(value).then((v) {
-                            _defaultNicknameAnim = v ? _goodDefaultNicknameAnim : _badDefaultNicknameAnim;
-                            _defaultNicknameAnimController.forward(from: 0);
-                            setState((){ helperText = v ? "Done!" : "Fuck";});
-                          });
-                        },
-                      ),
-                    );
-                  },
-                )),
-              ),
-              Divider(),
-              Padding(
-                padding: descriptionPadding,
-                child: Text("Stats of that player will be loaded initially right after launching this app. By default it loads my (dan63) stats. To change that, enter your nickname here."),
-              )
-            ],
-          ),
-        ),
-        Card(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: Text("Language", style: Theme.of(context).textTheme.displayLarge),
-                trailing: DropdownButton(
-                  items: locales,
-                  value: LocaleSettings.currentLocale,
-                  onChanged: (value){
-                    LocaleSettings.setLocale(value!);
-                    if(value.languageCode == Platform.localeName.substring(0, 2)){
-                      prefs.remove('locale');
-                    }else{
-                      prefs.setString('locale', value.languageCode);
-                    }
-                  },
-                ),
-              ),
-              Divider(),
-              Padding(
-                padding: descriptionPadding,
-                child: Text("Tetra Stats was translated on ${locales.length} languages. By default, app will pick your system one or English, if locale of your system isn't avaliable."),
-              )
-            ],
-          ),
-        ),
-        Card(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: Text("Update data in the background", style: Theme.of(context).textTheme.displayLarge),
-                trailing: Switch(value: updateInBG, onChanged: (bool value){
-                prefs.setBool("updateInBG", value);
-                setState(() {
-                  updateInBG = value;
-                });
-                })
-              ),
-              Divider(),
-              Padding(
-                padding: descriptionPadding,
-                child: Text("If on, Tetra Stats will attempt to retrieve new info once cache expires. Usually that happen every 5 minutes"),
-              )
-            ],
-          ),
-        ),
-        Card(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: Text("Compare TL stats with rank averages", style: Theme.of(context).textTheme.displayLarge),
-                trailing: Switch(value: showAverages, onChanged: (bool value){
-                  prefs.setBool("showAverages", value);
-                  setState(() {
-                    showAverages = value;
-                  });
-                }),
-              ),
-              Divider(),
-              Padding(
-                padding: descriptionPadding,
-                child: Text("If on, Tetra Stats will provide additional metrics, which allow you to compare yourself with average player on your rank. The way you'll see it — stats will be highlited with corresponding color, hover over them with cursor for more info."),
-              )
-            ],
-          ),
-        ),
-        Card(
-          surfaceTintColor: Colors.redAccent,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: Text("Show position on leaderboard by stats", style: Theme.of(context).textTheme.displayLarge),
-                trailing: Switch(value: showPositions, onChanged: (bool value){
-                  prefs.setBool("showPositions", value);
-                  setState(() {
-                    showPositions = value;
-                  });
-                }),
-              ),
-              Divider(),
-              Padding(
-                padding: descriptionPadding,
-                child: Text("This can take some time (and traffic) to load, but will allow you to see your position on the leaderboard, sorted by a stat"),
-              )
-            ],
-          ),
-        )
-      ]
-    );
-  }
-
-  Widget getCustomizationSettings(){
-    return Column(
-      children: [
-        Card(
-          child: Center(child: Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: Column(
-              children: [
-                Text(SettingsCardMod.customization.title, style: Theme.of(context).textTheme.titleLarge),
-              ],
-            ),
-          )),
-        ),
-        Card(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: Text("Accent color", style: Theme.of(context).textTheme.displayLarge),
-                trailing: ColorIndicator(HSVColor.fromColor(Theme.of(context).colorScheme.primary), width: 25, height: 25),
-              ),
-              Divider(),
-              Padding(
-                padding: descriptionPadding,
-                child: Text("That color is seen across this app and usually highlites interactive UI elements."),
-              )
-            ],
-          ),
-        ),
-        Card(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ListTile(
-                title: Text("Timestamps format", style: Theme.of(context).textTheme.displayLarge),
-                trailing:  DropdownButton(
-                  value: timestampMode,
-                  items: <DropdownMenuItem>[
-                    DropdownMenuItem(value: 0, child: Text(t.timestampsAbsoluteGMT)),
-                    DropdownMenuItem(value: 1, child: Text(t.timestampsAbsoluteLocalTime)),
-                    DropdownMenuItem(value: 2, child: Text(t.timestampsRelative))
-                  ],
-                  onChanged: (dynamic value){
-                    prefs.setInt("timestampMode", value);
-                    setState(() {
-                      timestampMode = value;
-                    });
-                  },
-                ),
-              ),
-              Divider(),
-              Padding(
-                padding: descriptionPadding,
-                child: Text("You can choose, in which way timestamps shows time. By default, they show time in GMT timezone, formatted according to chosen locale, example: ${DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms().format(DateTime.utc(2023, DateTime.july, 20, 21, 03, 19))}."),
-              ),
-              Padding(
-                padding: descriptionPadding,
-                child: Text("There is also:\n• Locale formatted in your timezone: ${DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms().format(DateTime.utc(2023, DateTime.july, 20, 21, 03, 19).toLocal())}\n• Relative timestamp: ${relativeDateTime(DateTime.utc(2023, DateTime.july, 20, 21, 03, 19))}"),
-              )
-            ],
-          ),
-        ),
-        Card(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: Text("Sheetbot-like behavior for radar graphs", style: Theme.of(context).textTheme.displayLarge),
-                trailing: Switch(value: sheetbotRadarGraphs, onChanged: (bool value){
-                  prefs.setBool("sheetbotRadarGraphs", value);
-                  setState(() {
-                    sheetbotRadarGraphs = value;
-                  });
-                }),
-              ),
-              Divider(),
-              Padding(
-                padding: descriptionPadding,
-                child: Text("Altough it was considered by me, that the way graphs work in SheetBot is not very correct, some people were confused to see, that -0.5 stride dosen't look the way it looks on SheetBot graph. Hence, he we are: if this toggle is on, points on the graphs can appear on the opposite half of the graph if value is negative."),
-              )
-            ],
-          ),
-        ),
-        Card(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: Text("Osk-Kagari gimmick", style: Theme.of(context).textTheme.displayLarge),
-                trailing: Switch(value: oskKagariGimmick, onChanged: (bool value){
-                  prefs.setBool("oskKagariGimmick", value);
-                  setState(() {
-                    oskKagariGimmick = value;
-                  });
-                }),
-              ),
-              Divider(),
-              Padding(
-                padding: descriptionPadding,
-                child: Text("If on, instead of osk's rank, :kagari: will be rendered."),
-              )
-            ],
-          ),
-        )
-      ],
-    );
-  }
-
-  Widget getDatabaseSettings(){
-    return Column(
-      children: [
-        Card(
-          child: Center(child: Column(
-            children: [
-              Text(SettingsCardMod.database.title, style: Theme.of(context).textTheme.titleLarge),
-              Divider(),
-              FutureBuilder<(int, int, int)>(future: teto.getDatabaseData(),
-                builder: (context, snapshot) {
-                  switch (snapshot.connectionState){
-                    case ConnectionState.none:
-                    case ConnectionState.waiting:
-                      return const Center(child: CircularProgressIndicator());
-                    case ConnectionState.active:
-                    case ConnectionState.done:
-                      if (snapshot.hasData){
-                        return RichText(
-                          text: TextSpan(
-                            style: TextStyle(fontFamily: "Eurostile Round", color: Colors.white),
-                            children: [
-                              TextSpan(text: "${bytesToSize(snapshot.data!.$1)} ", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)),
-                              TextSpan(text: "of data stored\n"),
-                              TextSpan(text: "${intf.format(snapshot.data!.$2)} ", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)),
-                              TextSpan(text: "Tetra League records saved\n"),
-                              TextSpan(text: "${intf.format(snapshot.data!.$3)} ", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)),
-                              TextSpan(text: "Tetra League playerstates saved"),
-                            ]
-                          )
-                        );
-                      }
-                      if (snapshot.hasError){ return FutureError(snapshot); }
-                    }
-                  return Text("huh?");
-                }
-              ),
-              Divider(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: (){teto.removeDuplicatesFromTLMatches().then((_) => setState((){}));},
-                      icon: const Icon(Icons.build),
-                      label: Text("Fix"),
-                      style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12.0)))))
-                    )
-                  ),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: (){teto.compressDB().then((_) => setState((){}));},
-                      icon: const Icon(Icons.compress),
-                      label: Text("Compress"),
-                      style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomRight: Radius.circular(12.0)))))
-                    )
-                  )
-                ],
-                )
-            ],
-          )),
-        ),
-        Card(
-          child: ListTile(
-            title: Text("Export Database", style: Theme.of(context).textTheme.displayLarge),
-          ),
-        ),
-        Card(
-          child: ListTile(
-            title: Text("Import Database", style: Theme.of(context).textTheme.displayLarge),
-          ),
-        )
-      ],
-    );
-  }
+  const InfoCard({required this.height, required this.assetLink, required this.title, required this.description});
 
   @override
   Widget build(BuildContext context) {
-    final t = Translations.of(context);
-    if (locales.isEmpty) for (var v in AppLocale.values){
-      locales.add(DropdownMenuItem<AppLocale>(
-        value: v, child: Text(t.locales[v.languageTag]!)));
-    }
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Card(
+      clipBehavior: Clip.hardEdge,
+      child: SizedBox(
+        width: 450,
+        height: height,
+        child: Column(
+          children: [
+            Image.asset("res/images/Снимок экрана_2023-11-06_01-00-50.png", fit: BoxFit.cover, height: 300.0),
+            Text(title, style: Theme.of(context).textTheme.titleLarge),
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Text(description),
+            ),
+            Spacer()
+          ],
+        ),
+      ),
+    );
+  }
+  
+}
+
+class _DestinationInfo extends State<DestinationInfo> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox(
-          width: 450,
-          child: Column(
+        Card(
+          child: Center(child: Text("Information Center", style: Theme.of(context).textTheme.titleLarge)),
+        ),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
             children: [
-              Card(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Spacer(),
-                    Text("Settings", style: Theme.of(context).textTheme.headlineMedium),
-                    Spacer()
-                  ],
-                ),
+              InfoCard(
+                height: widget.constraints.maxHeight - 77,
+                assetLink: "res/images/Снимок экрана_2023-11-06_01-00-50.png",
+                title: "Shizuru!",
+                description: "Shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru\nNakatsu Shizuru Nakatsu Shizuru Nakatsu Shizuru Nakatsu Shizuru Nakatsu Shizuru Nakatsu Shizuru Nakatsu Shizuru "
               ),
-              for (SettingsCardMod m in SettingsCardMod.values) Card(
-                child: ListTile(
-                  title: Text(m.title),
-                  trailing: Icon(Icons.arrow_right, color: mod == m ? Colors.white : Colors.grey),
-                  onTap: () {
-                    setState(() {
-                      mod = m;
-                    });
-                  },
-                ),
-              )
+              InfoCard(
+                height: widget.constraints.maxHeight - 77,
+                assetLink: "res/images/Снимок экрана_2023-11-06_01-00-50.png",
+                title: "Shizuru!",
+                description: "Shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru\nNakatsu Shizuru Nakatsu Shizuru Nakatsu Shizuru Nakatsu Shizuru Nakatsu Shizuru Nakatsu Shizuru Nakatsu Shizuru "
+              ),
+              InfoCard(
+                height: widget.constraints.maxHeight - 77,
+                assetLink: "res/images/Снимок экрана_2023-11-06_01-00-50.png",
+                title: "Shizuru!",
+                description: "Shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru\nNakatsu Shizuru Nakatsu Shizuru Nakatsu Shizuru Nakatsu Shizuru Nakatsu Shizuru Nakatsu Shizuru Nakatsu Shizuru "
+              ),
+              Card()
             ],
           ),
-        ),
-        SizedBox(
-          width: widget.constraints.maxWidth - 450 - 80,
-          child: SingleChildScrollView(
-            child: switch (mod){
-              SettingsCardMod.general => getGeneralSettings(),
-              SettingsCardMod.customization => getCustomizationSettings(),
-              SettingsCardMod.database => getDatabaseSettings(),
-            },
-          )
         )
       ],
     );
@@ -1377,24 +950,32 @@ class _NewUserThingyState extends State<NewUserThingy> with SingleTickerProvider
                           }),
                           const TextSpan(text:"\n"),
                           TextSpan(text: widget.player.gameTime.isNegative ? "-h --m" : playtime(widget.player.gameTime), style: TextStyle(color: widget.player.gameTime.isNegative ? Colors.grey : Colors.white, decoration: widget.player.gameTime.isNegative ? null : TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted), recognizer: !widget.player.gameTime.isNegative ? (TapGestureRecognizer()..onTap = (){
+                            Duration accountAge = DateTime.timestamp().difference(widget.player.registrationTime);
+                            Duration avgGametimeADay = Duration(microseconds: (widget.player.gameTime.inMicroseconds / accountAge.inDays).floor());
                             showDialog(
                               context: context,
                               builder: (BuildContext context) => AlertDialog(
                                 title: Text(t.exactGametime, textAlign: TextAlign.center),  
                                 content: SingleChildScrollView(
-                                  child: ListBody(children: [
-                                    Text(
-                                      "${intf.format(widget.player.gameTime.inDays)}d ${nonsecs.format(widget.player.gameTime.inHours%24)}h ${nonsecs.format(widget.player.gameTime.inMinutes%60)}m ${nonsecs.format(widget.player.gameTime.inSeconds%60)}s ${nonsecs3.format(widget.player.gameTime.inMilliseconds%1000)}ms ${nonsecs3.format(widget.player.gameTime.inMicroseconds%1000)}μs",
-                                      style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 24)
-                                      ),
+                                  child: Column(
+                                    children: [
+                                    RichText(text: TextSpan(
+                                      style: TextStyle(fontFamily: "Eurostile Round", color: Colors.white, fontSize: 28),
+                                      children: [
+                                        TextSpan(text: "${intf.format(widget.player.gameTime.inHours)}"),
+                                        TextSpan(text: ":${nonsecs.format(widget.player.gameTime.inMinutes%60)}:${nonsecs.format(widget.player.gameTime.inSeconds%60)}"),
+                                        TextSpan(text: ".${nonsecs3.format(widget.player.gameTime.inMicroseconds%1000000)}", style: TextStyle(fontSize: 14))
+                                      ]
+                                    )),
+                                    Text("${playtime(avgGametimeADay)} a day in average"),
                                     Padding(
                                       padding: const EdgeInsets.only(top: 8.0),
                                       child: Text("It's ${f4.format(widget.player.gameTime.inSeconds/31536000)} years,"),
                                     ),
-                                    Text("${f4.format(widget.player.gameTime.inSeconds/2628000)} monts,"),
-                                    Text("${f4.format(widget.player.gameTime.inSeconds/3600)} hours,"),
-                                    Text("${f2.format(widget.player.gameTime.inMilliseconds/60000)} minutes,"),
-                                    Text("${intf.format(widget.player.gameTime.inSeconds)} seconds"),
+                                    Text("or ${f4.format(widget.player.gameTime.inSeconds/2628000)} months,"),
+                                    Text("or ${f4.format(widget.player.gameTime.inSeconds/86400)} days,"),
+                                    Text("or ${f2.format(widget.player.gameTime.inMilliseconds/60000)} minutes,"),
+                                    Text("or ${intf.format(widget.player.gameTime.inSeconds)} seconds"),
                                     ]
                                     ),
                                 ),
@@ -1584,8 +1165,8 @@ class TetraLeagueThingy extends StatelessWidget{
       //surfaceTintColor: rankColors[league.rank],
       child: Column(
         children: [
-          TLRatingThingy(userID: "w", tlData: league, oldTl: toCompare, showPositions: true),
-          TLProgress(
+          TLRatingThingy(userID: league.id, tlData: league, oldTl: toCompare, showPositions: true),
+          if (league.gamesPlayed > 9) TLProgress(
             tlData: league,
             previousRankTRcutoff: cutoffs != null ? cutoffs!.tr[league.rank != "z" ? league.rank : league.percentileRank] : null,
             nextRankTRcutoff: cutoffs != null ? (league.rank != "z" ? league.rank == "x+" : league.percentileRank == "x+") ? 25000 : cutoffs!.tr[ranks.elementAtOrNull(ranks.indexOf(league.rank != "z" ? league.rank : league.percentileRank)+1)] : null,
@@ -1605,62 +1186,25 @@ class TetraLeagueThingy extends StatelessWidget{
                     defaultColumnWidth:const IntrinsicColumnWidth(),
                     children: [
                       TableRow(children: [
-                        Text(f2.format(league.apm??0.00), textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: league.apm != null ? getStatColor(league.apm!, averages?.apm, true) : null)),
-                        Text(" APM", style: TextStyle(fontSize: 21, color: league.apm != null ? getStatColor(league.apm!, averages?.apm, true) : null)),
+                        Text(league.apm != null ? f2.format(league.apm) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: league.apm != null ? getStatColor(league.apm!, averages?.apm, true) : Colors.grey)),
+                        Text(" APM", style: TextStyle(fontSize: 21, color: league.apm != null ? getStatColor(league.apm!, averages?.apm, true) : Colors.grey)),
                         if (toCompare != null) Text(" (${comparef2.format(league.apm!-toCompare!.apm!)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: getDifferenceColor(league.apm!-toCompare!.apm!)))
                       ]),
                       TableRow(children: [
-                        Text(f2.format(league.pps??0.00), textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: league.pps != null ? getStatColor(league.pps!, averages?.pps, true) : null)),
-                        Text(" PPS", style: TextStyle(fontSize: 21, color: league.pps != null ? getStatColor(league.pps!, averages?.pps, true) : null)),
+                        Text(league.pps != null ? f2.format(league.pps) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: league.pps != null ? getStatColor(league.pps!, averages?.pps, true) : Colors.grey)),
+                        Text(" PPS", style: TextStyle(fontSize: 21, color: league.pps != null ? getStatColor(league.pps!, averages?.pps, true) : Colors.grey)),
                         if (toCompare != null) Text(" (${comparef2.format(league.pps!-toCompare!.pps!)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: getDifferenceColor(league.pps!-toCompare!.pps!)))
                       ]),
                       TableRow(children: [
-                        Text(f2.format(league.vs??0.00), textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: league.vs != null ? getStatColor(league.vs!, averages?.vs, true) : null)),
-                        Text(" VS", style: TextStyle(fontSize: 21, color: league.vs != null ? getStatColor(league.vs!, averages?.vs, true) : null)),
+                        Text(league.vs != null ? f2.format(league.vs) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: league.vs != null ? getStatColor(league.vs!, averages?.vs, true) : Colors.grey)),
+                        Text(" VS", style: TextStyle(fontSize: 21, color: league.vs != null ? getStatColor(league.vs!, averages?.vs, true) : Colors.grey)),
                         if (toCompare != null) Text(" (${comparef2.format(league.vs!-toCompare!.vs!)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: getDifferenceColor(league.vs!-toCompare!.vs!)))
                       ])
                     ],
                   ),
                 ),
               ),
-              SizedBox(
-                height: 128.0,
-                width: 128.0,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(1000),
-                  child: SfRadialGauge(
-                    backgroundColor: Colors.black,
-                    axes: [
-                      RadialAxis(
-                        minimum: 0.0,
-                        maximum: 1.0,
-                        radiusFactor: 1.01,
-                        showTicks: true,
-                        showLabels: false,
-                        interval: 0.25,
-                        minorTicksPerInterval: 0,
-                        ranges:[
-                          GaugeRange(startValue: 0, endValue: league.winrate, color: theme.colorScheme.primary)
-                        ],
-                        annotations: [
-                          GaugeAnnotation(widget: Container(child:
-                          Text(percentage.format(league.winrate), textAlign: TextAlign.center, style: const TextStyle(fontSize: 25,fontWeight: FontWeight.bold))),
-                          angle: 90,positionFactor: 0.1
-                          ),
-                          GaugeAnnotation(widget: Container(child:
-                          Text(t.statCellNum.winrate, textAlign: TextAlign.center)),
-                          angle: 270,positionFactor: 0.4
-                          ),
-                          if (toCompare != null) GaugeAnnotation(widget: Container(child:
-                          Text(comparef2.format((league.winrate-toCompare!.winrate)*100), textAlign: TextAlign.center, style: TextStyle(color: getDifferenceColor(league.winrate-toCompare!.winrate)))),
-                          angle: 90,positionFactor: 0.45
-                          )
-                        ],
-                      )
-                    ]
-                  ),
-                ),
-              ),
+              GaugetThingy(value: league.winrate, min: 0, max: 1, tickInterval: 0.25, label: "Winrate", sideSize: 128, fractionDigits: 2, moreIsBetter: true, oldValue: toCompare?.winrate, percentileFormat: true),
               Expanded(
                 child: Center(
                   child: Table(
@@ -1846,7 +1390,8 @@ class GraphsThingy extends StatelessWidget{
 }
 
 class GaugetThingy extends StatelessWidget{
-  final double value;
+  final double? value;
+  final String? subString;
   final double min;
   final double max;
   final double? oldValue;
@@ -1855,9 +1400,10 @@ class GaugetThingy extends StatelessWidget{
   final double tickInterval;
   final String label;
   final double sideSize;
+  final bool percentileFormat;
   final int fractionDigits;
 
-  GaugetThingy({super.key, required this.value, required this.min, required this.max, this.oldValue, this.avgValue, required this.tickInterval, required this.label, required this.sideSize, required this.fractionDigits, required this.moreIsBetter});
+  const GaugetThingy({super.key, required this.value, this.subString, required this.min, required this.max, this.oldValue, this.avgValue, required this.tickInterval, required this.label, required this.sideSize, required this.fractionDigits, required this.moreIsBetter, this.percentileFormat = false});
 
   @override
   Widget build(BuildContext context) {
@@ -1877,21 +1423,25 @@ class GaugetThingy extends StatelessWidget{
               showTicks: true,
               showLabels: false,
               interval: tickInterval,
-              //labelsPosition: ElementsPosition.outside,
+              minorTicksPerInterval: 0,
               ranges:[
-                GaugeRange(startValue: 0, endValue: value, color: theme.colorScheme.primary)
+                GaugeRange(startValue: 0, endValue: (value != null && !value!.isNaN) ? value! : 0, color: theme.colorScheme.primary)
               ],
               annotations: [
                 GaugeAnnotation(widget: Container(child:
-                Text(f.format(value), textAlign: TextAlign.center, style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: getStatColor(value, avgValue, moreIsBetter)))),
+                Text((value != null && !value!.isNaN) ? percentileFormat ? percentage.format(value) : f.format(value) : "---", textAlign: TextAlign.center, style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: (value != null && !value!.isNaN) ? getStatColor(value!, avgValue, moreIsBetter) : Colors.grey))),
                 angle: 90,positionFactor: 0.10
                 ),
                 GaugeAnnotation(widget: Container(child:
-                Text(label, textAlign: TextAlign.center, style: const TextStyle(height: .9))),
-                angle: 270,positionFactor: 0.4
+                Text(label, textAlign: TextAlign.center, style: TextStyle(height: .9, color: (value != null && !value!.isNaN) ? null : Colors.grey))),
+                angle: 270,positionFactor: 0.3, verticalAlignment: GaugeAlignment.far,
                 ),
-                if (oldValue != null) GaugeAnnotation(widget: Container(child:
-                Text(comparef2.format(value-oldValue!), textAlign: TextAlign.center, style: TextStyle(color: getDifferenceColor(moreIsBetter ? value-oldValue! : oldValue!-value)))),
+                if (oldValue != null && (value != null && !value!.isNaN)) GaugeAnnotation(widget: Container(child:
+                Text(comparef2.format(percentileFormat ? (value!-oldValue!) * 100 : value!-oldValue!), textAlign: TextAlign.center, style: TextStyle(color: getDifferenceColor(moreIsBetter ? value!-oldValue! : oldValue!-value!)))),
+                angle: 90,positionFactor: 0.45
+                ),
+                if (subString != null) GaugeAnnotation(widget: Container(child:
+                Text(subString!, textAlign: TextAlign.center, style: TextStyle(color: (value != null && !value!.isNaN) ? null : Colors.grey))),
                 angle: 90,positionFactor: 0.45
                 )
               ],
@@ -1905,8 +1455,9 @@ class GaugetThingy extends StatelessWidget{
 
 class ZenithThingy extends StatelessWidget{
   final RecordSingle? zenith;
+  final bool old;
 
-  const ZenithThingy({super.key, required this.zenith});
+  const ZenithThingy({super.key, required this.zenith, this.old = false});
   
   @override
   Widget build(BuildContext context) {
@@ -1924,7 +1475,7 @@ class ZenithThingy extends StatelessWidget{
                     RichText(
                       text: TextSpan(
                         text: zenith != null ? "${f2.format(zenith!.stats.zenith!.altitude)} m" : "--- m",
-                        style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: FontWeight.w500, color: zenith != null ? Colors.white : Colors.grey),
+                        style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: FontWeight.w500, color: (zenith != null && !old) ? Colors.white : Colors.grey),
                       ),
                     ),
                     if (zenith != null) RichText(
@@ -1954,21 +1505,22 @@ class ZenithThingy extends StatelessWidget{
                     defaultColumnWidth:const IntrinsicColumnWidth(),
                     children: [
                       TableRow(children: [
-                        const Text("APM: ", style: TextStyle(fontSize: 21)),
                         Text(f2.format(zenith!.aggregateStats.apm), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
+                        const Text(" APM", style: TextStyle(fontSize: 21)),
                       ]),
                       TableRow(children: [
-                        const Text("PPS: ", style: TextStyle(fontSize: 21)),
                         Text(f2.format(zenith!.aggregateStats.pps), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
+                        const Text(" PPS", style: TextStyle(fontSize: 21)),
                       ]),
                       TableRow(children: [
-                        const Text("VS: ", style: TextStyle(fontSize: 21)),
                         Text(f2.format(zenith!.aggregateStats.vs), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
+                        const Text(" VS", style: TextStyle(fontSize: 21)),
                       ])
                     ],
                   ),
                 ),
               ),
+              GaugetThingy(value: zenith!.stats.cps, min: 0, max: 12, tickInterval: 3, label: "Climb\nSpeed", subString: "Peak: ${f2.format(zenith!.stats.zenith!.peakrank)}", sideSize: 128, fractionDigits: 2, moreIsBetter: true),
               Expanded(
                 child: Center(
                   child: Table(
@@ -1979,17 +1531,63 @@ class ZenithThingy extends StatelessWidget{
                         const Text(" KO's", style: TextStyle(fontSize: 21))
                       ]),
                       TableRow(children: [
-                        Text(f2.format(zenith!.stats.cps), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
-                        const Text(" CPS", style: TextStyle(fontSize: 21))
+                        Text(zenith!.stats.topBtB.toString(), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
+                        const Text(" B2B", style: TextStyle(fontSize: 21))
                       ]),
                       TableRow(children: [
-                        Text(f2.format(zenith!.stats.zenith!.peakrank), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
-                        const Text(" Peak CPS", style: TextStyle(fontSize: 21))
+                        Text(zenith!.stats.zenith!.floor.toString(), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
+                        const Text(" Floor", style: TextStyle(fontSize: 21))
                       ])
                     ],
                   ),
                 ),
-              ),
+              )
+              ],
+            ) else Row(
+              children: [
+                Expanded(
+                  child: Center(
+                    child: Table(
+                      defaultColumnWidth: IntrinsicColumnWidth(),
+                      children: [
+                        const TableRow(children: [
+                          Text("-.--", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: Colors.grey)),
+                          Text(" APM", style: TextStyle(fontSize: 21, color: Colors.grey)),
+                        ]),
+                        const TableRow(children: [
+                          Text("-.--", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: Colors.grey)),
+                          Text(" PPS", style: TextStyle(fontSize: 21, color: Colors.grey)),
+                        ]),
+                        const TableRow(children: [
+                          Text("-.--", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: Colors.grey)),
+                          Text(" VS", style: TextStyle(fontSize: 21, color: Colors.grey)),
+                        ])
+                      ],
+                    ),
+                  ),
+                ),
+                GaugetThingy(value: null, min: 0, max: 12, tickInterval: 3, label: "Climb\nSpeed", subString: "Peak: ---", sideSize: 128, fractionDigits: 0, moreIsBetter: true),
+                Expanded(
+                  child: Center(
+                    child: Table(
+                      defaultColumnWidth: IntrinsicColumnWidth(),
+                      children: [
+                        const TableRow(children: [
+                          Text("---", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: Colors.grey)),
+                          Text(" KO's", style: TextStyle(fontSize: 21, color: Colors.grey))
+                        ]),
+                        const TableRow(children: [
+                          Text("---", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: Colors.grey)),
+                          Text(" B2B", style: TextStyle(fontSize: 21, color: Colors.grey))
+                        ]),
+                        const TableRow(children: [
+                          Text("---", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: Colors.grey)),
+                          Text(" Floor", style: TextStyle(fontSize: 21, color: Colors.grey))
+                        ])
+                      ],
+                    ),
+                  ),
+                )
               ],
             )
           ]
@@ -2247,7 +1845,7 @@ class ErrorThingy extends StatelessWidget{
   final FetchResults? data;
   final String? eText;
 
-  ErrorThingy({this.data, this.eText});
+  const ErrorThingy({this.data, this.eText});
 
   @override
   Widget build(BuildContext context) {

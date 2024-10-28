@@ -39,9 +39,9 @@ class Summaries {
       zenithEx = RecordSingle.fromJson(json['zenithex']['record'],
           json['zenithex']['rank'], json['zenithex']['rank_local']);
     if (json['zenithex']['best']['record'] != null)
-      zenithCareerBest = RecordSingle.fromJson(
+      zenithExCareerBest = RecordSingle.fromJson(
           json['zenithex']['best']['record'],
-          json['zenith']['best']['rank'],
+          json['zenithex']['best']['rank'],
           -1);
     achievements = [
       for (var achievement in json['achievements'])

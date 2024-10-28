@@ -88,6 +88,7 @@ flutter:
      - res/icons/
      - res/tetrio_tl_alpha_ranks/
      - res/tetrio_badges/
+     - res/images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

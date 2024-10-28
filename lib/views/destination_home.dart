@@ -55,12 +55,13 @@ class FetchResults{
 class RecordSummary extends StatelessWidget{
   final RecordSingle? record;
   final bool hideRank;
+  final bool old;
   final bool? betterThanRankAverage;
   final MapEntry? closestAverage;
   final bool? betterThanClosestAverage;
   final String? rank;
 
-  const RecordSummary({super.key, required this.record, this.betterThanRankAverage, this.closestAverage, this.betterThanClosestAverage, this.rank, this.hideRank = false});
+  const RecordSummary({super.key, required this.record, this.betterThanRankAverage, this.closestAverage, this.old = false, this.betterThanClosestAverage, this.rank, this.hideRank = false});
   
   @override
   Widget build(BuildContext context) {
@@ -85,13 +86,12 @@ class RecordSummary extends StatelessWidget{
                 "zenithex" => "${f2.format(record!.stats.zenith!.altitude)} m",
                 _ => record!.stats.score.toString()
               },
-              style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 36, fontWeight: FontWeight.w500, color: Colors.white, height: 0.9),
+              style: TextStyle(fontFamily: "Eurostile Round", fontSize: 36, fontWeight: FontWeight.w500, color: old ? Colors.grey : Colors.white, height: 0.9),
               ),
             ),
           RichText(
             textAlign: hideRank ? TextAlign.center : TextAlign.start,
             text: TextSpan(
-            text: "",
             style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
             children: [
               if (rank != null && rank != "z") TextSpan(text: "${t.verdictGeneral(n: switch(record!.gamemode){
@@ -158,7 +158,7 @@ class LeagueCard extends StatelessWidget{
               )
               else Text("Tetra League", style: Theme.of(context).textTheme.titleSmall),
               const Divider(),
-              TLRatingThingy(userID: "", tlData: league, showPositions: true),
+              TLRatingThingy(userID: league.id, tlData: league, showPositions: true),
               const Divider(),
               RichText(text: TextSpan(
                 style: const TextStyle(fontFamily: "Eurostile Round", color: Colors.grey),
@@ -229,7 +229,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                       const Divider(),
                       RecordSummary(record: summaries.sprint, betterThanClosestAverage: sprintBetterThanClosestAverage, betterThanRankAverage: sprintBetterThanRankAverage, closestAverage: closestAverageSprint, rank: summaries.league.percentileRank),
                       const Divider(),
-                      Text("${summaries.sprint != null ? intf.format(summaries.sprint!.stats.piecesPlaced) : "---"} P • ${summaries.sprint != null ? f2.format(summaries.sprint!.stats.pps) : "---"} PPS • ${summaries.sprint != null ? f2.format(summaries.sprint!.stats.kpp) : "---"} KPP", style: const TextStyle(color: Colors.grey))
+                      Text("${summaries.sprint != null ? intf.format(summaries.sprint!.stats.piecesPlaced) : "---"} P • ${summaries.sprint != null ? f2.format(summaries.sprint!.stats.pps) : "-.--"} PPS • ${summaries.sprint != null ? f2.format(summaries.sprint!.stats.kpp) : "-.--"} KPP", style: const TextStyle(color: Colors.grey))
                     ],
                   ),
                 ),
@@ -246,7 +246,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                       const Divider(),
                       RecordSummary(record: summaries.blitz, betterThanClosestAverage: blitzBetterThanClosestAverage, betterThanRankAverage: blitzBetterThanRankAverage, closestAverage: closestAverageBlitz, rank: summaries.league.percentileRank),
                       const Divider(),
-                      Text("Level ${summaries.blitz != null ? intf.format(summaries.blitz!.stats.level): "--"} • ${summaries.blitz != null ? f2.format(summaries.blitz!.stats.spp) : "-.--"} SPP • ${summaries.blitz != null ? f2.format(summaries.blitz!.stats.pps) : "---"} PPS", style: const TextStyle(color: Colors.grey))
+                      Text("Level ${summaries.blitz != null ? intf.format(summaries.blitz!.stats.level): "--"} • ${summaries.blitz != null ? f2.format(summaries.blitz!.stats.spp) : "-.--"} SPP • ${summaries.blitz != null ? f2.format(summaries.blitz!.stats.pps) : "-.--"} PPS", style: const TextStyle(color: Colors.grey))
                     ],
                   ),
                 ),
@@ -266,7 +266,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                     children: [
                       Text("QP", style: Theme.of(context).textTheme.titleSmall),
                       const Divider(),
-                      RecordSummary(record: summaries.zenith, hideRank: true),
+                      RecordSummary(record: summaries.zenith != null ? summaries.zenith : summaries.zenithCareerBest, hideRank: true, old: summaries.zenith == null),
                       const Divider(),
                       Text("Overall PB: ${(summaries.achievements.isNotEmpty && summaries.achievements.firstWhere((e) => e.k == 18).v != null) ? f2.format(summaries.achievements.firstWhere((e) => e.k == 18).v!) : "-.--"} m", style: const TextStyle(color: Colors.grey))
                     ],
@@ -283,7 +283,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                     children: [
                       Text("QP Expert", style: Theme.of(context).textTheme.titleSmall),
                       const Divider(),
-                      RecordSummary(record: summaries.zenithEx, hideRank: true,),
+                      RecordSummary(record: summaries.zenithEx != null ? summaries.zenithEx : summaries.zenithExCareerBest, hideRank: true, old: summaries.zenith == null),
                       const Divider(),
                       Text("Overall PB: ${(summaries.achievements.isNotEmpty && summaries.achievements.firstWhere((e) => e.k == 19).v != null) ? f2.format(summaries.achievements.firstWhere((e) => e.k == 19).v!) : "-.--"} m", style: const TextStyle(color: Colors.grey))
                     ],
@@ -623,7 +623,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
     );
   }
 
-  Widget getZenithCard(RecordSingle? record){
+  Widget getZenithCard(RecordSingle? record, bool old){
     return Column(
       children: [
         Card(
@@ -641,7 +641,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
             ),
           ),
         ),
-        ZenithThingy(zenith: record),
+        ZenithThingy(zenith: record, old: old),
         if (record != null) Row(
           children: [
             Expanded(
@@ -1084,17 +1084,17 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                             child: SlideTransition(
                               position: _offsetAnimation,
                               child: switch (rightCard){
-                                Cards.overview => getOverviewCard(snapshot.data!.summaries!, (snapshot.data!.averages != null && snapshot.data!.summaries!.league.rank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.rank] : (snapshot.data!.averages != null && snapshot.data!.summaries!.league.percentileRank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.rank] : null),
+                                Cards.overview => getOverviewCard(snapshot.data!.summaries!, (snapshot.data!.averages != null && snapshot.data!.summaries!.league.rank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.rank] : (snapshot.data!.averages != null && snapshot.data!.summaries!.league.percentileRank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.percentileRank] : null),
                                 Cards.tetraLeague => switch (cardMod){
-                                  CardMod.info => getTetraLeagueCard(snapshot.data!.summaries!.league, snapshot.data!.cutoffs, (snapshot.data!.averages != null && snapshot.data!.summaries!.league.rank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.rank] : (snapshot.data!.averages != null && snapshot.data!.summaries!.league.percentileRank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.rank] : null, snapshot.data!.states),
+                                  CardMod.info => getTetraLeagueCard(snapshot.data!.summaries!.league, snapshot.data!.cutoffs, (snapshot.data!.averages != null && snapshot.data!.summaries!.league.rank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.rank] : (snapshot.data!.averages != null && snapshot.data!.summaries!.league.percentileRank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.percentileRank] : null, snapshot.data!.states),
                                   CardMod.ex => getPreviousSeasonsList(snapshot.data!.summaries!.pastLeague),
                                   CardMod.records => getRecentTLrecords(widget.constraints),
                                   _ => const Center(child: Text("huh?"))
                                 },
                                 Cards.quickPlay => switch (cardMod){
-                                  CardMod.info => getZenithCard(snapshot.data?.summaries!.zenith),
+                                  CardMod.info => getZenithCard(snapshot.data?.summaries?.zenith != null ? snapshot.data!.summaries!.zenith : snapshot.data!.summaries?.zenithCareerBest, snapshot.data!.summaries?.zenith == null),
                                   CardMod.records => getListOfRecords("zenith/recent", "zenith/top", widget.constraints),
-                                  CardMod.ex => getZenithCard(snapshot.data?.summaries!.zenithEx),
+                                  CardMod.ex => getZenithCard(snapshot.data?.summaries?.zenithEx != null ? snapshot.data!.summaries!.zenithEx : snapshot.data!.summaries?.zenithExCareerBest, snapshot.data!.summaries?.zenithEx == null),
                                   CardMod.exRecords => getListOfRecords("zenithex/recent", "zenithex/top", widget.constraints),
                                 },
                                 Cards.sprint => switch (cardMod){

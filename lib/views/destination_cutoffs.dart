@@ -10,6 +10,7 @@ import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
 import 'package:tetra_stats/views/main_view_tiles.dart';
+import 'package:tetra_stats/views/rank_view.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors; 
 
@@ -273,7 +274,10 @@ class _DestinationCutoffsState extends State<DestinationCutoffs> {
                             Padding(
                               padding: const EdgeInsets.only(right: 8.0),
                               child: TextButton(child: Text("View", textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)), onPressed: () {
-                                
+                                Navigator.push(context, MaterialPageRoute(
+                                  builder: (context) => RankView(rank: rank, nextRankTR: rank == "x+" ? snapshot.data!.data["top1"]!.tr : snapshot.data!.data[ranks[ranks.indexOf(rank)+1]]!.tr, nextRankPercentile: rank == "x+" ? 0.00 : snapshot.data!.data[ranks[ranks.indexOf(rank)+1]]!.percentile, nextRankTargetTR: rank == "x+" ? 25000.00 : snapshot.data!.data[ranks[ranks.indexOf(rank)+1]]!.targetTr, totalPlayers: snapshot.data!.total, cutoffTetrio: snapshot.data!.data[rank]!),
+                                ),
+                                );
                               },),
                             ),
                           ]

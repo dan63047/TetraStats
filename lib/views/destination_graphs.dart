@@ -10,7 +10,6 @@ import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
-import 'package:tetra_stats/views/destination_home.dart';
 import 'package:tetra_stats/views/main_view_tiles.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
 
@@ -45,6 +44,9 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
   Stats _Ychart = Stats.tr;
   Stats _Xchart = Stats.tr;
   int _season = currentSeason-1;
+  List<String> excludeRanks = [];
+  late Future<List<_MyScatterSpot>> futureLeague = getTetraLeagueData(_Xchart, _Ychart);
+  String searchLeague = "";
   //Duration postSeasonLeft = seasonStart.difference(DateTime.now());
 
   @override
@@ -169,16 +171,22 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
     TetrioPlayersLeaderboard leaderboard = await teto.fetchTLLeaderboard();
     List<_MyScatterSpot> _spots = [
       for (TetrioPlayerFromLeaderboard entry in leaderboard.leaderboard)
-        _MyScatterSpot(
+        if (excludeRanks.indexOf(entry.rank) == -1) _MyScatterSpot(
           entry.getStatByEnum(x).toDouble(),
           entry.getStatByEnum(y).toDouble(),
           entry.userId,
           entry.username,
           entry.rank,
-          rankColors[entry.rank]??Colors.white
+          (rankColors[entry.rank]??Colors.white).withAlpha((searchLeague.isNotEmpty && entry.username.startsWith(searchLeague.toLowerCase())) ? 255 : 20)
         )
     ];
     return _spots;
+  }
+
+  bool? getTotalFilterValue(){
+    if (excludeRanks.isEmpty) return true;
+    if (excludeRanks.length == ranks.length) return false;
+    return null;
   }
 
   Widget getHistoryGraph(){
@@ -247,7 +255,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
 
   Widget getLeagueState (){
     return FutureBuilder<List<_MyScatterSpot>>(
-      future: getTetraLeagueData(_Xchart, _Ychart),
+      future: futureLeague,
       builder: (context, snapshot) {
       switch (snapshot.connectionState){
         case ConnectionState.none:
@@ -340,6 +348,21 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                     spacing: 20,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
+                      if (_graph == Graph.leagueState) SizedBox(
+                        width: 300,
+                        child: TextField(
+                          decoration: InputDecoration(
+                            icon: Icon(Icons.search)
+                          ),
+                          onChanged: (v){
+                            searchLeague = v;
+                          },
+                          onSubmitted: (v){
+                            searchLeague = v;
+                            setState((){futureLeague = getTetraLeagueData(_Xchart, _Ychart);});
+                          },
+                        )
+                      ),
                       if (_graph == Graph.history) Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -404,6 +427,53 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                             Text(t.smooth, style: const TextStyle(color: Colors.white, fontSize: 22))
                         ],
                       ),
+                      if (_graph == Graph.leagueState) IconButton(
+                        color: excludeRanks.isNotEmpty ? Theme.of(context).colorScheme.primary : null,
+                        onPressed: (){
+                        showDialog(context: context, builder: (BuildContext context) {
+                          return StatefulBuilder(
+                          builder: (context, StateSetter setAlertState) {
+                            return AlertDialog(
+                              title: Text("Filter ranks on graph", textAlign: TextAlign.center),
+                              content: SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    CheckboxListTile(value: getTotalFilterValue(), tristate: true, title: Text("All", style: TextStyle(fontFamily: "Eurostile Round Extended")), onChanged: (value){
+                                      setAlertState(
+                                        (){
+                                          if (excludeRanks.length*2 > ranks.length){
+                                            excludeRanks.clear();
+                                          }else{
+                                            excludeRanks = List.of(ranks);
+                                          }
+                                        }
+                                      );
+                                    }),
+                                    for(String rank in ranks.reversed) CheckboxListTile(value: excludeRanks.indexOf(rank) == -1, onChanged: (value){
+                                      setAlertState(
+                                        (){
+                                          if (excludeRanks.indexOf(rank) == -1){
+                                            excludeRanks.add(rank);
+                                          }else{
+                                            excludeRanks.remove(rank);
+                                          }
+                                        }
+                                      );
+                                    }, title: Text(rank.toUpperCase()),)
+                                  ],
+                                ),
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: const Text("Apply"),
+                                  onPressed: () {Navigator.of(context).pop(); setState((){futureLeague = getTetraLeagueData(_Xchart, _Ychart);});}
+                                )  
+                              ]
+                            );
+                          }
+                        );
+                        });
+                      }, icon: Icon(Icons.filter_alt)),
                       IconButton(onPressed: () => _zoomPanBehavior.reset(), icon: const Icon(Icons.refresh), alignment: Alignment.center,)
                     ],
                   ),
