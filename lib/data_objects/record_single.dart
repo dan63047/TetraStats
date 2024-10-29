@@ -11,6 +11,7 @@ class RecordSingle {
   late String replayId;
   late String ownId;
   late String gamemode;
+  String? revolution;
   late DateTime timestamp;
   late ResultsStats stats;
   late int rank;
@@ -35,6 +36,7 @@ class RecordSingle {
     countryRank = cran;
     aggregateStats = AggregateStats.fromJson(json['results']['aggregatestats']);
     prisecter = Prisecter.fromJson(json['p']);
+    revolution = json["revolution"];
     var ex = json['extras'] as Map<String, dynamic>;
     switch (ex.keys.firstOrNull){
       case "zenith":

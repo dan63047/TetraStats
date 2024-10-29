@@ -44,6 +44,8 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
   Stats _Ychart = Stats.tr;
   Stats _Xchart = Stats.tr;
   int _season = currentSeason-1;
+  ValueNotifier<String> historyPlayerUsername = ValueNotifier("");
+  ValueNotifier<String> historyPlayerAvatarRevizion = ValueNotifier("");
   List<String> excludeRanks = [];
   late Future<List<_MyScatterSpot>> futureLeague = getTetraLeagueData(_Xchart, _Ychart);
   String searchLeague = "";
@@ -177,7 +179,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
           entry.userId,
           entry.username,
           entry.rank,
-          (rankColors[entry.rank]??Colors.white).withAlpha((searchLeague.isNotEmpty && entry.username.startsWith(searchLeague.toLowerCase())) ? 255 : 20)
+          (rankColors[entry.rank]??Colors.white).withOpacity((searchLeague.isEmpty || entry.username.startsWith(searchLeague.toLowerCase())) ? 1.0 : 0.005)
         )
     ];
     return _spots;
@@ -274,6 +276,10 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                 dataSource: snapshot.data,
                 animationDuration: 0,
                 pointColorMapper: (data, _) => data.color,
+                markerSettings: MarkerSettings(
+                  isVisible: false,
+                  borderColor: Colors.black,
+                ),
                 xValueMapper: (data, _) => data.x,
                 yValueMapper: (data, _) => data.y,
                 onPointTap: (point) => Navigator.push(context, MaterialPageRoute(builder: (context) => MainView(player: snapshot.data![point.pointIndex!].nickname), maintainState: false)),
@@ -348,11 +354,28 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                     spacing: 20,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
+                      if (_graph == Graph.history) Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.person),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: ValueListenableBuilder<String>(
+                              valueListenable: historyPlayerUsername,
+                              builder: (context, value, child) {
+                                return Text(value, style: TextStyle(fontSize: 22, fontFamily: "Eurostile Round Extended"));
+                              },
+                            )
+                          ),
+                        ],
+                      ),
                       if (_graph == Graph.leagueState) SizedBox(
                         width: 300,
                         child: TextField(
+                          style: TextStyle(fontSize: 18.0000),
                           decoration: InputDecoration(
-                            icon: Icon(Icons.search)
+                            icon: Icon(Icons.search),
+                            isDense: true
                           ),
                           onChanged: (v){
                             searchLeague = v;
@@ -414,7 +437,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                           ),
                         ],
                       ),
-                      if (_graph != Graph.leagueState) Row(
+                      if (_graph == Graph.history) Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Checkbox(value: _smooth,

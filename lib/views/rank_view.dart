@@ -233,31 +233,29 @@ class _RankState extends State<RankView> {
               SizedBox(
                 width: constraints.maxWidth - 350,
                 height: constraints.maxHeight,
-                child: Column(
+                child: Row(
                   children: [
-                    SegmentedButton<CardMod>(
-                      showSelectedIcon: false,
-                      selected: <CardMod>{cardMod},
-                      segments: <ButtonSegment<CardMod>>[
-                        ButtonSegment<CardMod>(
-                          value: CardMod.graph,
-                          label: Text("Graph"),
+                    SizedBox(
+                      width: 200.0,
+                      child: Card(
+                        child: Column(
+                          children: [],
                         ),
-                        ButtonSegment<CardMod>(
-                          value: CardMod.graph,
-                          label: Text("Minimums"),
+                      ),
+                    ),
+                    Expanded(
+                      child: Card(
+                        child: Column(
+                          children: [],
                         ),
-                        ButtonSegment<CardMod>(
-                          value: CardMod.graph,
-                          label: Text("Maximums"),
-                        )
-                      ],
-                      onSelectionChanged: (p0) {
-                        setState(() {
-                          cardMod = p0.first;
-                          //_transition.;
-                        });
-                      },
+                      ),
+                    ),
+                    Expanded(
+                      child: Card(
+                        child: Column(
+                          children: [],
+                        ),
+                      ),
                     )
                   ],
                 ),
