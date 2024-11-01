@@ -68,10 +68,10 @@ class CompareState extends State<CompareView> {
     try {
       if (user.startsWith("\$avg")){
         try{
-          var average = (await teto.fetchTLLeaderboard()).getAverageOfRank(user.substring(4).toLowerCase())[0];
-          Summaries summary = Summaries("avg${user.substring(4).toLowerCase()}", average, TetrioZen(level: 0, score: 0));
+          //var average = (await teto.fetchTLLeaderboard()).getAverageOfRank(user.substring(4).toLowerCase())[0];
+          //Summaries summary = Summaries("avg${user.substring(4).toLowerCase()}", average, TetrioZen(level: 0, score: 0));
           redSideMode = Mode.averages;
-          theRedSide = [null, null, summary];
+          //theRedSide = [null, null, summary];
           return setState(() {});
         }on Exception {
           if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.compareViewWrongValue(value: user))));
@@ -147,10 +147,10 @@ class CompareState extends State<CompareView> {
     try {
       if (user.startsWith("\$avg")){
         try{
-          var average = (await teto.fetchTLLeaderboard()).getAverageOfRank(user.substring(4).toLowerCase())[0];
-          Summaries summary = Summaries("avg${user.substring(4).toLowerCase()}", average, TetrioZen(level: 0, score: 0));
+          //var average = (await teto.fetchTLLeaderboard()).getAverageOfRank(user.substring(4).toLowerCase())[0];
+          //Summaries summary = Summaries("avg${user.substring(4).toLowerCase()}", average, TetrioZen(level: 0, score: 0));
           greenSideMode = Mode.averages;
-          theGreenSide = [null, null, summary];
+          //theGreenSide = [null, null, summary];
           return setState(() {});
         }on Exception {
           if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Falied to assign $user")));

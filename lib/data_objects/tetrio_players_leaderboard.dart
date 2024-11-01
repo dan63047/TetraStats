@@ -57,35 +57,14 @@ class TetrioPlayersLeaderboard {
     return lb;
   }
 
-  List<dynamic> getAverageOfRank(String rank){ // i tried to refactor it and that's was terrible
+  List<dynamic> getRankData(String rank){
     if (rank.isNotEmpty && !rankCutoffs.keys.contains(rank)) throw Exception("Invalid rank");
     List<TetrioPlayerFromLeaderboard> filtredLeaderboard = List.from(leaderboard); 
     if (rank.isNotEmpty) {
       filtredLeaderboard.removeWhere((element) => element.rank != rank);
     }
     if (filtredLeaderboard.isNotEmpty){
-      double avgAPM = 0,
-        avgPPS = 0,
-        avgVS = 0,
-        avgTR = 0,
-        avgGlixare = 0,
-        avgGlicko = 0,
-        avgRD = 0,
-        avgAPP = 0,
-        avgVSAPM = 0,
-        avgDSS = 0,
-        avgDSP = 0,
-        avgAPPDSP = 0,
-        avgCheese = 0,
-        avgGBE = 0,
-        avgNyaAPP = 0,
-        avgArea = 0,
-        avgEstTR = 0,
-        avgEstAcc = 0,
-        avgOpener = 0,
-        avgPlonk = 0,
-        avgStride = 0,
-        avgInfDS = 0,
+      double
         lowestTR = 25000,
         lowestGlixare = double.infinity,
         lowestGlicko = double.infinity,
@@ -131,7 +110,11 @@ class TetrioPlayersLeaderboard {
         highestOpener = double.negativeInfinity,
         highestPlonk = double.negativeInfinity,
         highestStride = double.negativeInfinity,
-        highestInfDS = double.negativeInfinity;
+        highestInfDS = double.negativeInfinity,
+        avgTR = 0,
+        avgGlixare = 0,
+        avgGlicko = 0,
+        avgRD = 0;
       int avgGamesPlayed = 0,
         avgGamesWon = 0,
         totalGamesPlayed = 0,
@@ -191,28 +174,10 @@ class TetrioPlayersLeaderboard {
         highestStrideID = "", highestStrideNick = "",
         highestInfDSid = "", highestInfDSnick = "";
       for (var entry in filtredLeaderboard){
-        avgAPM += entry.apm;
-        avgPPS += entry.pps;
-        avgVS += entry.vs;
         avgTR += entry.tr;
         avgGlixare += entry.gxe;
         if (entry.glicko != null) avgGlicko += entry.glicko!;
         if (entry.rd != null) avgRD += entry.rd!;
-        avgAPP += entry.nerdStats.app;
-        avgVSAPM += entry.nerdStats.vsapm;
-        avgDSS += entry.nerdStats.dss;
-        avgDSP += entry.nerdStats.dsp;
-        avgAPPDSP += entry.nerdStats.appdsp;
-        avgCheese += entry.nerdStats.cheese;
-        avgGBE += entry.nerdStats.gbe;
-        avgNyaAPP += entry.nerdStats.nyaapp;
-        avgArea += entry.nerdStats.area;
-        avgEstTR += entry.estTr.esttr;
-        avgEstAcc += entry.esttracc;
-        avgOpener += entry.playstyle.opener;
-        avgPlonk += entry.playstyle.plonk;
-        avgStride += entry.playstyle.stride;
-        avgInfDS += entry.playstyle.infds;
         totalGamesPlayed += entry.gamesPlayed;
         totalGamesWon += entry.gamesWon;
         if (entry.tr < lowestTR){
@@ -466,33 +431,14 @@ class TetrioPlayersLeaderboard {
           highestInfDSnick = entry.username;
         }
       }
-      avgAPM /= filtredLeaderboard.length;
-      avgPPS /= filtredLeaderboard.length;
-      avgVS /= filtredLeaderboard.length;
       avgTR /= filtredLeaderboard.length;
       avgGlixare /= filtredLeaderboard.length;
       avgGlicko /= filtredLeaderboard.length;
       avgRD /= filtredLeaderboard.length;
-      avgAPP /= filtredLeaderboard.length;
-      avgVSAPM /= filtredLeaderboard.length;
-      avgDSS /= filtredLeaderboard.length;
-      avgDSP /= filtredLeaderboard.length;
-      avgAPPDSP /= leaderboard.length;
-      avgCheese /= filtredLeaderboard.length;
-      avgGBE /= filtredLeaderboard.length;
-      avgNyaAPP /= filtredLeaderboard.length;
-      avgArea /= filtredLeaderboard.length;
-      avgEstTR /= filtredLeaderboard.length;
-      avgEstAcc /= filtredLeaderboard.length;
-      avgOpener /= filtredLeaderboard.length;
-      avgPlonk /= filtredLeaderboard.length;
-      avgStride /= filtredLeaderboard.length;
-      avgInfDS /= filtredLeaderboard.length;
       avgGamesPlayed = (totalGamesPlayed / filtredLeaderboard.length).floor();
       avgGamesWon = (totalGamesWon / filtredLeaderboard.length).floor();
-      return [TetraLeague(id: "", timestamp: DateTime.now(), apm: avgAPM, pps: avgPPS, vs: avgVS, gxe: avgGlixare, glicko: avgGlicko, rd: avgRD, gamesPlayed: avgGamesPlayed, gamesWon: avgGamesWon, bestRank: rank, decaying: false, tr: avgTR, rank: rank == "" ? "z" : rank, percentileRank: rank, percentile: rankCutoffs[rank]!, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1, season: currentSeason),
+      return [TetraLeague(id: "", timestamp: DateTime.now(), apm: null, pps: null, vs: null, gxe: avgGlixare, glicko: avgGlicko, rd: avgRD, gamesPlayed: avgGamesPlayed, gamesWon: avgGamesWon, bestRank: rank, decaying: false, tr: avgTR, rank: rank == "" ? "z" : rank, percentileRank: rank, percentile: rankCutoffs[rank]!, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1, season: currentSeason),
       {
-        "everyone": rank == "",
         "totalGamesPlayed": totalGamesPlayed,
         "totalGamesWon": totalGamesWon,
         "players": filtredLeaderboard.length,
@@ -652,24 +598,7 @@ class TetrioPlayersLeaderboard {
         "highestInfDS": highestInfDS,
         "highestInfDSid": highestInfDSid,
         "highestInfDSnick": highestInfDSnick,
-        "avgAPP": avgAPP,
-        "avgVSAPM": avgVSAPM,
-        "avgDSS": avgDSS,
-        "avgDSP": avgDSP,
-        "avgAPPDSP": avgAPPDSP,
-        "avgCheese": avgCheese,
-        "avgGBE": avgGBE,
-        "avgNyaAPP": avgNyaAPP,
-        "avgArea": avgArea,
-        "avgEstTR": avgEstTR,
-        "avgEstAcc": avgEstAcc,
-        "avgOpener": avgOpener,
-        "avgPlonk": avgPlonk,
-        "avgStride": avgStride,
-        "avgInfDS": avgInfDS,
-        "toEnterTR": rank.toLowerCase() != "z" ? leaderboard[(leaderboard.length * rankCutoffs[rank]!).floor()-1].tr : lowestTR,
         "toEnterGlicko": rank.toLowerCase() != "z" ? leaderboard[(leaderboard.length * rankCutoffs[rank]!).floor()-1].glicko : 0,
-        "entries": filtredLeaderboard
       }];
     }else{
       return [TetraLeague(id: "", timestamp: DateTime.now(), apm: 0, pps: 0, vs: 0, glicko: 0, rd: noTrRd, gamesPlayed: 0, gamesWon: 0, bestRank: rank, decaying: false, tr: 0, rank: rank, percentileRank: rank, gxe: -1, percentile: rankCutoffs[rank]!, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1, season: currentSeason),
@@ -702,65 +631,45 @@ class TetrioPlayersLeaderboard {
   }
 
   Map<String, List<dynamic>> get averages => {
-    'x+': getAverageOfRank("x+"),
-    'x': getAverageOfRank("x"),
-    'u': getAverageOfRank("u"),
-    'ss': getAverageOfRank("ss"),
-    's+': getAverageOfRank("s+"),
-    's': getAverageOfRank("s"),
-    's-': getAverageOfRank("s-"),
-    'a+': getAverageOfRank("a+"),
-    'a': getAverageOfRank("a"),
-    'a-': getAverageOfRank("a-"),
-    'b+': getAverageOfRank("b+"),
-    'b': getAverageOfRank("b"),
-    'b-': getAverageOfRank("b-"),
-    'c+': getAverageOfRank("c+"),
-    'c': getAverageOfRank("c"),
-    'c-': getAverageOfRank("c-"),
-    'd+': getAverageOfRank("d+"),
-    'd': getAverageOfRank("d"),
-    'z': getAverageOfRank("z")
-    };
-
-  Map<String, double> get cutoffs => {
-    'x': getAverageOfRank("x")[1]["toEnterTR"],
-    'u': getAverageOfRank("u")[1]["toEnterTR"],
-    'ss': getAverageOfRank("ss")[1]["toEnterTR"],
-    's+': getAverageOfRank("s+")[1]["toEnterTR"],
-    's': getAverageOfRank("s")[1]["toEnterTR"],
-    's-': getAverageOfRank("s-")[1]["toEnterTR"],
-    'a+': getAverageOfRank("a+")[1]["toEnterTR"],
-    'a': getAverageOfRank("a")[1]["toEnterTR"],
-    'a-': getAverageOfRank("a-")[1]["toEnterTR"],
-    'b+': getAverageOfRank("b+")[1]["toEnterTR"],
-    'b': getAverageOfRank("b")[1]["toEnterTR"],
-    'b-': getAverageOfRank("b-")[1]["toEnterTR"],
-    'c+': getAverageOfRank("c+")[1]["toEnterTR"],
-    'c': getAverageOfRank("c")[1]["toEnterTR"],
-    'c-': getAverageOfRank("c-")[1]["toEnterTR"],
-    'd+': getAverageOfRank("d+")[1]["toEnterTR"],
-    'd': getAverageOfRank("d")[1]["toEnterTR"]
+    'x+': getRankData("x+"),
+    'x': getRankData("x"),
+    'u': getRankData("u"),
+    'ss': getRankData("ss"),
+    's+': getRankData("s+"),
+    's': getRankData("s"),
+    's-': getRankData("s-"),
+    'a+': getRankData("a+"),
+    'a': getRankData("a"),
+    'a-': getRankData("a-"),
+    'b+': getRankData("b+"),
+    'b': getRankData("b"),
+    'b-': getRankData("b-"),
+    'c+': getRankData("c+"),
+    'c': getRankData("c"),
+    'c-': getRankData("c-"),
+    'd+': getRankData("d+"),
+    'd': getRankData("d"),
+    'z': getRankData("z")
     };
 
   Map<String, double> get cutoffsGlicko => {
-    'x': getAverageOfRank("x")[1]["toEnterGlicko"],
-    'u': getAverageOfRank("u")[1]["toEnterGlicko"],
-    'ss': getAverageOfRank("ss")[1]["toEnterGlicko"],
-    's+': getAverageOfRank("s+")[1]["toEnterGlicko"],
-    's': getAverageOfRank("s")[1]["toEnterGlicko"],
-    's-': getAverageOfRank("s-")[1]["toEnterGlicko"],
-    'a+': getAverageOfRank("a+")[1]["toEnterGlicko"],
-    'a': getAverageOfRank("a")[1]["toEnterGlicko"],
-    'a-': getAverageOfRank("a-")[1]["toEnterGlicko"],
-    'b+': getAverageOfRank("b+")[1]["toEnterGlicko"],
-    'b': getAverageOfRank("b")[1]["toEnterGlicko"],
-    'b-': getAverageOfRank("b-")[1]["toEnterGlicko"],
-    'c+': getAverageOfRank("c+")[1]["toEnterGlicko"],
-    'c': getAverageOfRank("c")[1]["toEnterGlicko"],
-    'c-': getAverageOfRank("c-")[1]["toEnterGlicko"],
-    'd+': getAverageOfRank("d+")[1]["toEnterGlicko"],
-    'd': getAverageOfRank("d")[1]["toEnterGlicko"]
+    'x': getRankData("x")[1]["toEnterGlicko"],
+    'u': getRankData("u")[1]["toEnterGlicko"],
+    'ss': getRankData("ss")[1]["toEnterGlicko"],
+    's+': getRankData("s+")[1]["toEnterGlicko"],
+    's': getRankData("s")[1]["toEnterGlicko"],
+    's-': getRankData("s-")[1]["toEnterGlicko"],
+    'a+': getRankData("a+")[1]["toEnterGlicko"],
+    'a': getRankData("a")[1]["toEnterGlicko"],
+    'a-': getRankData("a-")[1]["toEnterGlicko"],
+    'b+': getRankData("b+")[1]["toEnterGlicko"],
+    'b': getRankData("b")[1]["toEnterGlicko"],
+    'b-': getRankData("b-")[1]["toEnterGlicko"],
+    'c+': getRankData("c+")[1]["toEnterGlicko"],
+    'c': getRankData("c")[1]["toEnterGlicko"],
+    'c-': getRankData("c-")[1]["toEnterGlicko"],
+    'd+': getRankData("d+")[1]["toEnterGlicko"],
+    'd': getRankData("d")[1]["toEnterGlicko"]
     };
 
   TetrioPlayersLeaderboard.fromJson(List<dynamic> json, String t, DateTime ts) {

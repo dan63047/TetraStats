@@ -95,7 +95,7 @@ class TLLeaderboardState extends State<TLLeaderboardView> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => RankView(rank: snapshot.data!.getAverageOfRank("")),
+                              builder: (context) => RankView(rank: snapshot.data!.getRankData("")),
                             ),
                           );
                         }, child: Text(t.everyoneAverages,

@@ -132,7 +132,7 @@ const Map<Stats, String> chartsShortTitles = {
   Stats.area: "Area",
   Stats.eTR: "eTR",
   Stats.acceTR: "±eTR",
-  Stats.acceTRabs: "+eTR absolute",
+  Stats.acceTRabs: "±eTR absolute",
   Stats.opener: "Opener",
   Stats.plonk: "Plonk",
   Stats.infDS: "Inf. DS",

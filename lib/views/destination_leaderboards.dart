@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:tetra_stats/data_objects/tetrio_constants.dart';
+import 'package:tetra_stats/data_objects/tetrio_player_from_leaderboard.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/views/main_view_tiles.dart';
+import 'package:tetra_stats/views/tl_leaderboard_view.dart';
 import 'package:tetra_stats/views/user_view.dart';
 
 class DestinationLeaderboards extends StatefulWidget{
@@ -46,11 +49,19 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
   Stream<List<dynamic>> get dataStream => _dataStreamController.stream;
   List<dynamic> list = [];
   bool _isFetchingData = false;
+  List<String> _excludeRanks = [];
+  bool _reverse = false;
   String? prisecter;
   List<DropdownMenuEntry> _countries = [for (MapEntry e in t.countries.entries) DropdownMenuEntry(value: e.key, label: e.value)];
   List<DropdownMenuEntry> _stats = [for (MapEntry e in chartsShortTitles.entries) DropdownMenuEntry(value: e.key, label: e.value)];
   String? _country;
   Stats stat = Stats.tr;
+
+  bool? getTotalFilterValue(){
+    if (_excludeRanks.isEmpty) return true;
+    if (_excludeRanks.length == ranks.length) return false;
+    return null;
+  }
 
   Future<void> _fetchData() async {
     if (_isFetchingData) {
@@ -72,7 +83,9 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
         Leaderboards.zenithex => await teto.fetchTetrioRecordsLeaderboard(prisecter: prisecter, lb: "zenithex_global", country: _country),
       };
 
-      list.addAll(items);
+      if (_currentLb == Leaderboards.fullTL && _excludeRanks.isNotEmpty) items.removeWhere((e) => _excludeRanks.indexOf((e as TetrioPlayerFromLeaderboard).rank) != -1);
+
+      list.addAll((_reverse && _currentLb == Leaderboards.fullTL) ? items.reversed : items);
 
       _dataStreamController.add(list);
       prisecter = list.last.prisecter.toString();
@@ -129,10 +142,10 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                   itemCount: leaderboards.length,
                   itemBuilder: (BuildContext context, int index) { 
                     return Card(
-                      surfaceTintColor: index == 1 ? Colors.redAccent : theme.colorScheme.primary,
                       child: ListTile(
                         title: Text(leaderboards.values.elementAt(index)),
-                        subtitle: index == 1 ? Text("Heavy, but allows you to sort players by their stats", style: TextStyle(color: Colors.grey, fontSize: 12)) : null,
+                        trailing: Icon(Icons.arrow_right, color: _currentLb.index == index ? Colors.white : Colors.grey),
+                        subtitle: index == 1 ? Text("Heavy, but allows you to sort players by their stats and filter them by ranks", style: TextStyle(color: Colors.grey, fontSize: 12)) : null,
                         onTap: () {
                           _currentLb = leaderboards.keys.elementAt(index);
                           list.clear();
@@ -198,6 +211,71 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                                   _isFetchingData = false;
                                   setState((){_fetchData();});
                                 })
+                              ),
+                              if (_currentLb == Leaderboards.fullTL) IconButton(
+                                color: _excludeRanks.isNotEmpty ? Theme.of(context).colorScheme.primary : null,
+                                onPressed: (){
+                                showDialog(context: context, builder: (BuildContext context) {
+                                  return StatefulBuilder(
+                                  builder: (context, StateSetter setAlertState) {
+                                    return AlertDialog(
+                                      title: Text("Filter", textAlign: TextAlign.center),
+                                      content: SingleChildScrollView(
+                                        child: Column(
+                                          children: [
+                                            CheckboxListTile(value: getTotalFilterValue(), tristate: true, title: Text("All", style: TextStyle(fontFamily: "Eurostile Round Extended")), onChanged: (value){
+                                              setAlertState(
+                                                (){
+                                                  if (_excludeRanks.length*2 > ranks.length){
+                                                    _excludeRanks.clear();
+                                                  }else{
+                                                    _excludeRanks = List.of(ranks);
+                                                  }
+                                                }
+                                              );
+                                            }),
+                                            for(String rank in ranks.reversed) CheckboxListTile(value: _excludeRanks.indexOf(rank) == -1, onChanged: (value){
+                                              setAlertState(
+                                                (){
+                                                  if (_excludeRanks.indexOf(rank) == -1){
+                                                    _excludeRanks.add(rank);
+                                                  }else{
+                                                    _excludeRanks.remove(rank);
+                                                  }
+                                                }
+                                              );
+                                            }, title: Text(rank.toUpperCase()),)
+                                          ],
+                                        ),
+                                      ),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          child: const Text("Apply"),
+                                          onPressed: () {Navigator.of(context).pop(); setState((){
+                                            _currentLb = Leaderboards.fullTL;
+                                            list.clear();
+                                            prisecter = null;
+                                            _fetchData();});
+                                          }
+                                        )  
+                                      ]
+                                    );
+                                  }
+                                );
+                                });
+                              }, icon: Icon(Icons.filter_alt)),
+                              if (_currentLb == Leaderboards.fullTL) IconButton(
+                                color: _reverse ? Theme.of(context).colorScheme.primary : null,
+                                icon: Container(transform: _reverse ? Matrix4.rotationX(pi) : null, child: Icon(Icons.filter_list)),
+                                onPressed: (){
+                                  setState((){
+                                    _reverse = !_reverse;
+                                    _currentLb = Leaderboards.fullTL;
+                                    list.clear();
+                                    prisecter = null;
+                                    _fetchData();
+                                  });
+                                },
                               )
                             ],
                           ),

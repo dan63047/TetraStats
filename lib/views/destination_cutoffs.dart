@@ -211,7 +211,12 @@ class _DestinationCutoffsState extends State<DestinationCutoffs> {
                             ),
                             Padding(
                               padding: const EdgeInsets.only(right: 8.0),
-                              child: Text("More info", textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
+                              child: TextButton(child: Text("More Info", textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)), onPressed: () {
+                                Navigator.push(context, MaterialPageRoute(
+                                  builder: (context) => RankView(rank: "", nextRankTR: snapshot.data!.data["top1"]!.tr, nextRankPercentile: 0.00, nextRankTargetTR: 25000.00, totalPlayers: snapshot.data!.total, cutoffTetrio: CutoffTetrio(apm: 0, pps: 0, vs: 0, pos: 0, percentile: 0, count: snapshot.data!.total, countPercentile: 1, tr: 10000.00, targetTr: 10000.00)),
+                                ),
+                                );
+                              },),
                             ),
                           ]
                         ),

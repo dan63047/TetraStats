@@ -166,6 +166,8 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
     }
     fetchData = false;
 
+    historyPlayerUsername.value = await teto.getNicknameByID(widget.searchFor);
+
     return historyData;
   }
 
