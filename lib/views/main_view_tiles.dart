@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide Badge;
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
@@ -23,12 +21,12 @@ import 'package:tetra_stats/data_objects/record_extras.dart';
 import 'package:tetra_stats/data_objects/record_single.dart';
 import 'package:tetra_stats/data_objects/summaries.dart';
 import 'package:tetra_stats/data_objects/tetra_league.dart';
+import 'package:tetra_stats/data_objects/tetra_league_alpha_record.dart';
 import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 import 'package:tetra_stats/data_objects/tetrio_player.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/utils/colors_functions.dart';
-import 'package:tetra_stats/utils/filesizes_converter.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
@@ -64,6 +62,7 @@ Future<FetchResults> getData(String searchFor) async {
       }else{
         player = await teto.fetchPlayer(searchFor); // Otherwise it's probably a user id or username
       }
+      
     }on TetrioPlayerNotExist{
       return FetchResults(false, null, [], null, null, null, false, TetrioPlayerNotExist());
     }
@@ -1535,8 +1534,8 @@ class ZenithThingy extends StatelessWidget{
                         const Text(" B2B", style: TextStyle(fontSize: 21))
                       ]),
                       TableRow(children: [
-                        Text(zenith!.stats.zenith!.floor.toString(), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
-                        const Text(" Floor", style: TextStyle(fontSize: 21))
+                        Text(zenith!.stats.garbage.maxspike_nomult.toString(), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
+                        const Text(" Top spike", style: TextStyle(fontSize: 21))
                       ])
                     ],
                   ),
@@ -1582,7 +1581,7 @@ class ZenithThingy extends StatelessWidget{
                         ]),
                         const TableRow(children: [
                           Text("---", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: Colors.grey)),
-                          Text(" Floor", style: TextStyle(fontSize: 21, color: Colors.grey))
+                          Text(" Top spike", style: TextStyle(fontSize: 21, color: Colors.grey))
                         ])
                       ],
                     ),
@@ -1598,72 +1597,197 @@ class ZenithThingy extends StatelessWidget{
   
 }
 
-class TLRecords extends StatelessWidget {
+class AlphaLeagueEntryThingy extends StatelessWidget{
+  final TetraLeagueAlphaRecord record;
   final String userID;
-  final Function changePlayer;
-  final List<BetaRecord> data;
-  final bool wasActiveInTL;
-  final bool oldMathcesHere;
 
-  /// Widget, that displays Tetra League records.
-  /// Accepts list of TL records ([data]) and [userID] of player from the view
-  const TLRecords({required this.userID, required this.changePlayer, required this.data, required this.wasActiveInTL, required this.oldMathcesHere});
+  const AlphaLeagueEntryThingy(this.record, this.userID);
+  
+  @override
+  Widget build(BuildContext context) {
+    var accentColor = record.endContext.firstWhere((element) => element.userId == userID).success ? Colors.green : Colors.red;
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          stops: const [0, 0.05],
+          colors: [accentColor, Colors.transparent]
+        )
+      ),
+      child: ListTile(
+        leading: Text("${record.endContext.firstWhere((element) => element.userId == userID).points} : ${record.endContext.firstWhere((element) => element.userId != userID).points}",
+        style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, shadows: textShadow)),
+        title: Text("vs. ${record.endContext.firstWhere((element) => element.userId != userID).username}"),
+        subtitle: Text(timestamp(record.timestamp), style: const TextStyle(color: Colors.grey)),
+        trailing: TrailingStats(
+          record.endContext.firstWhere((element) => element.userId == userID).secondary,
+          record.endContext.firstWhere((element) => element.userId == userID).tertiary,
+          record.endContext.firstWhere((element) => element.userId == userID).extra,
+          record.endContext.firstWhere((element) => element.userId != userID).secondary,
+          record.endContext.firstWhere((element) => element.userId != userID).tertiary,
+          record.endContext.firstWhere((element) => element.userId != userID).extra
+          ),
+        //onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => TlMatchResultView(record: record, initPlayerId: userID))),
+      ),
+    );
+  }
+}
+
+class BetaLeagueEntryThingy extends StatelessWidget{
+  final BetaRecord record;
+  final String userID;
+
+  const BetaLeagueEntryThingy(this.record, this.userID);
+
+  TextSpan matchResult(String result){
+    return switch(result){
+      "victory" => TextSpan(
+        text: "Victory",
+        style: TextStyle(color: Colors.greenAccent)
+      ),
+      "defeat" => TextSpan(
+        text: "Defeat",
+        style: TextStyle(color: Colors.redAccent)
+      ),
+      "tie" => TextSpan(
+        text: "Tie",
+        style: TextStyle(color: Colors.white)
+      ),
+      "dqvictory" => TextSpan(
+        text: "Opponent was DQ'ed",
+        style: TextStyle(color: Colors.lightGreenAccent)
+      ),
+      "dqdefeat" => TextSpan(
+        text: "Player was DQ'ed",
+        style: TextStyle(color: Colors.red)
+      ),
+      "nocontest" => TextSpan(
+        text: "No Contest",
+        style: TextStyle(color: Colors.blueAccent)
+      ),
+      "nullified" => TextSpan(
+        text: "Nullified",
+        style: TextStyle(color: Colors.purpleAccent)
+      ),
+      _ => TextSpan(
+        text: "${result.toUpperCase()}",
+        style: TextStyle(color: Colors.orangeAccent)
+      )
+    };
+  }
+
+  Color deltaColor(double? delta){
+    if (delta == null || delta.isNaN) return Colors.grey;
+    if (delta.isNegative) return Colors.redAccent;
+    else return Colors.greenAccent;
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (data.isEmpty) {
-      return Center(child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(t.noRecords, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
-        if (wasActiveInTL) Text(t.errors.actionSuggestion),
-        if (wasActiveInTL) TextButton(onPressed: (){changePlayer(userID, fetchTLmatches: true);}, child: Text(t.fetchAndSaveOldTLmatches))
-      ],
-    ));
-    }
-    bool bigScreen = MediaQuery.of(context).size.width >= 768;
-    int length = data.length;
-    return ListView.builder(
-      physics: const AlwaysScrollableScrollPhysics(),
-      //controller: separateScrollController ? ScrollController() : null,
-      itemCount: oldMathcesHere ? length : length + 1,
-      itemBuilder: (BuildContext context, int index) {
-        if (index == length) {
-          return Center(child: Column(
-          mainAxisSize: MainAxisSize.min,
+    double? deltaTR = (record.extras.league[userID]?[1]?.tr != null && record.extras.league[userID]?[0]?.tr != null) ? record.extras.league[userID]![1]!.tr - record.extras.league[userID]![0]!.tr : null;
+    double? deltaGlicko = (record.extras.league[userID]?[1]?.glicko != null && record.extras.league[userID]?[0]?.glicko != null) ? record.extras.league[userID]![1]!.glicko - record.extras.league[userID]![0]!.glicko : null;
+    double? deltaRD = (record.extras.league[userID]?[1]?.rd != null && record.extras.league[userID]?[0]?.rd != null) ? record.extras.league[userID]![1]!.rd - record.extras.league[userID]![0]!.rd : null;
+    return Card(
+      child: ListTile(
+        title: Row(
           children: [
-            Text(t.noOldRecords(n: length), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28)),
-            if (wasActiveInTL) Text(t.errors.actionSuggestion),
-            if (wasActiveInTL) TextButton(onPressed: (){changePlayer(userID, fetchTLmatches: true);}, child: Text(t.fetchAndSaveOldTLmatches))
-          ],
-        ));
-        }
-
-        var accentColor = data[index].results.leaderboard.firstWhere((element) => element.id == userID).wins > data[index].results.leaderboard.firstWhere((element) => element.id != userID).wins ? Colors.green : Colors.red;
-      return Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            stops: const [0, 0.05],
-            colors: [accentColor, Colors.transparent]
-          )
-        ),
-        child: ListTile(
-          leading: Text("${data[index].results.leaderboard.firstWhere((element) => element.id == userID).wins} : ${data[index].results.leaderboard.firstWhere((element) => element.id != userID).wins}",
-          style: bigScreen ? const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, shadows: textShadow) : const TextStyle(fontSize: 28, shadows: textShadow)),
-          title: Text("vs. ${data[index].results.leaderboard.firstWhere((element) => element.id != userID).username}"),
-          subtitle: Text(timestamp(data[index].ts), style: const TextStyle(color: Colors.grey)),
-          trailing: TrailingStats(
-            data[index].results.leaderboard.firstWhere((element) => element.id == userID).stats.apm,
-            data[index].results.leaderboard.firstWhere((element) => element.id == userID).stats.pps,
-            data[index].results.leaderboard.firstWhere((element) => element.id == userID).stats.vs,
-            data[index].results.leaderboard.firstWhere((element) => element.id != userID).stats.apm,
-            data[index].results.leaderboard.firstWhere((element) => element.id != userID).stats.pps,
-            data[index].results.leaderboard.firstWhere((element) => element.id != userID).stats.vs,
+            Text(
+              "${record.results.leaderboard.firstWhere((element) => element.id != record.enemyID).wins} - ${record.results.leaderboard.firstWhere((element) => element.id == record.enemyID).wins} ",
+              style: TextStyle(fontSize: 26, height: 0.75, fontWeight: FontWeight.bold),
             ),
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => TlMatchResultView(record: data[index], initPlayerId: userID))) //Navigator.push(context, MaterialPageRoute(builder: (context) => TlMatchResultView(record: data[index], initPlayerId: userID))),
+            Text(
+              "vs.\n${record.enemyUsername}",
+              style: TextStyle(fontSize: 14, height: 0.8, fontWeight: FontWeight.w100),
+            ),
+          ],
         ),
-      );
-    });
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 4.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
+                  children: [
+                    matchResult(record.extras.result),
+                    TextSpan(
+                      text: ", ${timestamp(record.ts)}\n"
+                    ),
+                    TextSpan(
+                      text: deltaTR != null ? "${fDiff.format(deltaTR)} TR" : "??? TR",
+                      style: TextStyle(
+                        color: deltaColor(deltaTR)
+                      )
+                    ),
+                    TextSpan(
+                      text: ", "
+                    ),
+                    TextSpan(
+                      text: deltaGlicko != null ? "${fDiff.format(deltaGlicko)} Glicko" : "??? Glicko",
+                      style: TextStyle(
+                        color: deltaColor(deltaGlicko)
+                      )
+                    ),
+                    TextSpan(
+                      text: ", "
+                    ),
+                    TextSpan(
+                      text: deltaRD != null ? "${fDiff.format(deltaRD)} RD" : "??? RD",
+                      style: TextStyle(
+                        color: Colors.grey
+                      )
+                    ),
+                  ]
+                )
+              ),
+            ],
+          ),
+        ),
+        trailing: TrailingStats(
+          record.results.leaderboard.firstWhere((element) => element.id != record.enemyID).stats.apm,
+          record.results.leaderboard.firstWhere((element) => element.id != record.enemyID).stats.pps,
+          record.results.leaderboard.firstWhere((element) => element.id != record.enemyID).stats.vs,
+          record.results.leaderboard.firstWhere((element) => element.id == record.enemyID).stats.apm,
+          record.results.leaderboard.firstWhere((element) => element.id == record.enemyID).stats.pps,
+          record.results.leaderboard.firstWhere((element) => element.id == record.enemyID).stats.vs,
+        ),
+        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => TlMatchResultView(record: record, initPlayerId: userID))) //Navigator.push(context, MaterialPageRoute(builder: (context) => TlMatchResultView(record: data[index], initPlayerId: userID))),
+      ),
+    );
+  }
+  
+}
+
+class TLRecords extends StatelessWidget {
+  final String userID;
+
+  /// Widget, that displays Tetra League records.
+  /// Accepts list of TL records ([data]) and [userID] of player from the view
+  const TLRecords(this.userID);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: teto.fetchTLStream(userID),
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState){
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+          case ConnectionState.active:
+            return const Center(child: CircularProgressIndicator());
+          case ConnectionState.done:
+            if (snapshot.hasData){
+              return Column(
+                children: [
+                  for (BetaRecord record in snapshot.data!.records) BetaLeagueEntryThingy(record, userID)
+                ],
+              );
+            }
+            if (snapshot.hasError){ return FutureError(snapshot); }
+          }
+        return const Text("what?");
+      },
+    );
   }
 }
 
@@ -1917,4 +2041,23 @@ class ErrorThingy extends StatelessWidget{
       ),
     );
   }
+}
+
+class InfoThingy extends StatelessWidget{
+  final String info;
+
+  const InfoThingy(this.info);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.info_outline, size: 128.0, color: Colors.grey.shade800),
+        SizedBox(height: 5.0),
+        Text(info, textAlign: TextAlign.center),
+      ],
+    ));
+  }
+  
 }

@@ -284,230 +284,230 @@ class CompareState extends State<CompareView> {
         zenithRun?.aggregateStats.playstyle.stride,
         zenithRun?.aggregateStats.playstyle.infds,
       ]);
-      rawValues[3].add([
-        zenithExRun?.stats.zenith?.altitude,
-        zenithExRun?.rank,
-        zenithExRun?.aggregateStats.apm,
-        zenithExRun?.aggregateStats.pps,
-        zenithExRun?.aggregateStats.vs,
-        zenithExRun?.stats.kills,
-        zenithExRun?.stats.topBtB,
-        zenithExRun?.stats.cps,
-        zenithExRun?.stats.zenith?.peakrank,
-        zenithExRun?.stats.finalTime,
-        zenithExRun?.stats.finessePercentage,
-        "",
-        zenithExRun?.aggregateStats.nerdStats.app,
-        zenithExRun?.aggregateStats.nerdStats.vsapm,
-        zenithExRun?.aggregateStats.nerdStats.dss,
-        zenithExRun?.aggregateStats.nerdStats.dsp,
-        zenithExRun?.aggregateStats.nerdStats.appdsp,
-        zenithExRun?.aggregateStats.nerdStats.cheese,
-        zenithExRun?.aggregateStats.nerdStats.gbe,
-        zenithExRun?.aggregateStats.nerdStats.nyaapp,
-        zenithExRun?.aggregateStats.nerdStats.area,
-        "",
-        zenithExRun?.aggregateStats.playstyle.opener,
-        zenithExRun?.aggregateStats.playstyle.plonk,
-        zenithExRun?.aggregateStats.playstyle.stride,
-        zenithExRun?.aggregateStats.playstyle.infds,
-      ]);;
-      rawValues[4].add([
-        s.sprint?.stats.finalTime,
-        s.sprint?.stats.piecesPlaced,
-        s.sprint?.stats.inputs,
-        s.sprint?.stats.kpp,
-        s.sprint?.stats.pps,
-        s.sprint?.stats.kps,
-        s.sprint?.stats.finessePercentage,
-        s.sprint?.stats.finesse?.faults,
-        "",
-        s.sprint?.stats.clears.quads,
-        s.sprint?.stats.clears.triples,
-        s.sprint?.stats.clears.doubles,
-        s.sprint?.stats.clears.singles,
-        "",
-        s.sprint?.stats.clears.tSpinTriples,
-        s.sprint?.stats.clears.tSpinDoubles,
-        s.sprint?.stats.clears.tSpinSingles,
-        s.sprint?.stats.clears.tSpinZeros,
-        s.sprint?.stats.clears.tSpinMiniDoubles,
-        s.sprint?.stats.clears.tSpinMiniSingles,
-        s.sprint?.stats.clears.tSpinMiniZeros
-      ]);
-      rawValues[5].add(
-        [
-        s.blitz?.stats.score,
-        s.blitz?.stats.piecesPlaced,
-        s.blitz?.stats.lines,
-        s.blitz?.stats.level,
-        s.blitz?.stats.inputs,
-        s.blitz?.stats.kpp,
-        s.blitz?.stats.pps,
-        s.blitz?.stats.kps,
-        s.blitz?.stats.finessePercentage,
-        s.blitz?.stats.finesse?.faults,
-        "",
-        s.blitz?.stats.clears.quads,
-        s.blitz?.stats.clears.triples,
-        s.blitz?.stats.clears.doubles,
-        s.blitz?.stats.clears.singles,
-        "",
-        s.blitz?.stats.clears.tSpinTriples,
-        s.blitz?.stats.clears.tSpinDoubles,
-        s.blitz?.stats.clears.tSpinSingles,
-        s.blitz?.stats.clears.tSpinZeros,
-        s.blitz?.stats.clears.tSpinMiniDoubles,
-        s.blitz?.stats.clears.tSpinMiniSingles,
-        s.blitz?.stats.clears.tSpinMiniZeros
-      ]
-      );
-      rawValues[6].add([
-        s.zen.score,
-        s.zen.level
-      ]);
-      formattedValues[0].add([
-        Text(timestamp(p.registrationTime)),
-        RichText(text: p.xp.isNegative ? TextSpan(text: "hidden", style: TextStyle(fontFamily: "Eurostile Round", color: Colors.grey)) : TextSpan(text: intf.format(p.xp), style: TextStyle(fontFamily: "Eurostile Round"), children: [TextSpan(text: " (lvl ${intf.format(p.level.floor())})", style: TextStyle(color: Colors.grey))])),
-        Text(p.gameTime.isNegative ? "hidden" : playtime(p.gameTime), style: TextStyle(color: p.gameTime.isNegative ? Colors.grey : Colors.white)),
-        Text(p.gamesPlayed.isNegative ? "hidden" : intf.format(p.gamesPlayed), style: TextStyle(color: p.gamesPlayed.isNegative ? Colors.grey : Colors.white)),
-        Text(p.gamesWon.isNegative ? "hidden" : intf.format(p.gamesWon), style: TextStyle(color: p.gamesWon.isNegative ? Colors.grey : Colors.white)),
-        Text(intf.format(p.friendCount))
-      ]);
-      formattedValues[1].add([
-        Text(s.league.tr.isNegative ? "---" : f4.format(s.league.tr)),
-        Text(s.league.glicko!.isNegative ? "---" : f4.format(s.league.glicko)),
-        Text(s.league.rd!.isNegative ? "---" : f4.format(s.league.rd), style: TextStyle(color: s.league.rd!.isNegative ? Colors.grey : Colors.white)),
-        Text(s.league.gxe.isNegative ? "---" : f4.format(s.league.gxe)),
-        Text(s.league.s1tr.isNegative ? "---" : f4.format(s.league.s1tr)),
-        Text(s.league.standing.isNegative ? "---" : "№ "+intf.format(s.league.standing)),
-        Text(intf.format(s.league.gamesPlayed)),
-        Text(intf.format(s.league.gamesWon)),
-        Text(s.league.winrate.isNaN ? "---" : f4.format(s.league.winrate*100)+"%"),
-        Text(s.league.apm != null ? f2.format(s.league.apm) : "---"),
-        Text(s.league.pps != null ? f2.format(s.league.pps) : "---"),
-        Text(s.league.vs != null ? f2.format(s.league.vs) : "---"),
-        Text(""),
-        Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.app) : "---"),
-        Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.vsapm) : "---"),
-        Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.dss) : "---"),
-        Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.dsp) : "---"),
-        Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.appdsp) : "---"),
-        Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.cheese) : "---"),
-        Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.gbe) : "---"),
-        Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.nyaapp) : "---"),
-        Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.area) : "---"),
-        Text(""),
-        Text(s.league.playstyle != null ? f4.format(s.league.playstyle!.opener) : "---"),
-        Text(s.league.playstyle != null ? f4.format(s.league.playstyle!.plonk) : "---"),
-        Text(s.league.playstyle != null ? f4.format(s.league.playstyle!.stride) : "---"),
-        Text(s.league.playstyle != null ? f4.format(s.league.playstyle!.infds) : "---"),
-      ]);
-      formattedValues[2].add([
-        RichText(text: TextSpan(text: zenithRun != null ? "${f2.format(zenithRun.stats.zenith!.altitude)} m" : "---", style: TextStyle(fontFamily: "Eurostile Round"), children: [if (zenithRun != null && oldZenithRun) TextSpan(text: " (${zenithRun.revolution})", style: TextStyle(color: Colors.grey))])),
-        Text(zenithRun != null ? "№ "+intf.format(zenithRun.rank) : "---"),
-        Text(zenithRun != null ? f2.format(zenithRun.aggregateStats.apm) : "---"),
-        Text(zenithRun != null ? f2.format(zenithRun.aggregateStats.pps) : "---"),
-        Text(zenithRun != null ? f2.format(zenithRun.aggregateStats.vs) : "---"),
-        Text(zenithRun != null ? intf.format(zenithRun.stats.kills) : "---"),
-        Text(zenithRun != null ? intf.format(zenithRun.stats.topBtB) : "---"),
-        Text(zenithRun != null ? f4.format(zenithRun.stats.cps) : "---"),
-        Text(zenithRun != null ? f4.format(zenithRun.stats.zenith!.peakrank) : "---"),
-        Text(zenithRun != null ? getMoreNormalTime(zenithRun.stats.finalTime) : "---"),
-        Text(zenithRun != null ? f2.format(zenithRun.stats.finessePercentage*100)+"%" : "---"),
-        Text(""),
-        Text(zenithRun?.aggregateStats.nerdStats != null ? f4.format(zenithRun!.aggregateStats.nerdStats.app) : "---"),
-        Text(zenithRun?.aggregateStats.nerdStats != null ? f4.format(zenithRun!.aggregateStats.nerdStats.vsapm) : "---"),
-        Text(zenithRun?.aggregateStats.nerdStats != null ? f4.format(zenithRun!.aggregateStats.nerdStats.dss) : "---"),
-        Text(zenithRun?.aggregateStats.nerdStats != null ? f4.format(zenithRun!.aggregateStats.nerdStats.dsp) : "---"),
-        Text(zenithRun?.aggregateStats.nerdStats != null ? f4.format(zenithRun!.aggregateStats.nerdStats.appdsp) : "---"),
-        Text(zenithRun?.aggregateStats.nerdStats != null ? f4.format(zenithRun!.aggregateStats.nerdStats.cheese) : "---"),
-        Text(zenithRun?.aggregateStats.nerdStats != null ? f4.format(zenithRun!.aggregateStats.nerdStats.gbe) : "---"),
-        Text(zenithRun?.aggregateStats.nerdStats != null ? f4.format(zenithRun!.aggregateStats.nerdStats.nyaapp) : "---"),
-        Text(zenithRun?.aggregateStats.nerdStats != null ? f4.format(zenithRun!.aggregateStats.nerdStats.area) : "---"),
-        Text(""),
-        Text(zenithRun?.aggregateStats.playstyle != null ? f4.format(zenithRun!.aggregateStats.playstyle.opener) : "---"),
-        Text(zenithRun?.aggregateStats.playstyle != null ? f4.format(zenithRun!.aggregateStats.playstyle.plonk) : "---"),
-        Text(zenithRun?.aggregateStats.playstyle != null ? f4.format(zenithRun!.aggregateStats.playstyle.stride) : "---"),
-        Text(zenithRun?.aggregateStats.playstyle != null ? f4.format(zenithRun!.aggregateStats.playstyle.infds) : "---"),
-      ]);
-      formattedValues[3].add([
-        RichText(text: TextSpan(text: zenithExRun != null ? "${f2.format(zenithExRun.stats.zenith!.altitude)} m" : "---", style: TextStyle(fontFamily: "Eurostile Round"), children: [if (zenithExRun != null && oldZenithExRun) TextSpan(text: " (${zenithExRun.revolution})", style: TextStyle(color: Colors.grey))])),
-        Text(zenithExRun != null ? "№ "+intf.format(zenithExRun.rank) : "---"),
-        Text(zenithExRun != null ? f2.format(zenithExRun.aggregateStats.apm) : "---"),
-        Text(zenithExRun != null ? f2.format(zenithExRun.aggregateStats.pps) : "---"),
-        Text(zenithExRun != null ? f2.format(zenithExRun.aggregateStats.vs) : "---"),
-        Text(zenithExRun != null ? intf.format(zenithExRun.stats.kills) : "---"),
-        Text(zenithExRun != null ? intf.format(zenithExRun.stats.topBtB) : "---"),
-        Text(zenithExRun != null ? f4.format(zenithExRun.stats.cps) : "---"),
-        Text(zenithExRun != null ? f4.format(zenithExRun.stats.zenith!.peakrank) : "---"),
-        Text(zenithExRun != null ? getMoreNormalTime(zenithExRun.stats.finalTime) : "---"),
-        Text(zenithExRun != null ? f2.format(zenithExRun.stats.finessePercentage*100)+"%" : "---"),
-        Text(""),
-        Text(zenithExRun?.aggregateStats.nerdStats != null ? f4.format(zenithExRun!.aggregateStats.nerdStats.app) : "---"),
-        Text(zenithExRun?.aggregateStats.nerdStats != null ? f4.format(zenithExRun!.aggregateStats.nerdStats.vsapm) : "---"),
-        Text(zenithExRun?.aggregateStats.nerdStats != null ? f4.format(zenithExRun!.aggregateStats.nerdStats.dss) : "---"),
-        Text(zenithExRun?.aggregateStats.nerdStats != null ? f4.format(zenithExRun!.aggregateStats.nerdStats.dsp) : "---"),
-        Text(zenithExRun?.aggregateStats.nerdStats != null ? f4.format(zenithExRun!.aggregateStats.nerdStats.appdsp) : "---"),
-        Text(zenithExRun?.aggregateStats.nerdStats != null ? f4.format(zenithExRun!.aggregateStats.nerdStats.cheese) : "---"),
-        Text(zenithExRun?.aggregateStats.nerdStats != null ? f4.format(zenithExRun!.aggregateStats.nerdStats.gbe) : "---"),
-        Text(zenithExRun?.aggregateStats.nerdStats != null ? f4.format(zenithExRun!.aggregateStats.nerdStats.nyaapp) : "---"),
-        Text(zenithExRun?.aggregateStats.nerdStats != null ? f4.format(zenithExRun!.aggregateStats.nerdStats.area) : "---"),
-        Text(""),
-        Text(zenithExRun?.aggregateStats.playstyle != null ? f4.format(zenithExRun!.aggregateStats.playstyle.opener) : "---"),
-        Text(zenithExRun?.aggregateStats.playstyle != null ? f4.format(zenithExRun!.aggregateStats.playstyle.plonk) : "---"),
-        Text(zenithExRun?.aggregateStats.playstyle != null ? f4.format(zenithExRun!.aggregateStats.playstyle.stride) : "---"),
-        Text(zenithExRun?.aggregateStats.playstyle != null ? f4.format(zenithExRun!.aggregateStats.playstyle.infds) : "---"),
-      ]);
-      formattedValues[4].add([
-        Text(s.sprint != null ? getMoreNormalTime(s.sprint!.stats.finalTime) : "---"),
-        Text(s.sprint != null ? intf.format(s.sprint!.stats.piecesPlaced) : "---"),
-        Text(s.sprint != null ? intf.format(s.sprint!.stats.inputs) : "---"),
-        Text(s.sprint != null ? f4.format(s.sprint!.stats.kpp) : "---"),
-        Text(s.sprint != null ? f4.format(s.sprint!.stats.pps) : "---"),
-        Text(s.sprint != null ? f4.format(s.sprint!.stats.kps) : "---"),
-        Text(s.sprint != null ? percentage.format(s.sprint!.stats.finessePercentage) : "---"),
-        Text(s.sprint != null ? intf.format(s.sprint!.stats.finesse?.faults) : "---"),
-        Text(""),
-        Text(s.sprint != null ? intf.format(s.sprint!.stats.clears.quads) : "---"),
-        Text(s.sprint != null ? intf.format(s.sprint!.stats.clears.triples) : "---"),
-        Text(s.sprint != null ? intf.format(s.sprint!.stats.clears.doubles) : "---"),
-        Text(s.sprint != null ? intf.format(s.sprint!.stats.clears.singles) : "---"),
-        Text(""),
-        Text(s.sprint != null ? intf.format(s.sprint!.stats.clears.tSpinTriples) : "---"),
-        Text(s.sprint != null ? intf.format(s.sprint!.stats.clears.tSpinDoubles) : "---"),
-        Text(s.sprint != null ? intf.format(s.sprint!.stats.clears.tSpinSingles) : "---"),
-        Text(s.sprint != null ? intf.format(s.sprint!.stats.clears.tSpinZeros) : "---"),
-        Text(s.sprint != null ? intf.format(s.sprint!.stats.clears.tSpinMiniDoubles) : "---"),
-        Text(s.sprint != null ? intf.format(s.sprint!.stats.clears.tSpinMiniSingles) : "---"),
-        Text(s.sprint != null ? intf.format(s.sprint!.stats.clears.tSpinMiniZeros) : "---"),
-      ]);
-      formattedValues[5].add([
-        Text(s.blitz != null ? intf.format(s.blitz!.stats.score) : "---"),
-        Text(s.blitz != null ? intf.format(s.blitz!.stats.piecesPlaced) : "---"),
-        Text(s.blitz != null ? intf.format(s.blitz!.stats.lines) : "---"),
-        Text(s.blitz != null ? intf.format(s.blitz!.stats.level) : "---"),
-        Text(s.blitz != null ? intf.format(s.blitz!.stats.inputs) : "---"),
-        Text(s.blitz != null ? f4.format(s.blitz!.stats.kpp) : "---"),
-        Text(s.blitz != null ? f4.format(s.blitz!.stats.pps) : "---"),
-        Text(s.blitz != null ? f4.format(s.blitz!.stats.kps) : "---"),
-        Text(s.blitz != null ? percentage.format(s.blitz!.stats.finessePercentage) : "---"),
-        Text(s.blitz != null ? intf.format(s.blitz!.stats.finesse?.faults) : "---"),
-        Text(""),
-        Text(s.blitz != null ? intf.format(s.blitz!.stats.clears.quads) : "---"),
-        Text(s.blitz != null ? intf.format(s.blitz!.stats.clears.triples) : "---"),
-        Text(s.blitz != null ? intf.format(s.blitz!.stats.clears.doubles) : "---"),
-        Text(s.blitz != null ? intf.format(s.blitz!.stats.clears.singles) : "---"),
-        Text(""),
-        Text(s.blitz != null ? intf.format(s.blitz!.stats.clears.tSpinTriples) : "---"),
-        Text(s.blitz != null ? intf.format(s.blitz!.stats.clears.tSpinDoubles) : "---"),
-        Text(s.blitz != null ? intf.format(s.blitz!.stats.clears.tSpinSingles) : "---"),
-        Text(s.blitz != null ? intf.format(s.blitz!.stats.clears.tSpinZeros) : "---"),
-        Text(s.blitz != null ? intf.format(s.blitz!.stats.clears.tSpinMiniDoubles) : "---"),
-        Text(s.blitz != null ? intf.format(s.blitz!.stats.clears.tSpinMiniSingles) : "---"),
-        Text(s.blitz != null ? intf.format(s.blitz!.stats.clears.tSpinMiniZeros) : "---"),
-      ]);
-      formattedValues[6].add([
+    rawValues[3].add([
+      zenithExRun?.stats.zenith?.altitude,
+      zenithExRun?.rank,
+      zenithExRun?.aggregateStats.apm,
+      zenithExRun?.aggregateStats.pps,
+      zenithExRun?.aggregateStats.vs,
+      zenithExRun?.stats.kills,
+      zenithExRun?.stats.topBtB,
+      zenithExRun?.stats.cps,
+      zenithExRun?.stats.zenith?.peakrank,
+      zenithExRun?.stats.finalTime,
+      zenithExRun?.stats.finessePercentage,
+      "",
+      zenithExRun?.aggregateStats.nerdStats.app,
+      zenithExRun?.aggregateStats.nerdStats.vsapm,
+      zenithExRun?.aggregateStats.nerdStats.dss,
+      zenithExRun?.aggregateStats.nerdStats.dsp,
+      zenithExRun?.aggregateStats.nerdStats.appdsp,
+      zenithExRun?.aggregateStats.nerdStats.cheese,
+      zenithExRun?.aggregateStats.nerdStats.gbe,
+      zenithExRun?.aggregateStats.nerdStats.nyaapp,
+      zenithExRun?.aggregateStats.nerdStats.area,
+      "",
+      zenithExRun?.aggregateStats.playstyle.opener,
+      zenithExRun?.aggregateStats.playstyle.plonk,
+      zenithExRun?.aggregateStats.playstyle.stride,
+      zenithExRun?.aggregateStats.playstyle.infds,
+    ]);;
+    rawValues[4].add([
+      s.sprint?.stats.finalTime,
+      s.sprint?.stats.piecesPlaced,
+      s.sprint?.stats.inputs,
+      s.sprint?.stats.kpp,
+      s.sprint?.stats.pps,
+      s.sprint?.stats.kps,
+      s.sprint?.stats.finessePercentage,
+      s.sprint?.stats.finesse?.faults,
+      "",
+      s.sprint?.stats.clears.quads,
+      s.sprint?.stats.clears.triples,
+      s.sprint?.stats.clears.doubles,
+      s.sprint?.stats.clears.singles,
+      "",
+      s.sprint?.stats.clears.tSpinTriples,
+      s.sprint?.stats.clears.tSpinDoubles,
+      s.sprint?.stats.clears.tSpinSingles,
+      s.sprint?.stats.clears.tSpinZeros,
+      s.sprint?.stats.clears.tSpinMiniDoubles,
+      s.sprint?.stats.clears.tSpinMiniSingles,
+      s.sprint?.stats.clears.tSpinMiniZeros
+    ]);
+    rawValues[5].add(
+      [
+      s.blitz?.stats.score,
+      s.blitz?.stats.piecesPlaced,
+      s.blitz?.stats.lines,
+      s.blitz?.stats.level,
+      s.blitz?.stats.inputs,
+      s.blitz?.stats.kpp,
+      s.blitz?.stats.pps,
+      s.blitz?.stats.kps,
+      s.blitz?.stats.finessePercentage,
+      s.blitz?.stats.finesse?.faults,
+      "",
+      s.blitz?.stats.clears.quads,
+      s.blitz?.stats.clears.triples,
+      s.blitz?.stats.clears.doubles,
+      s.blitz?.stats.clears.singles,
+      "",
+      s.blitz?.stats.clears.tSpinTriples,
+      s.blitz?.stats.clears.tSpinDoubles,
+      s.blitz?.stats.clears.tSpinSingles,
+      s.blitz?.stats.clears.tSpinZeros,
+      s.blitz?.stats.clears.tSpinMiniDoubles,
+      s.blitz?.stats.clears.tSpinMiniSingles,
+      s.blitz?.stats.clears.tSpinMiniZeros
+    ]
+    );
+    rawValues[6].add([
+      s.zen.score,
+      s.zen.level
+    ]);
+    formattedValues[0].add([
+      Text(timestamp(p.registrationTime)),
+      RichText(text: p.xp.isNegative ? TextSpan(text: "hidden", style: TextStyle(fontFamily: "Eurostile Round", color: Colors.grey)) : TextSpan(text: intf.format(p.xp), style: TextStyle(fontFamily: "Eurostile Round"), children: [TextSpan(text: " (lvl ${intf.format(p.level.floor())})", style: TextStyle(color: Colors.grey))])),
+      Text(p.gameTime.isNegative ? "hidden" : playtime(p.gameTime), style: TextStyle(color: p.gameTime.isNegative ? Colors.grey : Colors.white)),
+      Text(p.gamesPlayed.isNegative ? "hidden" : intf.format(p.gamesPlayed), style: TextStyle(color: p.gamesPlayed.isNegative ? Colors.grey : Colors.white)),
+      Text(p.gamesWon.isNegative ? "hidden" : intf.format(p.gamesWon), style: TextStyle(color: p.gamesWon.isNegative ? Colors.grey : Colors.white)),
+      Text(intf.format(p.friendCount))
+    ]);
+    formattedValues[1].add([
+      Text(s.league.tr.isNegative ? "---" : f4.format(s.league.tr)),
+      Text(s.league.glicko!.isNegative ? "---" : f4.format(s.league.glicko)),
+      Text(s.league.rd!.isNegative ? "---" : f4.format(s.league.rd), style: TextStyle(color: s.league.rd!.isNegative ? Colors.grey : Colors.white)),
+      Text(s.league.gxe.isNegative ? "---" : f4.format(s.league.gxe)),
+      Text(s.league.s1tr.isNegative ? "---" : f4.format(s.league.s1tr)),
+      Text(s.league.standing.isNegative ? "---" : "№ "+intf.format(s.league.standing)),
+      Text(intf.format(s.league.gamesPlayed)),
+      Text(intf.format(s.league.gamesWon)),
+      Text(s.league.winrate.isNaN ? "---" : f4.format(s.league.winrate*100)+"%"),
+      Text(s.league.apm != null ? f2.format(s.league.apm) : "---"),
+      Text(s.league.pps != null ? f2.format(s.league.pps) : "---"),
+      Text(s.league.vs != null ? f2.format(s.league.vs) : "---"),
+      Text(""),
+      Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.app) : "---"),
+      Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.vsapm) : "---"),
+      Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.dss) : "---"),
+      Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.dsp) : "---"),
+      Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.appdsp) : "---"),
+      Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.cheese) : "---"),
+      Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.gbe) : "---"),
+      Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.nyaapp) : "---"),
+      Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.area) : "---"),
+      Text(""),
+      Text(s.league.playstyle != null ? f4.format(s.league.playstyle!.opener) : "---"),
+      Text(s.league.playstyle != null ? f4.format(s.league.playstyle!.plonk) : "---"),
+      Text(s.league.playstyle != null ? f4.format(s.league.playstyle!.stride) : "---"),
+      Text(s.league.playstyle != null ? f4.format(s.league.playstyle!.infds) : "---"),
+    ]);
+    formattedValues[2].add([
+      RichText(text: TextSpan(text: zenithRun != null ? "${f2.format(zenithRun.stats.zenith!.altitude)} m" : "---", style: TextStyle(fontFamily: "Eurostile Round"), children: [if (zenithRun != null && oldZenithRun) TextSpan(text: " (${zenithRun.revolution})", style: TextStyle(color: Colors.grey))])),
+      Text(zenithRun != null ? "№ "+intf.format(zenithRun.rank) : "---"),
+      Text(zenithRun != null ? f2.format(zenithRun.aggregateStats.apm) : "---"),
+      Text(zenithRun != null ? f2.format(zenithRun.aggregateStats.pps) : "---"),
+      Text(zenithRun != null ? f2.format(zenithRun.aggregateStats.vs) : "---"),
+      Text(zenithRun != null ? intf.format(zenithRun.stats.kills) : "---"),
+      Text(zenithRun != null ? intf.format(zenithRun.stats.topBtB) : "---"),
+      Text(zenithRun != null ? f4.format(zenithRun.stats.cps) : "---"),
+      Text(zenithRun != null ? f4.format(zenithRun.stats.zenith!.peakrank) : "---"),
+      Text(zenithRun != null ? getMoreNormalTime(zenithRun.stats.finalTime) : "---"),
+      Text(zenithRun != null ? f2.format(zenithRun.stats.finessePercentage*100)+"%" : "---"),
+      Text(""),
+      Text(zenithRun?.aggregateStats.nerdStats != null ? f4.format(zenithRun!.aggregateStats.nerdStats.app) : "---"),
+      Text(zenithRun?.aggregateStats.nerdStats != null ? f4.format(zenithRun!.aggregateStats.nerdStats.vsapm) : "---"),
+      Text(zenithRun?.aggregateStats.nerdStats != null ? f4.format(zenithRun!.aggregateStats.nerdStats.dss) : "---"),
+      Text(zenithRun?.aggregateStats.nerdStats != null ? f4.format(zenithRun!.aggregateStats.nerdStats.dsp) : "---"),
+      Text(zenithRun?.aggregateStats.nerdStats != null ? f4.format(zenithRun!.aggregateStats.nerdStats.appdsp) : "---"),
+      Text(zenithRun?.aggregateStats.nerdStats != null ? f4.format(zenithRun!.aggregateStats.nerdStats.cheese) : "---"),
+      Text(zenithRun?.aggregateStats.nerdStats != null ? f4.format(zenithRun!.aggregateStats.nerdStats.gbe) : "---"),
+      Text(zenithRun?.aggregateStats.nerdStats != null ? f4.format(zenithRun!.aggregateStats.nerdStats.nyaapp) : "---"),
+      Text(zenithRun?.aggregateStats.nerdStats != null ? f4.format(zenithRun!.aggregateStats.nerdStats.area) : "---"),
+      Text(""),
+      Text(zenithRun?.aggregateStats.playstyle != null ? f4.format(zenithRun!.aggregateStats.playstyle.opener) : "---"),
+      Text(zenithRun?.aggregateStats.playstyle != null ? f4.format(zenithRun!.aggregateStats.playstyle.plonk) : "---"),
+      Text(zenithRun?.aggregateStats.playstyle != null ? f4.format(zenithRun!.aggregateStats.playstyle.stride) : "---"),
+      Text(zenithRun?.aggregateStats.playstyle != null ? f4.format(zenithRun!.aggregateStats.playstyle.infds) : "---"),
+    ]);
+    formattedValues[3].add([
+      RichText(text: TextSpan(text: zenithExRun != null ? "${f2.format(zenithExRun.stats.zenith!.altitude)} m" : "---", style: TextStyle(fontFamily: "Eurostile Round"), children: [if (zenithExRun != null && oldZenithExRun) TextSpan(text: " (${zenithExRun.revolution})", style: TextStyle(color: Colors.grey))])),
+      Text(zenithExRun != null ? "№ "+intf.format(zenithExRun.rank) : "---"),
+      Text(zenithExRun != null ? f2.format(zenithExRun.aggregateStats.apm) : "---"),
+      Text(zenithExRun != null ? f2.format(zenithExRun.aggregateStats.pps) : "---"),
+      Text(zenithExRun != null ? f2.format(zenithExRun.aggregateStats.vs) : "---"),
+      Text(zenithExRun != null ? intf.format(zenithExRun.stats.kills) : "---"),
+      Text(zenithExRun != null ? intf.format(zenithExRun.stats.topBtB) : "---"),
+      Text(zenithExRun != null ? f4.format(zenithExRun.stats.cps) : "---"),
+      Text(zenithExRun != null ? f4.format(zenithExRun.stats.zenith!.peakrank) : "---"),
+      Text(zenithExRun != null ? getMoreNormalTime(zenithExRun.stats.finalTime) : "---"),
+      Text(zenithExRun != null ? f2.format(zenithExRun.stats.finessePercentage*100)+"%" : "---"),
+      Text(""),
+      Text(zenithExRun?.aggregateStats.nerdStats != null ? f4.format(zenithExRun!.aggregateStats.nerdStats.app) : "---"),
+      Text(zenithExRun?.aggregateStats.nerdStats != null ? f4.format(zenithExRun!.aggregateStats.nerdStats.vsapm) : "---"),
+      Text(zenithExRun?.aggregateStats.nerdStats != null ? f4.format(zenithExRun!.aggregateStats.nerdStats.dss) : "---"),
+      Text(zenithExRun?.aggregateStats.nerdStats != null ? f4.format(zenithExRun!.aggregateStats.nerdStats.dsp) : "---"),
+      Text(zenithExRun?.aggregateStats.nerdStats != null ? f4.format(zenithExRun!.aggregateStats.nerdStats.appdsp) : "---"),
+      Text(zenithExRun?.aggregateStats.nerdStats != null ? f4.format(zenithExRun!.aggregateStats.nerdStats.cheese) : "---"),
+      Text(zenithExRun?.aggregateStats.nerdStats != null ? f4.format(zenithExRun!.aggregateStats.nerdStats.gbe) : "---"),
+      Text(zenithExRun?.aggregateStats.nerdStats != null ? f4.format(zenithExRun!.aggregateStats.nerdStats.nyaapp) : "---"),
+      Text(zenithExRun?.aggregateStats.nerdStats != null ? f4.format(zenithExRun!.aggregateStats.nerdStats.area) : "---"),
+      Text(""),
+      Text(zenithExRun?.aggregateStats.playstyle != null ? f4.format(zenithExRun!.aggregateStats.playstyle.opener) : "---"),
+      Text(zenithExRun?.aggregateStats.playstyle != null ? f4.format(zenithExRun!.aggregateStats.playstyle.plonk) : "---"),
+      Text(zenithExRun?.aggregateStats.playstyle != null ? f4.format(zenithExRun!.aggregateStats.playstyle.stride) : "---"),
+      Text(zenithExRun?.aggregateStats.playstyle != null ? f4.format(zenithExRun!.aggregateStats.playstyle.infds) : "---"),
+    ]);
+    formattedValues[4].add([
+      Text(s.sprint != null ? getMoreNormalTime(s.sprint!.stats.finalTime) : "---"),
+      Text(s.sprint != null ? intf.format(s.sprint!.stats.piecesPlaced) : "---"),
+      Text(s.sprint != null ? intf.format(s.sprint!.stats.inputs) : "---"),
+      Text(s.sprint != null ? f4.format(s.sprint!.stats.kpp) : "---"),
+      Text(s.sprint != null ? f4.format(s.sprint!.stats.pps) : "---"),
+      Text(s.sprint != null ? f4.format(s.sprint!.stats.kps) : "---"),
+      Text(s.sprint != null ? percentage.format(s.sprint!.stats.finessePercentage) : "---"),
+      Text(s.sprint != null ? intf.format(s.sprint!.stats.finesse?.faults) : "---"),
+      Text(""),
+      Text(s.sprint != null ? intf.format(s.sprint!.stats.clears.quads) : "---"),
+      Text(s.sprint != null ? intf.format(s.sprint!.stats.clears.triples) : "---"),
+      Text(s.sprint != null ? intf.format(s.sprint!.stats.clears.doubles) : "---"),
+      Text(s.sprint != null ? intf.format(s.sprint!.stats.clears.singles) : "---"),
+      Text(""),
+      Text(s.sprint != null ? intf.format(s.sprint!.stats.clears.tSpinTriples) : "---"),
+      Text(s.sprint != null ? intf.format(s.sprint!.stats.clears.tSpinDoubles) : "---"),
+      Text(s.sprint != null ? intf.format(s.sprint!.stats.clears.tSpinSingles) : "---"),
+      Text(s.sprint != null ? intf.format(s.sprint!.stats.clears.tSpinZeros) : "---"),
+      Text(s.sprint != null ? intf.format(s.sprint!.stats.clears.tSpinMiniDoubles) : "---"),
+      Text(s.sprint != null ? intf.format(s.sprint!.stats.clears.tSpinMiniSingles) : "---"),
+      Text(s.sprint != null ? intf.format(s.sprint!.stats.clears.tSpinMiniZeros) : "---"),
+    ]);
+    formattedValues[5].add([
+      Text(s.blitz != null ? intf.format(s.blitz!.stats.score) : "---"),
+      Text(s.blitz != null ? intf.format(s.blitz!.stats.piecesPlaced) : "---"),
+      Text(s.blitz != null ? intf.format(s.blitz!.stats.lines) : "---"),
+      Text(s.blitz != null ? intf.format(s.blitz!.stats.level) : "---"),
+      Text(s.blitz != null ? intf.format(s.blitz!.stats.inputs) : "---"),
+      Text(s.blitz != null ? f4.format(s.blitz!.stats.kpp) : "---"),
+      Text(s.blitz != null ? f4.format(s.blitz!.stats.pps) : "---"),
+      Text(s.blitz != null ? f4.format(s.blitz!.stats.kps) : "---"),
+      Text(s.blitz != null ? percentage.format(s.blitz!.stats.finessePercentage) : "---"),
+      Text(s.blitz != null ? intf.format(s.blitz!.stats.finesse?.faults) : "---"),
+      Text(""),
+      Text(s.blitz != null ? intf.format(s.blitz!.stats.clears.quads) : "---"),
+      Text(s.blitz != null ? intf.format(s.blitz!.stats.clears.triples) : "---"),
+      Text(s.blitz != null ? intf.format(s.blitz!.stats.clears.doubles) : "---"),
+      Text(s.blitz != null ? intf.format(s.blitz!.stats.clears.singles) : "---"),
+      Text(""),
+      Text(s.blitz != null ? intf.format(s.blitz!.stats.clears.tSpinTriples) : "---"),
+      Text(s.blitz != null ? intf.format(s.blitz!.stats.clears.tSpinDoubles) : "---"),
+      Text(s.blitz != null ? intf.format(s.blitz!.stats.clears.tSpinSingles) : "---"),
+      Text(s.blitz != null ? intf.format(s.blitz!.stats.clears.tSpinZeros) : "---"),
+      Text(s.blitz != null ? intf.format(s.blitz!.stats.clears.tSpinMiniDoubles) : "---"),
+      Text(s.blitz != null ? intf.format(s.blitz!.stats.clears.tSpinMiniSingles) : "---"),
+      Text(s.blitz != null ? intf.format(s.blitz!.stats.clears.tSpinMiniZeros) : "---"),
+    ]);
+    formattedValues[6].add([
         Text(intf.format(s.zen.score)),
         Text(intf.format(s.zen.level))
       ]);
@@ -684,6 +684,20 @@ class CompareState extends State<CompareView> {
     });
   }
 
+  void removePlayer(String nickname) async {
+    int id = players.indexWhere((e) => e.username == nickname);
+    players.removeAt(id);
+    summaries.removeAt(id);
+    for (int i = 0; i < 7; i++){
+      rawValues[i].removeAt(id);
+      formattedValues[i].removeAt(id);
+    }  
+    if (players.isNotEmpty) best = recalculateBestEntries();
+    setState(() {
+      
+    });
+  }
+
   double getWinrateByTR(double yourGlicko, double yourRD, double notyourGlicko,double notyourRD) {
     return ((1 /
       (1 + pow(10,
@@ -739,7 +753,7 @@ class CompareState extends State<CompareView> {
                     ),
                     for (var p in players) SizedBox(
                       width: 300.0,
-                      child: HeaderCard(p),
+                      child: HeaderCard(p, removePlayer),
                     ),
                     SizedBox(width: 300, child: AddNewColumnCard(addPlayer))
                   ]
@@ -787,8 +801,9 @@ class CompareState extends State<CompareView> {
 
 class HeaderCard extends StatelessWidget{
   final TetrioPlayer player;
+  final Function removePlayer;
 
-  const HeaderCard(this.player);
+  const HeaderCard(this.player, this.removePlayer);
 
   String fontStyle(int length){
     if (length < 10) return "Eurostile Round Extended";
@@ -826,6 +841,12 @@ class HeaderCard extends StatelessWidget{
                         : Image.asset("res/avatars/tetrio_anon.png", fit: BoxFit.fitHeight, height: 128),
                   )
                 ),
+                Positioned(
+                  right: 0,
+                  child: IconButton(onPressed: (){
+                    removePlayer(player.username);
+                  }, icon: Icon(Icons.close, shadows: textShadow,))
+                )
               ],
             ),
             RichText(

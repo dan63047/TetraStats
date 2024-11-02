@@ -29,11 +29,11 @@ class _DestinationSavedData extends State<DestinationSavedData> {
   Widget getTetraLeagueListTile(TetraLeague data){
     return ListTile(
       title: Text("${timestamp(data.timestamp)}"),
-      subtitle: Text("${f2.format(data.apm)} APM, ${f2.format(data.pps)} PPS, ${f2.format(data.vs)} VS, ${intf.format(data.gamesPlayed)} games", style: TextStyle(color: Colors.grey)),
+      subtitle: Text("${data.apm != null ? f2.format(data.apm) : "-.--"} APM, ${data.pps != null ? f2.format(data.pps) : "-.--"} PPS, ${data.vs != null ? f2.format(data.vs) : "-.--"} VS, ${intf.format(data.gamesPlayed)} games", style: TextStyle(color: Colors.grey)),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text("${f2.format(data.tr)} TR", style: TextStyle(fontSize: 28)),
+          Text("${data.tr != -1.00 ? f2.format(data.tr) : "-.--"} TR", style: TextStyle(fontSize: 28)),
           Image.asset("res/tetrio_tl_alpha_ranks/${data.rank}.png", height: 36)
         ],
       ),
@@ -138,9 +138,7 @@ class _DestinationSavedData extends State<DestinationSavedData> {
                                       ListView.builder(
                                         itemCount: snapshot.data!.$3.length,
                                         itemBuilder: (context, index) {
-                                        return ListTile(
-                                          title: Text(snapshot.data!.$3[index].toString()),
-                                        );
+                                        return AlphaLeagueEntryThingy(snapshot.data!.$3[index], selectedID!);
                                       },),
                                       ]
                                     ),
@@ -154,7 +152,7 @@ class _DestinationSavedData extends State<DestinationSavedData> {
                       }
                     }
                   ) : 
-                  Text("Select nickname on the left to see data assosiated with it")
+                  InfoThingy("Select nickname on the left to see data assosiated with it")
                 )
               ],
             );

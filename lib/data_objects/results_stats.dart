@@ -2,6 +2,7 @@
 
 import 'package:tetra_stats/data_objects/clears.dart';
 import 'package:tetra_stats/data_objects/finesse.dart';
+import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
 import 'package:tetra_stats/data_objects/zenith_results.dart';
 
 class ResultsStats {
@@ -17,6 +18,7 @@ class ResultsStats {
   late Duration finalTime;
   late int tSpins;
   late Clears clears;
+  late Garbage garbage;
   late int kills;
   Finesse? finesse;
   ZenithResults? zenith; 
@@ -57,6 +59,7 @@ class ResultsStats {
     tSpins = json['tspins'];
     piecesPlaced = json['piecesplaced'];
     clears = Clears.fromJson(json['clears']);
+    garbage = Garbage.fromJson(json['garbage']);
     kills = json['kills'];
     if (json.containsKey("finesse")) finesse = Finesse.fromJson(json['finesse']);
     if (json.containsKey("zenith")) zenith = ZenithResults.fromJson(json['zenith']);

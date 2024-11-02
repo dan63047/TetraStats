@@ -483,7 +483,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                   ],
                 ),
                 SizedBox(
-                  height: 400,
+                  height: constraints.maxHeight - 192,
                   child: TabBarView(
                     children: [
                       FutureBuilder<SingleplayerStream>(
@@ -496,35 +496,37 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                             return const Center(child: CircularProgressIndicator());
                           case ConnectionState.done:
                             if (snapshot.hasData){
-                              return Column(
-                                children: [
-                                  for (int i = 0; i < snapshot.data!.records.length; i++) ListTile(
-                                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SingleplayerRecordView(record: snapshot.data!.records[i]))),
-                                  leading: Text(
-                                    switch (snapshot.data!.records[i].gamemode){
-                                      "40l" => "40L",
-                                      "blitz" => "BLZ",
-                                      "5mblast" => "5MB",
-                                      "zenith" => "QP",
-                                      "zenithex" => "QPE",
-                                      String() => "huh",
-                                    },
-                                    style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, shadows: textShadow, height: 0.9)
-                                  ),
-                                  title: Text(
-                                    switch (snapshot.data!.records[i].gamemode){
-                                      "40l" => get40lTime(snapshot.data!.records[i].stats.finalTime.inMicroseconds),
-                                      "blitz" => t.blitzScore(p: NumberFormat.decimalPattern().format(snapshot.data!.records[i].stats.score)),
-                                      "5mblast" => get40lTime(snapshot.data!.records[i].stats.finalTime.inMicroseconds),
-                                      "zenith" => "${f2.format(snapshot.data!.records[i].stats.zenith!.altitude)} m${(snapshot.data!.records[i].extras as ZenithExtras).mods.isNotEmpty ? " (${t.withModsPlural(n: (snapshot.data!.records[i].extras as ZenithExtras).mods.length)})" : ""}",
-                                      "zenithex" => "${f2.format(snapshot.data!.records[i].stats.zenith!.altitude)} m${(snapshot.data!.records[i].extras as ZenithExtras).mods.isNotEmpty ? " (${t.withModsPlural(n: (snapshot.data!.records[i].extras as ZenithExtras).mods.length)})" : ""}",
-                                      String() => "huh",
-                                    },
-                                  style: Theme.of(context).textTheme.displayLarge),
-                                  subtitle: Text(timestamp(snapshot.data!.records[i].timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
-                                  trailing: SpTrailingStats(snapshot.data!.records[i], snapshot.data!.records[i].gamemode)
-                                )
-                                ],
+                              return SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    for (int i = 0; i < snapshot.data!.records.length; i++) ListTile(
+                                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SingleplayerRecordView(record: snapshot.data!.records[i]))),
+                                    leading: Text(
+                                      switch (snapshot.data!.records[i].gamemode){
+                                        "40l" => "40L",
+                                        "blitz" => "BLZ",
+                                        "5mblast" => "5MB",
+                                        "zenith" => "QP",
+                                        "zenithex" => "QPE",
+                                        String() => "huh",
+                                      },
+                                      style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, shadows: textShadow, height: 0.9)
+                                    ),
+                                    title: Text(
+                                      switch (snapshot.data!.records[i].gamemode){
+                                        "40l" => get40lTime(snapshot.data!.records[i].stats.finalTime.inMicroseconds),
+                                        "blitz" => t.blitzScore(p: NumberFormat.decimalPattern().format(snapshot.data!.records[i].stats.score)),
+                                        "5mblast" => get40lTime(snapshot.data!.records[i].stats.finalTime.inMicroseconds),
+                                        "zenith" => "${f2.format(snapshot.data!.records[i].stats.zenith!.altitude)} m${(snapshot.data!.records[i].extras as ZenithExtras).mods.isNotEmpty ? " (${t.withModsPlural(n: (snapshot.data!.records[i].extras as ZenithExtras).mods.length)})" : ""}",
+                                        "zenithex" => "${f2.format(snapshot.data!.records[i].stats.zenith!.altitude)} m${(snapshot.data!.records[i].extras as ZenithExtras).mods.isNotEmpty ? " (${t.withModsPlural(n: (snapshot.data!.records[i].extras as ZenithExtras).mods.length)})" : ""}",
+                                        String() => "huh",
+                                      },
+                                    style: Theme.of(context).textTheme.displayLarge),
+                                    subtitle: Text(timestamp(snapshot.data!.records[i].timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
+                                    trailing: SpTrailingStats(snapshot.data!.records[i], snapshot.data!.records[i].gamemode)
+                                  )
+                                  ],
+                                ),
                               );
                             }
                             if (snapshot.hasError){ return FutureError(snapshot); }
@@ -542,28 +544,30 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                             return const Center(child: CircularProgressIndicator());
                           case ConnectionState.done:
                             if (snapshot.hasData){
-                              return Column(
-                                children: [
-                                  for (int i = 0; i < snapshot.data!.records.length; i++) ListTile(
-                                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SingleplayerRecordView(record: snapshot.data!.records[i]))),
-                                  leading: Text(
-                                    "#${i+1}",
-                                    style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, shadows: textShadow, height: 0.9)
-                                  ),
-                                  title: Text(
-                                    switch (snapshot.data!.records[i].gamemode){
-                                      "40l" => get40lTime(snapshot.data!.records[i].stats.finalTime.inMicroseconds),
-                                      "blitz" => t.blitzScore(p: NumberFormat.decimalPattern().format(snapshot.data!.records[i].stats.score)),
-                                      "5mblast" => get40lTime(snapshot.data!.records[i].stats.finalTime.inMicroseconds),
-                                      "zenith" => "${f2.format(snapshot.data!.records[i].stats.zenith!.altitude)} m${(snapshot.data!.records[i].extras as ZenithExtras).mods.isNotEmpty ? " (${t.withModsPlural(n: (snapshot.data!.records[i].extras as ZenithExtras).mods.length)})" : ""}",
-                                      "zenithex" => "${f2.format(snapshot.data!.records[i].stats.zenith!.altitude)} m${(snapshot.data!.records[i].extras as ZenithExtras).mods.isNotEmpty ? " (${t.withModsPlural(n: (snapshot.data!.records[i].extras as ZenithExtras).mods.length)})" : ""}",
-                                      String() => "huh",
-                                    },
-                                  style: Theme.of(context).textTheme.displayLarge),
-                                  subtitle: Text(timestamp(snapshot.data!.records[i].timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
-                                  trailing: SpTrailingStats(snapshot.data!.records[i], snapshot.data!.records[i].gamemode)
-                                )
-                                ],
+                              return SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    for (int i = 0; i < snapshot.data!.records.length; i++) ListTile(
+                                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SingleplayerRecordView(record: snapshot.data!.records[i]))),
+                                    leading: Text(
+                                      "#${i+1}",
+                                      style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28, shadows: textShadow, height: 0.9)
+                                    ),
+                                    title: Text(
+                                      switch (snapshot.data!.records[i].gamemode){
+                                        "40l" => get40lTime(snapshot.data!.records[i].stats.finalTime.inMicroseconds),
+                                        "blitz" => t.blitzScore(p: NumberFormat.decimalPattern().format(snapshot.data!.records[i].stats.score)),
+                                        "5mblast" => get40lTime(snapshot.data!.records[i].stats.finalTime.inMicroseconds),
+                                        "zenith" => "${f2.format(snapshot.data!.records[i].stats.zenith!.altitude)} m${(snapshot.data!.records[i].extras as ZenithExtras).mods.isNotEmpty ? " (${t.withModsPlural(n: (snapshot.data!.records[i].extras as ZenithExtras).mods.length)})" : ""}",
+                                        "zenithex" => "${f2.format(snapshot.data!.records[i].stats.zenith!.altitude)} m${(snapshot.data!.records[i].extras as ZenithExtras).mods.isNotEmpty ? " (${t.withModsPlural(n: (snapshot.data!.records[i].extras as ZenithExtras).mods.length)})" : ""}",
+                                        String() => "huh",
+                                      },
+                                    style: Theme.of(context).textTheme.displayLarge),
+                                    subtitle: Text(timestamp(snapshot.data!.records[i].timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
+                                    trailing: SpTrailingStats(snapshot.data!.records[i], snapshot.data!.records[i].gamemode)
+                                  )
+                                  ],
+                                ),
                               );
                             }
                             if (snapshot.hasError){ return FutureError(snapshot); }
@@ -582,7 +586,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
     );
   }
 
-  Widget getRecentTLrecords(BoxConstraints constraints){
+  Widget getRecentTLrecords(BoxConstraints constraints, String userID){
     return Column(
       children: [
         Card(
@@ -599,26 +603,27 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
             ),
           ),
         ),
-        Card(
-          clipBehavior: Clip.antiAlias,
-          child: FutureBuilder<TetraLeagueBetaStream>(
-            future: teto.fetchTLStream(widget.searchFor),
-            builder: (context, snapshot) {
-              switch (snapshot.connectionState){
-              case ConnectionState.none:
-              case ConnectionState.waiting:
-              case ConnectionState.active:
-                return const Center(child: CircularProgressIndicator());
-              case ConnectionState.done:
-                if (snapshot.hasData){
-                  return SizedBox(height: constraints.maxHeight - 145, child: TLRecords(userID: widget.searchFor, changePlayer: (){}, data: snapshot.data!.records, wasActiveInTL: snapshot.data!.records.isNotEmpty, oldMathcesHere: false));
-                }
-                if (snapshot.hasError){ return FutureError(snapshot); }
-              }
-            return const Text("what?");
-            },
-          ),
-        ),
+        TLRecords(userID),
+        // Card(
+        //   clipBehavior: Clip.antiAlias,
+        //   child: FutureBuilder<TetraLeagueBetaStream>(
+        //     future: teto.fetchTLStream(widget.searchFor),
+        //     builder: (context, snapshot) {
+        //       switch (snapshot.connectionState){
+        //       case ConnectionState.none:
+        //       case ConnectionState.waiting:
+        //       case ConnectionState.active:
+        //         return const Center(child: CircularProgressIndicator());
+        //       case ConnectionState.done:
+        //         if (snapshot.hasData){
+        //           return SizedBox(height: constraints.maxHeight - 145, child: TLRecords(userID: userID, changePlayer: (){}, data: snapshot.data!.records, wasActiveInTL: snapshot.data!.records.isNotEmpty, oldMathcesHere: false));
+        //         }
+        //         if (snapshot.hasError){ return FutureError(snapshot); }
+        //       }
+        //     return const Text("what?");
+        //     },
+        //   ),
+        // ),
       ],
     );
   }
@@ -1088,7 +1093,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                                 Cards.tetraLeague => switch (cardMod){
                                   CardMod.info => getTetraLeagueCard(snapshot.data!.summaries!.league, snapshot.data!.cutoffs, (snapshot.data!.averages != null && snapshot.data!.summaries!.league.rank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.rank] : (snapshot.data!.averages != null && snapshot.data!.summaries!.league.percentileRank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.percentileRank] : null, snapshot.data!.states),
                                   CardMod.ex => getPreviousSeasonsList(snapshot.data!.summaries!.pastLeague),
-                                  CardMod.records => getRecentTLrecords(widget.constraints),
+                                  CardMod.records => getRecentTLrecords(widget.constraints, snapshot.data!.player!.userId),
                                   _ => const Center(child: Text("huh?"))
                                 },
                                 Cards.quickPlay => switch (cardMod){

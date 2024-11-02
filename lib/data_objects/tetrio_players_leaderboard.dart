@@ -65,6 +65,28 @@ class TetrioPlayersLeaderboard {
     }
     if (filtredLeaderboard.isNotEmpty){
       double
+        avgAPM = 0,
+        avgPPS = 0,
+        avgVS = 0,
+        avgTR = 0,
+        avgGlixare = 0,
+        avgGlicko = 0,
+        avgRD = 0,
+        avgAPP = 0,
+        avgVSAPM = 0,
+        avgDSS = 0,
+        avgDSP = 0,
+        avgAPPDSP = 0,
+        avgCheese = 0,
+        avgGBE = 0,
+        avgNyaAPP = 0,
+        avgArea = 0,
+        avgEstTR = 0,
+        avgEstAcc = 0,
+        avgOpener = 0,
+        avgPlonk = 0,
+        avgStride = 0,
+        avgInfDS = 0,
         lowestTR = 25000,
         lowestGlixare = double.infinity,
         lowestGlicko = double.infinity,
@@ -110,11 +132,7 @@ class TetrioPlayersLeaderboard {
         highestOpener = double.negativeInfinity,
         highestPlonk = double.negativeInfinity,
         highestStride = double.negativeInfinity,
-        highestInfDS = double.negativeInfinity,
-        avgTR = 0,
-        avgGlixare = 0,
-        avgGlicko = 0,
-        avgRD = 0;
+        highestInfDS = double.negativeInfinity;
       int avgGamesPlayed = 0,
         avgGamesWon = 0,
         totalGamesPlayed = 0,
@@ -174,10 +192,28 @@ class TetrioPlayersLeaderboard {
         highestStrideID = "", highestStrideNick = "",
         highestInfDSid = "", highestInfDSnick = "";
       for (var entry in filtredLeaderboard){
+        avgAPM += entry.apm;
+        avgPPS += entry.pps;
+        avgVS += entry.vs;
         avgTR += entry.tr;
         avgGlixare += entry.gxe;
         if (entry.glicko != null) avgGlicko += entry.glicko!;
         if (entry.rd != null) avgRD += entry.rd!;
+        avgAPP += entry.nerdStats.app;
+        avgVSAPM += entry.nerdStats.vsapm;
+        avgDSS += entry.nerdStats.dss;
+        avgDSP += entry.nerdStats.dsp;
+        avgAPPDSP += entry.nerdStats.appdsp;
+        avgCheese += entry.nerdStats.cheese;
+        avgGBE += entry.nerdStats.gbe;
+        avgNyaAPP += entry.nerdStats.nyaapp;
+        avgArea += entry.nerdStats.area;
+        avgEstTR += entry.estTr.esttr;
+        avgEstAcc += entry.esttracc;
+        avgOpener += entry.playstyle.opener;
+        avgPlonk += entry.playstyle.plonk;
+        avgStride += entry.playstyle.stride;
+        avgInfDS += entry.playstyle.infds;
         totalGamesPlayed += entry.gamesPlayed;
         totalGamesWon += entry.gamesWon;
         if (entry.tr < lowestTR){
@@ -431,13 +467,31 @@ class TetrioPlayersLeaderboard {
           highestInfDSnick = entry.username;
         }
       }
+      avgAPM /= filtredLeaderboard.length;
+      avgPPS /= filtredLeaderboard.length;
+      avgVS /= filtredLeaderboard.length;
       avgTR /= filtredLeaderboard.length;
       avgGlixare /= filtredLeaderboard.length;
       avgGlicko /= filtredLeaderboard.length;
       avgRD /= filtredLeaderboard.length;
       avgGamesPlayed = (totalGamesPlayed / filtredLeaderboard.length).floor();
       avgGamesWon = (totalGamesWon / filtredLeaderboard.length).floor();
-      return [TetraLeague(id: "", timestamp: DateTime.now(), apm: null, pps: null, vs: null, gxe: avgGlixare, glicko: avgGlicko, rd: avgRD, gamesPlayed: avgGamesPlayed, gamesWon: avgGamesWon, bestRank: rank, decaying: false, tr: avgTR, rank: rank == "" ? "z" : rank, percentileRank: rank, percentile: rankCutoffs[rank]!, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1, season: currentSeason),
+      avgAPP /= filtredLeaderboard.length;
+      avgVSAPM /= filtredLeaderboard.length;
+      avgDSS /= filtredLeaderboard.length;
+      avgDSP /= filtredLeaderboard.length;
+      avgAPPDSP /= leaderboard.length;
+      avgCheese /= filtredLeaderboard.length;
+      avgGBE /= filtredLeaderboard.length;
+      avgNyaAPP /= filtredLeaderboard.length;
+      avgArea /= filtredLeaderboard.length;
+      avgEstTR /= filtredLeaderboard.length;
+      avgEstAcc /= filtredLeaderboard.length;
+      avgOpener /= filtredLeaderboard.length;
+      avgPlonk /= filtredLeaderboard.length;
+      avgStride /= filtredLeaderboard.length;
+      avgInfDS /= filtredLeaderboard.length;
+      return [TetraLeague(id: "", timestamp: DateTime.now(), apm: avgAPM, pps: avgPPS, vs: avgVS, gxe: avgGlixare, glicko: avgGlicko, rd: avgRD, gamesPlayed: avgGamesPlayed, gamesWon: avgGamesWon, bestRank: rank, decaying: false, tr: avgTR, rank: rank == "" ? "z" : rank, percentileRank: rank, percentile: rankCutoffs[rank]!, standing: -1, standingLocal: -1, nextAt: -1, prevAt: -1, season: currentSeason),
       {
         "totalGamesPlayed": totalGamesPlayed,
         "totalGamesWon": totalGamesWon,
@@ -598,6 +652,21 @@ class TetrioPlayersLeaderboard {
         "highestInfDS": highestInfDS,
         "highestInfDSid": highestInfDSid,
         "highestInfDSnick": highestInfDSnick,
+        "avgAPP": avgAPP,
+        "avgVSAPM": avgVSAPM,
+        "avgDSS": avgDSS,
+        "avgDSP": avgDSP,
+        "avgAPPDSP": avgAPPDSP,
+        "avgCheese": avgCheese,
+        "avgGBE": avgGBE,
+        "avgNyaAPP": avgNyaAPP,
+        "avgArea": avgArea,
+        "avgEstTR": avgEstTR,
+        "avgEstAcc": avgEstAcc,
+        "avgOpener": avgOpener,
+        "avgPlonk": avgPlonk,
+        "avgStride": avgStride,
+        "avgInfDS": avgInfDS,
         "toEnterGlicko": rank.toLowerCase() != "z" ? leaderboard[(leaderboard.length * rankCutoffs[rank]!).floor()-1].glicko : 0,
       }];
     }else{

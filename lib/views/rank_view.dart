@@ -32,6 +32,81 @@ class _RankState extends State<RankView> {
     return lb.getRankData(rank);
   }
 
+  Widget partOfTheWidget(List<dynamic>? data){
+    return Column(
+      children: [
+        Divider(),
+          Text("Average Stats", style: Theme.of(context).textTheme.displayLarge),
+          Text("${f2.format(data != null ? data[0].apm : widget.cutoffTetrio.apm)} APM • ${f2.format(data != null ? data[0].pps : widget.cutoffTetrio.pps)} PPS • ${f2.format(data != null ? data[0].vs : widget.cutoffTetrio.vs)} VS", style: Theme.of(context).textTheme.displayLarge),
+          Divider(),
+          Center(child: Text("Average Nerd Stats", style: Theme.of(context).textTheme.displayLarge)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Attack Per Piece", style: Theme.of(context).textTheme.displayLarge),
+              Text(f3.format(data != null ? data[1]["avgAPP"] : widget.cutoffTetrio.nerdStats?.app), style: Theme.of(context).textTheme.displayLarge)
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("VS / APM", style: Theme.of(context).textTheme.displayLarge),
+              Text(f3.format(data != null ? data[1]["avgVSAPM"] : widget.cutoffTetrio.nerdStats?.vsapm), style: Theme.of(context).textTheme.displayLarge)
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Downstack Per Second", style: Theme.of(context).textTheme.displayLarge),
+              Text(f3.format(data != null ? data[1]["avgDSS"] : widget.cutoffTetrio.nerdStats?.dss), style: Theme.of(context).textTheme.displayLarge)
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Downstack Per Piece", style: Theme.of(context).textTheme.displayLarge),
+              Text(f3.format(data != null ? data[1]["avgDSP"] : widget.cutoffTetrio.nerdStats?.dsp), style: Theme.of(context).textTheme.displayLarge)
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("APP + DSP", style: Theme.of(context).textTheme.displayLarge),
+              Text(f3.format(data != null ? data[1]["avgAPPDSP"] : widget.cutoffTetrio.nerdStats?.appdsp), style: Theme.of(context).textTheme.displayLarge)
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Cheese Index", style: Theme.of(context).textTheme.displayLarge),
+              Text(f2.format(data != null ? data[1]["avgCheese"] : widget.cutoffTetrio.nerdStats?.cheese), style: Theme.of(context).textTheme.displayLarge)
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Garbage Efficiency", style: Theme.of(context).textTheme.displayLarge),
+              Text(f3.format(data != null ? data[1]["avgGBE"] : widget.cutoffTetrio.nerdStats?.gbe), style: Theme.of(context).textTheme.displayLarge)
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Weighted APP", style: Theme.of(context).textTheme.displayLarge),
+              Text(f3.format(data != null ? data[1]["avgNyaAPP"] : widget.cutoffTetrio.nerdStats?.nyaapp), style: Theme.of(context).textTheme.displayLarge)
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Area", style: Theme.of(context).textTheme.displayLarge),
+              Text(f1.format(data != null ? data[1]["avgArea"] : widget.cutoffTetrio.nerdStats?.area), style: Theme.of(context).textTheme.displayLarge)
+            ],
+          ), 
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double percentileGap = widget.cutoffTetrio.percentile - widget.nextRankPercentile;
@@ -58,7 +133,7 @@ class _RankState extends State<RankView> {
                     children: [
                       Card(child: Center(child: Padding(
                             padding: const EdgeInsets.fromLTRB(0.0, 8.0, 5.0, 10.0),
-                            child: Text("${widget.rank.toUpperCase()} rank data", style: TextStyle(fontSize: 28)),
+                            child: Text(widget.rank == "" ? "Everyone" : "${widget.rank.toUpperCase()} rank data", style: TextStyle(fontSize: 28)),
                           ))),
                       Card(
                         child: Center(
@@ -67,7 +142,7 @@ class _RankState extends State<RankView> {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Image.asset("res/tetrio_tl_alpha_ranks/${widget.rank}.png",fit: BoxFit.fitHeight,height: 128),
+                                Image.asset("res/tetrio_tl_alpha_ranks/${widget.rank == "" ? "z" : widget.rank}.png",fit: BoxFit.fitHeight,height: 128),
                                 Text("${intf.format(widget.cutoffTetrio.count)} players", style: Theme.of(context).textTheme.titleSmall,),
                               ],
                             ),
@@ -96,14 +171,14 @@ class _RankState extends State<RankView> {
                                   ],
                                 ),
                               ),
-                              Row(
+                              if (widget.rank != "") Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text("Supposed to be", style: Theme.of(context).textTheme.displayLarge),
                                   Text("${intf.format(widget.cutoffTetrio.targetTr)} — ${intf.format(widget.nextRankTargetTR)}", style: Theme.of(context).textTheme.displayLarge)
                                 ],
                               ),
-                              Padding(
+                              if (widget.rank != "") Padding(
                                 padding: const EdgeInsets.only(bottom: 8.0),
                                 child: Row(
                                   children: [
@@ -126,14 +201,14 @@ class _RankState extends State<RankView> {
                                   Text("${f2.format(widget.cutoffTetrio.targetTr - widget.cutoffTetrio.tr)} TR", style: Theme.of(context).textTheme.displayLarge!.copyWith(color: Colors.greenAccent))
                                 ],
                               ),
-                              Row(
+                              if (widget.rank != "") Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text("LB pos range", style: Theme.of(context).textTheme.displayLarge),
                                   Text("${percentage.format(widget.cutoffTetrio.percentile)} — ${percentage.format(widget.nextRankPercentile)}", style: Theme.of(context).textTheme.displayLarge)
                                 ],
                               ),
-                              Padding(
+                              if (widget.rank != "") Padding(
                                 padding: const EdgeInsets.only(bottom: 8.0),
                                 child: Row(
                                   children: [
@@ -142,14 +217,14 @@ class _RankState extends State<RankView> {
                                   ],
                                 ),
                               ),
-                              Row(
+                              if (widget.rank != "") Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text("Supposed to be", style: Theme.of(context).textTheme.displayLarge),
                                   Text("${intf.format(supposedToBePlayers)} players", style: Theme.of(context).textTheme.displayLarge)
                                 ],
                               ),
-                              Padding(
+                              if (widget.rank != "") Padding(
                                 padding: const EdgeInsets.only(bottom: 8.0),
                                 child: Row(
                                   children: [
@@ -160,75 +235,24 @@ class _RankState extends State<RankView> {
                                   ],
                                 ),
                               ),
-                              Divider(),
-                              Text("Average Stats", style: Theme.of(context).textTheme.displayLarge),
-                              Text("${f2.format(widget.cutoffTetrio.apm)} APM • ${f2.format(widget.cutoffTetrio.pps)} PPS • ${f2.format(widget.cutoffTetrio.vs)} VS", style: Theme.of(context).textTheme.displayLarge),
-                              Divider(),
-                              Center(child: Text("Average Nerd Stats", style: Theme.of(context).textTheme.displayLarge)),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Attack Per Piece", style: Theme.of(context).textTheme.displayLarge),
-                                  Text(f3.format(widget.cutoffTetrio.nerdStats?.app), style: Theme.of(context).textTheme.displayLarge)
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("VS / APM", style: Theme.of(context).textTheme.displayLarge),
-                                  Text(f3.format(widget.cutoffTetrio.nerdStats?.vsapm), style: Theme.of(context).textTheme.displayLarge)
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Downstack Per Second", style: Theme.of(context).textTheme.displayLarge),
-                                  Text(f3.format(widget.cutoffTetrio.nerdStats?.dss), style: Theme.of(context).textTheme.displayLarge)
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Downstack Per Piece", style: Theme.of(context).textTheme.displayLarge),
-                                  Text(f3.format(widget.cutoffTetrio.nerdStats?.dsp), style: Theme.of(context).textTheme.displayLarge)
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("APP + DSP", style: Theme.of(context).textTheme.displayLarge),
-                                  Text(f3.format(widget.cutoffTetrio.nerdStats?.appdsp), style: Theme.of(context).textTheme.displayLarge)
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Cheese Index", style: Theme.of(context).textTheme.displayLarge),
-                                  Text(f2.format(widget.cutoffTetrio.nerdStats?.cheese), style: Theme.of(context).textTheme.displayLarge)
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Garbage Efficiency", style: Theme.of(context).textTheme.displayLarge),
-                                  Text(f3.format(widget.cutoffTetrio.nerdStats?.gbe), style: Theme.of(context).textTheme.displayLarge)
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Weighted APP", style: Theme.of(context).textTheme.displayLarge),
-                                  Text(f3.format(widget.cutoffTetrio.nerdStats?.nyaapp), style: Theme.of(context).textTheme.displayLarge)
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Area", style: Theme.of(context).textTheme.displayLarge),
-                                  Text(f1.format(widget.cutoffTetrio.nerdStats?.area), style: Theme.of(context).textTheme.displayLarge)
-                                ],
-                              ),
-                        
+                              if (widget.rank == "") FutureBuilder<List<dynamic>>(
+                                future: getRanksAverages(widget.rank),
+                                builder: (context, snapshot) {
+                                  switch (snapshot.connectionState){
+                                    case ConnectionState.none:
+                                    case ConnectionState.waiting:
+                                      return const Center(child: CircularProgressIndicator());
+                                    case ConnectionState.active:
+                                    case ConnectionState.done:
+                                      if (snapshot.hasData){
+                                        return partOfTheWidget(snapshot.data);
+                                      }
+                                      if (snapshot.hasError) return FutureError(snapshot);
+                                  }
+                                  return Text("End of the FutureBuilder");
+                                },
+                              )
+                              else partOfTheWidget(null)                   
                             ],
                           ),
                         ),

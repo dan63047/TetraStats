@@ -211,9 +211,9 @@ class _DestinationCutoffsState extends State<DestinationCutoffs> {
                             ),
                             Padding(
                               padding: const EdgeInsets.only(right: 8.0),
-                              child: TextButton(child: Text("More Info", textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)), onPressed: () {
+                              child: TextButton(child: Text("More Info", textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500)), onPressed: () {
                                 Navigator.push(context, MaterialPageRoute(
-                                  builder: (context) => RankView(rank: "", nextRankTR: snapshot.data!.data["top1"]!.tr, nextRankPercentile: 0.00, nextRankTargetTR: 25000.00, totalPlayers: snapshot.data!.total, cutoffTetrio: CutoffTetrio(apm: 0, pps: 0, vs: 0, pos: 0, percentile: 0, count: snapshot.data!.total, countPercentile: 1, tr: 10000.00, targetTr: 10000.00)),
+                                  builder: (context) => RankView(rank: "", nextRankTR: snapshot.data!.data["top1"]!.tr, nextRankPercentile: 0.00, nextRankTargetTR: 25000.00, totalPlayers: snapshot.data!.total, cutoffTetrio: CutoffTetrio(apm: 0, pps: 0, vs: 0, pos: 0, percentile: 1, count: snapshot.data!.total, countPercentile: 1, tr: snapshot.data!.data["d"]!.tr, targetTr: snapshot.data!.data['d']!.targetTr)),
                                 ),
                                 );
                               },),
@@ -278,7 +278,7 @@ class _DestinationCutoffsState extends State<DestinationCutoffs> {
                             ),
                             Padding(
                               padding: const EdgeInsets.only(right: 8.0),
-                              child: TextButton(child: Text("View", textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)), onPressed: () {
+                              child: TextButton(child: Text("View", textAlign: TextAlign.right, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500)), onPressed: () {
                                 Navigator.push(context, MaterialPageRoute(
                                   builder: (context) => RankView(rank: rank, nextRankTR: rank == "x+" ? snapshot.data!.data["top1"]!.tr : snapshot.data!.data[ranks[ranks.indexOf(rank)+1]]!.tr, nextRankPercentile: rank == "x+" ? 0.00 : snapshot.data!.data[ranks[ranks.indexOf(rank)+1]]!.percentile, nextRankTargetTR: rank == "x+" ? 25000.00 : snapshot.data!.data[ranks[ranks.indexOf(rank)+1]]!.targetTr, totalPlayers: snapshot.data!.total, cutoffTetrio: snapshot.data!.data[rank]!),
                                 ),

@@ -37,8 +37,11 @@ int biggestSpikeFromReplay(events){
 class Garbage{ // charsys where???
   late int sent;
   late int recived;
-  late int attack;
+  int? attack;
   late int cleared;
+  int? sent_normal;
+  int? maxspike;
+  int? maxspike_nomult;
 
   Garbage({
     required this.sent,
@@ -52,6 +55,9 @@ class Garbage{ // charsys where???
     recived = json['received'];
     attack = json['attack'];
     cleared = json['cleared'];
+    sent_normal = json['sent_normal'];
+    maxspike = json['maxspike'];
+    maxspike_nomult = json['maxspike_nomult'];
   }
 
   Garbage.toJson(){
@@ -59,7 +65,7 @@ class Garbage{ // charsys where???
   }
 
   Garbage operator + (Garbage other){
-    return Garbage(sent: sent + other.sent, recived: recived + other.recived, attack: attack + other.attack, cleared: cleared + other.cleared);
+    return Garbage(sent: sent + other.sent, recived: recived + other.recived, attack: attack??0 + (other.attack??0), cleared: cleared + other.cleared);
   }
 }
 

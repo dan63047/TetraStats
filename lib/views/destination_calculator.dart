@@ -244,7 +244,8 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
           ),
           if (playstyle != null) Card(
             child: GraphsThingy(nerdStats: nerdStats!, playstyle: playstyle!, apm: apm!, pps: pps!, vs: vs!)
-          )
+          ),
+          if (nerdStats == null) InfoThingy("Enter values and press \"Calc\" to see Nerd Stats for them")
         ],
       ),
     );
@@ -467,14 +468,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
             SizedBox(
               width: widget.constraints.maxWidth - 350 - 80,
               height: widget.constraints.maxHeight - 108,
-              child: clears.isEmpty ? Center(child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.info_outline, size: 128.0, color: Colors.grey.shade800),
-                  SizedBox(height: 5.0),
-                  Text("Click on the actions on the left to add them here", textAlign: ui.TextAlign.center),
-                ],
-              )) :
+              child: clears.isEmpty ? InfoThingy("Click on the actions on the left to add them here") :
               Card(
                 child: Column(
                   children: [
