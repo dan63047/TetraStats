@@ -9,6 +9,7 @@ class PlayerLeaderboardPosition{
   late LeaderboardPosition? gamesPlayed;
   late LeaderboardPosition? gamesWon;
   late LeaderboardPosition? winrate;
+  late LeaderboardPosition? glixare;
   late LeaderboardPosition? app;
   late LeaderboardPosition? vsapm;
   late LeaderboardPosition? dss;
@@ -28,6 +29,7 @@ class PlayerLeaderboardPosition{
     required this.gamesPlayed,
     required this.gamesWon,
     required this.winrate,
+    required this.glixare,
     required this.app,
     required this.vsapm,
     required this.dss,
@@ -48,16 +50,17 @@ class PlayerLeaderboardPosition{
     gamesPlayed = results[3];
     gamesWon = results[4];
     winrate = results[5];
-    app = results[6];
-    vsapm = results[7];
-    dss = results[8];
-    dsp = results[9];
-    appdsp = results[10];
-    cheese = results[11];
-    gbe = results[12];
-    nyaapp = results[13];
-    area = results[14];
-    estTr = results[15];
-    accOfEst = results[16];
+    glixare = results[6];
+    app = results[7];
+    vsapm = results[8];
+    dss = results[9];
+    dsp = results[10];
+    appdsp = results[11];
+    cheese = results[12];
+    gbe = results[13];
+    nyaapp = results[14];
+    area = results[15];
+    estTr = results[16];
+    accOfEst = results[17];
   }
 }

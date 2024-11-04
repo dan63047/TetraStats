@@ -8,7 +8,6 @@ import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/views/main_view_tiles.dart';
-import 'package:tetra_stats/views/tl_leaderboard_view.dart';
 import 'package:tetra_stats/views/user_view.dart';
 
 class DestinationLeaderboards extends StatefulWidget{
@@ -49,6 +48,7 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
   Stream<List<dynamic>> get dataStream => _dataStreamController.stream;
   List<dynamic> list = [];
   bool _isFetchingData = false;
+  bool _reachedTheEnd = false;
   List<String> _excludeRanks = [];
   bool _reverse = false;
   String? prisecter;
@@ -64,7 +64,7 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
   }
 
   Future<void> _fetchData() async {
-    if (_isFetchingData) {
+    if (_isFetchingData || _reachedTheEnd) {
       // Avoid fetching new data while already fetching
       return;
     }
@@ -84,7 +84,7 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
       };
 
       if (_currentLb == Leaderboards.fullTL && _excludeRanks.isNotEmpty) items.removeWhere((e) => _excludeRanks.indexOf((e as TetrioPlayerFromLeaderboard).rank) != -1);
-
+      if (_currentLb == Leaderboards.fullTL || items.isEmpty) _reachedTheEnd = true;
       list.addAll((_reverse && _currentLb == Leaderboards.fullTL) ? items.reversed : items);
 
       _dataStreamController.add(list);
@@ -150,6 +150,7 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                           _currentLb = leaderboards.keys.elementAt(index);
                           list.clear();
                           prisecter = null;
+                          _reachedTheEnd = false;
                           _fetchData();
                         },
                       ),
@@ -192,6 +193,7 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                                   list.clear();
                                   prisecter = null;
                                   _isFetchingData = false;
+                                  _reachedTheEnd = false;
                                   setState((){_fetchData();});
                                 })
                               ),
@@ -209,6 +211,7 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                                   list.clear();
                                   prisecter = null;
                                   _isFetchingData = false;
+                                  _reachedTheEnd = false;
                                   setState((){_fetchData();});
                                 })
                               ),
@@ -266,7 +269,7 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                               }, icon: Icon(Icons.filter_alt)),
                               if (_currentLb == Leaderboards.fullTL) IconButton(
                                 color: _reverse ? Theme.of(context).colorScheme.primary : null,
-                                icon: Container(transform: _reverse ? Matrix4.rotationX(pi) : null, child: Icon(Icons.filter_list)),
+                                icon: Transform.rotate(angle: _reverse ? pi : 0.0, child: Icon(Icons.filter_list)),
                                 onPressed: (){
                                   setState((){
                                     _reverse = !_reverse;
@@ -302,13 +305,21 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                                         Image.asset("res/tetrio_tl_alpha_ranks/${snapshot.data![index].rank}.png", height: 36)
                                       ],
                                     ),
-                                    Leaderboards.fullTL => Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text("${f2.format(snapshot.data![index].tr)} TR", style: trailingStyle),
-                                        Image.asset("res/tetrio_tl_alpha_ranks/${snapshot.data![index].rank}.png", height: 36)
-                                      ],
-                                    ),
+                                    Leaderboards.fullTL => switch (stat) {
+                                      Stats.tr => Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text("${f2.format(snapshot.data![index].tr)} TR", style: trailingStyle),
+                                          Image.asset("res/tetrio_tl_alpha_ranks/${snapshot.data![index].rank}.png", height: 36)
+                                        ],
+                                      ),
+                                      Stats.gp => Text("${intf.format(snapshot.data![index].getStatByEnum(stat))} ${chartsShortTitles[stat]}", style: trailingStyle),
+                                      Stats.gw => Text("${intf.format(snapshot.data![index].getStatByEnum(stat))} ${chartsShortTitles[stat]}", style: trailingStyle),
+                                      Stats.apm => Text("${f2.format(snapshot.data![index].getStatByEnum(stat))} ${chartsShortTitles[stat]}", style: trailingStyle),
+                                      Stats.pps => Text("${f2.format(snapshot.data![index].getStatByEnum(stat))} ${chartsShortTitles[stat]}", style: trailingStyle),
+                                      Stats.vs => Text("${f2.format(snapshot.data![index].getStatByEnum(stat))} ${chartsShortTitles[stat]}", style: trailingStyle),
+                                      _ => Text("${f4.format(snapshot.data![index].getStatByEnum(stat))} ${chartsShortTitles[stat]}", style: trailingStyle)
+                                    },
                                     Leaderboards.xp => Text("LVL ${f2.format(snapshot.data![index].level)}", style: trailingStyle),
                                     Leaderboards.ar => Text("${intf.format(snapshot.data![index].ar)} AR", style: trailingStyle),
                                     Leaderboards.sprint => Text(get40lTime(snapshot.data![index].stats.finalTime.inMicroseconds), style: trailingStyle),
@@ -318,7 +329,10 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                                   },
                                   subtitle: Text(switch (_currentLb){
                                     Leaderboards.tl => "${f2.format(snapshot.data![index].apm)} APM, ${f2.format(snapshot.data![index].pps)} PPS, ${f2.format(snapshot.data![index].vs)} VS, ${f2.format(snapshot.data![index].nerdStats.app)} APP, ${f2.format(snapshot.data![index].nerdStats.vsapm)} VS/APM",
-                                    Leaderboards.fullTL => "${f2.format(snapshot.data![index].apm)} APM, ${f2.format(snapshot.data![index].pps)} PPS, ${f2.format(snapshot.data![index].vs)} VS, ${f2.format(snapshot.data![index].nerdStats.app)} APP, ${f2.format(snapshot.data![index].nerdStats.vsapm)} VS/APM",
+                                    Leaderboards.fullTL => switch (stat) {
+                                      Stats.tr => "${f2.format(snapshot.data![index].apm)} APM, ${f2.format(snapshot.data![index].pps)} PPS, ${f2.format(snapshot.data![index].vs)} VS, ${f2.format(snapshot.data![index].nerdStats.app)} APP, ${f2.format(snapshot.data![index].nerdStats.vsapm)} VS/APM",
+                                      _ => "${f2.format(snapshot.data![index].tr)} TR, ${snapshot.data![index].rank.toUpperCase()} rank"
+                                    },
                                     Leaderboards.xp => "${f2.format(snapshot.data![index].xp)} XP${snapshot.data![index].playtime.isNegative ? "" : ", ${playtime(snapshot.data![index].playtime)} of gametime"}",
                                     Leaderboards.ar => "${snapshot.data![index].ar_counts}",
                                     Leaderboards.sprint => "${intf.format(snapshot.data![index].stats.finesse.faults)} FF, ${f2.format(snapshot.data![index].stats.kpp)} KPP, ${f2.format(snapshot.data![index].stats.kps)} KPS, ${f2.format(snapshot.data![index].stats.pps)} PPS, ${intf.format(snapshot.data![index].stats.piecesPlaced)} P",

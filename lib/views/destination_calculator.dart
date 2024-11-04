@@ -510,7 +510,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                             Text("PC's: ${intf.format(pcDamage)}")
                           ],
                         ),
-                        SfLinearGauge(
+                        if (totalDamage > 0) SfLinearGauge(
                           minimum: 0,
                           maximum: totalDamage.toDouble(),
                           showLabels: false,

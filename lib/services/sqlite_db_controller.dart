@@ -86,4 +86,24 @@ class DB {
     var newDBStats = await dbFile.stat();
     return dbStats.size - newDBStats.size;
   }
+
+  Future<bool> checkImportingDB(File db) async {
+    final newDB = await openDatabase(db.path);
+    var usersTable = await newDB.rawQuery("PRAGMA table_xinfo(`${tetrioUsersTable}`);");
+    List<String> usersTableRows = [for (Map<String, Object?> row in usersTable) row["name"] as String];
+    if (!listEquals(usersTableRows, tetrioUsersTableRows)) return false;
+    var usersToTrackTable = await newDB.rawQuery("PRAGMA table_xinfo(`${tetrioUsersToTrackTable}`);");
+    List<String> usersToTrackTableRows = [for (Map<String, Object?> row in usersToTrackTable) row["name"] as String];
+    if (!listEquals(usersToTrackTableRows, tetrioUsersToTrackTableRows)) return false;
+    var leagueMatchesTable = await newDB.rawQuery("PRAGMA table_xinfo(`${tetraLeagueMatchesTable}`);");
+    List<String> leagueMatchesTableRows = [for (Map<String, Object?> row in leagueMatchesTable) row["name"] as String];
+    if (!listEquals(leagueMatchesTableRows, tetraLeagueMatchesTableRows)) return false;
+    var tlReplayStatsTable = await newDB.rawQuery("PRAGMA table_xinfo(`${tetrioTLReplayStatsTable}`);");
+    List<String> TLReplayStatsTableRows = [for (Map<String, Object?> row in tlReplayStatsTable) row["name"] as String];
+    if (!listEquals(TLReplayStatsTableRows, tetrioTLReplayStatsTableRows)) return false;
+    var leagueTable = await newDB.rawQuery("PRAGMA table_xinfo(`${tetrioLeagueTable}`);");
+    List<String> leagueTableRows = [for (Map<String, Object?> row in leagueTable) row["name"] as String];
+    if (!listEquals(leagueTableRows, tetrioLeagueTableRows)) return false;
+    return true;
+  }
 }

@@ -49,6 +49,11 @@ const String endContext2 = "endContext2";
 const String statesCol = "jsonStates";
 const String player1id = "player1id";
 const String player2id = "player2id";
+const List<String> tetrioUsersTableRows = [idCol, nickCol, "jsonStates"];
+const List<String> tetrioUsersToTrackTableRows = [idCol];
+const List<String> tetraLeagueMatchesTableRows = [idCol, replayID, player1id, player2id, timestamp, endContext1, endContext2];
+const List<String> tetrioTLReplayStatsTableRows = [idCol, "data", "freyhoe"];
+const List<String> tetrioLeagueTableRows = [idCol, "gamesplayed", "gameswon", "tr", "glicko", "rd", "gxe", "rank", "bestrank", "apm", "pps", "vs", "decaying", "standing", "standing_local", "percentile", "prev_rank", "prev_at", "next_rank", "next_at", "percentile_rank", "season"];
 /// Table, that store players data, their stats at some moments of time
 const String createTetrioUsersTable = '''
         CREATE TABLE IF NOT EXISTS "tetrioUsers" (

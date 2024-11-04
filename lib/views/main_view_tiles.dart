@@ -16,6 +16,7 @@ import 'package:tetra_stats/data_objects/nerd_stats.dart';
 import 'package:tetra_stats/data_objects/news.dart';
 import 'package:tetra_stats/data_objects/news_entry.dart';
 import 'package:tetra_stats/data_objects/p1nkl0bst3r.dart';
+import 'package:tetra_stats/data_objects/player_leaderboard_position.dart';
 import 'package:tetra_stats/data_objects/playstyle.dart';
 import 'package:tetra_stats/data_objects/record_extras.dart';
 import 'package:tetra_stats/data_objects/record_single.dart';
@@ -24,6 +25,7 @@ import 'package:tetra_stats/data_objects/tetra_league.dart';
 import 'package:tetra_stats/data_objects/tetra_league_alpha_record.dart';
 import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 import 'package:tetra_stats/data_objects/tetrio_player.dart';
+import 'package:tetra_stats/data_objects/tetrio_players_leaderboard.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/utils/colors_functions.dart';
@@ -53,6 +55,7 @@ import 'package:vector_math/vector_math_64.dart' hide Colors;
 var fDiff = NumberFormat("+#,###.####;-#,###.####");
 late Future<FetchResults> _data;
 late Future<News> _newsData;
+TetrioPlayersLeaderboard? _everyone;
 
 Future<FetchResults> getData(String searchFor) async {
     TetrioPlayer player;
@@ -64,23 +67,33 @@ Future<FetchResults> getData(String searchFor) async {
       }
       
     }on TetrioPlayerNotExist{
-      return FetchResults(false, null, [], null, null, null, false, TetrioPlayerNotExist());
+      return FetchResults(false, null, [], null, null, null, null, false, TetrioPlayerNotExist());
     }
     late Summaries summaries;
-    late Cutoffs cutoffs;
-    late CutoffsTetrio averages;
+    late Cutoffs? cutoffs;
+    late CutoffsTetrio? averages;
     try {
       List<dynamic> requests = await Future.wait([
         teto.fetchSummaries(player.userId),
         teto.fetchCutoffsBeanserver(),
-        teto.fetchCutoffsTetrio()
+        if (prefs.getBool("showAverages") == true) teto.fetchCutoffsTetrio()
       ]);
 
       summaries = requests[0];
       cutoffs = requests.elementAtOrNull(1);
       averages = requests.elementAtOrNull(2);
     } on Exception catch (e) {
-      return FetchResults(false, null, [], null, null, null, false, e);
+      return FetchResults(false, null, [], null, null, null, null, false, e);
+    }
+    PlayerLeaderboardPosition? _meAmongEveryone;
+    if (prefs.getBool("showPositions") == true){
+      // Get tetra League leaderboard
+      _everyone = teto.getCachedLeaderboard();
+      _everyone ??= await teto.fetchTLLeaderboard();
+      if (_everyone!.leaderboard.isNotEmpty){
+        _meAmongEveryone = await compute(_everyone!.getLeaderboardPosition, {player.userId: summaries.league});
+        if (_meAmongEveryone != null) teto.cacheLeaderboardPositions(player.userId, _meAmongEveryone); 
+      }
     }
     List<TetraLeague> states = await teto.getStates(player.userId, season: currentSeason);
 
@@ -89,7 +102,7 @@ Future<FetchResults> getData(String searchFor) async {
       await teto.storeState(summaries.league);
     }
 
-    return FetchResults(true, player, states, summaries, cutoffs, averages, isTracking, null);
+    return FetchResults(true, player, states, summaries, cutoffs, averages, _meAmongEveryone, isTracking, null);
   }
 
 class MainView extends StatefulWidget {
@@ -579,7 +592,10 @@ class DistinguishmentThingy extends StatelessWidget{
               children: getDistinguishmentTitle(distinguishment.header),
             ),
           ),
-          Text(getDistinguishmentSubtitle(distinguishment.footer), style: Theme.of(context).textTheme.displayLarge, textAlign: TextAlign.center),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+            child: Text(getDistinguishmentSubtitle(distinguishment.footer), style: Theme.of(context).textTheme.displayLarge, textAlign: TextAlign.center),
+          ),
         ],
       ),
     );
@@ -641,7 +657,10 @@ class FakeDistinguishmentThingy extends StatelessWidget{
                 ),
               ),
             ),
-            Text(getDistinguishmentSubtitle(), style: Theme.of(context).textTheme.displayLarge, textAlign: TextAlign.center),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+              child: Text(getDistinguishmentSubtitle(), style: Theme.of(context).textTheme.displayLarge, textAlign: TextAlign.center),
+            ),
           ],
         ),
       ),
@@ -1103,7 +1122,7 @@ class _SearchDrawerState extends State<SearchDrawer>  {
                   SliverToBoxAdapter(
                     child: SearchBar(
                       controller: widget.controller,
-                      hintText: "Hello",
+                      hintText: "Enter the username",
                       hintStyle: const WidgetStatePropertyAll(TextStyle(color: Colors.grey)),
                       trailing: [
                         IconButton(onPressed: (){setState(() {
@@ -1121,12 +1140,22 @@ class _SearchDrawerState extends State<SearchDrawer>  {
                   ),
                   SliverToBoxAdapter(
                     child: ListTile(
+                    leading: Icon(Icons.home),
                     title: Text(prefs.getString("player") ?? "dan63"),
                     onTap: () {
                       widget.changePlayer(prefs.getString("playerID") ?? "6098518e3d5155e6ec429cdc");
                       Navigator.of(context).pop();
                     },
                   ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Divider(),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 10.0),
+                      child: Text("Tracked Players", style: Theme.of(context).textTheme.headlineLarge),
+                    ),
                   )
                 ];
               },
@@ -1136,6 +1165,9 @@ class _SearchDrawerState extends State<SearchDrawer>  {
                 var i = allPlayers.length-1-index; // Last players in this map are most recent ones, they are gonna be shown at the top.
                 return ListTile(
                   title: Text(allPlayers[keys[i]]??keys[i]), // Takes last known username from list of states
+                  trailing: IconButton(onPressed: (){
+                    teto.deletePlayerToTrack(keys[i]);
+                  }, icon: Icon(Icons.delete, color: Colors.grey)),
                   onTap: () {
                     widget.changePlayer(keys[i]); // changes to chosen player
                     Navigator.of(context).pop(); // and closes itself.
@@ -1155,8 +1187,9 @@ class TetraLeagueThingy extends StatelessWidget{
   final TetraLeague? toCompare;
   final Cutoffs? cutoffs;
   final CutoffTetrio? averages;
+  final PlayerLeaderboardPosition? lbPos;
 
-  const TetraLeagueThingy({super.key, required this.league, this.toCompare, this.cutoffs, this.averages});
+  const TetraLeagueThingy({super.key, required this.league, this.toCompare, this.cutoffs, this.averages, this.lbPos});
   
   @override
   Widget build(BuildContext context) {
@@ -1182,22 +1215,27 @@ class TetraLeagueThingy extends StatelessWidget{
               Expanded(
                 child: Center(
                   child: Table(
+                    defaultVerticalAlignment: TableCellVerticalAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
                     defaultColumnWidth:const IntrinsicColumnWidth(),
                     children: [
                       TableRow(children: [
                         Text(league.apm != null ? f2.format(league.apm) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: league.apm != null ? getStatColor(league.apm!, averages?.apm, true) : Colors.grey)),
                         Text(" APM", style: TextStyle(fontSize: 21, color: league.apm != null ? getStatColor(league.apm!, averages?.apm, true) : Colors.grey)),
-                        if (toCompare != null) Text(" (${comparef2.format(league.apm!-toCompare!.apm!)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: getDifferenceColor(league.apm!-toCompare!.apm!)))
+                        if (toCompare != null) Text(" (${comparef2.format(league.apm!-toCompare!.apm!)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: getDifferenceColor(league.apm!-toCompare!.apm!))),
+                        if (lbPos != null) Text(lbPos?.apm != null ? (lbPos!.apm!.position >= 1000 ? " (${t.top} ${f2.format(lbPos!.apm!.percentage*100)}%)" : " (№ ${lbPos!.apm!.position})") : "(№ ---)", style: TextStyle(color: lbPos?.apm != null ? getColorOfRank(lbPos!.apm!.position) : null))
                       ]),
                       TableRow(children: [
                         Text(league.pps != null ? f2.format(league.pps) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: league.pps != null ? getStatColor(league.pps!, averages?.pps, true) : Colors.grey)),
                         Text(" PPS", style: TextStyle(fontSize: 21, color: league.pps != null ? getStatColor(league.pps!, averages?.pps, true) : Colors.grey)),
-                        if (toCompare != null) Text(" (${comparef2.format(league.pps!-toCompare!.pps!)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: getDifferenceColor(league.pps!-toCompare!.pps!)))
+                        if (toCompare != null) Text(" (${comparef2.format(league.pps!-toCompare!.pps!)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: getDifferenceColor(league.pps!-toCompare!.pps!))),
+                        if (lbPos != null) Text(lbPos?.pps != null ? (lbPos!.pps!.position >= 1000 ? " (${t.top} ${f2.format(lbPos!.pps!.percentage*100)}%)" : " (№ ${lbPos!.pps!.position})") : "(№ ---)", style: TextStyle(color: lbPos?.pps != null ? getColorOfRank(lbPos!.pps!.position) : null))
                       ]),
                       TableRow(children: [
                         Text(league.vs != null ? f2.format(league.vs) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: league.vs != null ? getStatColor(league.vs!, averages?.vs, true) : Colors.grey)),
                         Text(" VS", style: TextStyle(fontSize: 21, color: league.vs != null ? getStatColor(league.vs!, averages?.vs, true) : Colors.grey)),
-                        if (toCompare != null) Text(" (${comparef2.format(league.vs!-toCompare!.vs!)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: getDifferenceColor(league.vs!-toCompare!.vs!)))
+                        if (toCompare != null) Text(" (${comparef2.format(league.vs!-toCompare!.vs!)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: getDifferenceColor(league.vs!-toCompare!.vs!))),
+                        if (lbPos != null) Text(lbPos?.vs != null ? (lbPos!.vs!.position >= 1000 ? " (${t.top} ${f2.format(lbPos!.vs!.percentage*100)}%)" : " (№ ${lbPos!.vs!.position})") : "(№ ---)", style: TextStyle(color: lbPos?.vs != null ? getColorOfRank(lbPos!.vs!.position) : null))
                       ])
                     ],
                   ),
@@ -1207,25 +1245,30 @@ class TetraLeagueThingy extends StatelessWidget{
               Expanded(
                 child: Center(
                   child: Table(
+                    defaultVerticalAlignment: TableCellVerticalAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
                     defaultColumnWidth:const IntrinsicColumnWidth(),
                     children: [
                       TableRow(children: [
                         //Text("APM: ", style: TextStyle(fontSize: 21)),
                         Text(intf.format(league.gamesPlayed), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
                         const Text(" Games", style: TextStyle(fontSize: 21)),
-                        if (toCompare != null) Text(" (${comparef2.format(league.gamesPlayed-toCompare!.gamesPlayed)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: Colors.grey))
+                        if (toCompare != null) Text(" (${comparef2.format(league.gamesPlayed-toCompare!.gamesPlayed)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: Colors.grey)),
+                        if (lbPos != null) Text(lbPos?.gamesPlayed != null ? (lbPos!.gamesPlayed!.position >= 1000 ? " (${t.top} ${f2.format(lbPos!.gamesPlayed!.percentage*100)}%)" : " (№ ${lbPos!.gamesPlayed!.position})") : "(№ ---)", style: TextStyle(color: lbPos?.gamesPlayed != null ? getColorOfRank(lbPos!.gamesPlayed!.position) : null))
                       ]),
                       TableRow(children: [
                         //Text("PPS: ", style: TextStyle(fontSize: 21)),
                         Text(intf.format(league.gamesWon), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
                         const Text(" Won", style: TextStyle(fontSize: 21)),
-                        if (toCompare != null) Text(" (${comparef2.format(league.gamesWon-toCompare!.gamesWon)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: Colors.grey))
+                        if (toCompare != null) Text(" (${comparef2.format(league.gamesWon-toCompare!.gamesWon)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: Colors.grey)),
+                        if (lbPos != null) Text(lbPos?.gamesWon != null ? (lbPos!.gamesWon!.position >= 1000 ? " (${t.top} ${f2.format(lbPos!.gamesWon!.percentage*100)}%)" : " (№ ${lbPos!.gamesWon!.position})") : "(№ ---)", style: TextStyle(color: lbPos?.gamesWon != null ? getColorOfRank(lbPos!.gamesWon!.position) : null))
                       ]),
                       TableRow(children: [
                         //Text("VS: ", style: TextStyle(fontSize: 21)),
-                        Tooltip(child: Text("${league.gxe.isNegative ? "---" : f3.format(league.gxe)}", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: league.standingLocal.isNegative ? Colors.grey : Colors.white)), message: "${f2.format(league.s1tr)}",),
-                        Text(" GLIXARE", style: TextStyle(fontSize: 21, color: league.standingLocal.isNegative ? Colors.grey : Colors.white)),
-                        if (toCompare != null) Text(" (${comparef.format(league.gxe-toCompare!.gxe)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: getDifferenceColor(league.standingLocal-toCompare!.standingLocal)))
+                        Tooltip(child: Text("${league.gxe.isNegative ? "---" : f3.format(league.gxe)}", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: league.gxe.isNegative ? Colors.grey : Colors.white)), message: "${f2.format(league.s1tr)}",),
+                        Text(" GLIXARE", style: TextStyle(fontSize: 21, color: league.gxe.isNegative ? Colors.grey : Colors.white)),
+                        if (toCompare != null) Text(" (${comparef.format(league.gxe-toCompare!.gxe)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: getDifferenceColor(league.gxe-toCompare!.gxe))),
+                        if (lbPos != null) Text(lbPos?.glixare != null ? (lbPos!.glixare!.position >= 1000 ? " (${t.top} ${f2.format(lbPos!.glixare!.percentage*100)}%)" : " (№ ${lbPos!.glixare!.position})") : "(№ ---)", style: TextStyle(color: lbPos?.glixare != null ? getColorOfRank(lbPos!.glixare!.position) : null))
                       ]),
                     ],
                   ),

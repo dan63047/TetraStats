@@ -6,12 +6,12 @@ import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/cutoff_tetrio.dart';
 import 'package:tetra_stats/data_objects/news.dart';
 import 'package:tetra_stats/data_objects/p1nkl0bst3r.dart';
+import 'package:tetra_stats/data_objects/player_leaderboard_position.dart';
 import 'package:tetra_stats/data_objects/record_extras.dart';
 import 'package:tetra_stats/data_objects/record_single.dart';
 import 'package:tetra_stats/data_objects/singleplayer_stream.dart';
 import 'package:tetra_stats/data_objects/summaries.dart';
 import 'package:tetra_stats/data_objects/tetra_league.dart';
-import 'package:tetra_stats/data_objects/tetra_league_beta_stream.dart';
 import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 import 'package:tetra_stats/data_objects/tetrio_player.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
@@ -32,8 +32,9 @@ class DestinationHome extends StatefulWidget{
   final Future<FetchResults> dataFuture;
   final Future<News>? newsFuture;
   final BoxConstraints constraints;
+  final bool noSidebar;
 
-  const DestinationHome({super.key, required this.searchFor, required this.dataFuture, this.newsFuture, required this.constraints});
+  const DestinationHome({super.key, required this.searchFor, required this.dataFuture, this.newsFuture, required this.constraints, this.noSidebar = false});
 
   @override
   State<DestinationHome> createState() => _DestinationHomeState();
@@ -46,10 +47,11 @@ class FetchResults{
   Summaries? summaries;
   Cutoffs? cutoffs;
   CutoffsTetrio? averages;
+  PlayerLeaderboardPosition? playerPos;
   bool isTracked;
   Exception? exception;
 
-  FetchResults(this.success, this.player, this.states, this.summaries, this.cutoffs, this.averages, this.isTracked, this.exception);
+  FetchResults(this.success, this.player, this.states, this.summaries, this.cutoffs, this.averages, this.playerPos, this.isTracked, this.exception);
 }
 
 class RecordSummary extends StatelessWidget{
@@ -389,7 +391,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
     );
   }
 
-  Widget getTetraLeagueCard(TetraLeague data, Cutoffs? cutoffs, CutoffTetrio? averages, List<TetraLeague> states){
+  Widget getTetraLeagueCard(TetraLeague data, Cutoffs? cutoffs, CutoffTetrio? averages, List<TetraLeague> states, PlayerLeaderboardPosition? lbPos){
     TetraLeague? toCompare = states.length >= 2 ? states.elementAtOrNull(states.length-2) : null;
     return Column(
       children: [
@@ -409,7 +411,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
             ),
           ),
         ),
-        TetraLeagueThingy(league: data, toCompare: toCompare, cutoffs: cutoffs, averages: averages),
+        TetraLeagueThingy(league: data, toCompare: toCompare, cutoffs: cutoffs, averages: averages, lbPos: lbPos),
         if (data.nerdStats != null) Card(
           //surfaceTintColor: rankColors[data.rank],
           child: Row(
@@ -604,26 +606,6 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
           ),
         ),
         TLRecords(userID),
-        // Card(
-        //   clipBehavior: Clip.antiAlias,
-        //   child: FutureBuilder<TetraLeagueBetaStream>(
-        //     future: teto.fetchTLStream(widget.searchFor),
-        //     builder: (context, snapshot) {
-        //       switch (snapshot.connectionState){
-        //       case ConnectionState.none:
-        //       case ConnectionState.waiting:
-        //       case ConnectionState.active:
-        //         return const Center(child: CircularProgressIndicator());
-        //       case ConnectionState.done:
-        //         if (snapshot.hasData){
-        //           return SizedBox(height: constraints.maxHeight - 145, child: TLRecords(userID: userID, changePlayer: (){}, data: snapshot.data!.records, wasActiveInTL: snapshot.data!.records.isNotEmpty, oldMathcesHere: false));
-        //         }
-        //         if (snapshot.hasError){ return FutureError(snapshot); }
-        //       }
-        //     return const Text("what?");
-        //     },
-        //   ),
-        // ),
       ],
     );
   }
@@ -1080,7 +1062,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                       ),
                   ),
                   SizedBox(
-                    width: widget.constraints.maxWidth - 450 - 80,
+                    width: widget.noSidebar ? widget.constraints.maxWidth - 450 : widget.constraints.maxWidth - 530,
                     child: Column(
                       children: [
                         SizedBox(
@@ -1091,7 +1073,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                               child: switch (rightCard){
                                 Cards.overview => getOverviewCard(snapshot.data!.summaries!, (snapshot.data!.averages != null && snapshot.data!.summaries!.league.rank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.rank] : (snapshot.data!.averages != null && snapshot.data!.summaries!.league.percentileRank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.percentileRank] : null),
                                 Cards.tetraLeague => switch (cardMod){
-                                  CardMod.info => getTetraLeagueCard(snapshot.data!.summaries!.league, snapshot.data!.cutoffs, (snapshot.data!.averages != null && snapshot.data!.summaries!.league.rank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.rank] : (snapshot.data!.averages != null && snapshot.data!.summaries!.league.percentileRank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.percentileRank] : null, snapshot.data!.states),
+                                  CardMod.info => getTetraLeagueCard(snapshot.data!.summaries!.league, snapshot.data!.cutoffs, (snapshot.data!.averages != null && snapshot.data!.summaries!.league.rank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.rank] : (snapshot.data!.averages != null && snapshot.data!.summaries!.league.percentileRank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.percentileRank] : null, snapshot.data!.states, snapshot.data!.playerPos),
                                   CardMod.ex => getPreviousSeasonsList(snapshot.data!.summaries!.pastLeague),
                                   CardMod.records => getRecentTLrecords(widget.constraints, snapshot.data!.player!.userId),
                                   _ => const Center(child: Text("huh?"))

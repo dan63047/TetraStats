@@ -1,8 +1,12 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:file_picker/file_picker.dart';
+import 'package:file_selector/file_selector.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:tetra_stats/data_objects/tetrio_player.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart';
@@ -486,11 +490,118 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
         Card(
           child: ListTile(
             title: Text("Export Database", style: Theme.of(context).textTheme.displayLarge),
+            onTap: () {
+              if (kIsWeb){
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.notForWeb)));
+              } else if (Platform.isAndroid){
+                var downloadFolder = Directory("/storage/emulated/0/Download");
+                File exportedDB = File("${downloadFolder.path}/TetraStats.db");
+                getApplicationDocumentsDirectory().then((value) {
+                  exportedDB.writeAsBytes(File("${value.path}/TetraStats.db").readAsBytesSync());
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                          title: Text(t.androidExportAlertTitle,
+                              style: const TextStyle(
+                                  fontFamily: "Eurostile Round Extended")),
+                          content: SingleChildScrollView(
+                            child: ListBody(children: [Text(t.androidExportText(exportedDB: exportedDB))]),
+                          ),
+                          actions: <Widget>[
+                            TextButton(
+                              child: Text(t.popupActions.ok),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        ));
+                });
+              } else if (Platform.isLinux || Platform.isWindows) {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) => AlertDialog(
+                    title: Text(t.desktopExportAlertTitle,
+                        style: const TextStyle(
+                            fontFamily: "Eurostile Round Extended")),
+                    content: SingleChildScrollView(
+                      child: ListBody(children: [
+                        Text(t.desktopExportText)
+                      ]),
+                    ),
+                    actions: <Widget>[
+                      TextButton(
+                        child: Text(t.popupActions.ok),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  ));
+              }
+            }
           ),
         ),
         Card(
           child: ListTile(
             title: Text("Import Database", style: Theme.of(context).textTheme.displayLarge),
+            onTap: (){
+              if (kIsWeb){
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.notForWeb)));
+              }else if(Platform.isAndroid){
+                FilePicker.platform.pickFiles(
+                  type: FileType.any,
+                ).then((value){
+                if (value != null){
+                  var newDB = value.paths[0]!;
+                  teto.checkImportingDB(File(newDB)).then((v){
+                    if (v){
+                      teto.close().then((value){
+                      getApplicationDocumentsDirectory().then((value){
+                        var oldDB = File("${value.path}/TetraStats.db");
+                        oldDB.writeAsBytes(File(newDB).readAsBytesSync()).then((value){
+                          teto.open();
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.importSuccess)));
+                        });
+                      });
+                    });
+                    }else{
+                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Import Failed: Wrong database sheme")));
+                    }
+                  });
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.importCancelled)));
+                }
+              }); 
+              }else{
+               const XTypeGroup typeGroup = XTypeGroup(
+                label: 'Tetra Stats Database',
+                extensions: <String>['db'],
+              );
+              openFile(acceptedTypeGroups: <XTypeGroup>[typeGroup]).then((value){
+                if (value != null){
+                  var newDB = value.path;
+                  teto.checkImportingDB(File(newDB)).then((v){
+                    if (v){
+                      teto.close().then((value){
+                      getApplicationDocumentsDirectory().then((value){
+                        var oldDB = File("${value.path}/TetraStats.db");
+                        oldDB.writeAsBytes(File(newDB).readAsBytesSync()).then((value){
+                          teto.open();
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.importSuccess)));
+                        });
+                      });
+                    });
+                    }else{
+                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Import Failed: Wrong database sheme")));
+                    }
+                  });
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.importCancelled)));
+                }
+              }); 
+              }
+            },
           ),
         )
       ],

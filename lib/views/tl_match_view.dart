@@ -571,7 +571,10 @@ class TlMatchResultState extends State<TlMatchResultView> {
     final t = Translations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text("${widget.record.results.leaderboard[greenSidePlayer].username.toUpperCase()} ${t.vs} ${widget.record.results.leaderboard[redSidePlayer].username.toUpperCase()} ${t.inTLmatch} ${widget.record.gamemode} ${timestamp(widget.record.ts)}"),
+        title: Text(
+          "${widget.record.results.leaderboard[greenSidePlayer].username.toUpperCase()} ${t.vs} ${widget.record.results.leaderboard[redSidePlayer].username.toUpperCase()} ${t.inTLmatch} ${widget.record.gamemode} ${timestamp(widget.record.ts)}",
+          style: Theme.of(context).textTheme.titleMedium!.copyWith(fontSize: 28),
+        ),
         actions: [
           PopupMenuButton(
             enabled: widget.record.gamemode == "league",

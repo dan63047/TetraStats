@@ -684,7 +684,7 @@ class TetrioPlayersLeaderboard {
       copyOfLeaderboard = List.of(leaderboard);
       copyOfLeaderboard.add(league.values.first.convertToPlayerFromLeaderboard(league.keys.first));
     } 
-    List<Stats> stats = [Stats.apm, Stats.pps, Stats.vs, Stats.gp, Stats.gw, Stats.wr,
+    List<Stats> stats = [Stats.apm, Stats.pps, Stats.vs, Stats.gp, Stats.gw, Stats.wr, Stats.gxe,
     Stats.app, Stats.vsapm, Stats.dss, Stats.dsp, Stats.appdsp, Stats.cheese, Stats.gbe, Stats.nyaapp, Stats.area, Stats.eTR, Stats.acceTR];
     List<LeaderboardPosition?> results = [];
     for (Stats stat in stats) {
