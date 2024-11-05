@@ -2,6 +2,7 @@ import 'package:intl/intl.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 
 final NumberFormat compareIntf = NumberFormat("+#,###;-#,###")..maximumFractionDigits = 0;
+final NumberFormat fDiff = NumberFormat("+#,###.####;-#,###.####");
 final NumberFormat comparef = NumberFormat("+#,###.###;-#,###.###")..maximumFractionDigits = 3;
 final NumberFormat comparef2 = NumberFormat("+#,###.##;-#,###.##")..maximumFractionDigits = 2;
 final NumberFormat intf = NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 0);

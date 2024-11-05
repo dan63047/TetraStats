@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 const int currentSeason = 2;
+final DateTime sprintAndBlitzRelevance = DateTime(2024, 8, 25);
 const double noTrRd = 60.9;
 const double apmWeight = 1;
 const double ppsWeight = 45;
@@ -12,6 +13,18 @@ const double appdspWeight = 140;
 const double vsapmWeight = 60;
 const double cheeseWeight = 1.25;
 const double gbeWeight = 315;
+
+const Map<int, double> xpTableScuffed = { // level: xp required
+  05000:    67009018.4885772,
+  10000:   763653437.386,
+  15000:  2337651144.54149,
+  20000:  4572735210.50902,
+  25000:  7376166347.04745,
+  30000: 10693620096.2168,
+  40000: 18728882739.482,
+  50000: 28468683855.2853
+};
+
 const List<String> ranks = [
   "d",
   "d+",

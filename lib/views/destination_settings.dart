@@ -13,7 +13,7 @@ import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/utils/filesizes_converter.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
-import 'package:tetra_stats/views/main_view_tiles.dart';
+import 'package:tetra_stats/widgets/future_error.dart';
 
 class DestinationSettings extends StatefulWidget{
   final BoxConstraints constraints;
@@ -50,7 +50,6 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
   late bool showPositions;
   late bool showAverages;
   late bool updateInBG;
-  final TextEditingController _playertext = TextEditingController();
   late AnimationController _defaultNicknameAnimController;
   late Animation _goodDefaultNicknameAnim;
   late Animation _badDefaultNicknameAnim;

@@ -10,7 +10,9 @@ import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
-import 'package:tetra_stats/views/main_view_tiles.dart';
+import 'package:tetra_stats/views/main_view.dart';
+import 'package:tetra_stats/widgets/error_thingy.dart';
+import 'package:tetra_stats/widgets/future_error.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
 
 class DestinationGraphs extends StatefulWidget{
@@ -207,7 +209,6 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
           if (snapshot.data!.isEmpty || !snapshot.data!.containsKey(_season)) return ErrorThingy(eText: "Not enough data");
           List<_HistoryChartSpot> selectedGraph = snapshot.data![_season]![_Ychart]!;
           yAxisTitle = chartsShortTitles[_Ychart]!;
-          // TODO: this graph can Krash
           return SfCartesianChart(
             tooltipBehavior: _historyTooltipBehavior,
             zoomPanBehavior: _zoomPanBehavior,

@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/views/destination_home.dart';
-import 'package:tetra_stats/views/main_view_tiles.dart';
+import 'package:tetra_stats/views/main_view.dart';
 
 final DateFormat dateFormat = DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms();
 

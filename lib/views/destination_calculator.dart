@@ -9,7 +9,9 @@ import 'package:tetra_stats/data_objects/playstyle.dart';
 import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
-import 'package:tetra_stats/views/main_view_tiles.dart';
+import 'package:tetra_stats/widgets/graphs.dart';
+import 'package:tetra_stats/widgets/info_thingy.dart';
+import 'package:tetra_stats/widgets/nerd_stats_thingy.dart';
 
 class DestinationCalculator extends StatefulWidget{
   final BoxConstraints constraints;
@@ -243,7 +245,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
             child: NerdStatsThingy(nerdStats: nerdStats!)
           ),
           if (playstyle != null) Card(
-            child: GraphsThingy(nerdStats: nerdStats!, playstyle: playstyle!, apm: apm!, pps: pps!, vs: vs!)
+            child: Graphs(apm!, pps!, vs!, nerdStats!, playstyle!)
           ),
           if (nerdStats == null) InfoThingy("Enter values and press \"Calc\" to see Nerd Stats for them")
         ],

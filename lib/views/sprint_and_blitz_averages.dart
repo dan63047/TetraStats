@@ -40,8 +40,14 @@ class SprintAndBlitzState extends State<SprintAndBlitzView> {
     final t = Translations.of(context);
     bool bigScreen = MediaQuery.of(context).size.width >= 368;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(t.sprintAndBlitsViewTitle),
+      floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 0.0),
+        child: FloatingActionButton(
+          onPressed: () => Navigator.pop(context),
+          tooltip: 'Fuck go back',
+          child: const Icon(Icons.arrow_back),
+        ),
       ),
       backgroundColor: Colors.black,
       body: SafeArea(

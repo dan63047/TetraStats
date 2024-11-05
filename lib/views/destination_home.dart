@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -20,12 +19,25 @@ import 'package:tetra_stats/utils/colors_functions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
-import 'package:tetra_stats/views/main_view_tiles.dart';
+import 'package:tetra_stats/views/main_view.dart';
 import 'package:tetra_stats/views/singleplayer_record_view.dart';
+import 'package:tetra_stats/widgets/badges_thingy.dart';
+import 'package:tetra_stats/widgets/distinguishment_thingy.dart';
+import 'package:tetra_stats/widgets/error_thingy.dart';
+import 'package:tetra_stats/widgets/fake_distinguishment_thingy.dart';
 import 'package:tetra_stats/widgets/finesse_thingy.dart';
+import 'package:tetra_stats/widgets/future_error.dart';
+import 'package:tetra_stats/widgets/graphs.dart';
 import 'package:tetra_stats/widgets/lineclears_thingy.dart';
+import 'package:tetra_stats/widgets/nerd_stats_thingy.dart';
+import 'package:tetra_stats/widgets/news_thingy.dart';
 import 'package:tetra_stats/widgets/sp_trailing_stats.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
+import 'package:tetra_stats/widgets/tl_rating_thingy.dart';
+import 'package:tetra_stats/widgets/tl_records_thingy.dart';
+import 'package:tetra_stats/widgets/tl_thingy.dart';
+import 'package:tetra_stats/widgets/user_thingy.dart';
+import 'package:tetra_stats/widgets/zenith_thingy.dart';
 
 class DestinationHome extends StatefulWidget{
   final String searchFor;
@@ -423,8 +435,8 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
             ],
           ),
         ),
-        if (data.nerdStats != null) NerdStatsThingy(nerdStats: data.nerdStats!, oldNerdStats: toCompare?.nerdStats, averages: averages),
-        if (data.nerdStats != null) GraphsThingy(nerdStats: data.nerdStats!, playstyle: data.playstyle!, apm: data.apm!, pps: data.pps!, vs: data.vs!)
+        if (data.nerdStats != null) NerdStatsThingy(nerdStats: data.nerdStats!, oldNerdStats: toCompare?.nerdStats, averages: averages, lbPos: lbPos),
+        if (data.nerdStats != null) Graphs(data.apm!, data.pps!, data.vs!, data.nerdStats!, data.playstyle!)
       ],
     );
   }
@@ -713,7 +725,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
           ),
         ),
         if (record != null) NerdStatsThingy(nerdStats: record.aggregateStats.nerdStats),
-        if (record != null) GraphsThingy(nerdStats: record.aggregateStats.nerdStats, playstyle: record.aggregateStats.playstyle, apm: record.aggregateStats.apm, pps: record.aggregateStats.pps, vs: record.aggregateStats.vs)
+        if (record != null) Graphs(record.aggregateStats.apm, record.aggregateStats.pps, record.aggregateStats.vs, record.aggregateStats.nerdStats, record.aggregateStats.playstyle)
       ],
     );
   }
@@ -1016,7 +1028,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                     width: 450,
                     child: Column(
                       children: [
-                        NewUserThingy(player: snapshot.data!.player!, initIsTracking: snapshot.data!.isTracked, showStateTimestamp: false, setState: setState),
+                        UserThingy(player: snapshot.data!.player!, initIsTracking: snapshot.data!.isTracked, showStateTimestamp: false, setState: setState),
                         if (snapshot.data!.player!.badges.isNotEmpty) BadgesThingy(badges: snapshot.data!.player!.badges),
                         if (snapshot.data!.player!.distinguishment != null) DistinguishmentThingy(snapshot.data!.player!.distinguishment!),
                         if (snapshot.data!.player!.role == "bot") FakeDistinguishmentThingy(bot: true, botMaintainers: snapshot.data!.player!.botmaster),

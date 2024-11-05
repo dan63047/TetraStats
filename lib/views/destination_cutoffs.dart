@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/data_objects/cutoff_tetrio.dart';
 import 'package:tetra_stats/data_objects/tetrio_constants.dart';
@@ -9,8 +8,8 @@ import 'package:tetra_stats/data_objects/tetrio_player_from_leaderboard.dart';
 import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
-import 'package:tetra_stats/views/main_view_tiles.dart';
 import 'package:tetra_stats/views/rank_view.dart';
+import 'package:tetra_stats/widgets/future_error.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors; 
 

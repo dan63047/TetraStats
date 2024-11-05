@@ -6,7 +6,7 @@ import 'package:tetra_stats/data_objects/beta_league_stats.dart';
 import 'package:tetra_stats/data_objects/beta_record.dart';
 import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
-import 'package:tetra_stats/views/compare_view.dart' show CompareThingy;
+import 'package:tetra_stats/widgets/compare_thingy.dart';
 import 'package:tetra_stats/widgets/list_tile_trailing_stats.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
 import 'package:tetra_stats/widgets/vs_graphs.dart';

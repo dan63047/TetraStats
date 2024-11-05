@@ -100,7 +100,7 @@ class SingleplayerRecord extends StatelessWidget {
                 if (record!.gamemode == "40l") Wrap(
                     alignment: WrapAlignment.spaceBetween,
                     spacing: 20,
-                    children: [
+                    children: [ // TODO: replace
                       StatCellNum(playerStat: record!.stats.piecesPlaced, playerStatLabel: t.statCellNum.pieces, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
                       StatCellNum(playerStat: record!.stats.pps, playerStatLabel: t.statCellNum.pps, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),
                       StatCellNum(playerStat: record!.stats.kpp, playerStatLabel: t.statCellNum.kpp, fractionDigits: 2, isScreenBig: bigScreen, higherIsBetter: true, smallDecimal: false),

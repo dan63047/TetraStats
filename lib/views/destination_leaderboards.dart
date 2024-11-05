@@ -7,8 +7,8 @@ import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
-import 'package:tetra_stats/views/main_view_tiles.dart';
 import 'package:tetra_stats/views/user_view.dart';
+import 'package:tetra_stats/widgets/future_error.dart';
 
 class DestinationLeaderboards extends StatefulWidget{
   final BoxConstraints constraints;

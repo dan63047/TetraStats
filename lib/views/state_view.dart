@@ -49,7 +49,7 @@ class StateState extends State<StateView> {
       ),
       backgroundColor: Colors.black,
       body: SafeArea(
-          child: TLThingy(tl: widget.state, userID: widget.state.id, states: [])
+          child: TetraLeagueThingy(league: widget.state)
       )
     );
   }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tetra_stats/data_objects/cutoff_tetrio.dart';
 import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
-import 'package:tetra_stats/views/main_view_tiles.dart';
+import 'package:tetra_stats/widgets/future_error.dart';
 
 class RankView extends StatefulWidget {
   final String rank;

@@ -7,19 +7,12 @@ import 'dart:developer' as developer;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
-import 'package:tetra_stats/views/customization_view.dart';
-import 'package:tetra_stats/views/ranks_averages_view.dart';
-import 'package:tetra_stats/views/sprint_and_blitz_averages.dart';
-import 'package:tetra_stats/views/tl_leaderboard_view.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:tetra_stats/views/main_view_tiles.dart';
-import 'package:tetra_stats/views/settings_view.dart';
-import 'package:tetra_stats/views/tracked_players_view.dart';
-import 'package:tetra_stats/views/calc_view.dart';
+import 'package:tetra_stats/views/main_view.dart';
 import 'package:go_router/go_router.dart';
 
 late final PackageInfo packageInfo;
@@ -72,44 +65,6 @@ final router = GoRouter(
     GoRoute(
       path: "/",
       builder: (_, __) => const MainView(),
-      routes: [
-         GoRoute(
-          path: 'settings',
-          builder: (_, __) => const SettingsView(),
-          routes: [
-            GoRoute(
-              path: 'customization',
-              builder: (_, __) => const CustomizationView(),
-            ),
-          ]
-        ),
-        GoRoute(
-          path: "leaderboard",
-          builder: (_, __) => const TLLeaderboardView(),
-          routes: [
-            GoRoute(
-              path: "LBvalues",
-              builder: (_, __) => const RankAveragesView(),
-            ),
-          ]
-        ),
-        GoRoute(
-          path: "LBvalues",
-          builder: (_, __) => const RankAveragesView(),
-        ),
-        GoRoute(
-          path: 'states',
-          builder: (_, __) => const TrackedPlayersView(),
-        ),
-        GoRoute(
-          path: 'calc',
-          builder: (_, __) => const CalcView(),
-        ),
-        GoRoute(
-          path: 'sprintAndBlitzAverages',
-          builder: (_, __) => const SprintAndBlitzView(),
-        )
-      ]
     ),
     GoRoute( // that one intended for Android users, that can open https://ch.tetr.io/u/ links
       path: "/u/:userId",

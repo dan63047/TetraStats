@@ -6,8 +6,10 @@ import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
-import 'package:tetra_stats/views/main_view_tiles.dart';
 import 'package:tetra_stats/views/state_view.dart';
+import 'package:tetra_stats/widgets/alpha_league_entry_thingy.dart';
+import 'package:tetra_stats/widgets/future_error.dart';
+import 'package:tetra_stats/widgets/info_thingy.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
 
 class DestinationSavedData extends StatefulWidget{
