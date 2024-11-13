@@ -23,7 +23,6 @@ import 'package:tetra_stats/views/destination_settings.dart';
 import 'package:tetra_stats/main.dart';
 
 late Future<FetchResults> _data;
-late Future<News> _newsData;
 TetrioPlayersLeaderboard? _everyone;
 
 Future<FetchResults> getData(String searchFor) async {
@@ -36,23 +35,26 @@ Future<FetchResults> getData(String searchFor) async {
       }
       
     }on TetrioPlayerNotExist{
-      return FetchResults(false, null, [], null, null, null, null, false, TetrioPlayerNotExist());
+      return FetchResults(false, null, [], null, null, null, null, null, false, TetrioPlayerNotExist());
     }
     late Summaries summaries;
+    late News? news;
     late Cutoffs? cutoffs;
     late CutoffsTetrio? averages;
     try {
       List<dynamic> requests = await Future.wait([
         teto.fetchSummaries(player.userId),
+        teto.fetchNews(player.userId),
         teto.fetchCutoffsBeanserver(),
         if (prefs.getBool("showAverages") == true) teto.fetchCutoffsTetrio()
       ]);
 
       summaries = requests[0];
-      cutoffs = requests.elementAtOrNull(1);
-      averages = requests.elementAtOrNull(2);
+      news = requests[1];
+      cutoffs = requests.elementAtOrNull(2);
+      averages = requests.elementAtOrNull(3);
     } on Exception catch (e) {
-      return FetchResults(false, null, [], null, null, null, null, false, e);
+      return FetchResults(false, null, [], null, null, null, null, null, false, e);
     }
     PlayerLeaderboardPosition? _meAmongEveryone;
     if (prefs.getBool("showPositions") == true){
@@ -71,7 +73,7 @@ Future<FetchResults> getData(String searchFor) async {
       await teto.storeState(summaries.league);
     }
 
-    return FetchResults(true, player, states, summaries, cutoffs, averages, _meAmongEveryone, isTracking, null);
+    return FetchResults(true, player, states, summaries, news, cutoffs, averages, _meAmongEveryone, isTracking, null);
   }
 
 class MainView extends StatefulWidget {
@@ -116,7 +118,6 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     setState(() {
       _searchFor = player;
       _data = getData(_searchFor);
-      _newsData = teto.fetchNews(_searchFor);
     });
   }
 
@@ -160,7 +161,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                       onPressed: () {
                         // Add your onPressed code here!
                       },
-                      icon: const Icon(Icons.more_horiz_rounded),
+                      icon: const Icon(Icons.refresh),
                     ),
                 destinations: [
                   getDestinationButton(Icons.home, "Home"),
@@ -191,7 +192,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
             ),
             Expanded(
               child: switch (destination){
-                0 => DestinationHome(searchFor: _searchFor, constraints: constraints, dataFuture: _data, newsFuture: _newsData),
+                0 => DestinationHome(searchFor: _searchFor, constraints: constraints, dataFuture: _data),
                 1 => DestinationGraphs(searchFor: _searchFor, constraints: constraints),
                 2 => DestinationLeaderboards(constraints: constraints),
                 3 => DestinationCutoffs(constraints: constraints),

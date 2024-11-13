@@ -665,7 +665,7 @@ class CompareState extends State<CompareView> {
 
   void getSummariesForInit() async {
     summaries.add(await teto.fetchSummaries(widget.initPlayer.userId));
-    if (summaries[0].league.nerdStats != null) nicknames.add(players[0].username);
+    nicknames.add(players[0].username);
     addvaluesEntrys(players.first, summaries.first);
     best = recalculateBestEntries();
     setState(() {
@@ -678,7 +678,7 @@ class CompareState extends State<CompareView> {
     summaries.add(await teto.fetchSummaries(players.last.userId));
     addvaluesEntrys(players.last, summaries.last);
     best = recalculateBestEntries();
-    if (summaries.last.league.nerdStats != null) nicknames.add(players.last.username);
+    nicknames.add(players.last.username);
     setState(() {
       
     });
@@ -688,6 +688,7 @@ class CompareState extends State<CompareView> {
     int id = players.indexWhere((e) => e.username == nickname);
     players.removeAt(id);
     summaries.removeAt(id);
+    nicknames.remove(nickname);
     for (int i = 0; i < 7; i++){
       rawValues[i].removeAt(id);
       formattedValues[i].removeAt(id);
@@ -786,7 +787,9 @@ class CompareState extends State<CompareView> {
                           ),
                         ]
                       ),
-                      //VsGraphs(stats: [for (var s in summaries) if (s.league.nerdStats != null) AggregateStats.precalculated(s.league.apm!, s.league.pps!, s.league.vs!, s.league.nerdStats!, s.league.playstyle!)], nicknames: nicknames)
+                      if (i == 1) VsGraphs(stats: [for (var s in summaries) if (s.league.nerdStats != null) AggregateStats.precalculated(s.league.apm!, s.league.pps!, s.league.vs!, s.league.nerdStats!, s.league.playstyle!)], nicknames: [for (int i = 0; i < summaries.length; i++)  if (summaries[i].league.nerdStats != null) nicknames[i]]),
+                      if (i == 2) VsGraphs(stats: [for (var s in summaries) if ((s.zenith != null || s.zenithCareerBest != null) && (s.zenith?.aggregateStats??s.zenithCareerBest!.aggregateStats).apm > 0.00) s.zenith?.aggregateStats??s.zenithCareerBest!.aggregateStats], nicknames: [for (int i = 0; i < summaries.length; i++) if ((summaries[i].zenith != null || summaries[i].zenithCareerBest != null) && (summaries[i].zenith?.aggregateStats??summaries[i].zenithCareerBest!.aggregateStats).apm > 0.00) nicknames[i]]),
+                      if (i == 3) VsGraphs(stats: [for (var s in summaries) if ((s.zenithEx != null || s.zenithExCareerBest != null) && (s.zenithEx?.aggregateStats??s.zenithExCareerBest!.aggregateStats).apm > 0.00) s.zenithEx?.aggregateStats??s.zenithExCareerBest!.aggregateStats], nicknames: [for (int i = 0; i < summaries.length; i++) if ((summaries[i].zenithEx != null || summaries[i].zenithExCareerBest != null) && (summaries[i].zenithEx?.aggregateStats??summaries[i].zenithExCareerBest!.aggregateStats).apm > 0.00) nicknames[i]]),
                     ],
                   ),
                 ),

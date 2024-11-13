@@ -56,7 +56,7 @@ class UserState extends State<UserView> {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) { 
-            return DestinationHome(searchFor: widget.searchFor, dataFuture: getData(widget.searchFor), newsFuture: teto.fetchNews(widget.searchFor), constraints: constraints, noSidebar: true);
+            return DestinationHome(searchFor: widget.searchFor, dataFuture: getData(widget.searchFor), constraints: constraints, noSidebar: true);
           }
         )
       )

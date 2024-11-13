@@ -262,6 +262,13 @@ enum ComboTables{
   multiplier
 }
 
+Map<ComboTables, String> comboTablesNames = {
+  ComboTables.none: "None",
+  ComboTables.classic: "Classic",
+  ComboTables.modern: "Modern",
+  ComboTables.multiplier: "Multiplier"
+};
+
 const int BACKTOBACK_BONUS = 1;
 const double BACKTOBACK_BONUS_LOG = .8;
 const int COMBO_MINIFIER = 1;

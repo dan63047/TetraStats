@@ -388,14 +388,27 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                           child: Column(
                             children: [
                               Card(
-                                child: ListTile(
-                                  title: Text("Multiplier", style: mainToggleInRules),
-                                  trailing: SizedBox(width: 90.0, child: TextField(
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
-                                    decoration: InputDecoration(hintText: rules.multiplier.toString()),
-                                    onChanged: (value) => setState((){rules.multiplier = double.parse(value);}),
-                                  )),
+                                child: Column(
+                                  children: [
+                                    ListTile(
+                                      title: Text("Multiplier", style: mainToggleInRules),
+                                      trailing: SizedBox(width: 90.0, child: TextField(
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
+                                        decoration: InputDecoration(hintText: rules.multiplier.toString()),
+                                        onChanged: (value) => setState((){rules.multiplier = double.parse(value);}),
+                                      )),
+                                    ),
+                                    ListTile(
+                                      title: Text("Perfect Clear Damage"),
+                                      trailing: SizedBox(width: 90.0, child: TextField(
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
+                                        decoration: InputDecoration(hintText: rules.pcDamage.toString()),
+                                        onChanged: (value) => setState((){rules.pcDamage = int.parse(value);}),
+                                      )),
+                                    ),
+                                  ],
                                 ),
                               ),
                               Card(
@@ -408,7 +421,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                                     if (rules.combo) ListTile(
                                       title: Text("Combo Table"),
                                       trailing: DropdownButton(
-                                        items: [for (var v in ComboTables.values) DropdownMenuItem(value: v.index, child: Text(v.name))],
+                                        items: [for (var v in ComboTables.values) if (v != ComboTables.none) DropdownMenuItem(value: v.index, child: Text(comboTablesNames[v]!))],
                                         value: rules.comboTable.index,
                                         onChanged: (v) => setState((){rules.comboTable = ComboTables.values[v!];}),
                                       ),
@@ -509,7 +522,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                             Text("Combo: ${intf.format(comboDamage)}"),
                             Text("B2B: ${intf.format(b2bDamage)}"),
                             Text("Surge: ${intf.format(surgeDamage)}"),
-                            Text("PC's: ${intf.format(pcDamage)}")
+                            Text("PCs: ${intf.format(pcDamage)}")
                           ],
                         ),
                         if (totalDamage > 0) SfLinearGauge(

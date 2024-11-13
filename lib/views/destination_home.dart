@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:tetra_stats/data_objects/achievement.dart';
 import 'package:tetra_stats/data_objects/cutoff_tetrio.dart';
 import 'package:tetra_stats/data_objects/news.dart';
 import 'package:tetra_stats/data_objects/p1nkl0bst3r.dart';
@@ -42,11 +43,10 @@ import 'package:tetra_stats/widgets/zenith_thingy.dart';
 class DestinationHome extends StatefulWidget{
   final String searchFor;
   final Future<FetchResults> dataFuture;
-  final Future<News>? newsFuture;
   final BoxConstraints constraints;
   final bool noSidebar;
 
-  const DestinationHome({super.key, required this.searchFor, required this.dataFuture, this.newsFuture, required this.constraints, this.noSidebar = false});
+  const DestinationHome({super.key, required this.searchFor, required this.dataFuture, required this.constraints, this.noSidebar = false});
 
   @override
   State<DestinationHome> createState() => _DestinationHomeState();
@@ -57,13 +57,14 @@ class FetchResults{
   TetrioPlayer? player;
   List<TetraLeague> states;
   Summaries? summaries;
+  News? news;
   Cutoffs? cutoffs;
   CutoffsTetrio? averages;
   PlayerLeaderboardPosition? playerPos;
   bool isTracked;
   Exception? exception;
 
-  FetchResults(this.success, this.player, this.states, this.summaries, this.cutoffs, this.averages, this.playerPos, this.isTracked, this.exception);
+  FetchResults(this.success, this.player, this.states, this.summaries, this.news, this.cutoffs, this.averages, this.playerPos, this.isTracked, this.exception);
 }
 
 class RecordSummary extends StatelessWidget{
@@ -137,6 +138,93 @@ class RecordSummary extends StatelessWidget{
         ),
       )
       ],
+    );
+  }
+}
+
+class AchievementSummary extends StatelessWidget{
+  final Achievement? achievement;
+
+  const AchievementSummary({this.achievement});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20.0, 8.0, 20.0, 12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(achievement?.name??"---", style: Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center),
+            const Divider(),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: Container(
+                    constraints: BoxConstraints(
+                      maxWidth: 512.0,
+                      maxHeight: 512.0,
+                      //minWidth: 256,
+                      minHeight: 64.0,
+                    ),
+                    child: ClipRect(
+                      child: Align(
+                        alignment: Alignment.topLeft.add(Alignment(0.285 * (((achievement?.k??1) - 1) % 8), 0.285 * (((achievement?.k??0) - 1) / 8).floor())),
+                        //alignment: Alignment.topLeft.add(Alignment(0.285 * 1, 0)),
+                        heightFactor: 0.125,
+                        widthFactor: 0.125,
+                        child: Image.asset("res/icons/achievements.png", width: 2048, height: 2048, scale: 1),
+                      ),
+                    ),
+                  ),
+                ),
+                //ClipRect(clipper: Rect.fromLTRB(0, 0, 64, 64), child: ),
+                Expanded(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                      RichText(
+                        textAlign: TextAlign.start,
+                        text: TextSpan(
+                          text: achievement?.v == null ? "---" : switch(achievement!.vt){
+                            1 => intf.format(achievement!.v),
+                            2 => get40lTime((achievement!.v! * 1000).floor()),
+                            3 => get40lTime((achievement!.v!.abs() * 1000).floor()),
+                            4 => "${f2.format(achievement!.v!)} m",
+                            5 => "№ ${intf.format(achievement!.pos!+1)}",
+                            6 => intf.format(achievement!.v!.abs()),
+                            _ => "lol"
+                          },
+                          style: TextStyle(fontFamily: "Eurostile Round", fontSize: 36, fontWeight: FontWeight.w500, color: Colors.white, height: 0.9),
+                          ),
+                        ),
+                      if (achievement != null) RichText(
+                        textAlign: TextAlign.start,
+                        text: TextSpan(
+                        style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
+                        children: [
+                          TextSpan(text: "${achievement!.object}\n"),
+                          if (achievement!.vt == 4) TextSpan(text: "Floor ${achievement?.a != null ? achievement!.a! : "-"}"),
+                          if (achievement!.vt == 4) TextSpan(text: " • "),
+                          if (achievement!.vt != 5) TextSpan(text: (achievement?.pos != null && !achievement!.pos!.isNegative) ? "№ ${intf.format(achievement!.pos!+1)}" : "№ ---", style: TextStyle(color: achievement?.pos != null ? getColorOfRank(achievement!.pos!+1) : Colors.grey)),
+                          if (achievement!.vt != 5) TextSpan(text: " • ", style: TextStyle(color: achievement?.pos != null ? getColorOfRank(achievement!.pos!+1) : Colors.grey)),
+                          TextSpan(text: "Top ${achievement?.pos != null ? percentage.format(achievement!.pos! / achievement!.total!) : "---%"}", style: TextStyle(color: achievement?.pos != null ? getColorOfRank(achievement!.pos!+1) : Colors.grey)),
+                        ]
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const Divider(),
+            Text(achievement?.t != null ? timestamp(achievement!.t!) : "---", style: const TextStyle(color: Colors.grey))
+          ],
+        ),
+      ),
     );
   }
   
@@ -730,7 +818,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
     );
   }
 
-  Widget getRecordCard(RecordSingle? record, bool? betterThanRankAverage, MapEntry? closestAverage, bool? betterThanClosestAverage, String? rank){
+  Widget getRecordCard(RecordSingle? record, List<Achievement> achievements, bool? betterThanRankAverage, MapEntry? closestAverage, bool? betterThanClosestAverage, String? rank){
     if (record == null) {
       return const Card(
         child: Center(child: Text("No record", style: TextStyle(fontSize: 42))),
@@ -895,7 +983,13 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
               ],
             ),
           ),
-        )
+        ),
+        Wrap(
+          direction: Axis.horizontal,
+          children: [
+            for (Achievement achievement in achievements) FractionallySizedBox(widthFactor: 0.5, child: AchievementSummary(achievement: achievement)),
+          ],
+        ),
       ]
     );
   }
@@ -965,12 +1059,6 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 
     _transition = AnimationController(vsync: this, duration: Durations.long4);
 
-    // _transition.addListener((){
-    //   setState(() {
-        
-    //   });
-    // });
-
     _offsetAnimation = Tween<Offset>(
     begin: Offset.zero,
     end: const Offset(1.5, 0.0),
@@ -1012,6 +1100,21 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
               closestAverageBlitz = blitzAverages.entries.last;
               blitzBetterThanClosestAverage = false;
             }
+            List<Achievement> sprintAchievements = <Achievement>[
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 5),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 7),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 8),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 9),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 36),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 37),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 38),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 48),
+            ];
+            List<Achievement> blitzAchievements = <Achievement>[
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 6),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 39),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 52),
+            ];
             return TweenAnimationBuilder(
               duration: Durations.long4,
               tween: Tween<double>(begin: 0, end: 1),
@@ -1051,24 +1154,8 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                             ],
                           ),
                         ),
-                          //if (testNews != null && testNews!.news.isNotEmpty)
                         Expanded(
-                          child: FutureBuilder<News>(
-                            future: widget.newsFuture,
-                            builder: (context, snapshot) {
-                              switch (snapshot.connectionState){
-                                case ConnectionState.none:
-                                case ConnectionState.waiting:
-                                case ConnectionState.active:
-                                  return const Card(child: Center(child: CircularProgressIndicator()));
-                                case ConnectionState.done:
-                                  if (snapshot.hasData){
-                                    return NewsThingy(snapshot.data!);
-                                  }else if (snapshot.hasError){ return FutureError(snapshot); }
-                              }
-                              return const Text("what?");
-                            }
-                          ),
+                          child: NewsThingy(snapshot.data!.news!)
                         )
                         ],
                       ),
@@ -1097,12 +1184,12 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                                   CardMod.exRecords => getListOfRecords("zenithex/recent", "zenithex/top", widget.constraints),
                                 },
                                 Cards.sprint => switch (cardMod){
-                                  CardMod.info => getRecordCard(snapshot.data?.summaries!.sprint, sprintBetterThanRankAverage, closestAverageSprint, sprintBetterThanClosestAverage, snapshot.data!.summaries!.league.rank),
+                                  CardMod.info => getRecordCard(snapshot.data?.summaries!.sprint, sprintAchievements, sprintBetterThanRankAverage, closestAverageSprint, sprintBetterThanClosestAverage, snapshot.data!.summaries!.league.rank),
                                   CardMod.records => getListOfRecords("40l/recent", "40l/top", widget.constraints),
                                   _ => const Center(child: Text("huh?"))
                                 },
                                 Cards.blitz => switch (cardMod){
-                                  CardMod.info => getRecordCard(snapshot.data?.summaries!.blitz, blitzBetterThanRankAverage, closestAverageBlitz, blitzBetterThanClosestAverage, snapshot.data!.summaries!.league.rank),
+                                  CardMod.info => getRecordCard(snapshot.data?.summaries!.blitz, blitzAchievements, blitzBetterThanRankAverage, closestAverageBlitz, blitzBetterThanClosestAverage, snapshot.data!.summaries!.league.rank),
                                   CardMod.records => getListOfRecords("blitz/recent", "blitz/top", widget.constraints),
                                   _ => const Center(child: Text("huh?"))
                                 },

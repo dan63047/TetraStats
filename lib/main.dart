@@ -7,6 +7,7 @@ import 'dart:developer' as developer;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
+import 'package:tetra_stats/views/first_time_view.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
@@ -18,6 +19,8 @@ import 'package:go_router/go_router.dart';
 late final PackageInfo packageInfo;
 late SharedPreferences prefs;
 late TetrioService teto;
+late GoRouter router;
+
 ThemeData theme = ThemeData(
   fontFamily: 'Eurostile Round',
   colorScheme: const ColorScheme.dark(
@@ -59,20 +62,6 @@ ThemeData theme = ThemeData(
   scaffoldBackgroundColor: Colors.black
 );
 
-final router = GoRouter(
-  initialLocation: "/",
-  routes: [
-    GoRoute(
-      path: "/",
-      builder: (_, __) => const MainView(),
-    ),
-    GoRoute( // that one intended for Android users, that can open https://ch.tetr.io/u/ links
-      path: "/u/:userId",
-      builder: (_, __) => MainView(player: __.pathParameters['userId'])
-    )
-  ],
-);
-
 void main() async {
   // Initializing sqflite
   if (kIsWeb) {
@@ -95,6 +84,25 @@ void main() async {
   packageInfo = await PackageInfo.fromPlatform();
   prefs = await SharedPreferences.getInstance();
   teto = TetrioService();
+
+  router = GoRouter(
+    //initialLocation: prefs.getBool("notFirstTime") == true ? "/" : "/hihello",
+    initialLocation: "/",
+    routes: [
+      GoRoute(
+        path: "/",
+        builder: (_, __) => const MainView(),
+      ),
+      GoRoute( // that one intended for Android users, that can open https://ch.tetr.io/u/ links
+        path: "/u/:userId",
+        builder: (_, __) => MainView(player: __.pathParameters['userId'])
+      ),
+      GoRoute(
+        path: "/hihello",
+        builder: (_, __) => const FirstTimeView(),
+      )
+    ],
+  );
 
   // Choosing the locale
   String? locale = prefs.getString("locale");

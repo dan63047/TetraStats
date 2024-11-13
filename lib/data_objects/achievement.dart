@@ -46,6 +46,11 @@ class Achievement {
       this.total,
       this.rank});
 
+  @override
+  String toString(){
+    return "${name}: ${v}";
+  }
+
   Achievement.fromJson(Map<String, dynamic> json) {
     k = json['k'];
     o = json['o'];

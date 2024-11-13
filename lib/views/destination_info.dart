@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:tetra_stats/utils/open_in_browser.dart';
+import 'package:tetra_stats/views/about_view.dart';
 import 'package:tetra_stats/views/sprint_and_blitz_averages.dart';
 
 class DestinationInfo extends StatefulWidget{
@@ -74,18 +76,23 @@ class _DestinationInfo extends State<DestinationInfo> {
               InfoCard(
                 height: widget.constraints.maxHeight - 77,
                 assetLink: "res/images/Снимок экрана_2023-11-06_01-00-50.png",
-                title: "Shizuru!",
-                description: "Shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru shizuru\nNakatsu Shizuru Nakatsu Shizuru Nakatsu Shizuru Nakatsu Shizuru Nakatsu Shizuru Nakatsu Shizuru Nakatsu Shizuru ",
-                onPressed: (){}
+                title: "Tetra Stats Wiki",
+                description: "Find more information about Tetra Stats functions and statictic, that it provides",
+                onPressed: (){
+                  launchInBrowser(Uri.https("github.com", "dan63047/TetraStats/wiki"));
+                }
               ),
               InfoCard(
                 height: widget.constraints.maxHeight - 77,
                 assetLink: "res/images/Снимок экрана_2023-11-06_01-00-50.png",
                 title: "About Tetra Stats",
                 description: "Developed by dan63\n",
-                onPressed: (){},
+                onPressed: (){
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => AboutView(),
+                  ));
+                },
               ),
-              Card()
             ],
           ),
         )
