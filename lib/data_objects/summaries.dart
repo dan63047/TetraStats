@@ -49,7 +49,7 @@ class Summaries {
     ];
     league =
         TetraLeague.fromJson(json['league'], DateTime.now(), currentSeason, i);
-    if (json['league']['past'].isNotEmpty)
+    if (json['league']['past'] != null && json['league']['past'].isNotEmpty)
       for (var key in json['league']['past'].keys) {
         pastLeague[int.parse(key)] = TetraLeague.fromJson(
             json['league']['past'][key],

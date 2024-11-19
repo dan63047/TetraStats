@@ -118,7 +118,10 @@ class _DestinationSavedData extends State<DestinationSavedData> {
                               child: Column(
                                 children: [
                                   Card(
-                                    child: TabBar(tabs: [
+                                    child: TabBar(
+                                      labelStyle: Theme.of(context).textTheme.titleMedium!.copyWith(fontSize: 28),
+                                      labelColor: Theme.of(context).colorScheme.primary,
+                                      tabs: [
                                       Tab(text: "S${currentSeason} TL States"),
                                       Tab(text: "S1 TL States"),
                                       Tab(text: "TL Records")

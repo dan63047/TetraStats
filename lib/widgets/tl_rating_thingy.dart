@@ -40,9 +40,10 @@ class TLRatingThingy extends StatelessWidget{
             ? Image.asset("res/icons/kagari.png", height: 128) // Btw why she wearing Kazamatsuri high school uniform?
             : Image.asset("res/tetrio_tl_alpha_ranks/${tlData.rank}.png", height: 128),
         Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: bigScreen ? CrossAxisAlignment.start : CrossAxisAlignment.center,
           children: [
             RichText(
+              textAlign: bigScreen ? TextAlign.start : TextAlign.center,
               text: TextSpan(
                 style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 20, color: Colors.white, height: 0.9),
                 children: (tlData.gamesPlayed > 9) ? switch(prefs.getInt("ratingMode")){
@@ -125,7 +126,7 @@ class TLRatingThingy extends StatelessWidget{
               ],
             ),
             if (showPositions == true) RichText(
-              textAlign: TextAlign.start,
+              textAlign: bigScreen ? TextAlign.start : TextAlign.center,
               text: TextSpan(
               text: "",
               style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),

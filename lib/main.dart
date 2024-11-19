@@ -59,7 +59,17 @@ ThemeData theme = ThemeData(
     expandedAlignment: Alignment.bottomCenter,
   ),
   dropdownMenuTheme: DropdownMenuThemeData(textStyle: TextStyle(fontFamily: "Eurostile Round", fontSize: 18)),
-  scaffoldBackgroundColor: Colors.black
+  scaffoldBackgroundColor: Colors.black,
+  tooltipTheme: TooltipThemeData(
+    textStyle: TextStyle(color: Colors.white),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.all(Radius.circular(8.0)),
+      border: Border.all(
+        color: Colors.white
+      ),
+      color: Colors.black,
+    )
+  )
 );
 
 void main() async {
