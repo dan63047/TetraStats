@@ -19,12 +19,16 @@ class DestinationGraphs extends StatefulWidget{
   final String searchFor;
   //final Function setState;
   final BoxConstraints constraints;
+  final bool noSidebar;
 
-  const DestinationGraphs({super.key, required this.searchFor, required this.constraints});
+  const DestinationGraphs({super.key, required this.searchFor, required this.constraints, required this.noSidebar});
 
   @override
   State<DestinationGraphs> createState() => _DestinationGraphsState();
 }
+
+Graph graph = Graph.history;
+Stats Ychart = Stats.tr;
 
 enum Graph{
   history,
@@ -42,14 +46,12 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
   String yAxisTitle = "";
   bool _smooth = false;
   final List<DropdownMenuItem<Stats>> _yAxis = [for (MapEntry e in chartsShortTitles.entries) DropdownMenuItem(value: e.key, child: Text(e.value))];
-  Graph _graph = Graph.history;
-  Stats _Ychart = Stats.tr;
   Stats _Xchart = Stats.tr;
   int _season = currentSeason-1;
   ValueNotifier<String> historyPlayerUsername = ValueNotifier("");
   ValueNotifier<String> historyPlayerAvatarRevizion = ValueNotifier("");
   List<String> excludeRanks = [];
-  late Future<List<_MyScatterSpot>> futureLeague = getTetraLeagueData(_Xchart, _Ychart);
+  late Future<List<_MyScatterSpot>> futureLeague = getTetraLeagueData(_Xchart, Ychart);
   String searchLeague = "";
   //Duration postSeasonLeft = seasonStart.difference(DateTime.now());
 
@@ -99,7 +101,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                     style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 20),
                   ),
                 ),
-                Text('${f4.format(data.x)} ${chartsShortTitles[_Xchart]}\n${f4.format(data.y)} ${chartsShortTitles[_Ychart]}')
+                Text('${f4.format(data.x)} ${chartsShortTitles[_Xchart]}\n${f4.format(data.y)} ${chartsShortTitles[Ychart]}')
               ],
             ),
           );
@@ -207,8 +209,8 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
         case ConnectionState.done:
         if (snapshot.hasData){
           if (snapshot.data!.isEmpty || !snapshot.data!.containsKey(_season)) return ErrorThingy(eText: "Not enough data");
-          List<_HistoryChartSpot> selectedGraph = snapshot.data![_season]![_Ychart]!;
-          yAxisTitle = chartsShortTitles[_Ychart]!;
+          List<_HistoryChartSpot> selectedGraph = snapshot.data![_season]![Ychart]!;
+          yAxisTitle = chartsShortTitles[Ychart]!;
           return SfCartesianChart(
             tooltipBehavior: _historyTooltipBehavior,
             zoomPanBehavior: _zoomPanBehavior,
@@ -306,14 +308,14 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
           return const Center(child: CircularProgressIndicator());
         case ConnectionState.done:
         if (snapshot.hasData){
-          yAxisTitle = chartsShortTitles[_Ychart]!;
+          yAxisTitle = chartsShortTitles[Ychart]!;
           return SfCartesianChart(
             tooltipBehavior: _leagueTooltipBehavior,
             zoomPanBehavior: _zoomPanBehavior,
             primaryXAxis: const DateTimeAxis(),
             primaryYAxis: NumericAxis(
               // isInversed: true,
-              maximum: switch (_Ychart){
+              maximum: switch (Ychart){
                 Stats.tr => 25000.0,
                 Stats.gxe => 100.00,
                 _ => null
@@ -327,7 +329,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                 animationDuration: 0,
                 //opacity: 0.5,
                 xValueMapper: (Cutoffs data, _) => data.ts,
-                yValueMapper: (Cutoffs data, _) => switch (_Ychart){
+                yValueMapper: (Cutoffs data, _) => switch (Ychart){
                   Stats.glicko => data.glicko[rank],
                   Stats.gxe => data.gxe[rank],
                   _ => data.tr[rank]
@@ -344,20 +346,20 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Column(
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Card(
                   child: Wrap(
                     spacing: 20,
                     crossAxisAlignment: WrapCrossAlignment.center,
+                    alignment: WrapAlignment.center,
                     children: [
-                      if (_graph == Graph.history) Row(
+                      if (graph == Graph.history) Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(Icons.person),
@@ -372,7 +374,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                           ),
                         ],
                       ),
-                      if (_graph == Graph.leagueState) SizedBox(
+                      if (graph == Graph.leagueState) SizedBox(
                         width: 300,
                         child: TextField(
                           style: TextStyle(fontSize: 18.0000),
@@ -385,11 +387,11 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                           },
                           onSubmitted: (v){
                             searchLeague = v;
-                            setState((){futureLeague = getTetraLeagueData(_Xchart, _Ychart);});
+                            setState((){futureLeague = getTetraLeagueData(_Xchart, Ychart);});
                           },
                         )
                       ),
-                      if (_graph == Graph.history) Row(
+                      if (graph == Graph.history) Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const Padding(padding: EdgeInsets.all(8.0), child: Text("Season:", style: TextStyle(fontSize: 22))),
@@ -404,20 +406,20 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                           ),
                         ],
                       ),
-                      if (_graph != Graph.leagueCutoffs) Row(
+                      if (graph != Graph.leagueCutoffs) Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const Padding(padding: EdgeInsets.all(8.0), child: Text("X:", style: TextStyle(fontSize: 22))),
                           DropdownButton(
-                            items: switch (_graph){
+                            items: switch (graph){
                               Graph.history => [DropdownMenuItem(value: false, child: Text("Date & Time")), DropdownMenuItem(value: true, child: Text("Games Played"))],
                               Graph.leagueState => _yAxis,
                               Graph.leagueCutoffs => [],
                             },
-                            value: _graph == Graph.history ? _gamesPlayedInsteadOfDateAndTime :  _Xchart,
+                            value: graph == Graph.history ? _gamesPlayedInsteadOfDateAndTime :  _Xchart,
                             onChanged: (value) {
                               setState(() {
-                                if (_graph == Graph.history)
+                                if (graph == Graph.history)
                                 _gamesPlayedInsteadOfDateAndTime = value! as bool;
                                 else _Xchart = value! as Stats;
                               });
@@ -430,17 +432,17 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                         children: [
                           const Padding(padding: EdgeInsets.all(8.0), child: Text("Y:", style: TextStyle(fontSize: 22))),
                           DropdownButton<Stats>(
-                            items: _graph == Graph.leagueCutoffs ? [DropdownMenuItem(value: Stats.tr, child: Text(chartsShortTitles[Stats.tr]!)), DropdownMenuItem(value: Stats.glicko, child: Text(chartsShortTitles[Stats.glicko]!)), DropdownMenuItem(value: Stats.gxe, child: Text(chartsShortTitles[Stats.gxe]!))] : _yAxis,
-                            value: _Ychart,
+                            items: graph == Graph.leagueCutoffs ? [DropdownMenuItem(value: Stats.tr, child: Text(chartsShortTitles[Stats.tr]!)), DropdownMenuItem(value: Stats.glicko, child: Text(chartsShortTitles[Stats.glicko]!)), DropdownMenuItem(value: Stats.gxe, child: Text(chartsShortTitles[Stats.gxe]!))] : _yAxis,
+                            value: Ychart,
                             onChanged: (value) {
                               setState(() {
-                                _Ychart = value!;
+                                Ychart = value!;
                               });
                             }
                           ),
                         ],
                       ),
-                      if (_graph == Graph.history) Row(
+                      if (graph == Graph.history) Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Checkbox(value: _smooth,
@@ -453,7 +455,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                             Text(t.smooth, style: const TextStyle(color: Colors.white, fontSize: 22))
                         ],
                       ),
-                      if (_graph == Graph.leagueState) IconButton(
+                      if (graph == Graph.leagueState) IconButton(
                         color: excludeRanks.isNotEmpty ? Theme.of(context).colorScheme.primary : null,
                         onPressed: (){
                         showDialog(context: context, builder: (BuildContext context) {
@@ -492,7 +494,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                               actions: <Widget>[
                                 TextButton(
                                   child: const Text("Apply"),
-                                  onPressed: () {Navigator.of(context).pop(); setState((){futureLeague = getTetraLeagueData(_Xchart, _Ychart);});}
+                                  onPressed: () {Navigator.of(context).pop(); setState((){futureLeague = getTetraLeagueData(_Xchart, Ychart);});}
                                 )  
                               ]
                             );
@@ -506,10 +508,10 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                 ),
                 Card(
                   child: SizedBox(
-                    width: MediaQuery.of(context).size.width - 88,
+                    width: MediaQuery.of(context).size.width - (widget.noSidebar ? 0 : 88),
                     height: MediaQuery.of(context).size.height - 96,
                     child: Padding( padding: const EdgeInsets.fromLTRB(40, 30, 40, 30),
-                    child: switch (_graph){
+                    child: switch (graph){
                       Graph.history => getHistoryGraph(),
                       Graph.leagueState => getLeagueState(),
                       Graph.leagueCutoffs => getCutoffsHistory()
@@ -519,34 +521,34 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                 )
               ],
             ),
-        ),
-        SegmentedButton<Graph>(
-          showSelectedIcon: false,
-          segments: <ButtonSegment<Graph>>[
-            const ButtonSegment<Graph>(
-              value: Graph.history,
-              label: Text('Player History')),
-            ButtonSegment<Graph>(
-              value: Graph.leagueState,
-              label: Text('League State')),
-            ButtonSegment<Graph>(
-              value: Graph.leagueCutoffs,
-              label: Text('League Cutoffs'),
-            ),
-          ],
-          selected: <Graph>{_graph},
-          onSelectionChanged: (Set<Graph> newSelection) {
-            setState(() {
-              _graph = newSelection.first;
-              switch (newSelection.first){
-                case Graph.leagueCutoffs:
-                case Graph.history:
-                  _Ychart = Stats.tr;
-                case Graph.leagueState:
-                  _Ychart = Stats.apm;
-              }
-            });})
-      ],
+          if (!widget.noSidebar) SegmentedButton<Graph>(
+            showSelectedIcon: false,
+            segments: <ButtonSegment<Graph>>[
+              const ButtonSegment<Graph>(
+                value: Graph.history,
+                label: Text('Player History')),
+              ButtonSegment<Graph>(
+                value: Graph.leagueState,
+                label: Text('League State')),
+              ButtonSegment<Graph>(
+                value: Graph.leagueCutoffs,
+                label: Text('League Cutoffs'),
+              ),
+            ],
+            selected: <Graph>{graph},
+            onSelectionChanged: (Set<Graph> newSelection) {
+              setState(() {
+                graph = newSelection.first;
+                switch (newSelection.first){
+                  case Graph.leagueCutoffs:
+                  case Graph.history:
+                    Ychart = Stats.tr;
+                  case Graph.leagueState:
+                    Ychart = Stats.apm;
+                }
+              });})
+        ],
+      ),
     ); 
   }
 }

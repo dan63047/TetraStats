@@ -607,6 +607,19 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
     );
   }
 
+  Widget rightSide(double width, bool hasSidebar){
+    return SizedBox(
+          width: width - (hasSidebar ? 80 : 0),
+          child: SingleChildScrollView(
+            child: switch (mod){
+              SettingsCardMod.general => getGeneralSettings(),
+              SettingsCardMod.customization => getCustomizationSettings(),
+              SettingsCardMod.database => getDatabaseSettings(),
+            },
+          )
+        );
+  }
+  
   @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);
@@ -618,7 +631,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          width: 450,
+          width: widget.constraints.maxWidth > 900.0 ? 350 : widget.constraints.maxWidth - (widget.constraints.maxWidth <= 768.0 ? 0 : 80),
           child: Column(
             children: [
               Card(
@@ -639,22 +652,33 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
                     setState(() {
                       mod = m;
                     });
+                    if (widget.constraints.maxWidth <= 900.0) Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Scaffold(
+                          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+                          floatingActionButton: Padding(
+                            padding: const EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 0.0),
+                            child: FloatingActionButton(
+                              onPressed: () => Navigator.pop(context),
+                              tooltip: 'Fuck go back',
+                              child: const Icon(Icons.arrow_back),
+                            ),
+                          ),
+                          body: SafeArea(
+                            child: rightSide(widget.constraints.maxWidth, false)
+                            )
+                          ),
+                        maintainState: false,
+                      ),
+                    );
                   },
                 ),
               )
             ],
           ),
         ),
-        SizedBox(
-          width: widget.constraints.maxWidth - 450 - 80,
-          child: SingleChildScrollView(
-            child: switch (mod){
-              SettingsCardMod.general => getGeneralSettings(),
-              SettingsCardMod.customization => getCustomizationSettings(),
-              SettingsCardMod.database => getDatabaseSettings(),
-            },
-          )
-        )
+        if (widget.constraints.maxWidth > 900.0) rightSide(widget.constraints.maxWidth - 350, true)
       ],
     );
   }

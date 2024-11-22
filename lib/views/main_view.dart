@@ -27,6 +27,10 @@ late Future<FetchResults> _data;
 TetrioPlayersLeaderboard? _everyone;
 int destination = 0;
 
+// TODO: Redesign some widgets, so they could look nice on mobile view
+// - stats below TL progress bar & similar parts in other widgets
+// - APP and VS/APM gadget
+
 Future<FetchResults> getData(String searchFor) async {
     TetrioPlayer player;
     try{
@@ -160,6 +164,102 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     );
   }
 
+  Widget pickers(int destination){
+    return switch (destination) {
+      0 => Column(
+        children: [
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SegmentedButton<CardMod>(
+              showSelectedIcon: false,
+              selected: <CardMod>{cardMod},
+              segments: modeButtons[rightCard]!,
+              onSelectionChanged: (p0) {
+                setState(() {
+                  cardMod = p0.first;
+                });
+              },
+            ),
+          ),
+          SegmentedButton<Cards>(
+          showSelectedIcon: false,
+          segments: <ButtonSegment<Cards>>[
+            const ButtonSegment<Cards>(
+                value: Cards.overview,
+                tooltip: 'Overview',
+                icon: Icon(Icons.calendar_view_day)),
+            ButtonSegment<Cards>(
+                value: Cards.tetraLeague,
+                tooltip: 'Tetra League',
+                icon: SvgPicture.asset("res/icons/league.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
+            ButtonSegment<Cards>(
+                value: Cards.quickPlay,
+                tooltip: 'Quick Play',
+                icon: SvgPicture.asset("res/icons/qp.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
+            ButtonSegment<Cards>(
+                value: Cards.sprint,
+                tooltip: '40 Lines',
+                icon: SvgPicture.asset("res/icons/40l.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
+            ButtonSegment<Cards>(
+                value: Cards.blitz,
+                tooltip: 'Blitz',
+                icon: SvgPicture.asset("res/icons/blitz.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
+          ],
+          selected: <Cards>{rightCard},
+          onSelectionChanged: (Set<Cards> newSelection) {
+            setState(() {
+              cardMod = CardMod.info;
+              rightCard = newSelection.first;
+            });})
+        ],
+      ),
+      1 => SegmentedButton<Graph>(
+        showSelectedIcon: false,
+        segments: <ButtonSegment<Graph>>[
+          const ButtonSegment<Graph>(
+            value: Graph.history,
+            label: Text('Player History')),
+          ButtonSegment<Graph>(
+            value: Graph.leagueState,
+            label: Text('League State')),
+          ButtonSegment<Graph>(
+            value: Graph.leagueCutoffs,
+            label: Text('League Cutoffs'),
+          ),
+        ],
+        selected: <Graph>{graph},
+        onSelectionChanged: (Set<Graph> newSelection) {
+          setState(() {
+            graph = newSelection.first;
+            switch (newSelection.first){
+              case Graph.leagueCutoffs:
+              case Graph.history:
+                Ychart = Stats.tr;
+              case Graph.leagueState:
+                Ychart = Stats.apm;
+            }
+          });}),
+      4 => SegmentedButton<CalcCards>(
+          showSelectedIcon: false,
+          segments: <ButtonSegment<CalcCards>>[
+            const ButtonSegment<CalcCards>(
+                value: CalcCards.calc,
+                label: Text('Stats Calculator'),
+                ),
+            ButtonSegment<CalcCards>(
+                value: CalcCards.damage,
+                label: Text('Damage Calculator'),
+                ),
+          ],
+          selected: <CalcCards>{calcCard},
+          onSelectionChanged: (Set<CalcCards> newSelection) {
+            setState(() {
+              calcCard = newSelection.first;
+            });}),
+      _ => Container()
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -185,58 +285,10 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                   },
                 ),
                 Expanded(
-                  child: Column(
-                    children: [
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: SegmentedButton<CardMod>(
-                          showSelectedIcon: false,
-                          selected: <CardMod>{cardMod},
-                          segments: modeButtons[rightCard]!,
-                          onSelectionChanged: (p0) {
-                            setState(() {
-                              cardMod = p0.first;
-                            });
-                          },
-                        ),
-                      ),
-                      SegmentedButton<Cards>(
-                        showSelectedIcon: false,
-                        segments: <ButtonSegment<Cards>>[
-                          const ButtonSegment<Cards>(
-                              value: Cards.overview,
-                              tooltip: 'Overview',
-                              icon: Icon(Icons.calendar_view_day)),
-                          ButtonSegment<Cards>(
-                              value: Cards.tetraLeague,
-                              tooltip: 'Tetra League',
-                              icon: SvgPicture.asset("res/icons/league.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
-                          ButtonSegment<Cards>(
-                              value: Cards.quickPlay,
-                              tooltip: 'Quick Play',
-                              icon: SvgPicture.asset("res/icons/qp.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
-                          ButtonSegment<Cards>(
-                              value: Cards.sprint,
-                              tooltip: '40 Lines',
-                              icon: SvgPicture.asset("res/icons/40l.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
-                          ButtonSegment<Cards>(
-                              value: Cards.blitz,
-                              tooltip: 'Blitz',
-                              icon: SvgPicture.asset("res/icons/blitz.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
-                        ],
-                        selected: <Cards>{rightCard},
-                        onSelectionChanged: (Set<Cards> newSelection) {
-                          setState(() {
-                            cardMod = CardMod.info;
-                            rightCard = newSelection.first;
-                          });})
-                    ],
-                  ),
+                  child: pickers(destination),
                 ),
-                IconButton(
-                  tooltip: 'Fake "Open navigation menu" button\nHere only for symmetry',
-                  icon: const Icon(Icons.menu, color: Colors.transparent),
-                  onPressed: () {},
+                SizedBox(
+                  width: 40.0,
                 ),
               ],
             ),
@@ -259,7 +311,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                   leading: FloatingActionButton(
                     elevation: 0,
                     onPressed: () {
-                      Scaffold.of(context).openDrawer();
+                      _scaffoldKey.currentState!.openDrawer();
                     },
                     child: const Icon(Icons.search),
                   ),
@@ -300,8 +352,8 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
               Expanded(
                 child: switch (destination){
                   0 => DestinationHome(searchFor: _searchFor, constraints: constraints, dataFuture: _data, noSidebar: !screenIsBig),
-                  1 => DestinationGraphs(searchFor: _searchFor, constraints: constraints),
-                  2 => DestinationLeaderboards(constraints: constraints),
+                  1 => DestinationGraphs(searchFor: _searchFor, constraints: constraints, noSidebar: !screenIsBig),
+                  2 => DestinationLeaderboards(constraints: constraints, noSidebar: !screenIsBig),
                   3 => DestinationCutoffs(constraints: constraints),
                   4 => DestinationCalculator(constraints: constraints),
                   5 => DestinationInfo(constraints: constraints),

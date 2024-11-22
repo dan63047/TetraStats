@@ -46,6 +46,7 @@ ThemeData theme = ThemeData(
   ),
   segmentedButtonTheme: SegmentedButtonThemeData(
     style: ButtonStyle(
+      visualDensity: VisualDensity(horizontal: -4.0, vertical: -4.0),
       side: const WidgetStatePropertyAll(BorderSide(color: Colors.transparent)),
       surfaceTintColor: const WidgetStatePropertyAll(Colors.cyanAccent),
       iconColor: const WidgetStatePropertyAll(Colors.cyanAccent),

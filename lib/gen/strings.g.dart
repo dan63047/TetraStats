@@ -6,7 +6,7 @@
 /// Locales: 3
 /// Strings: 1818 (606 per locale)
 ///
-/// Built on 2024-11-16 at 13:39 UTC
+/// Built on 2024-11-21 at 21:18 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -220,7 +220,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String comparingWith({required Object newDate, required Object oldDate}) => 'Data from ${newDate} comparing with ${oldDate}';
 	String get top => 'Top';
 	String get topRank => 'Top rank';
-	String verdictGeneral({required Object n, required Object verdict, required Object rank}) => '${n} ${verdict} than ${rank} rank average';
+	String verdictGeneral({required Object n, required Object verdict, required Object rank}) => '${n} ${verdict} ${rank} rank avg';
 	String get verdictBetter => 'better';
 	String get verdictWorse => 'worse';
 	String get smooth => 'Smooth';
@@ -2348,7 +2348,7 @@ extension on Translations {
 			case 'comparingWith': return ({required Object newDate, required Object oldDate}) => 'Data from ${newDate} comparing with ${oldDate}';
 			case 'top': return 'Top';
 			case 'topRank': return 'Top rank';
-			case 'verdictGeneral': return ({required Object n, required Object verdict, required Object rank}) => '${n} ${verdict} than ${rank} rank average';
+			case 'verdictGeneral': return ({required Object n, required Object verdict, required Object rank}) => '${n} ${verdict} ${rank} rank avg';
 			case 'verdictBetter': return 'better';
 			case 'verdictWorse': return 'worse';
 			case 'smooth': return 'Smooth';

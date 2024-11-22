@@ -84,7 +84,7 @@
     "comparingWith": "Data from ${newDate} comparing with ${oldDate}",
     "top": "Top",
     "topRank": "Top rank",
-    "verdictGeneral": "$n $verdict than $rank rank average",
+    "verdictGeneral": "$n $verdict $rank rank avg",
     "verdictBetter": "better",
     "verdictWorse": "worse",
     "smooth": "Smooth",

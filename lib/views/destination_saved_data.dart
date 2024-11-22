@@ -58,6 +58,69 @@ class _DestinationSavedData extends State<DestinationSavedData> {
     );
   }
 
+  Widget rightSide(double width, bool hasSidebar){
+    return SizedBox(
+      width: width - (hasSidebar ? 80.0 : 0.00),
+      child: selectedID != null ? FutureBuilder<(List<TetraLeague>, List<TetraLeague>, List<TetraLeagueAlphaRecord>)>(
+        future: getDataAbout(selectedID!),
+        builder: (context, snapshot) {
+          switch(snapshot.connectionState){
+            case ConnectionState.none:
+            case ConnectionState.waiting:
+            case ConnectionState.active:
+              return const Center(child: CircularProgressIndicator());
+            case ConnectionState.done:
+            if (snapshot.hasError){ return FutureError(snapshot); }
+            if (snapshot.hasData){
+              return DefaultTabController(
+                length: 3,
+                child: Card(
+                  child: Column(
+                    children: [
+                      Card(
+                        child: TabBar(
+                          labelStyle: Theme.of(context).textTheme.titleMedium!.copyWith(fontSize: 28),
+                          labelColor: Theme.of(context).colorScheme.primary,
+                          tabs: [
+                          Tab(text: "S${currentSeason} TL States"),
+                          Tab(text: "S1 TL States"),
+                          Tab(text: "TL Records")
+                        ]),
+                      ),
+                      SizedBox(
+                        height: widget.constraints.maxHeight - 64,
+                        child: TabBarView(children: [
+                          ListView.builder(
+                            itemCount: snapshot.data!.$1.length,
+                            itemBuilder: (context, index) {
+                            return getTetraLeagueListTile(snapshot.data!.$1[index]);
+                          },),
+                          ListView.builder(
+                            itemCount: snapshot.data!.$2.length,
+                            itemBuilder: (context, index) {
+                            return getTetraLeagueListTile(snapshot.data!.$2[index]);
+                          },),
+                          ListView.builder(
+                            itemCount: snapshot.data!.$3.length,
+                            itemBuilder: (context, index) {
+                            return AlphaLeagueEntryThingy(snapshot.data!.$3[index], selectedID!);
+                          },),
+                          ]
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              );
+            }
+            return Text("what?");
+          }
+        }
+      ) : 
+      InfoThingy("Select nickname on the left to see data assosiated with it")
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Map<String, String>>(
@@ -74,7 +137,7 @@ class _DestinationSavedData extends State<DestinationSavedData> {
             return Row(
               children: [
                 SizedBox(
-                  width: 450,
+                  width: widget.constraints.maxWidth > 900.0 ? 350 : widget.constraints.maxWidth - (widget.constraints.maxWidth <= 768.0 ? 0 : 80),
                   child: Column(
                     children: [
                       Card(
@@ -93,72 +156,33 @@ class _DestinationSavedData extends State<DestinationSavedData> {
                           //subtitle: Text("NaN states, NaN TL records", style: TextStyle(color: Colors.grey)),
                           onTap: () => setState(() {
                             selectedID = id;
+                            if (widget.constraints.maxWidth <= 900.0) Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Scaffold(
+                                floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+                                floatingActionButton: Padding(
+                                  padding: const EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 0.0),
+                                  child: FloatingActionButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    tooltip: 'Fuck go back',
+                                    child: const Icon(Icons.arrow_back),
+                                  ),
+                                ),
+                                body: SafeArea(
+                                  child: rightSide(widget.constraints.maxWidth, false)
+                                  )
+                                ),
+                              maintainState: false,
+                            ),
+                          );
                           }),
                         ),
                       )
                     ],
                   ),
                 ),
-                SizedBox(
-                  width: widget.constraints.maxWidth - 450 - 80,
-                  child: selectedID != null ? FutureBuilder<(List<TetraLeague>, List<TetraLeague>, List<TetraLeagueAlphaRecord>)>(
-                    future: getDataAbout(selectedID!),
-                    builder: (context, snapshot) {
-                      switch(snapshot.connectionState){
-                        case ConnectionState.none:
-                        case ConnectionState.waiting:
-                        case ConnectionState.active:
-                          return const Center(child: CircularProgressIndicator());
-                        case ConnectionState.done:
-                        if (snapshot.hasError){ return FutureError(snapshot); }
-                        if (snapshot.hasData){
-                          return DefaultTabController(
-                            length: 3,
-                            child: Card(
-                              child: Column(
-                                children: [
-                                  Card(
-                                    child: TabBar(
-                                      labelStyle: Theme.of(context).textTheme.titleMedium!.copyWith(fontSize: 28),
-                                      labelColor: Theme.of(context).colorScheme.primary,
-                                      tabs: [
-                                      Tab(text: "S${currentSeason} TL States"),
-                                      Tab(text: "S1 TL States"),
-                                      Tab(text: "TL Records")
-                                    ]),
-                                  ),
-                                  SizedBox(
-                                    height: widget.constraints.maxHeight - 64,
-                                    child: TabBarView(children: [
-                                      ListView.builder(
-                                        itemCount: snapshot.data!.$1.length,
-                                        itemBuilder: (context, index) {
-                                        return getTetraLeagueListTile(snapshot.data!.$1[index]);
-                                      },),
-                                      ListView.builder(
-                                        itemCount: snapshot.data!.$2.length,
-                                        itemBuilder: (context, index) {
-                                        return getTetraLeagueListTile(snapshot.data!.$2[index]);
-                                      },),
-                                      ListView.builder(
-                                        itemCount: snapshot.data!.$3.length,
-                                        itemBuilder: (context, index) {
-                                        return AlphaLeagueEntryThingy(snapshot.data!.$3[index], selectedID!);
-                                      },),
-                                      ]
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          );
-                        }
-                        return Text("what?");
-                      }
-                    }
-                  ) : 
-                  InfoThingy("Select nickname on the left to see data assosiated with it")
-                )
+                if (widget.constraints.maxWidth > 900.0) rightSide(widget.constraints.maxWidth - 350, true)
               ],
             );
           }

@@ -27,6 +27,8 @@ enum CalcCards{
   damage
 }
 
+CalcCards calcCard = CalcCards.calc;
+
 class ClearData{
   final String title;
   final Lineclears lineclear;
@@ -131,6 +133,7 @@ class Rules{
 const TextStyle mainToggleInRules = TextStyle(fontSize: 18, fontWeight: ui.FontWeight.w800);
 
 class _DestinationCalculatorState extends State<DestinationCalculator> {
+  // Stats calculator variables
   double? apm;
   double? pps;
   double? vs;
@@ -141,6 +144,25 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
   TextEditingController apmController = TextEditingController();
   TextEditingController vsController = TextEditingController();
 
+  // Damage Calculator variables
+  List<Widget> rSideWidgets = [];
+  List<Widget> lSideWidgets = [];
+  int combo = -1;
+  int b2b = -1;
+  int previousB2B = -1;
+  int totalDamage = 0;
+  int normalDamage = 0;
+  int comboDamage = 0;
+  int b2bDamage = 0;
+  int surgeDamage = 0;
+  int pcDamage = 0;
+
+   // values for "the bar"
+  late double sec2end;
+  late double sec3end;
+  late double sec4end;
+  late double sec5end;
+
   List<ClearData> clears = [];
   Map<String, int> customClearsChoice = {
     "No Spin Clears": 5,
@@ -148,8 +170,6 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
   };
   int idCounter = 0;
   Rules rules = Rules();
-
-  CalcCards card = CalcCards.calc;
 
   @override
   void initState() {
@@ -175,17 +195,11 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
     }
   }
 
-  // void calcDamage(){
-  //   for (ClearData lineclear in clears){
-
-  //   }
-  // }
-
   Widget getCalculator(){
     return SingleChildScrollView(
       child: Column(
         children: [
-          Card(
+          if (widget.constraints.maxWidth > 768.0) Card(
             child: Center(child: Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
               child: Column(
@@ -200,14 +214,16 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
               padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
               child: Row(
                 children: [
+                  //TODO: animate those TextFields
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 0.0),
                       child: TextField(
                         onSubmitted: (value) => calc(),
+                        onChanged: (value) {setState(() {});},
                         controller: apmController,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(suffix: Text("APM"), alignLabelWithHint: true, hintText: "Enter your APM"),
+                        decoration: InputDecoration(suffix: apmController.value.text.isNotEmpty ? Text("APM") : null, alignLabelWithHint: true, hintText: widget.constraints.maxWidth > 768.0 ? "Enter your APM" : "APM"),
                       ),
                     )
                   ),
@@ -216,9 +232,10 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                       padding: const EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 0.0),
                       child: TextField(
                         onSubmitted: (value) => calc(),
+                        onChanged: (value) {setState(() {});},
                         controller: ppsController,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(suffix: Text("PPS"), alignLabelWithHint: true, hintText: "Enter your PPS"),
+                        decoration: InputDecoration(suffix: ppsController.value.text.isNotEmpty ? Text("PPS") : null, alignLabelWithHint: true, hintText: widget.constraints.maxWidth > 768.0 ? "Enter your PPS" : "PPS"),
                       ),
                     )
                     ),
@@ -227,9 +244,10 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                       padding: const EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 0.0),
                       child: TextField(
                         onSubmitted: (value) => calc(),
+                        onChanged: (value) {setState(() {});},
                         controller: vsController,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(suffix: Text("VS"), alignLabelWithHint: true, hintText: "Enter your VS"),
+                        decoration: InputDecoration(suffix: vsController.value.text.isNotEmpty ? Text("VS") : null, alignLabelWithHint: true, hintText: widget.constraints.maxWidth > 768.0 ? "Enter your VS" : "VS"),
                       ),
                     )
                   ),
@@ -242,7 +260,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
             ),
           ),
           if (nerdStats != null) Card(
-            child: NerdStatsThingy(nerdStats: nerdStats!)
+            child: NerdStatsThingy(nerdStats: nerdStats!, width: widget.constraints.minWidth)
           ),
           if (playstyle != null) Card(
             child: Graphs(apm!, pps!, vs!, nerdStats!, playstyle!)
@@ -253,10 +271,102 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
     );
   }
 
-  Widget getDamageCalculator(){
-    List<Widget> rSideWidgets = [];
-    List<Widget> lSideWidgets = [];
+  Widget rSideDamageCalculator(double width, bool hasSidebar){
+    return SizedBox(
+      width: width - (hasSidebar ? 80 : 0),
+      height: widget.constraints.maxHeight - (hasSidebar ? 108 : 178),
+      child: clears.isEmpty ? InfoThingy("Click on the actions on the left to add them here") :
+      Card(
+        child: Column(
+          children: [
+            Expanded(
+              child: ReorderableListView(
+                onReorder: (oldIndex, newIndex) {
+                  setState((){
+                    if (oldIndex < newIndex) {
+                      newIndex -= 1;
+                    }
+                    final ClearData item = clears.removeAt(oldIndex);
+                    clears.insert(newIndex, item);
+                  });
+                },
+                children: lSideWidgets,
+              ),
+            ),
+            Divider(),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16.0, 0.0, 34.0, 0.0),
+                  child: Row(
+                    children: [
+                      Text("Total damage:", style: TextStyle(fontSize: 36, fontWeight: ui.FontWeight.w100)),
+                      Spacer(),
+                      Text(intf.format(totalDamage), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: ui.FontWeight.w100))
+                    ],
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Text("Lineclears: ${intf.format(normalDamage)}"),
+                    Text("Combo: ${intf.format(comboDamage)}"),
+                    Text("B2B: ${intf.format(b2bDamage)}"),
+                    Text("Surge: ${intf.format(surgeDamage)}"),
+                    Text("PCs: ${intf.format(pcDamage)}")
+                  ],
+                ),
+                if (totalDamage > 0) SfLinearGauge(
+                  minimum: 0,
+                  maximum: totalDamage.toDouble(),
+                  showLabels: false,
+                  showTicks: false,
+                  ranges: [
+                    LinearGaugeRange(
+                      color: Colors.green,
+                      startValue: 0,
+                      endValue: normalDamage.toDouble(),
+                      position: LinearElementPosition.cross,
+                    ),
+                    LinearGaugeRange(
+                      color: Colors.yellow,
+                      startValue: normalDamage.toDouble(),
+                      endValue: sec2end,
+                      position: LinearElementPosition.cross,
+                    ),
+                    LinearGaugeRange(
+                      color: Colors.blue,
+                      startValue: sec2end,
+                      endValue: sec3end,
+                      position: LinearElementPosition.cross,
+                    ),
+                    LinearGaugeRange(
+                      color: Colors.red,
+                      startValue: sec3end,
+                      endValue: sec4end,
+                      position: LinearElementPosition.cross,
+                    ),
+                    LinearGaugeRange(
+                      color: Colors.orange,
+                      startValue: sec4end,
+                      endValue: sec5end,
+                      position: LinearElementPosition.cross,
+                    ),
+                  ],
+                ),
+                ElevatedButton.icon(onPressed: (){setState((){clears.clear();});}, icon: const Icon(Icons.clear), label: Text("Clear all"), style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))))))
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
 
+  Widget getDamageCalculator(){
+    rSideWidgets = [];
+    lSideWidgets = [];
     for (var key in clearsExisting.keys){
       rSideWidgets.add(Text(key));
       for (ClearData data in clearsExisting[key]!) rSideWidgets.add(Card(
@@ -299,15 +409,15 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
       rSideWidgets.add(const Divider());
     }
 
-    int combo = -1;
-    int b2b = -1;
-    int previousB2B = -1;
-    int totalDamage = 0;
-    int normalDamage = 0;
-    int comboDamage = 0;
-    int b2bDamage = 0;
-    int surgeDamage = 0;
-    int pcDamage = 0;
+    combo = -1;
+    b2b = -1;
+    previousB2B = -1;
+    totalDamage = 0;
+    normalDamage = 0;
+    comboDamage = 0;
+    b2bDamage = 0;
+    surgeDamage = 0;
+    pcDamage = 0;
 
     for (ClearData lineclear in clears){
       previousB2B = b2b;
@@ -345,13 +455,13 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
       pcDamage += pcDmg;
     }
     // values for "the bar"
-    double sec2end = normalDamage.toDouble()+comboDamage.toDouble();
-    double sec3end = normalDamage.toDouble()+comboDamage.toDouble()+b2bDamage.toDouble();
-    double sec4end = normalDamage.toDouble()+comboDamage.toDouble()+b2bDamage.toDouble()+surgeDamage.toDouble();
-    double sec5end = normalDamage.toDouble()+comboDamage.toDouble()+b2bDamage.toDouble()+surgeDamage.toDouble()+pcDamage.toDouble();
+    sec2end = normalDamage.toDouble()+comboDamage.toDouble();
+    sec3end = normalDamage.toDouble()+comboDamage.toDouble()+b2bDamage.toDouble();
+    sec4end = normalDamage.toDouble()+comboDamage.toDouble()+b2bDamage.toDouble()+surgeDamage.toDouble();
+    sec5end = normalDamage.toDouble()+comboDamage.toDouble()+b2bDamage.toDouble()+surgeDamage.toDouble()+pcDamage.toDouble();
     return Column(
       children: [
-        Card(
+        if (widget.constraints.maxWidth > 768.0) Card(
           child: Center(child: Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
             child: Column(
@@ -361,216 +471,133 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
             ),
           )),
         ),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: 350.0,
-              child: DefaultTabController(length: 2,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Card(
-                      child: TabBar(tabs: [
-                        Tab(text: "Actions"),
-                        Tab(text: "Rules"),
-                      ]),
-                    ),
-                    SizedBox(
-                      height: widget.constraints.maxHeight - 164,
-                      child: TabBarView(children: [
-                        SingleChildScrollView(
-                          child: Column(
-                            children: rSideWidgets,
-                          ),
-                        ),
-                        SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              Card(
-                                child: Column(
-                                  children: [
-                                    ListTile(
-                                      title: Text("Multiplier", style: mainToggleInRules),
-                                      trailing: SizedBox(width: 90.0, child: TextField(
-                                        keyboardType: TextInputType.number,
-                                        inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
-                                        decoration: InputDecoration(hintText: rules.multiplier.toString()),
-                                        onChanged: (value) => setState((){rules.multiplier = double.parse(value);}),
-                                      )),
-                                    ),
-                                    ListTile(
-                                      title: Text("Perfect Clear Damage"),
-                                      trailing: SizedBox(width: 90.0, child: TextField(
-                                        keyboardType: TextInputType.number,
-                                        inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
-                                        decoration: InputDecoration(hintText: rules.pcDamage.toString()),
-                                        onChanged: (value) => setState((){rules.pcDamage = int.parse(value);}),
-                                      )),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Card(
-                                child: Column(
-                                  children: [
-                                    ListTile(
-                                      title: Text("Combo", style: mainToggleInRules),
-                                      trailing: Switch(value: rules.combo, onChanged: (v) => setState((){rules.combo = v;})),
-                                    ),
-                                    if (rules.combo) ListTile(
-                                      title: Text("Combo Table"),
-                                      trailing: DropdownButton(
-                                        items: [for (var v in ComboTables.values) if (v != ComboTables.none) DropdownMenuItem(value: v.index, child: Text(comboTablesNames[v]!))],
-                                        value: rules.comboTable.index,
-                                        onChanged: (v) => setState((){rules.comboTable = ComboTables.values[v!];}),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              Card(
-                                child: Column(
-                                  children: [
-                                    ListTile(
-                                      title: Text("Back-To-Back (B2B)", style: mainToggleInRules),
-                                      trailing: Switch(value: rules.b2b, onChanged: (v) => setState((){rules.b2b = v;})),
-                                    ),
-                                    if (rules.b2b) ListTile(
-                                      title: Text("Back-To-Back Chaining"),
-                                      trailing: Switch(value: rules.b2bChaining, onChanged: (v) => setState((){rules.b2bChaining = v;})),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Card(
-                                child: Column(
-                                  children: [
-                                    ListTile(
-                                      title: Text("Surge", style: mainToggleInRules),
-                                      trailing: Switch(value: rules.surge, onChanged: (v) => setState((){rules.surge = v;})),
-                                    ),
-                                    if (rules.surge) ListTile(
-                                      title: Text("Starts at B2B"),
-                                      trailing: SizedBox(width: 90.0, child: TextField(
-                                        keyboardType: TextInputType.number,
-                                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                                        decoration: InputDecoration(hintText: rules.surgeInitAtB2b.toString()),
-                                        onChanged: (value) => setState((){rules.surgeInitAtB2b = int.parse(value);}),
-                                      )),
-                                    ),
-                                    if (rules.surge) ListTile(
-                                      title: Text("Start amount"),
-                                      trailing: SizedBox(width: 90.0, child: TextField(
-                                        keyboardType: TextInputType.number,
-                                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                                        decoration: InputDecoration(hintText: rules.surgeInitAmount.toString()),
-                                        onChanged: (value) => setState((){rules.surgeInitAmount = int.parse(value);}),
-                                      )),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
-                        )
-                      ]),
-                    )
-                  ],
-                )
-              ),
-            ),
-            SizedBox(
-              width: widget.constraints.maxWidth - 350 - 80,
-              height: widget.constraints.maxHeight - 108,
-              child: clears.isEmpty ? InfoThingy("Click on the actions on the left to add them here") :
-              Card(
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: ReorderableListView(
-                        onReorder: (oldIndex, newIndex) {
-                          setState((){
-                            if (oldIndex < newIndex) {
-                              newIndex -= 1;
-                            }
-                            final ClearData item = clears.removeAt(oldIndex);
-                            clears.insert(newIndex, item);
-                          });
-                        },
-                        children: lSideWidgets,
+        Expanded(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: widget.constraints.maxWidth > 768.0 ? 350.0 : widget.constraints.maxWidth,
+                child: DefaultTabController(length: widget.constraints.maxWidth > 768.0 ? 2 : 3,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Card(
+                        child: TabBar(tabs: [
+                          Tab(text: "Actions"),
+                          if (widget.constraints.maxWidth <= 768.0) Tab(text: "Results"),
+                          Tab(text: "Rules"),
+                        ]),
                       ),
-                    ),
-                    Divider(),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(16.0, 0.0, 34.0, 0.0),
-                          child: Row(
-                            children: [
-                              Text("Total damage:", style: TextStyle(fontSize: 36, fontWeight: ui.FontWeight.w100)),
-                              Spacer(),
-                              Text(intf.format(totalDamage), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: ui.FontWeight.w100))
-                            ],
+                      SizedBox(
+                        height: widget.constraints.maxHeight - 164,
+                        child: TabBarView(children: [
+                          SingleChildScrollView(
+                            child: Column(
+                              children: rSideWidgets,
+                            ),
                           ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Text("Lineclears: ${intf.format(normalDamage)}"),
-                            Text("Combo: ${intf.format(comboDamage)}"),
-                            Text("B2B: ${intf.format(b2bDamage)}"),
-                            Text("Surge: ${intf.format(surgeDamage)}"),
-                            Text("PCs: ${intf.format(pcDamage)}")
-                          ],
-                        ),
-                        if (totalDamage > 0) SfLinearGauge(
-                          minimum: 0,
-                          maximum: totalDamage.toDouble(),
-                          showLabels: false,
-                          showTicks: false,
-                          ranges: [
-                            LinearGaugeRange(
-                              color: Colors.green,
-                              startValue: 0,
-                              endValue: normalDamage.toDouble(),
-                              position: LinearElementPosition.cross,
+                          if (widget.constraints.maxWidth <= 768.0) SingleChildScrollView(
+                            child: rSideDamageCalculator(widget.constraints.minWidth, false),
+                          ),
+                          SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                Card(
+                                  child: Column(
+                                    children: [
+                                      ListTile(
+                                        title: Text("Multiplier", style: mainToggleInRules),
+                                        trailing: SizedBox(width: 90.0, child: TextField(
+                                          keyboardType: TextInputType.number,
+                                          inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
+                                          decoration: InputDecoration(hintText: rules.multiplier.toString()),
+                                          onChanged: (value) => setState((){rules.multiplier = double.parse(value);}),
+                                        )),
+                                      ),
+                                      ListTile(
+                                        title: Text("Perfect Clear Damage"),
+                                        trailing: SizedBox(width: 90.0, child: TextField(
+                                          keyboardType: TextInputType.number,
+                                          inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
+                                          decoration: InputDecoration(hintText: rules.pcDamage.toString()),
+                                          onChanged: (value) => setState((){rules.pcDamage = int.parse(value);}),
+                                        )),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Card(
+                                  child: Column(
+                                    children: [
+                                      ListTile(
+                                        title: Text("Combo", style: mainToggleInRules),
+                                        trailing: Switch(value: rules.combo, onChanged: (v) => setState((){rules.combo = v;})),
+                                      ),
+                                      if (rules.combo) ListTile(
+                                        title: Text("Combo Table"),
+                                        trailing: DropdownButton(
+                                          items: [for (var v in ComboTables.values) if (v != ComboTables.none) DropdownMenuItem(value: v.index, child: Text(comboTablesNames[v]!))],
+                                          value: rules.comboTable.index,
+                                          onChanged: (v) => setState((){rules.comboTable = ComboTables.values[v!];}),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                Card(
+                                  child: Column(
+                                    children: [
+                                      ListTile(
+                                        title: Text("Back-To-Back (B2B)", style: mainToggleInRules),
+                                        trailing: Switch(value: rules.b2b, onChanged: (v) => setState((){rules.b2b = v;})),
+                                      ),
+                                      if (rules.b2b) ListTile(
+                                        title: Text("Back-To-Back Chaining"),
+                                        trailing: Switch(value: rules.b2bChaining, onChanged: (v) => setState((){rules.b2bChaining = v;})),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Card(
+                                  child: Column(
+                                    children: [
+                                      ListTile(
+                                        title: Text("Surge", style: mainToggleInRules),
+                                        trailing: Switch(value: rules.surge, onChanged: (v) => setState((){rules.surge = v;})),
+                                      ),
+                                      if (rules.surge) ListTile(
+                                        title: Text("Starts at B2B"),
+                                        trailing: SizedBox(width: 90.0, child: TextField(
+                                          keyboardType: TextInputType.number,
+                                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                          decoration: InputDecoration(hintText: rules.surgeInitAtB2b.toString()),
+                                          onChanged: (value) => setState((){rules.surgeInitAtB2b = int.parse(value);}),
+                                        )),
+                                      ),
+                                      if (rules.surge) ListTile(
+                                        title: Text("Start amount"),
+                                        trailing: SizedBox(width: 90.0, child: TextField(
+                                          keyboardType: TextInputType.number,
+                                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                          decoration: InputDecoration(hintText: rules.surgeInitAmount.toString()),
+                                          onChanged: (value) => setState((){rules.surgeInitAmount = int.parse(value);}),
+                                        )),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              ],
                             ),
-                            LinearGaugeRange(
-                              color: Colors.yellow,
-                              startValue: normalDamage.toDouble(),
-                              endValue: sec2end,
-                              position: LinearElementPosition.cross,
-                            ),
-                            LinearGaugeRange(
-                              color: Colors.blue,
-                              startValue: sec2end,
-                              endValue: sec3end,
-                              position: LinearElementPosition.cross,
-                            ),
-                            LinearGaugeRange(
-                              color: Colors.red,
-                              startValue: sec3end,
-                              endValue: sec4end,
-                              position: LinearElementPosition.cross,
-                            ),
-                            LinearGaugeRange(
-                              color: Colors.orange,
-                              startValue: sec4end,
-                              endValue: sec5end,
-                              position: LinearElementPosition.cross,
-                            ),
-                          ],
-                        ),
-                        ElevatedButton.icon(onPressed: (){setState((){clears.clear();});}, icon: const Icon(Icons.clear), label: Text("Clear all"), style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))))))
-                      ],
-                    )
-                  ],
+                          ),
+                        ]),
+                      )
+                    ],
+                  )
                 ),
               ),
-            )
-          ],
+              if (widget.constraints.maxWidth > 768.0) rSideDamageCalculator(widget.constraints.maxWidth - 350, true)
+            ],
+          ),
         )
       ],
     );
@@ -581,13 +608,13 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
     return Column(
       children: [
         SizedBox(
-          height: widget.constraints.maxHeight -32,
-          child: switch (card){
+          height: widget.constraints.maxHeight - (widget.constraints.maxWidth > 768.0 ? 32 : 133),
+          child: switch (calcCard){
             CalcCards.calc => getCalculator(),
             CalcCards.damage => getDamageCalculator()
           } 
         ),
-        SegmentedButton<CalcCards>(
+        if (widget.constraints.maxWidth > 768.0) SegmentedButton<CalcCards>(
           showSelectedIcon: false,
           segments: <ButtonSegment<CalcCards>>[
             const ButtonSegment<CalcCards>(
@@ -599,10 +626,10 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                 label: Text('Damage Calculator'),
                 ),
           ],
-          selected: <CalcCards>{card},
+          selected: <CalcCards>{calcCard},
           onSelectionChanged: (Set<CalcCards> newSelection) {
             setState(() {
-              card = newSelection.first;
+              calcCard = newSelection.first;
             });})
       ],
     );
