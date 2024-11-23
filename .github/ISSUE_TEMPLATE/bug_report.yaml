@@ -12,7 +12,6 @@ body:
       label: What happened?
       description: Describe the issue you are experiencing right now
       placeholder: Tell us what you see!
-      value: "A bug happened!"
     validations:
       required: true
   - type: textarea
@@ -20,11 +19,7 @@ body:
     attributes:
       label: How did that happened?
       description: Describe in details what do do to get this issue
-      placeholder: "Steps to reproduce:" |
-      1. Go here
-      2. Click this
-      3. Do that
-      etc...
+      placeholder: "Steps to reproduce:\n1. Go here\n2. Click this\n3. Do that\netc..."
     validations:
       required: true
   - type: textarea
@@ -39,12 +34,11 @@ body:
       label: On which platform you encountered this issue?
       description: Tick the ones, where this issue can be reproduced
       options:
-        - Web (ts.dan63.by)
-        - Windows
-        - Linux
-        - Android
-        - Web-beta (tsbeta.dan63.by)
-      default: 0
+        - label: Web (ts.dan63.by)
+        - label: Windows
+        - label: Linux
+        - label: Android
+        - label: Web-beta (tsbeta.dan63.by)
     validations:
       required: true
   - type: input
@@ -52,7 +46,7 @@ body:
     attributes:
       label: What version of Tetra Stats did you used?
       description: You can find that info in Information Center -> About Tetra Stats
-      placeholder: 2.0.0
+      placeholder: "2.0.0"
   - type: textarea
     id: additional-info
     attributes:
