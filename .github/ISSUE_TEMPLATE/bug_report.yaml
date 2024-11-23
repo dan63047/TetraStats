@@ -20,11 +20,11 @@ body:
       label: How did that happened?
       description: Describe in details what do do to get this issue
       placeholder: |
-      Steps to reproduce: 
+      "Steps to reproduce: 
       1. Go here
       2. Click this
       3. Do that
-      etc...
+      etc..."
     validations:
       required: true
   - type: textarea
