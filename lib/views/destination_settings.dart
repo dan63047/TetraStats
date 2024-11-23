@@ -669,7 +669,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
                             child: rightSide(widget.constraints.maxWidth, false)
                             )
                           ),
-                        maintainState: false,
+                        
                       ),
                     );
                   },

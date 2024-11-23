@@ -107,6 +107,144 @@ class _RankState extends State<RankView> {
     );
   }
 
+   Widget rightSide(double width, bool shortNames){
+    return SizedBox(
+      width: width,
+      child: FutureBuilder<List<dynamic>>(
+        future: getRanksAverages(widget.rank),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState){
+            case ConnectionState.none:
+            case ConnectionState.waiting:
+            case ConnectionState.active:
+              return const Center(child: CircularProgressIndicator());
+            case ConnectionState.done:
+            if (snapshot.hasError){ return FutureError(snapshot); }
+            if (snapshot.hasData){
+              return SingleChildScrollView(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: shortNames ? 140.0 : 200.0,
+                      child: Card(
+                        child: Column(
+                          children: [
+                            Text(shortNames ? "" : "Cheese Index", style: TextStyle(fontSize: 28, color: Colors.transparent)),
+                            Divider(),
+                            RankViewEntry(shortNames ? "TR" : "Tetra Rating", null, null),
+                            RankViewEntry("Glicko", null, null, differentBG: true),
+                            RankViewEntry("RD", null, null),
+                            RankViewEntry("Glixare", null, null, differentBG: true),
+                            RankViewEntry("S1 TR", null, null),
+                            RankViewEntry(shortNames ? "GP" : "Games Played", null, null, differentBG: true),
+                            RankViewEntry(shortNames ? "GW" : "Games Won", null, null),
+                            RankViewEntry(shortNames ? "WR" : "Winrate", null, null, differentBG: true),
+                            RankViewEntry(shortNames ? "APM" : "Attack Per Minute", null, null),
+                            RankViewEntry(shortNames ? "PPS" : "Pieces Per Second", null, null, differentBG: true),
+                            RankViewEntry(shortNames ? "VS" : "Versus Score", null, null),
+                            RankViewEntry(shortNames ? "APP" : "Attack Per Piece", null, null, differentBG: true),
+                            RankViewEntry("VS / APM", null, null),
+                            RankViewEntry(shortNames ? "DS/P" : "Downstack Per Second", null, null, differentBG: true),
+                            RankViewEntry(shortNames ? "DS/S" : "Downstack Per Piece", null, null),
+                            RankViewEntry("APP + DS/P", null, null, differentBG: true),
+                            RankViewEntry(shortNames ? "Cheese" : "Cheese Index", null, null),
+                            RankViewEntry(shortNames ? "GbE" : "Garbage Efficiency", null, null, differentBG: true),
+                            RankViewEntry(shortNames ? "wAPP" : "Weighted APP", null, null),
+                            RankViewEntry("Area", null, null, differentBG: true),
+                            RankViewEntry(shortNames ? "eTR" : "Estimated TR", null, null),
+                            RankViewEntry(shortNames ? "±eTR" : "Est. TR Accuracy", null, null, differentBG: true),
+                            RankViewEntry("Opener", null, null),
+                            RankViewEntry("Plonk", null, null, differentBG: true),
+                            RankViewEntry("Stride", null, null),
+                            RankViewEntry(shortNames ? "Inf DS" : "Infinite Downstack", null, null, differentBG: true),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Card(
+                        child: Column(
+                          children: [
+                            Text("Minimums", style: TextStyle(fontSize: 28)),
+                            Divider(),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestTR"])}${shortNames ? "" : " TR"}", snapshot.data![1]["lowestTRnick"], snapshot.data![1]["lowestTRid"]),
+                            RankViewEntry(f4.format(snapshot.data![1]["lowestGlicko"]), snapshot.data![1]["lowestGlickoNick"], snapshot.data![1]["lowestGlickoID"], differentBG: true),
+                            RankViewEntry(f4.format(snapshot.data![1]["lowestRD"]), snapshot.data![1]["lowestRdNick"], snapshot.data![1]["lowestRdID"]),
+                            RankViewEntry(f4.format(snapshot.data![1]["lowestGlixare"]), snapshot.data![1]["lowestGlixareNick"], snapshot.data![1]["lowestGlixareID"], differentBG: true),
+                            RankViewEntry(f2.format(snapshot.data![1]["lowestS1tr"]), snapshot.data![1]["lowestS1trNick"], snapshot.data![1]["lowestS1trID"]),
+                            RankViewEntry(intf.format(snapshot.data![1]["lowestGamesPlayed"]), snapshot.data![1]["lowestGamesPlayedNick"], snapshot.data![1]["lowestGamesPlayedID"], differentBG: true),
+                            RankViewEntry(intf.format(snapshot.data![1]["lowestGamesWon"]), snapshot.data![1]["lowestGamesWonNick"], snapshot.data![1]["lowestGamesWonID"]),
+                            RankViewEntry(percentage.format(snapshot.data![1]["lowestWinrate"]), snapshot.data![1]["lowestWinrateNick"], snapshot.data![1]["lowestWinrateID"], differentBG: true),
+                            RankViewEntry("${f2.format(snapshot.data![1]["lowestAPM"])}${shortNames ? "" : " APM"}", snapshot.data![1]["lowestAPMnick"], snapshot.data![1]["lowestAPMid"]),
+                            RankViewEntry("${f2.format(snapshot.data![1]["lowestPPS"])}${shortNames ? "" : " PPS"}", snapshot.data![1]["lowestPPSnick"], snapshot.data![1]["lowestPPSid"], differentBG: true),
+                            RankViewEntry("${f2.format(snapshot.data![1]["lowestVS"])}${shortNames ? "" : " VS"}", snapshot.data![1]["lowestVSnick"], snapshot.data![1]["lowestVSid"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestAPP"])}${shortNames ? "" : " APP"}", snapshot.data![1]["lowestAPPnick"], snapshot.data![1]["lowestAPPid"], differentBG: true),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestVSAPM"])}${shortNames ? "" : " VS/APM"}", snapshot.data![1]["lowestVSAPMnick"], snapshot.data![1]["lowestVSAPMid"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestDSS"])}${shortNames ? "" : " DS/S"}", snapshot.data![1]["lowestDSSnick"], snapshot.data![1]["lowestDSSid"], differentBG: true),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestDSP"])}${shortNames ? "" : " DS/P"}", snapshot.data![1]["lowestDSPnick"], snapshot.data![1]["lowestDSPid"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestAPPDSP"])}${shortNames ? "" : " APP+DS/P"}", snapshot.data![1]["lowestAPPDSPnick"], snapshot.data![1]["lowestAPPDSPid"], differentBG: true),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestCheese"])}${shortNames ? "" : " Cheese"}", snapshot.data![1]["lowestCheeseNick"], snapshot.data![1]["lowestCheeseID"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestGBE"])}${shortNames ? "" : " Gbe"}", snapshot.data![1]["lowestGBEnick"], snapshot.data![1]["lowestGBEid"], differentBG: true),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestNyaAPP"])}${shortNames ? "" : " WAPP"}", snapshot.data![1]["lowestNyaAPPnick"], snapshot.data![1]["lowestNyaAPPid"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestArea"])}${shortNames ? "" : " Area"}", snapshot.data![1]["lowestAreaNick"], snapshot.data![1]["lowestAreaID"], differentBG: true),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestEstTR"])}${shortNames ? "" : " eTR"}", snapshot.data![1]["lowestEstTRnick"], snapshot.data![1]["lowestEstTRid"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestEstAcc"])}${shortNames ? "" : " ±eTR"}", snapshot.data![1]["lowestEstAccNick"], snapshot.data![1]["lowestEstAccID"], differentBG: true),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestOpener"])}", snapshot.data![1]["lowestOpenerNick"], snapshot.data![1]["lowestOpenerID"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestPlonk"])}", snapshot.data![1]["lowestPlonkNick"], snapshot.data![1]["lowestPlonkID"], differentBG: true),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestStride"])}", snapshot.data![1]["lowestStrideNick"], snapshot.data![1]["lowestStrideID"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestInfDS"])}", snapshot.data![1]["lowestInfDSnick"], snapshot.data![1]["lowestInfDSid"], differentBG: true)
+                          ],
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Card(
+                        child: Column(
+                          children: [
+                            Text("Maximums", style: TextStyle(fontSize: 28)),
+                            Divider(),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestTR"])}${shortNames ? "" : " TR"}", snapshot.data![1]["highestTRnick"], snapshot.data![1]["highestTRid"]),
+                            RankViewEntry(f4.format(snapshot.data![1]["highestGlicko"]), snapshot.data![1]["highestGlickoNick"], snapshot.data![1]["highestGlickoID"], differentBG: true),
+                            RankViewEntry(f4.format(snapshot.data![1]["highestRD"]), snapshot.data![1]["highestRdNick"], snapshot.data![1]["highestRdID"]),
+                            RankViewEntry(f4.format(snapshot.data![1]["highestGlixare"]), snapshot.data![1]["highestGlixareNick"], snapshot.data![1]["highestGlixareID"], differentBG: true),
+                            RankViewEntry(f2.format(snapshot.data![1]["highestS1tr"]), snapshot.data![1]["highestS1trNick"], snapshot.data![1]["highestS1trID"]),
+                            RankViewEntry(intf.format(snapshot.data![1]["highestGamesPlayed"]), snapshot.data![1]["highestGamesPlayedNick"], snapshot.data![1]["highestGamesPlayedID"], differentBG: true),
+                            RankViewEntry(intf.format(snapshot.data![1]["highestGamesWon"]), snapshot.data![1]["highestGamesWonNick"], snapshot.data![1]["highestGamesWonID"]),
+                            RankViewEntry(percentage.format(snapshot.data![1]["highestWinrate"]), snapshot.data![1]["highestWinrateNick"], snapshot.data![1]["highestWinrateID"], differentBG: true),
+                            RankViewEntry("${f2.format(snapshot.data![1]["highestAPM"])}${shortNames ? "" : " APM"}", snapshot.data![1]["highestAPMnick"], snapshot.data![1]["highestAPMid"]),
+                            RankViewEntry("${f2.format(snapshot.data![1]["highestPPS"])}${shortNames ? "" : " PPS"}", snapshot.data![1]["highestPPSnick"], snapshot.data![1]["highestPPSid"], differentBG: true),
+                            RankViewEntry("${f2.format(snapshot.data![1]["highestVS"])}${shortNames ? "" : " VS"}", snapshot.data![1]["highestVSnick"], snapshot.data![1]["highestVSid"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestAPP"])}${shortNames ? "" : " APP"}", snapshot.data![1]["highestAPPnick"], snapshot.data![1]["highestAPPid"], differentBG: true),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestVSAPM"])}${shortNames ? "" : " VS/APM"}", snapshot.data![1]["highestVSAPMnick"], snapshot.data![1]["highestVSAPMid"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestDSS"])}${shortNames ? "" : " DS/S"}", snapshot.data![1]["highestDSSnick"], snapshot.data![1]["highestDSSid"], differentBG: true),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestDSP"])}${shortNames ? "" : " DS/P"}", snapshot.data![1]["highestDSPnick"], snapshot.data![1]["highestDSPid"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestAPPDSP"])}${shortNames ? "" : " APP+DS/P"}", snapshot.data![1]["highestAPPDSPnick"], snapshot.data![1]["highestAPPDSPid"], differentBG: true),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestCheese"])}${shortNames ? "" : " Cheese"}", snapshot.data![1]["highestCheeseNick"], snapshot.data![1]["highestCheeseID"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestGBE"])}${shortNames ? "" : " Gbe"}", snapshot.data![1]["highestGBEnick"], snapshot.data![1]["highestGBEid"], differentBG: true),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestNyaAPP"])}${shortNames ? "" : " wAPP"}", snapshot.data![1]["highestNyaAPPnick"], snapshot.data![1]["highestNyaAPPid"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestArea"])}${shortNames ? "" : " Area"}", snapshot.data![1]["highestAreaNick"], snapshot.data![1]["highestAreaID"], differentBG: true),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestEstTR"])}${shortNames ? "" : " eTR"}", snapshot.data![1]["highestEstTRnick"], snapshot.data![1]["highestEstTRid"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestEstAcc"])}${shortNames ? "" : " ±eTR"}", snapshot.data![1]["highestEstAccNick"], snapshot.data![1]["highestEstAccID"], differentBG: true),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestOpener"])}", snapshot.data![1]["highestOpenerNick"], snapshot.data![1]["highestOpenerID"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestPlonk"])}", snapshot.data![1]["highestPlonkNick"], snapshot.data![1]["highestPlonkID"], differentBG: true),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestStride"])}", snapshot.data![1]["highestStrideNick"], snapshot.data![1]["highestStrideID"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestInfDS"])}", snapshot.data![1]["highestInfDSnick"], snapshot.data![1]["highestInfDSid"], differentBG: true)
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              );
+            }
+          }
+          return const Text("End of FutureBuilder<List>");
+        }
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double percentileGap = widget.cutoffTetrio.percentile - widget.nextRankPercentile;
@@ -126,7 +264,7 @@ class _RankState extends State<RankView> {
           return Row(
             children: [
               SizedBox(
-                width: 350.0,
+                width: constraints.maxWidth <= 768.0 ? constraints.maxWidth : 350.0,
                 height: constraints.maxHeight,
                 child: SingleChildScrollView(
                   child: Column(
@@ -252,7 +390,9 @@ class _RankState extends State<RankView> {
                                   return Text("End of the FutureBuilder");
                                 },
                               )
-                              else partOfTheWidget(null)                   
+                              else partOfTheWidget(null),
+                              if (constraints.maxWidth <= 768.0) Divider(),
+                              if (constraints.maxWidth <= 768.0) rightSide(constraints.maxWidth, true)            
                             ],
                           ),
                         ),
@@ -261,141 +401,7 @@ class _RankState extends State<RankView> {
                   ),
                 )
               ),
-              SizedBox(
-                width: constraints.maxWidth - 350,
-                child: FutureBuilder<List<dynamic>>(
-                  future: getRanksAverages(widget.rank),
-                  builder: (context, snapshot) {
-                    switch (snapshot.connectionState){
-                      case ConnectionState.none:
-                      case ConnectionState.waiting:
-                      case ConnectionState.active:
-                        return const Center(child: CircularProgressIndicator());
-                      case ConnectionState.done:
-                      if (snapshot.hasError){ return FutureError(snapshot); }
-                      if (snapshot.hasData){
-                        return SingleChildScrollView(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(
-                                width: 200.0,
-                                child: Card(
-                                  child: Column(
-                                    children: [
-                                      Text("Cheese Index", style: TextStyle(fontSize: 28, color: Colors.transparent)),
-                                      Divider(),
-                                      RankViewEntry("Tetra Rating", null, null),
-                                      RankViewEntry("Glicko", null, null, differentBG: true),
-                                      RankViewEntry("RD", null, null),
-                                      RankViewEntry("Glixare", null, null, differentBG: true),
-                                      RankViewEntry("S1 TR", null, null),
-                                      RankViewEntry("Games Played", null, null, differentBG: true),
-                                      RankViewEntry("Games Won", null, null),
-                                      RankViewEntry("Winrate", null, null, differentBG: true),
-                                      RankViewEntry("Attack Per Minute", null, null),
-                                      RankViewEntry("Pieces Per Second", null, null, differentBG: true),
-                                      RankViewEntry("Versus Score", null, null),
-                                      RankViewEntry("Attack Per Piece", null, null, differentBG: true),
-                                      RankViewEntry("VS / APM", null, null),
-                                      RankViewEntry("Downstack Per Second", null, null, differentBG: true),
-                                      RankViewEntry("Downstack Per Piece", null, null),
-                                      RankViewEntry("APP + DS/P", null, null, differentBG: true),
-                                      RankViewEntry("Cheese Index", null, null),
-                                      RankViewEntry("Garbage Efficiency", null, null, differentBG: true),
-                                      RankViewEntry("Weighted APP", null, null),
-                                      RankViewEntry("Area", null, null, differentBG: true),
-                                      RankViewEntry("Estimated TR", null, null),
-                                      RankViewEntry("Est. TR Accuracy", null, null, differentBG: true),
-                                      RankViewEntry("Opener", null, null),
-                                      RankViewEntry("Plonk", null, null, differentBG: true),
-                                      RankViewEntry("Stride", null, null),
-                                      RankViewEntry("Infinite Downstack", null, null, differentBG: true),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: Card(
-                                  child: Column(
-                                    children: [
-                                      Text("Minimums", style: TextStyle(fontSize: 28)),
-                                      Divider(),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["lowestTR"])} TR", snapshot.data![1]["lowestTRnick"], snapshot.data![1]["lowestTRid"]),
-                                      RankViewEntry(f4.format(snapshot.data![1]["lowestGlicko"]), snapshot.data![1]["lowestGlickoNick"], snapshot.data![1]["lowestGlickoID"], differentBG: true),
-                                      RankViewEntry(f4.format(snapshot.data![1]["lowestRD"]), snapshot.data![1]["lowestRdNick"], snapshot.data![1]["lowestRdID"]),
-                                      RankViewEntry(f4.format(snapshot.data![1]["lowestGlixare"]), snapshot.data![1]["lowestGlixareNick"], snapshot.data![1]["lowestGlixareID"], differentBG: true),
-                                      RankViewEntry(f2.format(snapshot.data![1]["lowestS1tr"]), snapshot.data![1]["lowestS1trNick"], snapshot.data![1]["lowestS1trID"]),
-                                      RankViewEntry(intf.format(snapshot.data![1]["lowestGamesPlayed"]), snapshot.data![1]["lowestGamesPlayedNick"], snapshot.data![1]["lowestGamesPlayedID"], differentBG: true),
-                                      RankViewEntry(intf.format(snapshot.data![1]["lowestGamesWon"]), snapshot.data![1]["lowestGamesWonNick"], snapshot.data![1]["lowestGamesWonID"]),
-                                      RankViewEntry(percentage.format(snapshot.data![1]["lowestWinrate"]), snapshot.data![1]["lowestWinrateNick"], snapshot.data![1]["lowestWinrateID"], differentBG: true),
-                                      RankViewEntry("${f2.format(snapshot.data![1]["lowestAPM"])} APM", snapshot.data![1]["lowestAPMnick"], snapshot.data![1]["lowestAPMid"]),
-                                      RankViewEntry("${f2.format(snapshot.data![1]["lowestPPS"])} PPS", snapshot.data![1]["lowestPPSnick"], snapshot.data![1]["lowestPPSid"], differentBG: true),
-                                      RankViewEntry("${f2.format(snapshot.data![1]["lowestVS"])} VS", snapshot.data![1]["lowestVSnick"], snapshot.data![1]["lowestVSid"]),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["lowestAPP"])} APP", snapshot.data![1]["lowestAPPnick"], snapshot.data![1]["lowestAPPid"], differentBG: true),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["lowestVSAPM"])} VS/APM", snapshot.data![1]["lowestVSAPMnick"], snapshot.data![1]["lowestVSAPMid"]),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["lowestDSS"])} DS/S", snapshot.data![1]["lowestDSSnick"], snapshot.data![1]["lowestDSSid"], differentBG: true),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["lowestDSP"])} DS/P", snapshot.data![1]["lowestDSPnick"], snapshot.data![1]["lowestDSPid"]),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["lowestAPPDSP"])} APP+DS/P", snapshot.data![1]["lowestAPPDSPnick"], snapshot.data![1]["lowestAPPDSPid"], differentBG: true),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["lowestCheese"])} Cheese", snapshot.data![1]["lowestCheeseNick"], snapshot.data![1]["lowestCheeseID"]),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["lowestGBE"])} Gbe", snapshot.data![1]["lowestGBEnick"], snapshot.data![1]["lowestGBEid"], differentBG: true),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["lowestNyaAPP"])} wAPP", snapshot.data![1]["lowestNyaAPPnick"], snapshot.data![1]["lowestNyaAPPid"]),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["lowestArea"])} Area", snapshot.data![1]["lowestAreaNick"], snapshot.data![1]["lowestAreaID"], differentBG: true),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["lowestEstTR"])} eTR", snapshot.data![1]["lowestEstTRnick"], snapshot.data![1]["lowestEstTRid"]),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["lowestEstAcc"])} ±eTR", snapshot.data![1]["lowestEstAccNick"], snapshot.data![1]["lowestEstAccID"], differentBG: true),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["lowestOpener"])}", snapshot.data![1]["lowestOpenerNick"], snapshot.data![1]["lowestOpenerID"]),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["lowestPlonk"])}", snapshot.data![1]["lowestPlonkNick"], snapshot.data![1]["lowestPlonkID"], differentBG: true),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["lowestStride"])}", snapshot.data![1]["lowestStrideNick"], snapshot.data![1]["lowestStrideID"]),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["lowestInfDS"])}", snapshot.data![1]["lowestInfDSnick"], snapshot.data![1]["lowestInfDSid"], differentBG: true)
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: Card(
-                                  child: Column(
-                                    children: [
-                                      Text("Maximums", style: TextStyle(fontSize: 28)),
-                                      Divider(),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["highestTR"])} TR", snapshot.data![1]["highestTRnick"], snapshot.data![1]["highestTRid"]),
-                                      RankViewEntry(f4.format(snapshot.data![1]["highestGlicko"]), snapshot.data![1]["highestGlickoNick"], snapshot.data![1]["highestGlickoID"], differentBG: true),
-                                      RankViewEntry(f4.format(snapshot.data![1]["highestRD"]), snapshot.data![1]["highestRdNick"], snapshot.data![1]["highestRdID"]),
-                                      RankViewEntry(f4.format(snapshot.data![1]["highestGlixare"]), snapshot.data![1]["highestGlixareNick"], snapshot.data![1]["highestGlixareID"], differentBG: true),
-                                      RankViewEntry(f2.format(snapshot.data![1]["highestS1tr"]), snapshot.data![1]["highestS1trNick"], snapshot.data![1]["highestS1trID"]),
-                                      RankViewEntry(intf.format(snapshot.data![1]["highestGamesPlayed"]), snapshot.data![1]["highestGamesPlayedNick"], snapshot.data![1]["highestGamesPlayedID"], differentBG: true),
-                                      RankViewEntry(intf.format(snapshot.data![1]["highestGamesWon"]), snapshot.data![1]["highestGamesWonNick"], snapshot.data![1]["highestGamesWonID"]),
-                                      RankViewEntry(percentage.format(snapshot.data![1]["highestWinrate"]), snapshot.data![1]["highestWinrateNick"], snapshot.data![1]["highestWinrateID"], differentBG: true),
-                                      RankViewEntry("${f2.format(snapshot.data![1]["highestAPM"])} APM", snapshot.data![1]["highestAPMnick"], snapshot.data![1]["highestAPMid"]),
-                                      RankViewEntry("${f2.format(snapshot.data![1]["highestPPS"])} PPS", snapshot.data![1]["highestPPSnick"], snapshot.data![1]["highestPPSid"], differentBG: true),
-                                      RankViewEntry("${f2.format(snapshot.data![1]["highestVS"])} VS", snapshot.data![1]["highestVSnick"], snapshot.data![1]["highestVSid"]),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["highestAPP"])} APP", snapshot.data![1]["highestAPPnick"], snapshot.data![1]["highestAPPid"], differentBG: true),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["highestVSAPM"])} VS/APM", snapshot.data![1]["highestVSAPMnick"], snapshot.data![1]["highestVSAPMid"]),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["highestDSS"])} DS/S", snapshot.data![1]["highestDSSnick"], snapshot.data![1]["highestDSSid"], differentBG: true),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["highestDSP"])} DS/P", snapshot.data![1]["highestDSPnick"], snapshot.data![1]["highestDSPid"]),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["highestAPPDSP"])} APP+DS/P", snapshot.data![1]["highestAPPDSPnick"], snapshot.data![1]["highestAPPDSPid"], differentBG: true),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["highestCheese"])} Cheese", snapshot.data![1]["highestCheeseNick"], snapshot.data![1]["highestCheeseID"]),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["highestGBE"])} Gbe", snapshot.data![1]["highestGBEnick"], snapshot.data![1]["highestGBEid"], differentBG: true),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["highestNyaAPP"])} wAPP", snapshot.data![1]["highestNyaAPPnick"], snapshot.data![1]["highestNyaAPPid"]),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["highestArea"])} Area", snapshot.data![1]["highestAreaNick"], snapshot.data![1]["highestAreaID"], differentBG: true),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["highestEstTR"])} eTR", snapshot.data![1]["highestEstTRnick"], snapshot.data![1]["highestEstTRid"]),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["highestEstAcc"])} ±eTR", snapshot.data![1]["highestEstAccNick"], snapshot.data![1]["highestEstAccID"], differentBG: true),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["highestOpener"])}", snapshot.data![1]["highestOpenerNick"], snapshot.data![1]["highestOpenerID"]),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["highestPlonk"])}", snapshot.data![1]["highestPlonkNick"], snapshot.data![1]["highestPlonkID"], differentBG: true),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["highestStride"])}", snapshot.data![1]["highestStrideNick"], snapshot.data![1]["highestStrideID"]),
-                                      RankViewEntry("${f4.format(snapshot.data![1]["highestInfDS"])}", snapshot.data![1]["highestInfDSnick"], snapshot.data![1]["highestInfDSid"], differentBG: true)
-                                    ],
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        );
-                      }
-                    }
-                    return const Text("End of FutureBuilder<List>");
-                  }
-                ),
-              )
+              if (constraints.maxWidth > 768.0) rightSide(constraints.maxWidth - 350, false)
             ],
           );
         },),

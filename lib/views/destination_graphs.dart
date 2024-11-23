@@ -287,7 +287,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                 ),
                 xValueMapper: (data, _) => data.x,
                 yValueMapper: (data, _) => data.y,
-                onPointTap: (point) => Navigator.push(context, MaterialPageRoute(builder: (context) => MainView(player: snapshot.data![point.pointIndex!].nickname), maintainState: false)),
+                onPointTap: (point) => Navigator.push(context, MaterialPageRoute(builder: (context) => MainView(player: snapshot.data![point.pointIndex!].nickname))),
               )
             ],
           );

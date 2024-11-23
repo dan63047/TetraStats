@@ -308,7 +308,7 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => UserView(searchFor: snapshot.data![index].userId),
-                                    maintainState: false,
+                                    
                                   ),
                                 );
                               },
@@ -374,7 +374,7 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                                   child: rightSide(widget.constraints.maxWidth)
                                   )
                                 ),
-                              maintainState: false,
+                              
                             ),
                           );
                           _currentLb = leaderboards.keys.elementAt(index);

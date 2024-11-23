@@ -30,6 +30,7 @@ int destination = 0;
 // TODO: Redesign some widgets, so they could look nice on mobile view
 // - stats below TL progress bar & similar parts in other widgets
 // - APP and VS/APM gadget
+// - Badges widget needs some kind of scroll arrows for desktop mode (How is this related to this todo???)
 
 Future<FetchResults> getData(String searchFor) async {
     TetrioPlayer player;
@@ -299,6 +300,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
           elevation: 0,
           onPressed: () {
             _scaffoldKey.currentState!.openDrawer();
+            _searchController.clear();
           },
           child: const Icon(Icons.search),
         ),
@@ -312,6 +314,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                     elevation: 0,
                     onPressed: () {
                       _scaffoldKey.currentState!.openDrawer();
+                      _searchController.clear();
                     },
                     child: const Icon(Icons.search),
                   ),
@@ -403,7 +406,7 @@ class _SearchDrawerState extends State<SearchDrawer>  {
                     SliverToBoxAdapter(
                       child: SearchBar(
                         controller: widget.controller,
-                        hintText: "Enter the username",
+                        hintText: "Username or ID",
                         hintStyle: const WidgetStatePropertyAll(TextStyle(color: Colors.grey)),
                         trailing: [
                           IconButton(onPressed: (){setState(() {
@@ -417,6 +420,7 @@ class _SearchDrawerState extends State<SearchDrawer>  {
                             Navigator.of(context).pop();
                           });
                         },
+                        autoFocus: true,
                       ),
                     ),
                     SliverToBoxAdapter(

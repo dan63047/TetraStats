@@ -173,7 +173,7 @@ class _DestinationSavedData extends State<DestinationSavedData> {
                                   child: rightSide(widget.constraints.maxWidth, false)
                                   )
                                 ),
-                              maintainState: false,
+                              
                             ),
                           );
                           }),
