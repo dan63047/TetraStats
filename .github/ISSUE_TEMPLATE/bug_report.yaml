@@ -50,7 +50,7 @@ body:
     attributes:
       label: What version of Tetra Stats did you used?
       description: You can find that info in Information Center -> About Tetra Stats
-      placeholder: 2.0.0
+      placeholder: "2.0.0"
   - type: textarea
     id: additional-info
     attributes:
