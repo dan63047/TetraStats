@@ -43,7 +43,6 @@ body:
         - label: Linux
         - label: Android
         - label: Web-beta (tsbeta.dan63.by)
-      default: 0
     validations:
       required: true
   - type: input
