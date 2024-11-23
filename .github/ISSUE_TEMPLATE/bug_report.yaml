@@ -19,12 +19,7 @@ body:
     attributes:
       label: How did that happened?
       description: Describe in details what do do to get this issue
-      placeholder: |
-      "Steps to reproduce: 
-      1. Go here
-      2. Click this
-      3. Do that
-      etc..."
+      placeholder: "Steps to reproduce:\n1. Go here\n2. Click this\n3. Do that\netc..."
     validations:
       required: true
   - type: textarea
