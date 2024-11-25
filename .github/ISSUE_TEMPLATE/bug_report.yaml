@@ -11,14 +11,14 @@ body:
     attributes:
       label: What happened?
       description: Describe the issue you are experiencing right now
-      placeholder: Tell us what you see!
+      placeholder: This thing doesn't work as intended under certain circumstances
     validations:
       required: true
   - type: textarea
     id: reproducing
     attributes:
       label: How did that happened?
-      description: Describe in details what do do to get this issue
+      description: Describe in details what to do to get this issue
       placeholder: "Steps to reproduce:\n1. Go here\n2. Click this\n3. Do that\netc..."
     validations:
       required: true
@@ -31,7 +31,7 @@ body:
   - type: checkboxes
     id: platform
     attributes:
-      label: On which platform you encountered this issue?
+      label: On which platforms you encountered this issue?
       description: Tick the ones, where this issue can be reproduced
       options:
         - label: Web (ts.dan63.by)
@@ -47,6 +47,8 @@ body:
       label: What version of Tetra Stats did you used?
       description: You can find that info in Information Center -> About Tetra Stats
       placeholder: "2.0.0"
+    validations:
+      required: true
   - type: textarea
     id: additional-info
     attributes:

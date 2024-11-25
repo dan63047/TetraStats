@@ -223,8 +223,7 @@ const Map<String, int> blitzAverages = {
 
 List<DateTime> seasonStarts = [
   DateTime.utc(2020, DateTime.april, 18, 4), // Source = twitter or something
-  DateTime.utc(
-      2024, DateTime.august, 16, 18, 41, 10) // Source = osk status page
+  DateTime.utc(2024, DateTime.august, 16, 18, 41, 10) // Source = osk status page
 ];
 
 List<DateTime> seasonEnds = [
