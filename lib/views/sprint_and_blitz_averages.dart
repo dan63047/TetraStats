@@ -22,16 +22,16 @@ class SprintAndBlitzState extends State<SprintAndBlitzView> {
 
   @override
   void initState() {
-    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS){
-      windowManager.getTitle().then((value) => oldWindowTitle = value);
-      windowManager.setTitle("Tetra Stats: ${t.settings}");
-    }
+    // if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS){
+    //   windowManager.getTitle().then((value) => oldWindowTitle = value);
+    //   windowManager.setTitle("Tetra Stats: ${t.settings}");
+    // }
     super.initState();
   }
 
   @override
   void dispose(){
-    if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
+    // if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) windowManager.setTitle(oldWindowTitle);
     super.dispose();
   }
 
@@ -45,7 +45,7 @@ class SprintAndBlitzState extends State<SprintAndBlitzView> {
         padding: const EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 0.0),
         child: FloatingActionButton(
           onPressed: () => Navigator.pop(context),
-          tooltip: 'Fuck go back',
+          tooltip: t.goBackButton,
           child: const Icon(Icons.arrow_back),
         ),
       ),
@@ -73,11 +73,11 @@ class SprintAndBlitzState extends State<SprintAndBlitzView> {
                           Text(t.rank, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
                           Padding(
                             padding: const EdgeInsets.only(right: 8.0),
-                            child: Text(t.sprint, textAlign: TextAlign.right, style: TextStyle(fontFamily: bigScreen ? "Eurostile Round" : "Eurostile Round Condensed", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white)),
+                            child: Text(t.gamemodes["40l"]!, textAlign: TextAlign.right, style: TextStyle(fontFamily: bigScreen ? "Eurostile Round" : "Eurostile Round Condensed", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white)),
                           ),
                           Padding(
                             padding: const EdgeInsets.only(right: 8.0),
-                            child: Text(t.blitz, textAlign: TextAlign.right, style: TextStyle(fontFamily: bigScreen ? "Eurostile Round" : "Eurostile Round Condensed", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white)),
+                            child: Text(t.gamemodes["blitz"]!, textAlign: TextAlign.right, style: TextStyle(fontFamily: bigScreen ? "Eurostile Round" : "Eurostile Round Condensed", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white)),
                           ),
                         ]
                       ),

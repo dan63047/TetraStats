@@ -97,12 +97,12 @@ class MainView extends StatefulWidget {
 enum Cards {overview, tetraLeague, quickPlay, sprint, blitz}
 enum CardMod {info, records, ex, exRecords}
 Map<Cards, String> cardsTitles = {
-  Cards.overview: "Overview",
-  Cards.tetraLeague: t.tetraLeague,
-  Cards.quickPlay: t.quickPlay,
+  Cards.overview: t.homeNavigation.overview,
+  Cards.tetraLeague: t.gamemodes["league"]!,
+  Cards.quickPlay: t.gamemodes["zenith"]!,
   //Cards.quickPlayExpert: "${t.quickPlay} ${t.expert}",
-  Cards.sprint: t.sprint,
-  Cards.blitz: t.blitz,
+  Cards.sprint: t.gamemodes["zenith"]!,
+  Cards.blitz: t.gamemodes["zenithex"]!,
   //Cards.other: t.other
 };
 

@@ -13,7 +13,7 @@ class TrailingStats extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    const TextStyle style = TextStyle(height: 1.1, fontWeight: FontWeight.w100, fontSize: 15);
+    const TextStyle style = TextStyle(height: 1.0, fontWeight: FontWeight.w100, fontSize: 14);
     return Table(
       defaultColumnWidth: const IntrinsicColumnWidth(),
       defaultVerticalAlignment: TableCellVerticalAlignment.baseline,

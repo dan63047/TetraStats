@@ -76,7 +76,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                     style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 20),
                   ),
                 ),
-                Text(_gamesPlayedInsteadOfDateAndTime ? t.gamesPlayed(games: t.games(n: data.gamesPlayed)) : timestamp(data.timestamp))
+                Text(_gamesPlayedInsteadOfDateAndTime ? t.graphsDestination.gamesPlayed(games: t.stats.games(n: data.gamesPlayed)) : timestamp(data.timestamp))
               ],
             ),
           );
@@ -145,9 +145,9 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
     if(fetchHistory){
       try{
         var history = await teto.fetchAndsaveTLHistory(widget.searchFor);
-        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.fetchAndsaveTLHistoryResult(number: history.length))));
+        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.graphsDestination.fetchAndsaveTLHistoryResult(number: history.length))));
       }on TetrioHistoryNotExist{
-        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.noHistorySaved)));
+        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.noHistorySaved)));
       }on P1nkl0bst3rForbidden {
         if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.p1nkl0bst3rForbidden)));
       }on P1nkl0bst3rInternalProblem {
@@ -208,7 +208,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
           return const Center(child: CircularProgressIndicator());
         case ConnectionState.done:
         if (snapshot.hasData){
-          if (snapshot.data!.isEmpty || !snapshot.data!.containsKey(_season)) return ErrorThingy(eText: "Not enough data");
+          if (snapshot.data!.isEmpty || !snapshot.data!.containsKey(_season)) return ErrorThingy(eText: t.errors.notEnoughData);
           List<_HistoryChartSpot> selectedGraph = snapshot.data![_season]![Ychart]!;
           yAxisTitle = chartsShortTitles[Ychart]!;
           return SfCartesianChart(
@@ -394,7 +394,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                       if (graph == Graph.history) Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Padding(padding: EdgeInsets.all(8.0), child: Text("Season:", style: TextStyle(fontSize: 22))),
+                          Padding(padding: EdgeInsets.all(8.0), child: Text("${t.season}:", style: TextStyle(fontSize: 22))),
                           DropdownButton(
                             items: [for (int i = 1; i <= currentSeason; i++) DropdownMenuItem(value: i-1, child: Text("$i"))],
                             value: _season,
@@ -412,7 +412,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                           const Padding(padding: EdgeInsets.all(8.0), child: Text("X:", style: TextStyle(fontSize: 22))),
                           DropdownButton(
                             items: switch (graph){
-                              Graph.history => [DropdownMenuItem(value: false, child: Text("Date & Time")), DropdownMenuItem(value: true, child: Text("Games Played"))],
+                              Graph.history => [DropdownMenuItem(value: false, child: Text(t.graphsDestination.dateAndTime)), DropdownMenuItem(value: true, child: Text(t.stats.gp.full))],
                               Graph.leagueState => _yAxis,
                               Graph.leagueCutoffs => [],
                             },
@@ -462,11 +462,11 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                           return StatefulBuilder(
                           builder: (context, StateSetter setAlertState) {
                             return AlertDialog(
-                              title: Text("Filter ranks on graph", textAlign: TextAlign.center),
+                              title: Text(t.graphsDestination.filterModaleTitle, textAlign: TextAlign.center),
                               content: SingleChildScrollView(
                                 child: Column(
                                   children: [
-                                    CheckboxListTile(value: getTotalFilterValue(), tristate: true, title: Text("All", style: TextStyle(fontFamily: "Eurostile Round Extended")), onChanged: (value){
+                                    CheckboxListTile(value: getTotalFilterValue(), tristate: true, title: Text(t.filterModale.all, style: TextStyle(fontFamily: "Eurostile Round Extended")), onChanged: (value){
                                       setAlertState(
                                         (){
                                           if (excludeRanks.length*2 > ranks.length){
@@ -493,9 +493,13 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                               ),
                               actions: <Widget>[
                                 TextButton(
-                                  child: const Text("Apply"),
+                                  child: Text(t.actions.cancel),
+                                  onPressed: () {Navigator.of(context).pop();}
+                                ),
+                                TextButton(
+                                  child: Text(t.actions.apply),
                                   onPressed: () {Navigator.of(context).pop(); setState((){futureLeague = getTetraLeagueData(_Xchart, Ychart);});}
-                                )  
+                                )
                               ]
                             );
                           }
@@ -524,15 +528,15 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
           if (!widget.noSidebar) SegmentedButton<Graph>(
             showSelectedIcon: false,
             segments: <ButtonSegment<Graph>>[
-              const ButtonSegment<Graph>(
+              ButtonSegment<Graph>(
                 value: Graph.history,
-                label: Text('Player History')),
+                label: Text(t.graphsNavigation.history)),
               ButtonSegment<Graph>(
                 value: Graph.leagueState,
-                label: Text('League State')),
+                label: Text(t.graphsNavigation.league)),
               ButtonSegment<Graph>(
                 value: Graph.leagueCutoffs,
-                label: Text('League Cutoffs'),
+                label: Text(t.graphsNavigation.cutoffs),
               ),
             ],
             selected: <Graph>{graph},

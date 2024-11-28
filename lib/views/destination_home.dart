@@ -57,61 +57,61 @@ Cards rightCard = Cards.overview;
 CardMod cardMod = CardMod.info;
 Map<Cards, List<ButtonSegment<CardMod>>> modeButtons = {
   Cards.overview: [
-    const ButtonSegment<CardMod>(
+    ButtonSegment<CardMod>(
       value: CardMod.info,
-      label: Text('General'),
+      label: Text(t.general),
     ),
   ],
   Cards.tetraLeague: [
-    const ButtonSegment<CardMod>(
+    ButtonSegment<CardMod>(
         value: CardMod.info,
-        label: Text('Standing'),
+        label: Text(t.homeNavigation.standing),
       ),
-    const ButtonSegment<CardMod>(
+    ButtonSegment<CardMod>(
         value: CardMod.ex, // yeah i misusing my own Enum shut the fuck up
-        label: Text('Seasons'),
+        label: Text(t.homeNavigation.seasons),
       ),
-    const ButtonSegment<CardMod>(
+    ButtonSegment<CardMod>(
         value: CardMod.records,
-        label: Text('Matches'),
+        label: Text(t.homeNavigation.mathces),
       ),
     ],
   Cards.quickPlay: [
-    const ButtonSegment<CardMod>(
+    ButtonSegment<CardMod>(
         value: CardMod.info,
-        label: Text('Normal'),
+        label: Text(t.homeNavigation.normal),
     ),
-    const ButtonSegment<CardMod>(
+    ButtonSegment<CardMod>(
         value: CardMod.records,
-        label: Text('Records'),
+        label: Text(t.records),
     ),
-    const ButtonSegment<CardMod>(
+    ButtonSegment<CardMod>(
         value: CardMod.ex,
-        label: Text('Expert'),
+        label: Text(t.homeNavigation.expert),
     ),
-    const ButtonSegment<CardMod>(
+    ButtonSegment<CardMod>(
         value: CardMod.exRecords,
-        label: Text('Ex Records'),
+        label: Text(t.homeNavigation.expertRecords),
     )
   ],
   Cards.blitz: [
-    const ButtonSegment<CardMod>(
+    ButtonSegment<CardMod>(
           value: CardMod.info,
-          label: Text('PB'),
+          label: Text(t.homeNavigation.pb),
     ),
-    const ButtonSegment<CardMod>(
+    ButtonSegment<CardMod>(
         value: CardMod.records,
-        label: Text('Records'),
+        label: Text(t.recent),
     )
   ],
   Cards.sprint: [
-    const ButtonSegment<CardMod>(
+    ButtonSegment<CardMod>(
           value: CardMod.info,
-          label: Text('PB'),
+          label: Text(t.homeNavigation.pb),
     ),
-    const ButtonSegment<CardMod>(
+    ButtonSegment<CardMod>(
         value: CardMod.records,
-        label: Text('Records'),
+        label: Text(t.recent),
     )
   ]
 };
@@ -140,7 +140,7 @@ class ZenithCard extends StatelessWidget {
                     fontSize: 65,
                     height: 1.2,
                   )),
-                  const Positioned(left: 25, top: 20, child: Text("otal time", style: TextStyle(fontFamily: "Eurostile Round Extended"))),
+                  Positioned(left: 25, top: 20, child: Text(t.stats.totalTime.widgetTitle, style: TextStyle(fontFamily: "Eurostile Round Extended"))),
                   Padding(
                     padding: const EdgeInsets.only(left: 10.0),
                     child: Text(getMoreNormalTime(record!.stats.finalTime), style: const TextStyle(
@@ -160,11 +160,11 @@ class ZenithCard extends StatelessWidget {
                     0: FixedColumnWidth(36)
                   },
                   children: [
-                    const TableRow(
+                    TableRow(
                       children: [
-                        Text("Floor"),
-                        Text("Split", textAlign: TextAlign.right),
-                        Text("Total", textAlign: TextAlign.right),
+                        Text(t.stats.floor),
+                        Text(t.stats.split, textAlign: TextAlign.right),
+                        Text(t.stats.total, textAlign: TextAlign.right),
                       ]
                     ),
                     for (int i = 0; i < record!.stats.zenith!.splits.length; i++) TableRow(
@@ -196,7 +196,7 @@ class ZenithCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(t.quickPlay, style: Theme.of(context).textTheme.titleLarge),
+                  Text(t.gamemodes["zenith"]!, style: Theme.of(context).textTheme.titleLarge),
                   //Text("Leaderboard reset in ${countdown(postSeasonLeft)}", textAlign: TextAlign.center),
                 ],
               ),
@@ -307,7 +307,7 @@ class RecordCard extends StatelessWidget {
                     )),
                     if (record!.rank != -1) TextSpan(text: "№ ${intf.format(record!.rank)}", style: TextStyle(color: getColorOfRank(record!.rank))),
                     if (record!.rank != -1) const TextSpan(text: " • "),
-                    if (record!.countryRank != -1) TextSpan(text: "№ ${intf.format(record!.countryRank)} local", style: TextStyle(color: getColorOfRank(record!.countryRank))),
+                    if (record!.countryRank != -1) TextSpan(text: "№ ${intf.format(record!.countryRank)} ${t.localStanding}", style: TextStyle(color: getColorOfRank(record!.countryRank))),
                     if (record!.countryRank != -1) const TextSpan(text: " • "),
                     TextSpan(text: timestamp(record!.timestamp)),
                   ]
@@ -332,15 +332,15 @@ class RecordCard extends StatelessWidget {
                         _ => "What if "
                       }, textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
                       Text(switch(record!.gamemode){
-                        "40l" => " Pieces",
-                        "blitz" => " Level",
-                        "5mblast" => " SPP",
+                        "40l" => " ${t.stats.pieces.full}",
+                        "blitz" => " ${t.stats.level.full}",
+                        "5mblast" => " ${t.stats.spp.short}",
                         _ => " i wanted to"
                       }, textAlign: TextAlign.left, style: const TextStyle(fontSize: 21)),
                     ]),
                     TableRow(children: [
                       Text(f2.format(record!.stats.pps), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
-                      const Text(" PPS", textAlign: TextAlign.left, style: TextStyle(fontSize: 21)),
+                      Text(" ${t.stats.pps.short}", textAlign: TextAlign.left, style: TextStyle(fontSize: 21)),
                     ]),
                     TableRow(children: [
                       Text(switch(record!.gamemode){
@@ -350,9 +350,9 @@ class RecordCard extends StatelessWidget {
                         _ => "but god said"
                       }, textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
                       Text(switch(record!.gamemode){
-                        "40l" => " KPP",
-                        "blitz" => " SPP",
-                        "5mblast" => " Pieces",
+                        "40l" => " ${t.stats.kpp.short}",
+                        "blitz" => " ${t.stats.spp.short}",
+                        "5mblast" => " ${t.stats.pieces.short}",
                         _ => " no"
                       }, textAlign: TextAlign.left, style: const TextStyle(fontSize: 21)),
                     ])
@@ -365,11 +365,11 @@ class RecordCard extends StatelessWidget {
                   children: [
                     TableRow(children: [
                       Text(intf.format(record!.stats.inputs), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
-                      const Text(" Key presses", textAlign: TextAlign.left, style: TextStyle(fontSize: 21)),
+                      Text(" ${t.stats.kp.short}", textAlign: TextAlign.left, style: TextStyle(fontSize: 21)),
                     ]),
                     TableRow(children: [
                       Text(f2.format(record!.stats.kps), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
-                      const Text(" KPS", textAlign: TextAlign.left, style: TextStyle(fontSize: 21)),
+                      Text(" ${t.stats.kps.short}", textAlign: TextAlign.left, style: TextStyle(fontSize: 21)),
                     ]),
                     TableRow(children: [
                       Text(switch(record!.gamemode){
@@ -380,8 +380,8 @@ class RecordCard extends StatelessWidget {
                       }, textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
                       Text(switch(record!.gamemode){
                         "40l" => " ",
-                        "blitz" => " Pieces",
-                        "5mblast" => " Pieces",
+                        "blitz" => " ${t.stats.pieces.short}",
+                        "5mblast" => " ${t.stats.pieces.short}",
                         _ => " no"
                       }, textAlign: TextAlign.left, style: const TextStyle(fontSize: 21)),
                     ])
@@ -402,7 +402,7 @@ class RecordCard extends StatelessWidget {
           children: [
             FinesseThingy(record!.stats.finesse, record!.stats.finessePercentage),
             LineclearsThingy(record!.stats.clears, record!.stats.lines, record!.stats.holds, record!.stats.tSpins),
-            if (record!.gamemode == 'blitz') Text("${f2.format(record!.stats.kpp)} KPP")
+            if (record!.gamemode == 'blitz') Text("${f2.format(record!.stats.kpp)} ${t.stats.kpp.short}")
           ],
         ),
       ),
@@ -412,8 +412,8 @@ class RecordCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (record == null) {
-      return const Card(
-        child: Center(child: Text("No record", style: TextStyle(fontSize: 42))),
+      return Card(
+        child: Center(child: Text(t.noRecord, style: TextStyle(fontSize: 42))),
       );
     }
     return Column(
@@ -427,9 +427,9 @@ class RecordCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(switch(record!.gamemode){
-                    "40l" => t.sprint,
-                    "blitz" => t.blitz,
-                    "5mblast" => "5,000,000 Blast",
+                    "40l" => t.gamemodes["40l"]!,
+                    "blitz" => t.gamemodes["blitz"]!,
+                    "5mblast" => t.gamemodes["5mblast"]!,
                     _ => record!.gamemode
                   }, style: Theme.of(context).textTheme.titleLarge)
                 ],
@@ -516,7 +516,7 @@ class RecordSummary extends StatelessWidget{
                 "blitz" => readableIntDifference(record!.stats.score, blitzAverages[rank]!),
                 _ => record!.stats.score.toString()
               }, verdict: betterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
-                color: betterThanClosestAverage??false ? Colors.greenAccent : Colors.redAccent
+                color: betterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
               ))
               else if ((rank == null || rank == "z") && closestAverage != null) TextSpan(text: "${t.verdictGeneral(n: switch(record!.gamemode){
                 "40l" => readableTimeDifference(record!.stats.finalTime, closestAverage!.value),
@@ -527,7 +527,7 @@ class RecordSummary extends StatelessWidget{
               )),
               if (record!.rank != -1) TextSpan(text: "№ ${intf.format(record!.rank)}", style: TextStyle(color: getColorOfRank(record!.rank))),
               if (record!.rank != -1 && record!.countryRank != -1) const TextSpan(text: " • "),
-              if (record!.countryRank != -1) TextSpan(text: "№ ${intf.format(record!.countryRank)} local", style: TextStyle(color: getColorOfRank(record!.countryRank))),
+              if (record!.countryRank != -1) TextSpan(text: "№ ${intf.format(record!.countryRank)} ${t.localStanding}", style: TextStyle(color: getColorOfRank(record!.countryRank))),
               const TextSpan(text: "\n"),
               TextSpan(text: timestamp(record!.timestamp)),
             ]
@@ -609,11 +609,11 @@ class AchievementSummary extends StatelessWidget{
                         style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
                         children: [
                           if (achievement!.object.isNotEmpty) TextSpan(text: "${achievement!.object}\n"),
-                          if (achievement!.vt == 4) TextSpan(text: "Floor ${achievement?.a != null ? achievement!.a! : "-"}"),
+                          if (achievement!.vt == 4) TextSpan(text: "${t.stats.floor} ${achievement?.a != null ? achievement!.a! : "-"}"),
                           if (achievement!.vt == 4) TextSpan(text: " • "),
                           if (achievement!.vt != 5) TextSpan(text: (achievement?.pos != null && !achievement!.pos!.isNegative) ? "№ ${intf.format(achievement!.pos!+1)}" : "№ ---", style: TextStyle(color: achievement?.pos != null ? getColorOfRank(achievement!.pos!+1) : Colors.grey)),
                           if (achievement!.vt != 5) TextSpan(text: " • ", style: TextStyle(color: achievement?.pos != null ? getColorOfRank(achievement!.pos!+1) : Colors.grey)),
-                          TextSpan(text: "Top ${achievement?.pos != null ? percentagef4.format(achievement!.pos! / achievement!.total!) : "---%"}", style: TextStyle(color: achievement?.pos != null ? getColorOfRank(achievement!.pos!+1) : Colors.grey)),
+                          TextSpan(text: t.stats.top(percentage: achievement?.pos != null ? percentagef4.format(achievement!.pos! / achievement!.total!) : "---"), style: TextStyle(color: achievement?.pos != null ? getColorOfRank(achievement!.pos!+1) : Colors.grey)),
                         ]
                         ),
                       ),
@@ -653,7 +653,7 @@ class LeagueCard extends StatelessWidget{
                 crossAxisAlignment: CrossAxisAlignment.baseline,
                 textBaseline: TextBaseline.alphabetic,
                 children: [
-                  Text("Season ${league.season}", style: Theme.of(context).textTheme.titleSmall),
+                  Text("${t.season} ${league.season}", style: Theme.of(context).textTheme.titleSmall),
                   Spacer(),
                   Text(
                     "${seasonStarts.elementAtOrNull(league.season - 1) != null ? timestamp(seasonStarts[league.season - 1]) : "---"} — ${seasonEnds.elementAtOrNull(league.season - 1) != null ? timestamp(seasonEnds[league.season - 1]) : "---"}",
@@ -663,14 +663,14 @@ class LeagueCard extends StatelessWidget{
               ) : Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text("Season ${league.season}", style: Theme.of(context).textTheme.titleSmall),
+                  Text("${t.season} ${league.season}", style: Theme.of(context).textTheme.titleSmall),
                   Text(
                     "${seasonStarts.elementAtOrNull(league.season - 1) != null ? timestamp(seasonStarts[league.season - 1]) : "---"} — ${seasonEnds.elementAtOrNull(league.season - 1) != null ? timestamp(seasonEnds[league.season - 1]) : "---"}",
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.grey)),
                 ],
               )
-              else Text("Tetra League", style: Theme.of(context).textTheme.titleSmall),
+              else Text(t.gamemodes["league"]!, style: Theme.of(context).textTheme.titleSmall),
               const Divider(),
               TLRatingThingy(userID: league.id, tlData: league, showPositions: true),
               const Divider(),
@@ -679,15 +679,15 @@ class LeagueCard extends StatelessWidget{
                 text: TextSpan(
                 style: const TextStyle(fontFamily: "Eurostile Round", color: Colors.grey),
                 children: [
-                  TextSpan(text: "${league.apm != null ? f2.format(league.apm) : "-.--"} APM", style: TextStyle(color: league.apm != null ? getStatColor(league.apm!, averages?.apm, true) : null)),
+                  TextSpan(text: "${league.apm != null ? f2.format(league.apm) : "-.--"} ${t.stats.apm.short}", style: TextStyle(color: league.apm != null ? getStatColor(league.apm!, averages?.apm, true) : null)),
                   TextSpan(text: " • "),
-                  TextSpan(text: "${league.pps != null ? f2.format(league.pps) : "-.--"} PPS", style: TextStyle(color: league.pps != null ? getStatColor(league.pps!, averages?.pps, true) : null)),
+                  TextSpan(text: "${league.pps != null ? f2.format(league.pps) : "-.--"} ${t.stats.pps.short}", style: TextStyle(color: league.pps != null ? getStatColor(league.pps!, averages?.pps, true) : null)),
                   TextSpan(text: " • "),
-                  TextSpan(text: "${league.vs != null ? f2.format(league.vs) : "-.--"} VS", style: TextStyle(color: league.vs != null ? getStatColor(league.vs!, averages?.vs, true) : null)),
+                  TextSpan(text: "${league.vs != null ? f2.format(league.vs) : "-.--"} ${t.stats.vs.short}", style: TextStyle(color: league.vs != null ? getStatColor(league.vs!, averages?.vs, true) : null)),
                   TextSpan(text: " • "),
-                  TextSpan(text: "${league.nerdStats != null ? f2.format(league.nerdStats!.app) : "-.--"} APP", style: TextStyle(color: league.nerdStats != null ? getStatColor(league.nerdStats!.app, averages?.nerdStats?.app, true) : null)),
+                  TextSpan(text: "${league.nerdStats != null ? f2.format(league.nerdStats!.app) : "-.--"} ${t.stats.app.short}", style: TextStyle(color: league.nerdStats != null ? getStatColor(league.nerdStats!.app, averages?.nerdStats?.app, true) : null)),
                   TextSpan(text: " • "),
-                  TextSpan(text: "${league.nerdStats != null ? f2.format(league.nerdStats!.vsapm) : "-.--"} VS/APM", style: TextStyle(color: league.nerdStats != null ? getStatColor(league.nerdStats!.vsapm, averages?.nerdStats?.vsapm, true) : null)),
+                  TextSpan(text: "${league.nerdStats != null ? f2.format(league.nerdStats!.vsapm) : "-.--"} ${t.stats.vsapm.short}", style: TextStyle(color: league.nerdStats != null ? getStatColor(league.nerdStats!.vsapm, averages?.nerdStats?.vsapm, true) : null)),
                 ]
               )),
             ],
@@ -712,7 +712,6 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 
   Widget getOverviewCard(Summaries summaries, CutoffTetrio? averages, double width){
     return LayoutGrid(
-        // ASCII-art named areas 🔥
         areas: width > 600 ? '''
           h h
           t t
@@ -730,13 +729,10 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
           6
           7
         ''',
-        // Concise track sizing extension methods 🔥
         columnSizes: width > 600 ? [auto, auto] : [auto],
         rowSizes: width > 600 ? [auto, auto, auto, auto, auto, auto] : [auto, auto, auto, auto, auto, auto, auto, auto],
-        // Column and row gaps! 🔥
         columnGap: 0,
         rowGap: 0,
-        // Handy grid placement extension methods on Widget 🔥
         children: [
           if (width > 600) Card(
             child: Padding(
@@ -746,7 +742,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text("Overview", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                    Text(t.homeNavigation.overview, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
                   ],
                 ),
               ),
@@ -759,7 +755,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text("40 Lines", style: Theme.of(context).textTheme.titleSmall),
+                    Text(t.gamemodes['40l']!, style: Theme.of(context).textTheme.titleSmall),
                     const Divider(),
                     RecordSummary(record: summaries.sprint, betterThanClosestAverage: sprintBetterThanClosestAverage, betterThanRankAverage: sprintBetterThanRankAverage, closestAverage: closestAverageSprint, rank: summaries.league.percentileRank),
                     const Divider(),
@@ -774,7 +770,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text("Blitz", style: Theme.of(context).textTheme.titleSmall),
+                    Text(t.gamemodes['blitz']!, style: Theme.of(context).textTheme.titleSmall),
                     const Divider(),
                     RecordSummary(record: summaries.blitz, betterThanClosestAverage: blitzBetterThanClosestAverage, betterThanRankAverage: blitzBetterThanRankAverage, closestAverage: closestAverageBlitz, rank: summaries.league.percentileRank),
                     const Divider(),
@@ -789,11 +785,11 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text("QP", style: Theme.of(context).textTheme.titleSmall),
+                    Text(t.gamemodes['zenith']!, style: Theme.of(context).textTheme.titleSmall),
                     const Divider(),
                     RecordSummary(record: summaries.zenith != null ? summaries.zenith : summaries.zenithCareerBest, hideRank: true, old: summaries.zenith == null),
                     const Divider(),
-                    Text("Overall PB: ${(summaries.achievements.isNotEmpty && summaries.achievements.firstWhere((e) => e.k == 18).v != null) ? f2.format(summaries.achievements.firstWhere((e) => e.k == 18).v!) : "-.--"} m", style: const TextStyle(color: Colors.grey))
+                    Text(t.overallPB(pb: (summaries.achievements.isNotEmpty && summaries.achievements.firstWhere((e) => e.k == 18).v != null) ? f2.format(summaries.achievements.firstWhere((e) => e.k == 18).v!) : "-.--"), style: const TextStyle(color: Colors.grey))
                   ],
                 ),
               ),
@@ -804,11 +800,11 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text("QP Expert", style: Theme.of(context).textTheme.titleSmall),
+                    Text(t.gamemodes['zenithex']!, style: Theme.of(context).textTheme.titleSmall),
                     const Divider(),
                     RecordSummary(record: summaries.zenithEx != null ? summaries.zenithEx : summaries.zenithExCareerBest, hideRank: true, old: summaries.zenith == null),
                     const Divider(),
-                    Text("Overall PB: ${(summaries.achievements.isNotEmpty && summaries.achievements.firstWhere((e) => e.k == 19).v != null) ? f2.format(summaries.achievements.firstWhere((e) => e.k == 19).v!) : "-.--"} m", style: const TextStyle(color: Colors.grey))
+                    Text(t.overallPB(pb: (summaries.achievements.isNotEmpty && summaries.achievements.firstWhere((e) => e.k == 19).v != null) ? f2.format(summaries.achievements.firstWhere((e) => e.k == 19).v!) : "-.--"), style: const TextStyle(color: Colors.grey))
                   ],
                 ),
               ),
@@ -819,10 +815,10 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Center(child: Text("Zen", style: Theme.of(context).textTheme.titleSmall)),
-                    Text("Level ${intf.format(summaries.zen.level)}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 36, fontWeight: FontWeight.w500, color: Colors.white)),
-                    Text("Score ${intf.format(summaries.zen.score)}"),
-                    Text("Level up requirement: ${intf.format(summaries.zen.scoreRequirement)}", style: const TextStyle(color: Colors.grey))
+                    Center(child: Text(t.gamemodes['zen']!, style: Theme.of(context).textTheme.titleSmall)),
+                    Text("${t.stats.level.full} ${intf.format(summaries.zen.level)}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 36, fontWeight: FontWeight.w500, color: Colors.white)),
+                    Text("${t.stats.score} ${intf.format(summaries.zen.score)}"),
+                    Text(t.stats.levelUpRequirement(p: intf.format(summaries.zen.scoreRequirement)), style: const TextStyle(color: Colors.grey))
                   ],
                 ),
               ),
@@ -841,7 +837,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                         fontSize: 65,
                         height: 1.2,
                       )),
-                      const Positioned(left: 25, top: 20, child: Text("inesse", style: TextStyle(fontFamily: "Eurostile Round Extended"))),
+                      Positioned(left: 25, top: 20, child: Text(t.stats.finesse.widgetTitle, style: TextStyle(fontFamily: "Eurostile Round Extended"))),
                       Padding(
                         padding: const EdgeInsets.only(left: 10.0),
                         child: Text("${(summaries.achievements.isNotEmpty && summaries.achievements.firstWhere((e) => e.k == 4).v != null && summaries.achievements.firstWhere((e) => e.k == 1).v != null) ?
@@ -857,14 +853,14 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                     ),
                     Row(
                       children: [
-                        const Text("Total pieces placed:"),
+                        Text("${t.stats.piecesTotal}:"),
                         const Spacer(),
                         Text((summaries.achievements.isNotEmpty && summaries.achievements.firstWhere((e) => e.k == 1).v != null) ? intf.format(summaries.achievements.firstWhere((e) => e.k == 1).v!) : "---"),
                       ],
                     ),
                     Row(
                       children: [
-                        const Text(" - Placed with perfect finesse:"),
+                        Text(" - ${t.stats.piecesWithPerfectFinesse}:"),
                         const Spacer(),
                         Text((summaries.achievements.isNotEmpty && summaries.achievements.firstWhere((e) => e.k == 4).v != null) ? intf.format(summaries.achievements.firstWhere((e) => e.k == 4).v!) : "---"),
                       ],
@@ -873,7 +869,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 ),
               ),
             ).inGridArea('6'),
-          Card(
+          if (summaries.achievements.isNotEmpty) Card(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
               child: Column(
@@ -913,7 +909,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(t.tetraLeague, style: Theme.of(context).textTheme.titleLarge),
+                  Text(t.gamemodes["league"]!, style: Theme.of(context).textTheme.titleLarge),
                   //Text("${states.last.timestamp} ${states.last.tr}", textAlign: TextAlign.center)
                 ],
               ),
@@ -949,7 +945,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text("Previous Seasons", style: Theme.of(context).textTheme.titleLarge, textAlign: TextAlign.center),
+                  Text(t.previousSeasons, style: Theme.of(context).textTheme.titleLarge, textAlign: TextAlign.center),
                   //Text("${t.seasonStarts} ${countdown(postSeasonLeft)}", textAlign: TextAlign.center)
                 ],
               ),
@@ -966,7 +962,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
   Widget getListOfRecords(String recentStream, String topStream, BoxConstraints constraints){
     return Column(
       children: [
-        const Card(
+        Card(
           child: Padding(
             padding: EdgeInsets.only(bottom: 4.0),
             child: Center(
@@ -974,7 +970,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text("Records", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                  Text(t.records, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
                   //Text("${t.seasonStarts} ${countdown(postSeasonLeft)}", textAlign: TextAlign.center)
                 ],
               ),
@@ -987,10 +983,10 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const TabBar(
+                TabBar(
                   tabs: [
-                    Tab(text: "Recent"),
-                    Tab(text: "Top"),
+                    Tab(text: t.recent),
+                    Tab(text: t.top),
                   ],
                 ),
                 SizedBox(
@@ -1026,10 +1022,10 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                                     title: Text(
                                       switch (snapshot.data!.records[i].gamemode){
                                         "40l" => get40lTime(snapshot.data!.records[i].stats.finalTime.inMicroseconds),
-                                        "blitz" => t.blitzScore(p: NumberFormat.decimalPattern().format(snapshot.data!.records[i].stats.score)),
+                                        "blitz" => t.stats.blitzScore(p: NumberFormat.decimalPattern().format(snapshot.data!.records[i].stats.score)),
                                         "5mblast" => get40lTime(snapshot.data!.records[i].stats.finalTime.inMicroseconds),
-                                        "zenith" => "${f2.format(snapshot.data!.records[i].stats.zenith!.altitude)} m${(snapshot.data!.records[i].extras as ZenithExtras).mods.isNotEmpty ? " (${t.withModsPlural(n: (snapshot.data!.records[i].extras as ZenithExtras).mods.length)})" : ""}",
-                                        "zenithex" => "${f2.format(snapshot.data!.records[i].stats.zenith!.altitude)} m${(snapshot.data!.records[i].extras as ZenithExtras).mods.isNotEmpty ? " (${t.withModsPlural(n: (snapshot.data!.records[i].extras as ZenithExtras).mods.length)})" : ""}",
+                                        "zenith" => "${f2.format(snapshot.data!.records[i].stats.zenith!.altitude)} m${(snapshot.data!.records[i].extras as ZenithExtras).mods.isNotEmpty ? " (${t.stats.qpWithMods(n: (snapshot.data!.records[i].extras as ZenithExtras).mods.length)})" : ""}",
+                                        "zenithex" => "${f2.format(snapshot.data!.records[i].stats.zenith!.altitude)} m${(snapshot.data!.records[i].extras as ZenithExtras).mods.isNotEmpty ? " (${t.stats.qpWithMods(n: (snapshot.data!.records[i].extras as ZenithExtras).mods.length)})" : ""}",
                                         String() => "huh",
                                       },
                                     style: Theme.of(context).textTheme.displayLarge),
@@ -1067,10 +1063,10 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                                     title: Text(
                                       switch (snapshot.data!.records[i].gamemode){
                                         "40l" => get40lTime(snapshot.data!.records[i].stats.finalTime.inMicroseconds),
-                                        "blitz" => t.blitzScore(p: NumberFormat.decimalPattern().format(snapshot.data!.records[i].stats.score)),
+                                        "blitz" => t.stats.blitzScore(p: NumberFormat.decimalPattern().format(snapshot.data!.records[i].stats.score)),
                                         "5mblast" => get40lTime(snapshot.data!.records[i].stats.finalTime.inMicroseconds),
-                                        "zenith" => "${f2.format(snapshot.data!.records[i].stats.zenith!.altitude)} m${(snapshot.data!.records[i].extras as ZenithExtras).mods.isNotEmpty ? " (${t.withModsPlural(n: (snapshot.data!.records[i].extras as ZenithExtras).mods.length)})" : ""}",
-                                        "zenithex" => "${f2.format(snapshot.data!.records[i].stats.zenith!.altitude)} m${(snapshot.data!.records[i].extras as ZenithExtras).mods.isNotEmpty ? " (${t.withModsPlural(n: (snapshot.data!.records[i].extras as ZenithExtras).mods.length)})" : ""}",
+                                        "zenith" => "${f2.format(snapshot.data!.records[i].stats.zenith!.altitude)} m${(snapshot.data!.records[i].extras as ZenithExtras).mods.isNotEmpty ? " (${t.stats.qpWithMods(n: (snapshot.data!.records[i].extras as ZenithExtras).mods.length)})" : ""}",
+                                        "zenithex" => "${f2.format(snapshot.data!.records[i].stats.zenith!.altitude)} m${(snapshot.data!.records[i].extras as ZenithExtras).mods.isNotEmpty ? " (${t.stats.qpWithMods(n: (snapshot.data!.records[i].extras as ZenithExtras).mods.length)})" : ""}",
                                         String() => "huh",
                                       },
                                     style: Theme.of(context).textTheme.displayLarge),

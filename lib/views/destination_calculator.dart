@@ -95,25 +95,25 @@ class ClearData{
 }
 
 Map<String, List<ClearData>> clearsExisting = {
-  "No Spin Clears": [
-    ClearData("No lineclear (Break Combo)", Lineclears.ZERO, 0, false, false),
-    ClearData("Single", Lineclears.SINGLE, 1, false, false),
-    ClearData("Double", Lineclears.DOUBLE, 2, false, false),
-    ClearData("Triple", Lineclears.TRIPLE, 3, false, false),
-    ClearData("Quad", Lineclears.QUAD, 4, false, false)
+  t.calcDestination.noSpinClears: [
+    ClearData(t.calcDestination.noLineclear, Lineclears.ZERO, 0, false, false),
+    ClearData(t.stats.lineClears.single, Lineclears.SINGLE, 1, false, false),
+    ClearData(t.stats.lineClears.double, Lineclears.DOUBLE, 2, false, false),
+    ClearData(t.stats.lineClears.triple, Lineclears.TRIPLE, 3, false, false),
+    ClearData(t.stats.lineClears.quad, Lineclears.QUAD, 4, false, false)
   ],
-  "Spins": [
-    ClearData("Spin Zero", Lineclears.TSPIN, 0, false, true),
-    ClearData("Spin Single", Lineclears.TSPIN_SINGLE, 1, false, true),
-    ClearData("Spin Double", Lineclears.TSPIN_DOUBLE, 2, false, true),
-    ClearData("Spin Triple", Lineclears.TSPIN_TRIPLE, 3, false, true),
-    ClearData("Spin Quad", Lineclears.TSPIN_QUAD, 4, false, true),
+  t.stats.spins: [
+    ClearData("${t.stats.spin} ${t.stats.lineClears.zero}", Lineclears.TSPIN, 0, false, true),
+    ClearData("${t.stats.spin} ${t.stats.lineClears.single}", Lineclears.TSPIN_SINGLE, 1, false, true),
+    ClearData("${t.stats.spin} ${t.stats.lineClears.double}", Lineclears.TSPIN_DOUBLE, 2, false, true),
+    ClearData("${t.stats.spin} ${t.stats.lineClears.triple}", Lineclears.TSPIN_TRIPLE, 3, false, true),
+    ClearData("${t.stats.spin} ${t.stats.lineClears.quad}", Lineclears.TSPIN_QUAD, 4, false, true),
   ],
-  "Mini spins": [
-    ClearData("Mini Spin Zero", Lineclears.TSPIN_MINI, 0, true, false),
-    ClearData("Mini Spin Single", Lineclears.TSPIN_MINI_SINGLE, 1, true, false),
-    ClearData("Mini Spin Double", Lineclears.TSPIN_MINI_DOUBLE, 2, true, false),
-    ClearData("Mini Spin Triple", Lineclears.TSPIN_MINI_TRIPLE, 3, true, false),
+  "${t.stats.mini} ${t.stats.spins}": [
+    ClearData("${t.stats.mini} ${t.stats.spin} ${t.stats.lineClears.zero}", Lineclears.TSPIN_MINI, 0, true, false),
+    ClearData("${t.stats.mini} ${t.stats.spin} ${t.stats.lineClears.single}", Lineclears.TSPIN_MINI_SINGLE, 1, true, false),
+    ClearData("${t.stats.mini} ${t.stats.spin} ${t.stats.lineClears.double}", Lineclears.TSPIN_MINI_DOUBLE, 2, true, false),
+    ClearData("${t.stats.mini} ${t.stats.spin} ${t.stats.lineClears.triple}", Lineclears.TSPIN_MINI_TRIPLE, 3, true, false),
   ]
 };
 
@@ -165,8 +165,8 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
 
   List<ClearData> clears = [];
   Map<String, int> customClearsChoice = {
-    "No Spin Clears": 5,
-    "Spins": 5
+    t.calcDestination.noSpinClears: 5,
+    t.calcDestination.spins: 5
   };
   int idCounter = 0;
   Rules rules = Rules();
@@ -204,7 +204,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
               padding: const EdgeInsets.only(bottom: 8.0),
               child: Column(
                 children: [
-                  Text("Stats Calucator", style: Theme.of(context).textTheme.titleLarge),
+                  Text(t.calcNavigation.stats, style: Theme.of(context).textTheme.titleLarge),
                 ],
               ),
             )),
@@ -253,7 +253,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                   ),
                   TextButton(
                     onPressed: () => calc(),
-                    child: Text(t.calc),
+                    child: Text(t.calcDestination.statsCalcButton),
                   ),
                 ],
               ),
@@ -265,7 +265,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
           if (playstyle != null) Card(
             child: Graphs(apm!, pps!, vs!, nerdStats!, playstyle!)
           ),
-          if (nerdStats == null) InfoThingy("Enter values and press \"Calc\" to see Nerd Stats for them")
+          if (nerdStats == null) InfoThingy(t.calcDestination.tip)
         ],
       ),
     );
@@ -275,7 +275,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
     return SizedBox(
       width: width - (hasSidebar ? 80 : 0),
       height: widget.constraints.maxHeight - (hasSidebar ? 108 : 178),
-      child: clears.isEmpty ? InfoThingy("Click on the actions on the left to add them here") :
+      child: clears.isEmpty ? InfoThingy(t.calcDestination.damageCalcTip) :
       Card(
         child: Column(
           children: [
@@ -301,7 +301,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                   padding: const EdgeInsets.fromLTRB(16.0, 0.0, 34.0, 0.0),
                   child: Row(
                     children: [
-                      Text("Total damage:", style: TextStyle(fontSize: 36, fontWeight: ui.FontWeight.w100)),
+                      Text("${t.calcDestination.totalDamage}:", style: TextStyle(fontSize: 36, fontWeight: ui.FontWeight.w100)),
                       Spacer(),
                       Text(intf.format(totalDamage), style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: ui.FontWeight.w100))
                     ],
@@ -310,11 +310,11 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Text("Lineclears: ${intf.format(normalDamage)}"),
-                    Text("Combo: ${intf.format(comboDamage)}"),
-                    Text("B2B: ${intf.format(b2bDamage)}"),
-                    Text("Surge: ${intf.format(surgeDamage)}"),
-                    Text("PCs: ${intf.format(pcDamage)}")
+                    Text("${t.calcDestination.lineclears}: ${intf.format(normalDamage)}"),
+                    Text("${t.calcDestination.combo}: ${intf.format(comboDamage)}"),
+                    Text("${t.stats.b2b.short}: ${intf.format(b2bDamage)}"),
+                    Text("${t.calcDestination.surge}: ${intf.format(surgeDamage)}"),
+                    Text("${t.calcDestination.pcs}: ${intf.format(pcDamage)}")
                   ],
                 ),
                 if (totalDamage > 0) SfLinearGauge(
@@ -382,9 +382,9 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
           },
         ),
       ));
-      if (key != "Mini spins") rSideWidgets.add(Card(
+      if (key != "${t.stats.mini} ${t.stats.spins}") rSideWidgets.add(Card(
         child: ListTile(
-          title: Text("Custom"),
+          title: Text(t.calcDestination.custom),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -394,13 +394,13 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                 decoration: InputDecoration(hintText: "5"),
                 onChanged: (value) => customClearsChoice[key] = int.parse(value),
               )),
-              Text(" Lines", style: Theme.of(context).textTheme.displayLarge),
+              Text(" ${t.stats.lines}", style: Theme.of(context).textTheme.displayLarge),
               Icon(Icons.arrow_forward_ios)
             ],
           ),
           onTap: (){
             setState((){
-              clears.add(ClearData("${key == "Spins" ? "Spin " : ""}${clearNames[min(customClearsChoice[key]!, clearNames.length-1)]} (${customClearsChoice[key]!} Lines)", key == "Spins" ? Lineclears.TSPIN_PENTA : Lineclears.PENTA, customClearsChoice[key]!, false, key == "Spins").cloneWith(idCounter));
+              clears.add(ClearData("${key == t.calcDestination.spins ? "${t.stats.spin} " : ""}${clearNames[min(customClearsChoice[key]!, clearNames.length-1)]} (${customClearsChoice[key]!} ${t.stats.lines})", key == t.calcDestination.spins ? Lineclears.TSPIN_PENTA : Lineclears.PENTA, customClearsChoice[key]!, false, key == t.calcDestination.spins).cloneWith(idCounter));
             });
             idCounter++;
           },
@@ -466,7 +466,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
             padding: const EdgeInsets.only(bottom: 8.0),
             child: Column(
               children: [
-                Text("Damage Calucator", style: Theme.of(context).textTheme.titleLarge),
+                Text(t.calcNavigation.damage, style: Theme.of(context).textTheme.titleLarge),
               ],
             ),
           )),
@@ -483,9 +483,9 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                     children: [
                       Card(
                         child: TabBar(tabs: [
-                          Tab(text: "Actions"),
-                          if (widget.constraints.maxWidth <= 768.0) Tab(text: "Results"),
-                          Tab(text: "Rules"),
+                          Tab(text: t.calcDestination.actions),
+                          if (widget.constraints.maxWidth <= 768.0) Tab(text: t.calcDestination.results),
+                          Tab(text: t.calcDestination.rules),
                         ]),
                       ),
                       SizedBox(
@@ -506,7 +506,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                                   child: Column(
                                     children: [
                                       ListTile(
-                                        title: Text("Multiplier", style: mainToggleInRules),
+                                        title: Text(t.calcDestination.multiplier, style: mainToggleInRules),
                                         trailing: SizedBox(width: 90.0, child: TextField(
                                           keyboardType: TextInputType.number,
                                           inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
@@ -515,7 +515,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                                         )),
                                       ),
                                       ListTile(
-                                        title: Text("Perfect Clear Damage"),
+                                        title: Text(t.calcDestination.pcDamage),
                                         trailing: SizedBox(width: 90.0, child: TextField(
                                           keyboardType: TextInputType.number,
                                           inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
@@ -530,11 +530,11 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                                   child: Column(
                                     children: [
                                       ListTile(
-                                        title: Text("Combo", style: mainToggleInRules),
+                                        title: Text(t.calcDestination.combo, style: mainToggleInRules),
                                         trailing: Switch(value: rules.combo, onChanged: (v) => setState((){rules.combo = v;})),
                                       ),
                                       if (rules.combo) ListTile(
-                                        title: Text("Combo Table"),
+                                        title: Text(t.calcDestination.comboTable),
                                         trailing: DropdownButton(
                                           items: [for (var v in ComboTables.values) if (v != ComboTables.none) DropdownMenuItem(value: v.index, child: Text(comboTablesNames[v]!))],
                                           value: rules.comboTable.index,
@@ -548,11 +548,11 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                                   child: Column(
                                     children: [
                                       ListTile(
-                                        title: Text("Back-To-Back (B2B)", style: mainToggleInRules),
+                                        title: Text("${t.stats.b2b.full} (${t.stats.b2b.short})", style: mainToggleInRules),
                                         trailing: Switch(value: rules.b2b, onChanged: (v) => setState((){rules.b2b = v;})),
                                       ),
                                       if (rules.b2b) ListTile(
-                                        title: Text("Back-To-Back Chaining"),
+                                        title: Text(t.calcDestination.b2bChaining),
                                         trailing: Switch(value: rules.b2bChaining, onChanged: (v) => setState((){rules.b2bChaining = v;})),
                                       ),
                                     ],
@@ -562,11 +562,11 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                                   child: Column(
                                     children: [
                                       ListTile(
-                                        title: Text("Surge", style: mainToggleInRules),
+                                        title: Text(t.calcDestination.surge, style: mainToggleInRules),
                                         trailing: Switch(value: rules.surge, onChanged: (v) => setState((){rules.surge = v;})),
                                       ),
                                       if (rules.surge) ListTile(
-                                        title: Text("Starts at B2B"),
+                                        title: Text(t.calcDestination.surgeStartAtB2B),
                                         trailing: SizedBox(width: 90.0, child: TextField(
                                           keyboardType: TextInputType.number,
                                           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -575,7 +575,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                                         )),
                                       ),
                                       if (rules.surge) ListTile(
-                                        title: Text("Start amount"),
+                                        title: Text(t.calcDestination.surgeStartAmount),
                                         trailing: SizedBox(width: 90.0, child: TextField(
                                           keyboardType: TextInputType.number,
                                           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -617,13 +617,13 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
         if (widget.constraints.maxWidth > 768.0) SegmentedButton<CalcCards>(
           showSelectedIcon: false,
           segments: <ButtonSegment<CalcCards>>[
-            const ButtonSegment<CalcCards>(
+            ButtonSegment<CalcCards>(
                 value: CalcCards.calc,
-                label: Text('Stats Calculator'),
+                label: Text(t.calcNavigation.stats),
                 ),
             ButtonSegment<CalcCards>(
                 value: CalcCards.damage,
-                label: Text('Damage Calculator'),
+                label: Text(t.calcNavigation.damage),
                 ),
           ],
           selected: <CalcCards>{calcCard},

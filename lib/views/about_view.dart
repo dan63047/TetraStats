@@ -56,7 +56,7 @@ class AboutState extends State<AboutView> {
   void initState() {
     if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS){
       windowManager.getTitle().then((value) => oldWindowTitle = value);
-      windowManager.setTitle("Tetra Stats: ${t.settings}");
+      windowManager.setTitle(t.aboutView.title);
     }
     super.initState();
   }
@@ -69,15 +69,13 @@ class AboutState extends State<AboutView> {
 
   @override
   Widget build(BuildContext context) {
-    final t = Translations.of(context);
-    bool bigScreen = MediaQuery.of(context).size.width >= 368;
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
       floatingActionButton: Padding(
         padding: const EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 0.0),
         child: FloatingActionButton(
           onPressed: () => Navigator.pop(context),
-          tooltip: 'Fuck go back',
+          tooltip: t.goBackButton,
           child: const Icon(Icons.arrow_back),
         ),
       ),
@@ -89,7 +87,7 @@ class AboutState extends State<AboutView> {
           children: [
             Card(child: Center(child: Padding(
               padding: const EdgeInsets.fromLTRB(0.0, 6.0, 0.0, 18.0),
-              child: Text("About Tetra Stats", style: Theme.of(context).textTheme.titleLarge, textAlign: TextAlign.center),
+              child: Text(t.aboutView.title, style: Theme.of(context).textTheme.titleLarge, textAlign: TextAlign.center),
             ))),
             Column(
               mainAxisSize: MainAxisSize.min,
@@ -103,41 +101,38 @@ class AboutState extends State<AboutView> {
                         padding: const EdgeInsets.all(8.0),
                         child: Container(
                           constraints: BoxConstraints(maxWidth: 568.00),
-                          child: Text(
-                            textAlign: TextAlign.center,
-                            "Tetra Stats is a service, that works with TETR.IO Tetra Channel API, providing data from it and calculating some addtitional metrics, based on this data. Service allows user to track their progress in Tetra League with \"Track\" function, which records every Tetra League change into local database (not automatically, you have to visit service from time to time), so these changes could be looked through graphs.\n\nBeanserver blaster is a part of a Tetra Stats, that decoupled into a serverside script. It provides full Tetra League leaderboard, allowing Tetra Stats to sort leaderboard by any metric and build scatter chart, that allows user to analyse Tetra League trends. It also provides history of Tetra League ranks cutoffs, which can be viewed by user via graph as well.\n\nThere is a plans to add replay analysis and tournaments history, so stay tuned!\n\nService is not associated with TETR.IO or osk in any capacity."
-                          ),
+                          child: Text(textAlign: TextAlign.center, t.aboutView.about),
                         ),
                       ),
                     ),
                   ],
                 )),
-                AboutCard("App Version", packageInfo.version, "Build ${packageInfo.buildNumber}", [
+                AboutCard(t.aboutView.appVersion, packageInfo.version, t.aboutView.build(build: packageInfo.buildNumber), [
                   TextSpan(text: "${packageInfo.appName} (${packageInfo.packageName}) • "),
-                  TextSpan(text: "GitHub Repo", style: TextStyle(decoration: TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted, color: Theme.of(context).colorScheme.primary), recognizer: TapGestureRecognizer()..onTap = (){launchInBrowser(Uri.https("github.com", "dan63047/TetraStats"));}),
+                  TextSpan(text: t.aboutView.GHrepo, style: TextStyle(decoration: TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted, color: Theme.of(context).colorScheme.primary), recognizer: TapGestureRecognizer()..onTap = (){launchInBrowser(Uri.https("github.com", "dan63047/TetraStats"));}),
                   TextSpan(text: " • "),
-                  TextSpan(text: "Submit an issue", style: TextStyle(decoration: TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted, color: Theme.of(context).colorScheme.primary), recognizer: TapGestureRecognizer()..onTap = (){launchInBrowser(Uri.https("github.com", "dan63047/TetraStats/issues/new/choose"));}),
+                  TextSpan(text: t.aboutView.submitAnIssue, style: TextStyle(decoration: TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted, color: Theme.of(context).colorScheme.primary), recognizer: TapGestureRecognizer()..onTap = (){launchInBrowser(Uri.https("github.com", "dan63047/TetraStats/issues/new/choose"));}),
                 ]),
                 Card(child: Center(child: Padding(
                   padding: const EdgeInsets.fromLTRB(0.0, 6.0, 0.0, 18.0),
-                  child: Text("Credits", style: Theme.of(context).textTheme.titleLarge, textAlign: TextAlign.center),
+                  child: Text(t.aboutView.credits, style: Theme.of(context).textTheme.titleLarge, textAlign: TextAlign.center),
                 ))),
                 Wrap(
                   direction: Axis.horizontal,
                   children: [
-                    FractionallySizedBox(widthFactor: 1/((MediaQuery.of(context).size.width/600).ceil()), child: AboutCard("Autor & developer", "dan63", null, [
-                      TextSpan(text: "Support him!", style: TextStyle(decoration: TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted, color: Theme.of(context).colorScheme.primary), recognizer: TapGestureRecognizer()..onTap = (){launchInBrowser(Uri.https("dan63.by", "donate"));})
+                    FractionallySizedBox(widthFactor: 1/((MediaQuery.of(context).size.width/600).ceil()), child: AboutCard(t.aboutView.authorAndDeveloper, "dan63", null, [
+                      TextSpan(text: t.aboutView.supportHim, style: TextStyle(decoration: TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted, color: Theme.of(context).colorScheme.primary), recognizer: TapGestureRecognizer()..onTap = (){launchInBrowser(Uri.https("dan63.by", "donate"));})
                     ])),
-                    FractionallySizedBox(widthFactor: 1/((MediaQuery.of(context).size.width/600).ceil()), child: AboutCard("Provided formulas", "kerrmunism", null, [
+                    FractionallySizedBox(widthFactor: 1/((MediaQuery.of(context).size.width/600).ceil()), child: AboutCard(t.aboutView.providedFormulas, "kerrmunism", null, [
                       //TextSpan(text: "Support him!", style: TextStyle(decoration: TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted, color: Theme.of(context).colorScheme.primary), recognizer: TapGestureRecognizer()..onTap = (){launchInBrowser(Uri.https("paypal.com", "paypalme/Kerrmunism"));})
                     ])),
-                    FractionallySizedBox(widthFactor: 1/((MediaQuery.of(context).size.width/600).ceil()), child: AboutCard("Provided S1 history", "p1nkl0bst3r", null, [
+                    FractionallySizedBox(widthFactor: 1/((MediaQuery.of(context).size.width/600).ceil()), child: AboutCard(t.aboutView.providedS1history, "p1nkl0bst3r", null, [
                       //TextSpan(text: "Support him!", style: TextStyle(decoration: TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted, color: Theme.of(context).colorScheme.primary), recognizer: TapGestureRecognizer()..onTap = (){launchInBrowser(Uri.https("paypal.com", "paypalme/Kerrmunism"));})
                     ])),
-                    FractionallySizedBox(widthFactor: 1/((MediaQuery.of(context).size.width/600).ceil()), child: AboutCard("Inoue (replay grabber)", "szy", null, [
+                    FractionallySizedBox(widthFactor: 1/((MediaQuery.of(context).size.width/600).ceil()), child: AboutCard(t.aboutView.inoue, "szy", null, [
                       //TextSpan(text: "Support him!", style: TextStyle(decoration: TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted, color: Theme.of(context).colorScheme.primary), recognizer: TapGestureRecognizer()..onTap = (){launchInBrowser(Uri.https("paypal.com", "paypalme/Kerrmunism"));})
                     ])),
-                    FractionallySizedBox(widthFactor: 1/((MediaQuery.of(context).size.width/600).ceil()), child: AboutCard("Simplfied Chinise locale", "neko_ab4093", null, [
+                    FractionallySizedBox(widthFactor: 1/((MediaQuery.of(context).size.width/600).ceil()), child: AboutCard(t.aboutView.zhCNlocale, "neko_ab4093", null, [
                       //TextSpan(text: "Support him!", style: TextStyle(decoration: TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted, color: Theme.of(context).colorScheme.primary), recognizer: TapGestureRecognizer()..onTap = (){launchInBrowser(Uri.https("paypal.com", "paypalme/Kerrmunism"));})
                     ])),
                   ],

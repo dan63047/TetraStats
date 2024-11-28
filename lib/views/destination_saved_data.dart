@@ -42,7 +42,7 @@ class _DestinationSavedData extends State<DestinationSavedData> {
       leading: IconButton(
         onPressed: () {
           teto.deleteState(data.id+data.timestamp.millisecondsSinceEpoch.toRadixString(16)).then((value) => setState(() {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.stateRemoved(date: timestamp(data.timestamp)))));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.snackBarMessages.stateRemoved(date: timestamp(data.timestamp)))));
           }));
         },
         icon: Icon(Icons.delete_forever)
@@ -165,7 +165,7 @@ class _DestinationSavedData extends State<DestinationSavedData> {
                                   padding: const EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 0.0),
                                   child: FloatingActionButton(
                                     onPressed: () => Navigator.pop(context),
-                                    tooltip: 'Fuck go back',
+                                    tooltip: t.goBackButton,
                                     child: const Icon(Icons.arrow_back),
                                   ),
                                 ),

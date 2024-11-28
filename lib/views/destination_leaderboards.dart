@@ -37,14 +37,14 @@ enum Leaderboards{
 class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
   //Duration postSeasonLeft = seasonStart.difference(DateTime.now());
   final Map<Leaderboards, String> leaderboards = {
-    Leaderboards.tl: "Tetra League (Current Season)",
-    Leaderboards.fullTL: "Tetra League (Current Season, full one)",
-    Leaderboards.xp: "XP",
-    Leaderboards.ar: "Acievement Points",
-    Leaderboards.sprint: "40 Lines",
-    Leaderboards.blitz: "Blitz",
-    Leaderboards.zenith: "Quick Play",
-    Leaderboards.zenithex: "Quick Play Expert",
+    Leaderboards.tl: t.leaderboardsDestination.tl,
+    Leaderboards.fullTL: t.leaderboardsDestination.fullTL,
+    Leaderboards.xp: t.stats.xp.full,
+    Leaderboards.ar: t.leaderboardsDestination.ar,
+    Leaderboards.sprint: t.gamemodes["40l"]!,
+    Leaderboards.blitz: t.gamemodes["blitz"]!,
+    Leaderboards.zenith: t.gamemodes["zenith"]!,
+    Leaderboards.zenithex: t.gamemodes["zenithex"]!,
     };
   Leaderboards _currentLb = Leaderboards.tl;
   final StreamController<List<dynamic>> _dataStreamController = StreamController<List<dynamic>>.broadcast();
@@ -342,7 +342,7 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Spacer(),
-                    Text("Leaderboards", style: Theme.of(context).textTheme.headlineMedium!.copyWith(fontSize: 32)),
+                    Text(t.leaderboardsDestination.title, style: Theme.of(context).textTheme.headlineMedium!.copyWith(fontSize: 32)),
                     Spacer()
                   ],
                 ),
@@ -355,7 +355,7 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                       child: ListTile(
                         title: Text(leaderboards.values.elementAt(index)),
                         trailing: Icon(Icons.arrow_right, color: _currentLb.index == index ? Colors.white : Colors.grey),
-                        subtitle: index == 1 ? Text("Heavy, but allows you to sort players by their stats and filter them by ranks", style: TextStyle(color: Colors.grey, fontSize: 12)) : null,
+                        subtitle: index == 1 ? Text(t.leaderboardsDestination.fullTLnote, style: TextStyle(color: Colors.grey, fontSize: 12)) : null,
                         onTap: () {
                           if (widget.constraints.maxWidth <= transformThreshold) Navigator.push(
                             context,
@@ -366,7 +366,7 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                                   padding: const EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 0.0),
                                   child: FloatingActionButton(
                                     onPressed: () => Navigator.pop(context),
-                                    tooltip: 'Fuck go back',
+                                    tooltip: t.goBackButton,
                                     child: const Icon(Icons.arrow_back),
                                   ),
                                 ),

@@ -56,7 +56,7 @@ class BadgesThingy extends StatelessWidget{
                         ),
                         actions: <Widget>[
                           TextButton(
-                            child: Text(t.popupActions.ok),
+                            child: Text(t.actions.ok),
                             onPressed: () {
                               Navigator.of(context).pop();
                             },

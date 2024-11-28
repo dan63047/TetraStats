@@ -49,7 +49,7 @@ class UserState extends State<UserView> {
         padding: const EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 0.0),
         child: FloatingActionButton(
           onPressed: () => Navigator.pop(context),
-          tooltip: 'Fuck go back',
+          tooltip: t.goBackButton,
           child: const Icon(Icons.arrow_back),
         ),
       ),

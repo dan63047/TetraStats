@@ -4,13 +4,14 @@
         "ru": "Russian (Русский)",
         "zh-CN": "Simplified Chinese (简体中文)"
     },
-    "gamemodes":{
-        "tl": "Tetra League",
+    "gamemodes(map)":{
+        "league": "Tetra League",
         "zenith": "Quick Play",
         "zenithex": "Quick Play Expert",
         "40l": "40 Lines",
         "blitz": "Blitz",
-        "5mblast": "5,000,000 Blast"
+        "5mblast": "5,000,000 Blast",
+        "zen": "Zen"
     },
     "destinations": {
         "home": "Home",
@@ -26,6 +27,7 @@
     "nanow": "Not avaliable for now...",
     "seasonEnds": "Season ends in ${countdown}",
     "seasonEnded": "Season has ended",
+    "overallPB": "Overall PB: $pb",
     "gamesUntilRanked": "${left} games until being ranked",
     "numOfVictories": "~${wins} victories",
     "promotionOnNextWin": "Promotion on next win",
@@ -33,6 +35,7 @@
     "demotionOnNextLoss": "Demotion on next loss",
     "records": "Records",
     "nerdStats": "Nerd Stats",
+    "playstyles": "Playstyles",
     "horoscopes": "Horoscopes",
     "season": "Season",
     "smooth": "Smooth",
@@ -43,12 +46,15 @@
     "verdictBetter": "ahead",
     "verdictWorse": "behind",
     "localStanding": "local",
-    "xpProgressToNextLevel": "Progress to next level: $percentage",
-    "xpProgressTowardsGoal": "Progress from 0 XP to level $goal: $percentage ($left xp left)",
+    "xp": {
+        "title": "XP Level",
+        "progressToNextLevel": "Progress to next level: $percentage",
+        "progressTowardsGoal": "Progress from 0 XP to level $goal: $percentage ($left XP left)"
+    },
     "gametime":{
         "title": "Exact gametime",
         "gametimeAday": "$gametime a day in average",
-        "breakdown": "It's $years years,\nor $months months,\nor $days days,\nor$minutes minutes\nor $seconds seconds"
+        "breakdown": "It's $years years,\nor $months months,\nor $days days,\nor $minutes minutes\nor $seconds seconds"
     },
     "track": "Track",
     "stopTracking": "Stop tracking",
@@ -90,6 +96,15 @@
     "previousSeasons": "Previous Seasons",
     "recent": "Recent",
     "top": "Top",
+    "noRecord": "No record",
+    "sprintAndBlitsRelevance": "Relevance: ${date}",
+    "snackBarMessages":{
+        "stateRemoved": "${date} state was removed from database!",
+        "matchRemoved": "${date} match was removed from database!",
+        "notForWeb": "Function is not available for web version",
+        "importSuccess": "Import successful",
+        "importCancelled": "Import was cancelled"
+    },
     "errors": {
         "noRecords": "No records",
         "notEnoughData": "Not enough data",
@@ -125,7 +140,20 @@
         "cancel": "Cancel",
         "submit": "Submit",
         "ok": "OK",
+        "apply": "Apply",
         "refresh": "Refresh"
+    },
+    "graphsDestination": {
+        "fetchAndsaveTLHistory": "Get player history",
+        "fetchAndSaveOldTLmatches": "Get Tetra League matches history",
+        "fetchAndsaveTLHistoryResult": "${number} states was found",
+        "fetchAndSaveOldTLmatchesResult": "${number} matches was found",
+        "gamesPlayed": "$games played",
+        "dateAndTime": "Date & Time",
+        "filterModaleTitle": "Filter ranks on graph"
+    },
+    "filterModale":{
+        "all": "All"
     },
     "cutoffsDestination": {
         "title": "Tetra League State",
@@ -140,7 +168,9 @@
         "moreInfo": "More Info",
         "NumberOne": "№ 1 is $tr TR",
         "inflated": "Inflated on $tr TR",
+        "notInflated": "Not inflated",
         "deflated": "Deflated on $tr TR",
+        "notDeflated": "Not deflated",
         "wellDotDotDot": "Well...",
         "fromPlace": "from № $n",
         "viewButton": "View"
@@ -162,8 +192,74 @@
         "minimums": "Minimums",
         "maximums": "Maximums"
     },
+    "tlMatchView": {
+        "match": "Match",
+        "vs": "vs",
+        "winner": "Winner",
+        "roundNumber": "Round $n",
+        "statsFor": "Stats for",
+        "numberOfRounds": "Number of rounds",
+        "matchLength": "Match Length",
+        "roundLength": "Round Length",
+        "matchStats": "Match stats",
+        "downloadReplay": "Download .ttrm replay",
+        "openReplay": "Open replay in TETR.IO"
+    },
     "calcDestination": {
-        "tip": "Enter values and press \"Calc\" to see Nerd Stats for them"
+        "tip": "Enter values and press \"Calc\" to see Nerd Stats for them",
+        "statsCalcButton": "Calc",
+        "damageCalcTip": "Click on the actions on the left to add them here",
+        "actions": "Actions",
+        "results": "Results",
+        "rules": "Rules",
+        "noSpinClears": "No Spin Clears",
+        "spins": "Spins",
+        "miniSpins": "Mini spins",
+        "noLineclear": "No lineclear (Break Combo)",
+        "custom": "Custom",
+        "multiplier": "Multiplier",
+        "pcDamage": "Perfect Clear Damage",
+        "comboTable": "Combo Table",
+        "b2bChaining": "Back-To-Back Chaining",
+        "surgeStartAtB2B": "Starts at B2B",
+        "surgeStartAmount": "Start amount",
+        "totalDamage": "Total damage",
+        "lineclears": "Lineclears",
+        "combo": "Combo",
+        "surge": "Surge",
+        "pcs": "PCs"
+    },
+    "infoDestination": {
+        "title": "Information Center",
+        "sprintAndBlitzAverages": "40 Lines & Blitz Averages",
+        "sprintAndBlitzAveragesDescription": "Since calculating 40 Lines & Blitz averages is tedious process, it gets updated only once in a while. Click on the title of this card to see the full 40 Lines & Blitz averages table",
+        "tetraStatsWiki": "Tetra Stats Wiki",
+        "tetraStatsWikiDescription": "Find more information about Tetra Stats functions and statictic, that it provides",
+        "about": "About Tetra Stats",
+        "aboutDescription": "Developed by dan63\n"
+    },
+    "leaderboardsDestination": {
+        "title": "Leaderboards",
+        "tl": "Tetra League (Current Season)",
+        "fullTL": "Tetra League (Current Season, full one)",
+        "ar": "Acievement Points",
+        "fullTLnote": "Heavy, but allows you to sort players by their stats and filter them by ranks"
+    },
+    "settingsDestination": {
+        "title": "Settings",
+        "timestamps": "Timestamps",
+        "timestampsDescription": "You can choose, in which way timestamps shows time",
+        "timestampsAbsoluteGMT": "Absolute (GMT)",
+        "timestampsAbsoluteLocalTime": "Absolute (Your timezone)",
+        "timestampsRelative": "Relative",
+        "exportDB": "Export local database",
+        "desktopExportAlertTitle": "Desktop export",
+        "desktopExportText": "It seems like you using this app on desktop. Check your documents folder, you should find \"TetraStats.db\". Copy it somewhere",
+        "androidExportAlertTitle": "Android export",
+        "androidExportText": "Exported.\n${exportedDB}",
+        "importDB": "Import local database",
+        "importDBDescription": "Restore your backup. Notice that already stored database will be overwritten.",
+        "importWrongFileType": "Wrong file type"
     },
     "homeNavigation": {
         "overview": "Overview",
@@ -184,7 +280,31 @@
       "stats": "Stats Calculator",
       "damage": "Damage Calculator"
     },
+    "aboutView": {
+        "title": "About Tetra Stats",
+        "about": "Tetra Stats is a service, that works with TETR.IO Tetra Channel API, providing data from it and calculating some addtitional metrics, based on this data. Service allows user to track their progress in Tetra League with \"Track\" function, which records every Tetra League change into local database (not automatically, you have to visit service from time to time), so these changes could be looked through graphs.\n\nBeanserver blaster is a part of a Tetra Stats, that decoupled into a serverside script. It provides full Tetra League leaderboard, allowing Tetra Stats to sort leaderboard by any metric and build scatter chart, that allows user to analyse Tetra League trends. It also provides history of Tetra League ranks cutoffs, which can be viewed by user via graph as well.\n\nThere is a plans to add replay analysis and tournaments history, so stay tuned!\n\nService is not associated with TETR.IO or osk in any capacity.",
+        "appVersion": "App Version",
+        "build": "Build $build",
+        "GHrepo": "GitHub Repository",
+        "submitAnIssue": "Submit an issue",
+        "credits": "Credits",
+        "authorAndDeveloper": "Autor & developer",
+        "providedFormulas": "Provided formulas",
+        "providedS1history": "Provided S1 history",
+        "inoue": "Inoue (replay grabber)",
+        "zhCNlocale": "Simplfied Chinise locale",
+        "supportHim": "Support him!"
+    },
     "stats": {
+        "registrationDate": "Registration Date",
+        "gametime": "Time Played",
+        "ogp": "Online Games Played",
+        "ogw": "Online Games Won",
+        "followers": "Followers",
+        "xp": {
+            "short": "XP",
+            "full": "Experience Points"
+        },
         "tr": {
             "short": "TR",
             "full": "Tetra Rating"
@@ -200,6 +320,10 @@
         "glixare": {
             "short": "GXE",
             "full": "GLIXARE"
+        },
+        "s1tr": {
+            "short": "S1 TR",
+            "full": "Season 1 like TR"
         },
         "gp":{
             "short": "GP",
@@ -229,6 +353,10 @@
             "short": "APP",
             "full": "Attack Per Piece"
         },
+        "vsapm":{
+            "short": "VS/APM",
+            "full": "VS / APM"
+        },
         "dss":{
             "short": "DS/S",
             "full": "Downstack Per Second"
@@ -236,6 +364,10 @@
         "dsp":{
             "short": "DS/P",
             "full": "Downstack Per Piece"
+        },
+        "appdsp": {
+            "short": "APP+DSP",
+            "full": "APP + DSP"
         },
         "cheese":{
             "short": "Cheese",
@@ -304,6 +436,10 @@
             "full": "Finesse",
             "widgetTitle": "inesse"
         },
+        "finesseFaults":{
+            "short": "FF",
+            "full": "Finesse Faults"
+        },
         "totalTime":{
             "short": "Time",
             "full": "Total Time",
@@ -313,12 +449,43 @@
             "short": "Lvl",
             "full": "Level"
         },
+        "pieces": {
+            "short": "P",
+            "full": "Pieces"
+        },
+        "spp": {
+            "short": "SPP",
+            "full": "Score Per Piece"
+        },
+        "kp": {
+            "short": "KP",
+            "full": "Key presses"
+        },
+        "kpp": {
+            "short": "KPP",
+            "full": "Key presses Per Piece"
+        },
+        "kps": {
+            "short": "KPS",
+            "full": "Key presses Per Second"
+        },
+        "blitzScore": "$p points",
+        "levelUpRequirement": "Level up requirement: $p",
+        "piecesTotal": "Total pieces placed",
+        "piecesWithPerfectFinesse": "Placed with perfect finesse",
+        "score": "Score",
+        "lines": "Lines",
+        "pcs": "Perfect Clears",
+        "holds": "Holds",
         "spike": "Top Spike",
         "top": "Top $percentage",
         "topRank": "Top rank: $rank",
         "floor": "Floor",
         "split": "Split",
         "total": "Total",
+        "sent": "Sent",
+        "received": "Received",
+        "placement": "Placement",
         "qpWithMods(plural)": {
             "one": "With 1 mod",
             "two": "With $n mods",
@@ -342,7 +509,7 @@
             "many": "$n T-spins total",
             "other": "$n T-spins total"
         },
-        "lineClears(plural)": {
+        "linesCleared(plural)": {
             "zero": "$n lines cleared",
             "one": "$n line cleared",
             "two": "$n lines cleared",
@@ -372,7 +539,7 @@
             "many": "$n games",
             "other": "$n games"
         },
-        "lineClears(map)": {
+        "lineClear": {
             "single": "Single",
             "double": "Double",
             "triple": "Triple",
@@ -395,8 +562,19 @@
             "eicosa": "Eicosa",
             "kagaris": "Kagaris"
         },
+        "lineClears": {
+            "zero": "Zeros",
+            "single": "Singles",
+            "double": "Doubles",
+            "triple": "Triples",
+            "quad": "Quads",
+            "penta": "Pentas"
+        },
+        "mini": "Mini",
         "tSpin": "T-spin",
-        "spin": "Spin"
+        "tSpins": "T-spins",
+        "spin": "Spin",
+        "spins": "Spins"
     },
     "countries(map)": {
         "": "Worldwide",

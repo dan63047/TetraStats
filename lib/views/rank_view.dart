@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tetra_stats/data_objects/cutoff_tetrio.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/widgets/future_error.dart';
@@ -36,70 +37,70 @@ class _RankState extends State<RankView> {
     return Column(
       children: [
         Divider(),
-          Text("Average Stats", style: Theme.of(context).textTheme.displayLarge),
-          Text("${f2.format(data != null ? data[0].apm : widget.cutoffTetrio.apm)} APM • ${f2.format(data != null ? data[0].pps : widget.cutoffTetrio.pps)} PPS • ${f2.format(data != null ? data[0].vs : widget.cutoffTetrio.vs)} VS", style: Theme.of(context).textTheme.displayLarge),
+          Text(t.rankView.avgStats, style: Theme.of(context).textTheme.displayLarge),
+          Text("${f2.format(data != null ? data[0].apm : widget.cutoffTetrio.apm)} ${t.stats.apm.short} • ${f2.format(data != null ? data[0].pps : widget.cutoffTetrio.pps)} ${t.stats.pps.short} • ${f2.format(data != null ? data[0].vs : widget.cutoffTetrio.vs)} ${t.stats.vs.short}", style: Theme.of(context).textTheme.displayLarge),
           Divider(),
-          Center(child: Text("Average Nerd Stats", style: Theme.of(context).textTheme.displayLarge)),
+          Center(child: Text(t.rankView.avgNerdStats, style: Theme.of(context).textTheme.displayLarge)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Attack Per Piece", style: Theme.of(context).textTheme.displayLarge),
+              Text(t.stats.app.full, style: Theme.of(context).textTheme.displayLarge),
               Text(f3.format(data != null ? data[1]["avgAPP"] : widget.cutoffTetrio.nerdStats?.app), style: Theme.of(context).textTheme.displayLarge)
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("VS / APM", style: Theme.of(context).textTheme.displayLarge),
+              Text(t.stats.vsapm.full, style: Theme.of(context).textTheme.displayLarge),
               Text(f3.format(data != null ? data[1]["avgVSAPM"] : widget.cutoffTetrio.nerdStats?.vsapm), style: Theme.of(context).textTheme.displayLarge)
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Downstack Per Second", style: Theme.of(context).textTheme.displayLarge),
+              Text(t.stats.dss.full, style: Theme.of(context).textTheme.displayLarge),
               Text(f3.format(data != null ? data[1]["avgDSS"] : widget.cutoffTetrio.nerdStats?.dss), style: Theme.of(context).textTheme.displayLarge)
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Downstack Per Piece", style: Theme.of(context).textTheme.displayLarge),
+              Text(t.stats.dsp.full, style: Theme.of(context).textTheme.displayLarge),
               Text(f3.format(data != null ? data[1]["avgDSP"] : widget.cutoffTetrio.nerdStats?.dsp), style: Theme.of(context).textTheme.displayLarge)
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("APP + DSP", style: Theme.of(context).textTheme.displayLarge),
+              Text(t.stats.appdsp.full, style: Theme.of(context).textTheme.displayLarge),
               Text(f3.format(data != null ? data[1]["avgAPPDSP"] : widget.cutoffTetrio.nerdStats?.appdsp), style: Theme.of(context).textTheme.displayLarge)
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Cheese Index", style: Theme.of(context).textTheme.displayLarge),
+              Text(t.stats.cheese.full, style: Theme.of(context).textTheme.displayLarge),
               Text(f2.format(data != null ? data[1]["avgCheese"] : widget.cutoffTetrio.nerdStats?.cheese), style: Theme.of(context).textTheme.displayLarge)
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Garbage Efficiency", style: Theme.of(context).textTheme.displayLarge),
+              Text(t.stats.gbe.full, style: Theme.of(context).textTheme.displayLarge),
               Text(f3.format(data != null ? data[1]["avgGBE"] : widget.cutoffTetrio.nerdStats?.gbe), style: Theme.of(context).textTheme.displayLarge)
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Weighted APP", style: Theme.of(context).textTheme.displayLarge),
+              Text(t.stats.nyaapp.full, style: Theme.of(context).textTheme.displayLarge),
               Text(f3.format(data != null ? data[1]["avgNyaAPP"] : widget.cutoffTetrio.nerdStats?.nyaapp), style: Theme.of(context).textTheme.displayLarge)
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Area", style: Theme.of(context).textTheme.displayLarge),
+              Text(t.stats.area.full, style: Theme.of(context).textTheme.displayLarge),
               Text(f1.format(data != null ? data[1]["avgArea"] : widget.cutoffTetrio.nerdStats?.area), style: Theme.of(context).textTheme.displayLarge)
             ],
           ), 
@@ -255,7 +256,7 @@ class _RankState extends State<RankView> {
         padding: const EdgeInsets.fromLTRB(8.0, 4.0, 0.0, 0.0),
         child: FloatingActionButton(
           onPressed: () => Navigator.pop(context),
-          tooltip: 'Fuck go back',
+          tooltip: t.goBackButton,
           child: const Icon(Icons.arrow_back),
         ),
       ),

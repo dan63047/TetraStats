@@ -114,7 +114,7 @@ class TLRatingThingy extends StatelessWidget{
                     children: [
                       TextSpan(text: prefs.getInt("ratingMode") == 2 ? "${f2.format(tlData.tr)} TR  • % ${t.rank}: ${tlData.percentileRank.toUpperCase()}" : "${t.top} ${f2.format(tlData.percentile * 100)}% (${tlData.percentileRank.toUpperCase()})"),
                       if (tlData.bestRank != "z") const TextSpan(text: " • "),
-                      if (tlData.bestRank != "z") TextSpan(text: "${t.topRank}: ${tlData.bestRank.toUpperCase()}"),
+                      if (tlData.bestRank != "z") TextSpan(text: t.stats.topRank(rank: tlData.bestRank.toUpperCase())),
                       if (topTR != null) TextSpan(text: " (${f2.format(topTR)} TR)"),
                       TextSpan(text: " • ${prefs.getInt("ratingMode") == 1 ? "${f2.format(tlData.tr)} TR • RD: " : "Glicko: ${tlData.glicko != null ? f2.format(tlData.glicko) : "---"}±"}"),
                       TextSpan(text: f2.format(tlData.rd!), style: tlData.decaying ? TextStyle(color: tlData.rd! > 98 ? Colors.red : Colors.yellow) : null),

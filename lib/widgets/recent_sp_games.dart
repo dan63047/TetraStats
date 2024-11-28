@@ -37,7 +37,7 @@ class RecentSingleplayerGames extends StatelessWidget{
           title: Text(
             switch (record.gamemode){
               "40l" => get40lTime(record.stats.finalTime.inMicroseconds),
-              "blitz" => t.blitzScore(p: NumberFormat.decimalPattern().format(record.stats.score)),
+              "blitz" => t.stats.blitzScore(p: NumberFormat.decimalPattern().format(record.stats.score)),
               "5mblast" => get40lTime(record.stats.finalTime.inMicroseconds),
               String() => "huh",
             },

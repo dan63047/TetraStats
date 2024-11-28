@@ -13,14 +13,6 @@ class NewsThingy extends StatelessWidget{
   const NewsThingy(this.news, {super.key});
 
   ListTile getNewsTile(NewsEntry news){
-    Map<String, String> gametypes = {
-      "40l": t.sprint,
-      "blitz": t.blitz,
-      "5mblast": "5,000,000 Blast",
-      "zenith": "Quick Play",
-      "zenithex": "Quick Play Expert",
-    };
-
     // Individuly handle each entry type
     switch (news.type) {
       case "leaderboard":
@@ -32,7 +24,7 @@ class NewsThingy extends StatelessWidget{
               children: [
                 TextSpan(text: "№${news.data["rank"]} ", style: const TextStyle(fontWeight: FontWeight.bold)),
                 TextSpan(text: t.newsParts.leaderboardMiddle),
-                TextSpan(text: "№${gametypes[news.data["gametype"]]}", style: const TextStyle(fontWeight: FontWeight.bold)),
+                TextSpan(text: "№${t.gamemodes[news.data["gametype"]]}", style: const TextStyle(fontWeight: FontWeight.bold)),
               ]
             )
           ),
@@ -45,7 +37,7 @@ class NewsThingy extends StatelessWidget{
               style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16, color: Colors.white),
               text: t.newsParts.personalbest,
               children: [
-                TextSpan(text: "${gametypes[news.data["gametype"]]} ", style: const TextStyle(fontWeight: FontWeight.bold)),
+                TextSpan(text: "${t.gamemodes[news.data["gametype"]]} ", style: const TextStyle(fontWeight: FontWeight.bold)),
                 TextSpan(text: t.newsParts.personalbestMiddle),
                 TextSpan(text: switch (news.data["gametype"]){
                   "blitz" => NumberFormat.decimalPattern().format(news.data["result"]),

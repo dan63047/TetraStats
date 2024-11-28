@@ -355,9 +355,9 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
                 trailing:  DropdownButton(
                   value: timestampMode,
                   items: <DropdownMenuItem>[
-                    DropdownMenuItem(value: 0, child: Text(t.timestampsAbsoluteGMT)),
-                    DropdownMenuItem(value: 1, child: Text(t.timestampsAbsoluteLocalTime)),
-                    DropdownMenuItem(value: 2, child: Text(t.timestampsRelative))
+                    DropdownMenuItem(value: 0, child: Text(t.settingsDestination.timestampsAbsoluteGMT)),
+                    DropdownMenuItem(value: 1, child: Text(t.settingsDestination.timestampsAbsoluteLocalTime)),
+                    DropdownMenuItem(value: 2, child: Text(t.settingsDestination.timestampsRelative))
                   ],
                   onChanged: (dynamic value){
                     prefs.setInt("timestampMode", value);
@@ -491,7 +491,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
             title: Text("Export Database", style: Theme.of(context).textTheme.displayLarge),
             onTap: () {
               if (kIsWeb){
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.notForWeb)));
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.snackBarMessages.notForWeb)));
               } else if (Platform.isAndroid){
                 var downloadFolder = Directory("/storage/emulated/0/Download");
                 File exportedDB = File("${downloadFolder.path}/TetraStats.db");
@@ -500,15 +500,15 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
                   showDialog(
                     context: context,
                     builder: (BuildContext context) => AlertDialog(
-                          title: Text(t.androidExportAlertTitle,
+                          title: Text(t.settingsDestination.androidExportAlertTitle,
                               style: const TextStyle(
                                   fontFamily: "Eurostile Round Extended")),
                           content: SingleChildScrollView(
-                            child: ListBody(children: [Text(t.androidExportText(exportedDB: exportedDB))]),
+                            child: ListBody(children: [Text(t.settingsDestination.androidExportText(exportedDB: exportedDB))]),
                           ),
                           actions: <Widget>[
                             TextButton(
-                              child: Text(t.popupActions.ok),
+                              child: Text(t.actions.ok),
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
@@ -520,17 +520,17 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
                 showDialog(
                   context: context,
                   builder: (BuildContext context) => AlertDialog(
-                    title: Text(t.desktopExportAlertTitle,
+                    title: Text(t.settingsDestination.desktopExportAlertTitle,
                         style: const TextStyle(
                             fontFamily: "Eurostile Round Extended")),
                     content: SingleChildScrollView(
                       child: ListBody(children: [
-                        Text(t.desktopExportText)
+                        Text(t.settingsDestination.desktopExportText)
                       ]),
                     ),
                     actions: <Widget>[
                       TextButton(
-                        child: Text(t.popupActions.ok),
+                        child: Text(t.actions.ok),
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
@@ -546,7 +546,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
             title: Text("Import Database", style: Theme.of(context).textTheme.displayLarge),
             onTap: (){
               if (kIsWeb){
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.notForWeb)));
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.snackBarMessages.notForWeb)));
               }else if(Platform.isAndroid){
                 FilePicker.platform.pickFiles(
                   type: FileType.any,
@@ -560,7 +560,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
                         var oldDB = File("${value.path}/TetraStats.db");
                         oldDB.writeAsBytes(File(newDB).readAsBytesSync()).then((value){
                           teto.open();
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.importSuccess)));
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.snackBarMessages.importSuccess)));
                         });
                       });
                     });
@@ -569,7 +569,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
                     }
                   });
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.importCancelled)));
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.snackBarMessages.importCancelled)));
                 }
               }); 
               }else{
@@ -587,7 +587,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
                         var oldDB = File("${value.path}/TetraStats.db");
                         oldDB.writeAsBytes(File(newDB).readAsBytesSync()).then((value){
                           teto.open();
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.importSuccess)));
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.snackBarMessages.importSuccess)));
                         });
                       });
                     });
@@ -596,7 +596,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
                     }
                   });
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.importCancelled)));
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.snackBarMessages.importCancelled)));
                 }
               }); 
               }
@@ -661,7 +661,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
                             padding: const EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 0.0),
                             child: FloatingActionButton(
                               onPressed: () => Navigator.pop(context),
-                              tooltip: 'Fuck go back',
+                              tooltip: t.goBackButton,
                               child: const Icon(Icons.arrow_back),
                             ),
                           ),

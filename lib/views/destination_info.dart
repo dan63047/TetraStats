@@ -78,8 +78,8 @@ class _DestinationInfo extends State<DestinationInfo> {
         height: widget.constraints.maxHeight - 77,
         viewportWidth: widget.constraints.maxWidth,
         assetLink: "res/images/info card 1 focus.png",
-        title: "40 Lines & Blitz Averages",
-        description: "Since calculating 40 Lines & Blitz averages is tedious process, it gets updated only once in a while. Click on the title of this card to see the full 40 Lines & Blitz averages table\n\n${t.sprintAndBlitsRelevance(date: DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).format(sprintAndBlitzRelevance))}",
+        title: t.infoDestination.sprintAndBlitzAverages,
+        description: "${t.infoDestination.sprintAndBlitzAveragesDescription}\n\n${t.sprintAndBlitsRelevance(date: DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).format(sprintAndBlitzRelevance))}",
         onPressed: (){
           Navigator.push(context, MaterialPageRoute(
             builder: (context) => SprintAndBlitzView(),
@@ -90,8 +90,8 @@ class _DestinationInfo extends State<DestinationInfo> {
         height: widget.constraints.maxHeight - 77,
         viewportWidth: widget.constraints.maxWidth,
         assetLink: "res/images/Снимок экрана_2023-11-06_01-00-50.png",
-        title: "Tetra Stats Wiki",
-        description: "Find more information about Tetra Stats functions and statictic, that it provides",
+        title: t.infoDestination.tetraStatsWiki,
+        description: t.infoDestination.tetraStatsWikiDescription,
         onPressed: (){
           launchInBrowser(Uri.https("github.com", "dan63047/TetraStats/wiki"));
         }
@@ -100,8 +100,8 @@ class _DestinationInfo extends State<DestinationInfo> {
         height: widget.constraints.maxHeight - 77,
         viewportWidth: widget.constraints.maxWidth,
         assetLink: "res/images/Снимок экрана_2023-11-06_01-00-50.png",
-        title: "About Tetra Stats",
-        description: "Developed by dan63\n",
+        title: t.infoDestination.about,
+        description: t.infoDestination.aboutDescription,
         onPressed: (){
           Navigator.push(context, MaterialPageRoute(
             builder: (context) => AboutView(),
@@ -114,7 +114,7 @@ class _DestinationInfo extends State<DestinationInfo> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Card(
-          child: Center(child: Text("Information Center", style: Theme.of(context).textTheme.titleLarge)),
+          child: Center(child: Text(t.infoDestination.title, style: Theme.of(context).textTheme.titleLarge)),
         ),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,

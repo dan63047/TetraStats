@@ -215,14 +215,14 @@ class _UserThingyState extends State<UserThingy> with SingleTickerProviderStateM
                                         showLabels: false
                                         ),
                                     ),
-                                    Text("${t.statCellNum.xpProgress}: ${((widget.player.level - widget.player.level.floor()) * 100).toStringAsFixed(2)} %"),
-                                    Text("${t.statCellNum.xpFrom0ToLevel(n: xpTableScuffed.keys.toList()[xpTableID])}: ${((widget.player.xp / xpTableScuffed.values.toList()[xpTableID]) * 100).toStringAsFixed(2)} % (${NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 0).format(xpTableScuffed.values.toList()[xpTableID] - widget.player.xp)} ${t.statCellNum.xpLeft})")
+                                    Text(t.xp.progressToNextLevel(percentage: percentage.format((widget.player.level - widget.player.level.floor())))),
+                                    Text(t.xp.progressTowardsGoal(goal: xpTableScuffed.keys.toList()[xpTableID], percentage: percentage.format(widget.player.xp / xpTableScuffed.values.toList()[xpTableID]), left: NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 0).format(xpTableScuffed.values.toList()[xpTableID] - widget.player.xp)))
                                     ]
                                     ),
                                 ),
                                 actions: <Widget>[
                                   TextButton(
-                                    child: const Text("OK"),
+                                    child: Text(t.actions.ok),
                                     onPressed: () {Navigator.of(context).pop();}
                                   )  
                                 ]
@@ -236,7 +236,7 @@ class _UserThingyState extends State<UserThingy> with SingleTickerProviderStateM
                             showDialog(
                               context: context,
                               builder: (BuildContext context) => AlertDialog(
-                                title: Text(t.exactGametime, textAlign: TextAlign.center),  
+                                title: Text(t.gametime.title, textAlign: TextAlign.center),  
                                 content: SingleChildScrollView(
                                   child: Column(
                                     children: [
@@ -248,15 +248,20 @@ class _UserThingyState extends State<UserThingy> with SingleTickerProviderStateM
                                         TextSpan(text: ".${nonsecs3.format(widget.player.gameTime.inMicroseconds%1000000)}", style: TextStyle(fontSize: 14))
                                       ]
                                     )),
-                                    Text("${playtime(avgGametimeADay)} a day in average"),
+                                    Text(t.gametime.gametimeAday(gametime: playtime(avgGametimeADay))),
                                     Padding(
                                       padding: const EdgeInsets.only(top: 8.0),
-                                      child: Text("It's ${f4.format(widget.player.gameTime.inSeconds/31536000)} years,"),
-                                    ),
-                                    Text("or ${f4.format(widget.player.gameTime.inSeconds/2628000)} months,"),
-                                    Text("or ${f4.format(widget.player.gameTime.inSeconds/86400)} days,"),
-                                    Text("or ${f2.format(widget.player.gameTime.inMilliseconds/60000)} minutes,"),
-                                    Text("or ${intf.format(widget.player.gameTime.inSeconds)} seconds"),
+                                      child: Text(
+                                        textAlign: TextAlign.center,
+                                        t.gametime.breakdown(
+                                          years: f4.format(widget.player.gameTime.inSeconds/31536000),
+                                          months: f4.format(widget.player.gameTime.inSeconds/2628000),
+                                          days: f4.format(widget.player.gameTime.inSeconds/86400),
+                                          minutes: f2.format(widget.player.gameTime.inMilliseconds/60000),
+                                          seconds: intf.format(widget.player.gameTime.inSeconds)
+                                        )
+                                      ),
+                                    )
                                     ]
                                     ),
                                 ),

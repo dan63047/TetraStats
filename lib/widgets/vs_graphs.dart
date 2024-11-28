@@ -227,13 +227,13 @@ class VsGraphs extends StatelessWidget{
                 getTitle: (index, angle) {
                   switch (index) {
                     case 0:
-                      return RadarChartTitle(text: t.graphs.attack, angle: 0, positionPercentageOffset: 0.05);
+                      return RadarChartTitle(text: t.stats.graphs.attack, angle: 0, positionPercentageOffset: 0.05);
                     case 1:
-                      return RadarChartTitle(text: t.graphs.speed, angle: 0, positionPercentageOffset: 0.05);
+                      return RadarChartTitle(text: t.stats.graphs.speed, angle: 0, positionPercentageOffset: 0.05);
                     case 2:
-                      return RadarChartTitle(text: t.graphs.defense, angle: angle + 180, positionPercentageOffset: 0.05);
+                      return RadarChartTitle(text: t.stats.graphs.defense, angle: angle + 180, positionPercentageOffset: 0.05);
                     case 3:
-                      return RadarChartTitle(text: t.graphs.cheese, angle: 0, positionPercentageOffset: 0.05);
+                      return RadarChartTitle(text: t.stats.graphs.cheese, angle: 0, positionPercentageOffset: 0.05);
                     default:
                       return const RadarChartTitle(text: '');
                   }

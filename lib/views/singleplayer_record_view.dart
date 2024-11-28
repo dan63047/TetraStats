@@ -21,7 +21,7 @@ class SingleplayerRecordView extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16.0, 8.0, 0.0, 0.0),
         child: FloatingActionButton(
           onPressed: () => Navigator.pop(context),
-          tooltip: 'Fuck go back',
+          tooltip: t.goBackButton,
           child: const Icon(Icons.arrow_back),
         ),
       ),
