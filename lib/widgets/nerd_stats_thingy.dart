@@ -60,7 +60,7 @@ class NerdStatsThingy extends StatelessWidget{
                 text: TextSpan(
                   style: const TextStyle(fontFamily: "Eurostile Round"),
                   children: [
-                    const TextSpan(text: "APP\n"),
+                    TextSpan(text: "${t.stats.app.short}\n"),
                     TextSpan(text: f3.format(nerdStats.app), style: TextStyle(fontSize: 25, fontFamily: "Eurostile Round Extended", fontWeight: FontWeight.w100, color: getStatColor(nerdStats.app, averages?.nerdStats?.app, true))),
                     if (lbPos != null) TextSpan(text: lbPos!.app!.position >= 1000 ? "\n${t.top} ${f2.format(lbPos!.app!.percentage*100)}%" : "\n№${lbPos!.app!.position}", style: TextStyle(color: getColorOfRank(lbPos!.app!.position))),
                     if (oldNerdStats != null) TextSpan(text: "\n${comparef.format(nerdStats.app - oldNerdStats!.app)}", style: TextStyle(color: getDifferenceColor(nerdStats.app - oldNerdStats!.app)))
@@ -101,7 +101,7 @@ class NerdStatsThingy extends StatelessWidget{
                     text: TextSpan(
                       style: const TextStyle(fontFamily: "Eurostile Round"),
                       children: [
-                        const TextSpan(text: "VS/APM\n"),
+                        TextSpan(text: "${t.stats.vsapm.short}\n"),
                         TextSpan(text: f3.format(nerdStats.vsapm), style: TextStyle(fontSize: 25, fontFamily: "Eurostile Round Extended", fontWeight: FontWeight.w100, color: getStatColor(nerdStats.vsapm, averages?.nerdStats?.vsapm, true))),
                         if (lbPos != null) TextSpan(text: lbPos!.vsapm!.position >= 1000 ? "\n${t.top} ${f2.format(lbPos!.vsapm!.percentage*100)}%" : "\n№${lbPos!.vsapm!.position}", style: TextStyle(color: getColorOfRank(lbPos!.vsapm!.position))),
                         if (oldNerdStats != null) TextSpan(text: "\n${comparef.format(nerdStats.vsapm - oldNerdStats!.vsapm)}", style: TextStyle(color: getDifferenceColor(nerdStats.vsapm - oldNerdStats!.vsapm))),
@@ -125,13 +125,13 @@ class NerdStatsThingy extends StatelessWidget{
       runSpacing: 10.0,
       runAlignment: WrapAlignment.start,
       children: [
-        GaugetThingy(value: nerdStats.dss, oldValue: oldNerdStats?.dss, min: 0, max: 1.0, tickInterval: .2, label: "DS/S", sideSize: 128.0, fractionDigits: 3, moreIsBetter: true, avgValue: averages?.nerdStats?.dss, lbPos: lbPos?.dss),
-        GaugetThingy(value: nerdStats.dsp, oldValue: oldNerdStats?.dsp, min: 0, max: 1.0, tickInterval: .2, label: "DS/P", sideSize: 128.0, fractionDigits: 3, moreIsBetter: true, avgValue: averages?.nerdStats?.dsp, lbPos: lbPos?.dsp),
-        GaugetThingy(value: nerdStats.appdsp, oldValue: oldNerdStats?.appdsp, min: 0, max: 1.2, tickInterval: .2, label: "APP+DS/P", sideSize: 128.0, fractionDigits: 3, moreIsBetter: true, avgValue: averages?.nerdStats?.appdsp, lbPos: lbPos?.appdsp),
-        GaugetThingy(value: nerdStats.cheese, oldValue: oldNerdStats?.cheese, min: -80, max: 80, tickInterval: 40, label: "Cheese", sideSize: 128.0, fractionDigits: 2, moreIsBetter: false, lbPos: lbPos?.cheese),
-        GaugetThingy(value: nerdStats.gbe, oldValue: oldNerdStats?.gbe, min: 0, max: 1.0, tickInterval: .2, label: "GbE", sideSize: 128.0, fractionDigits: 3, moreIsBetter: true, avgValue: averages?.nerdStats?.gbe, lbPos: lbPos?.gbe),
-        GaugetThingy(value: nerdStats.nyaapp, oldValue: oldNerdStats?.nyaapp, min: 0, max: 1.2, tickInterval: .2, label: "wAPP", sideSize: 128.0, fractionDigits: 3, moreIsBetter: true, avgValue: averages?.nerdStats?.nyaapp, lbPos: lbPos?.nyaapp),
-        GaugetThingy(value: nerdStats.area, oldValue: oldNerdStats?.area, min: 0, max: 1000, tickInterval: 100, label: "Area", sideSize: 128.0, fractionDigits: 1, moreIsBetter: true, avgValue: averages?.nerdStats?.area, lbPos: lbPos?.area),
+        GaugetThingy(value: nerdStats.dss, oldValue: oldNerdStats?.dss, min: 0, max: 1.0, tickInterval: .2, label: t.stats.dss.short, sideSize: 128.0, fractionDigits: 3, moreIsBetter: true, avgValue: averages?.nerdStats?.dss, lbPos: lbPos?.dss),
+        GaugetThingy(value: nerdStats.dsp, oldValue: oldNerdStats?.dsp, min: 0, max: 1.0, tickInterval: .2, label: t.stats.dsp.short, sideSize: 128.0, fractionDigits: 3, moreIsBetter: true, avgValue: averages?.nerdStats?.dsp, lbPos: lbPos?.dsp),
+        GaugetThingy(value: nerdStats.appdsp, oldValue: oldNerdStats?.appdsp, min: 0, max: 1.2, tickInterval: .2, label: t.stats.appdsp.short, sideSize: 128.0, fractionDigits: 3, moreIsBetter: true, avgValue: averages?.nerdStats?.appdsp, lbPos: lbPos?.appdsp),
+        GaugetThingy(value: nerdStats.cheese, oldValue: oldNerdStats?.cheese, min: -80, max: 80, tickInterval: 40, label: t.stats.cheese.short, sideSize: 128.0, fractionDigits: 2, moreIsBetter: false, lbPos: lbPos?.cheese),
+        GaugetThingy(value: nerdStats.gbe, oldValue: oldNerdStats?.gbe, min: 0, max: 1.0, tickInterval: .2, label: t.stats.gbe.short, sideSize: 128.0, fractionDigits: 3, moreIsBetter: true, avgValue: averages?.nerdStats?.gbe, lbPos: lbPos?.gbe),
+        GaugetThingy(value: nerdStats.nyaapp, oldValue: oldNerdStats?.nyaapp, min: 0, max: 1.2, tickInterval: .2, label: t.stats.nyaapp.short, sideSize: 128.0, fractionDigits: 3, moreIsBetter: true, avgValue: averages?.nerdStats?.nyaapp, lbPos: lbPos?.nyaapp),
+        GaugetThingy(value: nerdStats.area, oldValue: oldNerdStats?.area, min: 0, max: 1000, tickInterval: 100, label: t.stats.area.short, sideSize: 128.0, fractionDigits: 1, moreIsBetter: true, avgValue: averages?.nerdStats?.area, lbPos: lbPos?.area),
       ],
     );
   }

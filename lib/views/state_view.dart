@@ -30,7 +30,7 @@ class StateState extends State<StateView> {
     _scrollController = ScrollController();
     if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS){
       windowManager.getTitle().then((value) => oldWindowTitle = value);
-      windowManager.setTitle("State from ${timestamp(widget.state.timestamp)}");
+      windowManager.setTitle(t.stateView.title(date: timestamp(widget.state.timestamp)));
     }
     super.initState();
   }
@@ -47,7 +47,7 @@ class StateState extends State<StateView> {
     //final t = Translations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text("State from ${timestamp(widget.state.timestamp)}", style: Theme.of(context).textTheme.titleMedium!.copyWith(fontSize: 28)),
+        title: Text(t.stateView.title(date: timestamp(widget.state.timestamp)), style: Theme.of(context).textTheme.titleMedium!.copyWith(fontSize: 28)),
       ),
       backgroundColor: Colors.black,
       body: SafeArea(

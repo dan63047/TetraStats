@@ -129,7 +129,7 @@ class _UserThingyState extends State<UserThingy> with SingleTickerProviderStateM
                     top: widget.player.bannerRevision != null ? 120.0 : 40.0,
                     left: 160.0,
                     child: Tooltip(
-                      message: "${widget.player.userId}\n(Click to copy user ID)",
+                      message: "${widget.player.userId}\n(${t.copyUserID})",
                       child: RichText(text: TextSpan(text: widget.player.username, style: TextStyle(
                           fontFamily: fontStyle(widget.player.username.length),
                           fontSize: 28,
@@ -194,11 +194,11 @@ class _UserThingyState extends State<UserThingy> with SingleTickerProviderStateM
                             showDialog(
                               context: context,
                               builder: (BuildContext context) => AlertDialog(
-                                title: Text("Level ${intf.format(widget.player.level.floor())}", textAlign: TextAlign.center),  
+                                title: Text("${t.stats.level.full} ${intf.format(widget.player.level.floor())}", textAlign: TextAlign.center),  
                                 content: SingleChildScrollView(
                                   child: ListBody(children: [
                                     Text(
-                                      "${NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2).format(widget.player.xp)} XP",
+                                      "${NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2).format(widget.player.xp)} ${t.stats.xp.short}",
                                       style: const TextStyle(fontFamily: "Eurostile Round", fontWeight: FontWeight.bold)
                                       ),
                                     Padding(
@@ -267,7 +267,7 @@ class _UserThingyState extends State<UserThingy> with SingleTickerProviderStateM
                                 ),
                                 actions: <Widget>[
                                   TextButton(
-                                    child: const Text("OK"),
+                                    child: Text(t.actions.ok),
                                     onPressed: () {Navigator.of(context).pop();}
                                   )  
                                 ]

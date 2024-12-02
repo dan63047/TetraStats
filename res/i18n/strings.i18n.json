@@ -67,12 +67,33 @@
     "obtainDate": "Obtained ${date}",
     "assignedManualy": "That badge was assigned manualy by TETR.IO admins",
     "distinguishment": "Distinguishment",
-    "bigRedBanned": "BANNED",
-    "normalBanned": "Banned", 
-    "bigRedBadStanding": "BAD STANDING",
+    "banned": "Banned",
+    "bannedSubtext": "Bans are placed when TETR.IO rules or terms of service are broken",
+    "badStanding": "Bad standing",
+    "badStandingSubtext": "One or more recent bans on record",
+    "botAccount": "Bot account",
+    "botAccountSubtext": "Operated by $botMaintainers",
     "copiedToClipboard": "Copied to clipboard!",
     "bio": "Bio",
     "news": "News",
+    "matchResult": {
+        "victory": "Victory",
+        "defeat": "Defeat",
+        "tie": "Tie",
+        "dqvictory": "Opponent was DQ'ed",
+        "dqdefeat": "Disqualified",
+        "nocontest": "No Contest",
+        "nullified": "Nullified"
+    },
+    "distinguishments": {
+        "noHeader": "Header is missing",
+        "noFooter": "Footer is missing",
+        "twc": "TETR.IO World Champion",
+        "twcYear": "$year TETR.IO World Championship"
+    },
+    "newsEntrys":{
+        "leaderboard": "Got № $rank on $gametype"
+    },
     "newsParts":{
         "leaderboardStart": "Got ",
         "leaderboardMiddle": "on ",
@@ -90,6 +111,9 @@
     },
     "copyUserID": "Click to copy user ID",
     "searchHint": "Username or ID",
+    "navMenu": "Navigation menu",
+    "navMenuTooltip": "Open navigation menu",
+    "refresh": "Refresh data",
     "searchButton": "Search",
     "trackedPlayers": "Tracked Players",
     "standing": "Standing",
@@ -181,6 +205,7 @@
         "trRange": "TR Range",
         "supposedToBe": "Supposed to be",
         "gap": "$value gap",
+        "trGap": "$value TR gap",
         "deflationGap": "Deflation gap",
         "inflationGap": "Inflation gap",
         "LBposRange": "LB pos range",
@@ -191,6 +216,9 @@
         "avgNerdStats": "Average Nerd Stats",
         "minimums": "Minimums",
         "maximums": "Maximums"
+    },
+    "stateView": {
+        "title": "State from $date"
     },
     "tlMatchView": {
         "match": "Match",
@@ -245,13 +273,57 @@
         "ar": "Acievement Points",
         "fullTLnote": "Heavy, but allows you to sort players by their stats and filter them by ranks"
     },
+    "savedDataDestination": {
+        "title": "Saved Data",
+        "tip": "Select nickname on the left to see data assosiated with it",
+        "seasonTLstates": "S$s TL States",
+        "TLrecords": "TL Records"
+    },
     "settingsDestination": {
         "title": "Settings",
-        "timestamps": "Timestamps",
-        "timestampsDescription": "You can choose, in which way timestamps shows time",
+        "general": "General",
+        "customization": "Custonization",
+        "database": "Local database",
+        "checking": "Checking...",
+        "enterToSubmit": "Press Enter to submit",
+        "account": "Your account in TETR.IO",
+        "accountDescription": "Stats of that player will be loaded initially right after launching this app. By default it loads my (dan63) stats. To change that, enter your nickname here.",
+        "done": "Done!",
+        "noSuchAccount": "No such account",
+        "language": "Language",
+        "languageDescription": "Tetra Stats was translated on $languages. By default, app will pick your system one or English, if locale of your system isn't avaliable.",
+        "languages(plural)": {
+            "zero": "zero languages",
+            "one": "$n language",
+            "two": "$n languages",
+            "few": "$n languages",
+            "many": "$n languages",
+            "other": "$n languages"
+        },
+        "updateInTheBackground": "Update data in the background",
+        "updateInTheBackgroundDescription": "If on, Tetra Stats will attempt to retrieve new info once cache expires. Usually that happen every 5 minutes",
+        "compareStats": "Compare TL stats with rank averages",
+        "compareStatsDescription": "If on, Tetra Stats will provide additional metrics, which allow you to compare yourself with average player on your rank. The way you'll see it — stats will be highlited with corresponding color, hover over them with cursor for more info.", 
+        "showPosition": "Show position on leaderboard by stats",
+        "showPositionDescription": "This can take some time (and traffic) to load, but will allow you to see your position on the leaderboard, sorted by a stat",
+        "accentColor": "Accent color",
+        "accentColorDescription": "That color is seen across this app and usually highlites interactive UI elements.",
+        "accentColorModale": "Pick an accent color",
+        "timestamps": "Timestamps format",
+        "timestampsDescriptionPart1": "You can choose, in which way timestamps shows time. By default, they show time in GMT timezone, formatted according to chosen locale, example: $d.",
+        "timestampsDescriptionPart2": "There is also:\n• Locale formatted in your timezone: $y\n• Relative timestamp: $r", 
         "timestampsAbsoluteGMT": "Absolute (GMT)",
         "timestampsAbsoluteLocalTime": "Absolute (Your timezone)",
         "timestampsRelative": "Relative",
+        "sheetbotLikeGraphs": "Sheetbot-like behavior for radar graphs",
+        "sheetbotLikeGraphsDescription": "Altough it was considered by me, that the way graphs work in SheetBot is not very correct, some people were confused to see, that -0.5 stride dosen't look the way it looks on SheetBot graph. Hence, he we are: if this toggle is on, points on the graphs can appear on the opposite half of the graph if value is negative.",
+        "oskKagariGimmick": "Osk-Kagari gimmick",
+        "oskKagariGimmickDescription": "If on, instead of osk's rank, :kagari: will be rendered.",
+        "bytesOfDataStored": "of data stored",
+        "TLrecordsSaved": "Tetra League records saved",
+        "TLplayerstatesSaved": "Tetra League playerstates saved",
+        "fixButton": "Fix",
+        "compressButton": "Compress",
         "exportDB": "Export local database",
         "desktopExportAlertTitle": "Desktop export",
         "desktopExportText": "It seems like you using this app on desktop. Check your documents folder, you should find \"TetraStats.db\". Copy it somewhere",
@@ -279,6 +351,12 @@
     "calcNavigation": {
       "stats": "Stats Calculator",
       "damage": "Damage Calculator"
+    },
+    "firstTimeView": {
+        "welcome": "Welcome to Tetra Stats",
+        "description": "Service, that allows you to keep track of various statistics for TETR.IO",
+        "nicknameQuestion": "What's your nickname?",
+        "inpuntHint": "Type it here... (3-16 symbols)"
     },
     "aboutView": {
         "title": "About Tetra Stats",
@@ -475,6 +553,7 @@
         "piecesWithPerfectFinesse": "Placed with perfect finesse",
         "score": "Score",
         "lines": "Lines",
+        "linesShort": "L",
         "pcs": "Perfect Clears",
         "holds": "Holds",
         "spike": "Top Spike",
@@ -486,6 +565,7 @@
         "sent": "Sent",
         "received": "Received",
         "placement": "Placement",
+        "peak": "peak",
         "qpWithMods(plural)": {
             "one": "With 1 mod",
             "two": "With $n mods",

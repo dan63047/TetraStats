@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tetra_stats/data_objects/beta_record.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/views/tl_match_view.dart';
 import 'package:tetra_stats/widgets/list_tile_trailing_stats.dart';
@@ -8,37 +9,37 @@ import 'package:tetra_stats/widgets/text_timestamp.dart';
 class BetaLeagueEntryThingy extends StatelessWidget{
   final BetaRecord record;
   final String userID;
-
+  // TODO: Rating delta string is too long for small screens
   const BetaLeagueEntryThingy(this.record, this.userID);
 
   TextSpan matchResult(String result){
     return switch(result){
       "victory" => TextSpan(
-        text: "Victory",
+        text: t.matchResult.victory,
         style: TextStyle(color: Colors.greenAccent)
       ),
       "defeat" => TextSpan(
-        text: "Defeat",
+        text: t.matchResult.defeat,
         style: TextStyle(color: Colors.redAccent)
       ),
       "tie" => TextSpan(
-        text: "Tie",
+        text: t.matchResult.tie,
         style: TextStyle(color: Colors.white)
       ),
       "dqvictory" => TextSpan(
-        text: "Opponent was DQ'ed",
+        text: t.matchResult.dqvictory,
         style: TextStyle(color: Colors.lightGreenAccent)
       ),
       "dqdefeat" => TextSpan(
-        text: "Player was DQ'ed",
+        text: t.matchResult.dqdefeat,
         style: TextStyle(color: Colors.red)
       ),
       "nocontest" => TextSpan(
-        text: "No Contest",
+        text: t.matchResult.nocontest,
         style: TextStyle(color: Colors.blueAccent)
       ),
       "nullified" => TextSpan(
-        text: "Nullified",
+        text: t.matchResult.nullified,
         style: TextStyle(color: Colors.purpleAccent)
       ),
       _ => TextSpan(

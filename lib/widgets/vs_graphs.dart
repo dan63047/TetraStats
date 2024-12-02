@@ -45,33 +45,25 @@ class VsGraphs extends StatelessWidget{
             getTitle: (index, angle) {
               switch (index) {
                 case 0:
-                  return RadarChartTitle(
-                    text: 'APM',
-                    angle: angle,
-                    positionPercentageOffset: 0.05
-                  );
+                  return RadarChartTitle(text: t.stats.apm.short, angle: angle, positionPercentageOffset: 0.05);
                 case 1:
-                  return RadarChartTitle(
-                    text: 'PPS',
-                    angle: angle,
-                    positionPercentageOffset: 0.05
-                  );
+                  return RadarChartTitle(text: t.stats.pps.short, angle: angle, positionPercentageOffset: 0.05 );
                 case 2:
-                  return RadarChartTitle(text: 'VS', angle: angle, positionPercentageOffset: 0.05);
+                  return RadarChartTitle(text: t.stats.vs.short, angle: angle, positionPercentageOffset: 0.05);
                 case 3:
-                  return RadarChartTitle(text: 'APP', angle: angle + 180, positionPercentageOffset: 0.05);
+                  return RadarChartTitle(text: t.stats.app.short, angle: angle + 180, positionPercentageOffset: 0.05);
                 case 4:
-                  return RadarChartTitle(text: 'DS/S', angle: angle + 180, positionPercentageOffset: 0.05);
+                  return RadarChartTitle(text: t.stats.dss.short, angle: angle + 180, positionPercentageOffset: 0.05);
                 case 5:
-                  return RadarChartTitle(text: 'DS/P', angle: angle + 180, positionPercentageOffset: 0.05);
+                  return RadarChartTitle(text: t.stats.dsp.short, angle: angle + 180, positionPercentageOffset: 0.05);
                 case 6:
-                  return RadarChartTitle(text: 'APP+DS/P', angle: angle + 180, positionPercentageOffset: 0.05);
+                  return RadarChartTitle(text: t.stats.appdsp.short, angle: angle + 180, positionPercentageOffset: 0.05);
                 case 7:
-                  return RadarChartTitle(text: 'VS/APM', angle: angle + 180, positionPercentageOffset: 0.05);
+                  return RadarChartTitle(text: t.stats.vsapm.short, angle: angle + 180, positionPercentageOffset: 0.05);
                 case 8:
-                  return RadarChartTitle(text: 'Cheese', angle: angle, positionPercentageOffset: 0.05);
+                  return RadarChartTitle(text: t.stats.cheese.short, angle: angle, positionPercentageOffset: 0.05);
                 case 9:
-                  return RadarChartTitle(text: 'Gb Eff.', angle: angle, positionPercentageOffset: 0.05);
+                  return RadarChartTitle(text: t.stats.gbe.short, angle: angle, positionPercentageOffset: 0.05);
                 default:
                   return const RadarChartTitle(text: '');
               }
@@ -150,13 +142,13 @@ class VsGraphs extends StatelessWidget{
                 getTitle: (index, angle) {
                   switch (index) {
                     case 0:
-                      return RadarChartTitle(text: 'Opener',angle: angle, positionPercentageOffset: 0.05);
+                      return RadarChartTitle(text: t.stats.opener.short,angle: angle, positionPercentageOffset: 0.05);
                     case 1:
-                      return RadarChartTitle(text: 'Stride', angle: angle, positionPercentageOffset: 0.05);
+                      return RadarChartTitle(text: t.stats.stride.short, angle: angle, positionPercentageOffset: 0.05);
                     case 2:
-                      return RadarChartTitle(text: 'Inf Ds', angle: angle + 180, positionPercentageOffset: 0.05);
+                      return RadarChartTitle(text: t.stats.infds.short, angle: angle + 180, positionPercentageOffset: 0.05);
                     case 3:
-                      return RadarChartTitle(text: 'Plonk', angle: angle, positionPercentageOffset: 0.05);
+                      return RadarChartTitle(text: t.stats.plonk.short, angle: angle, positionPercentageOffset: 0.05);
                     default:
                       return const RadarChartTitle(text: '');
                   }

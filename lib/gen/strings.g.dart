@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 690
+/// Strings: 756
 ///
-/// Built on 2024-11-28 at 20:31 UTC
+/// Built on 2024-12-02 at 19:52 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -198,15 +198,24 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String obtainDate({required Object date}) => 'Obtained ${date}';
 	String get assignedManualy => 'That badge was assigned manualy by TETR.IO admins';
 	String get distinguishment => 'Distinguishment';
-	String get bigRedBanned => 'BANNED';
-	String get normalBanned => 'Banned';
-	String get bigRedBadStanding => 'BAD STANDING';
+	String get banned => 'Banned';
+	String get bannedSubtext => 'Bans are placed when TETR.IO rules or terms of service are broken';
+	String get badStanding => 'Bad standing';
+	String get badStandingSubtext => 'One or more recent bans on record';
+	String get botAccount => 'Bot account';
+	String botAccountSubtext({required Object botMaintainers}) => 'Operated by ${botMaintainers}';
 	String get copiedToClipboard => 'Copied to clipboard!';
 	String get bio => 'Bio';
 	String get news => 'News';
+	late final _StringsMatchResultEn matchResult = _StringsMatchResultEn._(_root);
+	late final _StringsDistinguishmentsEn distinguishments = _StringsDistinguishmentsEn._(_root);
+	late final _StringsNewsEntrysEn newsEntrys = _StringsNewsEntrysEn._(_root);
 	late final _StringsNewsPartsEn newsParts = _StringsNewsPartsEn._(_root);
 	String get copyUserID => 'Click to copy user ID';
 	String get searchHint => 'Username or ID';
+	String get navMenu => 'Navigation menu';
+	String get navMenuTooltip => 'Open navigation menu';
+	String get refresh => 'Refresh data';
 	String get searchButton => 'Search';
 	String get trackedPlayers => 'Tracked Players';
 	String get standing => 'Standing';
@@ -222,14 +231,17 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	late final _StringsFilterModaleEn filterModale = _StringsFilterModaleEn._(_root);
 	late final _StringsCutoffsDestinationEn cutoffsDestination = _StringsCutoffsDestinationEn._(_root);
 	late final _StringsRankViewEn rankView = _StringsRankViewEn._(_root);
+	late final _StringsStateViewEn stateView = _StringsStateViewEn._(_root);
 	late final _StringsTlMatchViewEn tlMatchView = _StringsTlMatchViewEn._(_root);
 	late final _StringsCalcDestinationEn calcDestination = _StringsCalcDestinationEn._(_root);
 	late final _StringsInfoDestinationEn infoDestination = _StringsInfoDestinationEn._(_root);
 	late final _StringsLeaderboardsDestinationEn leaderboardsDestination = _StringsLeaderboardsDestinationEn._(_root);
+	late final _StringsSavedDataDestinationEn savedDataDestination = _StringsSavedDataDestinationEn._(_root);
 	late final _StringsSettingsDestinationEn settingsDestination = _StringsSettingsDestinationEn._(_root);
 	late final _StringsHomeNavigationEn homeNavigation = _StringsHomeNavigationEn._(_root);
 	late final _StringsGraphsNavigationEn graphsNavigation = _StringsGraphsNavigationEn._(_root);
 	late final _StringsCalcNavigationEn calcNavigation = _StringsCalcNavigationEn._(_root);
+	late final _StringsFirstTimeViewEn firstTimeView = _StringsFirstTimeViewEn._(_root);
 	late final _StringsAboutViewEn aboutView = _StringsAboutViewEn._(_root);
 	late final _StringsStatsEn stats = _StringsStatsEn._(_root);
 	Map<String, String> get countries => {
@@ -536,6 +548,45 @@ class _StringsGametimeEn {
 	String breakdown({required Object years, required Object months, required Object days, required Object minutes, required Object seconds}) => 'It\'s ${years} years,\nor ${months} months,\nor ${days} days,\nor ${minutes} minutes\nor ${seconds} seconds';
 }
 
+// Path: matchResult
+class _StringsMatchResultEn {
+	_StringsMatchResultEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get victory => 'Victory';
+	String get defeat => 'Defeat';
+	String get tie => 'Tie';
+	String get dqvictory => 'Opponent was DQ\'ed';
+	String get dqdefeat => 'Disqualified';
+	String get nocontest => 'No Contest';
+	String get nullified => 'Nullified';
+}
+
+// Path: distinguishments
+class _StringsDistinguishmentsEn {
+	_StringsDistinguishmentsEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get noHeader => 'Header is missing';
+	String get noFooter => 'Footer is missing';
+	String get twc => 'TETR.IO World Champion';
+	String twcYear({required Object year}) => '${year} TETR.IO World Championship';
+}
+
+// Path: newsEntrys
+class _StringsNewsEntrysEn {
+	_StringsNewsEntrysEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String leaderboard({required Object rank, required Object gametype}) => 'Got № ${rank} on ${gametype}';
+}
+
 // Path: newsParts
 class _StringsNewsPartsEn {
 	_StringsNewsPartsEn._(this._root);
@@ -689,6 +740,7 @@ class _StringsRankViewEn {
 	String get trRange => 'TR Range';
 	String get supposedToBe => 'Supposed to be';
 	String gap({required Object value}) => '${value} gap';
+	String trGap({required Object value}) => '${value} TR gap';
 	String get deflationGap => 'Deflation gap';
 	String get inflationGap => 'Inflation gap';
 	String get LBposRange => 'LB pos range';
@@ -699,6 +751,16 @@ class _StringsRankViewEn {
 	String get avgNerdStats => 'Average Nerd Stats';
 	String get minimums => 'Minimums';
 	String get maximums => 'Maximums';
+}
+
+// Path: stateView
+class _StringsStateViewEn {
+	_StringsStateViewEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String title({required Object date}) => 'State from ${date}';
 }
 
 // Path: tlMatchView
@@ -782,6 +844,19 @@ class _StringsLeaderboardsDestinationEn {
 	String get fullTLnote => 'Heavy, but allows you to sort players by their stats and filter them by ranks';
 }
 
+// Path: savedDataDestination
+class _StringsSavedDataDestinationEn {
+	_StringsSavedDataDestinationEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get title => 'Saved Data';
+	String get tip => 'Select nickname on the left to see data assosiated with it';
+	String seasonTLstates({required Object s}) => 'S${s} TL States';
+	String get TLrecords => 'TL Records';
+}
+
 // Path: settingsDestination
 class _StringsSettingsDestinationEn {
 	_StringsSettingsDestinationEn._(this._root);
@@ -790,11 +865,49 @@ class _StringsSettingsDestinationEn {
 
 	// Translations
 	String get title => 'Settings';
-	String get timestamps => 'Timestamps';
-	String get timestampsDescription => 'You can choose, in which way timestamps shows time';
+	String get general => 'General';
+	String get customization => 'Custonization';
+	String get database => 'Local database';
+	String get checking => 'Checking...';
+	String get enterToSubmit => 'Press Enter to submit';
+	String get account => 'Your account in TETR.IO';
+	String get accountDescription => 'Stats of that player will be loaded initially right after launching this app. By default it loads my (dan63) stats. To change that, enter your nickname here.';
+	String get done => 'Done!';
+	String get noSuchAccount => 'No such account';
+	String get language => 'Language';
+	String languageDescription({required Object languages}) => 'Tetra Stats was translated on ${languages}. By default, app will pick your system one or English, if locale of your system isn\'t avaliable.';
+	String languages({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		zero: 'zero languages',
+		one: '${n} language',
+		two: '${n} languages',
+		few: '${n} languages',
+		many: '${n} languages',
+		other: '${n} languages',
+	);
+	String get updateInTheBackground => 'Update data in the background';
+	String get updateInTheBackgroundDescription => 'If on, Tetra Stats will attempt to retrieve new info once cache expires. Usually that happen every 5 minutes';
+	String get compareStats => 'Compare TL stats with rank averages';
+	String get compareStatsDescription => 'If on, Tetra Stats will provide additional metrics, which allow you to compare yourself with average player on your rank. The way you\'ll see it — stats will be highlited with corresponding color, hover over them with cursor for more info.';
+	String get showPosition => 'Show position on leaderboard by stats';
+	String get showPositionDescription => 'This can take some time (and traffic) to load, but will allow you to see your position on the leaderboard, sorted by a stat';
+	String get accentColor => 'Accent color';
+	String get accentColorDescription => 'That color is seen across this app and usually highlites interactive UI elements.';
+	String get accentColorModale => 'Pick an accent color';
+	String get timestamps => 'Timestamps format';
+	String timestampsDescriptionPart1({required Object d}) => 'You can choose, in which way timestamps shows time. By default, they show time in GMT timezone, formatted according to chosen locale, example: ${d}.';
+	String timestampsDescriptionPart2({required Object y, required Object r}) => 'There is also:\n• Locale formatted in your timezone: ${y}\n• Relative timestamp: ${r}';
 	String get timestampsAbsoluteGMT => 'Absolute (GMT)';
 	String get timestampsAbsoluteLocalTime => 'Absolute (Your timezone)';
 	String get timestampsRelative => 'Relative';
+	String get sheetbotLikeGraphs => 'Sheetbot-like behavior for radar graphs';
+	String get sheetbotLikeGraphsDescription => 'Altough it was considered by me, that the way graphs work in SheetBot is not very correct, some people were confused to see, that -0.5 stride dosen\'t look the way it looks on SheetBot graph. Hence, he we are: if this toggle is on, points on the graphs can appear on the opposite half of the graph if value is negative.';
+	String get oskKagariGimmick => 'Osk-Kagari gimmick';
+	String get oskKagariGimmickDescription => 'If on, instead of osk\'s rank, :kagari: will be rendered.';
+	String get bytesOfDataStored => 'of data stored';
+	String get TLrecordsSaved => 'Tetra League records saved';
+	String get TLplayerstatesSaved => 'Tetra League playerstates saved';
+	String get fixButton => 'Fix';
+	String get compressButton => 'Compress';
 	String get exportDB => 'Export local database';
 	String get desktopExportAlertTitle => 'Desktop export';
 	String get desktopExportText => 'It seems like you using this app on desktop. Check your documents folder, you should find "TetraStats.db". Copy it somewhere';
@@ -843,6 +956,19 @@ class _StringsCalcNavigationEn {
 	// Translations
 	String get stats => 'Stats Calculator';
 	String get damage => 'Damage Calculator';
+}
+
+// Path: firstTimeView
+class _StringsFirstTimeViewEn {
+	_StringsFirstTimeViewEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get welcome => 'Welcome to Tetra Stats';
+	String get description => 'Service, that allows you to keep track of various statistics for TETR.IO';
+	String get nicknameQuestion => 'What\'s your nickname?';
+	String get inpuntHint => 'Type it here... (3-16 symbols)';
 }
 
 // Path: aboutView
@@ -926,6 +1052,7 @@ class _StringsStatsEn {
 	String get piecesWithPerfectFinesse => 'Placed with perfect finesse';
 	String get score => 'Score';
 	String get lines => 'Lines';
+	String get linesShort => 'L';
 	String get pcs => 'Perfect Clears';
 	String get holds => 'Holds';
 	String get spike => 'Top Spike';
@@ -937,6 +1064,7 @@ class _StringsStatsEn {
 	String get sent => 'Sent';
 	String get received => 'Received';
 	String get placement => 'Placement';
+	String get peak => 'peak';
 	String qpWithMods({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
 		one: 'With 1 mod',
 		two: 'With ${n} mods',
@@ -1571,12 +1699,27 @@ extension on Translations {
 			case 'obtainDate': return ({required Object date}) => 'Obtained ${date}';
 			case 'assignedManualy': return 'That badge was assigned manualy by TETR.IO admins';
 			case 'distinguishment': return 'Distinguishment';
-			case 'bigRedBanned': return 'BANNED';
-			case 'normalBanned': return 'Banned';
-			case 'bigRedBadStanding': return 'BAD STANDING';
+			case 'banned': return 'Banned';
+			case 'bannedSubtext': return 'Bans are placed when TETR.IO rules or terms of service are broken';
+			case 'badStanding': return 'Bad standing';
+			case 'badStandingSubtext': return 'One or more recent bans on record';
+			case 'botAccount': return 'Bot account';
+			case 'botAccountSubtext': return ({required Object botMaintainers}) => 'Operated by ${botMaintainers}';
 			case 'copiedToClipboard': return 'Copied to clipboard!';
 			case 'bio': return 'Bio';
 			case 'news': return 'News';
+			case 'matchResult.victory': return 'Victory';
+			case 'matchResult.defeat': return 'Defeat';
+			case 'matchResult.tie': return 'Tie';
+			case 'matchResult.dqvictory': return 'Opponent was DQ\'ed';
+			case 'matchResult.dqdefeat': return 'Disqualified';
+			case 'matchResult.nocontest': return 'No Contest';
+			case 'matchResult.nullified': return 'Nullified';
+			case 'distinguishments.noHeader': return 'Header is missing';
+			case 'distinguishments.noFooter': return 'Footer is missing';
+			case 'distinguishments.twc': return 'TETR.IO World Champion';
+			case 'distinguishments.twcYear': return ({required Object year}) => '${year} TETR.IO World Championship';
+			case 'newsEntrys.leaderboard': return ({required Object rank, required Object gametype}) => 'Got № ${rank} on ${gametype}';
 			case 'newsParts.leaderboardStart': return 'Got ';
 			case 'newsParts.leaderboardMiddle': return 'on ';
 			case 'newsParts.personalbest': return 'Got a new PB in ';
@@ -1592,6 +1735,9 @@ extension on Translations {
 			case 'newsParts.unknownNews': return ({required Object type}) => 'Unknown news of type ${type}';
 			case 'copyUserID': return 'Click to copy user ID';
 			case 'searchHint': return 'Username or ID';
+			case 'navMenu': return 'Navigation menu';
+			case 'navMenuTooltip': return 'Open navigation menu';
+			case 'refresh': return 'Refresh data';
 			case 'searchButton': return 'Search';
 			case 'trackedPlayers': return 'Tracked Players';
 			case 'standing': return 'Standing';
@@ -1670,6 +1816,7 @@ extension on Translations {
 			case 'rankView.trRange': return 'TR Range';
 			case 'rankView.supposedToBe': return 'Supposed to be';
 			case 'rankView.gap': return ({required Object value}) => '${value} gap';
+			case 'rankView.trGap': return ({required Object value}) => '${value} TR gap';
 			case 'rankView.deflationGap': return 'Deflation gap';
 			case 'rankView.inflationGap': return 'Inflation gap';
 			case 'rankView.LBposRange': return 'LB pos range';
@@ -1680,6 +1827,7 @@ extension on Translations {
 			case 'rankView.avgNerdStats': return 'Average Nerd Stats';
 			case 'rankView.minimums': return 'Minimums';
 			case 'rankView.maximums': return 'Maximums';
+			case 'stateView.title': return ({required Object date}) => 'State from ${date}';
 			case 'tlMatchView.match': return 'Match';
 			case 'tlMatchView.vs': return 'vs';
 			case 'tlMatchView.winner': return 'Winner';
@@ -1725,12 +1873,54 @@ extension on Translations {
 			case 'leaderboardsDestination.fullTL': return 'Tetra League (Current Season, full one)';
 			case 'leaderboardsDestination.ar': return 'Acievement Points';
 			case 'leaderboardsDestination.fullTLnote': return 'Heavy, but allows you to sort players by their stats and filter them by ranks';
+			case 'savedDataDestination.title': return 'Saved Data';
+			case 'savedDataDestination.tip': return 'Select nickname on the left to see data assosiated with it';
+			case 'savedDataDestination.seasonTLstates': return ({required Object s}) => 'S${s} TL States';
+			case 'savedDataDestination.TLrecords': return 'TL Records';
 			case 'settingsDestination.title': return 'Settings';
-			case 'settingsDestination.timestamps': return 'Timestamps';
-			case 'settingsDestination.timestampsDescription': return 'You can choose, in which way timestamps shows time';
+			case 'settingsDestination.general': return 'General';
+			case 'settingsDestination.customization': return 'Custonization';
+			case 'settingsDestination.database': return 'Local database';
+			case 'settingsDestination.checking': return 'Checking...';
+			case 'settingsDestination.enterToSubmit': return 'Press Enter to submit';
+			case 'settingsDestination.account': return 'Your account in TETR.IO';
+			case 'settingsDestination.accountDescription': return 'Stats of that player will be loaded initially right after launching this app. By default it loads my (dan63) stats. To change that, enter your nickname here.';
+			case 'settingsDestination.done': return 'Done!';
+			case 'settingsDestination.noSuchAccount': return 'No such account';
+			case 'settingsDestination.language': return 'Language';
+			case 'settingsDestination.languageDescription': return ({required Object languages}) => 'Tetra Stats was translated on ${languages}. By default, app will pick your system one or English, if locale of your system isn\'t avaliable.';
+			case 'settingsDestination.languages': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+				zero: 'zero languages',
+				one: '${n} language',
+				two: '${n} languages',
+				few: '${n} languages',
+				many: '${n} languages',
+				other: '${n} languages',
+			);
+			case 'settingsDestination.updateInTheBackground': return 'Update data in the background';
+			case 'settingsDestination.updateInTheBackgroundDescription': return 'If on, Tetra Stats will attempt to retrieve new info once cache expires. Usually that happen every 5 minutes';
+			case 'settingsDestination.compareStats': return 'Compare TL stats with rank averages';
+			case 'settingsDestination.compareStatsDescription': return 'If on, Tetra Stats will provide additional metrics, which allow you to compare yourself with average player on your rank. The way you\'ll see it — stats will be highlited with corresponding color, hover over them with cursor for more info.';
+			case 'settingsDestination.showPosition': return 'Show position on leaderboard by stats';
+			case 'settingsDestination.showPositionDescription': return 'This can take some time (and traffic) to load, but will allow you to see your position on the leaderboard, sorted by a stat';
+			case 'settingsDestination.accentColor': return 'Accent color';
+			case 'settingsDestination.accentColorDescription': return 'That color is seen across this app and usually highlites interactive UI elements.';
+			case 'settingsDestination.accentColorModale': return 'Pick an accent color';
+			case 'settingsDestination.timestamps': return 'Timestamps format';
+			case 'settingsDestination.timestampsDescriptionPart1': return ({required Object d}) => 'You can choose, in which way timestamps shows time. By default, they show time in GMT timezone, formatted according to chosen locale, example: ${d}.';
+			case 'settingsDestination.timestampsDescriptionPart2': return ({required Object y, required Object r}) => 'There is also:\n• Locale formatted in your timezone: ${y}\n• Relative timestamp: ${r}';
 			case 'settingsDestination.timestampsAbsoluteGMT': return 'Absolute (GMT)';
 			case 'settingsDestination.timestampsAbsoluteLocalTime': return 'Absolute (Your timezone)';
 			case 'settingsDestination.timestampsRelative': return 'Relative';
+			case 'settingsDestination.sheetbotLikeGraphs': return 'Sheetbot-like behavior for radar graphs';
+			case 'settingsDestination.sheetbotLikeGraphsDescription': return 'Altough it was considered by me, that the way graphs work in SheetBot is not very correct, some people were confused to see, that -0.5 stride dosen\'t look the way it looks on SheetBot graph. Hence, he we are: if this toggle is on, points on the graphs can appear on the opposite half of the graph if value is negative.';
+			case 'settingsDestination.oskKagariGimmick': return 'Osk-Kagari gimmick';
+			case 'settingsDestination.oskKagariGimmickDescription': return 'If on, instead of osk\'s rank, :kagari: will be rendered.';
+			case 'settingsDestination.bytesOfDataStored': return 'of data stored';
+			case 'settingsDestination.TLrecordsSaved': return 'Tetra League records saved';
+			case 'settingsDestination.TLplayerstatesSaved': return 'Tetra League playerstates saved';
+			case 'settingsDestination.fixButton': return 'Fix';
+			case 'settingsDestination.compressButton': return 'Compress';
 			case 'settingsDestination.exportDB': return 'Export local database';
 			case 'settingsDestination.desktopExportAlertTitle': return 'Desktop export';
 			case 'settingsDestination.desktopExportText': return 'It seems like you using this app on desktop. Check your documents folder, you should find "TetraStats.db". Copy it somewhere';
@@ -1752,6 +1942,10 @@ extension on Translations {
 			case 'graphsNavigation.cutoffs': return 'Cutoffs History';
 			case 'calcNavigation.stats': return 'Stats Calculator';
 			case 'calcNavigation.damage': return 'Damage Calculator';
+			case 'firstTimeView.welcome': return 'Welcome to Tetra Stats';
+			case 'firstTimeView.description': return 'Service, that allows you to keep track of various statistics for TETR.IO';
+			case 'firstTimeView.nicknameQuestion': return 'What\'s your nickname?';
+			case 'firstTimeView.inpuntHint': return 'Type it here... (3-16 symbols)';
 			case 'aboutView.title': return 'About Tetra Stats';
 			case 'aboutView.about': return 'Tetra Stats is a service, that works with TETR.IO Tetra Channel API, providing data from it and calculating some addtitional metrics, based on this data. Service allows user to track their progress in Tetra League with "Track" function, which records every Tetra League change into local database (not automatically, you have to visit service from time to time), so these changes could be looked through graphs.\n\nBeanserver blaster is a part of a Tetra Stats, that decoupled into a serverside script. It provides full Tetra League leaderboard, allowing Tetra Stats to sort leaderboard by any metric and build scatter chart, that allows user to analyse Tetra League trends. It also provides history of Tetra League ranks cutoffs, which can be viewed by user via graph as well.\n\nThere is a plans to add replay analysis and tournaments history, so stay tuned!\n\nService is not associated with TETR.IO or osk in any capacity.';
 			case 'aboutView.appVersion': return 'App Version';
@@ -1862,6 +2056,7 @@ extension on Translations {
 			case 'stats.piecesWithPerfectFinesse': return 'Placed with perfect finesse';
 			case 'stats.score': return 'Score';
 			case 'stats.lines': return 'Lines';
+			case 'stats.linesShort': return 'L';
 			case 'stats.pcs': return 'Perfect Clears';
 			case 'stats.holds': return 'Holds';
 			case 'stats.spike': return 'Top Spike';
@@ -1873,6 +2068,7 @@ extension on Translations {
 			case 'stats.sent': return 'Sent';
 			case 'stats.received': return 'Received';
 			case 'stats.placement': return 'Placement';
+			case 'stats.peak': return 'peak';
 			case 'stats.qpWithMods': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
 				one: 'With 1 mod',
 				two: 'With ${n} mods',

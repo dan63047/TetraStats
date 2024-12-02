@@ -31,11 +31,11 @@ class _DestinationSavedData extends State<DestinationSavedData> {
   Widget getTetraLeagueListTile(TetraLeague data){
     return ListTile(
       title: Text("${timestamp(data.timestamp)}"),
-      subtitle: Text("${data.apm != null ? f2.format(data.apm) : "-.--"} APM, ${data.pps != null ? f2.format(data.pps) : "-.--"} PPS, ${data.vs != null ? f2.format(data.vs) : "-.--"} VS, ${intf.format(data.gamesPlayed)} games", style: TextStyle(color: Colors.grey)),
+      subtitle: Text("${data.apm != null ? f2.format(data.apm) : "-.--"} ${t.stats.apm.short}, ${data.pps != null ? f2.format(data.pps) : "-.--"} ${t.stats.pps.short}, ${data.vs != null ? f2.format(data.vs) : "-.--"} ${t.stats.vs.short}, ${intf.format(data.gamesPlayed)} ${t.stats.gp.short}", style: TextStyle(color: Colors.grey)),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text("${data.tr != -1.00 ? f2.format(data.tr) : "-.--"} TR", style: TextStyle(fontSize: 28)),
+          Text("${data.tr != -1.00 ? f2.format(data.tr) : "-.--"} ${t.stats.tr.short}", style: TextStyle(fontSize: 28)),
           Image.asset("res/tetrio_tl_alpha_ranks/${data.rank}.png", height: 36)
         ],
       ),
@@ -82,9 +82,9 @@ class _DestinationSavedData extends State<DestinationSavedData> {
                           labelStyle: Theme.of(context).textTheme.titleMedium!.copyWith(fontSize: 28),
                           labelColor: Theme.of(context).colorScheme.primary,
                           tabs: [
-                          Tab(text: "S${currentSeason} TL States"),
-                          Tab(text: "S1 TL States"),
-                          Tab(text: "TL Records")
+                          Tab(text: t.savedDataDestination.seasonTLstates(s: currentSeason)),
+                          Tab(text: t.savedDataDestination.seasonTLstates(s: 1)),
+                          Tab(text: t.savedDataDestination.TLrecords)
                         ]),
                       ),
                       SizedBox(
@@ -117,7 +117,7 @@ class _DestinationSavedData extends State<DestinationSavedData> {
           }
         }
       ) : 
-      InfoThingy("Select nickname on the left to see data assosiated with it")
+      InfoThingy(t.savedDataDestination.tip)
     );
   }
 
@@ -145,7 +145,7 @@ class _DestinationSavedData extends State<DestinationSavedData> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Spacer(),
-                            Text("Saved Data", style: Theme.of(context).textTheme.headlineMedium),
+                            Text(t.savedDataDestination.title, style: Theme.of(context).textTheme.headlineMedium),
                             Spacer()
                           ],
                         ),

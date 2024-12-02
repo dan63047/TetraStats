@@ -1277,25 +1277,25 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                         SegmentedButton<Cards>(
                           showSelectedIcon: false,
                           segments: <ButtonSegment<Cards>>[
-                            const ButtonSegment<Cards>(
+                            ButtonSegment<Cards>(
                                 value: Cards.overview,
-                                //label: Text('Overview'),
+                                tooltip: t.homeNavigation.overview,
                                 icon: Icon(Icons.calendar_view_day)),
                             ButtonSegment<Cards>(
                                 value: Cards.tetraLeague,
-                                //label: Text('Tetra League'),
+                                tooltip: t.gamemodes["league"],
                                 icon: SvgPicture.asset("res/icons/league.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
                             ButtonSegment<Cards>(
                                 value: Cards.quickPlay,
-                                //label: Text('Quick Play'),
+                                tooltip: t.gamemodes["zenith"],
                                 icon: SvgPicture.asset("res/icons/qp.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
                             ButtonSegment<Cards>(
                                 value: Cards.sprint,
-                                //label: Text('40 Lines'),
+                                tooltip: t.gamemodes["40l"],
                                 icon: SvgPicture.asset("res/icons/40l.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
                             ButtonSegment<Cards>(
                                 value: Cards.blitz,
-                                //label: Text('Blitz'),
+                                tooltip: t.gamemodes["blitz"],
                                 icon: SvgPicture.asset("res/icons/blitz.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
                           ],
                           selected: <Cards>{rightCard},

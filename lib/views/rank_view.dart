@@ -131,34 +131,34 @@ class _RankState extends State<RankView> {
                       child: Card(
                         child: Column(
                           children: [
-                            Text(shortNames ? "" : "Cheese Index", style: TextStyle(fontSize: 28, color: Colors.transparent)),
+                            Text(shortNames ? "" : t.stats.cheese.full, style: TextStyle(fontSize: 28, color: Colors.transparent)),
                             Divider(),
-                            RankViewEntry(shortNames ? "TR" : "Tetra Rating", null, null),
-                            RankViewEntry("Glicko", null, null, differentBG: true),
-                            RankViewEntry("RD", null, null),
-                            RankViewEntry("Glixare", null, null, differentBG: true),
-                            RankViewEntry("S1 TR", null, null),
-                            RankViewEntry(shortNames ? "GP" : "Games Played", null, null, differentBG: true),
-                            RankViewEntry(shortNames ? "GW" : "Games Won", null, null),
-                            RankViewEntry(shortNames ? "WR" : "Winrate", null, null, differentBG: true),
-                            RankViewEntry(shortNames ? "APM" : "Attack Per Minute", null, null),
-                            RankViewEntry(shortNames ? "PPS" : "Pieces Per Second", null, null, differentBG: true),
-                            RankViewEntry(shortNames ? "VS" : "Versus Score", null, null),
-                            RankViewEntry(shortNames ? "APP" : "Attack Per Piece", null, null, differentBG: true),
-                            RankViewEntry("VS / APM", null, null),
-                            RankViewEntry(shortNames ? "DS/P" : "Downstack Per Second", null, null, differentBG: true),
-                            RankViewEntry(shortNames ? "DS/S" : "Downstack Per Piece", null, null),
-                            RankViewEntry("APP + DS/P", null, null, differentBG: true),
-                            RankViewEntry(shortNames ? "Cheese" : "Cheese Index", null, null),
-                            RankViewEntry(shortNames ? "GbE" : "Garbage Efficiency", null, null, differentBG: true),
-                            RankViewEntry(shortNames ? "wAPP" : "Weighted APP", null, null),
-                            RankViewEntry("Area", null, null, differentBG: true),
-                            RankViewEntry(shortNames ? "eTR" : "Estimated TR", null, null),
-                            RankViewEntry(shortNames ? "±eTR" : "Est. TR Accuracy", null, null, differentBG: true),
-                            RankViewEntry("Opener", null, null),
-                            RankViewEntry("Plonk", null, null, differentBG: true),
-                            RankViewEntry("Stride", null, null),
-                            RankViewEntry(shortNames ? "Inf DS" : "Infinite Downstack", null, null, differentBG: true),
+                            RankViewEntry(shortNames ? t.stats.tr.short : t.stats.tr.full, null, null),
+                            RankViewEntry(t.stats.glicko.full, null, null, differentBG: true),
+                            RankViewEntry(shortNames ? t.stats.rd.short : t.stats.rd.full, null, null),
+                            RankViewEntry(t.stats.glixare.full, null, null, differentBG: true),
+                            RankViewEntry(t.stats.s1tr.short, null, null),
+                            RankViewEntry(shortNames ? t.stats.gp.short : t.stats.gp.full, null, null, differentBG: true),
+                            RankViewEntry(shortNames ? t.stats.gw.short : t.stats.gw.full, null, null),
+                            RankViewEntry(shortNames ? t.stats.winrate.short : t.stats.winrate.full, null, null, differentBG: true),
+                            RankViewEntry(shortNames ? t.stats.apm.short : t.stats.apm.full, null, null),
+                            RankViewEntry(shortNames ? t.stats.pps.short : t.stats.pps.full, null, null, differentBG: true),
+                            RankViewEntry(shortNames ? t.stats.vs.short : t.stats.vs.full, null, null),
+                            RankViewEntry(shortNames ? t.stats.app.short : t.stats.app.full, null, null, differentBG: true),
+                            RankViewEntry(t.stats.vsapm.full, null, null),
+                            RankViewEntry(shortNames ? t.stats.dss.short : t.stats.dss.full, null, null, differentBG: true),
+                            RankViewEntry(shortNames ? t.stats.dsp.short : t.stats.dsp.full, null, null),
+                            RankViewEntry(t.stats.appdsp.full, null, null, differentBG: true),
+                            RankViewEntry(shortNames ? t.stats.cheese.short : t.stats.cheese.full, null, null),
+                            RankViewEntry(shortNames ? t.stats.gbe.short : t.stats.gbe.full, null, null, differentBG: true),
+                            RankViewEntry(shortNames ? t.stats.nyaapp.short : t.stats.nyaapp.full, null, null),
+                            RankViewEntry(t.stats.area.full, null, null, differentBG: true),
+                            RankViewEntry(shortNames ? t.stats.etr.short : t.stats.etr.full, null, null),
+                            RankViewEntry(shortNames ? t.stats.etracc.short : t.stats.etracc.full, null, null, differentBG: true),
+                            RankViewEntry(shortNames ? t.stats.opener.short : t.stats.opener.full, null, null),
+                            RankViewEntry(shortNames ? t.stats.plonk.short : t.stats.plonk.full, null, null, differentBG: true),
+                            RankViewEntry(shortNames ? t.stats.stride.short : t.stats.stride.full, null, null),
+                            RankViewEntry(shortNames ? t.stats.infds.short : t.stats.infds.full, null, null, differentBG: true),
                           ],
                         ),
                       ),
@@ -167,9 +167,9 @@ class _RankState extends State<RankView> {
                       child: Card(
                         child: Column(
                           children: [
-                            Text("Minimums", style: TextStyle(fontSize: 28)),
+                            Text(t.rankView.minimums, style: TextStyle(fontSize: 28)),
                             Divider(),
-                            RankViewEntry("${f4.format(snapshot.data![1]["lowestTR"])}${shortNames ? "" : " TR"}", snapshot.data![1]["lowestTRnick"], snapshot.data![1]["lowestTRid"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestTR"])}${shortNames ? "" : " ${t.stats.tr.short}"}", snapshot.data![1]["lowestTRnick"], snapshot.data![1]["lowestTRid"]),
                             RankViewEntry(f4.format(snapshot.data![1]["lowestGlicko"]), snapshot.data![1]["lowestGlickoNick"], snapshot.data![1]["lowestGlickoID"], differentBG: true),
                             RankViewEntry(f4.format(snapshot.data![1]["lowestRD"]), snapshot.data![1]["lowestRdNick"], snapshot.data![1]["lowestRdID"]),
                             RankViewEntry(f4.format(snapshot.data![1]["lowestGlixare"]), snapshot.data![1]["lowestGlixareNick"], snapshot.data![1]["lowestGlixareID"], differentBG: true),
@@ -177,20 +177,20 @@ class _RankState extends State<RankView> {
                             RankViewEntry(intf.format(snapshot.data![1]["lowestGamesPlayed"]), snapshot.data![1]["lowestGamesPlayedNick"], snapshot.data![1]["lowestGamesPlayedID"], differentBG: true),
                             RankViewEntry(intf.format(snapshot.data![1]["lowestGamesWon"]), snapshot.data![1]["lowestGamesWonNick"], snapshot.data![1]["lowestGamesWonID"]),
                             RankViewEntry(percentage.format(snapshot.data![1]["lowestWinrate"]), snapshot.data![1]["lowestWinrateNick"], snapshot.data![1]["lowestWinrateID"], differentBG: true),
-                            RankViewEntry("${f2.format(snapshot.data![1]["lowestAPM"])}${shortNames ? "" : " APM"}", snapshot.data![1]["lowestAPMnick"], snapshot.data![1]["lowestAPMid"]),
-                            RankViewEntry("${f2.format(snapshot.data![1]["lowestPPS"])}${shortNames ? "" : " PPS"}", snapshot.data![1]["lowestPPSnick"], snapshot.data![1]["lowestPPSid"], differentBG: true),
-                            RankViewEntry("${f2.format(snapshot.data![1]["lowestVS"])}${shortNames ? "" : " VS"}", snapshot.data![1]["lowestVSnick"], snapshot.data![1]["lowestVSid"]),
-                            RankViewEntry("${f4.format(snapshot.data![1]["lowestAPP"])}${shortNames ? "" : " APP"}", snapshot.data![1]["lowestAPPnick"], snapshot.data![1]["lowestAPPid"], differentBG: true),
-                            RankViewEntry("${f4.format(snapshot.data![1]["lowestVSAPM"])}${shortNames ? "" : " VS/APM"}", snapshot.data![1]["lowestVSAPMnick"], snapshot.data![1]["lowestVSAPMid"]),
-                            RankViewEntry("${f4.format(snapshot.data![1]["lowestDSS"])}${shortNames ? "" : " DS/S"}", snapshot.data![1]["lowestDSSnick"], snapshot.data![1]["lowestDSSid"], differentBG: true),
-                            RankViewEntry("${f4.format(snapshot.data![1]["lowestDSP"])}${shortNames ? "" : " DS/P"}", snapshot.data![1]["lowestDSPnick"], snapshot.data![1]["lowestDSPid"]),
-                            RankViewEntry("${f4.format(snapshot.data![1]["lowestAPPDSP"])}${shortNames ? "" : " APP+DS/P"}", snapshot.data![1]["lowestAPPDSPnick"], snapshot.data![1]["lowestAPPDSPid"], differentBG: true),
-                            RankViewEntry("${f4.format(snapshot.data![1]["lowestCheese"])}${shortNames ? "" : " Cheese"}", snapshot.data![1]["lowestCheeseNick"], snapshot.data![1]["lowestCheeseID"]),
-                            RankViewEntry("${f4.format(snapshot.data![1]["lowestGBE"])}${shortNames ? "" : " Gbe"}", snapshot.data![1]["lowestGBEnick"], snapshot.data![1]["lowestGBEid"], differentBG: true),
-                            RankViewEntry("${f4.format(snapshot.data![1]["lowestNyaAPP"])}${shortNames ? "" : " WAPP"}", snapshot.data![1]["lowestNyaAPPnick"], snapshot.data![1]["lowestNyaAPPid"]),
-                            RankViewEntry("${f4.format(snapshot.data![1]["lowestArea"])}${shortNames ? "" : " Area"}", snapshot.data![1]["lowestAreaNick"], snapshot.data![1]["lowestAreaID"], differentBG: true),
-                            RankViewEntry("${f4.format(snapshot.data![1]["lowestEstTR"])}${shortNames ? "" : " eTR"}", snapshot.data![1]["lowestEstTRnick"], snapshot.data![1]["lowestEstTRid"]),
-                            RankViewEntry("${f4.format(snapshot.data![1]["lowestEstAcc"])}${shortNames ? "" : " ±eTR"}", snapshot.data![1]["lowestEstAccNick"], snapshot.data![1]["lowestEstAccID"], differentBG: true),
+                            RankViewEntry("${f2.format(snapshot.data![1]["lowestAPM"])}${shortNames ? "" : " ${t.stats.apm.short}"}", snapshot.data![1]["lowestAPMnick"], snapshot.data![1]["lowestAPMid"]),
+                            RankViewEntry("${f2.format(snapshot.data![1]["lowestPPS"])}${shortNames ? "" : " ${t.stats.pps.short}"}", snapshot.data![1]["lowestPPSnick"], snapshot.data![1]["lowestPPSid"], differentBG: true),
+                            RankViewEntry("${f2.format(snapshot.data![1]["lowestVS"])}${shortNames ? "" : " ${t.stats.vs.short}"}", snapshot.data![1]["lowestVSnick"], snapshot.data![1]["lowestVSid"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestAPP"])}${shortNames ? "" : " ${t.stats.app.short}"}", snapshot.data![1]["lowestAPPnick"], snapshot.data![1]["lowestAPPid"], differentBG: true),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestVSAPM"])}${shortNames ? "" : " ${t.stats.vsapm.short}"}", snapshot.data![1]["lowestVSAPMnick"], snapshot.data![1]["lowestVSAPMid"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestDSS"])}${shortNames ? "" : " ${t.stats.dss.short}"}", snapshot.data![1]["lowestDSSnick"], snapshot.data![1]["lowestDSSid"], differentBG: true),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestDSP"])}${shortNames ? "" : " ${t.stats.dsp.short}"}", snapshot.data![1]["lowestDSPnick"], snapshot.data![1]["lowestDSPid"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestAPPDSP"])}${shortNames ? "" : " ${t.stats.appdsp.short}"}", snapshot.data![1]["lowestAPPDSPnick"], snapshot.data![1]["lowestAPPDSPid"], differentBG: true),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestCheese"])}${shortNames ? "" : " ${t.stats.cheese.short}"}", snapshot.data![1]["lowestCheeseNick"], snapshot.data![1]["lowestCheeseID"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestGBE"])}${shortNames ? "" : " ${t.stats.gbe.short}"}", snapshot.data![1]["lowestGBEnick"], snapshot.data![1]["lowestGBEid"], differentBG: true),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestNyaAPP"])}${shortNames ? "" : " ${t.stats.nyaapp.short}"}", snapshot.data![1]["lowestNyaAPPnick"], snapshot.data![1]["lowestNyaAPPid"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestArea"])}${shortNames ? "" : " ${t.stats.area.short}"}", snapshot.data![1]["lowestAreaNick"], snapshot.data![1]["lowestAreaID"], differentBG: true),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestEstTR"])}${shortNames ? "" : " ${t.stats.etr.short}"}", snapshot.data![1]["lowestEstTRnick"], snapshot.data![1]["lowestEstTRid"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["lowestEstAcc"])}${shortNames ? "" : " ${t.stats.etracc.short}"}", snapshot.data![1]["lowestEstAccNick"], snapshot.data![1]["lowestEstAccID"], differentBG: true),
                             RankViewEntry("${f4.format(snapshot.data![1]["lowestOpener"])}", snapshot.data![1]["lowestOpenerNick"], snapshot.data![1]["lowestOpenerID"]),
                             RankViewEntry("${f4.format(snapshot.data![1]["lowestPlonk"])}", snapshot.data![1]["lowestPlonkNick"], snapshot.data![1]["lowestPlonkID"], differentBG: true),
                             RankViewEntry("${f4.format(snapshot.data![1]["lowestStride"])}", snapshot.data![1]["lowestStrideNick"], snapshot.data![1]["lowestStrideID"]),
@@ -203,9 +203,9 @@ class _RankState extends State<RankView> {
                       child: Card(
                         child: Column(
                           children: [
-                            Text("Maximums", style: TextStyle(fontSize: 28)),
+                            Text(t.rankView.maximums, style: TextStyle(fontSize: 28)),
                             Divider(),
-                            RankViewEntry("${f4.format(snapshot.data![1]["highestTR"])}${shortNames ? "" : " TR"}", snapshot.data![1]["highestTRnick"], snapshot.data![1]["highestTRid"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestTR"])}${shortNames ? "" : " ${t.stats.tr.short}"}", snapshot.data![1]["highestTRnick"], snapshot.data![1]["highestTRid"]),
                             RankViewEntry(f4.format(snapshot.data![1]["highestGlicko"]), snapshot.data![1]["highestGlickoNick"], snapshot.data![1]["highestGlickoID"], differentBG: true),
                             RankViewEntry(f4.format(snapshot.data![1]["highestRD"]), snapshot.data![1]["highestRdNick"], snapshot.data![1]["highestRdID"]),
                             RankViewEntry(f4.format(snapshot.data![1]["highestGlixare"]), snapshot.data![1]["highestGlixareNick"], snapshot.data![1]["highestGlixareID"], differentBG: true),
@@ -213,20 +213,20 @@ class _RankState extends State<RankView> {
                             RankViewEntry(intf.format(snapshot.data![1]["highestGamesPlayed"]), snapshot.data![1]["highestGamesPlayedNick"], snapshot.data![1]["highestGamesPlayedID"], differentBG: true),
                             RankViewEntry(intf.format(snapshot.data![1]["highestGamesWon"]), snapshot.data![1]["highestGamesWonNick"], snapshot.data![1]["highestGamesWonID"]),
                             RankViewEntry(percentage.format(snapshot.data![1]["highestWinrate"]), snapshot.data![1]["highestWinrateNick"], snapshot.data![1]["highestWinrateID"], differentBG: true),
-                            RankViewEntry("${f2.format(snapshot.data![1]["highestAPM"])}${shortNames ? "" : " APM"}", snapshot.data![1]["highestAPMnick"], snapshot.data![1]["highestAPMid"]),
-                            RankViewEntry("${f2.format(snapshot.data![1]["highestPPS"])}${shortNames ? "" : " PPS"}", snapshot.data![1]["highestPPSnick"], snapshot.data![1]["highestPPSid"], differentBG: true),
-                            RankViewEntry("${f2.format(snapshot.data![1]["highestVS"])}${shortNames ? "" : " VS"}", snapshot.data![1]["highestVSnick"], snapshot.data![1]["highestVSid"]),
-                            RankViewEntry("${f4.format(snapshot.data![1]["highestAPP"])}${shortNames ? "" : " APP"}", snapshot.data![1]["highestAPPnick"], snapshot.data![1]["highestAPPid"], differentBG: true),
-                            RankViewEntry("${f4.format(snapshot.data![1]["highestVSAPM"])}${shortNames ? "" : " VS/APM"}", snapshot.data![1]["highestVSAPMnick"], snapshot.data![1]["highestVSAPMid"]),
-                            RankViewEntry("${f4.format(snapshot.data![1]["highestDSS"])}${shortNames ? "" : " DS/S"}", snapshot.data![1]["highestDSSnick"], snapshot.data![1]["highestDSSid"], differentBG: true),
-                            RankViewEntry("${f4.format(snapshot.data![1]["highestDSP"])}${shortNames ? "" : " DS/P"}", snapshot.data![1]["highestDSPnick"], snapshot.data![1]["highestDSPid"]),
-                            RankViewEntry("${f4.format(snapshot.data![1]["highestAPPDSP"])}${shortNames ? "" : " APP+DS/P"}", snapshot.data![1]["highestAPPDSPnick"], snapshot.data![1]["highestAPPDSPid"], differentBG: true),
-                            RankViewEntry("${f4.format(snapshot.data![1]["highestCheese"])}${shortNames ? "" : " Cheese"}", snapshot.data![1]["highestCheeseNick"], snapshot.data![1]["highestCheeseID"]),
-                            RankViewEntry("${f4.format(snapshot.data![1]["highestGBE"])}${shortNames ? "" : " Gbe"}", snapshot.data![1]["highestGBEnick"], snapshot.data![1]["highestGBEid"], differentBG: true),
-                            RankViewEntry("${f4.format(snapshot.data![1]["highestNyaAPP"])}${shortNames ? "" : " wAPP"}", snapshot.data![1]["highestNyaAPPnick"], snapshot.data![1]["highestNyaAPPid"]),
-                            RankViewEntry("${f4.format(snapshot.data![1]["highestArea"])}${shortNames ? "" : " Area"}", snapshot.data![1]["highestAreaNick"], snapshot.data![1]["highestAreaID"], differentBG: true),
-                            RankViewEntry("${f4.format(snapshot.data![1]["highestEstTR"])}${shortNames ? "" : " eTR"}", snapshot.data![1]["highestEstTRnick"], snapshot.data![1]["highestEstTRid"]),
-                            RankViewEntry("${f4.format(snapshot.data![1]["highestEstAcc"])}${shortNames ? "" : " ±eTR"}", snapshot.data![1]["highestEstAccNick"], snapshot.data![1]["highestEstAccID"], differentBG: true),
+                            RankViewEntry("${f2.format(snapshot.data![1]["highestAPM"])}${shortNames ? "" : " ${t.stats.apm.short}"}", snapshot.data![1]["highestAPMnick"], snapshot.data![1]["highestAPMid"]),
+                            RankViewEntry("${f2.format(snapshot.data![1]["highestPPS"])}${shortNames ? "" : " ${t.stats.pps.short}"}", snapshot.data![1]["highestPPSnick"], snapshot.data![1]["highestPPSid"], differentBG: true),
+                            RankViewEntry("${f2.format(snapshot.data![1]["highestVS"])}${shortNames ? "" : " ${t.stats.vs.short}"}", snapshot.data![1]["highestVSnick"], snapshot.data![1]["highestVSid"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestAPP"])}${shortNames ? "" : " ${t.stats.app.short}"}", snapshot.data![1]["highestAPPnick"], snapshot.data![1]["highestAPPid"], differentBG: true),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestVSAPM"])}${shortNames ? "" : " ${t.stats.vsapm.short}"}", snapshot.data![1]["highestVSAPMnick"], snapshot.data![1]["highestVSAPMid"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestDSS"])}${shortNames ? "" : " ${t.stats.dss.short}"}", snapshot.data![1]["highestDSSnick"], snapshot.data![1]["highestDSSid"], differentBG: true),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestDSP"])}${shortNames ? "" : " ${t.stats.dsp.short}"}", snapshot.data![1]["highestDSPnick"], snapshot.data![1]["highestDSPid"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestAPPDSP"])}${shortNames ? "" : " ${t.stats.appdsp.short}"}", snapshot.data![1]["highestAPPDSPnick"], snapshot.data![1]["highestAPPDSPid"], differentBG: true),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestCheese"])}${shortNames ? "" : " ${t.stats.cheese.short}"}", snapshot.data![1]["highestCheeseNick"], snapshot.data![1]["highestCheeseID"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestGBE"])}${shortNames ? "" : " ${t.stats.gbe.short}"}", snapshot.data![1]["highestGBEnick"], snapshot.data![1]["highestGBEid"], differentBG: true),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestNyaAPP"])}${shortNames ? "" : " ${t.stats.nyaapp.short}"}", snapshot.data![1]["highestNyaAPPnick"], snapshot.data![1]["highestNyaAPPid"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestArea"])}${shortNames ? "" : " ${t.stats.area.short}"}", snapshot.data![1]["highestAreaNick"], snapshot.data![1]["highestAreaID"], differentBG: true),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestEstTR"])}${shortNames ? "" : " ${t.stats.etr.short}"}", snapshot.data![1]["highestEstTRnick"], snapshot.data![1]["highestEstTRid"]),
+                            RankViewEntry("${f4.format(snapshot.data![1]["highestEstAcc"])}${shortNames ? "" : " ${t.stats.etracc.short}"}", snapshot.data![1]["highestEstAccNick"], snapshot.data![1]["highestEstAccID"], differentBG: true),
                             RankViewEntry("${f4.format(snapshot.data![1]["highestOpener"])}", snapshot.data![1]["highestOpenerNick"], snapshot.data![1]["highestOpenerID"]),
                             RankViewEntry("${f4.format(snapshot.data![1]["highestPlonk"])}", snapshot.data![1]["highestPlonkNick"], snapshot.data![1]["highestPlonkID"], differentBG: true),
                             RankViewEntry("${f4.format(snapshot.data![1]["highestStride"])}", snapshot.data![1]["highestStrideNick"], snapshot.data![1]["highestStrideID"]),
@@ -272,7 +272,7 @@ class _RankState extends State<RankView> {
                     children: [
                       Card(child: Center(child: Padding(
                             padding: const EdgeInsets.fromLTRB(0.0, 8.0, 5.0, 10.0),
-                            child: Text(widget.rank == "" ? "Everyone" : "${widget.rank.toUpperCase()} rank data", style: TextStyle(fontSize: 28)),
+                            child: Text(widget.rank == "" ? t.rankView.everyoneTitle : t.rankView.rankTitle(rank: widget.rank.toUpperCase()), style: TextStyle(fontSize: 28)),
                           ))),
                       Card(
                         child: Center(
@@ -282,7 +282,7 @@ class _RankState extends State<RankView> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Image.asset("res/tetrio_tl_alpha_ranks/${widget.rank == "" ? "z" : widget.rank}.png",fit: BoxFit.fitHeight,height: 128),
-                                Text("${intf.format(widget.cutoffTetrio.count)} players", style: Theme.of(context).textTheme.titleSmall,),
+                                Text(t.stats.players(n: widget.cutoffTetrio.count), style: Theme.of(context).textTheme.titleSmall,),
                               ],
                             ),
                           ),
@@ -297,7 +297,7 @@ class _RankState extends State<RankView> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text("TR range", style: Theme.of(context).textTheme.displayLarge),
+                                  Text(t.rankView.trRange, style: Theme.of(context).textTheme.displayLarge),
                                   Text("${f2.format(widget.cutoffTetrio.tr)} — ${f2.format(widget.nextRankTR)}", style: Theme.of(context).textTheme.displayLarge)
                                 ],
                               ),
@@ -306,14 +306,14 @@ class _RankState extends State<RankView> {
                                 child: Row(
                                   children: [
                                     Spacer(),
-                                    Text("(${f2.format(widget.nextRankTR - widget.cutoffTetrio.tr)} TR gap)", style: Theme.of(context).textTheme.displayLarge!.copyWith(color: Colors.grey, fontSize: 14))
+                                    Text("(${t.rankView.trGap(value: f2.format(widget.nextRankTR - widget.cutoffTetrio.tr))})", style: Theme.of(context).textTheme.displayLarge!.copyWith(color: Colors.grey, fontSize: 14))
                                   ],
                                 ),
                               ),
                               if (widget.rank != "") Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text("Supposed to be", style: Theme.of(context).textTheme.displayLarge),
+                                  Text(t.rankView.supposedToBe, style: Theme.of(context).textTheme.displayLarge),
                                   Text("${intf.format(widget.cutoffTetrio.targetTr)} — ${intf.format(widget.nextRankTargetTR)}", style: Theme.of(context).textTheme.displayLarge)
                                 ],
                               ),
@@ -322,28 +322,28 @@ class _RankState extends State<RankView> {
                                 child: Row(
                                   children: [
                                     Spacer(),
-                                    Text("(${intf.format(widget.nextRankTargetTR - widget.cutoffTetrio.targetTr)} TR gap)", style: Theme.of(context).textTheme.displayLarge!.copyWith(color: Colors.grey, fontSize: 14))
+                                    Text("(${t.rankView.trGap(value: intf.format(widget.nextRankTargetTR - widget.cutoffTetrio.targetTr))})", style: Theme.of(context).textTheme.displayLarge!.copyWith(color: Colors.grey, fontSize: 14))
                                   ],
                                 ),
                               ),
                               if (widget.nextRankTargetTR < widget.nextRankTR) Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text("Inflation gap", style: Theme.of(context).textTheme.displayLarge!.copyWith(color: Colors.redAccent)),
-                                  Text("${f2.format(widget.nextRankTR - widget.nextRankTargetTR)} TR", style: Theme.of(context).textTheme.displayLarge!.copyWith(color: Colors.redAccent))
+                                  Text(t.rankView.inflationGap, style: Theme.of(context).textTheme.displayLarge!.copyWith(color: Colors.redAccent)),
+                                  Text("${f2.format(widget.nextRankTR - widget.nextRankTargetTR)} ${t.stats.tr.short}", style: Theme.of(context).textTheme.displayLarge!.copyWith(color: Colors.redAccent))
                                 ],
                               ),
                               if (widget.cutoffTetrio.tr < widget.cutoffTetrio.targetTr) Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text("Deflation gap", style: Theme.of(context).textTheme.displayLarge!.copyWith(color: Colors.greenAccent)),
-                                  Text("${f2.format(widget.cutoffTetrio.targetTr - widget.cutoffTetrio.tr)} TR", style: Theme.of(context).textTheme.displayLarge!.copyWith(color: Colors.greenAccent))
+                                  Text(t.rankView.deflationGap, style: Theme.of(context).textTheme.displayLarge!.copyWith(color: Colors.greenAccent)),
+                                  Text("${f2.format(widget.cutoffTetrio.targetTr - widget.cutoffTetrio.tr)} ${t.stats.tr.short}", style: Theme.of(context).textTheme.displayLarge!.copyWith(color: Colors.greenAccent))
                                 ],
                               ),
                               if (widget.rank != "") Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text("LB pos range", style: Theme.of(context).textTheme.displayLarge),
+                                  Text(t.rankView.LBposRange, style: Theme.of(context).textTheme.displayLarge),
                                   Text("${percentage.format(widget.cutoffTetrio.percentile)} — ${percentage.format(widget.nextRankPercentile)}", style: Theme.of(context).textTheme.displayLarge)
                                 ],
                               ),
@@ -352,15 +352,15 @@ class _RankState extends State<RankView> {
                                 child: Row(
                                   children: [
                                     Spacer(),
-                                    Text("(${percentage.format(percentileGap)} gap)", style: Theme.of(context).textTheme.displayLarge!.copyWith(color: Colors.grey, fontSize: 14))
+                                    Text("(${t.rankView.gap(value: percentage.format(percentileGap))})", style: Theme.of(context).textTheme.displayLarge!.copyWith(color: Colors.grey, fontSize: 14))
                                   ],
                                 ),
                               ),
                               if (widget.rank != "") Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text("Supposed to be", style: Theme.of(context).textTheme.displayLarge),
-                                  Text("${intf.format(supposedToBePlayers)} players", style: Theme.of(context).textTheme.displayLarge)
+                                  Text(t.rankView.supposedToBe, style: Theme.of(context).textTheme.displayLarge),
+                                  Text(t.stats.players(n: supposedToBePlayers), style: Theme.of(context).textTheme.displayLarge)
                                 ],
                               ),
                               if (widget.rank != "") Padding(
@@ -368,9 +368,9 @@ class _RankState extends State<RankView> {
                                 child: Row(
                                   children: [
                                     Spacer(),
-                                    if (widget.cutoffTetrio.count > supposedToBePlayers) Text("(overpopulated by a ${intf.format(widget.cutoffTetrio.count - supposedToBePlayers)} players)", style: Theme.of(context).textTheme.displayLarge!.copyWith(color: Colors.grey, fontSize: 14))
-                                    else if (widget.cutoffTetrio.count < supposedToBePlayers) Text("(underpopulated by a ${intf.format(supposedToBePlayers - widget.cutoffTetrio.count)} players)", style: Theme.of(context).textTheme.displayLarge!.copyWith(color: Colors.grey, fontSize: 14))
-                                    else Text("(cute)", style: Theme.of(context).textTheme.displayLarge!.copyWith(color: Colors.grey, fontSize: 14))
+                                    if (widget.cutoffTetrio.count > supposedToBePlayers) Text("(${t.rankView.overpopulated(players: t.stats.players(n: widget.cutoffTetrio.count - supposedToBePlayers))})", style: Theme.of(context).textTheme.displayLarge!.copyWith(color: Colors.grey, fontSize: 14))
+                                    else if (widget.cutoffTetrio.count < supposedToBePlayers) Text("(${t.rankView.overpopulated(players: t.stats.players(n: supposedToBePlayers - widget.cutoffTetrio.count))})", style: Theme.of(context).textTheme.displayLarge!.copyWith(color: Colors.grey, fontSize: 14))
+                                    else Text("(${t.rankView.PlayersEqualSupposedToBe})", style: Theme.of(context).textTheme.displayLarge!.copyWith(color: Colors.grey, fontSize: 14))
                                   ],
                                 ),
                               ),

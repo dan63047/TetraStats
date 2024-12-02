@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 
 class FirstTimeView extends StatefulWidget {
   /// The very first view, that user see when he launch this programm.
@@ -44,8 +45,8 @@ class _FirstTimeState extends State<FirstTimeView> with SingleTickerProviderStat
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("Welcome to Tetra Stats", style: Theme.of(context).textTheme.titleLarge),
-                Text("Service, that allows you to keep track of various statistics for TETR.IO"),
+                Text(t.firstTimeView.welcome, style: Theme.of(context).textTheme.titleLarge),
+                Text(t.firstTimeView.description),
                 Padding(
                   padding: const EdgeInsets.only(top: 24.0),
                   child: Card(
@@ -54,13 +55,13 @@ class _FirstTimeState extends State<FirstTimeView> with SingleTickerProviderStat
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text("What's your nickname?", style: Theme.of(context).textTheme.titleSmall),
+                          Text(t.firstTimeView.nicknameQuestion, style: Theme.of(context).textTheme.titleSmall),
                           Padding(
                             padding: const EdgeInsets.only(bottom: 8.0),
                             child: SizedBox(width: 400.0, child: TextField(
                               maxLength: 16,
                               decoration: InputDecoration(
-                                hintText: "Type it here... (3-16 symbols)",
+                                hintText: t.firstTimeView.inpuntHint,
                                 counter: const Offstage()
                               ),
                             )),

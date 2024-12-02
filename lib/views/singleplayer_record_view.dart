@@ -3,7 +3,6 @@ import 'package:tetra_stats/data_objects/record_single.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/views/destination_home.dart';
 import 'package:tetra_stats/widgets/singleplayer_record.dart';
-import 'package:tetra_stats/widgets/text_timestamp.dart';
 
 class SingleplayerRecordView extends StatelessWidget {
   final RecordSingle record;
@@ -33,8 +32,8 @@ class SingleplayerRecordView extends StatelessWidget {
                 maxWidth: 768
               ),
               child: switch (record.gamemode){
-                "zenith" => ZenithCard(record, false),
-                "zenithex" => ZenithCard(record, false),
+                "zenith" => ZenithCard(record, false, width: MediaQuery.of(context).size.width),
+                "zenithex" => ZenithCard(record, false, width: MediaQuery.of(context).size.width),
                 _ => SingleplayerRecord(record: record, hideTitle: true)
               },
             ),

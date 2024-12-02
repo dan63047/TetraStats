@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 
 class TrailingStats extends StatelessWidget{
@@ -23,9 +24,9 @@ class TrailingStats extends StatelessWidget{
         2: FixedColumnWidth(54),
       },
         children: [
-        TableRow(children: [Text(f2.format(yourAPM), textAlign: TextAlign.right, style: style), const Text(" :", style: style), Text(f2.format(notyourAPM), textAlign: TextAlign.right, style: style), const Text(" APM", textAlign: TextAlign.right, style: style)]),
-        TableRow(children: [Text(f2.format(yourPPS), textAlign: TextAlign.right, style: style), const Text(" :", style: style), Text(f2.format(notyourPPS), textAlign: TextAlign.right, style: style), const Text(" PPS", textAlign: TextAlign.right, style: style)]),
-        TableRow(children: [Text(f2.format(yourVS), textAlign: TextAlign.right, style: style), const Text(" :", style: style), Text(f2.format(notyourVS), textAlign: TextAlign.right, style: style), const Text(" VS", textAlign: TextAlign.right, style: style)]),
+        TableRow(children: [Text(f2.format(yourAPM), textAlign: TextAlign.right, style: style), const Text(" :", style: style), Text(f2.format(notyourAPM), textAlign: TextAlign.right, style: style), Text(" ${t.stats.apm.short}", textAlign: TextAlign.right, style: style)]),
+        TableRow(children: [Text(f2.format(yourPPS), textAlign: TextAlign.right, style: style), const Text(" :", style: style), Text(f2.format(notyourPPS), textAlign: TextAlign.right, style: style), Text(" ${t.stats.pps.short}", textAlign: TextAlign.right, style: style)]),
+        TableRow(children: [Text(f2.format(yourVS), textAlign: TextAlign.right, style: style), const Text(" :", style: style), Text(f2.format(notyourVS), textAlign: TextAlign.right, style: style), Text(" ${t.stats.vs.short}", textAlign: TextAlign.right, style: style)]),
       ],
     );
   }

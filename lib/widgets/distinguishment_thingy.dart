@@ -11,9 +11,9 @@ class DistinguishmentThingy extends StatelessWidget{
 
   List<InlineSpan> getDistinguishmentTitle(String? text) {
     // TWC champions don't have header in their distinguishments
-    if (distinguishment.type == "twc") return [const TextSpan(text: "TETR.IO World Champion", style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.yellowAccent))];
+    if (distinguishment.type == "twc") return [TextSpan(text: t.distinguishments.twc, style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.yellowAccent))];
     // In case if it missing for some other reason, return this 
-    if (text == null) return [const TextSpan(text: "Header is missing", style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.redAccent))];
+    if (text == null) return [TextSpan(text: t.distinguishments.noHeader, style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.redAccent))];
     
     // Handling placeholders for logos
     var exploded = text.split(" "); // wtf PHP reference?
@@ -43,9 +43,9 @@ class DistinguishmentThingy extends StatelessWidget{
   /// Receives [text], which is footer and returns sets of widgets for RichText widget
   String getDistinguishmentSubtitle(String? text){
     // TWC champions don't have footer in their distinguishments
-    if (distinguishment.type == "twc") return "${distinguishment.detail} TETR.IO World Championship";
+    if (distinguishment.type == "twc") return "${t.distinguishments.twcYear(year: distinguishment.detail!)}";
     // In case if it missing for some other reason, return this 
-    if (text == null) return "Footer is missing";
+    if (text == null) return t.distinguishments.noFooter;
     // If everything ok, return as it is
     return text;
   }

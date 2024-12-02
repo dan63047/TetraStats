@@ -25,21 +25,22 @@ class DestinationSettings extends StatefulWidget{
 }
 
 enum SettingsCardMod{
-  general("General"),
-  customization("Custonization"),
-  database("Local database");
-
-  const SettingsCardMod(this.title);
-
-  final String title;
+  general,
+  customization,
+  database
 }
 
+Map<SettingsCardMod, String> settingsCardTitles = {
+  SettingsCardMod.general: t.settingsDestination.general,
+  SettingsCardMod.customization: t.settingsDestination.customization,
+  SettingsCardMod.database: t.settingsDestination.database
+};
 const EdgeInsets descriptionPadding = EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 8.0);
 
 class _DestinationSettings extends State<DestinationSettings> with SingleTickerProviderStateMixin {
   SettingsCardMod mod = SettingsCardMod.general;
   List<DropdownMenuItem<AppLocale>> locales = <DropdownMenuItem<AppLocale>>[];
-  String defaultNickname = "Checking...";
+  String defaultNickname = t.settingsDestination.checking;
   String defaultID = "";
   Color pickerColor = Colors.cyanAccent;
   Color currentColor = Colors.cyanAccent;
@@ -55,7 +56,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
   late Animation _badDefaultNicknameAnim;
   late Animation _defaultNicknameAnim = _goodDefaultNicknameAnim;
   double helperTextOpacity = 0;
-  String helperText = "Press Enter to submit";
+  String helperText = t.settingsDestination.enterToSubmit;
 
   @override
   void initState() {
@@ -76,7 +77,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
       curve: Easing.emphasizedAccelerate,
       //reverseCurve: Cubic(0,.99,.99,1.01)
     ))..addStatusListener((status) {
-      if (status.index == 3) setState((){helperText = "Press Enter to submit"; helperTextOpacity = 0;});
+      if (status.index == 3) setState((){helperText = t.settingsDestination.enterToSubmit; helperTextOpacity = 0;});
     });
     _badDefaultNicknameAnim = new ColorTween(
       begin: Colors.redAccent,
@@ -86,7 +87,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
       curve: Easing.emphasizedAccelerate,
       //reverseCurve: Cubic(0,.99,.99,1.01)
     ))..addStatusListener((status) {
-      if (status.index == 3) setState((){helperText = "Press Enter to submit"; helperTextOpacity = 0;});
+      if (status.index == 3) setState((){helperText = t.settingsDestination.enterToSubmit; helperTextOpacity = 0;});
     });
     _getPreferences();
     super.initState();
@@ -147,7 +148,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
             padding: const EdgeInsets.only(bottom: 8.0),
             child: Column(
               children: [
-                Text(SettingsCardMod.general.title, style: Theme.of(context).textTheme.titleLarge),
+                Text(t.settingsDestination.general, style: Theme.of(context).textTheme.titleLarge),
               ],
             ),
           )),
@@ -157,13 +158,13 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Text("Your account in TETR.IO", style: Theme.of(context).textTheme.displayLarge),
+                title: Text(t.settingsDestination.account, style: Theme.of(context).textTheme.displayLarge),
                 trailing: SizedBox(width: 150.0, child: AnimatedBuilder(
                   animation: _defaultNicknameAnim,
                   builder: (context, child) {
                     return Focus(
                       onFocusChange: (value) {
-                        setState((){helperTextOpacity = ((value || helperText != "Press Enter to submit")) ? 1 : 0;});
+                        setState((){helperTextOpacity = ((value || helperText != t.settingsDestination.enterToSubmit)) ? 1 : 0;});
                       },
                       child: TextField(
                         keyboardType: TextInputType.text,
@@ -177,11 +178,11 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
                           ),
                         ),
                         onSubmitted: (value) {
-                          helperText = "Checking...";
+                          helperText = t.settingsDestination.checking;
                           _setDefaultNickname(value).then((v) {
                             _defaultNicknameAnim = v ? _goodDefaultNicknameAnim : _badDefaultNicknameAnim;
                             _defaultNicknameAnimController.forward(from: 0);
-                            setState((){ helperText = v ? "Done!" : "Fuck";});
+                            setState((){ helperText = v ? t.settingsDestination.done : t.settingsDestination.noSuchAccount;});
                           });
                         },
                       ),
@@ -192,7 +193,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
               Divider(),
               Padding(
                 padding: descriptionPadding,
-                child: Text("Stats of that player will be loaded initially right after launching this app. By default it loads my (dan63) stats. To change that, enter your nickname here."),
+                child: Text(t.settingsDestination.accountDescription),
               )
             ],
           ),
@@ -219,7 +220,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
               Divider(),
               Padding(
                 padding: descriptionPadding,
-                child: Text("Tetra Stats was translated on ${locales.length} languages. By default, app will pick your system one or English, if locale of your system isn't avaliable."),
+                child: Text(t.settingsDestination.languageDescription(languages: t.settingsDestination.languages(n: locales.length))),
               )
             ],
           ),
@@ -229,7 +230,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Text("Update data in the background", style: Theme.of(context).textTheme.displayLarge),
+                title: Text(t.settingsDestination.updateInTheBackground, style: Theme.of(context).textTheme.displayLarge),
                 trailing: Switch(value: updateInBG, onChanged: (bool value){
                 prefs.setBool("updateInBG", value);
                 setState(() {
@@ -240,7 +241,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
               Divider(),
               Padding(
                 padding: descriptionPadding,
-                child: Text("If on, Tetra Stats will attempt to retrieve new info once cache expires. Usually that happen every 5 minutes"),
+                child: Text(t.settingsDestination.updateInTheBackgroundDescription),
               )
             ],
           ),
@@ -250,7 +251,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Text("Compare TL stats with rank averages", style: Theme.of(context).textTheme.displayLarge),
+                title: Text(t.settingsDestination.compareStats, style: Theme.of(context).textTheme.displayLarge),
                 trailing: Switch(value: showAverages, onChanged: (bool value){
                   prefs.setBool("showAverages", value);
                   setState(() {
@@ -261,7 +262,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
               Divider(),
               Padding(
                 padding: descriptionPadding,
-                child: Text("If on, Tetra Stats will provide additional metrics, which allow you to compare yourself with average player on your rank. The way you'll see it — stats will be highlited with corresponding color, hover over them with cursor for more info."),
+                child: Text(t.settingsDestination.compareStatsDescription),
               )
             ],
           ),
@@ -272,7 +273,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Text("Show position on leaderboard by stats", style: Theme.of(context).textTheme.displayLarge),
+                title: Text(t.settingsDestination.showPosition, style: Theme.of(context).textTheme.displayLarge),
                 trailing: Switch(value: showPositions, onChanged: (bool value){
                   prefs.setBool("showPositions", value);
                   setState(() {
@@ -283,7 +284,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
               Divider(),
               Padding(
                 padding: descriptionPadding,
-                child: Text("This can take some time (and traffic) to load, but will allow you to see your position on the leaderboard, sorted by a stat"),
+                child: Text(t.settingsDestination.showPositionDescription),
               )
             ],
           ),
@@ -300,7 +301,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
             padding: const EdgeInsets.only(bottom: 8.0),
             child: Column(
               children: [
-                Text(SettingsCardMod.customization.title, style: Theme.of(context).textTheme.titleLarge),
+                Text(t.settingsDestination.customization, style: Theme.of(context).textTheme.titleLarge),
               ],
             ),
           )),
@@ -310,13 +311,13 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Text("Accent color", style: Theme.of(context).textTheme.displayLarge),
+                title: Text(t.settingsDestination.accentColor, style: Theme.of(context).textTheme.displayLarge),
                 trailing: ColorIndicator(HSVColor.fromColor(Theme.of(context).colorScheme.primary), width: 25, height: 25),
                 onTap: () {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) => AlertDialog(
-                    title: const Text('Pick an accent color'),
+                    title: Text(t.settingsDestination.accentColorModale),
                     content: SingleChildScrollView(
                       child: ColorPicker(
                         pickerColor: pickerColor,
@@ -325,7 +326,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
                     ),
                     actions: <Widget>[
                       ElevatedButton(
-                        child: const Text('Set'),
+                        child: Text(t.actions.apply),
                         onPressed: () {
                           setState(() {
                             context.findAncestorStateOfType<MyAppState>()?.setAccentColor(pickerColor);
@@ -340,7 +341,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
               Divider(),
               Padding(
                 padding: descriptionPadding,
-                child: Text("That color is seen across this app and usually highlites interactive UI elements."),
+                child: Text(t.settingsDestination.accentColorDescription),
               )
             ],
           ),
@@ -351,7 +352,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ListTile(
-                title: Text("Timestamps format", style: Theme.of(context).textTheme.displayLarge),
+                title: Text(t.settingsDestination.timestamps, style: Theme.of(context).textTheme.displayLarge),
                 trailing:  DropdownButton(
                   value: timestampMode,
                   items: <DropdownMenuItem>[
@@ -370,11 +371,11 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
               Divider(),
               Padding(
                 padding: descriptionPadding,
-                child: Text("You can choose, in which way timestamps shows time. By default, they show time in GMT timezone, formatted according to chosen locale, example: ${DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms().format(DateTime.utc(2023, DateTime.july, 20, 21, 03, 19))}."),
+                child: Text(t.settingsDestination.timestampsDescriptionPart1(d: DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms().format(DateTime.utc(2023, DateTime.july, 20, 21, 03, 19)))),
               ),
               Padding(
                 padding: descriptionPadding,
-                child: Text("There is also:\n• Locale formatted in your timezone: ${DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms().format(DateTime.utc(2023, DateTime.july, 20, 21, 03, 19).toLocal())}\n• Relative timestamp: ${relativeDateTime(DateTime.utc(2023, DateTime.july, 20, 21, 03, 19))}"),
+                child: Text(t.settingsDestination.timestampsDescriptionPart2(y: DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).add_Hms().format(DateTime.utc(2023, DateTime.july, 20, 21, 03, 19).toLocal()), r: relativeDateTime(DateTime.utc(2023, DateTime.july, 20, 21, 03, 19)))),
               )
             ],
           ),
@@ -384,7 +385,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Text("Sheetbot-like behavior for radar graphs", style: Theme.of(context).textTheme.displayLarge),
+                title: Text(t.settingsDestination.sheetbotLikeGraphs, style: Theme.of(context).textTheme.displayLarge),
                 trailing: Switch(value: sheetbotRadarGraphs, onChanged: (bool value){
                   prefs.setBool("sheetbotRadarGraphs", value);
                   setState(() {
@@ -395,7 +396,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
               Divider(),
               Padding(
                 padding: descriptionPadding,
-                child: Text("Altough it was considered by me, that the way graphs work in SheetBot is not very correct, some people were confused to see, that -0.5 stride dosen't look the way it looks on SheetBot graph. Hence, he we are: if this toggle is on, points on the graphs can appear on the opposite half of the graph if value is negative."),
+                child: Text(t.settingsDestination.sheetbotLikeGraphsDescription),
               )
             ],
           ),
@@ -405,7 +406,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Text("Osk-Kagari gimmick", style: Theme.of(context).textTheme.displayLarge),
+                title: Text(t.settingsDestination.oskKagariGimmick, style: Theme.of(context).textTheme.displayLarge),
                 trailing: Switch(value: oskKagariGimmick, onChanged: (bool value){
                   prefs.setBool("oskKagariGimmick", value);
                   setState(() {
@@ -416,7 +417,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
               Divider(),
               Padding(
                 padding: descriptionPadding,
-                child: Text("If on, instead of osk's rank, :kagari: will be rendered."),
+                child: Text(t.settingsDestination.oskKagariGimmickDescription),
               )
             ],
           ),
@@ -431,7 +432,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
         Card(
           child: Center(child: Column(
             children: [
-              Text(SettingsCardMod.database.title, style: Theme.of(context).textTheme.titleLarge),
+              Text(t.settingsDestination.database, style: Theme.of(context).textTheme.titleLarge),
               Divider(),
               FutureBuilder<(int, int, int)>(future: teto.getDatabaseData(),
                 builder: (context, snapshot) {
@@ -447,11 +448,11 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
                             style: TextStyle(fontFamily: "Eurostile Round", color: Colors.white),
                             children: [
                               TextSpan(text: "${bytesToSize(snapshot.data!.$1)} ", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)),
-                              TextSpan(text: "of data stored\n"),
+                              TextSpan(text: "${t.settingsDestination.bytesOfDataStored}\n"),
                               TextSpan(text: "${intf.format(snapshot.data!.$2)} ", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)),
-                              TextSpan(text: "Tetra League records saved\n"),
+                              TextSpan(text: "${t.settingsDestination.TLrecordsSaved}\n"),
                               TextSpan(text: "${intf.format(snapshot.data!.$3)} ", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)),
-                              TextSpan(text: "Tetra League playerstates saved"),
+                              TextSpan(text: t.settingsDestination.TLplayerstatesSaved),
                             ]
                           )
                         );
@@ -469,7 +470,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
                     child: ElevatedButton.icon(
                       onPressed: (){teto.removeDuplicatesFromTLMatches().then((_) => setState((){}));},
                       icon: const Icon(Icons.build),
-                      label: Text("Fix"),
+                      label: Text(t.settingsDestination.fixButton),
                       style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12.0)))))
                     )
                   ),
@@ -477,7 +478,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
                     child: ElevatedButton.icon(
                       onPressed: (){teto.compressDB().then((_) => setState((){}));},
                       icon: const Icon(Icons.compress),
-                      label: Text("Compress"),
+                      label: Text(t.settingsDestination.compressButton),
                       style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomRight: Radius.circular(12.0)))))
                     )
                   )
@@ -488,7 +489,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
         ),
         Card(
           child: ListTile(
-            title: Text("Export Database", style: Theme.of(context).textTheme.displayLarge),
+            title: Text(t.settingsDestination.exportDB, style: Theme.of(context).textTheme.displayLarge),
             onTap: () {
               if (kIsWeb){
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.snackBarMessages.notForWeb)));
@@ -543,7 +544,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
         ),
         Card(
           child: ListTile(
-            title: Text("Import Database", style: Theme.of(context).textTheme.displayLarge),
+            title: Text(t.settingsDestination.importDB, style: Theme.of(context).textTheme.displayLarge),
             onTap: (){
               if (kIsWeb){
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.snackBarMessages.notForWeb)));
@@ -639,14 +640,14 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Spacer(),
-                    Text("Settings", style: Theme.of(context).textTheme.headlineMedium),
+                    Text(t.settingsDestination.title, style: Theme.of(context).textTheme.headlineMedium),
                     Spacer()
                   ],
                 ),
               ),
               for (SettingsCardMod m in SettingsCardMod.values) Card(
                 child: ListTile(
-                  title: Text(m.title),
+                  title: Text(settingsCardTitles[m]!),
                   trailing: Icon(Icons.arrow_right, color: mod == m ? Colors.white : Colors.grey),
                   onTap: () {
                     setState(() {

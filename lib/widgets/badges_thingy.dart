@@ -7,7 +7,7 @@ import 'package:tetra_stats/widgets/text_timestamp.dart';
 
 class BadgesThingy extends StatelessWidget{
   final List<Badge> badges;
-
+  // TODO: make it obvious, that it's scrollable
   const BadgesThingy({super.key, required this.badges});
 
   @override
@@ -19,7 +19,7 @@ class BadgesThingy extends StatelessWidget{
             padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
             child: Row(
               children: [
-                const Text("Badges", style: TextStyle(fontFamily: "Eurostile Round Extended")),
+                Text(t.badges, style: TextStyle(fontFamily: "Eurostile Round Extended")),
                 const Spacer(),
                 Text(intf.format(badges.length))
               ],

@@ -50,7 +50,7 @@ class TLRatingThingy extends StatelessWidget{
                   1 => [
                     TextSpan(text: formatedGlicko[0], style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
                     if (formatedGlicko.elementAtOrNull(1) != null) TextSpan(text: decimalSeparator + formatedGlicko[1]),
-                    TextSpan(text: " Glicko", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
+                    TextSpan(text: " ${t.stats.glicko.short}", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
                   ],
                   2 => [
                     TextSpan(text: "${t.top} ${formatedPercentile[0]}", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
@@ -60,7 +60,7 @@ class TLRatingThingy extends StatelessWidget{
                   _ => [
                   TextSpan(text: formatedTR[0], style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
                   if (formatedTR.elementAtOrNull(1) != null) TextSpan(text: decimalSeparator + formatedTR[1]),
-                  TextSpan(text: " TR", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
+                  TextSpan(text: " ${t.stats.tr.short}", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28))
                 ],
                 } : [TextSpan(text: "---\n", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28, color: Colors.grey)), TextSpan(text: t.gamesUntilRanked(left: 10-tlData.gamesPlayed), style: const TextStyle(color: Colors.grey, fontSize: 14)),]
               )
@@ -72,9 +72,9 @@ class TLRatingThingy extends StatelessWidget{
                 style: DefaultTextStyle.of(context).style,
                 children: [
                   TextSpan(text: switch(prefs.getInt("ratingMode")){
-                    1 => "${fDiff.format(tlData.glicko! - oldTl!.glicko!)} Glicko",
+                    1 => "${fDiff.format(tlData.glicko! - oldTl!.glicko!)} ${t.stats.glicko.short}",
                     2 => "${fDiff.format(tlData.percentile * 100 - oldTl!.percentile * 100)} %",
-                    _ => "${fDiff.format(tlData.tr - oldTl!.tr)} TR"
+                    _ => "${fDiff.format(tlData.tr - oldTl!.tr)} ${t.stats.tr.short}"
                   },
                   style: TextStyle(
                       color: getDifferenceColor(switch(prefs.getInt("ratingMode")){
@@ -86,8 +86,8 @@ class TLRatingThingy extends StatelessWidget{
                   ),
                   const TextSpan(text: " • ", style: TextStyle(color: Colors.grey)),
                   TextSpan(text: switch(prefs.getInt("ratingMode")){
-                    1 => "${fDiff.format(tlData.tr - oldTl!.tr)} TR",
-                    _ => "${fDiff.format(tlData.glicko! - oldTl!.glicko!)} Glicko"
+                    1 => "${fDiff.format(tlData.tr - oldTl!.tr)} ${t.stats.tr.short}",
+                    _ => "${fDiff.format(tlData.glicko! - oldTl!.glicko!)} ${t.stats.glicko.short}"
                   },
                   style: TextStyle(
                       color: getDifferenceColor(switch(prefs.getInt("ratingMode")){
@@ -98,7 +98,7 @@ class TLRatingThingy extends StatelessWidget{
                   ),
                   const TextSpan(text: " • ", style: TextStyle(color: Colors.grey)),
                   TextSpan(
-                    text: "${fDiff.format(tlData.rd! - oldTl!.rd!)} RD",
+                    text: "${fDiff.format(tlData.rd! - oldTl!.rd!)} ${t.stats.rd.short}",
                     style: TextStyle(color: getDifferenceColor(oldTl!.rd! - tlData.rd!))
                   )
                 ],
@@ -133,7 +133,7 @@ class TLRatingThingy extends StatelessWidget{
               children: [
                 if (tlData.standing != -1) TextSpan(text: "№ ${intf.format(tlData.standing)}", style: TextStyle(color: getColorOfRank(tlData.standing))),
                 if (tlData.standing != -1 || tlData.standingLocal != -1) const TextSpan(text: " • "),
-                if (tlData.standingLocal != -1) TextSpan(text: "№ ${intf.format(tlData.standingLocal)} local", style: TextStyle(color: getColorOfRank(tlData.standingLocal))),
+                if (tlData.standingLocal != -1) TextSpan(text: "№ ${intf.format(tlData.standingLocal)} ${t.localStanding}", style: TextStyle(color: getColorOfRank(tlData.standingLocal))),
                 if (tlData.standing != -1 && tlData.standingLocal != -1) const TextSpan(text: " • "),
                 TextSpan(text: timestamp(tlData.timestamp)),
               ]

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart';
 
 class FakeDistinguishmentThingy extends StatelessWidget{
@@ -18,16 +19,16 @@ class FakeDistinguishmentThingy extends StatelessWidget{
 
   InlineSpan getDistinguishmentTitle() {
     String text = "";
-    if (banned) text = "banned";
-    if (badStanding) text = "bad standing";
-    if (bot) text = "bot account";
+    if (banned) text = t.banned;
+    if (badStanding) text = t.badStanding;
+    if (bot) text = t.botAccount;
     return TextSpan(text: text.toUpperCase(), style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white));
   }
 
   String getDistinguishmentSubtitle(){
-    if (banned) return "Bans are placed when TETR.IO rules or terms of service are broken";
-    if (badStanding) return "One or more recent bans on record";
-    if (bot) return "Operated by $botMaintainers";
+    if (banned) return t.bannedSubtext;
+    if (badStanding) return t.badStandingSubtext;
+    if (bot) return t.botAccountSubtext(botMaintainers: botMaintainers!);
     return "";
   }
 

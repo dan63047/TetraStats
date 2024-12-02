@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
-import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/views/destination_home.dart';
 import 'package:tetra_stats/views/main_view.dart';
 

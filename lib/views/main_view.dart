@@ -30,8 +30,8 @@ int destination = 0;
 // TODO: Redesign some widgets, so they could look nice on mobile view
 // - stats below TL progress bar & similar parts in other widgets
 // - APP and VS/APM gadget
-// - Badges widget needs some kind of scroll arrows for desktop mode (How is this related to this todo???)
-
+// - different design for radar graphs
+// - i should put tooltips everywhere
 Future<FetchResults> getData(String searchFor) async {
     TetrioPlayer player;
     try{
@@ -53,7 +53,7 @@ Future<FetchResults> getData(String searchFor) async {
         teto.fetchSummaries(player.userId),
         teto.fetchNews(player.userId),
         teto.fetchCutoffsBeanserver(),
-        if (prefs.getBool("showAverages") == true) teto.fetchCutoffsTetrio()
+        if (prefs.getBool("showAverages") ?? true) teto.fetchCutoffsTetrio()
       ]);
 
       summaries = requests[0];
@@ -185,25 +185,25 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
           SegmentedButton<Cards>(
           showSelectedIcon: false,
           segments: <ButtonSegment<Cards>>[
-            const ButtonSegment<Cards>(
+            ButtonSegment<Cards>(
                 value: Cards.overview,
-                tooltip: 'Overview',
+                tooltip: t.homeNavigation.overview,
                 icon: Icon(Icons.calendar_view_day)),
             ButtonSegment<Cards>(
                 value: Cards.tetraLeague,
-                tooltip: 'Tetra League',
+                tooltip: t.gamemodes["league"],
                 icon: SvgPicture.asset("res/icons/league.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
             ButtonSegment<Cards>(
                 value: Cards.quickPlay,
-                tooltip: 'Quick Play',
+                tooltip: t.gamemodes["zenith"],
                 icon: SvgPicture.asset("res/icons/qp.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
             ButtonSegment<Cards>(
                 value: Cards.sprint,
-                tooltip: '40 Lines',
+                tooltip: t.gamemodes["40l"],
                 icon: SvgPicture.asset("res/icons/40l.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
             ButtonSegment<Cards>(
                 value: Cards.blitz,
-                tooltip: 'Blitz',
+                tooltip: t.gamemodes["blitz"],
                 icon: SvgPicture.asset("res/icons/blitz.svg", height: 16, colorFilter: ColorFilter.mode(theme.colorScheme.primary, BlendMode.modulate))),
           ],
           selected: <Cards>{rightCard},
@@ -217,15 +217,15 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       1 => SegmentedButton<Graph>(
         showSelectedIcon: false,
         segments: <ButtonSegment<Graph>>[
-          const ButtonSegment<Graph>(
+          ButtonSegment<Graph>(
             value: Graph.history,
-            label: Text('Player History')),
+            label: Text(t.graphsNavigation.history)),
           ButtonSegment<Graph>(
             value: Graph.leagueState,
-            label: Text('League State')),
+            label: Text(t.graphsNavigation.league)),
           ButtonSegment<Graph>(
             value: Graph.leagueCutoffs,
-            label: Text('League Cutoffs'),
+            label: Text(t.graphsNavigation.cutoffs),
           ),
         ],
         selected: <Graph>{graph},
@@ -243,13 +243,13 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       4 => SegmentedButton<CalcCards>(
           showSelectedIcon: false,
           segments: <ButtonSegment<CalcCards>>[
-            const ButtonSegment<CalcCards>(
+            ButtonSegment<CalcCards>(
                 value: CalcCards.calc,
-                label: Text('Stats Calculator'),
+                label: Text(t.calcNavigation.stats),
                 ),
             ButtonSegment<CalcCards>(
                 value: CalcCards.damage,
-                label: Text('Damage Calculator'),
+                label: Text(t.calcNavigation.damage),
                 ),
           ],
           selected: <CalcCards>{calcCard},
@@ -279,7 +279,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
             child: Row(
               children: <Widget>[
                 IconButton(
-                  tooltip: 'Open navigation menu',
+                  tooltip: t.navMenuTooltip,
                   icon: const Icon(Icons.menu),
                   onPressed: () {
                     _scaffoldKey.currentState!.openEndDrawer();
@@ -319,21 +319,21 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                     child: const Icon(Icons.search),
                   ),
                   trailing: IconButton(
-                    tooltip: "Refresh data",
+                    tooltip: t.refresh,
                     onPressed: () {
                       changePlayer(_searchFor);
                     },
                     icon: const Icon(Icons.refresh),
                   ),
                   destinations: [
-                    getDestinationButton(Icons.home, "Home"),
-                    getDestinationButton(Icons.data_thresholding_outlined, "Graphs"),
-                    getDestinationButton(Icons.leaderboard, "Leaderboards"),
-                    getDestinationButton(Icons.compress, "Cutoffs"),
-                    getDestinationButton(Icons.calculate, "Calc"),
-                    getDestinationButton(Icons.info_outline, "Information"),
-                    getDestinationButton(Icons.storage, "Saved Data"),
-                    getDestinationButton(Icons.settings, "Settings"),
+                    getDestinationButton(Icons.home, t.destinations.home),
+                    getDestinationButton(Icons.data_thresholding_outlined, t.destinations.graphs),
+                    getDestinationButton(Icons.leaderboard, t.destinations.leaderboards),
+                    getDestinationButton(Icons.compress, t.destinations.cutoffs),
+                    getDestinationButton(Icons.calculate, t.destinations.calc),
+                    getDestinationButton(Icons.info_outline, t.destinations.info),
+                    getDestinationButton(Icons.storage, t.destinations.data),
+                    getDestinationButton(Icons.settings, t.destinations.settings),
                   ],
                   selectedIndex: destination,
                   onDestinationSelected: (value) {
@@ -406,7 +406,7 @@ class _SearchDrawerState extends State<SearchDrawer>  {
                     SliverToBoxAdapter(
                       child: SearchBar(
                         controller: widget.controller,
-                        hintText: "Username or ID",
+                        hintText: t.searchHint,
                         hintStyle: const WidgetStatePropertyAll(TextStyle(color: Colors.grey)),
                         trailing: [
                           IconButton(onPressed: (){setState(() {
@@ -439,7 +439,7 @@ class _SearchDrawerState extends State<SearchDrawer>  {
                     SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.only(left: 10.0),
-                        child: Text("Tracked Players", style: Theme.of(context).textTheme.headlineLarge),
+                        child: Text(t.trackedPlayers, style: Theme.of(context).textTheme.headlineLarge),
                       ),
                     )
                   ];
@@ -487,7 +487,7 @@ class _DestinationsDrawerState extends State<DestinationsDrawer>{
           return [
             SliverToBoxAdapter(
               child: DrawerHeader(
-                child: Text("Navigation menu", style: const TextStyle(color: Colors.white, fontSize: 25),
+                child: Text(t.navMenu, style: const TextStyle(color: Colors.white, fontSize: 25),
           )))
           ];
         },
@@ -495,7 +495,7 @@ class _DestinationsDrawerState extends State<DestinationsDrawer>{
           children: [
             ListTile(
               leading: Icon(Icons.home),
-              title: Text("Home"),
+              title: Text(t.destinations.home),
               onTap: (){
                 widget.changeDestination(0);
                 Navigator.of(context).pop();
@@ -503,7 +503,7 @@ class _DestinationsDrawerState extends State<DestinationsDrawer>{
             ),
             ListTile(
               leading: Icon(Icons.data_thresholding_outlined),
-              title: Text("Graphs"),
+              title: Text(t.destinations.graphs),
               onTap: (){
                 widget.changeDestination(1);
                 Navigator.of(context).pop();
@@ -511,7 +511,7 @@ class _DestinationsDrawerState extends State<DestinationsDrawer>{
             ),
             ListTile(
               leading: Icon(Icons.leaderboard),
-              title: Text("Leaderboards"),
+              title: Text(t.destinations.leaderboards),
               onTap: (){
                 widget.changeDestination(2);
                 Navigator.of(context).pop();
@@ -519,7 +519,7 @@ class _DestinationsDrawerState extends State<DestinationsDrawer>{
             ),
             ListTile(
               leading: Icon(Icons.compress),
-              title: Text("Cutoffs"),
+              title: Text(t.destinations.cutoffs),
               onTap: (){
                 widget.changeDestination(3);
                 Navigator.of(context).pop();
@@ -527,7 +527,7 @@ class _DestinationsDrawerState extends State<DestinationsDrawer>{
             ),
             ListTile(
               leading: Icon(Icons.calculate),
-              title: Text("Calc"),
+              title: Text(t.destinations.calc),
               onTap: (){
                 widget.changeDestination(4);
                 Navigator.of(context).pop();
@@ -535,7 +535,7 @@ class _DestinationsDrawerState extends State<DestinationsDrawer>{
             ),
             ListTile(
               leading: Icon(Icons.info_outline),
-              title: Text("Information"),
+              title: Text(t.destinations.info),
               onTap: (){
                 widget.changeDestination(5);
                 Navigator.of(context).pop();
@@ -543,7 +543,7 @@ class _DestinationsDrawerState extends State<DestinationsDrawer>{
             ),
             ListTile(
               leading: Icon(Icons.storage),
-              title: Text("Saved Data"),
+              title: Text(t.destinations.data),
               onTap: (){
                 widget.changeDestination(6);
                 Navigator.of(context).pop();
@@ -551,7 +551,7 @@ class _DestinationsDrawerState extends State<DestinationsDrawer>{
             ),
             ListTile(
               leading: Icon(Icons.settings),
-              title: Text("Settings"),
+              title: Text(t.destinations.settings),
               onTap: (){
                 widget.changeDestination(7);
                 Navigator.of(context).pop();

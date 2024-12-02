@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tetra_stats/data_objects/record_extras.dart';
 import 'package:tetra_stats/data_objects/record_single.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/colors_functions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/widgets/gauget_thingy.dart';
@@ -17,40 +18,40 @@ class ZenithThingy extends StatelessWidget{
     return [
       TableRow(children: [
         Text(intf.format(zenith!.stats.kills), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
-        const Text(" KO's", style: TextStyle(fontSize: 21))
+        Text(" ${t.stats.kos.short}", style: TextStyle(fontSize: 21))
       ]),
       TableRow(children: [
         Text(zenith!.stats.topBtB.toString(), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
-        const Text(" B2B", style: TextStyle(fontSize: 21))
+        Text(" ${t.stats.b2b.short}", style: TextStyle(fontSize: 21))
       ]),
       TableRow(children: [
         Text(zenith!.stats.garbage.maxspike_nomult.toString(), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
-        const Text(" Top spike", style: TextStyle(fontSize: 21))
+        Text(" ${t.stats.spike}", style: TextStyle(fontSize: 21))
       ]),
       if (width <= 600) TableRow(children: [
         Text(f2.format(zenith!.stats.zenith!.peakrank), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
-        const Text(" Peak CSP", style: TextStyle(fontSize: 21)),
+        Text(" ${t.stats.peakClimbSpeed.short}", style: TextStyle(fontSize: 21)),
       ])
     ];
   }
 
   List<TableRow> noRecordSecondColumn(){
     return [
-      const TableRow(children: [
+      TableRow(children: [
         Text("---", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: Colors.grey)),
-        Text(" KO's", style: TextStyle(fontSize: 21, color: Colors.grey))
+        Text(" ${t.stats.kos.short}", style: TextStyle(fontSize: 21, color: Colors.grey))
       ]),
-      const TableRow(children: [
+      TableRow(children: [
         Text("---", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: Colors.grey)),
-        Text(" B2B", style: TextStyle(fontSize: 21, color: Colors.grey))
+        Text(" ${t.stats.b2b.short}", style: TextStyle(fontSize: 21, color: Colors.grey))
       ]),
-      const TableRow(children: [
+      TableRow(children: [
         Text("---", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: Colors.grey)),
-        Text(" Top spike", style: TextStyle(fontSize: 21, color: Colors.grey))
+        Text(" ${t.stats.spike}", style: TextStyle(fontSize: 21, color: Colors.grey))
       ]),
       if (width <= 600) TableRow(children: [
         Text("-.--", textAlign: TextAlign.right, style: const TextStyle(fontSize: 21, color: Colors.grey)),
-        const Text(" Peak CSP", style: TextStyle(fontSize: 21, color: Colors.grey)),
+        Text(" ${t.stats.peakClimbSpeed.short}", style: TextStyle(fontSize: 21, color: Colors.grey)),
       ])
     ];
   }
@@ -102,26 +103,26 @@ class ZenithThingy extends StatelessWidget{
                     children: [
                       TableRow(children: [
                         Text(f2.format(zenith!.aggregateStats.apm), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
-                        const Text(" APM", style: TextStyle(fontSize: 21)),
+                        Text(" ${t.stats.apm.short}", style: TextStyle(fontSize: 21)),
                       ]),
                       TableRow(children: [
                         Text(f2.format(zenith!.aggregateStats.pps), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
-                        const Text(" PPS", style: TextStyle(fontSize: 21)),
+                        Text(" ${t.stats.pps.short}", style: TextStyle(fontSize: 21)),
                       ]),
                       TableRow(children: [
                         Text(f2.format(zenith!.aggregateStats.vs), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
-                        const Text(" VS", style: TextStyle(fontSize: 21)),
+                        Text(" ${t.stats.vs.short}", style: TextStyle(fontSize: 21)),
                       ]),
                       if (width <= 600) TableRow(children: [
                         Text(f2.format(zenith!.stats.cps), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
-                        const Text(" CSP", style: TextStyle(fontSize: 21)),
+                        Text(" ${t.stats.climbSpeed.short}", style: TextStyle(fontSize: 21)),
                       ]),
                       if (width <= 400) ...secondColumn().reversed
                     ],
                   ),
                 ),
               ),
-              if (width > 600) GaugetThingy(value: zenith!.stats.cps, min: 0, max: 12, tickInterval: 3, label: "Climb\nSpeed", subString: "Peak: ${f2.format(zenith!.stats.zenith!.peakrank)}", sideSize: 128, fractionDigits: 2, moreIsBetter: true),
+              if (width > 600) GaugetThingy(value: zenith!.stats.cps, min: 0, max: 12, tickInterval: 3, label: t.stats.climbSpeed.gaugetTitle, subString: "${t.stats.peak}: ${f2.format(zenith!.stats.zenith!.peakrank)}", sideSize: 128, fractionDigits: 2, moreIsBetter: true),
               if (width > 400) Expanded(
                 child: Center(
                   child: Table(
@@ -138,27 +139,27 @@ class ZenithThingy extends StatelessWidget{
                     child: Table(
                       defaultColumnWidth: IntrinsicColumnWidth(),
                       children: [
-                        const TableRow(children: [
+                        TableRow(children: [
                           Text("-.--", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: Colors.grey)),
-                          Text(" APM", style: TextStyle(fontSize: 21, color: Colors.grey)),
+                          Text(" ${t.stats.apm.short}", style: TextStyle(fontSize: 21, color: Colors.grey)),
                         ]),
-                        const TableRow(children: [
+                        TableRow(children: [
                           Text("-.--", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: Colors.grey)),
-                          Text(" PPS", style: TextStyle(fontSize: 21, color: Colors.grey)),
+                          Text(" ${t.stats.pps.short}", style: TextStyle(fontSize: 21, color: Colors.grey)),
                         ]),
-                        const TableRow(children: [
+                        TableRow(children: [
                           Text("-.--", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: Colors.grey)),
-                          Text(" VS", style: TextStyle(fontSize: 21, color: Colors.grey)),
+                          Text(" ${t.stats.vs.short}", style: TextStyle(fontSize: 21, color: Colors.grey)),
                         ]),
                         if (width <= 600) TableRow(children: [
                           Text("-.--", textAlign: TextAlign.right, style: const TextStyle(fontSize: 21, color: Colors.grey)),
-                          const Text(" CSP", style: TextStyle(fontSize: 21, color: Colors.grey)),
+                          Text(" ${t.stats.climbSpeed.short}", style: TextStyle(fontSize: 21, color: Colors.grey)),
                         ])
                       ],
                     ),
                   ),
                 ),
-                if (width > 600) GaugetThingy(value: null, min: 0, max: 12, tickInterval: 3, label: "Climb\nSpeed", subString: "Peak: ---", sideSize: 128, fractionDigits: 0, moreIsBetter: true),
+                if (width > 600) GaugetThingy(value: null, min: 0, max: 12, tickInterval: 3, label: t.stats.climbSpeed.gaugetTitle, subString: "${t.stats.peak}: ---", sideSize: 128, fractionDigits: 0, moreIsBetter: true),
                 if (width > 400) Expanded(
                   child: Center(
                     child: Table(
