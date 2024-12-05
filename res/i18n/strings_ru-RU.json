@@ -91,24 +91,16 @@
         "twc": "Чемпион мира TETR.IO",
         "twcYear": "Чемпионат мира по TETR.IO $year года"
     },
-    "newsEntrys": {
-        "leaderboard": "Got № $rank on $gametype"
+    "newsEntries": {
+        "leaderboard(rich)": "Got № $rank in $gametype",
+        "personalbest(rich)": "Got a new PB in $gametype of $pb",
+        "badge(rich)": "Obtained a $badge badge",
+        "rankup(rich)": "Obtained $rank in Tetra League",
+        "supporter(rich)": "Became a ${s(TETR.IO supporter)}",
+        "supporter_gift(rich)": "Received the gift of ${s(TETR.IO supporter)}",
+        "unknown(rich)": "Unknown news of type $type"
     },
-    "newsParts": {
-        "leaderboardStart": "Взял ",
-        "leaderboardMiddle": "в таблице ",
-        "personalbest": "Поставил новый ЛР в ",
-        "personalbestMiddle": "с результатом в ",
-        "badgeStart": "Заработал значок ",
-        "badgeEnd": "",
-        "rankupStart": "Заработал ",
-        "rankupMiddle": "${r} ранг ",
-        "rankupEnd": "in Tetra League",
-        "tetoSupporter": "TETR.IO supporter",
-        "supporterStart": "Become a ",
-        "supporterGiftStart": "Received the gift of ",
-        "unknownNews": "Unknown news of type ${type}"
-    },
+    "rankupMiddle": "${r} rank",
     "copyUserID": "Click to copy user ID",
     "searchHint": "Username or ID",
     "navMenu": "Navigation menu",
@@ -565,7 +557,7 @@
         "sent": "Sent",
         "received": "Received",
         "placement": "Placement",
-        "peak": "peak",
+        "peak": "Peak",
         "qpWithMods(plural)": {
             "one": "With 1 mod",
             "two": "With $n mods",
