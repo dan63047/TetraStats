@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 756
+/// Strings: 750
 ///
-/// Built on 2024-12-02 at 19:52 UTC
+/// Built on 2024-12-04 at 18:43 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -209,8 +209,8 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get news => 'News';
 	late final _StringsMatchResultEn matchResult = _StringsMatchResultEn._(_root);
 	late final _StringsDistinguishmentsEn distinguishments = _StringsDistinguishmentsEn._(_root);
-	late final _StringsNewsEntrysEn newsEntrys = _StringsNewsEntrysEn._(_root);
-	late final _StringsNewsPartsEn newsParts = _StringsNewsPartsEn._(_root);
+	late final _StringsNewsEntriesEn newsEntries = _StringsNewsEntriesEn._(_root);
+	String rankupMiddle({required Object r}) => '${r} rank';
 	String get copyUserID => 'Click to copy user ID';
 	String get searchHint => 'Username or ID';
 	String get navMenu => 'Navigation menu';
@@ -577,36 +577,47 @@ class _StringsDistinguishmentsEn {
 	String twcYear({required Object year}) => '${year} TETR.IO World Championship';
 }
 
-// Path: newsEntrys
-class _StringsNewsEntrysEn {
-	_StringsNewsEntrysEn._(this._root);
+// Path: newsEntries
+class _StringsNewsEntriesEn {
+	_StringsNewsEntriesEn._(this._root);
 
 	final Translations _root; // ignore: unused_field
 
 	// Translations
-	String leaderboard({required Object rank, required Object gametype}) => 'Got № ${rank} on ${gametype}';
-}
-
-// Path: newsParts
-class _StringsNewsPartsEn {
-	_StringsNewsPartsEn._(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-	String get leaderboardStart => 'Got ';
-	String get leaderboardMiddle => 'on ';
-	String get personalbest => 'Got a new PB in ';
-	String get personalbestMiddle => 'of ';
-	String get badgeStart => 'Obtained a ';
-	String get badgeEnd => 'badge';
-	String get rankupStart => 'Obtained ';
-	String rankupMiddle({required Object r}) => '${r} rank ';
-	String get rankupEnd => 'in Tetra League';
-	String get tetoSupporter => 'TETR.IO supporter';
-	String get supporterStart => 'Become a ';
-	String get supporterGiftStart => 'Received the gift of ';
-	String unknownNews({required Object type}) => 'Unknown news of type ${type}';
+	TextSpan leaderboard({required InlineSpan rank, required InlineSpan gametype}) => TextSpan(children: [
+		const TextSpan(text: 'Got № '),
+		rank,
+		const TextSpan(text: ' in '),
+		gametype,
+	]);
+	TextSpan personalbest({required InlineSpan gametype, required InlineSpan pb}) => TextSpan(children: [
+		const TextSpan(text: 'Got a new PB in '),
+		gametype,
+		const TextSpan(text: ' of '),
+		pb,
+	]);
+	TextSpan badge({required InlineSpan badge}) => TextSpan(children: [
+		const TextSpan(text: 'Obtained a '),
+		badge,
+		const TextSpan(text: ' badge'),
+	]);
+	TextSpan rankup({required InlineSpan rank}) => TextSpan(children: [
+		const TextSpan(text: 'Obtained '),
+		rank,
+		const TextSpan(text: ' in Tetra League'),
+	]);
+	TextSpan supporter({required InlineSpanBuilder s}) => TextSpan(children: [
+		const TextSpan(text: 'Became a '),
+		s('TETR.IO supporter'),
+	]);
+	TextSpan supporter_gift({required InlineSpanBuilder s}) => TextSpan(children: [
+		const TextSpan(text: 'Received the gift of '),
+		s('TETR.IO supporter'),
+	]);
+	TextSpan unknown({required InlineSpan type}) => TextSpan(children: [
+		const TextSpan(text: 'Unknown news of type '),
+		type,
+	]);
 }
 
 // Path: snackBarMessages
@@ -1064,7 +1075,7 @@ class _StringsStatsEn {
 	String get sent => 'Sent';
 	String get received => 'Received';
 	String get placement => 'Placement';
-	String get peak => 'peak';
+	String get peak => 'Peak';
 	String qpWithMods({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
 		one: 'With 1 mod',
 		two: 'With ${n} mods',
@@ -1719,20 +1730,41 @@ extension on Translations {
 			case 'distinguishments.noFooter': return 'Footer is missing';
 			case 'distinguishments.twc': return 'TETR.IO World Champion';
 			case 'distinguishments.twcYear': return ({required Object year}) => '${year} TETR.IO World Championship';
-			case 'newsEntrys.leaderboard': return ({required Object rank, required Object gametype}) => 'Got № ${rank} on ${gametype}';
-			case 'newsParts.leaderboardStart': return 'Got ';
-			case 'newsParts.leaderboardMiddle': return 'on ';
-			case 'newsParts.personalbest': return 'Got a new PB in ';
-			case 'newsParts.personalbestMiddle': return 'of ';
-			case 'newsParts.badgeStart': return 'Obtained a ';
-			case 'newsParts.badgeEnd': return 'badge';
-			case 'newsParts.rankupStart': return 'Obtained ';
-			case 'newsParts.rankupMiddle': return ({required Object r}) => '${r} rank ';
-			case 'newsParts.rankupEnd': return 'in Tetra League';
-			case 'newsParts.tetoSupporter': return 'TETR.IO supporter';
-			case 'newsParts.supporterStart': return 'Become a ';
-			case 'newsParts.supporterGiftStart': return 'Received the gift of ';
-			case 'newsParts.unknownNews': return ({required Object type}) => 'Unknown news of type ${type}';
+			case 'newsEntries.leaderboard': return ({required InlineSpan rank, required InlineSpan gametype}) => TextSpan(children: [
+				const TextSpan(text: 'Got № '),
+				rank,
+				const TextSpan(text: ' in '),
+				gametype,
+			]);
+			case 'newsEntries.personalbest': return ({required InlineSpan gametype, required InlineSpan pb}) => TextSpan(children: [
+				const TextSpan(text: 'Got a new PB in '),
+				gametype,
+				const TextSpan(text: ' of '),
+				pb,
+			]);
+			case 'newsEntries.badge': return ({required InlineSpan badge}) => TextSpan(children: [
+				const TextSpan(text: 'Obtained a '),
+				badge,
+				const TextSpan(text: ' badge'),
+			]);
+			case 'newsEntries.rankup': return ({required InlineSpan rank}) => TextSpan(children: [
+				const TextSpan(text: 'Obtained '),
+				rank,
+				const TextSpan(text: ' in Tetra League'),
+			]);
+			case 'newsEntries.supporter': return ({required InlineSpanBuilder s}) => TextSpan(children: [
+				const TextSpan(text: 'Became a '),
+				s('TETR.IO supporter'),
+			]);
+			case 'newsEntries.supporter_gift': return ({required InlineSpanBuilder s}) => TextSpan(children: [
+				const TextSpan(text: 'Received the gift of '),
+				s('TETR.IO supporter'),
+			]);
+			case 'newsEntries.unknown': return ({required InlineSpan type}) => TextSpan(children: [
+				const TextSpan(text: 'Unknown news of type '),
+				type,
+			]);
+			case 'rankupMiddle': return ({required Object r}) => '${r} rank';
 			case 'copyUserID': return 'Click to copy user ID';
 			case 'searchHint': return 'Username or ID';
 			case 'navMenu': return 'Navigation menu';
@@ -2068,7 +2100,7 @@ extension on Translations {
 			case 'stats.sent': return 'Sent';
 			case 'stats.received': return 'Received';
 			case 'stats.placement': return 'Placement';
-			case 'stats.peak': return 'peak';
+			case 'stats.peak': return 'Peak';
 			case 'stats.qpWithMods': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
 				one: 'With 1 mod',
 				two: 'With ${n} mods',

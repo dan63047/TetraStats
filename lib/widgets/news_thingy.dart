@@ -20,11 +20,11 @@ class NewsThingy extends StatelessWidget{
           title: RichText(
             text: TextSpan(
               style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16, color: Colors.white),
-              text: t.newsParts.leaderboardStart,
               children: [
-                TextSpan(text: "№${news.data["rank"]} ", style: const TextStyle(fontWeight: FontWeight.bold)),
-                TextSpan(text: t.newsParts.leaderboardMiddle),
-                TextSpan(text: "№${t.gamemodes[news.data["gametype"]]}", style: const TextStyle(fontWeight: FontWeight.bold)),
+                t.newsEntries.leaderboard(
+                  rank: TextSpan(text: news.data["rank"], style: const TextStyle(fontWeight: FontWeight.bold)),
+                  gametype: TextSpan(text: t.gamemodes[news.data["gametype"]], style: const TextStyle(fontWeight: FontWeight.bold))
+                )
               ]
             )
           ),
@@ -35,11 +35,10 @@ class NewsThingy extends StatelessWidget{
           title: RichText(
             text: TextSpan(
               style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16, color: Colors.white),
-              text: t.newsParts.personalbest,
               children: [
-                TextSpan(text: "${t.gamemodes[news.data["gametype"]]} ", style: const TextStyle(fontWeight: FontWeight.bold)),
-                TextSpan(text: t.newsParts.personalbestMiddle),
-                TextSpan(text: switch (news.data["gametype"]){
+                t.newsEntries.personalbest(
+                  gametype: TextSpan(text: t.gamemodes[news.data["gametype"]], style: const TextStyle(fontWeight: FontWeight.bold)),
+                  pb: TextSpan(text: switch (news.data["gametype"]){
                   "blitz" => NumberFormat.decimalPattern().format(news.data["result"]),
                   "40l" => get40lTime((news.data["result"]*1000).floor()),
                   "5mblast" => get40lTime((news.data["result"]*1000).floor()),
@@ -48,7 +47,8 @@ class NewsThingy extends StatelessWidget{
                   _ => "unknown"
                 },
                 style: const TextStyle(fontWeight: FontWeight.bold)
-                ),
+                )
+                )
               ]
             )
           ),
@@ -67,10 +67,8 @@ class NewsThingy extends StatelessWidget{
           title: RichText(
             text: TextSpan(
               style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16, color: Colors.white),
-              text: t.newsParts.badgeStart,
               children: [
-                TextSpan(text: "${news.data["label"]} ", style: const TextStyle(fontWeight: FontWeight.bold)),
-                TextSpan(text: t.newsParts.badgeEnd)
+                t.newsEntries.badge(badge: TextSpan(text: news.data["label"], style: const TextStyle(fontWeight: FontWeight.bold)))
               ]
             )
           ),
@@ -89,10 +87,8 @@ class NewsThingy extends StatelessWidget{
           title: RichText(
             text: TextSpan(
               style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16, color: Colors.white),
-              text: t.newsParts.rankupStart,
               children: [
-                TextSpan(text: t.newsParts.rankupMiddle(r: news.data["rank"].toString().toUpperCase()), style: const TextStyle(fontWeight: FontWeight.bold)),
-                TextSpan(text: t.newsParts.rankupEnd)
+                t.newsEntries.rankup(rank: TextSpan(text: t.rankupMiddle(r: news.data["rank"].toString().toUpperCase()), style: const TextStyle(fontWeight: FontWeight.bold)))
               ]
             )
           ),
@@ -111,9 +107,8 @@ class NewsThingy extends StatelessWidget{
           title: RichText(
             text: TextSpan(
               style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16, color: Colors.white),
-              text: t.newsParts.supporterStart,
               children: [
-                TextSpan(text: t.newsParts.tetoSupporter, style: const TextStyle(fontWeight: FontWeight.bold))
+                t.newsEntries.supporter(s: (p0) => TextSpan(text: p0, style: const TextStyle(fontWeight: FontWeight.bold)))     
               ]
             )
           ),
@@ -132,9 +127,8 @@ class NewsThingy extends StatelessWidget{
           title: RichText(
             text: TextSpan(
               style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16, color: Colors.white),
-              text: t.newsParts.supporterGiftStart,
               children: [
-                TextSpan(text: t.newsParts.tetoSupporter, style: const TextStyle(fontWeight: FontWeight.bold))
+                t.newsEntries.supporter_gift(s: (p0) => TextSpan(text: p0, style: const TextStyle(fontWeight: FontWeight.bold)))
               ]
             )
           ),
@@ -150,7 +144,14 @@ class NewsThingy extends StatelessWidget{
         );
       default: // if type is unknown
       return ListTile(
-        title: Text(t.newsParts.unknownNews(type: news.type)),
+        title: RichText(
+          text: TextSpan(
+            style: const TextStyle(fontFamily: 'Eurostile Round', fontSize: 16, color: Colors.white),
+            children: [
+              t.newsEntries.unknown(type: TextSpan(text: news.type, style: const TextStyle(fontWeight: FontWeight.bold)))
+            ]
+          )
+        ),
         subtitle: Text(timestamp(news.timestamp)),
       );
     }

@@ -140,6 +140,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   void dispose() {
     controller.dispose();
     _searchController.dispose();
+    _backgroundUpdate.cancel();
     super.dispose();
   }
 
