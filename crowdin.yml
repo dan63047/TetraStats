@@ -2,4 +2,4 @@ files:
   - source: /res/i18n/*.json
     ignore:
       - /res/i18n/old_*.json
-    translation: /res/i18n/strings_%locale_with_underscore%.%file_extension%
+    translation: /res/i18n/strings_%locale%.%file_extension%
