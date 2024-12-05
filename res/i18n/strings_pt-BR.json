@@ -1,7 +1,7 @@
 {
     "locales(map)": {
         "en": "English",
-        "ru": "Russian (Русский)",
+        "ru": "Russo",
         "zh-CN": "Simplified Chinese (简体中文)"
     },
     "gamemodes(map)": {
@@ -28,7 +28,7 @@
     "seasonEnds": "Season ends in ${countdown}",
     "seasonEnded": "Season has ended",
     "overallPB": "Overall PB: $pb",
-    "gamesUntilRanked": "${left} games until being ranked",
+    "gamesUntilRanked": "",
     "numOfVictories": "~${wins} victories",
     "promotionOnNextWin": "Promotion on next win",
     "numOfdefeats": "~${losses} defeats",
@@ -58,7 +58,7 @@
     },
     "track": "Track",
     "stopTracking": "Stop tracking",
-    "supporter": "Supporter tier ${tier}",
+    "supporter": "'Tier' de apoiador ${Tier}",
     "comparingWith": "Data from ${newDate} comparing with ${oldDate}",
     "compare": "Compare",
     "comparison": "Comparison",
