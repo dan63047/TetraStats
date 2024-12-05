@@ -17,7 +17,7 @@
         "home": "Дом",
         "graphs": "Графики",
         "leaderboards": "Таблицы лидеров",
-        "cutoffs": "Cutoffs",
+        "cutoffs": "Требования рангов",
         "calc": "Калькулятор",
         "info": "Инфо-центр",
         "data": "Сохранённые данные",
@@ -137,10 +137,10 @@
         "forbidden": "Ваш IP-адрес заблокирован",
         "forbiddenSub": "Если вы используете VPN или Proxy, выключите его. Если это не помогает, свяжитесь с $nickname",
         "tooManyRequests": "Слишком много запросов",
-        "tooManyRequestsSub": "Слишком много запросов",
+        "tooManyRequestsSub": "Повторите попытку позже",
         "internal": "Что-то случилось на стороне tetr.io",
         "internalSub": "Скорее всего, osk уже в курсе",
-        "internalWebVersion": "Скорее всего, osk уже в курсе",
+        "internalWebVersion": "Что-то случилось на стороне TETR.IO (или у oskware_bridge, я хз)",
         "internalWebVersionSub": "Если на osk status page нет сообщений о проблемах, дайте знать dan63047",
         "oskwareBridge": "Что-то случилось с oskware_bridge",
         "oskwareBridgeSub": "Дайте знать dan63047",
@@ -174,10 +174,10 @@
     "cutoffsDestination": {
         "title": "Состояние Тетра Лиги",
         "relevance": "на момент $timestamp",
-        "actual": "Фактический",
-        "target": "Целевой",
-        "cutoffTR": "Cutoff TR",
-        "targetTR": "Target TR",
+        "actual": "Требование",
+        "target": "Цель",
+        "cutoffTR": "Требуемый TR",
+        "targetTR": "Целевой TR",
         "state": "Состояние",
         "advanced": "Продвинутая",
         "players": "Игроков ($n)",
@@ -196,33 +196,33 @@
         "everyoneTitle": "Вся таблица",
         "trRange": "Диапазон TR",
         "supposedToBe": "Должен быть",
-        "gap": "$value gap",
-        "trGap": "$value TR gap",
-        "deflationGap": "Deflation gap",
-        "inflationGap": "Inflation gap",
-        "LBposRange": "LB pos range",
-        "overpopulated": "Overpopulated by a $players",
-        "underpopulated": "Underpopulated by a $players",
-        "PlayersEqualSupposedToBe": "cute",
-        "avgStats": "Average Stats",
-        "avgNerdStats": "Average Nerd Stats",
-        "minimums": "Minimums",
-        "maximums": "Maximums"
+        "gap": "промежуток в $value",
+        "trGap": "промежуток в $value TR",
+        "deflationGap": "Зона дефляции",
+        "inflationGap": "Зона инфляции",
+        "LBposRange": "Диапазон по позициям",
+        "overpopulated": "Переполнен $players",
+        "underpopulated": "Не хватает $players",
+        "PlayersEqualSupposedToBe": "лол",
+        "avgStats": "Средние значения",
+        "avgNerdStats": "Средние задротские значения",
+        "minimums": "Минимумы",
+        "maximums": "Максимумы"
     },
     "stateView": {
-        "title": "State from $date"
+        "title": "Состояние от $date"
     },
     "tlMatchView": {
-        "match": "Match",
-        "vs": "vs",
-        "winner": "Winner",
-        "roundNumber": "Round $n",
-        "statsFor": "Stats for",
-        "numberOfRounds": "Number of rounds",
-        "matchLength": "Match Length",
-        "roundLength": "Round Length",
-        "matchStats": "Match stats",
-        "downloadReplay": "Download .ttrm replay",
+        "match": "Матч",
+        "vs": "против",
+        "winner": "Победитель",
+        "roundNumber": "Раунд $n",
+        "statsFor": "Статистика для",
+        "numberOfRounds": "Количество раундов",
+        "matchLength": "Продолжительность матча",
+        "roundLength": "Продолжительность раунда",
+        "matchStats": "Статистика матча",
+        "downloadReplay": "Скачать .ttrm повтор",
         "openReplay": "Открыть повтор в TETR.IO"
     },
     "calcDestination": {
@@ -238,7 +238,7 @@
         "noLineclear": "0 линий (сброс комбо)",
         "custom": "Свой",
         "multiplier": "Множитель",
-        "pcDamage": "Perfect Clear Damage",
+        "pcDamage": "PC урон",
         "comboTable": "Таблица комбо",
         "b2bChaining": "Таблица комбо",
         "surgeStartAtB2B": "Начинается с B2B",
@@ -252,9 +252,9 @@
     "infoDestination": {
         "title": "Информационный Центр",
         "sprintAndBlitzAverages": "Средние значения для 40 линий и блиц",
-        "sprintAndBlitzAveragesDescription": "Since calculating 40 Lines & Blitz averages is tedious process, it gets updated only once in a while. Click on the title of this card to see the full 40 Lines & Blitz averages table",
-        "tetraStatsWiki": "Tetra Stats Wiki",
-        "tetraStatsWikiDescription": "Find more information about Tetra Stats functions and statictic, that it provides",
+        "sprintAndBlitzAveragesDescription": "Поскольку считать средние значения 40 линий и Блиц неудобно, они обновляется довольно редко. Кликните по названию этой карточки, чтобы увидеть таблицу средних значений 40 линий и Блиц",
+        "tetraStatsWiki": "Tetra Stats Вики",
+        "tetraStatsWikiDescription": "Узнайте больше о функциях Tetra Stats и статистике, что он предоставляет",
         "about": "О Tetra Stats",
         "aboutDescription": "Разработано dan63\n"
     },
@@ -283,19 +283,19 @@
         "done": "Готово!",
         "noSuchAccount": "Нет такого аккаунта",
         "language": "Язык",
-        "languageDescription": "Tetra Stats was translated on $languages. By default, app will pick your system one or English, if locale of your system isn't avaliable.",
+        "languageDescription": "Tetra Stats был переведен на $languages. По умолчанию приложение выберет язык системы или Английский, если перевода на язык системы нету.",
         "languages(plural)": {
-            "zero": "zero languages",
-            "one": "$n language",
-            "two": "$n languages",
-            "few": "$n languages",
-            "many": "$n languages",
-            "other": "$n languages"
+            "zero": "ноль языков",
+            "one": "$n язык",
+            "two": "$n языка",
+            "few": "$n языка",
+            "many": "$n языков",
+            "other": "$n языков"
         },
-        "updateInTheBackground": "Update data in the background",
-        "updateInTheBackgroundDescription": "If on, Tetra Stats will attempt to retrieve new info once cache expires. Usually that happen every 5 minutes",
-        "compareStats": "Compare TL stats with rank averages",
-        "compareStatsDescription": "If on, Tetra Stats will provide additional metrics, which allow you to compare yourself with average player on your rank. The way you'll see it — stats will be highlited with corresponding color, hover over them with cursor for more info.",
+        "updateInTheBackground": "Обновлять данные в фоновом режиме",
+        "updateInTheBackgroundDescription": "Пока Tetra Stats работает, он может обновлять статистику самостоятельно когда кэш истекает. Обычно это происходит каждые 5 минут",
+        "compareStats": "Сравнивать статистику со средними значениями ранга",
+        "compareStatsDescription": "Если включено, Tetra Stats загрузит средние значения и будет сравнивать вас со средними значениями вашего ранга. В результате этого почти каждый пункт статистики обретёт цвет, наводите курсор, что-бы узнать больше.",
         "showPosition": "Show position on leaderboard by stats",
         "showPositionDescription": "This can take some time (and traffic) to load, but will allow you to see your position on the leaderboard, sorted by a stat",
         "accentColor": "Accent color",
@@ -352,7 +352,7 @@
     },
     "aboutView": {
         "title": "О Tetra Stats",
-        "about": "Tetra Stats is a service, that works with TETR.IO Tetra Channel API, providing data from it and calculating some addtitional metrics, based on this data. Service allows user to track their progress in Tetra League with \"Track\" function, which records every Tetra League change into local database (not automatically, you have to visit service from time to time), so these changes could be looked through graphs.\n\nBeanserver blaster is a part of a Tetra Stats, that decoupled into a serverside script. It provides full Tetra League leaderboard, allowing Tetra Stats to sort leaderboard by any metric and build scatter chart, that allows user to analyse Tetra League trends. It also provides history of Tetra League ranks cutoffs, which can be viewed by user via graph as well.\n\nThere is a plans to add replay analysis and tournaments history, so stay tuned!\n\nService is not associated with TETR.IO or osk in any capacity.",
+        "about": "Tetra Stats — это сервис, который работает с TETR.IO Tetra Channel API, показывает данные оттуда и считает дополнительную статистику, основанную на этих данных. Сервис позволяет отслеживать прогресс в Тетра Лиге с помощью функции \"Отслеживать\", которая записывает каждое изменение в Лиге в локальную базу данных (не автоматически, вы должны вручную посещать свой профиль), что позволяет потом просматривать изменения с помощью графиков.\n\nBeanserver blaster — серверная часть Tetra Stats. Она собирает полную таблицу игроков Тетра Лиги, благодаря чему сортировать эту таблицу по любой метрике и строить точечную диаграмму, что позволяет анализировать тренды Лиги. Также она предоставляет историю требований рангов, которую тоже можно посмотреть на графике.\n\nВ будущем планируется добавить анализ повторов и историю турниров, так что оставайтесь на связи.\n\nСервис ни коим образом не ассоциируется с TETR.IO или osk.",
         "appVersion": "Версия приложения",
         "build": "Сборка $build",
         "GHrepo": "Репозиторий на GitHub",
@@ -409,11 +409,11 @@
         },
         "apm": {
             "short": "APM",
-            "full": "Attack Per Minute"
+            "full": "Атаки в Минуту"
         },
         "pps": {
             "short": "PPS",
-            "full": "Pieces Per Second"
+            "full": "Фигур в Секунду"
         },
         "vs": {
             "short": "VS",
@@ -421,7 +421,7 @@
         },
         "app": {
             "short": "APP",
-            "full": "Attack Per Piece"
+            "full": "Атаки на Фигуру"
         },
         "vsapm": {
             "short": "VS/APM",
@@ -429,11 +429,11 @@
         },
         "dss": {
             "short": "DS/S",
-            "full": "Downstack Per Second"
+            "full": "Спуск в секунду"
         },
         "dsp": {
             "short": "DS/P",
-            "full": "Downstack Per Piece"
+            "full": "Спуск на фигуру"
         },
         "appdsp": {
             "short": "APP+DSP",
@@ -441,15 +441,15 @@
         },
         "cheese": {
             "short": "Cheese",
-            "full": "Cheese Index"
+            "full": "Индекс Сыра"
         },
         "gbe": {
             "short": "GbE",
-            "full": "Garbage Efficiency"
+            "full": "Эффективность Мусора"
         },
         "nyaapp": {
             "short": "wAPP",
-            "full": "Weigente APP"
+            "full": "Взвешенный APP"
         },
         "area": {
             "short": "Area",
@@ -517,99 +517,99 @@
         },
         "level": {
             "short": "Lvl",
-            "full": "Level"
+            "full": "Уровень"
         },
         "pieces": {
             "short": "P",
-            "full": "Pieces"
+            "full": "Фигур"
         },
         "spp": {
             "short": "SPP",
-            "full": "Score Per Piece"
+            "full": "Очков на Фигуру"
         },
         "kp": {
             "short": "KP",
-            "full": "Key presses"
+            "full": "Нажатий клавиш"
         },
         "kpp": {
             "short": "KPP",
-            "full": "Key presses Per Piece"
+            "full": "Нажатий клавиш на Фигуру"
         },
         "kps": {
             "short": "KPS",
-            "full": "Key presses Per Second"
+            "full": "Нажатий клавиш в Секунду"
         },
-        "blitzScore": "$p points",
-        "levelUpRequirement": "Level up requirement: $p",
-        "piecesTotal": "Total pieces placed",
-        "piecesWithPerfectFinesse": "Placed with perfect finesse",
-        "score": "Score",
-        "lines": "Lines",
+        "blitzScore": "$p очков",
+        "levelUpRequirement": "Очков для повышения уровня: $p",
+        "piecesTotal": "Всего фигур установлено",
+        "piecesWithPerfectFinesse": "Установлено с идеальной техникой",
+        "score": "Счёт",
+        "lines": "Линий",
         "linesShort": "L",
         "pcs": "Perfect Clears",
         "holds": "Holds",
         "spike": "Top Spike",
-        "top": "Top $percentage",
-        "topRank": "Top rank: $rank",
-        "floor": "Floor",
-        "split": "Split",
-        "total": "Total",
-        "sent": "Sent",
-        "received": "Received",
-        "placement": "Placement",
-        "peak": "Peak",
+        "top": "Топ $percentage",
+        "topRank": "Топ ранг: $rank",
+        "floor": "Этаж",
+        "split": "Сектор",
+        "total": "Всего",
+        "sent": "Отправлено",
+        "received": "Получено",
+        "placement": "Положение",
+        "peak": "Пик",
         "qpWithMods(plural)": {
-            "one": "With 1 mod",
-            "two": "With $n mods",
-            "few": "With $n mods",
-            "many": "With $n mods",
-            "other": "With $n mods"
+            "one": "С 1 модом",
+            "two": "С $n модами",
+            "few": "С $n модами",
+            "many": "С $n модами",
+            "other": "С $n модами"
         },
         "inputs(plural)": {
-            "zero": "$n key presses",
-            "one": "$n key press",
-            "two": "$n key presses",
-            "few": "$n key presses",
-            "many": "$n key presses",
-            "other": "$n key presses"
+            "zero": "$n нажатий клавиш",
+            "one": "$n нажатие клавиш",
+            "two": "$n нажатия клавиш",
+            "few": "$n нажатия клавиш",
+            "many": "$n нажатий клавиш",
+            "other": "$n нажатий клавиш"
         },
         "tspinsTotal(plural)": {
-            "zero": "$n T-spins total",
-            "one": "$n T-spin total",
-            "two": "$n T-spins total",
-            "few": "$n T-spins total",
-            "many": "$n T-spins total",
-            "other": "$n T-spins total"
+            "zero": "$n T-спинов всего",
+            "one": "Всего $n T-спин",
+            "two": "$n T-спина всего",
+            "few": "$n T-спина всего",
+            "many": "$n T-спинов всего",
+            "other": "$n T-спинов всего"
         },
         "linesCleared(plural)": {
-            "zero": "$n lines cleared",
-            "one": "$n line cleared",
-            "two": "$n lines cleared",
-            "few": "$n lines cleared",
-            "many": "$n lines cleared",
-            "other": "$n lines cleared"
+            "zero": "$n линий очищено",
+            "one": "$n линия очищена",
+            "two": "$n линии очищено",
+            "few": "$n линии очищено",
+            "many": "$n T-спинов всего",
+            "other": "$n T-спинов всего"
         },
         "graphs": {
-            "attack": "Attack",
-            "speed": "Speed",
-            "defense": "Defense",
-            "cheese": "Cheese"
+            "attack": "Атака",
+            "speed": "Скорость",
+            "defense": "Оборона",
+            "cheese": "Сыр"
         },
         "players(plural)": {
-            "zero": "$n players",
-            "one": "$n player",
-            "two": "$n players",
-            "few": "$n players",
-            "many": "$n players",
-            "other": "$n players"
+            "zero": "$n игроков",
+            "one": "$n игрок",
+            "two": "$n игрока",
+            "few": "$n игрока",
+            "many": "$n игроков",
+            "other": "$n игроков"
         },
         "games(plural)": {
-            "zero": "$n games",
-            "one": "$n game",
-            "two": "$n games",
-            "few": "$n games",
-            "many": "$n games",
-            "other": "$n games"
+            "zero": "$n игр",
+            "one": "$n игра",
+            "two": "$n игры",
+            "few": "$n игры",
+            "many": "$n игр",
+            "other": "$n игр"
         },
         "lineClear": {
             "single": "Single",
