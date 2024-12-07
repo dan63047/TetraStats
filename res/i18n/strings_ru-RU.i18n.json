@@ -1,13 +1,13 @@
 {
     "locales(map)": {
         "en": "Английский (English)",
-        "ru-RU": "Russian (Русский)",
+        "ru-RU": "Русский",
         "zh-CN": "Упрощенный Китайский (简体中文)"
     },
     "gamemodes(map)": {
         "league": "Тетра Лига",
-        "zenith": "Быстрая Игра",
-        "zenithex": "Быстра Игра Эксперт",
+        "zenith": "Quick Play",
+        "zenithex": "Quick Play Expert",
         "40l": "40 линий",
         "blitz": "Блиц",
         "5mblast": "5 000 000 бласт",
@@ -24,20 +24,20 @@
         "settings": "Настройки"
     },
     "playerRole(map)": {
-        "user": "User",
-        "banned": "Banned",
-        "bot": "Bot",
-        "sysop": "System operator",
-        "admin": "Admin",
-        "mod": "Moderator",
-        "halfmod": "Community moderator",
-        "anon": "Anonymous"
+        "user": "Пользователь",
+        "banned": "Заблокированный пользователь",
+        "bot": "Бот",
+        "sysop": "Системный оператор",
+        "admin": "Администратор",
+        "mod": "Модератор",
+        "halfmod": "Модератор сообщества",
+        "anon": "Аноним"
     },
     "goBackButton": "Назад",
     "nanow": "Сейчас недоступно...",
     "seasonEnds": "Сезон закончится через ${countdown}",
     "seasonEnded": "Сезон завершён",
-    "overallPB": "Абсолютный рекорд: $pb",
+    "overallPB": "Overall PB: $pb m",
     "gamesUntilRanked": "${left} матчей до получения рейтинга",
     "numOfVictories": "~${wins} побед",
     "promotionOnNextWin": "Повышение после следующей победы",
@@ -50,7 +50,7 @@
     "season": "Сезон",
     "smooth": "Сглаживание",
     "dateAndTime": "Дата и время",
-    "TLfullLBnote": "Большая, но позволяет сортировать игроков по их характеристикам и фильтровать их по рангам",
+    "TLfullLBnote": "Большая, но позволяет сортировать игроков по их статам и фильтровать их по рангам",
     "rank": "Ранг",
     "verdictGeneral": "На $n $verdict среднего $rank",
     "verdictBetter": "впереди",
@@ -82,7 +82,7 @@
     "badStanding": "Плохая репутация",
     "badStandingSubtext": "Один или более банов на счету",
     "botAccount": "Бот аккаунт",
-    "botAccountSubtext": "Оперирует $botMaintainers",
+    "botAccountSubtext": "Операторы: $botMaintainers",
     "copiedToClipboard": "Скопировано в буфер обмена!",
     "bio": "Биография",
     "news": "Новости",
@@ -247,7 +247,7 @@
         "spins": "Спины",
         "miniSpins": "Мини спины",
         "noLineclear": "0 линий (сброс комбо)",
-        "custom": "Свой",
+        "custom": "Custom",
         "multiplier": "Множитель",
         "pcDamage": "PC урон",
         "comboTable": "Таблица комбо",
@@ -273,8 +273,7 @@
         "title": "Таблицы лидеров",
         "tl": "Тетра Лига (Текущий сезон)",
         "fullTL": "Тетра Лига (Текущий сезон, вся за раз)",
-        "ar": "Очки достижений",
-        "fullTLnote": "Тяжелый, но позволяет сортировать игроков по их характеристикам и фильтровать их по рангам"
+        "ar": "Очки достижений"
     },
     "savedDataDestination": {
         "title": "Сохранённые данные",
