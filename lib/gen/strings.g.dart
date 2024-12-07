@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 1518 (759 per locale)
+/// Strings: 1516 (758 per locale)
 ///
-/// Built on 2024-12-07 at 13:16 UTC
+/// Built on 2024-12-07 at 15:08 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -177,7 +177,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get nanow => 'Not avaliable for now...';
 	String seasonEnds({required Object countdown}) => 'Season ends in ${countdown}';
 	String get seasonEnded => 'Season has ended';
-	String overallPB({required Object pb}) => 'Overall PB: ${pb}';
+	String overallPB({required Object pb}) => 'Overall PB: ${pb} m';
 	String gamesUntilRanked({required Object left}) => '${left} games until being ranked';
 	String numOfVictories({required Object wins}) => '~${wins} victories';
 	String get promotionOnNextWin => 'Promotion on next win';
@@ -864,7 +864,6 @@ class _StringsLeaderboardsDestinationEn {
 	String get tl => 'Tetra League (Current Season)';
 	String get fullTL => 'Tetra League (Current Season, full one)';
 	String get ar => 'Acievement Points';
-	String get fullTLnote => 'Heavy, but allows you to sort players by their stats and filter them by ranks';
 }
 
 // Path: savedDataDestination
@@ -1689,8 +1688,8 @@ class _StringsRuRu implements Translations {
 	};
 	@override Map<String, String> get gamemodes => {
 		'league': 'Тетра Лига',
-		'zenith': 'Быстрая Игра',
-		'zenithex': 'Быстрая Игра Эксперт',
+		'zenith': 'Quick Play',
+		'zenithex': 'Quick Play Expert',
 		'40l': '40 линий',
 		'blitz': 'Блиц',
 		'5mblast': '5 000 000 бласт',
@@ -1698,20 +1697,20 @@ class _StringsRuRu implements Translations {
 	};
 	@override late final _StringsDestinationsRuRu destinations = _StringsDestinationsRuRu._(_root);
 	@override Map<String, String> get playerRole => {
-		'user': 'User',
-		'banned': 'Banned',
-		'bot': 'Bot',
-		'sysop': 'System operator',
-		'admin': 'Admin',
-		'mod': 'Moderator',
-		'halfmod': 'Community moderator',
-		'anon': 'Anonymous',
+		'user': 'Пользователь',
+		'banned': 'Заблокированный пользователь',
+		'bot': 'Бот',
+		'sysop': 'Системный оператор',
+		'admin': 'Администратор',
+		'mod': 'Модератор',
+		'halfmod': 'Модератор сообщества',
+		'anon': 'Аноним',
 	};
 	@override String get goBackButton => 'Назад';
 	@override String get nanow => 'Сейчас недоступно...';
 	@override String seasonEnds({required Object countdown}) => 'Сезон закончится через ${countdown}';
 	@override String get seasonEnded => 'Сезон завершён';
-	@override String overallPB({required Object pb}) => 'Абсолютный рекорд: ${pb}';
+	@override String overallPB({required Object pb}) => 'Абсолютный рекорд: ${pb} м';
 	@override String gamesUntilRanked({required Object left}) => '${left} матчей до получения рейтинга';
 	@override String numOfVictories({required Object wins}) => '~${wins} побед';
 	@override String get promotionOnNextWin => 'Повышение после следующей победы';
@@ -1724,7 +1723,7 @@ class _StringsRuRu implements Translations {
 	@override String get season => 'Сезон';
 	@override String get smooth => 'Сглаживание';
 	@override String get dateAndTime => 'Дата и время';
-	@override String get TLfullLBnote => 'Большая, но позволяет сортировать игроков по их характеристикам и фильтровать их по рангам';
+	@override String get TLfullLBnote => 'Большая, но позволяет сортировать игроков по их статам и фильтровать их по рангам';
 	@override String get rank => 'Ранг';
 	@override String verdictGeneral({required Object n, required Object verdict, required Object rank}) => 'На ${n} ${verdict} среднего ${rank}';
 	@override String get verdictBetter => 'впереди';
@@ -1748,7 +1747,7 @@ class _StringsRuRu implements Translations {
 	@override String get badStanding => 'Плохая репутация';
 	@override String get badStandingSubtext => 'Один или более банов на счету';
 	@override String get botAccount => 'Бот аккаунт';
-	@override String botAccountSubtext({required Object botMaintainers}) => 'Оперирует ${botMaintainers}';
+	@override String botAccountSubtext({required Object botMaintainers}) => 'Операторы: ${botMaintainers}';
 	@override String get copiedToClipboard => 'Скопировано в буфер обмена!';
 	@override String get bio => 'Биография';
 	@override String get news => 'Новости';
@@ -2346,7 +2345,7 @@ class _StringsCalcDestinationRuRu implements _StringsCalcDestinationEn {
 	@override final _StringsRuRu _root; // ignore: unused_field
 
 	// Translations
-	@override String placeholders({required Object stat}) => 'Enter your ${stat}';
+	@override String placeholders({required Object stat}) => 'Введите ваш ${stat}';
 	@override String get tip => 'Введите значения и нажмите "Считать", чтобы увидеть статистику для задротов';
 	@override String get statsCalcButton => 'Считать';
 	@override String get damageCalcTip => 'Нажмите на действия слева, чтобы добавить их сюда';
@@ -2357,7 +2356,7 @@ class _StringsCalcDestinationRuRu implements _StringsCalcDestinationEn {
 	@override String get spins => 'Спины';
 	@override String get miniSpins => 'Мини спины';
 	@override String get noLineclear => '0 линий (сброс комбо)';
-	@override String get custom => 'Свой';
+	@override String get custom => 'Custom';
 	@override String get multiplier => 'Множитель';
 	@override String get pcDamage => 'PC урон';
 	@override String get comboTable => 'Таблица комбо';
@@ -2398,7 +2397,6 @@ class _StringsLeaderboardsDestinationRuRu implements _StringsLeaderboardsDestina
 	@override String get tl => 'Тетра Лига (Текущий сезон)';
 	@override String get fullTL => 'Тетра Лига (Текущий сезон, вся за раз)';
 	@override String get ar => 'Очки достижений';
-	@override String get fullTLnote => 'Тяжелый, но позволяет сортировать игроков по их характеристикам и фильтровать их по рангам';
 }
 
 // Path: savedDataDestination
@@ -2650,8 +2648,8 @@ class _StringsStatsRuRu implements _StringsStatsEn {
 		one: '${n} линия очищена',
 		two: '${n} линии очищено',
 		few: '${n} линии очищено',
-		many: '${n} T-спинов всего',
-		other: '${n} T-спинов всего',
+		many: '${n} линий очищено',
+		other: '${n} линий очищено',
 	);
 	@override late final _StringsStatsGraphsRuRu graphs = _StringsStatsGraphsRuRu._(_root);
 	@override String players({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
@@ -2896,7 +2894,7 @@ class _StringsStatsNyaappRuRu implements _StringsStatsNyaappEn {
 
 	// Translations
 	@override String get short => 'wAPP';
-	@override String get full => 'Взвешенный APP';
+	@override String get full => 'Weighted APP';
 }
 
 // Path: stats.area
@@ -3228,7 +3226,7 @@ extension on Translations {
 			case 'nanow': return 'Not avaliable for now...';
 			case 'seasonEnds': return ({required Object countdown}) => 'Season ends in ${countdown}';
 			case 'seasonEnded': return 'Season has ended';
-			case 'overallPB': return ({required Object pb}) => 'Overall PB: ${pb}';
+			case 'overallPB': return ({required Object pb}) => 'Overall PB: ${pb} m';
 			case 'gamesUntilRanked': return ({required Object left}) => '${left} games until being ranked';
 			case 'numOfVictories': return ({required Object wins}) => '~${wins} victories';
 			case 'promotionOnNextWin': return 'Promotion on next win';
@@ -3459,7 +3457,6 @@ extension on Translations {
 			case 'leaderboardsDestination.tl': return 'Tetra League (Current Season)';
 			case 'leaderboardsDestination.fullTL': return 'Tetra League (Current Season, full one)';
 			case 'leaderboardsDestination.ar': return 'Acievement Points';
-			case 'leaderboardsDestination.fullTLnote': return 'Heavy, but allows you to sort players by their stats and filter them by ranks';
 			case 'savedDataDestination.title': return 'Saved Data';
 			case 'savedDataDestination.tip': return 'Select nickname on the left to see data assosiated with it';
 			case 'savedDataDestination.seasonTLstates': return ({required Object s}) => 'S${s} TL States';
@@ -4010,8 +4007,8 @@ extension on _StringsRuRu {
 			case 'locales.ru-RU': return 'Русский';
 			case 'locales.zh-CN': return 'Упрощенный Китайский (简体中文)';
 			case 'gamemodes.league': return 'Тетра Лига';
-			case 'gamemodes.zenith': return 'Быстрая Игра';
-			case 'gamemodes.zenithex': return 'Быстрая Игра Эксперт';
+			case 'gamemodes.zenith': return 'Quick Play';
+			case 'gamemodes.zenithex': return 'Quick Play Expert';
 			case 'gamemodes.40l': return '40 линий';
 			case 'gamemodes.blitz': return 'Блиц';
 			case 'gamemodes.5mblast': return '5 000 000 бласт';
@@ -4024,19 +4021,19 @@ extension on _StringsRuRu {
 			case 'destinations.info': return 'Инфо-центр';
 			case 'destinations.data': return 'Сохранённые данные';
 			case 'destinations.settings': return 'Настройки';
-			case 'playerRole.user': return 'User';
-			case 'playerRole.banned': return 'Banned';
-			case 'playerRole.bot': return 'Bot';
-			case 'playerRole.sysop': return 'System operator';
-			case 'playerRole.admin': return 'Admin';
-			case 'playerRole.mod': return 'Moderator';
-			case 'playerRole.halfmod': return 'Community moderator';
-			case 'playerRole.anon': return 'Anonymous';
+			case 'playerRole.user': return 'Пользователь';
+			case 'playerRole.banned': return 'Заблокированный пользователь';
+			case 'playerRole.bot': return 'Бот';
+			case 'playerRole.sysop': return 'Системный оператор';
+			case 'playerRole.admin': return 'Администратор';
+			case 'playerRole.mod': return 'Модератор';
+			case 'playerRole.halfmod': return 'Модератор сообщества';
+			case 'playerRole.anon': return 'Аноним';
 			case 'goBackButton': return 'Назад';
 			case 'nanow': return 'Сейчас недоступно...';
 			case 'seasonEnds': return ({required Object countdown}) => 'Сезон закончится через ${countdown}';
 			case 'seasonEnded': return 'Сезон завершён';
-			case 'overallPB': return ({required Object pb}) => 'Абсолютный рекорд: ${pb}';
+			case 'overallPB': return ({required Object pb}) => 'Абсолютный рекорд: ${pb} м';
 			case 'gamesUntilRanked': return ({required Object left}) => '${left} матчей до получения рейтинга';
 			case 'numOfVictories': return ({required Object wins}) => '~${wins} побед';
 			case 'promotionOnNextWin': return 'Повышение после следующей победы';
@@ -4049,7 +4046,7 @@ extension on _StringsRuRu {
 			case 'season': return 'Сезон';
 			case 'smooth': return 'Сглаживание';
 			case 'dateAndTime': return 'Дата и время';
-			case 'TLfullLBnote': return 'Большая, но позволяет сортировать игроков по их характеристикам и фильтровать их по рангам';
+			case 'TLfullLBnote': return 'Большая, но позволяет сортировать игроков по их статам и фильтровать их по рангам';
 			case 'rank': return 'Ранг';
 			case 'verdictGeneral': return ({required Object n, required Object verdict, required Object rank}) => 'На ${n} ${verdict} среднего ${rank}';
 			case 'verdictBetter': return 'впереди';
@@ -4077,7 +4074,7 @@ extension on _StringsRuRu {
 			case 'badStanding': return 'Плохая репутация';
 			case 'badStandingSubtext': return 'Один или более банов на счету';
 			case 'botAccount': return 'Бот аккаунт';
-			case 'botAccountSubtext': return ({required Object botMaintainers}) => 'Оперирует ${botMaintainers}';
+			case 'botAccountSubtext': return ({required Object botMaintainers}) => 'Операторы: ${botMaintainers}';
 			case 'copiedToClipboard': return 'Скопировано в буфер обмена!';
 			case 'bio': return 'Биография';
 			case 'news': return 'Новости';
@@ -4233,7 +4230,7 @@ extension on _StringsRuRu {
 			case 'tlMatchView.matchStats': return 'Статистика матча';
 			case 'tlMatchView.downloadReplay': return 'Скачать .ttrm повтор';
 			case 'tlMatchView.openReplay': return 'Открыть повтор в TETR.IO';
-			case 'calcDestination.placeholders': return ({required Object stat}) => 'Enter your ${stat}';
+			case 'calcDestination.placeholders': return ({required Object stat}) => 'Введите ваш ${stat}';
 			case 'calcDestination.tip': return 'Введите значения и нажмите "Считать", чтобы увидеть статистику для задротов';
 			case 'calcDestination.statsCalcButton': return 'Считать';
 			case 'calcDestination.damageCalcTip': return 'Нажмите на действия слева, чтобы добавить их сюда';
@@ -4244,7 +4241,7 @@ extension on _StringsRuRu {
 			case 'calcDestination.spins': return 'Спины';
 			case 'calcDestination.miniSpins': return 'Мини спины';
 			case 'calcDestination.noLineclear': return '0 линий (сброс комбо)';
-			case 'calcDestination.custom': return 'Свой';
+			case 'calcDestination.custom': return 'Custom';
 			case 'calcDestination.multiplier': return 'Множитель';
 			case 'calcDestination.pcDamage': return 'PC урон';
 			case 'calcDestination.comboTable': return 'Таблица комбо';
@@ -4267,7 +4264,6 @@ extension on _StringsRuRu {
 			case 'leaderboardsDestination.tl': return 'Тетра Лига (Текущий сезон)';
 			case 'leaderboardsDestination.fullTL': return 'Тетра Лига (Текущий сезон, вся за раз)';
 			case 'leaderboardsDestination.ar': return 'Очки достижений';
-			case 'leaderboardsDestination.fullTLnote': return 'Тяжелый, но позволяет сортировать игроков по их характеристикам и фильтровать их по рангам';
 			case 'savedDataDestination.title': return 'Сохранённые данные';
 			case 'savedDataDestination.tip': return 'Выберите никнейм слева, чтобы увидеть данные ассоциированные с ним';
 			case 'savedDataDestination.seasonTLstates': return ({required Object s}) => 'TL ${s} сезона';
@@ -4398,7 +4394,7 @@ extension on _StringsRuRu {
 			case 'stats.gbe.short': return 'GbE';
 			case 'stats.gbe.full': return 'Эффективность Мусора';
 			case 'stats.nyaapp.short': return 'wAPP';
-			case 'stats.nyaapp.full': return 'Взвешенный APP';
+			case 'stats.nyaapp.full': return 'Weighted APP';
 			case 'stats.area.short': return 'Area';
 			case 'stats.area.full': return 'Area';
 			case 'stats.etr.short': return 'eTR';
@@ -4492,8 +4488,8 @@ extension on _StringsRuRu {
 				one: '${n} линия очищена',
 				two: '${n} линии очищено',
 				few: '${n} линии очищено',
-				many: '${n} T-спинов всего',
-				other: '${n} T-спинов всего',
+				many: '${n} линий очищено',
+				other: '${n} линий очищено',
 			);
 			case 'stats.graphs.attack': return 'Атака';
 			case 'stats.graphs.speed': return 'Скорость';
