@@ -141,14 +141,7 @@ class _DestinationSavedData extends State<DestinationSavedData> {
                   child: Column(
                     children: [
                       Card(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Spacer(),
-                            Text(t.savedDataDestination.title, style: Theme.of(context).textTheme.headlineMedium),
-                            Spacer()
-                          ],
-                        ),
+                        child: Center(child: Text(t.savedDataDestination.title, style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.center)),
                       ),
                       for (String id in snapshot.data!.keys) Card(
                         child: ListTile(

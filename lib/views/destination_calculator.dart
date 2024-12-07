@@ -482,11 +482,15 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Card(
-                        child: TabBar(tabs: [
-                          Tab(text: t.calcDestination.actions),
-                          if (widget.constraints.maxWidth <= 768.0) Tab(text: t.calcDestination.results),
-                          Tab(text: t.calcDestination.rules),
-                        ]),
+                        child: TabBar(
+                          labelStyle: Theme.of(context).textTheme.titleMedium!.copyWith(fontSize: 28),
+                          labelColor: Theme.of(context).colorScheme.primary,
+                          tabs: [
+                            Tab(text: t.calcDestination.actions),
+                            if (widget.constraints.maxWidth <= 768.0) Tab(text: t.calcDestination.results),
+                            Tab(text: t.calcDestination.rules),
+                          ]
+                        ),
                       ),
                       SizedBox(
                         height: widget.constraints.maxHeight - 164,

@@ -354,7 +354,7 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                       child: ListTile(
                         title: Text(leaderboards.values.elementAt(index)),
                         trailing: Icon(Icons.arrow_right, color: _currentLb.index == index ? Colors.white : Colors.grey),
-                        subtitle: index == 1 ? Text(t.leaderboardsDestination.fullTLnote, style: TextStyle(color: Colors.grey, fontSize: 12)) : null,
+                        subtitle: index == 1 ? Text(t.TLfullLBnote, style: TextStyle(color: Colors.grey, fontSize: 12)) : null,
                         onTap: () {
                           if (widget.constraints.maxWidth <= transformThreshold) Navigator.push(
                             context,

@@ -742,7 +742,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(t.homeNavigation.overview, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42)),
+                    Text(t.homeNavigation.overview, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42), textAlign: TextAlign.center),
                   ],
                 ),
               ),
@@ -755,7 +755,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(t.gamemodes['40l']!, style: Theme.of(context).textTheme.titleSmall),
+                    Text(t.gamemodes['40l']!, style: Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center),
                     const Divider(),
                     RecordSummary(record: summaries.sprint, betterThanClosestAverage: sprintBetterThanClosestAverage, betterThanRankAverage: sprintBetterThanRankAverage, closestAverage: closestAverageSprint, rank: summaries.league.percentileRank),
                     const Divider(),
@@ -770,7 +770,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(t.gamemodes['blitz']!, style: Theme.of(context).textTheme.titleSmall),
+                    Text(t.gamemodes['blitz']!, style: Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center),
                     const Divider(),
                     RecordSummary(record: summaries.blitz, betterThanClosestAverage: blitzBetterThanClosestAverage, betterThanRankAverage: blitzBetterThanRankAverage, closestAverage: closestAverageBlitz, rank: summaries.league.percentileRank),
                     const Divider(),
@@ -785,7 +785,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(t.gamemodes['zenith']!, style: Theme.of(context).textTheme.titleSmall),
+                    Text(t.gamemodes['zenith']!, style: Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center),
                     const Divider(),
                     RecordSummary(record: summaries.zenith != null ? summaries.zenith : summaries.zenithCareerBest, hideRank: true, old: summaries.zenith == null),
                     const Divider(),
@@ -800,7 +800,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(t.gamemodes['zenithex']!, style: Theme.of(context).textTheme.titleSmall),
+                    Text(t.gamemodes['zenithex']!, style: Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center),
                     const Divider(),
                     RecordSummary(record: summaries.zenithEx != null ? summaries.zenithEx : summaries.zenithExCareerBest, hideRank: true, old: summaries.zenith == null),
                     const Divider(),
@@ -815,7 +815,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Center(child: Text(t.gamemodes['zen']!, style: Theme.of(context).textTheme.titleSmall)),
+                    Center(child: Text(t.gamemodes['zen']!, style: Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center)),
                     Text("${t.stats.level.full} ${intf.format(summaries.zen.level)}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 36, fontWeight: FontWeight.w500, color: Colors.white)),
                     Text("${t.stats.score} ${intf.format(summaries.zen.score)}"),
                     Text(t.stats.levelUpRequirement(p: intf.format(summaries.zen.scoreRequirement)), style: const TextStyle(color: Colors.grey))

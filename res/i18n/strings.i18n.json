@@ -37,7 +37,7 @@
     "nanow": "Not avaliable for now...",
     "seasonEnds": "Season ends in ${countdown}",
     "seasonEnded": "Season has ended",
-    "overallPB": "Overall PB: $pb",
+    "overallPB": "Overall PB: $pb m",
     "gamesUntilRanked": "${left} games until being ranked",
     "numOfVictories": "~${wins} victories",
     "promotionOnNextWin": "Promotion on next win",
@@ -273,8 +273,7 @@
         "title": "Leaderboards",
         "tl": "Tetra League (Current Season)",
         "fullTL": "Tetra League (Current Season, full one)",
-        "ar": "Acievement Points",
-        "fullTLnote": "Heavy, but allows you to sort players by their stats and filter them by ranks"
+        "ar": "Acievement Points"
     },
     "savedDataDestination": {
         "title": "Saved Data",
