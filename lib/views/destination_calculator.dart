@@ -97,23 +97,23 @@ class ClearData{
 Map<String, List<ClearData>> clearsExisting = {
   t.calcDestination.noSpinClears: [
     ClearData(t.calcDestination.noLineclear, Lineclears.ZERO, 0, false, false),
-    ClearData(t.stats.lineClears.single, Lineclears.SINGLE, 1, false, false),
-    ClearData(t.stats.lineClears.double, Lineclears.DOUBLE, 2, false, false),
-    ClearData(t.stats.lineClears.triple, Lineclears.TRIPLE, 3, false, false),
-    ClearData(t.stats.lineClears.quad, Lineclears.QUAD, 4, false, false)
+    ClearData(t.stats.lineClear.single, Lineclears.SINGLE, 1, false, false),
+    ClearData(t.stats.lineClear.double, Lineclears.DOUBLE, 2, false, false),
+    ClearData(t.stats.lineClear.triple, Lineclears.TRIPLE, 3, false, false),
+    ClearData(t.stats.lineClear.quad, Lineclears.QUAD, 4, false, false)
   ],
   t.stats.spins: [
     ClearData("${t.stats.spin} ${t.stats.lineClears.zero}", Lineclears.TSPIN, 0, false, true),
-    ClearData("${t.stats.spin} ${t.stats.lineClears.single}", Lineclears.TSPIN_SINGLE, 1, false, true),
-    ClearData("${t.stats.spin} ${t.stats.lineClears.double}", Lineclears.TSPIN_DOUBLE, 2, false, true),
-    ClearData("${t.stats.spin} ${t.stats.lineClears.triple}", Lineclears.TSPIN_TRIPLE, 3, false, true),
-    ClearData("${t.stats.spin} ${t.stats.lineClears.quad}", Lineclears.TSPIN_QUAD, 4, false, true),
+    ClearData("${t.stats.spin} ${t.stats.lineClear.single}", Lineclears.TSPIN_SINGLE, 1, false, true),
+    ClearData("${t.stats.spin} ${t.stats.lineClear.double}", Lineclears.TSPIN_DOUBLE, 2, false, true),
+    ClearData("${t.stats.spin} ${t.stats.lineClear.triple}", Lineclears.TSPIN_TRIPLE, 3, false, true),
+    ClearData("${t.stats.spin} ${t.stats.lineClear.quad}", Lineclears.TSPIN_QUAD, 4, false, true),
   ],
   "${t.stats.mini} ${t.stats.spins}": [
     ClearData("${t.stats.mini} ${t.stats.spin} ${t.stats.lineClears.zero}", Lineclears.TSPIN_MINI, 0, true, false),
-    ClearData("${t.stats.mini} ${t.stats.spin} ${t.stats.lineClears.single}", Lineclears.TSPIN_MINI_SINGLE, 1, true, false),
-    ClearData("${t.stats.mini} ${t.stats.spin} ${t.stats.lineClears.double}", Lineclears.TSPIN_MINI_DOUBLE, 2, true, false),
-    ClearData("${t.stats.mini} ${t.stats.spin} ${t.stats.lineClears.triple}", Lineclears.TSPIN_MINI_TRIPLE, 3, true, false),
+    ClearData("${t.stats.mini} ${t.stats.spin} ${t.stats.lineClear.single}", Lineclears.TSPIN_MINI_SINGLE, 1, true, false),
+    ClearData("${t.stats.mini} ${t.stats.spin} ${t.stats.lineClear.double}", Lineclears.TSPIN_MINI_DOUBLE, 2, true, false),
+    ClearData("${t.stats.mini} ${t.stats.spin} ${t.stats.lineClear.triple}", Lineclears.TSPIN_MINI_TRIPLE, 3, true, false),
   ]
 };
 
@@ -223,7 +223,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                         onChanged: (value) {setState(() {});},
                         controller: apmController,
                         keyboardType: TextInputType.number,
-                        decoration: InputDecoration(suffix: apmController.value.text.isNotEmpty ? Text("APM") : null, alignLabelWithHint: true, hintText: widget.constraints.maxWidth > 768.0 ? "Enter your APM" : "APM"),
+                        decoration: InputDecoration(suffix: apmController.value.text.isNotEmpty ? Text("APM") : null, alignLabelWithHint: true, hintText: widget.constraints.maxWidth > 768.0 ? t.calcDestination.placeholders(stat: t.stats.apm.short) : t.stats.apm.short),
                       ),
                     )
                   ),
@@ -235,7 +235,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                         onChanged: (value) {setState(() {});},
                         controller: ppsController,
                         keyboardType: TextInputType.number,
-                        decoration: InputDecoration(suffix: ppsController.value.text.isNotEmpty ? Text("PPS") : null, alignLabelWithHint: true, hintText: widget.constraints.maxWidth > 768.0 ? "Enter your PPS" : "PPS"),
+                        decoration: InputDecoration(suffix: ppsController.value.text.isNotEmpty ? Text("PPS") : null, alignLabelWithHint: true, hintText: widget.constraints.maxWidth > 768.0 ? t.calcDestination.placeholders(stat: t.stats.pps.short) : t.stats.pps.short),
                       ),
                     )
                     ),
@@ -247,7 +247,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                         onChanged: (value) {setState(() {});},
                         controller: vsController,
                         keyboardType: TextInputType.number,
-                        decoration: InputDecoration(suffix: vsController.value.text.isNotEmpty ? Text("VS") : null, alignLabelWithHint: true, hintText: widget.constraints.maxWidth > 768.0 ? "Enter your VS" : "VS"),
+                        decoration: InputDecoration(suffix: vsController.value.text.isNotEmpty ? Text("VS") : null, alignLabelWithHint: true, hintText: widget.constraints.maxWidth > 768.0 ? t.calcDestination.placeholders(stat: t.stats.vs.short) : t.stats.vs.short),
                       ),
                     )
                   ),

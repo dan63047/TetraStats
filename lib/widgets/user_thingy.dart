@@ -149,16 +149,19 @@ class _UserThingyState extends State<UserThingy> with SingleTickerProviderStateM
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(right: 4.0),
-                          child: Chip(label: Text(widget.player.role.toUpperCase(), style: const TextStyle(shadows: textShadow),), padding: const EdgeInsets.all(0.0), color: WidgetStatePropertyAll(roleColor(widget.player.role))),
+                          child: Tooltip(
+                            message: t.playerRole[widget.player.role]??"Unknown role ${widget.player.role}",
+                            child: Chip(label: Text(widget.player.role.toUpperCase(), style: const TextStyle(shadows: textShadow),), padding: const EdgeInsets.all(0.0), color: WidgetStatePropertyAll(roleColor(widget.player.role)))
+                          ),
                         ),
                         RichText(
                           text: TextSpan(
                             style: const TextStyle(fontFamily: "Eurostile Round"),
                             children:
                             [
-                            if (widget.player.friendCount > 0) const WidgetSpan(child: Icon(Icons.person), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic),
+                            if (widget.player.friendCount > 0) WidgetSpan(child: Tooltip(message: t.stats.followers, child: Icon(Icons.person)), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic),
                             if (widget.player.friendCount > 0) TextSpan(text: "${intf.format(widget.player.friendCount)} "),
-                            if (widget.player.supporterTier > 0) WidgetSpan(child: Icon(widget.player.supporterTier > 1 ? Icons.star : Icons.star_border, color: widget.player.supporterTier > 1 ? Colors.yellowAccent : Colors.white), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic),
+                            if (widget.player.supporterTier > 0) WidgetSpan(child: Tooltip(message: t.supporter(tier: widget.player.supporterTier), child: Icon(widget.player.supporterTier > 1 ? Icons.star : Icons.star_border, color: widget.player.supporterTier > 1 ? Colors.yellowAccent : Colors.white)), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic),
                             if (widget.player.supporterTier > 0) TextSpan(text: widget.player.supporterTier.toString(), style: TextStyle(color: widget.player.supporterTier > 1 ? Colors.yellowAccent : Colors.white)),
                             ] 
                           ) 
@@ -324,13 +327,13 @@ class _UserThingyState extends State<UserThingy> with SingleTickerProviderStateM
                         transform: Matrix4.translationValues(0, firstButtonPosition, 0),
                         child: Opacity(
                           opacity: max(min(1, firstButtonOpacity), 0),
-                          child: Text(_addToTrackAnimController.isAnimating && _addToTrackAnim.status == AnimationStatus.forward ? "Done!" : "Track")
+                          child: Text(_addToTrackAnimController.isAnimating && _addToTrackAnim.status == AnimationStatus.forward ? t.settingsDestination.done : t.track)
                         )
                       ) : Container(
                         transform: Matrix4.translationValues(0, secondButtonPosition, 0),
                         child: Opacity(
                           opacity: max(0, min(1, secondButtonOpacity)),
-                          child: Text(_addToTrackAnimController.isAnimating && _addToTrackAnim.status == AnimationStatus.reverse ? "Done!             " : "Stop tracking")
+                          child: Text(_addToTrackAnimController.isAnimating && _addToTrackAnim.status == AnimationStatus.reverse ? t.settingsDestination.done : t.stopTracking)
                         )
                       ),
                       style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12.0))))));

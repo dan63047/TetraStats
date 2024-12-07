@@ -1,7 +1,7 @@
 {
     "locales(map)": {
         "en": "English",
-        "ru": "Russian (Русский)",
+        "ru-RU": "Russian (Русский)",
         "zh-CN": "Simplified Chinese (简体中文)"
     },
     "gamemodes(map)":{
@@ -22,6 +22,16 @@
         "info": "Info Center",
         "data": "Saved Data",
         "settings": "Settings"
+    },
+    "playerRole(map)": {
+        "user": "User",
+        "banned": "Banned",
+        "bot": "Bot",
+        "sysop": "System operator",
+        "admin": "Admin",
+        "mod": "Moderator",
+        "halfmod": "Community moderator",
+        "anon": "Anonymous"
     },
     "goBackButton": "Go Back",
     "nanow": "Not avaliable for now...",
@@ -226,6 +236,7 @@
         "openReplay": "Open replay in TETR.IO"
     },
     "calcDestination": {
+        "placeholders": "Enter your $stat",
         "tip": "Enter values and press \"Calc\" to see Nerd Stats for them",
         "statsCalcButton": "Calc",
         "damageCalcTip": "Click on the actions on the left to add them here",
@@ -449,7 +460,7 @@
         },
         "nyaapp":{
             "short": "wAPP",
-            "full": "Weigente APP"
+            "full": "Weighted APP"
         },
         "area":{
             "short": "Area",
