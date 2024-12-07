@@ -37,7 +37,7 @@
     "nanow": "Сейчас недоступно...",
     "seasonEnds": "Сезон закончится через ${countdown}",
     "seasonEnded": "Сезон завершён",
-    "overallPB": "Overall PB: $pb m",
+    "overallPB": "Абсолютный рекорд: $pb м",
     "gamesUntilRanked": "${left} матчей до получения рейтинга",
     "numOfVictories": "~${wins} побед",
     "promotionOnNextWin": "Повышение после следующей победы",
@@ -236,7 +236,7 @@
         "openReplay": "Открыть повтор в TETR.IO"
     },
     "calcDestination": {
-        "placeholders": "Enter your $stat",
+        "placeholders": "Введите ваш $stat",
         "tip": "Введите значения и нажмите \"Считать\", чтобы увидеть статистику для задротов",
         "statsCalcButton": "Считать",
         "damageCalcTip": "Нажмите на действия слева, чтобы добавить их сюда",
