@@ -358,7 +358,9 @@
         "welcome": "Добро пожаловать в Tetra Stats",
         "description": "Сервис, который позволяет просматривать статистику в TETR.IO",
         "nicknameQuestion": "Какой у вас ник?",
-        "inpuntHint": "Введите его здесь... (3-16 символов)"
+        "inpuntHint": "Введите его здесь... (3-16 символов)",
+        "emptyInputError": "Can't submit empty string",
+        "skip": "Skip"
     },
     "aboutView": {
         "title": "О Tetra Stats",
