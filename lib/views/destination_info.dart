@@ -77,7 +77,7 @@ class _DestinationInfo extends State<DestinationInfo> {
       InfoCard(
         height: widget.constraints.maxHeight - 77,
         viewportWidth: widget.constraints.maxWidth,
-        assetLink: "res/images/info card 1 focus.png",
+        assetLink: "res/images/info card 1.png",
         title: t.infoDestination.sprintAndBlitzAverages,
         description: "${t.infoDestination.sprintAndBlitzAveragesDescription}\n\n${t.sprintAndBlitsRelevance(date: DateFormat.yMMMd(LocaleSettings.currentLocale.languageCode).format(sprintAndBlitzRelevance))}",
         onPressed: (){
@@ -89,7 +89,7 @@ class _DestinationInfo extends State<DestinationInfo> {
       InfoCard(
         height: widget.constraints.maxHeight - 77,
         viewportWidth: widget.constraints.maxWidth,
-        assetLink: "res/images/Снимок экрана_2023-11-06_01-00-50.png",
+        assetLink: "res/images/info card 2.png",
         title: t.infoDestination.tetraStatsWiki,
         description: t.infoDestination.tetraStatsWikiDescription,
         onPressed: (){
@@ -99,7 +99,7 @@ class _DestinationInfo extends State<DestinationInfo> {
       InfoCard(
         height: widget.constraints.maxHeight - 77,
         viewportWidth: widget.constraints.maxWidth,
-        assetLink: "res/images/Снимок экрана_2023-11-06_01-00-50.png",
+        assetLink: "res/images/info card 3.png",
         title: t.infoDestination.about,
         description: t.infoDestination.aboutDescription,
         onPressed: (){

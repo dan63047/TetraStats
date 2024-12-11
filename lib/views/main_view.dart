@@ -25,6 +25,7 @@ import 'package:tetra_stats/main.dart';
 
 late Future<FetchResults> _data;
 TetrioPlayersLeaderboard? _everyone;
+late RangeValues currentRangeValues;
 int destination = 0;
 
 // TODO: Redesign some widgets, so they could look nice on mobile view
@@ -32,7 +33,7 @@ int destination = 0;
 // - APP and VS/APM gadget
 // - different design for radar graphs
 // - i should put tooltips everywhere
-Future<FetchResults> getData(String searchFor) async {
+Future<FetchResults> getData(String searchFor, {bool withHistory = false}) async {
     TetrioPlayer player;
     try{
       if (searchFor.startsWith("ds:")){
@@ -60,6 +61,8 @@ Future<FetchResults> getData(String searchFor) async {
       news = requests[1];
       cutoffs = requests.elementAtOrNull(2);
       averages = requests.elementAtOrNull(3);
+
+    if(withHistory) await teto.fetchAndsaveTLHistory(player.userId, 1); // Retrieve if needed
     } on Exception catch (e) {
       return FetchResults(false, null, [], null, null, null, null, null, false, e);
     }
@@ -80,7 +83,7 @@ Future<FetchResults> getData(String searchFor) async {
       await teto.storeState(summaries.league);
     }
 
-    return FetchResults(true, player, states, summaries, news, cutoffs, averages, _meAmongEveryone, isTracking, null);
+    return FetchResults(true, player, states.reversed.toList(), summaries, news, cutoffs, averages, _meAmongEveryone, isTracking, null);
   }
 
 class MainView extends StatefulWidget {
@@ -131,6 +134,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
 
   void changePlayer(String player) {
     setState(() {
+      currentRangeValues = const RangeValues(0, 1);
       _searchFor = player;
       _data = getData(_searchFor);
     });

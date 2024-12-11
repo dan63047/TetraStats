@@ -144,7 +144,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
   Future<Map<int, Map<Stats, List<_HistoryChartSpot>>>> getHistoryData(bool fetchHistory) async {
     if(fetchHistory){
       try{
-        var history = await teto.fetchAndsaveTLHistory(widget.searchFor);
+        var history = await teto.fetchAndsaveTLHistory(widget.searchFor, 1);
         if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.graphsDestination.fetchAndsaveTLHistoryResult(number: history.length))));
       }on TetrioHistoryNotExist{
         if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.noHistorySaved)));

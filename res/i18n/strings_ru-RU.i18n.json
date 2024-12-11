@@ -357,8 +357,10 @@
     "firstTimeView": {
         "welcome": "Добро пожаловать в Tetra Stats",
         "description": "Сервис, который позволяет просматривать статистику в TETR.IO",
-        "nicknameQuestion": "Какой у вас ник?",
-        "inpuntHint": "Введите его здесь... (3-16 символов)"
+        "nicknameQuestion": "Введите свой ник",
+        "inpuntHint": "(3-16 символов)",
+        "emptyInputError": "Строка пуста",
+        "skip": "Пропустить"
     },
     "aboutView": {
         "title": "О Tetra Stats",

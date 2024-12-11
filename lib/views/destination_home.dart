@@ -897,7 +897,18 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
   }
 
   Widget getTetraLeagueCard(TetraLeague data, Cutoffs? cutoffs, CutoffTetrio? averages, List<TetraLeague> states, PlayerLeaderboardPosition? lbPos, double width){
-    TetraLeague? toCompare = states.length >= 2 ? states.elementAtOrNull(states.length-2) : null;
+    TetraLeague toSee;
+    TetraLeague? toCompare;
+    if (currentRangeValues.start.round() == 0){
+      toSee = data;
+    }else{
+      toSee = states[currentRangeValues.start.round()-1];
+    }
+    if (currentRangeValues.end.round() == 0){
+      toCompare = states.length >= 2 ? states.elementAtOrNull(states.length-2) : null;
+    }else{
+      toCompare = states[currentRangeValues.end.round()-1];
+    }
     return Column(
       children: [
         Card(
@@ -910,13 +921,36 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(t.gamemodes["league"]!, style: Theme.of(context).textTheme.titleLarge),
-                  //Text("${states.last.timestamp} ${states.last.tr}", textAlign: TextAlign.center)
+                  if (toCompare != null) Text(t.comparingWith(newDate: timestamp(toSee.timestamp), oldDate: timestamp(toCompare.timestamp)), textAlign: TextAlign.center)
                 ],
               ),
             ),
           ),
         ),
-        TetraLeagueThingy(league: data, toCompare: toCompare, cutoffs: cutoffs, averages: averages, lbPos: lbPos, width: width),
+        if (toCompare != null) Card(
+          child: RangeSlider(values: currentRangeValues, max: states.length.toDouble(),
+            labels: RangeLabels(
+                currentRangeValues.start.round().toString(),
+                currentRangeValues.end.round().toString(),
+              ),
+              onChanged: (RangeValues values) {
+                setState(() {
+                  currentRangeValues = values;
+                });
+              },
+            ),
+        ),
+        TetraLeagueThingy(league: toSee, toCompare: toCompare, cutoffs: cutoffs, averages: averages, lbPos: lbPos, width: width),
+        // Center(
+        //   child: Card(
+        //     child: ElevatedButton.icon(
+        //       onPressed: (){teto.fetchAndsaveTLHistory(data.id, 1).then((_) => setState((){}));},
+        //       icon: const Icon(Icons.query_stats),
+        //       label: Text(t.graphsDestination.fetchAndsaveTLHistory),
+        //       style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0)))))
+        //     )
+        //   ),
+        // ),
         if (data.nerdStats != null) Card(
           //surfaceTintColor: rankColors[data.rank],
           child: Row(
@@ -928,8 +962,8 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
             ],
           ),
         ),
-        if (data.nerdStats != null) NerdStatsThingy(nerdStats: data.nerdStats!, oldNerdStats: toCompare?.nerdStats, averages: averages, lbPos: lbPos, width: width),
-        if (data.nerdStats != null) Graphs(data.apm!, data.pps!, data.vs!, data.nerdStats!, data.playstyle!)
+        if (data.nerdStats != null) NerdStatsThingy(nerdStats: toSee.nerdStats!, oldNerdStats: toCompare?.nerdStats, averages: averages, lbPos: lbPos, width: width),
+        if (data.nerdStats != null) Graphs(toSee.apm!, toSee.pps!, toSee.vs!, toSee.nerdStats!, toSee.playstyle!)
       ],
     );
   }
@@ -1120,12 +1154,12 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
     _transition = AnimationController(vsync: this, duration: Durations.long4);
 
     _offsetAnimation = Tween<Offset>(
-    begin: Offset.zero,
-    end: const Offset(1.5, 0.0),
-  ).animate(CurvedAnimation(
-    parent: _transition,
-    curve: Curves.elasticIn,
-  ));
+      begin: Offset.zero,
+      end: const Offset(1.5, 0.0),
+    ).animate(CurvedAnimation(
+      parent: _transition,
+      curve: Curves.elasticIn,
+    ));
 
     super.initState();
   }

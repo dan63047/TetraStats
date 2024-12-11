@@ -29,7 +29,7 @@ class TLRecords extends StatelessWidget {
                 ],
               );
             }
-            if (snapshot.hasError){ return FutureError(snapshot); }
+            if (snapshot.hasError){ return SizedBox(height: 500, child: Center(child: FutureError(snapshot))); }
           }
         return const Text("what?");
       },

@@ -358,7 +358,9 @@
         "welcome": "Welcome to Tetra Stats",
         "description": "Service, that allows you to keep track of various statistics for TETR.IO",
         "nicknameQuestion": "What's your nickname?",
-        "inpuntHint": "Type it here... (3-16 symbols)"
+        "inpuntHint": "Type it here... (3-16 symbols)",
+        "emptyInputError": "Can't submit empty string",
+        "skip": "Skip"
     },
     "aboutView": {
         "title": "About Tetra Stats",

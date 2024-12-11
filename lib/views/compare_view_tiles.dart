@@ -11,6 +11,7 @@ import 'package:tetra_stats/data_objects/record_single.dart';
 import 'package:tetra_stats/data_objects/summaries.dart';
 import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 import 'package:tetra_stats/data_objects/tetrio_player.dart';
+import 'package:tetra_stats/data_objects/tetrio_zen.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart' show teto;
 import 'package:tetra_stats/utils/numers_formats.dart';
@@ -40,6 +41,7 @@ class CompareView extends StatefulWidget {
 
 class CompareState extends State<CompareView> {
   late ScrollController _scrollController;
+  bool tlOnly = false;
   List<TetrioPlayer> players = [];
   List<Summaries> summaries = [];
   List<String> nicknames = [];
@@ -513,6 +515,69 @@ class CompareState extends State<CompareView> {
       ]);
   }
 
+  addAverages(Summaries s){
+    rawValues[1].add(
+      [
+        s.league.tr,
+        s.league.glicko,
+        s.league.rd,
+        s.league.gxe,
+        s.league.s1tr,
+        s.league.standing,
+        s.league.gamesPlayed,
+        s.league.gamesWon,
+        s.league.winrate,
+        s.league.apm,
+        s.league.pps,
+        s.league.vs,
+        "",
+        s.league.nerdStats?.app,
+        s.league.nerdStats?.vsapm,
+        s.league.nerdStats?.dss,
+        s.league.nerdStats?.dsp,
+        s.league.nerdStats?.appdsp,
+        s.league.nerdStats?.cheese,
+        s.league.nerdStats?.gbe,
+        s.league.nerdStats?.nyaapp,
+        s.league.nerdStats?.area,
+        "",
+        s.league.playstyle?.opener,
+        s.league.playstyle?.plonk,
+        s.league.playstyle?.stride,
+        s.league.playstyle?.infds,
+      ]
+    );
+    formattedValues[1].add([
+      Text(s.league.tr.isNegative ? "---" : f4.format(s.league.tr)),
+      Text(s.league.glicko!.isNegative ? "---" : f4.format(s.league.glicko)),
+      Text(s.league.rd!.isNegative ? "---" : f4.format(s.league.rd), style: TextStyle(color: s.league.rd!.isNegative ? Colors.grey : Colors.white)),
+      Text(s.league.gxe.isNegative ? "---" : f4.format(s.league.gxe)),
+      Text(s.league.s1tr.isNegative ? "---" : f4.format(s.league.s1tr)),
+      Text(s.league.standing.isNegative ? "---" : "№ "+intf.format(s.league.standing)),
+      Text(intf.format(s.league.gamesPlayed)),
+      Text(intf.format(s.league.gamesWon)),
+      Text(s.league.winrate.isNaN ? "---" : f4.format(s.league.winrate*100)+"%"),
+      Text(s.league.apm != null ? f2.format(s.league.apm) : "---"),
+      Text(s.league.pps != null ? f2.format(s.league.pps) : "---"),
+      Text(s.league.vs != null ? f2.format(s.league.vs) : "---"),
+      Text(""),
+      Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.app) : "---"),
+      Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.vsapm) : "---"),
+      Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.dss) : "---"),
+      Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.dsp) : "---"),
+      Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.appdsp) : "---"),
+      Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.cheese) : "---"),
+      Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.gbe) : "---"),
+      Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.nyaapp) : "---"),
+      Text(s.league.nerdStats != null ? f4.format(s.league.nerdStats!.area) : "---"),
+      Text(""),
+      Text(s.league.playstyle != null ? f4.format(s.league.playstyle!.opener) : "---"),
+      Text(s.league.playstyle != null ? f4.format(s.league.playstyle!.plonk) : "---"),
+      Text(s.league.playstyle != null ? f4.format(s.league.playstyle!.stride) : "---"),
+      Text(s.league.playstyle != null ? f4.format(s.league.playstyle!.infds) : "---"),
+    ]);
+  }
+
   List<List<dynamic>> recalculateBestEntries(){
     return [
       [
@@ -674,28 +739,66 @@ class CompareState extends State<CompareView> {
   }
 
   void addPlayer(String nickname) async {
-    players.add(await teto.fetchPlayer(nickname));
-    summaries.add(await teto.fetchSummaries(players.last.userId));
-    addvaluesEntrys(players.last, summaries.last);
+    if (nickname.startsWith("\$avg")){
+      await addRankAverages(nickname.substring(4).toLowerCase());
+    }else{
+      players.add(await teto.fetchPlayer(nickname));
+      summaries.add(await teto.fetchSummaries(players.last.userId));
+      addvaluesEntrys(players.last, summaries.last);
+      nicknames.add(players.last.username);
+    }
     best = recalculateBestEntries();
-    nicknames.add(players.last.username);
     setState(() {
       
     });
   }
 
-  void removePlayer(String nickname) async {
-    int id = players.indexWhere((e) => e.username == nickname);
-    players.removeAt(id);
-    summaries.removeAt(id);
-    nicknames.remove(nickname);
+  Future<void> addRankAverages(String rank) async {
+     try{
+        var average = (await teto.fetchTLLeaderboard()).getRankData(rank)[0];
+        Summaries summary = Summaries("avg${rank.toUpperCase()}", average, TetrioZen(level: 0, score: 0));
+        players.add(TetrioPlayer(
+          userId: "avg${rank}",
+          username: "Avg ${rank.toUpperCase()} rank",
+          role: "rank",
+          state: summary.league.timestamp,
+          registrationTime: summary.league.timestamp,
+          badges: [],
+          friendCount: -1,
+          gamesPlayed: -1,
+          gamesWon: -1,
+          gameTime: Duration(seconds: -1),
+          xp: -1,
+          supporterTier: 0,
+          verified: false,
+          connections: null
+        ));
+        summaries.add(summary);
+        nicknames.add("Avg ${rank.toUpperCase()} rank");
+        addAverages(summary);
+        return setState(() {tlOnly = true;});
+      }on Exception {
+        //if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.snackBarMessages.compareViewWrongValue(value: rank))));
+        return;
+      }
+  }
+
+  void removePlayer(String id) async {
+    int p = players.indexWhere((e) => e.userId == id);
+    players.removeAt(p);
+    summaries.removeAt(p);
+    nicknames.removeAt(p);
+    if (id.startsWith("avg")){
+      rawValues[1].removeAt(p);
+      formattedValues[1].removeAt(p);
+    }else
     for (int i = 0; i < 7; i++){
-      rawValues[i].removeAt(id);
-      formattedValues[i].removeAt(id);
+      rawValues[i].removeAt(p);
+      formattedValues[i].removeAt(p);
     }  
     if (players.isNotEmpty) best = recalculateBestEntries();
     setState(() {
-      
+      if (players.any((e) => e.userId.startsWith("avg")) == false) tlOnly = false;
     });
   }
 
@@ -759,7 +862,38 @@ class CompareState extends State<CompareView> {
                     SizedBox(width: 300, child: AddNewColumnCard(addPlayer))
                   ]
                 ),
-                for (int i = 0; i < formattedValues.length; i++) SizedBox(
+                if (tlOnly) SizedBox(
+                  width: 300+300*summaries.length.toDouble(),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 300.0,
+                            child: Card(
+                              child: Column(children: [
+                                for (String title in TitesForStats[TitesForStats.keys.elementAt(1)]!) Text(title),
+                              ]),
+                            ),
+                          ),
+                          for (int k = 0; k < formattedValues[1].length; k++) SizedBox(
+                            width: 300.0,
+                            child: Card(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  for (int l = 0; l < formattedValues[1][k].length; l++) Container(decoration: (rawValues[0].length > 1 && rawValues[1][k][l] != null && best[1][l] == rawValues[1][k][l]) ? BoxDecoration(boxShadow: [BoxShadow(color: Colors.cyanAccent.withAlpha(96), spreadRadius: 0, blurRadius: 4)]) : null, child: formattedValues[1][k][l]),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ]
+                      ),
+                      VsGraphs(stats: [for (var s in summaries) if (s.league.nerdStats != null) AggregateStats.precalculated(s.league.apm!, s.league.pps!, s.league.vs!, s.league.nerdStats!, s.league.playstyle!)], nicknames: [for (int i = 0; i < summaries.length; i++)  if (summaries[i].league.nerdStats != null) nicknames[i]]),
+                    ],
+                  ),
+                )
+                else for (int i = 0; i < formattedValues.length; i++) SizedBox(
                   width: 300+300*summaries.length.toDouble(),
                   child: ExpansionTile(
                     title: Text(TitesForStats.keys.elementAt(i), style: _expansionTileTitleTextStyle),
@@ -831,7 +965,7 @@ class HeaderCard extends StatelessWidget{
                   height: 120.0,
                   fadeInCurve: Easing.standard, fadeInDuration: Durations.long4
                 )
-                else SizedBox(height: 120.0),
+                else SizedBox(height: 120.0, width: 300.0),
                 Positioned(
                   top: 20.0,
                   child: ClipRRect(
@@ -847,7 +981,7 @@ class HeaderCard extends StatelessWidget{
                 Positioned(
                   right: 0,
                   child: IconButton(onPressed: (){
-                    removePlayer(player.username);
+                    removePlayer(player.userId);
                   }, icon: Icon(Icons.close, shadows: textShadow,))
                 )
               ],

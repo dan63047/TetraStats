@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 1516 (758 per locale)
+/// Strings: 1520 (760 per locale)
 ///
-/// Built on 2024-12-07 at 15:08 UTC
+/// Built on 2024-12-11 at 15:09 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -991,6 +991,8 @@ class _StringsFirstTimeViewEn {
 	String get description => 'Service, that allows you to keep track of various statistics for TETR.IO';
 	String get nicknameQuestion => 'What\'s your nickname?';
 	String get inpuntHint => 'Type it here... (3-16 symbols)';
+	String get emptyInputError => 'Can\'t submit empty string';
+	String get skip => 'Skip';
 }
 
 // Path: aboutView
@@ -2522,8 +2524,10 @@ class _StringsFirstTimeViewRuRu implements _StringsFirstTimeViewEn {
 	// Translations
 	@override String get welcome => 'Добро пожаловать в Tetra Stats';
 	@override String get description => 'Сервис, который позволяет просматривать статистику в TETR.IO';
-	@override String get nicknameQuestion => 'Какой у вас ник?';
-	@override String get inpuntHint => 'Введите его здесь... (3-16 символов)';
+	@override String get nicknameQuestion => 'Введите свой ник';
+	@override String get inpuntHint => '(3-16 символов)';
+	@override String get emptyInputError => 'Строка пуста';
+	@override String get skip => 'Пропустить';
 }
 
 // Path: aboutView
@@ -3530,6 +3534,8 @@ extension on Translations {
 			case 'firstTimeView.description': return 'Service, that allows you to keep track of various statistics for TETR.IO';
 			case 'firstTimeView.nicknameQuestion': return 'What\'s your nickname?';
 			case 'firstTimeView.inpuntHint': return 'Type it here... (3-16 symbols)';
+			case 'firstTimeView.emptyInputError': return 'Can\'t submit empty string';
+			case 'firstTimeView.skip': return 'Skip';
 			case 'aboutView.title': return 'About Tetra Stats';
 			case 'aboutView.about': return 'Tetra Stats is a service, that works with TETR.IO Tetra Channel API, providing data from it and calculating some addtitional metrics, based on this data. Service allows user to track their progress in Tetra League with "Track" function, which records every Tetra League change into local database (not automatically, you have to visit service from time to time), so these changes could be looked through graphs.\n\nBeanserver blaster is a part of a Tetra Stats, that decoupled into a serverside script. It provides full Tetra League leaderboard, allowing Tetra Stats to sort leaderboard by any metric and build scatter chart, that allows user to analyse Tetra League trends. It also provides history of Tetra League ranks cutoffs, which can be viewed by user via graph as well.\n\nThere is a plans to add replay analysis and tournaments history, so stay tuned!\n\nService is not associated with TETR.IO or osk in any capacity.';
 			case 'aboutView.appVersion': return 'App Version';
@@ -4335,8 +4341,10 @@ extension on _StringsRuRu {
 			case 'calcNavigation.damage': return 'Калькулятор урона';
 			case 'firstTimeView.welcome': return 'Добро пожаловать в Tetra Stats';
 			case 'firstTimeView.description': return 'Сервис, который позволяет просматривать статистику в TETR.IO';
-			case 'firstTimeView.nicknameQuestion': return 'Какой у вас ник?';
-			case 'firstTimeView.inpuntHint': return 'Введите его здесь... (3-16 символов)';
+			case 'firstTimeView.nicknameQuestion': return 'Введите свой ник';
+			case 'firstTimeView.inpuntHint': return '(3-16 символов)';
+			case 'firstTimeView.emptyInputError': return 'Строка пуста';
+			case 'firstTimeView.skip': return 'Пропустить';
 			case 'aboutView.title': return 'О Tetra Stats';
 			case 'aboutView.about': return 'Tetra Stats — это сервис, который работает с TETR.IO Tetra Channel API, показывает данные оттуда и считает дополнительную статистику, основанную на этих данных. Сервис позволяет отслеживать прогресс в Тетра Лиге с помощью функции "Отслеживать", которая записывает каждое изменение в Лиге в локальную базу данных (не автоматически, вы должны вручную посещать свой профиль), что позволяет потом просматривать изменения с помощью графиков.\n\nBeanserver blaster — серверная часть Tetra Stats. Она собирает полную таблицу игроков Тетра Лиги, благодаря чему сортировать эту таблицу по любой метрике и строить точечную диаграмму, что позволяет анализировать тренды Лиги. Также она предоставляет историю требований рангов, которую тоже можно посмотреть на графике.\n\nВ будущем планируется добавить анализ повторов и историю турниров, так что оставайтесь на связи.\n\nСервис ни коим образом не ассоциируется с TETR.IO или osk.';
 			case 'aboutView.appVersion': return 'Версия приложения';
