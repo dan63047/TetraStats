@@ -133,6 +133,7 @@ class _UserThingyState extends State<UserThingy> with SingleTickerProviderStateM
                       child: RichText(text: TextSpan(text: widget.player.username, style: TextStyle(
                           fontFamily: fontStyle(widget.player.username.length),
                           fontSize: 28,
+                          color: Colors.white
                         ),
                         recognizer: TapGestureRecognizer()..onTap = (){
                             copyToClipboard(widget.player.userId);
@@ -156,7 +157,7 @@ class _UserThingyState extends State<UserThingy> with SingleTickerProviderStateM
                         ),
                         RichText(
                           text: TextSpan(
-                            style: const TextStyle(fontFamily: "Eurostile Round"),
+                            style: const TextStyle(fontFamily: "Eurostile Round", color: Colors.white),
                             children:
                             [
                             if (widget.player.friendCount > 0) WidgetSpan(child: Tooltip(message: t.stats.followers, child: Icon(Icons.person)), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic),
@@ -176,7 +177,7 @@ class _UserThingyState extends State<UserThingy> with SingleTickerProviderStateM
                       width: 270,
                       child: RichText(
                         text: TextSpan(
-                          style: const TextStyle(fontFamily: "Eurostile Round"),
+                          style: const TextStyle(fontFamily: "Eurostile Round", color: Colors.white),
                           children: [
                             TextSpan(text: timestamp(widget.player.registrationTime), style: const TextStyle(color: Colors.grey)),
                             if (widget.player.country != null) TextSpan(text: " • ${t.countries[widget.player.country]}")
@@ -191,7 +192,7 @@ class _UserThingyState extends State<UserThingy> with SingleTickerProviderStateM
                     child: RichText(
                       textAlign: TextAlign.end,
                       text: TextSpan(
-                        style: const TextStyle(fontFamily: "Eurostile Round"),
+                        style: const TextStyle(fontFamily: "Eurostile Round", color: Colors.white),
                         children: [
                           TextSpan(text: "Level ${(widget.player.level.isNegative || widget.player.level.isNaN) ? "---" : intf.format(widget.player.level.floor())}", style: TextStyle(decoration: (widget.player.level.isNegative || widget.player.level.isNaN) ? null : TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted, color: (widget.player.level.isNegative || widget.player.level.isNaN) ? Colors.grey : Colors.white), recognizer: (widget.player.level.isNegative || widget.player.level.isNaN) ? null : TapGestureRecognizer()?..onTap = (){
                             showDialog(

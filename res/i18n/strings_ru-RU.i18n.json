@@ -216,6 +216,7 @@
         "underpopulated": "Не хватает $players",
         "PlayersEqualSupposedToBe": "лол",
         "avgStats": "Средние значения",
+        "avgForRank": "Среднее для $rank ранга",
         "avgNerdStats": "Средние задротские значения",
         "minimums": "Минимумы",
         "maximums": "Максимумы"

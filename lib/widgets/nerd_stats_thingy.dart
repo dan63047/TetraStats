@@ -58,7 +58,7 @@ class NerdStatsThingy extends StatelessWidget{
               RichText(
                 textAlign: TextAlign.center,
                 text: TextSpan(
-                  style: const TextStyle(fontFamily: "Eurostile Round"),
+                  style: const TextStyle(fontFamily: "Eurostile Round", color: Colors.white),
                   children: [
                     TextSpan(text: "${t.stats.app.short}\n"),
                     TextSpan(text: f3.format(nerdStats.app), style: TextStyle(fontSize: 25, fontFamily: "Eurostile Round Extended", fontWeight: FontWeight.w100, color: getStatColor(nerdStats.app, averages?.nerdStats?.app, true))),
@@ -99,7 +99,7 @@ class NerdStatsThingy extends StatelessWidget{
                   RichText(
                     textAlign: TextAlign.center,
                     text: TextSpan(
-                      style: const TextStyle(fontFamily: "Eurostile Round"),
+                      style: const TextStyle(fontFamily: "Eurostile Round", color: Colors.white),
                       children: [
                         TextSpan(text: "${t.stats.vsapm.short}\n"),
                         TextSpan(text: f3.format(nerdStats.vsapm), style: TextStyle(fontSize: 25, fontFamily: "Eurostile Round Extended", fontWeight: FontWeight.w100, color: getStatColor(nerdStats.vsapm, averages?.nerdStats?.vsapm, true))),

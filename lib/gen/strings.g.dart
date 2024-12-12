@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 1526 (763 per locale)
+/// Strings: 1528 (764 per locale)
 ///
-/// Built on 2024-12-12 at 15:53 UTC
+/// Built on 2024-12-12 at 21:30 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -771,6 +771,7 @@ class _StringsRankViewEn {
 	String underpopulated({required Object players}) => 'Underpopulated by a ${players}';
 	String get PlayersEqualSupposedToBe => 'cute';
 	String get avgStats => 'Average Stats';
+	String avgForRank({required Object rank}) => 'Average for ${rank} rank';
 	String get avgNerdStats => 'Average Nerd Stats';
 	String get minimums => 'Minimums';
 	String get maximums => 'Maximums';
@@ -2309,6 +2310,7 @@ class _StringsRankViewRuRu implements _StringsRankViewEn {
 	@override String underpopulated({required Object players}) => 'Не хватает ${players}';
 	@override String get PlayersEqualSupposedToBe => 'лол';
 	@override String get avgStats => 'Средние значения';
+	@override String avgForRank({required Object rank}) => 'Среднее для ${rank} ранга';
 	@override String get avgNerdStats => 'Средние задротские значения';
 	@override String get minimums => 'Минимумы';
 	@override String get maximums => 'Максимумы';
@@ -3419,6 +3421,7 @@ extension on Translations {
 			case 'rankView.underpopulated': return ({required Object players}) => 'Underpopulated by a ${players}';
 			case 'rankView.PlayersEqualSupposedToBe': return 'cute';
 			case 'rankView.avgStats': return 'Average Stats';
+			case 'rankView.avgForRank': return ({required Object rank}) => 'Average for ${rank} rank';
 			case 'rankView.avgNerdStats': return 'Average Nerd Stats';
 			case 'rankView.minimums': return 'Minimums';
 			case 'rankView.maximums': return 'Maximums';
@@ -4231,6 +4234,7 @@ extension on _StringsRuRu {
 			case 'rankView.underpopulated': return ({required Object players}) => 'Не хватает ${players}';
 			case 'rankView.PlayersEqualSupposedToBe': return 'лол';
 			case 'rankView.avgStats': return 'Средние значения';
+			case 'rankView.avgForRank': return ({required Object rank}) => 'Среднее для ${rank} ранга';
 			case 'rankView.avgNerdStats': return 'Средние задротские значения';
 			case 'rankView.minimums': return 'Минимумы';
 			case 'rankView.maximums': return 'Максимумы';

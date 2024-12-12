@@ -35,6 +35,7 @@ import 'package:tetra_stats/services/sqlite_db_controller.dart';
 import 'package:csv/csv.dart';
 
 const String dbName = "TetraStats.db";
+const String webVersionDomain = "tsbeta.dan63.by";
 const String tetrioUsersTable = "tetrioUsers";
 const String tetrioUsersToTrackTable = "tetrioUsersToTrack";
 const String tetraLeagueMatchesTable = "tetrioAlphaLeagueMathces";
@@ -289,7 +290,7 @@ class TetrioService extends DB {
     // If failed, actually trying to retrieve
     Uri url;
     if (kIsWeb) { // Web version sends every request through my php script at the same domain, where Tetra Stats located because of CORS
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "tetrioReplay", "replayid": replayID});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "tetrioReplay", "replayid": replayID});
     } else { // Actually going to hit inoue
       url = Uri.https('inoue.szy.lol', '/api/replay/$replayID');
     }
@@ -385,7 +386,7 @@ class TetrioService extends DB {
     
     Uri url;
     if (kIsWeb) {
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "singleplayerStream", "user": userID.toLowerCase().trim(), "stream": stream});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "singleplayerStream", "user": userID.toLowerCase().trim(), "stream": stream});
     } else {
       url = Uri.https('ch.tetr.io', 'api/users/${userID.toLowerCase().trim()}/records/$stream');
     }
@@ -433,7 +434,7 @@ class TetrioService extends DB {
 
     Uri url;
     if (kIsWeb) { // Web version sends every request through my php script at the same domain, where Tetra Stats located because of CORS
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "PeakTR", "user": id});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "PeakTR", "user": id});
     } else { // Actually going to hit p1nkl0bst3r api
       url = Uri.https('api.p1nkl0bst3r.xyz', 'toptr/$id');
     }
@@ -484,7 +485,7 @@ class TetrioService extends DB {
 
     Uri url;
     if (kIsWeb) {
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "cutoffs"});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "cutoffs"});
     } else {
       url = Uri.https('ch.tetr.io', 'api/labs/league_ranks');
     }
@@ -528,7 +529,7 @@ class TetrioService extends DB {
     Cutoffs? cached = _cache.get("CutoffsTetrioleague_ranks", Cutoffs);
     if (cached != null) return cached;
 
-    Uri url = Uri.https('ts.dan63.by', 'beanserver_blaster/cutoffs.json');
+    Uri url = Uri.https(webVersionDomain, 'beanserver_blaster/cutoffs.json');
 
     try{
       final response = await client.get(url);
@@ -572,7 +573,7 @@ class TetrioService extends DB {
   }
 
   Future<List<Cutoffs>> fetchCutoffsHistory() async {
-    Uri url = Uri.https('ts.dan63.by', 'beanserver_blaster/history.csv');
+    Uri url = Uri.https(webVersionDomain, 'beanserver_blaster/history.csv');
 
     try{
       final response = await client.get(url);
@@ -632,7 +633,7 @@ class TetrioService extends DB {
 
     Uri url;
     if (kIsWeb) {
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLTopOne"});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "TLTopOne"});
     } else {
       url = Uri.https('ch.tetr.io', 'api/users/by/league', {"after": "25000:0:0", "limit": "1"});
     }
@@ -676,7 +677,7 @@ class TetrioService extends DB {
     // TODO: find le way to get season 2 history
     Uri url;
     if (kIsWeb) {
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLHistory", "user": id});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "TLHistory", "user": id});
     } else {
       url = Uri.https('api.p1nkl0bst3r.xyz', 'tlhist/$id');
     }
@@ -748,7 +749,7 @@ class TetrioService extends DB {
   Future<TetraLeagueAlphaStream> fetchAndSaveOldTLmatches(String userID) async {
     Uri url;
     if (kIsWeb) {
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLMatches", "user": userID});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "TLMatches", "user": userID});
     } else {
       url = Uri.https('api.p1nkl0bst3r.xyz', 'tlmatches/$userID', {"before": "0", "count": "9000"});
     }
@@ -790,7 +791,7 @@ class TetrioService extends DB {
     TetrioPlayersLeaderboard? cached = _cache.get("league", TetrioPlayersLeaderboard);
     if (cached != null) return cached;
 
-    Uri url = Uri.https('ts.dan63.by', 'beanserver_blaster/leaderboard.json');
+    Uri url = Uri.https(webVersionDomain, 'beanserver_blaster/leaderboard.json');
 
     try{
       final response = await client.get(url);
@@ -830,7 +831,7 @@ class TetrioService extends DB {
      
     Uri url;
     if (kIsWeb) {
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLLeaderboard"});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "TLLeaderboard"});
     } else {
       url = Uri.https('ch.tetr.io', 'api/users/by/${lb??"league"}', {
         "limit": "100",
@@ -882,7 +883,7 @@ class TetrioService extends DB {
   Future<List<RecordSingle>> fetchTetrioRecordsLeaderboard({String? prisecter, String? lb, String? country}) async{
     Uri url;
     if (kIsWeb) {
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLLeaderboard"});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "TLLeaderboard"});
     } else {
       url = Uri.https('ch.tetr.io', 'api/records/${lb??"40l_global"}', {
         "limit": "100",
@@ -942,7 +943,7 @@ class TetrioService extends DB {
     
     Uri url;
     if (kIsWeb) {
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "tetrioNews", "user": userID.toLowerCase().trim(), "limit": "100"});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "tetrioNews", "user": userID.toLowerCase().trim(), "limit": "100"});
     } else {
       url = Uri.https('ch.tetr.io', 'api/news/user_${userID.toLowerCase().trim()}', {"limit": "100"});
     }
@@ -990,7 +991,7 @@ class TetrioService extends DB {
     
     Uri url;
     if (kIsWeb) {
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "tetrioUserTL", "user": userID.toLowerCase().trim()});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "tetrioUserTL", "user": userID.toLowerCase().trim()});
     } else {
       url = Uri.https('ch.tetr.io', 'api/users/${userID.toLowerCase().trim()}/records/league/recent');
     }
@@ -1120,7 +1121,7 @@ class TetrioService extends DB {
     
     Uri url;
     if (kIsWeb) {
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "tetrioUserRecords", "user": userID.toLowerCase().trim()});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "tetrioUserRecords", "user": userID.toLowerCase().trim()});
     } else {
       url = Uri.https('ch.tetr.io', 'api/users/${userID.toLowerCase().trim()}/records');
     }
@@ -1173,7 +1174,7 @@ class TetrioService extends DB {
 
     Uri url;
     if (kIsWeb) {
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "Summaries", "id": id});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "Summaries", "id": id});
     } else {
       url = Uri.https('ch.tetr.io', 'api/users/$id/summaries');
     }
@@ -1311,7 +1312,7 @@ class TetrioService extends DB {
       // trying to find player with given discord id
       Uri dUrl;
       if (kIsWeb) {
-        dUrl = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "tetrioUserByDiscordID", "user": user.toLowerCase().trim()});
+        dUrl = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "tetrioUserByDiscordID", "user": user.toLowerCase().trim()});
       } else {
         dUrl = Uri.https('ch.tetr.io', 'api/users/search/discord:${user.toLowerCase().trim()}');
       }
@@ -1356,7 +1357,7 @@ class TetrioService extends DB {
     // finally going to obtain
     Uri url;
     if (kIsWeb) {
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "tetrioUser", "user": user.toLowerCase().trim()});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "tetrioUser", "user": user.toLowerCase().trim()});
     } else {
       url = Uri.https('ch.tetr.io', 'api/users/${user.toLowerCase().trim()}');
     }

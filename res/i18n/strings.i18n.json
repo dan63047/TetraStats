@@ -216,6 +216,7 @@
         "underpopulated": "Underpopulated by a $players",
         "PlayersEqualSupposedToBe": "cute",
         "avgStats": "Average Stats",
+        "avgForRank": "Average for $rank rank",
         "avgNerdStats": "Average Nerd Stats",
         "minimums": "Minimums",
         "maximums": "Maximums"
