@@ -72,6 +72,7 @@
     "comparingWith": "Данные от ${newDate} в сравнении с данными от ${oldDate}",
     "compare": "Сравнить",
     "comparison": "Сравнение",
+    "enterUsername": "Введите ник или \\$avgX (где X это ранг)",
     "general": "Основное",
     "badges": "Значки",
     "obtainDate": "Получен ${date}",
@@ -360,6 +361,8 @@
         "nicknameQuestion": "Введите свой ник",
         "inpuntHint": "(3-16 символов)",
         "emptyInputError": "Строка пуста",
+        "niceToSeeYou": "Приятно познакомиться, $n",
+        "letsTakeALook": "Давайте же посмотрим на ваши статы...",
         "skip": "Пропустить"
     },
     "aboutView": {

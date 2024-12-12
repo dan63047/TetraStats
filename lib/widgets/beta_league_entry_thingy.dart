@@ -50,7 +50,7 @@ class BetaLeagueEntryThingy extends StatelessWidget{
   }
 
   Color deltaColor(double? delta){
-    if (delta == null || delta.isNaN) return Colors.grey;
+    if (delta == null || delta.isNaN || ["nocontest", "nullified"].contains(record.extras.result)) return Colors.grey;
     if (delta.isNegative) return Colors.redAccent;
     else return Colors.greenAccent;
   }

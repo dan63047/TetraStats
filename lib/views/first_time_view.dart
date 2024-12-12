@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tetra_stats/data_objects/tetrio_player.dart';
@@ -19,7 +21,10 @@ class _FirstTimeState extends State<FirstTimeView> with SingleTickerProviderStat
   late Animation<double> _enterNicknameOpacity;
   late Animation<double> _transform;
   late Animation<Color?> _badNicknameAnim;
+  late Animation<double> _fadeOutOpacity;
   late TextEditingController _controller;
+  String title = t.firstTimeView.welcome;
+  String subtitle = t.firstTimeView.description;
   String helperText = "";
   String nickname = "";
   double helperTextOpacity = 0;
@@ -29,9 +34,6 @@ class _FirstTimeState extends State<FirstTimeView> with SingleTickerProviderStat
   void initState() {
     _animController = AnimationController(
       vsync: this,
-      // value: 0,
-      // lowerBound: 0.0,
-      // upperBound: 2.0,
       duration: Durations.extralong2
     );
     _spinAnimation = Tween<double>(
@@ -53,7 +55,7 @@ class _FirstTimeState extends State<FirstTimeView> with SingleTickerProviderStat
       curve: const Interval(
         0.5,
         0.75,
-        curve: Easing.emphasizedAccelerate
+        curve: Curves.easeInCubic
       ),
     ));
     _opacity = Tween<double>(
@@ -77,21 +79,34 @@ class _FirstTimeState extends State<FirstTimeView> with SingleTickerProviderStat
         parent: _animController,
         curve: const Interval(
           0.75,
-          1.0,
+          0.9,
           curve: Curves.ease,
         ),
       ),
     );
     _transform = Tween<double>(
       begin: 0.0,
-      end: 40.0
+      end: 150.0
     ).animate(
        CurvedAnimation(
         parent: _animController,
         curve: const Interval(
           0.75,
-          1.0,
+          0.9,
           curve: Curves.easeInOut,
+        ),
+      ),
+    );
+    _fadeOutOpacity = Tween<double>(
+      begin: 1.0,
+      end: 0.0
+    ).animate(
+       CurvedAnimation(
+        parent: _animController,
+        curve: const Interval(
+          0.9,
+          1.0,
+          curve: Curves.ease,
         ),
       ),
     );
@@ -121,17 +136,23 @@ class _FirstTimeState extends State<FirstTimeView> with SingleTickerProviderStat
           TetrioPlayer player = await teto.fetchPlayer(n);
           nickname = player.username;
           await prefs.setString('playerID', player.userId);
+          if(!(await teto.isPlayerTracking(player.userId))) await teto.addPlayerToTrack(player);
         }
         await prefs.setString('player', nickname);
+        await prefs.setBool("notFirstTime", true);
         helperText = "";
-        _animController.forward();
+        _animController.animateTo(0.9);
         setState((){
           userSet = true;
+          title = "Nice to see you, ${nickname}";
+          subtitle = "Let's take a look at your stats...";
         });
+        Timer(Duration(seconds: 2), () => _animController.animateTo(1.0, duration: Duration(seconds: 1)));
+        Timer(Duration(seconds: 3), () => context.replace("/"));
         return true;
       } catch (e) {
         _animController.value = 0.5;
-        _animController.animateTo(1.0, duration: Durations.long1);
+        _animController.animateTo(0.75, duration: Duration(seconds: 1));
         setState((){
           helperText = t.settingsDestination.noSuchAccount;
         });
@@ -139,12 +160,82 @@ class _FirstTimeState extends State<FirstTimeView> with SingleTickerProviderStat
       }
     } else {
       _animController.value = 0.5;
-      _animController.animateTo(1.0, duration: Durations.long1);
+      _animController.animateTo(0.75, duration: Durations.long1);
       setState((){
         helperText = t.firstTimeView.emptyInputError;
       });
       return false;
     }
+  }
+
+  Widget _buildAnimation(BuildContext context, Widget? child) {
+    return Center(
+      child: Container(
+        transform: Matrix4.translationValues(0, _transform.value, 0),
+        child: Opacity(
+          opacity: _fadeOutOpacity.value,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Spacer(),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 24.0),
+                child: RotationTransition(
+                  turns: _spinAnimation,
+                  child: Image.asset("res/icons/app.png", height: 128, opacity: _opacity)
+                ),
+              ),
+              Text(title, style: Theme.of(context).textTheme.titleLarge),
+              Text(subtitle, style: TextStyle(color: Colors.grey)),
+              Opacity(
+                opacity: _enterNicknameOpacity.value,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 24.0),
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(t.firstTimeView.nicknameQuestion, style: Theme.of(context).textTheme.titleSmall),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: SizedBox(width: 400.0, child: Focus(
+                              onFocusChange: (value) {
+                                setState((){if (value) helperTextOpacity = 0;});
+                              },
+                              child: TextField(
+                                controller: _controller,
+                                maxLength: 16,
+                                textAlign: TextAlign.center,
+                                enabled: !userSet,
+                                decoration: InputDecoration(
+                                  hintText: t.firstTimeView.inpuntHint,
+                                  helper: Opacity(
+                                    opacity: helperTextOpacity,
+                                    child: Text(helperText, style: TextStyle(fontFamily: "Eurostile Round", color: _badNicknameAnim.value, height: 0.5))
+                                  ),
+                                  counter: const Offstage()
+                                ),
+                                onSubmitted: (value) => _setDefaultNickname(value),
+                              ),
+                            )),
+                          ),
+                          ElevatedButton.icon(onPressed: !userSet ? () => _setDefaultNickname(_controller.value.text) : null, icon: Icon(Icons.subdirectory_arrow_left), label: Text(t.actions.submit))
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Spacer(flex: 2),
+              TextButton(onPressed: (){ context.replace("/"); }, child: Text(t.firstTimeView.skip))
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -164,64 +255,9 @@ class _FirstTimeState extends State<FirstTimeView> with SingleTickerProviderStat
               child: Opacity(opacity: value, child: child),
             );
           },
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Spacer(),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 24.0),
-                  child: RotationTransition(
-                    turns: _spinAnimation,
-                    child: Image.asset("res/icons/app.png", height: 128, opacity: _opacity)
-                  ),
-                ),
-                Text(t.firstTimeView.welcome, style: Theme.of(context).textTheme.titleLarge),
-                Text(t.firstTimeView.description, style: TextStyle(color: Colors.grey)),
-                Padding(
-                  padding: const EdgeInsets.only(top: 24.0),
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(t.firstTimeView.nicknameQuestion, style: Theme.of(context).textTheme.titleSmall),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
-                            child: SizedBox(width: 400.0, child: Focus(
-                              onFocusChange: (value) {
-                                setState((){if (value) helperTextOpacity = 0;});
-                              },
-                              child: TextField(
-                                controller: _controller,
-                                maxLength: 16,
-                                textAlign: TextAlign.center,
-                                decoration: InputDecoration(
-                                  hintText: t.firstTimeView.inpuntHint,
-                                  helper: AnimatedOpacity(
-                                    opacity: helperTextOpacity,
-                                    duration: Durations.long1,
-                                    curve: Easing.standardDecelerate,
-                                    child: AnimatedDefaultTextStyle(child: Text(helperText), style: TextStyle(fontFamily: "Eurostile Round", color: _badNicknameAnim.value, height: 0.5), duration: Durations.long1)
-                                  ),
-                                  counter: const Offstage()
-                                ),
-                                onSubmitted: (value) => _setDefaultNickname(value),
-                              ),
-                            )),
-                          ),
-                          ElevatedButton.icon(onPressed: () => _setDefaultNickname(_controller.value.text), icon: Icon(Icons.subdirectory_arrow_left), label: Text(t.actions.submit))
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                Spacer(flex: 2),
-                TextButton(onPressed: (){ context.replace("/"); }, child: Text(t.firstTimeView.skip))
-              ],
-            ),
+          child: AnimatedBuilder(
+            animation: _animController,
+            builder: _buildAnimation
           )
         ),
       ),

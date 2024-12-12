@@ -882,7 +882,7 @@ class CompareState extends State<CompareView> {
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  for (int l = 0; l < formattedValues[1][k].length; l++) Container(decoration: (rawValues[0].length > 1 && rawValues[1][k][l] != null && best[1][l] == rawValues[1][k][l]) ? BoxDecoration(boxShadow: [BoxShadow(color: Colors.cyanAccent.withAlpha(96), spreadRadius: 0, blurRadius: 4)]) : null, child: formattedValues[1][k][l]),
+                                  for (int l = 0; l < formattedValues[1][k].length; l++) Container(decoration: (rawValues[1].length > 1 && rawValues[1][k][l] != null && best[1][l] == rawValues[1][k][l]) ? BoxDecoration(boxShadow: [BoxShadow(color: Colors.cyanAccent.withAlpha(96), spreadRadius: 0, blurRadius: 4)]) : null, child: formattedValues[1][k][l]),
                                 ],
                               ),
                             ),
@@ -1010,6 +1010,8 @@ class AddNewColumnCard extends StatefulWidget{
 }
 
 class _AddNewColumnCardState extends State<AddNewColumnCard> with SingleTickerProviderStateMixin {
+  // TODO: make spinner while awaiting for data
+  // TODO: show error if failed to retrieve data
   late AnimationController _animController;
   late Animation _anim;
 
@@ -1049,7 +1051,7 @@ class _AddNewColumnCardState extends State<AddNewColumnCard> with SingleTickerPr
                 transform: Matrix4.translationValues(0, 100-(_anim.value as double)*100, 0),
                 child: Column(
                   children: [
-                    Text("Enter username:"),
+                    Text(t.enterUsername),
                     TextField(
                       autofocus: true,
                       onSubmitted: (value){

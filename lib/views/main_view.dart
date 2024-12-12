@@ -121,7 +121,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   void initState() {
     teto.open();
     controller = ScrollController();
-    changePlayer(_searchFor);
+    changePlayer(prefs.getString('playerID')??_searchFor);
 
     if (prefs.getBool("updateInBG") == true) {
       _backgroundUpdate = Timer(Duration(minutes: 5), () {

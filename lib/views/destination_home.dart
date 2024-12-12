@@ -904,13 +904,26 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
     }else{
       toSee = states[currentRangeValues.start.round()-1];
     }
-    if (currentRangeValues.end.round() == 0){
-      toCompare = states.length >= 2 ? states.elementAtOrNull(states.length-2) : null;
+    if (currentRangeValues.end.round() == 1){
+      toCompare = states.length >= 2 ? states.elementAtOrNull(2) : null;
     }else{
       toCompare = states[currentRangeValues.end.round()-1];
     }
     return Column(
       children: [
+        if (toCompare != null) Card(
+          child: RangeSlider(values: currentRangeValues, max: states.length.toDouble(),
+            labels: RangeLabels(
+                currentRangeValues.start.round().toString(),
+                currentRangeValues.end.round().toString(),
+              ),
+              onChanged: (RangeValues values) {
+                setState(() {
+                  currentRangeValues = values;
+                });
+              },
+            ),
+        ),
         Card(
           //surfaceTintColor: rankColors[data.rank],
           child: Padding(
@@ -926,19 +939,6 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
               ),
             ),
           ),
-        ),
-        if (toCompare != null) Card(
-          child: RangeSlider(values: currentRangeValues, max: states.length.toDouble(),
-            labels: RangeLabels(
-                currentRangeValues.start.round().toString(),
-                currentRangeValues.end.round().toString(),
-              ),
-              onChanged: (RangeValues values) {
-                setState(() {
-                  currentRangeValues = values;
-                });
-              },
-            ),
         ),
         TetraLeagueThingy(league: toSee, toCompare: toCompare, cutoffs: cutoffs, averages: averages, lbPos: lbPos, width: width),
         // Center(

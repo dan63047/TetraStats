@@ -28,7 +28,7 @@ class SmallLeague{
     rd = json['rd'];
     tr = json['tr'];
     rank = json['rank'];
-    placement = json['placement'];
+    placement = json['placement']??-1;
   }
 }
 

@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 1520 (760 per locale)
+/// Strings: 1526 (763 per locale)
 ///
-/// Built on 2024-12-11 at 15:09 UTC
+/// Built on 2024-12-12 at 15:53 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -204,6 +204,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String comparingWith({required Object newDate, required Object oldDate}) => 'Data from ${newDate} comparing with ${oldDate}';
 	String get compare => 'Compare';
 	String get comparison => 'Comparison';
+	String get enterUsername => 'Enter username or \$avgX (where X is rank)';
 	String get general => 'General';
 	String get badges => 'Badges';
 	String obtainDate({required Object date}) => 'Obtained ${date}';
@@ -991,7 +992,9 @@ class _StringsFirstTimeViewEn {
 	String get description => 'Service, that allows you to keep track of various statistics for TETR.IO';
 	String get nicknameQuestion => 'What\'s your nickname?';
 	String get inpuntHint => 'Type it here... (3-16 symbols)';
-	String get emptyInputError => 'Can\'t submit empty string';
+	String get emptyInputError => 'Can\'t submit an empty string';
+	String niceToSeeYou({required Object n}) => 'Nice to see you, ${n}';
+	String get letsTakeALook => 'Let\'s take a look at your stats...';
 	String get skip => 'Skip';
 }
 
@@ -1739,6 +1742,7 @@ class _StringsRuRu implements Translations {
 	@override String comparingWith({required Object newDate, required Object oldDate}) => 'Данные от ${newDate} в сравнении с данными от ${oldDate}';
 	@override String get compare => 'Сравнить';
 	@override String get comparison => 'Сравнение';
+	@override String get enterUsername => 'Введите ник или \$avgX (где X это ранг)';
 	@override String get general => 'Основное';
 	@override String get badges => 'Значки';
 	@override String obtainDate({required Object date}) => 'Получен ${date}';
@@ -2527,6 +2531,8 @@ class _StringsFirstTimeViewRuRu implements _StringsFirstTimeViewEn {
 	@override String get nicknameQuestion => 'Введите свой ник';
 	@override String get inpuntHint => '(3-16 символов)';
 	@override String get emptyInputError => 'Строка пуста';
+	@override String niceToSeeYou({required Object n}) => 'Приятно познакомиться, ${n}';
+	@override String get letsTakeALook => 'Давайте же посмотрим на ваши статы...';
 	@override String get skip => 'Пропустить';
 }
 
@@ -3261,6 +3267,7 @@ extension on Translations {
 			case 'comparingWith': return ({required Object newDate, required Object oldDate}) => 'Data from ${newDate} comparing with ${oldDate}';
 			case 'compare': return 'Compare';
 			case 'comparison': return 'Comparison';
+			case 'enterUsername': return 'Enter username or \$avgX (where X is rank)';
 			case 'general': return 'General';
 			case 'badges': return 'Badges';
 			case 'obtainDate': return ({required Object date}) => 'Obtained ${date}';
@@ -3534,7 +3541,9 @@ extension on Translations {
 			case 'firstTimeView.description': return 'Service, that allows you to keep track of various statistics for TETR.IO';
 			case 'firstTimeView.nicknameQuestion': return 'What\'s your nickname?';
 			case 'firstTimeView.inpuntHint': return 'Type it here... (3-16 symbols)';
-			case 'firstTimeView.emptyInputError': return 'Can\'t submit empty string';
+			case 'firstTimeView.emptyInputError': return 'Can\'t submit an empty string';
+			case 'firstTimeView.niceToSeeYou': return ({required Object n}) => 'Nice to see you, ${n}';
+			case 'firstTimeView.letsTakeALook': return 'Let\'s take a look at your stats...';
 			case 'firstTimeView.skip': return 'Skip';
 			case 'aboutView.title': return 'About Tetra Stats';
 			case 'aboutView.about': return 'Tetra Stats is a service, that works with TETR.IO Tetra Channel API, providing data from it and calculating some addtitional metrics, based on this data. Service allows user to track their progress in Tetra League with "Track" function, which records every Tetra League change into local database (not automatically, you have to visit service from time to time), so these changes could be looked through graphs.\n\nBeanserver blaster is a part of a Tetra Stats, that decoupled into a serverside script. It provides full Tetra League leaderboard, allowing Tetra Stats to sort leaderboard by any metric and build scatter chart, that allows user to analyse Tetra League trends. It also provides history of Tetra League ranks cutoffs, which can be viewed by user via graph as well.\n\nThere is a plans to add replay analysis and tournaments history, so stay tuned!\n\nService is not associated with TETR.IO or osk in any capacity.';
@@ -4070,6 +4079,7 @@ extension on _StringsRuRu {
 			case 'comparingWith': return ({required Object newDate, required Object oldDate}) => 'Данные от ${newDate} в сравнении с данными от ${oldDate}';
 			case 'compare': return 'Сравнить';
 			case 'comparison': return 'Сравнение';
+			case 'enterUsername': return 'Введите ник или \$avgX (где X это ранг)';
 			case 'general': return 'Основное';
 			case 'badges': return 'Значки';
 			case 'obtainDate': return ({required Object date}) => 'Получен ${date}';
@@ -4344,6 +4354,8 @@ extension on _StringsRuRu {
 			case 'firstTimeView.nicknameQuestion': return 'Введите свой ник';
 			case 'firstTimeView.inpuntHint': return '(3-16 символов)';
 			case 'firstTimeView.emptyInputError': return 'Строка пуста';
+			case 'firstTimeView.niceToSeeYou': return ({required Object n}) => 'Приятно познакомиться, ${n}';
+			case 'firstTimeView.letsTakeALook': return 'Давайте же посмотрим на ваши статы...';
 			case 'firstTimeView.skip': return 'Пропустить';
 			case 'aboutView.title': return 'О Tetra Stats';
 			case 'aboutView.about': return 'Tetra Stats — это сервис, который работает с TETR.IO Tetra Channel API, показывает данные оттуда и считает дополнительную статистику, основанную на этих данных. Сервис позволяет отслеживать прогресс в Тетра Лиге с помощью функции "Отслеживать", которая записывает каждое изменение в Лиге в локальную базу данных (не автоматически, вы должны вручную посещать свой профиль), что позволяет потом просматривать изменения с помощью графиков.\n\nBeanserver blaster — серверная часть Tetra Stats. Она собирает полную таблицу игроков Тетра Лиги, благодаря чему сортировать эту таблицу по любой метрике и строить точечную диаграмму, что позволяет анализировать тренды Лиги. Также она предоставляет историю требований рангов, которую тоже можно посмотреть на графике.\n\nВ будущем планируется добавить анализ повторов и историю турниров, так что оставайтесь на связи.\n\nСервис ни коим образом не ассоциируется с TETR.IO или osk.';
