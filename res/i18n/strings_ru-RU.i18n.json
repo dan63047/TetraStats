@@ -72,6 +72,7 @@
     "comparingWith": "Данные от ${newDate} в сравнении с данными от ${oldDate}",
     "compare": "Сравнить",
     "comparison": "Сравнение",
+    "enterUsername": "Введите ник или \\$avgX (где X это ранг)",
     "general": "Основное",
     "badges": "Значки",
     "obtainDate": "Получен ${date}",
@@ -215,6 +216,7 @@
         "underpopulated": "Не хватает $players",
         "PlayersEqualSupposedToBe": "лол",
         "avgStats": "Средние значения",
+        "avgForRank": "Среднее для $rank ранга",
         "avgNerdStats": "Средние задротские значения",
         "minimums": "Минимумы",
         "maximums": "Максимумы"
@@ -359,8 +361,10 @@
         "description": "Сервис, который позволяет просматривать статистику в TETR.IO",
         "nicknameQuestion": "Какой у вас ник?",
         "inpuntHint": "Введите его здесь... (3-16 символов)",
-        "emptyInputError": "Can't submit empty string",
-        "skip": "Skip"
+        "emptyInputError": "Строка пуста",
+        "niceToSeeYou": "Приятно познакомиться, $n",
+        "letsTakeALook": "Давайте же посмотрим на ваши статы...",
+        "skip": "Пропустить"
     },
     "aboutView": {
         "title": "О Tetra Stats",
