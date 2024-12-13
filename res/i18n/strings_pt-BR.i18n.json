@@ -72,6 +72,7 @@
     "comparingWith": "Data from ${newDate} comparing with ${oldDate}",
     "compare": "Compare",
     "comparison": "Comparação",
+    "enterUsername": "Enter username or \\$avgX (where X is rank)",
     "general": "General",
     "badges": "Badges",
     "obtainDate": "Obtained ${date}",
@@ -215,6 +216,7 @@
         "underpopulated": "Underpopulated by a $players",
         "PlayersEqualSupposedToBe": "cute",
         "avgStats": "Average Stats",
+        "avgForRank": "Average for $rank rank",
         "avgNerdStats": "Average Nerd Stats",
         "minimums": "Minimums",
         "maximums": "Maximums"
@@ -359,7 +361,9 @@
         "description": "Service, that allows you to keep track of various statistics for TETR.IO",
         "nicknameQuestion": "What's your nickname?",
         "inpuntHint": "Type it here... (3-16 symbols)",
-        "emptyInputError": "Can't submit empty string",
+        "emptyInputError": "Can't submit an empty string",
+        "niceToSeeYou": "Nice to see you, $n",
+        "letsTakeALook": "Let's take a look at your stats...",
         "skip": "Skip"
     },
     "aboutView": {
