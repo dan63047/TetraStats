@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -15,6 +17,7 @@ import 'package:tetra_stats/data_objects/summaries.dart';
 import 'package:tetra_stats/data_objects/tetra_league.dart';
 import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 import 'package:tetra_stats/data_objects/tetrio_player.dart';
+import 'package:tetra_stats/data_objects/tetrio_player_from_leaderboard.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/utils/colors_functions.dart';
@@ -120,8 +123,9 @@ class ZenithCard extends StatelessWidget {
   final RecordSingle? record;
   final bool old;
   final double width;
+  final List<Achievement> achievements;
 
-  const ZenithCard(this.record, this.old, {this.width = double.infinity});
+  const ZenithCard(this.record, this.old, this.achievements, {this.width = double.infinity});
 
   Widget splitsCard(){
     return Card(
@@ -246,7 +250,23 @@ class ZenithCard extends StatelessWidget {
           ),
         ),
         if (record != null) NerdStatsThingy(nerdStats: record!.aggregateStats.nerdStats, width: width),
-        if (record != null) Graphs(record!.aggregateStats.apm, record!.aggregateStats.pps, record!.aggregateStats.vs, record!.aggregateStats.nerdStats, record!.aggregateStats.playstyle)
+        if (record != null) Graphs(record!.aggregateStats.apm, record!.aggregateStats.pps, record!.aggregateStats.vs, record!.aggregateStats.nerdStats, record!.aggregateStats.playstyle),
+        if (achievements.isNotEmpty) Card(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Spacer(),
+              Text(t.relatedAchievements, style: Theme.of(context).textTheme.titleLarge),
+              const Spacer()
+            ],
+          ),
+        ),
+        if (achievements.isNotEmpty) Wrap(
+          direction: Axis.horizontal,
+          children: [
+            for (Achievement achievement in achievements) FractionallySizedBox(widthFactor: 1/((width/600).ceil()), child: AchievementSummary(achievement: achievement)),
+          ],
+        ),
       ],
     );
   }
@@ -573,11 +593,10 @@ class AchievementSummary extends StatelessWidget{
                     ),
                     child: ClipRect(
                       child: Align(
-                        alignment: Alignment.topLeft.add(Alignment(0.285 * (((achievement?.k??1) - 1) % 8), 0.285 * (((achievement?.k??0) - 1) / 8).floor())),
-                        //alignment: Alignment.topLeft.add(Alignment(0.285 * 1, 0)),
+                        alignment: Alignment.topLeft.add(Alignment(0.286 * (((achievement?.k??1) - 1) % 8), 0.286 * (((achievement?.k??0) - 1) / 8).floor())),
                         heightFactor: 0.125,
                         widthFactor: 0.125,
-                        child: Image.asset("res/icons/achievements.png", width: 2048, height: 2048, scale: 1, color: achievement?.v == null ? Colors.grey : Colors.white),
+                        child: Image.asset("res/icons/achievements.png", width: 2048, height: 2048, scale: 1, color: achievement?.v == null ? Colors.grey : achievementColors[min(achievement!.rank!, 6)]),
                       ),
                     ),
                   ),
@@ -718,7 +737,6 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
           1 2
           3 4
           5 6
-          7 7
         ''' : '''
           t
           1
@@ -727,10 +745,9 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
           4
           5
           6
-          7
         ''',
         columnSizes: width > 600 ? [auto, auto] : [auto],
-        rowSizes: width > 600 ? [auto, auto, auto, auto, auto, auto] : [auto, auto, auto, auto, auto, auto, auto, auto],
+        rowSizes: width > 600 ? [auto, auto, auto, auto, auto] : [auto, auto, auto, auto, auto, auto, auto],
         columnGap: 0,
         rowGap: 0,
         children: [
@@ -869,34 +886,11 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 ),
               ),
             ).inGridArea('6'),
-          if (summaries.achievements.isNotEmpty) Card(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
-              child: Column(
-                children: [
-                  if (summaries.achievements.firstWhere((e) => e.k == 16).v != null) Row(
-                    children: [
-                      const Text("Total height climbed in QP"),
-                      const Spacer(),
-                      Text("${f2.format(summaries.achievements.firstWhere((e) => e.k == 16).v!)} m"),
-                    ],
-                  ),
-                  if (summaries.achievements.firstWhere((e) => e.k == 17).v != null) Row(
-                    children: [
-                      const Text("KO's in QP"),
-                      const Spacer(),
-                      Text(intf.format(summaries.achievements.firstWhere((e) => e.k == 17).v!)),
-                    ],
-                  )
-                ],
-              ),
-            ),
-          ).inGridArea('7')
         ],
       );
   }
 
-  Widget getTetraLeagueCard(TetraLeague data, Cutoffs? cutoffs, CutoffTetrio? averages, List<TetraLeague> states, PlayerLeaderboardPosition? lbPos, double width){
+  Widget getTetraLeagueCard(TetraLeague data, Cutoffs? cutoffs, CutoffTetrio? averages, List<TetraLeague> states, PlayerLeaderboardPosition? lbPos, double width, List<Achievement> achievements){
     TetraLeague toSee;
     TetraLeague? toCompare;
     if (currentRangeValues.start.round() == 0){
@@ -963,7 +957,24 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
           ),
         ),
         if (data.nerdStats != null) NerdStatsThingy(nerdStats: toSee.nerdStats!, oldNerdStats: toCompare?.nerdStats, averages: averages, lbPos: lbPos, width: width),
-        if (data.nerdStats != null) Graphs(toSee.apm!, toSee.pps!, toSee.vs!, toSee.nerdStats!, toSee.playstyle!)
+        if (data.nerdStats != null) Graphs(toSee.apm!, toSee.pps!, toSee.vs!, toSee.nerdStats!, toSee.playstyle!),
+        Card(
+          //surfaceTintColor: rankColors[data.rank],
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Spacer(),
+              Text(t.relatedAchievements, style: Theme.of(context).textTheme.titleLarge),
+              const Spacer()
+            ],
+          ),
+        ),
+        Wrap(
+          direction: Axis.horizontal,
+          children: [
+            for (Achievement achievement in achievements) FractionallySizedBox(widthFactor: 1/((width/600).ceil()), child: AchievementSummary(achievement: achievement)),
+          ],
+        ),
       ],
     );
   }
@@ -1164,19 +1175,19 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
     super.initState();
   }
 
-  Widget rigthCard(AsyncSnapshot<FetchResults> snapshot, List<Achievement> sprintAchievements, List<Achievement> blitzAchievements, double width){
+  Widget rigthCard(AsyncSnapshot<FetchResults> snapshot, List<Achievement> sprintAchievements, List<Achievement> blitzAchievements, List<Achievement> tlAchievements, List<Achievement> qpAchievements, List<Achievement> qpExAchievements, double width){
     return switch (rightCard){
       Cards.overview => getOverviewCard(snapshot.data!.summaries!, (snapshot.data!.averages != null && snapshot.data!.summaries!.league.rank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.rank] : (snapshot.data!.averages != null && snapshot.data!.summaries!.league.percentileRank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.percentileRank] : null, width),
       Cards.tetraLeague => switch (cardMod){
-        CardMod.info => getTetraLeagueCard(snapshot.data!.summaries!.league, snapshot.data!.cutoffs, (snapshot.data!.averages != null && snapshot.data!.summaries!.league.rank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.rank] : (snapshot.data!.averages != null && snapshot.data!.summaries!.league.percentileRank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.percentileRank] : null, snapshot.data!.states, snapshot.data!.playerPos, width),
+        CardMod.info => getTetraLeagueCard(snapshot.data!.summaries!.league, snapshot.data!.cutoffs, (snapshot.data!.averages != null && snapshot.data!.summaries!.league.rank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.rank] : (snapshot.data!.averages != null && snapshot.data!.summaries!.league.percentileRank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.percentileRank] : null, snapshot.data!.states, snapshot.data!.playerPos, width, tlAchievements),
         CardMod.ex => getPreviousSeasonsList(snapshot.data!.summaries!.pastLeague, width),
         CardMod.records => getRecentTLrecords(widget.constraints, snapshot.data!.player!.userId),
         _ => const Center(child: Text("huh?"))
       },
       Cards.quickPlay => switch (cardMod){
-        CardMod.info => ZenithCard(snapshot.data?.summaries?.zenith != null ? snapshot.data!.summaries!.zenith : snapshot.data!.summaries?.zenithCareerBest, snapshot.data!.summaries?.zenith == null, width: width),
+        CardMod.info => ZenithCard(snapshot.data?.summaries?.zenith != null ? snapshot.data!.summaries!.zenith : snapshot.data!.summaries?.zenithCareerBest, snapshot.data!.summaries?.zenith == null, qpAchievements, width: width),
         CardMod.records => getListOfRecords("zenith/recent", "zenith/top", widget.constraints),
-        CardMod.ex => ZenithCard(snapshot.data?.summaries?.zenithEx != null ? snapshot.data!.summaries!.zenithEx : snapshot.data!.summaries?.zenithExCareerBest, snapshot.data!.summaries?.zenithEx == null, width: width),
+        CardMod.ex => ZenithCard(snapshot.data?.summaries?.zenithEx != null ? snapshot.data!.summaries!.zenithEx : snapshot.data!.summaries?.zenithExCareerBest, snapshot.data!.summaries?.zenithEx == null, qpExAchievements, width: width),
         CardMod.exRecords => getListOfRecords("zenithex/recent", "zenithex/top", widget.constraints),
       },
       Cards.sprint => switch (cardMod){
@@ -1224,6 +1235,48 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
               closestAverageBlitz = blitzAverages.entries.last;
               blitzBetterThanClosestAverage = false;
             }
+            List<Achievement> tlAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? <Achievement>[
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 10),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 12),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 13),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 14),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 15),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 47),
+            ] : [];
+            List<Achievement> qpAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? <Achievement>[
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 16),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 17),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 18),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 20),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 21),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 22),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 23),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 24),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 25),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 26),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 27),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 28),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 29),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 30),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 33),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 41),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 43),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 44),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 45),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 46),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 51),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 54),
+            ] : [];
+            List<Achievement> qpExAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? <Achievement>[
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 19),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 31),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 32),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 34),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 40),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 49),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 50),
+              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 53),
+            ] : [];
             List<Achievement> sprintAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? <Achievement>[
               snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 5),
               snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 7),
@@ -1293,7 +1346,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                           child: SlideTransition(
                             position: _offsetAnimation,
                             child: SingleChildScrollView(
-                              child: rigthCard(snapshot, sprintAchievements, blitzAchievements, width - 450),
+                              child: rigthCard(snapshot, sprintAchievements, blitzAchievements, tlAchievements, qpAchievements, qpExAchievements, width - 450),
                           ),
                         ),
                       ),
@@ -1351,7 +1404,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                   if (snapshot.data!.player!.role == "bot") FakeDistinguishmentThingy(bot: true, botMaintainers: snapshot.data!.player!.botmaster),
                   if (snapshot.data!.player!.role == "banned") FakeDistinguishmentThingy(banned: true)
                   else if (snapshot.data!.player!.badstanding == true) FakeDistinguishmentThingy(badStanding: true),
-                  rigthCard(snapshot, sprintAchievements, blitzAchievements, width),
+                  rigthCard(snapshot, sprintAchievements, blitzAchievements, tlAchievements, qpAchievements, qpExAchievements, width),
                   if (rightCard == Cards.overview) Card(
                     child: Column(
                       children: [

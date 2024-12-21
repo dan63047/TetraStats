@@ -35,7 +35,7 @@ import 'package:tetra_stats/services/sqlite_db_controller.dart';
 import 'package:csv/csv.dart';
 
 const String dbName = "TetraStats.db";
-const String webVersionDomain = "tsbeta.dan63.by";
+const String webVersionDomain = "ts.dan63.by";
 const String tetrioUsersTable = "tetrioUsers";
 const String tetrioUsersToTrackTable = "tetrioUsersToTrack";
 const String tetraLeagueMatchesTable = "tetrioAlphaLeagueMathces";
@@ -831,7 +831,12 @@ class TetrioService extends DB {
      
     Uri url;
     if (kIsWeb) {
-      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "TLLeaderboard"});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {
+        "endpoint": "leaderboard",
+        "lb": lb??"league",
+        if (prisecter != null) "after": prisecter,
+        if (country != null) "country": country
+        });
     } else {
       url = Uri.https('ch.tetr.io', 'api/users/by/${lb??"league"}', {
         "limit": "100",

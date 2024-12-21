@@ -32,8 +32,8 @@ class SingleplayerRecordView extends StatelessWidget {
                 maxWidth: 768
               ),
               child: switch (record.gamemode){
-                "zenith" => ZenithCard(record, false, width: MediaQuery.of(context).size.width),
-                "zenithex" => ZenithCard(record, false, width: MediaQuery.of(context).size.width),
+                "zenith" => ZenithCard(record, false, [], width: MediaQuery.of(context).size.width),
+                "zenithex" => ZenithCard(record, false, [], width: MediaQuery.of(context).size.width),
                 _ => SingleplayerRecord(record: record, hideTitle: true)
               },
             ),

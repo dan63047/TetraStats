@@ -55,19 +55,19 @@ class TetraLeagueThingy extends StatelessWidget{
   
   @override
   Widget build(BuildContext context) {
+    print(ranks2.indexOf(league.rank != "z" ? league.rank : league.percentileRank)-1);
     return Card(
-      //surfaceTintColor: rankColors[league.rank],
       child: Column(
         children: [
           TLRatingThingy(userID: league.id, tlData: league, oldTl: toCompare, showPositions: true),
           if (league.gamesPlayed > 9) TLProgress(
             tlData: league,
             previousRankTRcutoff: cutoffs != null ? cutoffs!.tr[league.rank != "z" ? league.rank : league.percentileRank] : null,
-            nextRankTRcutoff: cutoffs != null ? (league.rank != "z" ? league.rank == "x+" : league.percentileRank == "x+") ? 25000 : cutoffs!.tr[ranks.elementAtOrNull(ranks.indexOf(league.rank != "z" ? league.rank : league.percentileRank)+1)] : null,
+            nextRankTRcutoff: cutoffs != null ? cutoffs!.tr[ranks2[ranks2.indexOf(league.rank != "z" ? league.rank : league.percentileRank)-1]] : null,
             previousRankTRcutoffTarget: league.rank != "z" ? rankTargets[league.rank] : null,
-            nextRankTRcutoffTarget: (league.rank != "z" && league.rank != "x+") ? rankTargets[ranks.elementAtOrNull(ranks.indexOf(league.rank)+1)] : null,
+            nextRankTRcutoffTarget: (league.rank != "z" && league.rank != "x+") ? rankTargets[ranks2[ranks2.indexOf(league.rank != "z" ? league.rank : league.percentileRank)-1]] : null,
             previousGlickoCutoff: cutoffs != null ? cutoffs!.glicko[league.rank != "z" ? league.rank : league.percentileRank] : null,
-            nextRankGlickoCutoff: cutoffs != null ? (league.rank != "z" ? league.rank == "x+" : league.percentileRank == "x+") ? 25000 : cutoffs!.glicko[ranks.elementAtOrNull(ranks.indexOf(league.rank != "z" ? league.rank : league.percentileRank)+1)] : null,
+            nextRankGlickoCutoff: cutoffs != null ? cutoffs!.glicko[ranks2[ranks2.indexOf(league.rank != "z" ? league.rank : league.percentileRank)-1]] : null,
           ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,

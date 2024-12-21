@@ -45,6 +45,27 @@ const List<String> ranks = [
   "x",
   "x+"
 ];
+const List<String> ranks2 = [
+  "top1",
+  "x+",
+  "x",
+  "u",
+  "ss",
+  "s+",
+  "s",
+  "s-",
+  "a+",
+  "a",
+  "a-",
+  "b+",
+  "b",
+  "b-",
+  "c+",
+  "c",
+  "c-",
+  "d+",
+  "d"
+];
 const Map<String, double> rankCutoffs = {
   "x+": 0.002,
   "x": 0.01,
@@ -177,6 +198,16 @@ const Map<String, Color> rankColors = {
   'z': Color(0xFF375433),
   'top1': Colors.yellowAccent
 };
+
+const List<Color> achievementColors = [
+  Colors.grey,
+  Color(0xFFB38070), // bronze
+  Color(0xFF7E9EA7), // silver
+  Color(0xFFE2A042), // gold
+  Color(0xFF70D0A3), // platinum
+  Color(0xFFD590FF), // diamond
+  Colors.white,
+];
 
 const Map<String, Duration> sprintAverages = {
   // based on https://discord.com/channels/673303546107658242/674421736162197515/1277367281264889908

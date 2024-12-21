@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 1528 (764 per locale)
+/// Strings: 1530 (765 per locale)
 ///
-/// Built on 2024-12-12 at 21:30 UTC
+/// Built on 2024-12-21 at 17:08 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -187,6 +187,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get nerdStats => 'Nerd Stats';
 	String get playstyles => 'Playstyles';
 	String get horoscopes => 'Horoscopes';
+	String get relatedAchievements => 'Related Achievements';
 	String get season => 'Season';
 	String get smooth => 'Smooth';
 	String get dateAndTime => 'Date & Time';
@@ -890,7 +891,7 @@ class _StringsSettingsDestinationEn {
 	// Translations
 	String get title => 'Settings';
 	String get general => 'General';
-	String get customization => 'Custonization';
+	String get customization => 'Customization';
 	String get database => 'Local database';
 	String get checking => 'Checking...';
 	String get enterToSubmit => 'Press Enter to submit';
@@ -1726,6 +1727,7 @@ class _StringsRuRu implements Translations {
 	@override String get nerdStats => 'Для Задротов';
 	@override String get playstyles => 'Стили игры';
 	@override String get horoscopes => 'Гороскопы';
+	@override String get relatedAchievements => 'Достижения режима';
 	@override String get season => 'Сезон';
 	@override String get smooth => 'Сглаживание';
 	@override String get dateAndTime => 'Дата и время';
@@ -3248,6 +3250,7 @@ extension on Translations {
 			case 'nerdStats': return 'Nerd Stats';
 			case 'playstyles': return 'Playstyles';
 			case 'horoscopes': return 'Horoscopes';
+			case 'relatedAchievements': return 'Related Achievements';
 			case 'season': return 'Season';
 			case 'smooth': return 'Smooth';
 			case 'dateAndTime': return 'Date & Time';
@@ -3477,7 +3480,7 @@ extension on Translations {
 			case 'savedDataDestination.TLrecords': return 'TL Records';
 			case 'settingsDestination.title': return 'Settings';
 			case 'settingsDestination.general': return 'General';
-			case 'settingsDestination.customization': return 'Custonization';
+			case 'settingsDestination.customization': return 'Customization';
 			case 'settingsDestination.database': return 'Local database';
 			case 'settingsDestination.checking': return 'Checking...';
 			case 'settingsDestination.enterToSubmit': return 'Press Enter to submit';
@@ -4061,6 +4064,7 @@ extension on _StringsRuRu {
 			case 'nerdStats': return 'Для Задротов';
 			case 'playstyles': return 'Стили игры';
 			case 'horoscopes': return 'Гороскопы';
+			case 'relatedAchievements': return 'Достижения режима';
 			case 'season': return 'Сезон';
 			case 'smooth': return 'Сглаживание';
 			case 'dateAndTime': return 'Дата и время';

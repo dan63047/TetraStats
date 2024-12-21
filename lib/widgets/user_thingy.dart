@@ -1,7 +1,9 @@
 import 'dart:math';
+import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart' show Size;
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/data_objects/tetrio_constants.dart';
@@ -15,6 +17,45 @@ import 'package:tetra_stats/utils/text_shadow.dart';
 import 'package:tetra_stats/views/compare_view_tiles.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
 import 'package:transparent_image/transparent_image.dart';
+
+Future<ui.Image> osksFuture = loadImage(Uri.https("tetr.io", "/user-content/banners/5e32fc85ab319c2ab1beb07c.jpg", {"rv": "1628366386763"}));
+
+Future<ui.Image> loadImage(Uri url) async {
+  final response = await teto.client.get(url);
+  return await decodeImageFromList(response.bodyBytes);
+}
+
+ Widget createCustomImage(ui.Image image) {
+   return SizedBox(
+     width: image.width.toDouble(),
+     height: image.height.toDouble()/64,
+     child: CustomPaint(
+      size: Size(128.0, 128.0),
+      painter: ImagePainter(image),
+     ),
+   );
+ }
+
+ class ImagePainter extends CustomPainter {
+   ImagePainter(ui.Image this.image);
+   final ui.Image image;
+
+   @override
+   void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.red
+      ..strokeWidth = 5
+      ..style = PaintingStyle.stroke;
+
+    canvas.translate(-240, 0);
+    canvas.scale(0.5);
+    canvas.drawImage(image, Offset.zero, paint);
+   }
+
+   @override
+   bool shouldRepaint(ImagePainter oldDelegate) =>
+       image != oldDelegate.image;
+ }
 
 class UserThingy extends StatefulWidget {
   final TetrioPlayer player;
@@ -103,14 +144,30 @@ class _UserThingyState extends State<UserThingy> with SingleTickerProviderStateM
                 constraints: const BoxConstraints(maxWidth: 960),
                 height: widget.player.bannerRevision != null ? 218.0 : 138.0,
                 child: Stack(
-                //clipBehavior: Clip.none,
                 children: [
-                  // TODO: osk banner can cause memory leak
-                  if (widget.player.bannerRevision != null) FadeInImage.memoryNetwork(image: kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioBanner&user=${widget.player.userId}&rv=${widget.player.bannerRevision}" : "https://tetr.io/user-content/banners/${widget.player.userId}.jpg?rv=${widget.player.bannerRevision}",
+                  // Very weird solution to draw only the first frame of the gif
+                  if (widget.player.userId == "5e32fc85ab319c2ab1beb07c") FutureBuilder<ui.Image>(
+                    future: osksFuture,
+                    builder: (context, snapshot) {
+                      switch (snapshot.connectionState){
+                        case ConnectionState.none:
+                        case ConnectionState.waiting:
+                        case ConnectionState.active:
+                          return SizedBox(width: 960);
+                        case ConnectionState.done:
+                          return createCustomImage(snapshot.data!);
+                      }
+                    },
+                  ) // If not osk, using a normal widget like a normal human being
+                  else if (widget.player.bannerRevision != null) FadeInImage.memoryNetwork(
+                    image: kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioBanner&user=${widget.player.userId}&rv=${widget.player.bannerRevision}" : "https://tetr.io/user-content/banners/${widget.player.userId}.jpg?rv=${widget.player.bannerRevision}",
                     placeholder: kTransparentImage,
                     fit: BoxFit.cover,
                     height: 120,
-                    fadeInCurve: Easing.standard, fadeInDuration: Durations.long4
+                    fadeInCurve: Easing.standard, fadeInDuration: Durations.long4,
+                    imageErrorBuilder: (context, object, trace){
+                      return SizedBox(width: 960);
+                    } 
                   ),
                   Positioned(
                     top: widget.player.bannerRevision != null ? 90.0 : 10.0,
