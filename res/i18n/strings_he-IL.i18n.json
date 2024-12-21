@@ -47,6 +47,7 @@
     "nerdStats": "Nerd Stats",
     "playstyles": "Playstyles",
     "horoscopes": "Horoscopes",
+    "relatedAchievements": "Related Achievements",
     "season": "Season",
     "smooth": "Smooth",
     "dateAndTime": "Date & Time",
@@ -286,7 +287,7 @@
     "settingsDestination": {
         "title": "Settings",
         "general": "General",
-        "customization": "Custonization",
+        "customization": "Customization",
         "database": "Local database",
         "checking": "Checking...",
         "enterToSubmit": "Press Enter to submit",
