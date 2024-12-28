@@ -379,7 +379,7 @@
         "providedFormulas": "Предоставил формулы",
         "providedS1history": "Предоставляет историю первого сезона лиги",
         "inoue": "Inoue (достаёт повторы)",
-        "zhCNlocale": "Simplfied Chinese locale",
+        "zhCNlocale": "Перевёл на упрощённый китайский",
         "supportHim": "Поддержите его!"
     },
     "stats": {
@@ -389,7 +389,7 @@
         "ogw": "Онлайн побед",
         "followers": "Подписчиков",
         "xp": {
-            "short": "Опыт",
+            "short": "XP",
             "full": "Очки опыта"
         },
         "tr": {
