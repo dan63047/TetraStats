@@ -332,58 +332,58 @@
         "exportDB": "Export local database",
         "desktopExportAlertTitle": "Desktop export",
         "desktopExportText": "It seems like you using this app on desktop. Check your documents folder, you should find \"TetraStats.db\". Copy it somewhere",
-        "androidExportAlertTitle": "Android export",
+        "androidExportAlertTitle": "Android 导出",
         "androidExportText": "已导出。\n${exportedDB}",
-        "importDB": "Import local database",
-        "importDBDescription": "Restore your backup. Notice that already stored database will be overwritten.",
-        "importWrongFileType": "Wrong file type"
+        "importDB": "导入本地数据库",
+        "importDBDescription": "还原您的备份。请注意已存储的数据库将被覆盖。",
+        "importWrongFileType": "文件类型错误！"
     },
     "homeNavigation": {
-        "overview": "Overview",
-        "standing": "Standing",
-        "seasons": "Seasons",
-        "mathces": "Matches",
-        "pb": "PB",
-        "normal": "Normal",
-        "expert": "Expert",
-        "expertRecords": "Ex Records"
+        "overview": "概览",
+        "standing": "名次",
+        "seasons": "赛季",
+        "mathces": "比赛场次",
+        "pb": "个人最佳",
+        "normal": "普通模式",
+        "expert": "专家模式",
+        "expertRecords": "专家模式记录"
     },
     "graphsNavigation": {
         "history": "Player History",
         "league": "League State",
-        "cutoffs": "Cutoffs History"
+        "cutoffs": "分段线历史"
     },
     "calcNavigation": {
-        "stats": "Stats Calculator",
-        "damage": "Damage Calculator"
+        "stats": "数据计算器",
+        "damage": "伤害计算器"
     },
     "firstTimeView": {
         "welcome": "Welcome to Tetra Stats",
-        "description": "Service, that allows you to keep track of various statistics for TETR.IO",
-        "nicknameQuestion": "What's your nickname?",
-        "inpuntHint": "Type it here... (3-16 symbols)",
-        "emptyInputError": "Can't submit an empty string",
-        "niceToSeeYou": "Nice to see you, $n",
+        "description": "服务，允许您跟踪TETR.IO的各种数据",
+        "nicknameQuestion": "您的昵称是？",
+        "inpuntHint": "在此处输入... (3-16个符号)",
+        "emptyInputError": "不能提交空字符串",
+        "niceToSeeYou": "很高兴见到你，$n",
         "letsTakeALook": "Let's take a look at your stats...",
-        "skip": "Skip"
+        "skip": "跳过"
     },
     "aboutView": {
         "title": "About Tetra Stats",
-        "about": "Tetra Stats is a service, that works with TETR.IO Tetra Channel API, providing data from it and calculating some addtitional metrics, based on this data. Service allows user to track their progress in Tetra League with \"Track\" function, which records every Tetra League change into local database (not automatically, you have to visit service from time to time), so these changes could be looked through graphs.\n\nBeanserver blaster is a part of a Tetra Stats, that decoupled into a serverside script. It provides full Tetra League leaderboard, allowing Tetra Stats to sort leaderboard by any metric and build scatter chart, that allows user to analyse Tetra League trends. It also provides history of Tetra League ranks cutoffs, which can be viewed by user via graph as well.\n\nThere is a plans to add replay analysis and tournaments history, so stay tuned!\n\nService is not associated with TETR.IO or osk in any capacity.",
-        "appVersion": "App Version",
+        "about": "Tetra Stats是一种服务，与TETR.IO Tetra Channel API共用，提供数据并根据这种数据计算一些附加度量。 服务允许用户用\"Track\"功能跟踪他们在Tetra League中的进度，该函数记录每个Tetra Leage更改到本地数据库(非自动) 您必须不时地访问服务。)这样，这些更改可以通过图表来查看。\n\nBeanserver blaster 是Tetra Stats的一部分，它被拆解成服务器侧脚本。 它提供完整的Tetra League排行榜，允许Tetra Stats通过任何公式对排行榜进行排序并生成散点图，这允许用户分析Tetra联赛趋势。 它还提供了Tetra League 的评分历史，用户也可以通过图表看到。\n\n我们有一个添加回放分析和锦标赛历史记录的计划，所以随时关注！\n\n服务没有与TETR.IO与osk以任何身份关联。",
+        "appVersion": "版本",
         "build": "Build $build",
         "GHrepo": "GitHub Repository",
-        "submitAnIssue": "Submit an issue",
-        "credits": "Credits",
-        "authorAndDeveloper": "Autor & developer",
-        "providedFormulas": "Provided formulas",
-        "providedS1history": "Provided S1 history",
-        "inoue": "Inoue (replay grabber)",
-        "zhCNlocale": "Simplfied Chinise locale",
-        "supportHim": "Support him!"
+        "submitAnIssue": "提交问题",
+        "credits": "鸣谢",
+        "authorAndDeveloper": "作者 & 开发者",
+        "providedFormulas": "提供的公式",
+        "providedS1history": "提供的 S1 历史",
+        "inoue": "回放抓取器",
+        "zhCNlocale": "简中翻译员",
+        "supportHim": "为他提供支持！"
     },
     "stats": {
-        "registrationDate": "Registration Date",
+        "registrationDate": "注册时间",
         "gametime": "Time Played",
         "ogp": "Online Games Played",
         "ogw": "Online Games Won",
