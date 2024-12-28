@@ -268,7 +268,7 @@
         "sprintAndBlitzAverages": "40 行 & 闪电战平均数据",
         "sprintAndBlitzAveragesDescription": "计算40 行 & 闪电战平均数据是个很繁琐的过程，所以很久才会更新一次。 点击标题查看完整的 40 行 & 闪电战平均数据表",
         "tetraStatsWiki": "Tetra Stats Wiki",
-        "tetraStatsWikiDescription": "查看更多关于Tetra Stats提供的函数和数据",
+        "tetraStatsWikiDescription": "查看更多关于Tetra Stats提供的功能和数据",
         "about": "关于 Tetra Stats",
         "aboutDescription": "由 dan63 开发"
     },
@@ -369,7 +369,7 @@
     },
     "aboutView": {
         "title": "关于 Tetra Stats",
-        "about": "Tetra Stats是一种服务，与TETR.IO Tetra Channel API共用，提供数据并根据这种数据计算一些附加度量。 服务允许用户用\"Track\"功能跟踪他们在Tetra League中的进度，该函数记录每个Tetra Leage更改到本地数据库(非自动) 您必须不时地访问服务。这样，这些更改可以通过图表来查看。\n\nBeanserver blaster 是Tetra Stats的一部分，它被拆解成服务器侧脚本。 它提供完整的Tetra League排行榜，允许Tetra Stats通过任何公式对排行榜进行排序并生成散点图，这允许用户分析Tetra联赛趋势。 它还提供了Tetra League 的评分历史，用户也可以通过图表看到。\n\n我们有一个添加回放分析和锦标赛历史记录的计划，所以随时关注！\n\n服务没有与TETR.IO与osk以任何身份关联。",
+        "about": "Tetra Stats是一种服务，与TETR.IO Tetra Channel API共用，提供数据并根据这种数据计算一些附加度量。 服务允许用户用\"Track\"功能跟踪他们在Tetra League中的进度，这个功能记录每个Tetra Leage更改到本地数据库(非自动) 您必须不时地访问服务。这样，这些更改可以通过图表来查看。\n\nBeanserver blaster 是Tetra Stats的一部分，它被拆解成服务器侧脚本。 它提供完整的Tetra League排行榜，允许Tetra Stats通过任何公式对排行榜进行排序并生成散点图，这允许用户分析Tetra联赛趋势。 它还提供了Tetra League 的评分历史，用户也可以通过图表看到。\n\n我们有一个添加回放分析和锦标赛历史记录的计划，所以随时关注！\n\n服务没有与TETR.IO与osk以任何身份关联。",
         "appVersion": "版本",
         "build": "$build",
         "GHrepo": "GitHub Repository",
