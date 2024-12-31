@@ -53,7 +53,8 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
   List<String> excludeRanks = [];
   late Future<List<_MyScatterSpot>> futureLeague = getTetraLeagueData(_Xchart, Ychart);
   String searchLeague = "";
-  //Duration postSeasonLeft = seasonStart.difference(DateTime.now());
+  int? TLstatePlayers;
+  DateTime? TLrelevance;
 
   @override
   void initState(){
@@ -177,6 +178,8 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
 
   Future<List<_MyScatterSpot>> getTetraLeagueData(Stats x, Stats y) async {
     TetrioPlayersLeaderboard leaderboard = await teto.fetchTLLeaderboard();
+    TLrelevance = leaderboard.timestamp;
+    TLstatePlayers = leaderboard.leaderboard.length;
     List<_MyScatterSpot> _spots = [
       for (TetrioPlayerFromLeaderboard entry in leaderboard.leaderboard)
         if (excludeRanks.indexOf(entry.rank) == -1) _MyScatterSpot(
@@ -359,6 +362,25 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     alignment: WrapAlignment.center,
                     children: [
+                      if (graph == Graph.leagueState && TLstatePlayers != null && TLrelevance != null) Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: RichText(
+                              textAlign: TextAlign.right,
+                              text: TextSpan(
+                                style: TextStyle(color: Colors.white, fontFamily: "Eurostile Round"),
+                                children: [
+                                  TextSpan(text: t.stats.players(n: TLstatePlayers!)),
+                                  TextSpan(text: "\n"),
+                                  TextSpan(text: timestamp(TLrelevance!))
+                                ]
+                              )
+                            ),
+                          )
+                        ],
+                      ),
                       if (graph == Graph.history) Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -421,7 +443,10 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                               setState(() {
                                 if (graph == Graph.history)
                                 _gamesPlayedInsteadOfDateAndTime = value! as bool;
-                                else _Xchart = value! as Stats;
+                                else{
+                                  _Xchart = value! as Stats;
+                                  setState((){futureLeague = getTetraLeagueData(_Xchart, Ychart);});
+                                } 
                               });
                             }
                           ),
@@ -437,6 +462,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                             onChanged: (value) {
                               setState(() {
                                 Ychart = value!;
+                                futureLeague = getTetraLeagueData(_Xchart, Ychart);
                               });
                             }
                           ),

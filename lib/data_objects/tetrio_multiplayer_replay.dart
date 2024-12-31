@@ -38,7 +38,7 @@ class Garbage{ // charsys where???
   late int sent;
   late int recived;
   int? attack;
-  late int cleared;
+  int? cleared;
   int? sent_normal;
   int? maxspike;
   int? maxspike_nomult;
@@ -65,7 +65,7 @@ class Garbage{ // charsys where???
   }
 
   Garbage operator + (Garbage other){
-    return Garbage(sent: sent + other.sent, recived: recived + other.recived, attack: attack??0 + (other.attack??0), cleared: cleared + other.cleared);
+    return Garbage(sent: sent + other.sent, recived: recived + other.recived, attack: attack??0 + (other.attack??0), cleared: (cleared??0) + (other.cleared??0));
   }
 }
 

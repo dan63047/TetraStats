@@ -2,21 +2,19 @@
 
 Track your and other players stats in TETR.IO
 
+Tetra Stats works with TETR.IO Tetra Channel API, providing data from it and calculating some addtitional metrics, based on this data.
+
 You can [download an app](https://github.com/dan63047/TetraStats/releases), or [use web version](https://ts.dan63.by).
 
 ![Screenshot of the app 1](https://imgur.com/e8CYvj3.png)
 
 # Available functionality
 - Advanced stats for players
+- Charts for analyzing players Tetra League standing and Tetra League itself
 - Ranks cutoffs
-- Minimums, averages, and maximums for every stat of every rank, as well, as whole leaderboard
-- Chart for analyzing tetra league state
+- Full and sortable Tetra League leagerboard
+- Stats and Damage Calculator
 - Local database, that can store players data
-- Comparison to players, rank averages, and player stats from the past
-- Stats Calculator
-- Player history in charts
-- Tetra League matches history
-- Time-weighted stats in Tetra League matches 
 
 # Special thanks
 - **kerrmunism** — formulas
@@ -24,5 +22,7 @@ You can [download an app](https://github.com/dan63047/TetraStats/releases), or [
 - **neko_ab4093** — Simplified Chinese localization
 - **osk** and his team — TETR.IO
 
-## Legal note
-I do NOT own any assets located in `/res/*`, excluding app icon (`/res/icons/app.png`) and localization (`/res/i18n/*`), which is distributed under GNU license (as well, as this software)
+## Legal notes
+Tetra Stats is not associated with TETR.IO or osk in any capacity.
+
+I do NOT own any assets located in `/res/*`, excluding app icon (`/res/icons/app.png`), localization (`/res/i18n/*`) and images (`/res/images/*`), which is distributed under GNU license (as well, as this software)

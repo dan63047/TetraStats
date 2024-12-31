@@ -28,7 +28,7 @@ class Summaries {
           json['40l']['rank_local']);
     if (json['blitz']['record'] != null)
       blitz = RecordSingle.fromJson(json['blitz']['record'],
-          json['blitz']['rank'], json['40l']['rank_local']);
+          json['blitz']['rank'], json['blitz']['rank_local']);
     if (json['zenith']['record'] != null)
       zenith = RecordSingle.fromJson(json['zenith']['record'],
           json['zenith']['rank'], json['zenith']['rank_local']);

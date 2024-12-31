@@ -35,7 +35,7 @@ import 'package:tetra_stats/services/sqlite_db_controller.dart';
 import 'package:csv/csv.dart';
 
 const String dbName = "TetraStats.db";
-const String webVersionDomain = "ts.dan63.by";
+const String webVersionDomain = "tsbeta.dan63.by";
 const String tetrioUsersTable = "tetrioUsers";
 const String tetrioUsersToTrackTable = "tetrioUsersToTrack";
 const String tetraLeagueMatchesTable = "tetrioAlphaLeagueMathces";
@@ -888,12 +888,16 @@ class TetrioService extends DB {
   Future<List<RecordSingle>> fetchTetrioRecordsLeaderboard({String? prisecter, String? lb, String? country}) async{
     Uri url;
     if (kIsWeb) {
-      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "TLLeaderboard"});
-    } else {
-      url = Uri.https('ch.tetr.io', 'api/records/${lb??"40l_global"}', {
-        "limit": "100",
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {
+        "endpoint": "RecordsLeaderboard",
+        "lb": lb??"40l",
         if (prisecter != null) "after": prisecter,
         if (country != null) "country": country
+      });
+    } else {
+      url = Uri.https('ch.tetr.io', 'api/records/${lb??"40l"}_${country != null ? "country_${country}":"global"}', {
+        "limit": "100",
+        if (prisecter != null) "after": prisecter
       });
     }
     try{
@@ -908,12 +912,12 @@ class TetrioService extends DB {
             for (Map<String, dynamic> entry in rawJson['data']['entries']) {
               leaderboard.add(RecordSingle.fromJson(entry, -1, -1));
             }
-            developer.log("fetchTLLeaderboard: Leaderboard retrieved and cached", name: "services/tetrio_crud");
+            developer.log("fetchTetrioRecordsLeaderboard: Leaderboard retrieved and cached", name: "services/tetrio_crud");
             //_leaderboardsCache[rawJson['cache']['cached_until'].toString()] = leaderboard;
             //_cache.store(leaderboard, rawJson['cache']['cached_until']);
             return leaderboard;
           } else { // idk how to hit that one
-            developer.log("fetchTLLeaderboard: Bruh", name: "services/tetrio_crud", error: rawJson);
+            developer.log("fetchTetrioRecordsLeaderboard: Bruh", name: "services/tetrio_crud", error: rawJson);
             throw Exception("Failed to get leaderboard (problems on the tetr.io side)"); // will it be on tetr.io side?
           }
         case 403:
@@ -928,7 +932,7 @@ class TetrioService extends DB {
         case 504:
           throw TetrioInternalProblem();
         default:
-          developer.log("fetchTLLeaderboard: Failed to fetch leaderboard", name: "services/tetrio_crud", error: response.statusCode);
+          developer.log("fetchTetrioRecordsLeaderboard: Failed to fetch leaderboard", name: "services/tetrio_crud", error: response.statusCode);
           throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
       }
     } on http.ClientException catch (e, s) {
@@ -990,15 +994,22 @@ class TetrioService extends DB {
 
   /// Retrieves avaliable Tetra League matches from Tetra Channel api. Returns stream object (fake stream).
   /// Throws an exception if fails to retrieve.
-  Future<TetraLeagueBetaStream> fetchTLStream(String userID) async {
-    TetraLeagueBetaStream? cached = _cache.get(userID, TetraLeagueBetaStream);
-    if (cached != null) return cached;
+  Future<TetraLeagueBetaStream> fetchTLStream(String userID, {String? prisecter}) async {
+    // TetraLeagueBetaStream? cached = _cache.get(userID, TetraLeagueBetaStream);
+    // if (cached != null) return cached;
     
     Uri url;
     if (kIsWeb) {
-      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "tetrioUserTL", "user": userID.toLowerCase().trim()});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {
+        "endpoint": "tetrioUserTL",
+        "user": userID.toLowerCase().trim(),
+        if (prisecter != null) "after": prisecter
+      });
     } else {
-      url = Uri.https('ch.tetr.io', 'api/users/${userID.toLowerCase().trim()}/records/league/recent');
+      url = Uri.https('ch.tetr.io', 'api/users/${userID.toLowerCase().trim()}/records/league/recent', {
+        "limit": "100",
+        if (prisecter != null) "after": prisecter
+      });
     }
     try {
       final response = await client.get(url);

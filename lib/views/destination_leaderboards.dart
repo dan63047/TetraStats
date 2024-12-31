@@ -3,12 +3,14 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 import 'package:tetra_stats/data_objects/tetrio_player_from_leaderboard.dart';
+import 'package:tetra_stats/data_objects/tetrio_players_leaderboard.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/views/user_view.dart';
 import 'package:tetra_stats/widgets/future_error.dart';
+import 'package:tetra_stats/widgets/text_timestamp.dart';
 
 class DestinationLeaderboards extends StatefulWidget{
   final BoxConstraints constraints;
@@ -59,6 +61,8 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
   List<DropdownMenuEntry> _stats = [for (MapEntry e in chartsShortTitles.entries) DropdownMenuEntry(value: e.key, label: e.value)];
   String? _country;
   Stats stat = Stats.tr;
+  int? fullTLlbPlayers;
+  DateTime? fullTLlbTimestamp;
 
   bool? getTotalFilterValue(){
     if (_excludeRanks.isEmpty) return true;
@@ -74,24 +78,36 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
     try {
       _isFetchingData = true;
       setState(() {});
+      TetrioPlayersLeaderboard? fullLB;
+
+      if (_currentLb == Leaderboards.fullTL){
+        fullLB = await teto.fetchTLLeaderboard();
+        fullTLlbPlayers = fullLB.leaderboard.length;
+        fullTLlbTimestamp = fullLB.timestamp;
+        _reachedTheEnd = true;
+      } 
 
       final items = switch(_currentLb){
         Leaderboards.tl => await teto.fetchTetrioLeaderboard(prisecter: prisecter, country: _country),
-        Leaderboards.fullTL => (await teto.fetchTLLeaderboard()).getStatRankingFromLB(stat, country: _country??""),
+        Leaderboards.fullTL => fullLB!.getStatRankingFromLB(stat, country: _country??""),
         Leaderboards.xp => await teto.fetchTetrioLeaderboard(prisecter: prisecter, lb: "xp", country: _country),
         Leaderboards.ar => await teto.fetchTetrioLeaderboard(prisecter: prisecter, lb: "ar", country: _country),
         Leaderboards.sprint => await teto.fetchTetrioRecordsLeaderboard(prisecter: prisecter, country: _country),
-        Leaderboards.blitz => await teto.fetchTetrioRecordsLeaderboard(prisecter: prisecter, lb: "blitz_global", country: _country),
-        Leaderboards.zenith => await teto.fetchTetrioRecordsLeaderboard(prisecter: prisecter, lb: "zenith_global", country: _country),
-        Leaderboards.zenithex => await teto.fetchTetrioRecordsLeaderboard(prisecter: prisecter, lb: "zenithex_global", country: _country),
+        Leaderboards.blitz => await teto.fetchTetrioRecordsLeaderboard(prisecter: prisecter, lb: "blitz", country: _country),
+        Leaderboards.zenith => await teto.fetchTetrioRecordsLeaderboard(prisecter: prisecter, lb: "zenith", country: _country),
+        Leaderboards.zenithex => await teto.fetchTetrioRecordsLeaderboard(prisecter: prisecter, lb: "zenithex", country: _country),
       };
 
       if (_currentLb == Leaderboards.fullTL && _excludeRanks.isNotEmpty) items.removeWhere((e) => _excludeRanks.indexOf((e as TetrioPlayerFromLeaderboard).rank) != -1);
-      if (_currentLb == Leaderboards.fullTL || items.isEmpty) _reachedTheEnd = true;
+      if (items.isEmpty) _reachedTheEnd = true;
       list.addAll((_reverse && _currentLb == Leaderboards.fullTL) ? items.reversed : items);
-
-      _dataStreamController.add(list);
-      prisecter = list.last.prisecter.toString();
+      if (items.isNotEmpty){
+        _dataStreamController.add(list);
+        prisecter = list.last.prisecter.toString();
+      } else{
+        _dataStreamController.add([]);
+      }
+      
     } catch (e) {
       _dataStreamController.addError(e);
     } finally {
@@ -179,8 +195,8 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                           ),
                           if (_currentLb == Leaderboards.fullTL) IconButton(
                             color: _excludeRanks.isNotEmpty ? Theme.of(context).colorScheme.primary : null,
-                            onPressed: (){
-                            showDialog(context: context, builder: (BuildContext context) {
+                            onPressed: () async {
+                            await showDialog(context: context, builder: (BuildContext context) {
                               return StatefulBuilder(
                               builder: (context, StateSetter setAlertState) {
                                 return AlertDialog(
@@ -216,11 +232,8 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                                   actions: <Widget>[
                                     TextButton(
                                       child: const Text("Apply"),
-                                      onPressed: () {Navigator.of(context).pop(); setState((){
-                                        _currentLb = Leaderboards.fullTL;
-                                        list.clear();
-                                        prisecter = null;
-                                        _fetchData();});
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
                                       }
                                     )  
                                   ]
@@ -228,22 +241,30 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                               }
                             );
                             });
+                            setState(() {
+                              _currentLb = Leaderboards.fullTL;
+                              list.clear();
+                              prisecter = null;
+                              _isFetchingData = false;
+                              _reachedTheEnd = false;
+                              _fetchData();
+                            });
                           }, icon: Icon(Icons.filter_alt)),
                           if (_currentLb == Leaderboards.fullTL) IconButton(
                             color: _reverse ? Theme.of(context).colorScheme.primary : null,
                             icon: Transform.rotate(angle: _reverse ? pi : 0.0, child: Icon(Icons.filter_list)),
                             onPressed: (){
-                              setState((){
-                                _reverse = !_reverse;
-                                _currentLb = Leaderboards.fullTL;
-                                list.clear();
-                                prisecter = null;
-                                _fetchData();
-                              });
+                              _reverse = !_reverse;
+                              list.clear();
+                              prisecter = null;
+                              _isFetchingData = false;
+                              _reachedTheEnd = false;
+                              _fetchData();
                             },
                           )
                         ],
                       ),
+                      if (_currentLb == Leaderboards.fullTL && fullTLlbPlayers != null && fullTLlbTimestamp != null) Text("${t.stats.players(n: fullTLlbPlayers!)} • ${t.sprintAndBlitsRelevance(date: timestamp(fullTLlbTimestamp!))}"),
                       const Divider(),
                       Expanded(
                         child: ListView.builder(
@@ -284,7 +305,7 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                                 },
                                 Leaderboards.xp => Text("LVL ${f2.format(snapshot.data![index].level)}", style: trailingStyle),
                                 Leaderboards.ar => Text("${intf.format(snapshot.data![index].ar)} AR", style: trailingStyle),
-                                Leaderboards.sprint => Text(get40lTime(snapshot.data![index].stats.finalTime.inMicroseconds), style: trailingStyle),
+                                Leaderboards.sprint => Text(getALittleBitMoreNormalTime(snapshot.data![index].stats.finalTime), style: trailingStyle),
                                 Leaderboards.blitz => Text(intf.format(snapshot.data![index].stats.score), style: trailingStyle),
                                 Leaderboards.zenith => Text("${f2.format(snapshot.data![index].stats.zenith!.altitude)} m", style: trailingStyle),
                                 Leaderboards.zenithex => Text("${f2.format(snapshot.data![index].stats.zenith!.altitude)} m", style: trailingStyle)
@@ -297,7 +318,7 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                                 },
                                 Leaderboards.xp => "${f2.format(snapshot.data![index].xp)} XP${snapshot.data![index].playtime.isNegative ? "" : ", ${playtime(snapshot.data![index].playtime)} of gametime"}",
                                 Leaderboards.ar => "${snapshot.data![index].ar_counts}",
-                                Leaderboards.sprint => "${intf.format(snapshot.data![index].stats.finesse.faults)} FF, ${f2.format(snapshot.data![index].stats.kpp)} KPP, ${f2.format(snapshot.data![index].stats.kps)} KPS, ${f2.format(snapshot.data![index].stats.pps)} PPS, ${intf.format(snapshot.data![index].stats.piecesPlaced)} P",
+                                Leaderboards.sprint => "${snapshot.data?[index]?.stats?.finesse?.faults != null ? intf.format(snapshot.data![index].stats.finesse.faults) : "?"} FF, ${f2.format(snapshot.data![index].stats.kpp)} KPP, ${f2.format(snapshot.data![index].stats.kps)} KPS, ${f2.format(snapshot.data![index].stats.pps)} PPS, ${intf.format(snapshot.data![index].stats.piecesPlaced)} P",
                                 Leaderboards.blitz => "lvl ${snapshot.data![index].stats.level}, ${f2.format(snapshot.data![index].stats.pps)} PPS, ${f2.format(snapshot.data![index].stats.spp)} SPP",
                                 Leaderboards.zenith => "${f2.format(snapshot.data![index].aggregateStats.apm)} APM, ${f2.format(snapshot.data![index].aggregateStats.pps)} PPS, ${intf.format(snapshot.data![index].stats.kills)} KO's, ${f2.format(snapshot.data![index].stats.cps)} climb speed (${f2.format(snapshot.data![index].stats.zenith!.peakrank)} peak), ${intf.format(snapshot.data![index].stats.topBtB)} B2B",
                                 Leaderboards.zenithex => "${f2.format(snapshot.data![index].aggregateStats.apm)} APM, ${f2.format(snapshot.data![index].aggregateStats.pps)} PPS, ${intf.format(snapshot.data![index].stats.kills)} KO's, ${f2.format(snapshot.data![index].stats.cps)} climb speed (${f2.format(snapshot.data![index].stats.zenith!.peakrank)} peak), ${intf.format(snapshot.data![index].stats.topBtB)} B2B"

@@ -83,15 +83,21 @@ class ZenithThingy extends StatelessWidget{
                           if (zenith!.rank != -1) TextSpan(text: "№ ${intf.format(zenith!.rank)}", style: TextStyle(color: getColorOfRank(zenith!.rank))),
                           if (zenith!.rank != -1) const TextSpan(text: " • "),
                           if (zenith!.countryRank != -1) TextSpan(text: "№ ${intf.format(zenith!.countryRank)} local", style: TextStyle(color: getColorOfRank(zenith!.countryRank))),
-                          if (zenith!.countryRank != -1) const TextSpan(text: " • "),
+                          if (zenith!.countryRank != -1) TextSpan(text: width > 400.0 ? " • " : "\n"),
                           TextSpan(text: timestamp(zenith!.timestamp)),
                         ]
                       ),
                     ),
                   ],
                 ),
-                if (zenith != null && (zenith!.extras as ZenithExtras).mods.isNotEmpty) Container(width: 16.0),
-                if (zenith != null && (zenith!.extras as ZenithExtras).mods.isNotEmpty) for (String mod in (zenith!.extras as ZenithExtras).mods) Image.asset("res/icons/${mod}.png", height: 64.0) 
+                if (zenith != null && (zenith!.extras as ZenithExtras).mods.isNotEmpty && width > 600.0) Container(width: 16.0),
+                if (zenith != null && (zenith!.extras as ZenithExtras).mods.isNotEmpty && width > 600.0) for (String mod in (zenith!.extras as ZenithExtras).mods) Image.asset("res/icons/${mod}.png", height: 64.0) 
+              ],
+            ),
+            if (zenith != null && (zenith!.extras as ZenithExtras).mods.isNotEmpty && width <= 600.0) Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                for (String mod in (zenith!.extras as ZenithExtras).mods) Image.asset("res/icons/${mod}.png", height: 32.0)
               ],
             ),
             if (zenith != null) Row(

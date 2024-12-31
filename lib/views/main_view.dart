@@ -34,57 +34,57 @@ int destination = 0;
 // - different design for radar graphs
 // - i should put tooltips everywhere
 Future<FetchResults> getData(String searchFor, {bool withHistory = false}) async {
-    TetrioPlayer player;
-    try{
-      if (searchFor.startsWith("ds:")){
-        player = await teto.fetchPlayer(searchFor.substring(3), isItDiscordID: true); // we trying to get him with that 
-      }else{
-        player = await teto.fetchPlayer(searchFor); // Otherwise it's probably a user id or username
-      }
-      
-    }on TetrioPlayerNotExist{
-      return FetchResults(false, null, [], null, null, null, null, null, false, TetrioPlayerNotExist());
+  TetrioPlayer player;
+  try{
+    if (searchFor.startsWith("ds:")){
+      player = await teto.fetchPlayer(searchFor.substring(3), isItDiscordID: true); // we trying to get him with that 
+    }else{
+      player = await teto.fetchPlayer(searchFor); // Otherwise it's probably a user id or username
     }
-    late Summaries summaries;
-    late News? news;
-    late Cutoffs? cutoffs;
-    late CutoffsTetrio? averages;
-    try {
-      List<dynamic> requests = await Future.wait([
-        teto.fetchSummaries(player.userId),
-        teto.fetchNews(player.userId),
-        teto.fetchCutoffsBeanserver(),
-        if (prefs.getBool("showAverages") ?? true) teto.fetchCutoffsTetrio()
-      ]);
-
-      summaries = requests[0];
-      news = requests[1];
-      cutoffs = requests.elementAtOrNull(2);
-      averages = requests.elementAtOrNull(3);
-
-    if(withHistory) await teto.fetchAndsaveTLHistory(player.userId, 1); // Retrieve if needed
-    } on Exception catch (e) {
-      return FetchResults(false, null, [], null, null, null, null, null, false, e);
-    }
-    PlayerLeaderboardPosition? _meAmongEveryone;
-    if (prefs.getBool("showPositions") == true){
-      // Get tetra League leaderboard
-      _everyone = teto.getCachedLeaderboard();
-      _everyone ??= await teto.fetchTLLeaderboard();
-      if (_everyone!.leaderboard.isNotEmpty){
-        _meAmongEveryone = await compute(_everyone!.getLeaderboardPosition, {player.userId: summaries.league});
-        if (_meAmongEveryone != null) teto.cacheLeaderboardPositions(player.userId, _meAmongEveryone); 
-      }
-    }
-    List<TetraLeague> states = await teto.getStates(player.userId, season: currentSeason);
-
-    bool isTracking = await teto.isPlayerTracking(player.userId);
-    if (isTracking){ // if tracked - save data to local DB
-      await teto.storeState(summaries.league);
-    }
-
-    return FetchResults(true, player, states.reversed.toList(), summaries, news, cutoffs, averages, _meAmongEveryone, isTracking, null);
+    
+  }on TetrioPlayerNotExist{
+    return FetchResults(false, null, [], null, null, null, null, null, false, TetrioPlayerNotExist());
   }
+  late Summaries summaries;
+  late News? news;
+  late Cutoffs? cutoffs;
+  late CutoffsTetrio? averages;
+  try {
+    List<dynamic> requests = await Future.wait([
+      teto.fetchSummaries(player.userId),
+      teto.fetchNews(player.userId),
+      teto.fetchCutoffsBeanserver(),
+      if (prefs.getBool("showAverages") ?? true) teto.fetchCutoffsTetrio()
+    ]);
+
+    summaries = requests[0];
+    news = requests[1];
+    cutoffs = requests.elementAtOrNull(2);
+    averages = requests.elementAtOrNull(3);
+
+  if(withHistory) await teto.fetchAndsaveTLHistory(player.userId, 1); // Retrieve if needed
+  } on Exception catch (e) {
+    return FetchResults(false, null, [], null, null, null, null, null, false, e);
+  }
+  PlayerLeaderboardPosition? _meAmongEveryone;
+  if (prefs.getBool("showPositions") == true){
+    // Get tetra League leaderboard
+    _everyone = teto.getCachedLeaderboard();
+    _everyone ??= await teto.fetchTLLeaderboard();
+    if (_everyone!.leaderboard.isNotEmpty){
+      _meAmongEveryone = await compute(_everyone!.getLeaderboardPosition, {player.userId: summaries.league});
+      if (_meAmongEveryone != null) teto.cacheLeaderboardPositions(player.userId, _meAmongEveryone); 
+    }
+  }
+  List<TetraLeague> states = await teto.getStates(player.userId, season: currentSeason);
+
+  bool isTracking = await teto.isPlayerTracking(player.userId);
+  if (isTracking){ // if tracked - save data to local DB
+    await teto.storeState(summaries.league);
+  }
+
+  return FetchResults(true, player, states.reversed.toList(), summaries, news, cutoffs, averages, _meAmongEveryone, isTracking, null);
+}
 
 class MainView extends StatefulWidget {
   final String? player;

@@ -1,9 +1,9 @@
+import 'dart:io';
 import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart' show Size;
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/data_objects/tetrio_constants.dart';
@@ -201,7 +201,7 @@ class _UserThingyState extends State<UserThingy> with SingleTickerProviderStateM
                     ),
                   ),
                   Positioned(
-                    top: widget.player.bannerRevision != null ? 160.0 : 80.0,
+                    top: (kIsWeb || !Platform.isAndroid) ? widget.player.bannerRevision != null ? 160.0 : 80.0 : widget.player.bannerRevision != null ? 152.0 : 72.0,
                     left: 160.0,
                     child: Row(
                       children: [

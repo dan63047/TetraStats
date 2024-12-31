@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/news.dart';
 import 'package:tetra_stats/data_objects/news_entry.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:tetra_stats/services/tetrio_crud.dart' show webVersionDomain;
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
@@ -73,14 +75,14 @@ class NewsThingy extends StatelessWidget{
             )
           ),
           subtitle: Text(timestamp(news.timestamp)),
-          leading: Image.asset(
-            "res/tetrio_badges/${news.data["type"]}.png",
+          leading: Image.network(
+            kIsWeb ? "https://${webVersionDomain}/oskware_bridge.php?endpoint=TetrioBadge&badge=${news.data["type"]}" : "https://tetr.io/res/badges/${news.data["type"]}.png",
             height: 48,
             width: 48,
-            errorBuilder: (context, error, stackTrace) {
-              return Image.asset("res/icons/kagari.png", height: 64, width: 64);
-            },
-          ),
+            errorBuilder:(context, error, stackTrace) {
+              return Image.asset("res/icons/kagari.png", height: 32, width: 32);
+            }
+          )
         );
       case "rankup":
         return ListTile(

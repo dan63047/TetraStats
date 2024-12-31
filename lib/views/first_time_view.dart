@@ -144,8 +144,8 @@ class _FirstTimeState extends State<FirstTimeView> with SingleTickerProviderStat
         _animController.animateTo(0.9);
         setState((){
           userSet = true;
-          title = "Nice to see you, ${nickname}";
-          subtitle = "Let's take a look at your stats...";
+          title = t.firstTimeView.niceToSeeYou(n: nickname);
+          subtitle = t.firstTimeView.letsTakeALook;
         });
         Timer(Duration(seconds: 2), () => _animController.animateTo(1.0, duration: Duration(seconds: 1)));
         Timer(Duration(seconds: 3), () => context.replace("/"));

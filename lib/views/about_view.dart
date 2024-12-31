@@ -30,9 +30,9 @@ class AboutCard extends StatelessWidget{
   Widget build(BuildContext context) {
     return Card(child: Column(
       children: [
-        Text(title, style: Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center),
+        Text(title, style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.center),
         Divider(),
-        Text(value, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36, fontWeight: FontWeight.w500, color: Colors.white)),
+        Text(value, textAlign: TextAlign.center, style: Theme.of(context).textTheme.headlineMedium),
         if (undervalue != null) Text(undervalue!, textAlign: TextAlign.center),
         Divider(),
         Padding(
@@ -115,7 +115,7 @@ class AboutState extends State<AboutView> {
                 ]),
                 Card(child: Center(child: Padding(
                   padding: const EdgeInsets.fromLTRB(0.0, 6.0, 0.0, 18.0),
-                  child: Text(t.aboutView.credits, style: Theme.of(context).textTheme.titleLarge, textAlign: TextAlign.center),
+                  child: Text(t.aboutView.credits, style: Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center),
                 ))),
                 Wrap(
                   direction: Axis.horizontal,

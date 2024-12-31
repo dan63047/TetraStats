@@ -6,6 +6,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'dart:developer' as developer;
 import 'package:tetra_stats/data_objects/aggregate_stats.dart';
 import 'package:tetra_stats/data_objects/record_single.dart';
 import 'package:tetra_stats/data_objects/summaries.dart';
@@ -14,6 +15,7 @@ import 'package:tetra_stats/data_objects/tetrio_player.dart';
 import 'package:tetra_stats/data_objects/tetrio_zen.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart' show teto;
+import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
@@ -406,7 +408,7 @@ class CompareState extends State<CompareView> {
       Text(s.league.playstyle != null ? f4.format(s.league.playstyle!.infds) : "---"),
     ]);
     formattedValues[2].add([
-      RichText(text: TextSpan(text: zenithRun != null ? "${f2.format(zenithRun.stats.zenith!.altitude)} m" : "---", style: TextStyle(fontFamily: "Eurostile Round"), children: [if (zenithRun != null && oldZenithRun) TextSpan(text: " (${zenithRun.revolution})", style: TextStyle(color: Colors.grey))])),
+      RichText(text: TextSpan(text: zenithRun != null ? "${f2.format(zenithRun.stats.zenith!.altitude)} m" : "---", style: TextStyle(fontFamily: "Eurostile Round", color: Colors.white), children: [if (zenithRun != null && oldZenithRun) TextSpan(text: " (${zenithRun.revolution})", style: TextStyle(color: Colors.grey))])),
       Text(zenithRun != null ? "№ "+intf.format(zenithRun.rank) : "---"),
       Text(zenithRun != null ? f2.format(zenithRun.aggregateStats.apm) : "---"),
       Text(zenithRun != null ? f2.format(zenithRun.aggregateStats.pps) : "---"),
@@ -434,7 +436,7 @@ class CompareState extends State<CompareView> {
       Text(zenithRun?.aggregateStats.playstyle != null ? f4.format(zenithRun!.aggregateStats.playstyle.infds) : "---"),
     ]);
     formattedValues[3].add([
-      RichText(text: TextSpan(text: zenithExRun != null ? "${f2.format(zenithExRun.stats.zenith!.altitude)} m" : "---", style: TextStyle(fontFamily: "Eurostile Round"), children: [if (zenithExRun != null && oldZenithExRun) TextSpan(text: " (${zenithExRun.revolution})", style: TextStyle(color: Colors.grey))])),
+      RichText(text: TextSpan(text: zenithExRun != null ? "${f2.format(zenithExRun.stats.zenith!.altitude)} m" : "---", style: TextStyle(fontFamily: "Eurostile Round", color: Colors.white), children: [if (zenithExRun != null && oldZenithExRun) TextSpan(text: " (${zenithExRun.revolution})", style: TextStyle(color: Colors.grey))])),
       Text(zenithExRun != null ? "№ "+intf.format(zenithExRun.rank) : "---"),
       Text(zenithExRun != null ? f2.format(zenithExRun.aggregateStats.apm) : "---"),
       Text(zenithExRun != null ? f2.format(zenithExRun.aggregateStats.pps) : "---"),
@@ -738,19 +740,31 @@ class CompareState extends State<CompareView> {
     });
   }
 
-  void addPlayer(String nickname) async {
-    if (nickname.startsWith("\$avg")){
-      await addRankAverages(nickname.substring(4).toLowerCase());
-    }else{
-      players.add(await teto.fetchPlayer(nickname));
-      summaries.add(await teto.fetchSummaries(players.last.userId));
-      addvaluesEntrys(players.last, summaries.last);
-      nicknames.add(players.last.username);
+  Future<Exception?> addPlayer(String nickname) async {
+    try {
+      if (nickname.startsWith("\$avg")){
+        await addRankAverages(nickname.substring(4).toLowerCase());
+        return null;
+      }else{
+        late TetrioPlayer player;
+        late Summaries summary;
+        List<dynamic> requests = await Future.wait([teto.fetchPlayer(nickname), teto.fetchSummaries(players.last.userId)]);
+        player = requests[0];
+        summary = requests[1];
+        players.add(player);
+        summaries.add(summary);
+        addvaluesEntrys(players.last, summaries.last);
+        nicknames.add(players.last.username);
+      }
+    } on Exception catch (e) {
+      developer.log("Failed to add player:", error: e);
+      return e;
     }
     best = recalculateBestEntries();
     setState(() {
       
     });
+    return null;
   }
 
   Future<void> addRankAverages(String rank) async {
@@ -832,103 +846,105 @@ class CompareState extends State<CompareView> {
           child: const Icon(Icons.arrow_back),
         ),
       ),
-      body: SingleChildScrollView(
+      body: SafeArea(
         child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          controller: _scrollController,
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                Row(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            controller: _scrollController,
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(
-                      height: 175.0,
-                      width: 300.0,
-                      child: Card(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(90.0, 18.0, 5.0, 0),
-                          child: Text(t.comparison, style: TextStyle(fontSize: 28)),
+                  Row(
+                    children: [
+                      SizedBox(
+                        height: 175.0,
+                        width: 300.0,
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(90.0, 18.0, 5.0, 0),
+                            child: Text(t.comparison, style: TextStyle(fontSize: 28)),
+                          ),
                         ),
                       ),
-                    ),
-                    for (var p in players) SizedBox(
-                      width: 300.0,
-                      child: HeaderCard(p, removePlayer),
-                    ),
-                    SizedBox(width: 300, child: AddNewColumnCard(addPlayer))
-                  ]
-                ),
-                if (tlOnly) SizedBox(
-                  width: 300+300*summaries.length.toDouble(),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 300.0,
-                            child: Card(
-                              child: Column(children: [
-                                for (String title in TitesForStats[TitesForStats.keys.elementAt(1)]!) Text(title),
-                              ]),
-                            ),
-                          ),
-                          for (int k = 0; k < formattedValues[1].length; k++) SizedBox(
-                            width: 300.0,
-                            child: Card(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  for (int l = 0; l < formattedValues[1][k].length; l++) Container(decoration: (rawValues[1].length > 1 && rawValues[1][k][l] != null && best[1][l] == rawValues[1][k][l]) ? BoxDecoration(boxShadow: [BoxShadow(color: Colors.cyanAccent.withAlpha(96), spreadRadius: 0, blurRadius: 4)]) : null, child: formattedValues[1][k][l]),
-                                ],
+                      for (var p in players) SizedBox(
+                        width: 300.0,
+                        child: HeaderCard(p, removePlayer),
+                      ),
+                      SizedBox(width: 300, child: AddNewColumnCard(addPlayer))
+                    ]
+                  ),
+                  if (tlOnly) SizedBox(
+                    width: 300+300*summaries.length.toDouble(),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 300.0,
+                              child: Card(
+                                child: Column(children: [
+                                  for (String title in TitesForStats[TitesForStats.keys.elementAt(1)]!) Text(title),
+                                ]),
                               ),
                             ),
-                          ),
-                        ]
-                      ),
-                      VsGraphs(stats: [for (var s in summaries) if (s.league.nerdStats != null) AggregateStats.precalculated(s.league.apm!, s.league.pps!, s.league.vs!, s.league.nerdStats!, s.league.playstyle!)], nicknames: [for (int i = 0; i < summaries.length; i++)  if (summaries[i].league.nerdStats != null) nicknames[i]]),
-                    ],
-                  ),
-                )
-                else for (int i = 0; i < formattedValues.length; i++) SizedBox(
-                  width: 300+300*summaries.length.toDouble(),
-                  child: ExpansionTile(
-                    title: Text(TitesForStats.keys.elementAt(i), style: _expansionTileTitleTextStyle),
-                    children: [
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 300.0,
-                            child: Card(
-                              child: Column(children: [
-                                for (String title in TitesForStats[TitesForStats.keys.elementAt(i)]!) Text(title),
-                              ]),
-                            ),
-                          ),
-                          for (int k = 0; k < formattedValues[i].length; k++) SizedBox(
-                            width: 300.0,
-                            child: Card(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  for (int l = 0; l < formattedValues[i][k].length; l++) Container(decoration: (rawValues[0].length > 1 && rawValues[i][k][l] != null && best[i][l] == rawValues[i][k][l]) ? BoxDecoration(boxShadow: [BoxShadow(color: Colors.cyanAccent.withAlpha(96), spreadRadius: 0, blurRadius: 4)]) : null, child: formattedValues[i][k][l]),
-                                ],
+                            for (int k = 0; k < formattedValues[1].length; k++) SizedBox(
+                              width: 300.0,
+                              child: Card(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    for (int l = 0; l < formattedValues[1][k].length; l++) Container(decoration: (rawValues[1].length > 1 && rawValues[1][k][l] != null && best[1][l] == rawValues[1][k][l]) ? BoxDecoration(boxShadow: [BoxShadow(color: Colors.cyanAccent.withAlpha(96), spreadRadius: 0, blurRadius: 4)]) : null, child: formattedValues[1][k][l]),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ]
-                      ),
-                      if (i == 1) VsGraphs(stats: [for (var s in summaries) if (s.league.nerdStats != null) AggregateStats.precalculated(s.league.apm!, s.league.pps!, s.league.vs!, s.league.nerdStats!, s.league.playstyle!)], nicknames: [for (int i = 0; i < summaries.length; i++)  if (summaries[i].league.nerdStats != null) nicknames[i]]),
-                      if (i == 2) VsGraphs(stats: [for (var s in summaries) if ((s.zenith != null || s.zenithCareerBest != null) && (s.zenith?.aggregateStats??s.zenithCareerBest!.aggregateStats).apm > 0.00) s.zenith?.aggregateStats??s.zenithCareerBest!.aggregateStats], nicknames: [for (int i = 0; i < summaries.length; i++) if ((summaries[i].zenith != null || summaries[i].zenithCareerBest != null) && (summaries[i].zenith?.aggregateStats??summaries[i].zenithCareerBest!.aggregateStats).apm > 0.00) nicknames[i]]),
-                      if (i == 3) VsGraphs(stats: [for (var s in summaries) if ((s.zenithEx != null || s.zenithExCareerBest != null) && (s.zenithEx?.aggregateStats??s.zenithExCareerBest!.aggregateStats).apm > 0.00) s.zenithEx?.aggregateStats??s.zenithExCareerBest!.aggregateStats], nicknames: [for (int i = 0; i < summaries.length; i++) if ((summaries[i].zenithEx != null || summaries[i].zenithExCareerBest != null) && (summaries[i].zenithEx?.aggregateStats??summaries[i].zenithExCareerBest!.aggregateStats).apm > 0.00) nicknames[i]]),
-                    ],
+                          ]
+                        ),
+                        VsGraphs(stats: [for (var s in summaries) if (s.league.nerdStats != null) AggregateStats.precalculated(s.league.apm!, s.league.pps!, s.league.vs!, s.league.nerdStats!, s.league.playstyle!)], nicknames: [for (int i = 0; i < summaries.length; i++)  if (summaries[i].league.nerdStats != null) nicknames[i]]),
+                      ],
+                    ),
+                  )
+                  else for (int i = 0; i < formattedValues.length; i++) SizedBox(
+                    width: 300+300*summaries.length.toDouble(),
+                    child: ExpansionTile(
+                      title: Text(TitesForStats.keys.elementAt(i), style: _expansionTileTitleTextStyle),
+                      children: [
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 300.0,
+                              child: Card(
+                                child: Column(children: [
+                                  for (String title in TitesForStats[TitesForStats.keys.elementAt(i)]!) Text(title),
+                                ]),
+                              ),
+                            ),
+                            for (int k = 0; k < formattedValues[i].length; k++) SizedBox(
+                              width: 300.0,
+                              child: Card(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    for (int l = 0; l < formattedValues[i][k].length; l++) Container(decoration: (rawValues[0].length > 1 && rawValues[i][k][l] != null && best[i][l] == rawValues[i][k][l]) ? BoxDecoration(boxShadow: [BoxShadow(color: Colors.cyanAccent.withAlpha(96), spreadRadius: 0, blurRadius: 4)]) : null, child: formattedValues[i][k][l]),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ]
+                        ),
+                        if (i == 1) VsGraphs(stats: [for (var s in summaries) if (s.league.nerdStats != null) AggregateStats.precalculated(s.league.apm!, s.league.pps!, s.league.vs!, s.league.nerdStats!, s.league.playstyle!)], nicknames: [for (int i = 0; i < summaries.length; i++)  if (summaries[i].league.nerdStats != null) nicknames[i]]),
+                        if (i == 2) VsGraphs(stats: [for (var s in summaries) if ((s.zenith != null || s.zenithCareerBest != null) && (s.zenith?.aggregateStats??s.zenithCareerBest!.aggregateStats).apm > 0.00) s.zenith?.aggregateStats??s.zenithCareerBest!.aggregateStats], nicknames: [for (int i = 0; i < summaries.length; i++) if ((summaries[i].zenith != null || summaries[i].zenithCareerBest != null) && (summaries[i].zenith?.aggregateStats??summaries[i].zenithCareerBest!.aggregateStats).apm > 0.00) nicknames[i]]),
+                        if (i == 3) VsGraphs(stats: [for (var s in summaries) if ((s.zenithEx != null || s.zenithExCareerBest != null) && (s.zenithEx?.aggregateStats??s.zenithExCareerBest!.aggregateStats).apm > 0.00) s.zenithEx?.aggregateStats??s.zenithExCareerBest!.aggregateStats], nicknames: [for (int i = 0; i < summaries.length; i++) if ((summaries[i].zenithEx != null || summaries[i].zenithExCareerBest != null) && (summaries[i].zenithEx?.aggregateStats??summaries[i].zenithExCareerBest!.aggregateStats).apm > 0.00) nicknames[i]]),
+                      ],
+                    ),
                   ),
-                ),
-              ]),
-            ],
+                ]),
+              ],
+            ),
           ),
         ),
       ),
@@ -1001,7 +1017,7 @@ class HeaderCard extends StatelessWidget{
   }}
 
 class AddNewColumnCard extends StatefulWidget{
-  final Function addPlayer;
+  final Future<Exception?> Function(String) addPlayer;
 
   const AddNewColumnCard(this.addPlayer);
 
@@ -1010,10 +1026,9 @@ class AddNewColumnCard extends StatefulWidget{
 }
 
 class _AddNewColumnCardState extends State<AddNewColumnCard> with SingleTickerProviderStateMixin {
-  // TODO: make spinner while awaiting for data
-  // TODO: show error if failed to retrieve data
   late AnimationController _animController;
   late Animation _anim;
+  bool showSpinner = false;
 
   @override
   void initState(){
@@ -1037,6 +1052,14 @@ class _AddNewColumnCardState extends State<AddNewColumnCard> with SingleTickerPr
     super.dispose();
   }
 
+  String getExcepitonText(Exception e){
+    return switch(e.runtimeType){
+      TetrioPlayerNotExist => t.errors.noSuchUser,
+      ConnectionIssue => t.errors.connection(code: (e as ConnectionIssue).code, message: e.message),
+      _ => e.toString()
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -1055,11 +1078,28 @@ class _AddNewColumnCardState extends State<AddNewColumnCard> with SingleTickerPr
                     TextField(
                       autofocus: true,
                       onSubmitted: (value){
-                        widget.addPlayer(value);
+                        widget.addPlayer(value).then((onValue){
+                          showSpinner = false;
+                          setState(() {
+                            if (onValue != null) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(getExcepitonText(onValue))));
+                          });
+                        });
+                        setState(() {
+                          showSpinner = true;
+                        });
                       },
                       onTapOutside: (event) {
                         setState((){_animController.animateBack(0);});
                       },
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Opacity(
+                        opacity: showSpinner ? 1.0 : 0.0,
+                        child: CircularProgressIndicator(
+                          value: showSpinner ? null : 0.0,
+                        )
+                      ),
                     )
                   ],
                 ),

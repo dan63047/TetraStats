@@ -34,74 +34,86 @@ class _RankState extends State<RankView> {
   }
 
   Widget partOfTheWidget(List<dynamic>? data){
+    double? avgAPM = data != null ? data[0].apm : widget.cutoffTetrio.apm;
+    double? avgPPS = data != null ? data[0].pps : widget.cutoffTetrio.pps;
+    double? avgVS = data != null ? data[0].vs : widget.cutoffTetrio.vs;
+    double? avgAPP = data != null ? data[1]["avgAPP"] : widget.cutoffTetrio.nerdStats?.app;
+    double? avgVSAPM = data != null ? data[1]["avgVSAPM"] : widget.cutoffTetrio.nerdStats?.vsapm;
+    double? avgDSS = data != null ? data[1]["avgDSS"] : widget.cutoffTetrio.nerdStats?.dss;
+    double? avgDSP = data != null ? data[1]["avgDSP"] : widget.cutoffTetrio.nerdStats?.dsp;
+    double? avgAPPDSP = data != null ? data[1]["avgAPPDSP"] : widget.cutoffTetrio.nerdStats?.appdsp;
+    double? avgCheese = data != null ? data[1]["avgCheese"] : widget.cutoffTetrio.nerdStats?.cheese;
+    double? avgGbE = data != null ? data[1]["avgGBE"] : widget.cutoffTetrio.nerdStats?.gbe;
+    double? avgNyaAPP = data != null ? data[1]["avgNyaAPP"] : widget.cutoffTetrio.nerdStats?.nyaapp;
+    double? avgArea = data != null ? data[1]["avgArea"] : widget.cutoffTetrio.nerdStats?.area;
     return Column(
       children: [
         Divider(),
           Text(t.rankView.avgStats, style: Theme.of(context).textTheme.displayLarge),
-          Text("${f2.format(data != null ? data[0].apm : widget.cutoffTetrio.apm)} ${t.stats.apm.short} • ${f2.format(data != null ? data[0].pps : widget.cutoffTetrio.pps)} ${t.stats.pps.short} • ${f2.format(data != null ? data[0].vs : widget.cutoffTetrio.vs)} ${t.stats.vs.short}", style: Theme.of(context).textTheme.displayLarge),
+          Text("${avgAPM != null ? f2.format(avgAPM) : "-.--"} ${t.stats.apm.short} • ${avgPPS != null ? f2.format(avgPPS) : "-.--"} ${t.stats.pps.short} • ${avgVS != null ? f2.format(avgVS) : "-.--"} ${t.stats.vs.short}", style: Theme.of(context).textTheme.displayLarge),
           Divider(),
           Center(child: Text(t.rankView.avgNerdStats, style: Theme.of(context).textTheme.displayLarge)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(t.stats.app.full, style: Theme.of(context).textTheme.displayLarge),
-              Text(f3.format(data != null ? data[1]["avgAPP"] : widget.cutoffTetrio.nerdStats?.app), style: Theme.of(context).textTheme.displayLarge)
+              Text(avgAPP != null ? f3.format(avgAPP) : "-.---", style: Theme.of(context).textTheme.displayLarge)
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(t.stats.vsapm.full, style: Theme.of(context).textTheme.displayLarge),
-              Text(f3.format(data != null ? data[1]["avgVSAPM"] : widget.cutoffTetrio.nerdStats?.vsapm), style: Theme.of(context).textTheme.displayLarge)
+              Text(avgVSAPM != null ? f3.format(avgVSAPM) : "-.---", style: Theme.of(context).textTheme.displayLarge)
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(t.stats.dss.full, style: Theme.of(context).textTheme.displayLarge),
-              Text(f3.format(data != null ? data[1]["avgDSS"] : widget.cutoffTetrio.nerdStats?.dss), style: Theme.of(context).textTheme.displayLarge)
+              Text(avgDSS != null ? f3.format(avgDSS) : "-.---", style: Theme.of(context).textTheme.displayLarge)
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(t.stats.dsp.full, style: Theme.of(context).textTheme.displayLarge),
-              Text(f3.format(data != null ? data[1]["avgDSP"] : widget.cutoffTetrio.nerdStats?.dsp), style: Theme.of(context).textTheme.displayLarge)
+              Text(avgDSP != null ? f3.format(avgDSP) : "-.---", style: Theme.of(context).textTheme.displayLarge)
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(t.stats.appdsp.full, style: Theme.of(context).textTheme.displayLarge),
-              Text(f3.format(data != null ? data[1]["avgAPPDSP"] : widget.cutoffTetrio.nerdStats?.appdsp), style: Theme.of(context).textTheme.displayLarge)
+              Text(avgAPPDSP != null ? f3.format(avgAPPDSP) : "-.---", style: Theme.of(context).textTheme.displayLarge)
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(t.stats.cheese.full, style: Theme.of(context).textTheme.displayLarge),
-              Text(f2.format(data != null ? data[1]["avgCheese"] : widget.cutoffTetrio.nerdStats?.cheese), style: Theme.of(context).textTheme.displayLarge)
+              Text(avgCheese != null ? f3.format(avgCheese) : "--.--", style: Theme.of(context).textTheme.displayLarge)
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(t.stats.gbe.full, style: Theme.of(context).textTheme.displayLarge),
-              Text(f3.format(data != null ? data[1]["avgGBE"] : widget.cutoffTetrio.nerdStats?.gbe), style: Theme.of(context).textTheme.displayLarge)
+              Text(avgGbE != null ? f3.format(avgGbE) : "-.---", style: Theme.of(context).textTheme.displayLarge)
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(t.stats.nyaapp.full, style: Theme.of(context).textTheme.displayLarge),
-              Text(f3.format(data != null ? data[1]["avgNyaAPP"] : widget.cutoffTetrio.nerdStats?.nyaapp), style: Theme.of(context).textTheme.displayLarge)
+              Text(avgNyaAPP != null ? f3.format(avgNyaAPP) : "-.---", style: Theme.of(context).textTheme.displayLarge)
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(t.stats.area.full, style: Theme.of(context).textTheme.displayLarge),
-              Text(f1.format(data != null ? data[1]["avgArea"] : widget.cutoffTetrio.nerdStats?.area), style: Theme.of(context).textTheme.displayLarge)
+              Text(avgArea != null ? f3.format(avgArea) : "---.-", style: Theme.of(context).textTheme.displayLarge)
             ],
           ), 
       ],

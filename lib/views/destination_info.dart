@@ -30,38 +30,19 @@ class InfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       clipBehavior: Clip.hardEdge,
-      child: viewportWidth > 768.0 ? SizedBox(
-        width: 450,
-        height: height,
+      child: SizedBox(
+        width: viewportWidth > 768.0 ? 450 : viewportWidth,
+        height: viewportWidth > 768.0 ? height : null,
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset(assetLink, fit: BoxFit.cover, height: 300.0),
-            TextButton(child: Text(title, style: Theme.of(context).textTheme.titleLarge!.copyWith(decoration: TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted), textAlign: TextAlign.center), onPressed: onPressed),
+            Image.asset(assetLink, fit: BoxFit.cover, height: viewportWidth > 768.0 ? 300.0 : 150.0, width: viewportWidth > 768.0 ? null : viewportWidth),
+            TextButton(child: Text(title, style: (viewportWidth > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleSmall)!.copyWith(decoration: TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted), textAlign: TextAlign.center), onPressed: onPressed),
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: Text(description),
             ),
-            Spacer()
-          ],
-        ),
-      ) : SizedBox(
-        width: viewportWidth,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.asset(assetLink, fit: BoxFit.cover, width: 200.0),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextButton(child: Text(title, style: Theme.of(context).textTheme.titleLarge!.copyWith(decoration: TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted, fontSize: 28), textAlign: TextAlign.center), onPressed: onPressed),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Text(description),
-                  ),
-                ],
-              ),
-            ),
+            if (viewportWidth > 768.0) Spacer()
           ],
         ),
       ),
@@ -75,7 +56,7 @@ class _DestinationInfo extends State<DestinationInfo> {
   Widget build(BuildContext context) {
     List<Widget> cards = [
       InfoCard(
-        height: widget.constraints.maxHeight - 77,
+        height: widget.constraints.maxHeight,
         viewportWidth: widget.constraints.maxWidth,
         assetLink: "res/images/info card 1.png",
         title: t.infoDestination.sprintAndBlitzAverages,
@@ -87,7 +68,7 @@ class _DestinationInfo extends State<DestinationInfo> {
         }
       ),
       InfoCard(
-        height: widget.constraints.maxHeight - 77,
+        height: widget.constraints.maxHeight,
         viewportWidth: widget.constraints.maxWidth,
         assetLink: "res/images/info card 2.png",
         title: t.infoDestination.tetraStatsWiki,
@@ -97,7 +78,7 @@ class _DestinationInfo extends State<DestinationInfo> {
         }
       ),
       InfoCard(
-        height: widget.constraints.maxHeight - 77,
+        height: widget.constraints.maxHeight,
         viewportWidth: widget.constraints.maxWidth,
         assetLink: "res/images/info card 3.png",
         title: t.infoDestination.about,
@@ -114,11 +95,14 @@ class _DestinationInfo extends State<DestinationInfo> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Card(
-          child: Center(child: Text(t.infoDestination.title, style: Theme.of(context).textTheme.titleLarge)),
+          child: Center(child: Text(t.infoDestination.title, style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleSmall!.copyWith(height: 1.1))),
         ),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: widget.constraints.maxWidth > 768.0 ? Row(children: cards) : Column(children: cards),
+        SizedBox(
+          height: widget.constraints.maxWidth > 768.0 ? widget.constraints.maxHeight - 61 : widget.constraints.maxHeight - 170,
+          child: SingleChildScrollView(
+            scrollDirection: widget.constraints.maxWidth > 768.0 ? Axis.horizontal : Axis.vertical,
+            child: widget.constraints.maxWidth > 768.0 ? Row(children: cards) : Column(children: cards),
+          ),
         )
       ],
     );

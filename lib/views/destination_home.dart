@@ -1,5 +1,5 @@
+import 'dart:async';
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -238,28 +238,10 @@ class ZenithCard extends StatelessWidget {
             splitsCard(),
           ],
         ),
-        if (record != null) Card(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Spacer(),
-              Text(t.nerdStats, style: Theme.of(context).textTheme.titleLarge),
-              const Spacer()
-            ],
-          ),
-        ),
+        if (record != null) Card(child: Center(child: Text(t.nerdStats, style: Theme.of(context).textTheme.titleLarge, textAlign: TextAlign.center))),
         if (record != null) NerdStatsThingy(nerdStats: record!.aggregateStats.nerdStats, width: width),
         if (record != null) Graphs(record!.aggregateStats.apm, record!.aggregateStats.pps, record!.aggregateStats.vs, record!.aggregateStats.nerdStats, record!.aggregateStats.playstyle),
-        if (achievements.isNotEmpty) Card(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Spacer(),
-              Text(t.relatedAchievements, style: Theme.of(context).textTheme.titleLarge),
-              const Spacer()
-            ],
-          ),
-        ),
+        if (achievements.isNotEmpty) Card(child: Center(child: Text(t.relatedAchievements, style: Theme.of(context).textTheme.titleLarge, textAlign: TextAlign.center))),
         if (achievements.isNotEmpty) Wrap(
           direction: Axis.horizontal,
           children: [
@@ -290,7 +272,13 @@ class RecordCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (closestAverage != null) Padding(padding: const EdgeInsets.only(right: 8.0),
-              child: Image.asset("res/tetrio_tl_alpha_ranks/${closestAverage!.key}.png", height: 96)
+              child: Tooltip(message: "${t.rankView.avgForRank(rank: closestAverage!.key.toUpperCase())}: ${
+                switch(record!.gamemode){
+                  "40l" => get40lTime(closestAverage!.value.inMicroseconds),
+                  "blitz" => NumberFormat.decimalPattern().format(closestAverage!.value),
+                  _ => closestAverage!.value.toString()
+                }
+              }", child: Image.asset("res/tetrio_tl_alpha_ranks/${closestAverage!.key}.png", height: 96))
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -327,7 +315,7 @@ class RecordCard extends StatelessWidget {
                     if (record!.rank != -1) TextSpan(text: "№ ${intf.format(record!.rank)}", style: TextStyle(color: getColorOfRank(record!.rank))),
                     if (record!.rank != -1) const TextSpan(text: " • "),
                     if (record!.countryRank != -1) TextSpan(text: "№ ${intf.format(record!.countryRank)} ${t.localStanding}", style: TextStyle(color: getColorOfRank(record!.countryRank))),
-                    if (record!.countryRank != -1) const TextSpan(text: " • "),
+                    if (record!.countryRank != -1) TextSpan(text: width > 600.0 ? " • " : "\n"),
                     TextSpan(text: timestamp(record!.timestamp)),
                   ]
                   ),
@@ -505,7 +493,13 @@ class RecordSummary extends StatelessWidget{
       mainAxisSize: MainAxisSize.min,
       children: [
         if (closestAverage != null && record != null) Padding(padding: const EdgeInsets.only(right: 8.0),
-        child: Image.asset("res/tetrio_tl_alpha_ranks/${closestAverage!.key}.png", height: 96))
+        child: Tooltip(message: "${t.rankView.avgForRank(rank: closestAverage!.key.toUpperCase())}: ${
+          switch(record!.gamemode){
+            "40l" => get40lTime(closestAverage!.value.inMicroseconds),
+            "blitz" => NumberFormat.decimalPattern().format(closestAverage!.value),
+            _ => closestAverage!.value.toString()
+          }
+        }", child: Image.asset("res/tetrio_tl_alpha_ranks/${closestAverage!.key}.png", height: 96)))
         else !hideRank ? Image.asset("res/tetrio_tl_alpha_ranks/z.png", height: 96) : Container(),
         if (record != null) Column(
           crossAxisAlignment: hideRank ? CrossAxisAlignment.center : CrossAxisAlignment.start,
@@ -944,30 +938,10 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
         //     )
         //   ),
         // ),
-        if (data.nerdStats != null) Card(
-          //surfaceTintColor: rankColors[data.rank],
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Spacer(),
-              Text(t.nerdStats, style: Theme.of(context).textTheme.titleLarge),
-              const Spacer()
-            ],
-          ),
-        ),
+        if (data.nerdStats != null) Card(child: Center(child: Text(t.nerdStats, style: Theme.of(context).textTheme.titleLarge, textAlign: TextAlign.center))),
         if (data.nerdStats != null) NerdStatsThingy(nerdStats: toSee.nerdStats!, oldNerdStats: toCompare?.nerdStats, averages: averages, lbPos: lbPos, width: width),
         if (data.nerdStats != null) Graphs(toSee.apm!, toSee.pps!, toSee.vs!, toSee.nerdStats!, toSee.playstyle!),
-        Card(
-          //surfaceTintColor: rankColors[data.rank],
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Spacer(),
-              Text(t.relatedAchievements, style: Theme.of(context).textTheme.titleLarge),
-              const Spacer()
-            ],
-          ),
-        ),
+        Card(child: Center(child: Text(t.relatedAchievements, style: Theme.of(context).textTheme.titleLarge, textAlign: TextAlign.center))),
         Wrap(
           direction: Axis.horizontal,
           children: [
@@ -1162,7 +1136,6 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
   @override
   initState(){
     _transition = AnimationController(vsync: this, duration: Durations.long4);
-
     _offsetAnimation = Tween<Offset>(
       begin: Offset.zero,
       end: const Offset(1.5, 0.0),
@@ -1170,7 +1143,6 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
       parent: _transition,
       curve: Curves.elasticIn,
     ));
-
     super.initState();
   }
 
@@ -1404,7 +1376,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                   if (snapshot.data!.player!.role == "banned") FakeDistinguishmentThingy(banned: true)
                   else if (snapshot.data!.player!.badstanding == true) FakeDistinguishmentThingy(badStanding: true),
                   rigthCard(snapshot, sprintAchievements, blitzAchievements, tlAchievements, qpAchievements, qpExAchievements, width),
-                  if (rightCard == Cards.overview) Card(
+                  if (rightCard == Cards.overview && snapshot.data?.player?.bio != null) Card(
                     child: Column(
                       children: [
                         Row(

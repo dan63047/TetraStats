@@ -188,7 +188,7 @@
         "relevance": "на момент $timestamp",
         "actual": "Требование",
         "target": "Цель",
-        "cutoffTR": "Требуемый TR",
+        "cutoffTR": "Треб. TR",
         "targetTR": "Целевой TR",
         "state": "Состояние",
         "advanced": "Продвинутая",
