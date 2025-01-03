@@ -24,30 +24,30 @@ class TetraLeagueThingy extends StatelessWidget{
   List<TableRow> secondColumn(){
     return [
       TableRow(children: [
-        Text(intf.format(league.gamesPlayed), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
+        Text(intf.format(league.gamesPlayed), textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18)),
         Tooltip(
           message: "${t.stats.gp.full}",
-          child: Text(" ${t.stats.gp.short}", style: TextStyle(fontSize: 21))
+          child: Text(" ${t.stats.gp.short}", style: TextStyle(fontSize: width > 768.0 ? 21 : 18))
         ),
-        if (toCompare != null) Text(" (${comparef2.format(league.gamesPlayed-toCompare!.gamesPlayed)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: Colors.grey)),
+        if (toCompare != null) Text(" (${comparef2.format(league.gamesPlayed-toCompare!.gamesPlayed)})", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: Colors.grey)),
         if (lbPos != null) Text(lbPos?.gamesPlayed != null ? (lbPos!.gamesPlayed!.position >= 1000 ? " (${t.top} ${f2.format(lbPos!.gamesPlayed!.percentage*100)}%)" : " (№ ${lbPos!.gamesPlayed!.position})") : "(№ ---)", style: TextStyle(color: lbPos?.gamesPlayed != null ? getColorOfRank(lbPos!.gamesPlayed!.position) : null))
       ]),
       TableRow(children: [
-        Text(intf.format(league.gamesWon), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
+        Text(intf.format(league.gamesWon), textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18)),
         Tooltip(
           message: "${t.stats.gw.full}",
-          child: Text(" ${t.stats.gw.short}", style: TextStyle(fontSize: 21))
+          child: Text(" ${t.stats.gw.short}", style: TextStyle(fontSize: width > 768.0 ? 21 : 18))
         ),
-        if (toCompare != null) Text(" (${comparef2.format(league.gamesWon-toCompare!.gamesWon)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: Colors.grey)),
+        if (toCompare != null) Text(" (${comparef2.format(league.gamesWon-toCompare!.gamesWon)})", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: Colors.grey)),
         if (lbPos != null) Text(lbPos?.gamesWon != null ? (lbPos!.gamesWon!.position >= 1000 ? " (${t.top} ${f2.format(lbPos!.gamesWon!.percentage*100)}%)" : " (№ ${lbPos!.gamesWon!.position})") : "(№ ---)", style: TextStyle(color: lbPos?.gamesWon != null ? getColorOfRank(lbPos!.gamesWon!.position) : null))
       ]),
       TableRow(children: [
-        Tooltip(child: Text("${league.gxe.isNegative ? "---" : f3.format(league.gxe)}", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: league.gxe.isNegative ? Colors.grey : Colors.white)), message: "${f2.format(league.s1tr)} S1 TR"),
+        Tooltip(child: Text("${league.gxe.isNegative ? "---" : f3.format(league.gxe)}", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: league.gxe.isNegative ? Colors.grey : Colors.white)), message: "${f2.format(league.s1tr)} S1 TR"),
         Tooltip(
           message: "${t.stats.glixare.full}",
-          child: Tooltip(child: Text(" ${t.stats.glixare.short}", style: TextStyle(fontSize: 21, color: league.gxe.isNegative ? Colors.grey : Colors.white)), message: "Glixare")
+          child: Tooltip(child: Text(" ${t.stats.glixare.short}", style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: league.gxe.isNegative ? Colors.grey : Colors.white)), message: "Glixare")
         ),
-        if (toCompare != null) Text(" (${comparef.format(league.gxe-toCompare!.gxe)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: getDifferenceColor(league.gxe-toCompare!.gxe))),
+        if (toCompare != null) Text(" (${comparef.format(league.gxe-toCompare!.gxe)})", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: getDifferenceColor(league.gxe-toCompare!.gxe))),
         if (lbPos != null) Text(lbPos?.glixare != null ? (lbPos!.glixare!.position >= 1000 ? " (${t.top} ${f2.format(lbPos!.glixare!.percentage*100)}%)" : " (№ ${lbPos!.glixare!.position})") : "(№ ---)", style: TextStyle(color: lbPos?.glixare != null ? getColorOfRank(lbPos!.glixare!.position) : null))
       ]),
     ];
@@ -80,36 +80,36 @@ class TetraLeagueThingy extends StatelessWidget{
                     defaultColumnWidth:const IntrinsicColumnWidth(),
                     children: [
                       TableRow(children: [
-                        Text(league.apm != null ? f2.format(league.apm) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: league.apm != null ? getStatColor(league.apm!, averages?.apm, true) : Colors.grey)),
+                        Text(league.apm != null ? f2.format(league.apm) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: league.apm != null ? getStatColor(league.apm!, averages?.apm, true) : Colors.grey)),
                         Tooltip(
                           message: "${t.stats.apm.full}${(averages != null) ? "\n${t.rankView.avgForRank(rank: league.percentileRank.toUpperCase())}: ${f2.format(averages!.apm)} ${t.stats.apm.short}" : ""}",
-                          child: Text(" ${t.stats.apm.short}", style: TextStyle(fontSize: 21, color: league.apm != null ? getStatColor(league.apm!, averages?.apm, true) : Colors.grey))
+                          child: Text(" ${t.stats.apm.short}", style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: league.apm != null ? getStatColor(league.apm!, averages?.apm, true) : Colors.grey))
                         ),
-                        if (toCompare != null) Text(" (${comparef2.format(league.apm!-toCompare!.apm!)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: getDifferenceColor(league.apm!-toCompare!.apm!))),
+                        if (toCompare != null) Text(" (${comparef2.format(league.apm!-toCompare!.apm!)})", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: getDifferenceColor(league.apm!-toCompare!.apm!))),
                         if (lbPos != null) Text(lbPos?.apm != null ? (lbPos!.apm!.position >= 1000 ? " (${t.top} ${f2.format(lbPos!.apm!.percentage*100)}%)" : " (№ ${lbPos!.apm!.position})") : "(№ ---)", style: TextStyle(color: lbPos?.apm != null ? getColorOfRank(lbPos!.apm!.position) : null))
                       ]),
                       TableRow(children: [
-                        Text(league.pps != null ? f2.format(league.pps) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: league.pps != null ? getStatColor(league.pps!, averages?.pps, true) : Colors.grey)),
+                        Text(league.pps != null ? f2.format(league.pps) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: league.pps != null ? getStatColor(league.pps!, averages?.pps, true) : Colors.grey)),
                         Tooltip(
                           message: "${t.stats.pps.full}${(averages != null) ? "\n${t.rankView.avgForRank(rank: league.percentileRank.toUpperCase())}: ${f2.format(averages!.pps)} ${t.stats.pps.short}" : ""}",
-                          child: Text(" ${t.stats.pps.short}", style: TextStyle(fontSize: 21, color: league.pps != null ? getStatColor(league.pps!, averages?.pps, true) : Colors.grey))
+                          child: Text(" ${t.stats.pps.short}", style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: league.pps != null ? getStatColor(league.pps!, averages?.pps, true) : Colors.grey))
                         ),
-                        if (toCompare != null) Text(" (${comparef2.format(league.pps!-toCompare!.pps!)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: getDifferenceColor(league.pps!-toCompare!.pps!))),
+                        if (toCompare != null) Text(" (${comparef2.format(league.pps!-toCompare!.pps!)})", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: getDifferenceColor(league.pps!-toCompare!.pps!))),
                         if (lbPos != null) Text(lbPos?.pps != null ? (lbPos!.pps!.position >= 1000 ? " (${t.top} ${f2.format(lbPos!.pps!.percentage*100)}%)" : " (№ ${lbPos!.pps!.position})") : "(№ ---)", style: TextStyle(color: lbPos?.pps != null ? getColorOfRank(lbPos!.pps!.position) : null))
                       ]),
                       TableRow(children: [
-                        Text(league.vs != null ? f2.format(league.vs) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: league.vs != null ? getStatColor(league.vs!, averages?.vs, true) : Colors.grey)),
+                        Text(league.vs != null ? f2.format(league.vs) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: league.vs != null ? getStatColor(league.vs!, averages?.vs, true) : Colors.grey)),
                         Tooltip(
                           message: "${t.stats.vs.full}${(averages != null) ? "\n${t.rankView.avgForRank(rank: league.percentileRank.toUpperCase())}: ${f2.format(averages!.vs)} ${t.stats.vs.short}" : ""}",
-                          child: Text(" ${t.stats.vs.short}", style: TextStyle(fontSize: 21, color: league.vs != null ? getStatColor(league.vs!, averages?.vs, true) : Colors.grey))
+                          child: Text(" ${t.stats.vs.short}", style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: league.vs != null ? getStatColor(league.vs!, averages?.vs, true) : Colors.grey))
                         ),
-                        if (toCompare != null) Text(" (${comparef2.format(league.vs!-toCompare!.vs!)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: getDifferenceColor(league.vs!-toCompare!.vs!))),
+                        if (toCompare != null) Text(" (${comparef2.format(league.vs!-toCompare!.vs!)})", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: getDifferenceColor(league.vs!-toCompare!.vs!))),
                         if (lbPos != null) Text(lbPos?.vs != null ? (lbPos!.vs!.position >= 1000 ? " (${t.top} ${f2.format(lbPos!.vs!.percentage*100)}%)" : " (№ ${lbPos!.vs!.position})") : "(№ ---)", style: TextStyle(color: lbPos?.vs != null ? getColorOfRank(lbPos!.vs!.position) : null))
                       ]),
                       if (width <= 600) TableRow(children: [
-                        Text(!league.winrate.isNegative ? percentage.format(league.winrate) : "---", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: !league.winrate.isNegative ? Colors.white : Colors.grey)),
-                        Text(" ${t.stats.winrate.short}", style: TextStyle(fontSize: 21, color: !league.winrate.isNegative ? Colors.white : Colors.grey)),
-                        if (toCompare != null) Text(" (${comparef2.format((league.winrate-toCompare!.winrate)*100)})", textAlign: TextAlign.right, style: TextStyle(fontSize: 21, color: getDifferenceColor(league.winrate-toCompare!.winrate))),
+                        Text(!league.winrate.isNegative ? percentage.format(league.winrate) : "---", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: !league.winrate.isNegative ? Colors.white : Colors.grey)),
+                        Text(" ${t.stats.winrate.short}", style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: !league.winrate.isNegative ? Colors.white : Colors.grey)),
+                        if (toCompare != null) Text(" (${comparef2.format((league.winrate-toCompare!.winrate)*100)})", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: getDifferenceColor(league.winrate-toCompare!.winrate))),
                         if (lbPos != null) Text(lbPos?.winrate != null ? (lbPos!.winrate!.position >= 1000 ? " (${t.top} ${f2.format(lbPos!.winrate!.percentage*100)}%)" : " (№ ${lbPos!.winrate!.position})") : "(№ ---)", style: TextStyle(color: lbPos?.winrate != null ? getColorOfRank(lbPos!.winrate!.position) : null))
                       ]),
                       if (width <= 400) ...secondColumn()

@@ -199,7 +199,7 @@ class ZenithCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(t.gamemodes["zenith"]!, style: Theme.of(context).textTheme.titleLarge),
+                  Text(t.gamemodes["zenith"]!, style: width > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleSmall),
                   //Text("Leaderboard reset in ${countdown(postSeasonLeft)}", textAlign: TextAlign.center),
                 ],
               ),
@@ -238,10 +238,16 @@ class ZenithCard extends StatelessWidget {
             splitsCard(),
           ],
         ),
-        if (record != null) Card(child: Center(child: Text(t.nerdStats, style: Theme.of(context).textTheme.titleLarge, textAlign: TextAlign.center))),
+        if (record != null) Card(child: Center(child: Padding(
+          padding: const EdgeInsets.only(bottom: 4.0),
+          child: Text(t.nerdStats, style: width > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center),
+        ))),
         if (record != null) NerdStatsThingy(nerdStats: record!.aggregateStats.nerdStats, width: width),
         if (record != null) Graphs(record!.aggregateStats.apm, record!.aggregateStats.pps, record!.aggregateStats.vs, record!.aggregateStats.nerdStats, record!.aggregateStats.playstyle),
-        if (achievements.isNotEmpty) Card(child: Center(child: Text(t.relatedAchievements, style: Theme.of(context).textTheme.titleLarge, textAlign: TextAlign.center))),
+        if (achievements.isNotEmpty) Card(child: Center(child: Padding(
+          padding: const EdgeInsets.only(bottom: 4.0),
+          child: Text(t.relatedAchievements, style: width > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center),
+        ))),
         if (achievements.isNotEmpty) Wrap(
           direction: Axis.horizontal,
           children: [
@@ -265,6 +271,7 @@ class RecordCard extends StatelessWidget {
   const RecordCard(this.record, this.achievements, this.betterThanRankAverage, this.closestAverage, this.betterThanClosestAverage, this.rank, {this.width = double.infinity});
   
   Widget result(){
+    TextStyle tableTextStyle = TextStyle(fontSize: width > 768.0 ? 21 : 18);
     return Card(
       child: Column(
         children: [
@@ -303,9 +310,9 @@ class RecordCard extends StatelessWidget {
                       "blitz" => readableIntDifference(record!.stats.score, blitzAverages[rank]!),
                       _ => record!.stats.score.toString()
                     }, verdict: betterThanRankAverage??false ? t.verdictBetter : t.verdictWorse, rank: rank!.toUpperCase())}\n", style: TextStyle(
-                      color: betterThanClosestAverage??false ? Colors.greenAccent : Colors.redAccent
+                      color: betterThanRankAverage??false ? Colors.greenAccent : Colors.redAccent
                     ))
-                    else if ((rank == null || rank == "z" || rank == "x+") && closestAverage != null) TextSpan(text: "${t.verdictGeneral(n: switch(record!.gamemode){
+                    else if ((rank == null || rank == "z") && closestAverage != null) TextSpan(text: "${t.verdictGeneral(n: switch(record!.gamemode){
                       "40l" => readableTimeDifference(record!.stats.finalTime, closestAverage!.value),
                       "blitz" => readableIntDifference(record!.stats.score, closestAverage!.value),
                       _ => record!.stats.score.toString()
@@ -337,17 +344,17 @@ class RecordCard extends StatelessWidget {
                         "blitz" => record!.stats.level.toString(),
                         "5mblast" => NumberFormat.decimalPattern().format(record!.stats.spp),
                         _ => "What if "
-                      }, textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
+                      }, textAlign: TextAlign.right, style: tableTextStyle),
                       Text(switch(record!.gamemode){
                         "40l" => " ${t.stats.pieces.full}",
                         "blitz" => " ${t.stats.level.full}",
                         "5mblast" => " ${t.stats.spp.short}",
                         _ => " i wanted to"
-                      }, textAlign: TextAlign.left, style: const TextStyle(fontSize: 21)),
+                      }, textAlign: TextAlign.left, style: tableTextStyle),
                     ]),
                     TableRow(children: [
-                      Text(f2.format(record!.stats.pps), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
-                      Text(" ${t.stats.pps.short}", textAlign: TextAlign.left, style: TextStyle(fontSize: 21)),
+                      Text(f2.format(record!.stats.pps), textAlign: TextAlign.right, style: tableTextStyle),
+                      Text(" ${t.stats.pps.short}", textAlign: TextAlign.left, style: tableTextStyle),
                     ]),
                     TableRow(children: [
                       Text(switch(record!.gamemode){
@@ -355,13 +362,13 @@ class RecordCard extends StatelessWidget {
                         "blitz" => f2.format(record!.stats.spp),
                         "5mblast" => record!.stats.piecesPlaced.toString(),
                         _ => "but god said"
-                      }, textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
+                      }, textAlign: TextAlign.right, style: tableTextStyle),
                       Text(switch(record!.gamemode){
                         "40l" => " ${t.stats.kpp.short}",
                         "blitz" => " ${t.stats.spp.short}",
                         "5mblast" => " ${t.stats.pieces.short}",
                         _ => " no"
-                      }, textAlign: TextAlign.left, style: const TextStyle(fontSize: 21)),
+                      }, textAlign: TextAlign.left, style: tableTextStyle),
                     ])
                   ],
                 ),
@@ -371,12 +378,12 @@ class RecordCard extends StatelessWidget {
                   defaultColumnWidth:const IntrinsicColumnWidth(),
                   children: [
                     TableRow(children: [
-                      Text(intf.format(record!.stats.inputs), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
-                      Text(" ${t.stats.kp.short}", textAlign: TextAlign.left, style: TextStyle(fontSize: 21)),
+                      Text(intf.format(record!.stats.inputs), textAlign: TextAlign.right, style: tableTextStyle),
+                      Text(" ${t.stats.kp.short}", textAlign: TextAlign.left, style: tableTextStyle),
                     ]),
                     TableRow(children: [
-                      Text(f2.format(record!.stats.kps), textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
-                      Text(" ${t.stats.kps.short}", textAlign: TextAlign.left, style: TextStyle(fontSize: 21)),
+                      Text(f2.format(record!.stats.kps), textAlign: TextAlign.right, style: tableTextStyle),
+                      Text(" ${t.stats.kps.short}", textAlign: TextAlign.left, style: tableTextStyle),
                     ]),
                     TableRow(children: [
                       Text(switch(record!.gamemode){
@@ -384,13 +391,13 @@ class RecordCard extends StatelessWidget {
                         "blitz" => record!.stats.piecesPlaced.toString(),
                         "5mblast" => record!.stats.piecesPlaced.toString(),
                         _ => "but god said"
-                      }, textAlign: TextAlign.right, style: const TextStyle(fontSize: 21)),
+                      }, textAlign: TextAlign.right, style: tableTextStyle),
                       Text(switch(record!.gamemode){
                         "40l" => " ",
                         "blitz" => " ${t.stats.pieces.short}",
                         "5mblast" => " ${t.stats.pieces.short}",
                         _ => " no"
-                      }, textAlign: TextAlign.left, style: const TextStyle(fontSize: 21)),
+                      }, textAlign: TextAlign.left, style: tableTextStyle),
                     ])
                   ],
                 ),
@@ -767,7 +774,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                   children: [
                     Text(t.gamemodes['40l']!, style: Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center),
                     const Divider(),
-                    RecordSummary(record: summaries.sprint, betterThanClosestAverage: sprintBetterThanClosestAverage, betterThanRankAverage: sprintBetterThanRankAverage, closestAverage: closestAverageSprint, rank: summaries.league.percentileRank),
+                    RecordSummary(record: summaries.sprint, betterThanClosestAverage: sprintBetterThanClosestAverage, betterThanRankAverage: sprintBetterThanRankAverage, closestAverage: closestAverageSprint, rank: summaries.league.rank),
                     const Divider(),
                     Text("${summaries.sprint != null ? intf.format(summaries.sprint!.stats.piecesPlaced) : "---"} P • ${summaries.sprint != null ? f2.format(summaries.sprint!.stats.pps) : "-.--"} PPS • ${summaries.sprint != null ? f2.format(summaries.sprint!.stats.kpp) : "-.--"} KPP", style: const TextStyle(color: Colors.grey), textAlign: TextAlign.center)
                   ],
@@ -782,7 +789,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                   children: [
                     Text(t.gamemodes['blitz']!, style: Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center),
                     const Divider(),
-                    RecordSummary(record: summaries.blitz, betterThanClosestAverage: blitzBetterThanClosestAverage, betterThanRankAverage: blitzBetterThanRankAverage, closestAverage: closestAverageBlitz, rank: summaries.league.percentileRank),
+                    RecordSummary(record: summaries.blitz, betterThanClosestAverage: blitzBetterThanClosestAverage, betterThanRankAverage: blitzBetterThanRankAverage, closestAverage: closestAverageBlitz, rank: summaries.league.rank),
                     const Divider(),
                     Text("Level ${summaries.blitz != null ? intf.format(summaries.blitz!.stats.level): "--"} • ${summaries.blitz != null ? f2.format(summaries.blitz!.stats.spp) : "-.--"} SPP • ${summaries.blitz != null ? f2.format(summaries.blitz!.stats.pps) : "-.--"} PPS", style: const TextStyle(color: Colors.grey))
                   ],
@@ -920,8 +927,11 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(t.gamemodes["league"]!, style: Theme.of(context).textTheme.titleLarge),
-                  if (toCompare != null) Text(t.comparingWith(newDate: timestamp(toSee.timestamp), oldDate: timestamp(toCompare.timestamp)), textAlign: TextAlign.center)
+                  Text(t.gamemodes["league"]!, style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleSmall),
+                  if (toCompare != null) Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: Text(t.comparingWith(newDate: timestamp(toSee.timestamp), oldDate: timestamp(toCompare.timestamp)), textAlign: TextAlign.center, style: widget.constraints.maxWidth > 768.0 ? null : TextStyle(fontSize: 12.0)),
+                  )
                 ],
               ),
             ),
@@ -938,10 +948,13 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
         //     )
         //   ),
         // ),
-        if (data.nerdStats != null) Card(child: Center(child: Text(t.nerdStats, style: Theme.of(context).textTheme.titleLarge, textAlign: TextAlign.center))),
+        if (data.nerdStats != null) Card(child: Center(child: Padding(
+          padding: const EdgeInsets.only(bottom: 4.0),
+          child: Text(t.nerdStats, style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center),
+        ))),
         if (data.nerdStats != null) NerdStatsThingy(nerdStats: toSee.nerdStats!, oldNerdStats: toCompare?.nerdStats, averages: averages, lbPos: lbPos, width: width),
         if (data.nerdStats != null) Graphs(toSee.apm!, toSee.pps!, toSee.vs!, toSee.nerdStats!, toSee.playstyle!),
-        Card(child: Center(child: Text(t.relatedAchievements, style: Theme.of(context).textTheme.titleLarge, textAlign: TextAlign.center))),
+        Card(child: Center(child: Text(t.relatedAchievements, style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center))),
         Wrap(
           direction: Axis.horizontal,
           children: [
@@ -963,7 +976,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(t.previousSeasons, style: Theme.of(context).textTheme.titleLarge, textAlign: TextAlign.center),
+                  Text(t.previousSeasons, style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center),
                   //Text("${t.seasonStarts} ${countdown(postSeasonLeft)}", textAlign: TextAlign.center)
                 ],
               ),
@@ -1122,7 +1135,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(t.recent, style: Theme.of(context).textTheme.titleLarge),
+                  Text(t.recent, style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleSmall),
                 ],
               ),
             ),
@@ -1190,8 +1203,8 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
           if (snapshot.hasError){ return FutureError(snapshot); }
           if (snapshot.hasData){
             if (!snapshot.data!.success) return ErrorThingy(data: snapshot.data!);
-            blitzBetterThanRankAverage = (snapshot.data!.summaries!.league.rank != "z" && snapshot.data!.summaries!.blitz != null && snapshot.data!.summaries!.league.rank != "x+") ? snapshot.data!.summaries!.blitz!.stats.score > blitzAverages[snapshot.data!.summaries!.league.rank]! : null;
-            sprintBetterThanRankAverage = (snapshot.data!.summaries!.league.rank != "z" && snapshot.data!.summaries!.sprint != null && snapshot.data!.summaries!.league.rank != "x+") ? snapshot.data!.summaries!.sprint!.stats.finalTime < sprintAverages[snapshot.data!.summaries!.league.rank]! : null;
+            blitzBetterThanRankAverage = (snapshot.data!.summaries!.league.rank != "z" && snapshot.data!.summaries!.blitz != null) ? snapshot.data!.summaries!.blitz!.stats.score > blitzAverages[snapshot.data!.summaries!.league.rank]! : null;
+            sprintBetterThanRankAverage = (snapshot.data!.summaries!.league.rank != "z" && snapshot.data!.summaries!.sprint != null) ? snapshot.data!.summaries!.sprint!.stats.finalTime < sprintAverages[snapshot.data!.summaries!.league.rank]! : null;
               if (snapshot.data!.summaries!.sprint != null) {
               closestAverageSprint = sprintAverages.entries.singleWhere((element) => element.value == sprintAverages.values.reduce((a, b) => (a-snapshot.data!.summaries!.sprint!.stats.finalTime).abs() < (b -snapshot.data!.summaries!.sprint!.stats.finalTime).abs() ? a : b));
               sprintBetterThanClosestAverage = snapshot.data!.summaries!.sprint!.stats.finalTime < closestAverageSprint!.value;
@@ -1321,7 +1334,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                           ),
                         ),
                       ),
-                        if (modeButtons[rightCard]!.length > 1) SegmentedButton<CardMod>(
+                        if (modeButtons[rightCard]!.length > 1 && !widget.noSidebar) SegmentedButton<CardMod>(
                           showSelectedIcon: false,
                           selected: <CardMod>{cardMod},
                           segments: modeButtons[rightCard]!,
@@ -1332,7 +1345,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                             });
                           },
                         ),
-                        SegmentedButton<Cards>(
+                        if (!widget.noSidebar) SegmentedButton<Cards>(
                           showSelectedIcon: false,
                           segments: <ButtonSegment<Cards>>[
                             ButtonSegment<Cards>(

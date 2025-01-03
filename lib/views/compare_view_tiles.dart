@@ -746,11 +746,8 @@ class CompareState extends State<CompareView> {
         await addRankAverages(nickname.substring(4).toLowerCase());
         return null;
       }else{
-        late TetrioPlayer player;
-        late Summaries summary;
-        List<dynamic> requests = await Future.wait([teto.fetchPlayer(nickname), teto.fetchSummaries(players.last.userId)]);
-        player = requests[0];
-        summary = requests[1];
+        TetrioPlayer player = await teto.fetchPlayer(nickname);
+        Summaries summary = await teto.fetchSummaries(player.userId);
         players.add(player);
         summaries.add(summary);
         addvaluesEntrys(players.last, summaries.last);
@@ -848,103 +845,105 @@ class CompareState extends State<CompareView> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            controller: _scrollController,
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                  Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Center(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  controller: _scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(
-                        height: 175.0,
-                        width: 300.0,
-                        child: Card(
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(90.0, 18.0, 5.0, 0),
-                            child: Text(t.comparison, style: TextStyle(fontSize: 28)),
+                    Row(
+                      children: [
+                        SizedBox(
+                          height: 175.0,
+                          width: 300.0,
+                          child: Card(
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(18.0, 120.0, 5.0, 0),
+                              child: Text(t.comparison, style: TextStyle(fontSize: 28)),
+                            ),
                           ),
                         ),
-                      ),
-                      for (var p in players) SizedBox(
-                        width: 300.0,
-                        child: HeaderCard(p, removePlayer),
-                      ),
-                      SizedBox(width: 300, child: AddNewColumnCard(addPlayer))
-                    ]
-                  ),
-                  if (tlOnly) SizedBox(
-                    width: 300+300*summaries.length.toDouble(),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: 300.0,
-                              child: Card(
-                                child: Column(children: [
-                                  for (String title in TitesForStats[TitesForStats.keys.elementAt(1)]!) Text(title),
-                                ]),
-                              ),
-                            ),
-                            for (int k = 0; k < formattedValues[1].length; k++) SizedBox(
-                              width: 300.0,
-                              child: Card(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    for (int l = 0; l < formattedValues[1][k].length; l++) Container(decoration: (rawValues[1].length > 1 && rawValues[1][k][l] != null && best[1][l] == rawValues[1][k][l]) ? BoxDecoration(boxShadow: [BoxShadow(color: Colors.cyanAccent.withAlpha(96), spreadRadius: 0, blurRadius: 4)]) : null, child: formattedValues[1][k][l]),
-                                  ],
+                        for (var p in players) SizedBox(
+                          width: 300.0,
+                          child: HeaderCard(p, removePlayer),
+                        ),
+                        SizedBox(width: 300, child: AddNewColumnCard(addPlayer))
+                      ]
+                    ),
+                    if (tlOnly) SizedBox(
+                      width: 300+300*summaries.length.toDouble(),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: 300.0,
+                                child: Card(
+                                  child: Column(children: [
+                                    for (String title in TitesForStats[TitesForStats.keys.elementAt(1)]!) Text(title),
+                                  ]),
                                 ),
                               ),
-                            ),
-                          ]
-                        ),
-                        VsGraphs(stats: [for (var s in summaries) if (s.league.nerdStats != null) AggregateStats.precalculated(s.league.apm!, s.league.pps!, s.league.vs!, s.league.nerdStats!, s.league.playstyle!)], nicknames: [for (int i = 0; i < summaries.length; i++)  if (summaries[i].league.nerdStats != null) nicknames[i]]),
-                      ],
-                    ),
-                  )
-                  else for (int i = 0; i < formattedValues.length; i++) SizedBox(
-                    width: 300+300*summaries.length.toDouble(),
-                    child: ExpansionTile(
-                      title: Text(TitesForStats.keys.elementAt(i), style: _expansionTileTitleTextStyle),
-                      children: [
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: 300.0,
-                              child: Card(
-                                child: Column(children: [
-                                  for (String title in TitesForStats[TitesForStats.keys.elementAt(i)]!) Text(title),
-                                ]),
-                              ),
-                            ),
-                            for (int k = 0; k < formattedValues[i].length; k++) SizedBox(
-                              width: 300.0,
-                              child: Card(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    for (int l = 0; l < formattedValues[i][k].length; l++) Container(decoration: (rawValues[0].length > 1 && rawValues[i][k][l] != null && best[i][l] == rawValues[i][k][l]) ? BoxDecoration(boxShadow: [BoxShadow(color: Colors.cyanAccent.withAlpha(96), spreadRadius: 0, blurRadius: 4)]) : null, child: formattedValues[i][k][l]),
-                                  ],
+                              for (int k = 0; k < formattedValues[1].length; k++) SizedBox(
+                                width: 300.0,
+                                child: Card(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      for (int l = 0; l < formattedValues[1][k].length; l++) Container(decoration: (rawValues[1].length > 1 && rawValues[1][k][l] != null && best[1][l] == rawValues[1][k][l]) ? BoxDecoration(boxShadow: [BoxShadow(color: Colors.cyanAccent.withAlpha(96), spreadRadius: 0, blurRadius: 4)]) : null, child: formattedValues[1][k][l]),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ]
-                        ),
-                        if (i == 1) VsGraphs(stats: [for (var s in summaries) if (s.league.nerdStats != null) AggregateStats.precalculated(s.league.apm!, s.league.pps!, s.league.vs!, s.league.nerdStats!, s.league.playstyle!)], nicknames: [for (int i = 0; i < summaries.length; i++)  if (summaries[i].league.nerdStats != null) nicknames[i]]),
-                        if (i == 2) VsGraphs(stats: [for (var s in summaries) if ((s.zenith != null || s.zenithCareerBest != null) && (s.zenith?.aggregateStats??s.zenithCareerBest!.aggregateStats).apm > 0.00) s.zenith?.aggregateStats??s.zenithCareerBest!.aggregateStats], nicknames: [for (int i = 0; i < summaries.length; i++) if ((summaries[i].zenith != null || summaries[i].zenithCareerBest != null) && (summaries[i].zenith?.aggregateStats??summaries[i].zenithCareerBest!.aggregateStats).apm > 0.00) nicknames[i]]),
-                        if (i == 3) VsGraphs(stats: [for (var s in summaries) if ((s.zenithEx != null || s.zenithExCareerBest != null) && (s.zenithEx?.aggregateStats??s.zenithExCareerBest!.aggregateStats).apm > 0.00) s.zenithEx?.aggregateStats??s.zenithExCareerBest!.aggregateStats], nicknames: [for (int i = 0; i < summaries.length; i++) if ((summaries[i].zenithEx != null || summaries[i].zenithExCareerBest != null) && (summaries[i].zenithEx?.aggregateStats??summaries[i].zenithExCareerBest!.aggregateStats).apm > 0.00) nicknames[i]]),
-                      ],
+                            ]
+                          ),
+                          VsGraphs(stats: [for (var s in summaries) if (s.league.nerdStats != null) AggregateStats.precalculated(s.league.apm!, s.league.pps!, s.league.vs!, s.league.nerdStats!, s.league.playstyle!)], nicknames: [for (int i = 0; i < summaries.length; i++)  if (summaries[i].league.nerdStats != null) nicknames[i]]),
+                        ],
+                      ),
+                    )
+                    else for (int i = 0; i < formattedValues.length; i++) SizedBox(
+                      width: 300+300*summaries.length.toDouble(),
+                      child: ExpansionTile(
+                        title: Text(TitesForStats.keys.elementAt(i), style: _expansionTileTitleTextStyle),
+                        children: [
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: 300.0,
+                                child: Card(
+                                  child: Column(children: [
+                                    for (String title in TitesForStats[TitesForStats.keys.elementAt(i)]!) Text(title),
+                                  ]),
+                                ),
+                              ),
+                              for (int k = 0; k < formattedValues[i].length; k++) SizedBox(
+                                width: 300.0,
+                                child: Card(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      for (int l = 0; l < formattedValues[i][k].length; l++) Container(decoration: (rawValues[0].length > 1 && rawValues[i][k][l] != null && best[i][l] == rawValues[i][k][l]) ? BoxDecoration(boxShadow: [BoxShadow(color: Colors.cyanAccent.withAlpha(96), spreadRadius: 0, blurRadius: 4)]) : null, child: formattedValues[i][k][l]),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ]
+                          ),
+                          if (i == 1) VsGraphs(stats: [for (var s in summaries) if (s.league.nerdStats != null) AggregateStats.precalculated(s.league.apm!, s.league.pps!, s.league.vs!, s.league.nerdStats!, s.league.playstyle!)], nicknames: [for (int i = 0; i < summaries.length; i++)  if (summaries[i].league.nerdStats != null) nicknames[i]]),
+                          if (i == 2) VsGraphs(stats: [for (var s in summaries) if ((s.zenith != null || s.zenithCareerBest != null) && (s.zenith?.aggregateStats??s.zenithCareerBest!.aggregateStats).apm > 0.00) s.zenith?.aggregateStats??s.zenithCareerBest!.aggregateStats], nicknames: [for (int i = 0; i < summaries.length; i++) if ((summaries[i].zenith != null || summaries[i].zenithCareerBest != null) && (summaries[i].zenith?.aggregateStats??summaries[i].zenithCareerBest!.aggregateStats).apm > 0.00) nicknames[i]]),
+                          if (i == 3) VsGraphs(stats: [for (var s in summaries) if ((s.zenithEx != null || s.zenithExCareerBest != null) && (s.zenithEx?.aggregateStats??s.zenithExCareerBest!.aggregateStats).apm > 0.00) s.zenithEx?.aggregateStats??s.zenithExCareerBest!.aggregateStats], nicknames: [for (int i = 0; i < summaries.length; i++) if ((summaries[i].zenithEx != null || summaries[i].zenithExCareerBest != null) && (summaries[i].zenithEx?.aggregateStats??summaries[i].zenithExCareerBest!.aggregateStats).apm > 0.00) nicknames[i]]),
+                        ],
+                      ),
                     ),
-                  ),
-                ]),
-              ],
-            ),
+                  ]),
+                ),
+              ),
+            ],
           ),
         ),
       ),

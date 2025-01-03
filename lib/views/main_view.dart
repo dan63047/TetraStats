@@ -173,6 +173,8 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   Widget pickers(int destination){
     return switch (destination) {
       0 => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -270,45 +272,41 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints){
-        bool screenIsBig = constraints.maxWidth > 768.00;
+        bool screenIsBig = constraints.maxWidth > 1030.00;
         return Scaffold(
         key: _scaffoldKey,
         drawer: SearchDrawer(changePlayer: changePlayer, controller: _searchController),
         endDrawer: DestinationsDrawer(changeDestination: (value) {setState(() {destination = value;});}),
-        bottomNavigationBar: screenIsBig ? null : BottomAppBar(
-          shape: const AutomaticNotchedShape(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(0.0))), RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16.0)))),
-          notchMargin: 2.0,
-          height: 88,
-          child: IconTheme(
-            data: IconThemeData(color: Theme.of(context).colorScheme.primary),
-            child: Row(
-              children: <Widget>[
-                IconButton(
-                  tooltip: t.navMenuTooltip,
-                  icon: const Icon(Icons.menu),
-                  onPressed: () {
-                    _scaffoldKey.currentState!.openEndDrawer();
-                  },
-                ),
-                Expanded(
-                  child: pickers(destination),
-                ),
-                SizedBox(
-                  width: 40.0,
-                ),
-              ],
+        persistentFooterButtons: screenIsBig ? null : [Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton.filled(
+              icon: const Icon(Icons.search),
+              style: IconButton.styleFrom(
+                visualDensity: VisualDensity(horizontal: 1.0, vertical: 1.0),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16.0))),
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                fixedSize: Size(52, 52)
+              ),
+              onPressed: () {
+                _scaffoldKey.currentState!.openDrawer();
+                _searchController.clear();
+              },
             ),
-          ),
-        ),
-        floatingActionButtonLocation: screenIsBig ? null : FloatingActionButtonLocation.endDocked,
-        floatingActionButton: screenIsBig ? null : FloatingActionButton(
-          elevation: 0,
-          onPressed: () {
-            _scaffoldKey.currentState!.openDrawer();
-            _searchController.clear();
-          },
-          child: const Icon(Icons.search),
-        ),
+            IconButton(
+              onPressed: (){
+                _scaffoldKey.currentState!.openEndDrawer();
+              },
+              style: IconButton.styleFrom(
+                visualDensity: VisualDensity(horizontal: 1.0, vertical: 1.0),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16.0))),
+              ),
+              icon: Icon(Icons.menu)
+            ),
+            Expanded(child: pickers(destination)),
+          ],
+        )],
+        persistentFooterAlignment: AlignmentDirectional.bottomCenter,
         body: SafeArea(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
