@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/data_objects/glicko.dart';
-import 'package:tetra_stats/data_objects/tetrio.dart';
+import 'package:tetra_stats/data_objects/tetra_league.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 
@@ -45,7 +45,7 @@ class TLProgress extends StatelessWidget{
                   children: [
                     if (tlData.prevAt > 0) TextSpan(text: "№ ${f0.format(tlData.prevAt)}"),
                     if (tlData.prevAt > 0 && previousRankTRcutoff != null) const TextSpan(text: "\n"),
-                    if (previousRankTRcutoff != null) TextSpan(text: "${f2.format(previousRankTRcutoff)} (${comparef2.format(previousRankTRcutoff!-tlData.tr)}) TR"),
+                    if (previousRankTRcutoff != null) TextSpan(text: "${f2.format(previousRankTRcutoff)} (${comparef2.format(previousRankTRcutoff!-tlData.tr)}) ${t.stats.tr.short}"),
                     if ((tlData.prevAt > 0 || previousRankTRcutoff != null) && previousGlickoCutoff != null) const TextSpan(text: "\n"),
                     if (previousGlickoCutoff != null) TextSpan(text: (tlData.standing > tlData.prevAt || ((tlData.glicko!-previousGlickoCutoff!)/glickoForWin < 0.5 && tlData.percentileRank != "d")) ? t.demotionOnNextLoss : t.numOfdefeats(losses: f2.format((tlData.glicko!-previousGlickoCutoff!)/glickoForWin)), style: TextStyle(color: (tlData.standing > tlData.prevAt || ((tlData.glicko!-previousGlickoCutoff!)/glickoForWin < 0.5 && tlData.percentileRank != "d")) ? Colors.redAccent : null))
                   ]
@@ -59,7 +59,7 @@ class TLProgress extends StatelessWidget{
                   children: [
                     if (tlData.nextAt > 0) TextSpan(text: "№ ${f0.format(tlData.nextAt)}"),
                     if (tlData.nextAt > 0 && nextRankTRcutoff != null) const TextSpan(text: "\n"),
-                    if (nextRankTRcutoff != null) TextSpan(text: "${f2.format(nextRankTRcutoff)} (${comparef2.format(nextRankTRcutoff!-tlData.tr)}) TR"),
+                    if (nextRankTRcutoff != null) TextSpan(text: "${f2.format(nextRankTRcutoff)} (${comparef2.format(nextRankTRcutoff!-tlData.tr)}) ${t.stats.tr.short}"),
                     if ((tlData.nextAt > 0 || nextRankTRcutoff != null) && nextRankGlickoCutoff != null) const TextSpan(text: "\n"),
                     if (nextRankGlickoCutoff != null) TextSpan(text: (tlData.standing < tlData.nextAt || ((nextRankGlickoCutoff!-tlData.glicko!)/glickoForWin < 0.5 && ((tlData.rank != "x+" && tlData.rank != "z") || tlData.percentileRank != "x+"))) ? t.promotionOnNextWin : t.numOfVictories(wins: f2.format((nextRankGlickoCutoff!-tlData.glicko!)/glickoForWin)), style: TextStyle(color: (tlData.standing < tlData.nextAt || ((nextRankGlickoCutoff!-tlData.glicko!)/glickoForWin < 0.5 && tlData.percentileRank != "x+")) ? Colors.greenAccent : null))
                   ]
@@ -74,8 +74,8 @@ class TLProgress extends StatelessWidget{
             ranges: [
               if (previousRankTRcutoff != null && nextRankTRcutoff != null) LinearGaugeRange(endValue: getBarTR(tlData.tr)!, color: Theme.of(context).colorScheme.primary, position: LinearElementPosition.cross)
               else if (tlData.standing != -1) LinearGaugeRange(endValue: getBarPosition(), color: Theme.of(context).colorScheme.primary, position: LinearElementPosition.cross),
-              if (previousRankTRcutoff != null && previousRankTRcutoffTarget != null) LinearGaugeRange(endValue: getBarTR(previousRankTRcutoffTarget!)!, color: Colors.greenAccent, position: LinearElementPosition.inside),
-              if (nextRankTRcutoff != null && nextRankTRcutoffTarget != null && previousRankTRcutoff != null) LinearGaugeRange(startValue: getBarTR(nextRankTRcutoffTarget!)!, endValue: 1, color: Colors.yellowAccent, position: LinearElementPosition.inside)
+              if (previousRankTRcutoff != null && previousRankTRcutoffTarget != null) LinearGaugeRange(endValue: getBarTR(previousRankTRcutoffTarget!)!, color: Colors.greenAccent.withAlpha(175), position: LinearElementPosition.inside),
+              if (nextRankTRcutoff != null && nextRankTRcutoffTarget != null && previousRankTRcutoff != null) LinearGaugeRange(startValue: getBarTR(nextRankTRcutoffTarget!)!, endValue: 1, color: Colors.yellowAccent.withAlpha(175), position: LinearElementPosition.inside)
             ],
             markerPointers: [
               LinearShapePointer(value: (previousRankTRcutoff != null && nextRankTRcutoff != null) ? getBarTR(tlData.tr)! : getBarPosition(), position: LinearElementPosition.cross, shapeType: LinearShapePointerType.diamond, color: Colors.white, height: 20),

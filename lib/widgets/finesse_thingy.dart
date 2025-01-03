@@ -1,7 +1,8 @@
 // ignore_for_file: curly_braces_in_flow_control_structures
 
 import 'package:flutter/material.dart';
-import 'package:tetra_stats/data_objects/tetrio.dart';
+import 'package:tetra_stats/data_objects/finesse.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
 
@@ -28,7 +29,7 @@ class FinesseThingy extends StatelessWidget{
           fontSize: 65,
           height: 1.2,
         )),
-        const Positioned(left: 25, top: 20, child: Text("inesse", style: TextStyle(fontFamily: "Eurostile Round Extended"))),
+        Positioned(left: 25, top: 20, child: Text(t.stats.finesse.widgetTitle, style: TextStyle(fontFamily: "Eurostile Round Extended"))),
         Positioned(
           right: 0, top: 20,
           child: Text("${finesse != null ? finesse!.faults : "---"}F", style: TextStyle(

@@ -4,21 +4,38 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
+import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sqflite/sql.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:tetra_stats/data_objects/tetra_stats.dart';
+import 'package:tetra_stats/data_objects/cutoff_tetrio.dart';
+import 'package:tetra_stats/data_objects/end_context_multi.dart';
+import 'package:tetra_stats/data_objects/news.dart';
+import 'package:tetra_stats/data_objects/p1nkl0bst3r.dart';
+import 'package:tetra_stats/data_objects/player_leaderboard_position.dart';
+import 'package:tetra_stats/data_objects/record_single.dart';
+import 'package:tetra_stats/data_objects/singleplayer_stream.dart';
+import 'package:tetra_stats/data_objects/summaries.dart';
+import 'package:tetra_stats/data_objects/tetra_league.dart';
+import 'package:tetra_stats/data_objects/tetra_league_alpha_record.dart';
+import 'package:tetra_stats/data_objects/tetra_league_alpha_stream.dart';
+import 'package:tetra_stats/data_objects/tetra_league_beta_stream.dart';
+import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
+import 'package:tetra_stats/data_objects/tetrio_player.dart';
+import 'package:tetra_stats/data_objects/tetrio_player_from_leaderboard.dart';
+import 'package:tetra_stats/data_objects/tetrio_players_leaderboard.dart';
+import 'package:tetra_stats/data_objects/tetrio_zen.dart';
+import 'package:tetra_stats/data_objects/user_records.dart';
 import 'package:tetra_stats/main.dart' show packageInfo;
 import 'package:flutter/foundation.dart';
 import 'package:tetra_stats/services/custom_http_client.dart';
 import 'package:http/http.dart' as http;
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/services/sqlite_db_controller.dart';
-import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:csv/csv.dart';
 
 const String dbName = "TetraStats.db";
+const String webVersionDomain = "ts.dan63.by";
 const String tetrioUsersTable = "tetrioUsers";
 const String tetrioUsersToTrackTable = "tetrioUsersToTrack";
 const String tetraLeagueMatchesTable = "tetrioAlphaLeagueMathces";
@@ -33,6 +50,11 @@ const String endContext2 = "endContext2";
 const String statesCol = "jsonStates";
 const String player1id = "player1id";
 const String player2id = "player2id";
+const List<String> tetrioUsersTableRows = [idCol, nickCol, "jsonStates"];
+const List<String> tetrioUsersToTrackTableRows = [idCol];
+const List<String> tetraLeagueMatchesTableRows = [idCol, replayID, player1id, player2id, timestamp, endContext1, endContext2];
+const List<String> tetrioTLReplayStatsTableRows = [idCol, "data", "freyhoe"];
+const List<String> tetrioLeagueTableRows = [idCol, "gamesplayed", "gameswon", "tr", "glicko", "rd", "gxe", "rank", "bestrank", "apm", "pps", "vs", "decaying", "standing", "standing_local", "percentile", "prev_rank", "prev_at", "next_rank", "next_at", "percentile_rank", "season"];
 /// Table, that store players data, their stats at some moments of time
 const String createTetrioUsersTable = '''
         CREATE TABLE IF NOT EXISTS "tetrioUsers" (
@@ -268,7 +290,7 @@ class TetrioService extends DB {
     // If failed, actually trying to retrieve
     Uri url;
     if (kIsWeb) { // Web version sends every request through my php script at the same domain, where Tetra Stats located because of CORS
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "tetrioReplay", "replayid": replayID});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "tetrioReplay", "replayid": replayID});
     } else { // Actually going to hit inoue
       url = Uri.https('inoue.szy.lol', '/api/replay/$replayID');
     }
@@ -337,6 +359,25 @@ class TetrioService extends DB {
     return data;
   }
 
+
+  /// Returns three integers, representing size of the database in bytes, amount of TL records in it and amount of TL states in it
+  Future<(int, int, int)> getDatabaseData() async {
+    await ensureDbIsOpen();
+    final db = getDatabaseOrThrow();
+    String dbPath;
+    if (kIsWeb) {
+      dbPath = dbName;
+    } else {
+      final docsPath = await getApplicationDocumentsDirectory();
+      dbPath = join(docsPath.path, dbName);
+    }
+    var dbFile = File(dbPath);
+    var dbSize = (await dbFile.stat()).size;
+    var dbTLRecordsQuery = (await db.rawQuery('SELECT COUNT(*) FROM `${tetraLeagueMatchesTable}`')).first['COUNT(*)']! as int;
+    var dbTLStatesQuery = (await db.rawQuery('SELECT COUNT(*) FROM `${tetrioLeagueTable}`')).first['COUNT(*)']! as int;
+    return (dbSize, dbTLRecordsQuery, dbTLStatesQuery);
+  }
+
   /// Retrieves avaliable Tetra League matches from Tetra Channel api. Returns stream object (fake stream).
   /// Throws an exception if fails to retrieve.
   Future<SingleplayerStream> fetchStream(String userID, String stream) async {
@@ -345,7 +386,7 @@ class TetrioService extends DB {
     
     Uri url;
     if (kIsWeb) {
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "singleplayerStream", "user": userID.toLowerCase().trim(), "stream": stream});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "singleplayerStream", "user": userID.toLowerCase().trim(), "stream": stream});
     } else {
       url = Uri.https('ch.tetr.io', 'api/users/${userID.toLowerCase().trim()}/records/$stream');
     }
@@ -393,7 +434,7 @@ class TetrioService extends DB {
 
     Uri url;
     if (kIsWeb) { // Web version sends every request through my php script at the same domain, where Tetra Stats located because of CORS
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "PeakTR", "user": id});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "PeakTR", "user": id});
     } else { // Actually going to hit p1nkl0bst3r api
       url = Uri.https('api.p1nkl0bst3r.xyz', 'toptr/$id');
     }
@@ -444,7 +485,7 @@ class TetrioService extends DB {
 
     Uri url;
     if (kIsWeb) {
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "cutoffs"});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "cutoffs"});
     } else {
       url = Uri.https('ch.tetr.io', 'api/labs/league_ranks');
     }
@@ -485,10 +526,10 @@ class TetrioService extends DB {
   }
 
   Future<Cutoffs?> fetchCutoffsBeanserver() async {
-    Cutoffs? cached = _cache.get("", Cutoffs);
+    Cutoffs? cached = _cache.get("CutoffsTetrioleague_ranks", Cutoffs);
     if (cached != null) return cached;
 
-    Uri url = Uri.https('ts.dan63.by', 'beanserver_blaster/cutoffs.json');
+    Uri url = Uri.https(webVersionDomain, 'beanserver_blaster/cutoffs.json');
 
     try{
       final response = await client.get(url);
@@ -531,13 +572,68 @@ class TetrioService extends DB {
     }
   }
 
+  Future<List<Cutoffs>> fetchCutoffsHistory() async {
+    Uri url = Uri.https(webVersionDomain, 'beanserver_blaster/history.csv');
+
+    try{
+      final response = await client.get(url);
+
+      switch (response.statusCode) {
+        case 200:
+          List<List<dynamic>> csv = const CsvToListConverter().convert(response.body, eol: "\n")..removeAt(0);
+          List<Cutoffs> history = [];
+          for (List<dynamic> entry in csv){
+            Map<String, double> tr = {};
+            Map<String, double> glicko = {};
+            Map<String, double> gxe = {};
+            for(int i = 0; i < ranks.length; i++){
+              tr[ranks[ranks.length - 1 - i]] = entry[1 + i*3];
+              glicko[ranks[ranks.length - 1 - i]] = entry[2 + i*3];
+              gxe[ranks[ranks.length - 1 - i]] = entry[3 + i*3];
+            }
+            history.add(
+              Cutoffs(
+                DateTime.fromMillisecondsSinceEpoch(entry[0]*1000),
+                tr,
+                glicko,
+                gxe
+              )
+            );
+          }
+          return history;
+        case 404:
+          developer.log("fetchCutoffsHistory: Cutoffs are gone", name: "services/tetrio_crud", error: response.statusCode);
+          return [];
+        // if not 200 or 404 - throw a unique for each code exception  
+        case 403:
+          throw P1nkl0bst3rForbidden();
+        case 429:
+          throw P1nkl0bst3rTooManyRequests();
+        case 418:
+          throw TetrioOskwareBridgeProblem();
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+          developer.log("fetchCutoffsHistory: Cutoffs are unavalable (${response.statusCode})", name: "services/tetrio_crud", error: response.statusCode);
+          return [];
+        default:
+          developer.log("fetchCutoffsHistory: Failed to fetch top Cutoffs", name: "services/tetrio_crud", error: response.statusCode);
+          throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
+      }
+    } on http.ClientException catch (e, s) { // If local http client fails
+      developer.log("$e, $s");
+      throw http.ClientException(e.message, e.uri); // just assuming, that our end user don't have acess to the internet
+    }
+  }
+
   Future<TetrioPlayerFromLeaderboard> fetchTopOneFromTheLeaderboard() async {
     TetrioPlayerFromLeaderboard? cached = _cache.get("topone", TetrioPlayerFromLeaderboard);
     if (cached != null) return cached;
 
     Uri url;
     if (kIsWeb) {
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLTopOne"});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "TLTopOne"});
     } else {
       url = Uri.https('ch.tetr.io', 'api/users/by/league', {"after": "25000:0:0", "limit": "1"});
     }
@@ -577,10 +673,11 @@ class TetrioService extends DB {
 
   /// Retrieves Tetra League history from p1nkl0bst3r api for a player with given [id]. Returns a list of states
   /// (state = instance of [TetrioPlayer] at some point of time). Can throw an exception if fails to retrieve data.
-  Future<List<TetraLeague>> fetchAndsaveTLHistory(String id) async { 
+  Future<List<TetraLeague>> fetchAndsaveTLHistory(String id, int season) async { 
+    // TODO: find le way to get season 2 history
     Uri url;
     if (kIsWeb) {
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLHistory", "user": id});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "TLHistory", "user": id});
     } else {
       url = Uri.https('api.p1nkl0bst3r.xyz', 'tlhist/$id');
     }
@@ -652,7 +749,7 @@ class TetrioService extends DB {
   Future<TetraLeagueAlphaStream> fetchAndSaveOldTLmatches(String userID) async {
     Uri url;
     if (kIsWeb) {
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLMatches", "user": userID});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "TLMatches", "user": userID});
     } else {
       url = Uri.https('api.p1nkl0bst3r.xyz', 'tlmatches/$userID', {"before": "0", "count": "9000"});
     }
@@ -694,7 +791,7 @@ class TetrioService extends DB {
     TetrioPlayersLeaderboard? cached = _cache.get("league", TetrioPlayersLeaderboard);
     if (cached != null) return cached;
 
-    Uri url = Uri.https('ts.dan63.by', 'beanserver_blaster/leaderboard.json');
+    Uri url = Uri.https(webVersionDomain, 'beanserver_blaster/leaderboard.json');
 
     try{
       final response = await client.get(url);
@@ -728,34 +825,121 @@ class TetrioService extends DB {
     }
   }
 
-  // Stream<TetrioPlayersLeaderboard> fetchFullLeaderboard() async* {
-  //   late double after;
-  //   int lbLength = 100;
-  //   TetrioPlayersLeaderboard leaderboard = await fetchTLLeaderboard();
-  //   after = leaderboard.leaderboard.last.tr;
-  //   while (lbLength == 100){
-  //     TetrioPlayersLeaderboard pseudoLb = await fetchTLLeaderboard(after: after);
-  //     leaderboard.addPlayers(pseudoLb.leaderboard);
-  //     lbLength = pseudoLb.leaderboard.length;
-  //     after = pseudoLb.leaderboard.last.tr;
-  //     yield leaderboard;
-  //   }
-  // }
-
-  // i want to know progress, so i trying to figure out this thing:
-  // Stream<TetrioPlayersLeaderboard> fetchTLLeaderboardAsStream() async {
-  //   TetrioPlayersLeaderboard? cached = _cache.get("league", TetrioPlayersLeaderboard);
-  //   if (cached != null) return cached;
+  Future<List<TetrioPlayerFromLeaderboard>> fetchTetrioLeaderboard({String? prisecter, String? lb, String? country}) async {
+    // TetrioPlayersLeaderboard? cached = _cache.get("league", TetrioPlayersLeaderboard);
+    // if (cached != null) return cached;
      
-  //   Uri url;
-  //   if (kIsWeb) {
-  //     url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "TLLeaderboard"});
-  //   } else {
-  //     url = Uri.https('ch.tetr.io', 'api/users/lists/league/all');
-  //   }
+    Uri url;
+    if (kIsWeb) {
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {
+        "endpoint": "leaderboard",
+        "lb": lb??"league",
+        if (prisecter != null) "after": prisecter,
+        if (country != null) "country": country
+        });
+    } else {
+      url = Uri.https('ch.tetr.io', 'api/users/by/${lb??"league"}', {
+        "limit": "100",
+        if (prisecter != null) "after": prisecter,
+        if (country != null) "country": country
+      });
+    }
+    try{
+      final response = await client.get(url);
 
-  //   Stream<TetrioPlayersLeaderboard> stream = http.StreamedRequest("GET", url);
-  // }
+      switch (response.statusCode) {
+        case 200:
+          _lbPositions.clear();
+          var rawJson = jsonDecode(response.body);
+          if (rawJson['success']) { // if api confirmed that everything ok
+            List<TetrioPlayerFromLeaderboard> leaderboard = [];
+            for (Map<String, dynamic> entry in rawJson['data']['entries']) {
+              leaderboard.add(TetrioPlayerFromLeaderboard.fromJson(entry, DateTime.fromMillisecondsSinceEpoch(rawJson['cache']['cached_at'])));
+            }
+            developer.log("fetchTLLeaderboard: Leaderboard retrieved and cached", name: "services/tetrio_crud");
+            //_leaderboardsCache[rawJson['cache']['cached_until'].toString()] = leaderboard;
+            //_cache.store(leaderboard, rawJson['cache']['cached_until']);
+            return leaderboard;
+          } else { // idk how to hit that one
+            developer.log("fetchTLLeaderboard: Bruh", name: "services/tetrio_crud", error: rawJson);
+            throw Exception("Failed to get leaderboard (problems on the tetr.io side)"); // will it be on tetr.io side?
+          }
+        case 403:
+          throw TetrioForbidden();
+        case 429:
+          throw TetrioTooManyRequests();
+        case 418:
+          throw TetrioOskwareBridgeProblem();
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+          throw TetrioInternalProblem();
+        default:
+          developer.log("fetchTLLeaderboard: Failed to fetch leaderboard", name: "services/tetrio_crud", error: response.statusCode);
+          throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
+      }
+    } on http.ClientException catch (e, s) {
+      developer.log("$e, $s");
+      throw http.ClientException(e.message, e.uri);
+    }
+  }
+
+  Future<List<RecordSingle>> fetchTetrioRecordsLeaderboard({String? prisecter, String? lb, String? country}) async{
+    Uri url;
+    if (kIsWeb) {
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {
+        "endpoint": "RecordsLeaderboard",
+        "lb": lb??"40l",
+        if (prisecter != null) "after": prisecter,
+        if (country != null) "country": country
+      });
+    } else {
+      url = Uri.https('ch.tetr.io', 'api/records/${lb??"40l"}_${country != null ? "country_${country}":"global"}', {
+        "limit": "100",
+        if (prisecter != null) "after": prisecter
+      });
+    }
+    try{
+      final response = await client.get(url);
+
+      switch (response.statusCode) {
+        case 200:
+          _lbPositions.clear();
+          var rawJson = jsonDecode(response.body);
+          if (rawJson['success']) { // if api confirmed that everything ok
+            List<RecordSingle> leaderboard = [];
+            for (Map<String, dynamic> entry in rawJson['data']['entries']) {
+              leaderboard.add(RecordSingle.fromJson(entry, -1, -1));
+            }
+            developer.log("fetchTetrioRecordsLeaderboard: Leaderboard retrieved and cached", name: "services/tetrio_crud");
+            //_leaderboardsCache[rawJson['cache']['cached_until'].toString()] = leaderboard;
+            //_cache.store(leaderboard, rawJson['cache']['cached_until']);
+            return leaderboard;
+          } else { // idk how to hit that one
+            developer.log("fetchTetrioRecordsLeaderboard: Bruh", name: "services/tetrio_crud", error: rawJson);
+            throw Exception("Failed to get leaderboard (problems on the tetr.io side)"); // will it be on tetr.io side?
+          }
+        case 403:
+          throw TetrioForbidden();
+        case 429:
+          throw TetrioTooManyRequests();
+        case 418:
+          throw TetrioOskwareBridgeProblem();
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+          throw TetrioInternalProblem();
+        default:
+          developer.log("fetchTetrioRecordsLeaderboard: Failed to fetch leaderboard", name: "services/tetrio_crud", error: response.statusCode);
+          throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
+      }
+    } on http.ClientException catch (e, s) {
+      developer.log("$e, $s");
+      throw http.ClientException(e.message, e.uri);
+    }
+  }
 
   TetrioPlayersLeaderboard? getCachedLeaderboard(){
     return _cache.get("league", TetrioPlayersLeaderboard);
@@ -768,7 +952,7 @@ class TetrioService extends DB {
     
     Uri url;
     if (kIsWeb) {
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "tetrioNews", "user": userID.toLowerCase().trim(), "limit": "100"});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "tetrioNews", "user": userID.toLowerCase().trim(), "limit": "100"});
     } else {
       url = Uri.https('ch.tetr.io', 'api/news/user_${userID.toLowerCase().trim()}', {"limit": "100"});
     }
@@ -810,15 +994,22 @@ class TetrioService extends DB {
 
   /// Retrieves avaliable Tetra League matches from Tetra Channel api. Returns stream object (fake stream).
   /// Throws an exception if fails to retrieve.
-  Future<TetraLeagueBetaStream> fetchTLStream(String userID) async {
-    TetraLeagueBetaStream? cached = _cache.get(userID, TetraLeagueBetaStream);
-    if (cached != null) return cached;
+  Future<TetraLeagueBetaStream> fetchTLStream(String userID, {String? prisecter}) async {
+    // TetraLeagueBetaStream? cached = _cache.get(userID, TetraLeagueBetaStream);
+    // if (cached != null) return cached;
     
     Uri url;
     if (kIsWeb) {
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "tetrioUserTL", "user": userID.toLowerCase().trim()});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {
+        "endpoint": "tetrioUserTL",
+        "user": userID.toLowerCase().trim(),
+        if (prisecter != null) "after": prisecter
+      });
     } else {
-      url = Uri.https('ch.tetr.io', 'api/users/${userID.toLowerCase().trim()}/records/league/recent');
+      url = Uri.https('ch.tetr.io', 'api/users/${userID.toLowerCase().trim()}/records/league/recent', {
+        "limit": "100",
+        if (prisecter != null) "after": prisecter
+      });
     }
     try {
       final response = await client.get(url);
@@ -946,7 +1137,7 @@ class TetrioService extends DB {
     
     Uri url;
     if (kIsWeb) {
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "tetrioUserRecords", "user": userID.toLowerCase().trim()});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "tetrioUserRecords", "user": userID.toLowerCase().trim()});
     } else {
       url = Uri.https('ch.tetr.io', 'api/users/${userID.toLowerCase().trim()}/records');
     }
@@ -999,7 +1190,7 @@ class TetrioService extends DB {
 
     Uri url;
     if (kIsWeb) {
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "Summaries", "id": id});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "Summaries", "id": id});
     } else {
       url = Uri.https('ch.tetr.io', 'api/users/$id/summaries');
     }
@@ -1137,9 +1328,9 @@ class TetrioService extends DB {
       // trying to find player with given discord id
       Uri dUrl;
       if (kIsWeb) {
-        dUrl = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "tetrioUserByDiscordID", "user": user.toLowerCase().trim()});
+        dUrl = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "tetrioUserByDiscordID", "user": user.toLowerCase().trim()});
       } else {
-        dUrl = Uri.https('ch.tetr.io', 'api/users/search/${user.toLowerCase().trim()}');
+        dUrl = Uri.https('ch.tetr.io', 'api/users/search/discord:${user.toLowerCase().trim()}');
       }
       try{
         final response = await client.get(dUrl);
@@ -1182,7 +1373,7 @@ class TetrioService extends DB {
     // finally going to obtain
     Uri url;
     if (kIsWeb) {
-      url = Uri.https('ts.dan63.by', 'oskware_bridge.php', {"endpoint": "tetrioUser", "user": user.toLowerCase().trim()});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "tetrioUser", "user": user.toLowerCase().trim()});
     } else {
       url = Uri.https('ch.tetr.io', 'api/users/${user.toLowerCase().trim()}');
     }
@@ -1191,7 +1382,7 @@ class TetrioService extends DB {
 
       switch (response.statusCode) {
         case 200:
-          var json = jsonDecode(response.body);
+          var json = jsonDecode(utf8.decode(response.bodyBytes));
           if (json['success']) {
             // parse and count stats
             TetrioPlayer player = TetrioPlayer.fromJson(json['data'], DateTime.fromMillisecondsSinceEpoch(json['cache']['cached_at'], isUtc: true), json['data']['_id'], json['data']['username'], DateTime.fromMillisecondsSinceEpoch(json['cache']['cached_until'], isUtc: true));

@@ -1,0 +1,36 @@
+name: Feature request
+description: Tell me what you want to see in this app by filling this form.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: If your request does exist or it's similar to existing one, it's better to support existing one issue!
+  - type: textarea
+    id: problem
+    attributes:
+      label: Is it related to a problem?
+      description: Is your feature solves some problem?
+      placeholder: I don't like how i can't see or do this or that
+  - type: textarea
+    id: feature
+    attributes:
+      label: Elaborate about your feature
+      description: Describe in details what you want to see
+      placeholder: A thing, that allows us to see or do that! It's small and fluffy (what?)
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: What makes you think that is a good idea, or maybe, where did you saw that feature 
+      placeholder: MinoMuncher can do this and that and I think in could be a good addition to Tetra Stats
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: My repo have [Code of Conduct](https://example.com), which means that you should behave well. 
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true

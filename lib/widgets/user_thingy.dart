@@ -1,428 +1,419 @@
+import 'dart:io';
+import 'dart:math';
+import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:syncfusion_flutter_gauges/gauges.dart';
-import 'package:tetra_stats/data_objects/tetrio.dart';
-import 'package:tetra_stats/gen/strings.g.dart';
-import 'package:tetra_stats/main.dart' show teto;
-import 'package:tetra_stats/views/compare_view.dart';
 import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_gauges/gauges.dart';
+import 'package:tetra_stats/data_objects/tetrio_constants.dart';
+import 'package:tetra_stats/data_objects/tetrio_player.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:tetra_stats/main.dart';
+import 'package:tetra_stats/utils/copy_to_clipboard.dart';
+import 'package:tetra_stats/utils/numers_formats.dart';
+import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
-import 'dart:developer' as developer;
-import 'package:tetra_stats/widgets/stat_sell_num.dart';
+import 'package:tetra_stats/views/compare_view_tiles.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
+import 'package:transparent_image/transparent_image.dart';
 
-const Map<int, double> xpTableScuffed = { // level: xp required
-  05000:    67009018.4885772,
-  10000:   763653437.386,
-  15000:  2337651144.54149,
-  20000:  4572735210.50902,
-  25000:  7376166347.04745,
-  30000: 10693620096.2168,
-  40000: 18728882739.482,
-  50000: 28468683855.2853
-};
+Future<ui.Image> osksFuture = loadImage(Uri.https("tetr.io", "/user-content/banners/5e32fc85ab319c2ab1beb07c.jpg", {"rv": "1628366386763"}));
 
-Future<void> copyToClipboard(String text) async {
-  await Clipboard.setData(ClipboardData(text: text));
+Future<ui.Image> loadImage(Uri url) async {
+  final response = await teto.client.get(url);
+  return await decodeImageFromList(response.bodyBytes);
 }
 
-class UserThingy extends StatelessWidget {
+ Widget createCustomImage(ui.Image image) {
+   return SizedBox(
+     width: image.width.toDouble(),
+     height: image.height.toDouble()/64,
+     child: CustomPaint(
+      size: Size(128.0, 128.0),
+      painter: ImagePainter(image),
+     ),
+   );
+ }
+
+ class ImagePainter extends CustomPainter {
+   ImagePainter(ui.Image this.image);
+   final ui.Image image;
+
+   @override
+   void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.red
+      ..strokeWidth = 5
+      ..style = PaintingStyle.stroke;
+
+    canvas.translate(-240, 0);
+    canvas.scale(0.5);
+    canvas.drawImage(image, Offset.zero, paint);
+   }
+
+   @override
+   bool shouldRepaint(ImagePainter oldDelegate) =>
+       image != oldDelegate.image;
+ }
+
+class UserThingy extends StatefulWidget {
   final TetrioPlayer player;
   final bool showStateTimestamp;
+  final bool initIsTracking;
   final Function setState;
   
-  const UserThingy({super.key, required this.player, required this.showStateTimestamp, required this.setState});
+  const UserThingy({super.key, required this.player, required this.initIsTracking, required this.showStateTimestamp, required this.setState});
+
+  @override
+  State<UserThingy> createState() => _UserThingyState();
+}
+
+class _UserThingyState extends State<UserThingy> with SingleTickerProviderStateMixin {
+  late AnimationController _addToTrackAnimController;
+  late Animation _addToTrackAnim;
+
+  @override
+  void initState(){
+    _addToTrackAnimController = AnimationController(
+      value: widget.initIsTracking ? 1.0 : 0.0,
+      duration: Durations.extralong4,
+      vsync: this,
+    );
+    _addToTrackAnim = new Tween(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(new CurvedAnimation(
+      parent: _addToTrackAnimController,
+      curve: Cubic(.15,-0.40,.86,-0.39),
+      reverseCurve: Cubic(0,.99,.99,1.01)
+    ));
+    
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _addToTrackAnimController.dispose();
+    super.dispose();
+  }
+
+  Color roleColor(String role){
+    switch (role){
+      case "sysop":
+        return const Color.fromARGB(255, 23, 165, 133);
+      case "admin":
+        return const Color.fromARGB(255, 255, 78, 138);
+      case "mod":
+        return const Color.fromARGB(255, 204, 128, 242);
+      case "halfmod":
+        return const Color.fromARGB(255, 95, 118, 254);
+      case "bot":
+        return const Color.fromARGB(255, 60, 93, 55);
+      case "banned":
+        return const Color.fromARGB(255, 248, 28, 28);
+      default:
+        return Colors.white10;
+    }
+  }
+
+  String fontStyle(int length){
+    if (length < 10) return "Eurostile Round Extended";
+    else if (length < 13) return "Eurostile Round";
+    else return "Eurostile Round Condensed";
+  }
 
   @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);
     return LayoutBuilder(builder: (context, constraints) {
-      bool bigScreen = constraints.maxWidth > 768;
-      double bannerHeight = bigScreen ? 240 : 120;
       double pfpHeight = 128;
       int xpTableID = 0;
 
-      while (player.xp > xpTableScuffed.values.toList()[xpTableID]) {
+      while (widget.player.xp > xpTableScuffed.values.toList()[xpTableID]) {
         xpTableID++;
       }
 
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Stack(
-            alignment: Alignment.topCenter,
-            children: [
-              if (player.bannerRevision != null)
-                Image.network(kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioBanner&user=${player.userId}&rv=${player.bannerRevision}" : "https://tetr.io/user-content/banners/${player.userId}.jpg?rv=${player.bannerRevision}",
-                  fit: BoxFit.cover,
-                  height: bannerHeight,
-                  errorBuilder: (context, error, stackTrace) {
-                    developer.log("Error with building banner image", name: "main_view", error: error, stackTrace: stackTrace);
-                      return Container();
+      return Card(
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4.0),
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 960),
+                height: widget.player.bannerRevision != null ? 218.0 : 138.0,
+                child: Stack(
+                children: [
+                  // Very weird solution to draw only the first frame of the gif
+                  if (widget.player.userId == "5e32fc85ab319c2ab1beb07c") FutureBuilder<ui.Image>(
+                    future: osksFuture,
+                    builder: (context, snapshot) {
+                      switch (snapshot.connectionState){
+                        case ConnectionState.none:
+                        case ConnectionState.waiting:
+                        case ConnectionState.active:
+                          return SizedBox(width: 960);
+                        case ConnectionState.done:
+                          return createCustomImage(snapshot.data!);
+                      }
                     },
+                  ) // If not osk, using a normal widget like a normal human being
+                  else if (widget.player.bannerRevision != null) FadeInImage.memoryNetwork(
+                    image: kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioBanner&user=${widget.player.userId}&rv=${widget.player.bannerRevision}" : "https://tetr.io/user-content/banners/${widget.player.userId}.jpg?rv=${widget.player.bannerRevision}",
+                    placeholder: kTransparentImage,
+                    fit: BoxFit.cover,
+                    height: 120,
+                    fadeInCurve: Easing.standard, fadeInDuration: Durations.long4,
+                    imageErrorBuilder: (context, object, trace){
+                      return SizedBox(width: 960);
+                    } 
                   ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(8, player.bannerRevision != null ? bannerHeight / 1.4 : 0, 8, bigScreen ? 16 : 0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
+                  Positioned(
+                    top: widget.player.bannerRevision != null ? 90.0 : 10.0,
+                    left: 16.0,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(1000),
+                      child: widget.player.role == "banned"
+                        ? Image.asset("res/avatars/tetrio_banned.png", fit: BoxFit.fitHeight, height: pfpHeight,)
+                        : widget.player.avatarRevision != null
+                          ? FadeInImage.memoryNetwork(image: kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioProfilePicture&user=${widget.player.userId}&rv=${widget.player.avatarRevision}" : "https://tetr.io/user-content/avatars/${widget.player.userId}.jpg?rv=${widget.player.avatarRevision}",
+                            fit: BoxFit.fitHeight, height: 128, placeholder: kTransparentImage, fadeInCurve: Easing.emphasizedDecelerate, fadeInDuration: Durations.long4)
+                          : Image.asset("res/avatars/tetrio_anon.png", fit: BoxFit.fitHeight, height: pfpHeight),
+                    )
+                  ),
+                  Positioned(
+                    top: widget.player.bannerRevision != null ? 120.0 : 40.0,
+                    left: 160.0,
+                    child: Tooltip(
+                      message: "${widget.player.userId}\n(${t.copyUserID})",
+                      child: RichText(text: TextSpan(text: widget.player.username, style: TextStyle(
+                          fontFamily: fontStyle(widget.player.username.length),
+                          fontSize: 28,
+                          color: Colors.white
+                        ),
+                        recognizer: TapGestureRecognizer()..onTap = (){
+                            copyToClipboard(widget.player.userId);
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.copiedToClipboard)));
+                          }
+                        )
+                      ) 
+                    ),
+                  ),
+                  Positioned(
+                    top: (kIsWeb || !Platform.isAndroid) ? widget.player.bannerRevision != null ? 160.0 : 80.0 : widget.player.bannerRevision != null ? 152.0 : 72.0,
+                    left: 160.0,
+                    child: Row(
                       children: [
-                        Wrap(
-                          direction: bigScreen ? Axis.horizontal : Axis.vertical,
-                          alignment: WrapAlignment.spaceBetween,
-                          spacing: bigScreen ? 25 : 0,
-                          //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          clipBehavior: Clip.hardEdge,
-                          children: [
-                            Wrap(
-                              direction: bigScreen ? Axis.horizontal : Axis.vertical,
-                              alignment: WrapAlignment.start,
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              spacing: bigScreen ? 20 : 0,
-                              clipBehavior: Clip.hardEdge,
-                              children: [
-                                Stack(
-                                  alignment: Alignment.topCenter,
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(1000),
-                                      child: player.role == "banned"
-                                        ? Image.asset("res/avatars/tetrio_banned.png", fit: BoxFit.fitHeight, height: pfpHeight,)
-                                        : player.avatarRevision != null
-                                          ? Image.network(kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioProfilePicture&user=${player.userId}&rv=${player.avatarRevision}" : "https://tetr.io/user-content/avatars/${player.userId}.jpg?rv=${player.avatarRevision}",
-                                              // TODO: osk banner can cause memory leak
-                                              fit: BoxFit.fitHeight, height: 128, errorBuilder: (context, error, stackTrace) {
-                                                developer.log("Error with building profile picture", name: "main_view", error: error, stackTrace: stackTrace);
-                                                  return Image.asset("res/avatars/tetrio_anon.png", fit: BoxFit.fitHeight, height: pfpHeight);
-                                                })
-                                          : Image.asset("res/avatars/tetrio_anon.png", fit: BoxFit.fitHeight, height: pfpHeight),
-                                      ),
-                                    if (player.verified)
-                                      Padding(
-                                        padding: EdgeInsets.fromLTRB(pfpHeight - 22, pfpHeight - 32, 0, 0),
-                                        child: const Icon(Icons.verified),
-                                      )
-                                  ],
-                                ),
-                                Column(
-                                children: [
-                                  Text(player.username,
-                                  style: TextStyle(
-                                    fontFamily: "Eurostile Round Extended",
-                                    fontSize: bigScreen ? 42 : 28,
-                                    shadows: textShadow,
-                                    )),
-                                  TextButton(
-                                    child: Text(player.userId, style: const TextStyle(fontFamily: "Eurostile Round Condensed", fontSize: 14)),
-                                    onPressed: () {
-                                      copyToClipboard(player.userId);
-                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.copiedToClipboard)));
-                                    }),
-                                ],
-                                ),   
-                              ],
-                            ),
-                            showStateTimestamp
-                            ? Text(t.fetchDate(date: timestamp(player.state)))
-                            : Wrap(direction: Axis.horizontal, alignment: WrapAlignment.center, spacing: 25, crossAxisAlignment: WrapCrossAlignment.start, children: [
-                                FutureBuilder(
-                                    future: teto.isPlayerTracking(player.userId),
-                                    builder: (context, snapshot) {
-                                      switch (snapshot.connectionState) {
-                                        case ConnectionState.none:
-                                        case ConnectionState.waiting:
-                                        case ConnectionState.active:
-                                        case ConnectionState.done:
-                                          if (snapshot.data != null && snapshot.data!) {
-                                            return Column(
-                                              children: [
-                                                IconButton(
-                                                  icon: const Icon(
-                                                    Icons.person_remove,
-                                                    shadows: <Shadow>[
-                                                      Shadow(
-                                                        offset: Offset(0.0, 0.0),
-                                                        blurRadius: 3.0,
-                                                        color: Colors.black,
-                                                      ),
-                                                      Shadow(
-                                                        offset: Offset(0.0, 0.0),
-                                                        blurRadius: 8.0,
-                                                        color: Colors.black,
-                                                      ),
-                                                    ],),
-                                                  onPressed: () {
-                                                    teto.deletePlayerToTrack(player.userId).then((value) => setState());
-                                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.stoppedBeingTracked)));
-                                                  },
-                                                ),
-                                                Text(t.stopTracking, textAlign: TextAlign.center)
-                                              ],
-                                            );
-                                          } else {
-                                            return Column(
-                                              children: [
-                                                IconButton(
-                                                  icon: const Icon(
-                                                    Icons.person_add,
-                                                    shadows: <Shadow>[
-                                                      Shadow(
-                                                        offset: Offset(0.0, 0.0),
-                                                        blurRadius: 3.0,
-                                                        color: Colors.black,
-                                                      ),
-                                                      Shadow(
-                                                        offset: Offset(0.0, 0.0),
-                                                        blurRadius: 8.0,
-                                                        color: Colors.black,
-                                                      ),
-                                                    ],),
-                                                  onPressed: () {
-                                                    teto.addPlayerToTrack(player).then((value) => setState());
-                                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.becameTracked)));
-                                                  },
-                                                ),
-                                                Text(t.track, textAlign: TextAlign.center)
-                                              ],
-                                            );
-                                          }
-                                      }
-                                    }),
-                                Column(
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.balance,
-                                        shadows: <Shadow>[
-                                          Shadow(
-                                            offset: Offset(0.0, 0.0),
-                                            blurRadius: 3.0,
-                                            color: Colors.black,
-                                          ),
-                                          Shadow(
-                                            offset: Offset(0.0, 0.0),
-                                            blurRadius: 8.0,
-                                            color: Colors.black,
-                                          ),
-                                        ],),
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => CompareView(greenSide: [player, null, null], redSide: const [null, null, null], greenMode: Mode.player, redMode: Mode.player),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                    Text(t.compare, textAlign: TextAlign.center)
-                                  ],
-                                )
-                              ])
-                          ]),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 4.0),
+                          child: Tooltip(
+                            message: t.playerRole[widget.player.role]??"Unknown role ${widget.player.role}",
+                            child: Chip(label: Text(widget.player.role.toUpperCase(), style: const TextStyle(shadows: textShadow),), padding: const EdgeInsets.all(0.0), color: WidgetStatePropertyAll(roleColor(widget.player.role)))
+                          ),
+                        ),
+                        RichText(
+                          text: TextSpan(
+                            style: const TextStyle(fontFamily: "Eurostile Round", color: Colors.white),
+                            children:
+                            [
+                            if (widget.player.friendCount > 0) WidgetSpan(child: Tooltip(message: t.stats.followers, child: Icon(Icons.person)), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic),
+                            if (widget.player.friendCount > 0) TextSpan(text: "${intf.format(widget.player.friendCount)} "),
+                            if (widget.player.supporterTier > 0) WidgetSpan(child: Tooltip(message: t.supporter(tier: widget.player.supporterTier), child: Icon(widget.player.supporterTier > 1 ? Icons.star : Icons.star_border, color: widget.player.supporterTier > 1 ? Colors.yellowAccent : Colors.white)), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic),
+                            if (widget.player.supporterTier > 0) TextSpan(text: widget.player.supporterTier.toString(), style: TextStyle(color: widget.player.supporterTier > 1 ? Colors.yellowAccent : Colors.white)),
+                            ] 
+                          ) 
+                        )
                       ],
                     ),
-                  ],
-                ),
-              ), 
-            ],
-          ),
-          if (!["banned", "p1nkl0bst3r"].contains(player.role))
-            Wrap(
-              // mainAxisSize: MainAxisSize.min,
-              direction: Axis.horizontal,
-              alignment: WrapAlignment.center,
-              spacing: 25,
-              crossAxisAlignment: WrapCrossAlignment.start,
-              clipBehavior: Clip.hardEdge, // hard WHAT???
-              children: [
-                if (!player.level.isNegative && !player.level.isNaN) StatCellNum(
-                  playerStat: player.level,
-                  playerStatLabel: t.statCellNum.xpLevel,
-                  isScreenBig: bigScreen,
-                  alertWidgets: [
-                    Text(
-                      "${NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2).format(player.xp)} XP",
-                      style: const TextStyle(fontFamily: "Eurostile Round", fontWeight: FontWeight.bold)
-                      ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
-                      child: SfLinearGauge(
-                        minimum: 0,
-                        maximum: 1,
-                        interval: 1, 
-                        ranges: [
-                          LinearGaugeRange(startValue: 0, endValue: player.level - player.level.floor(), color: Colors.cyanAccent),
-                          LinearGaugeRange(startValue: 0, endValue: (player.xp / xpTableScuffed.values.toList()[xpTableID]), color: Colors.redAccent, position: LinearElementPosition.cross)
-                          ],
-                        // markerPointers: [LinearShapePointer(value: player.level - player.level.floor(), position: LinearElementPosition.inside, shapeType: LinearShapePointerType.triangle, color: Colors.white, height: 20)],
-                        showTicks: true,
-                        showLabels: false
-                        ),
-                    ),
-                    Text("${t.statCellNum.xpProgress}: ${((player.level - player.level.floor()) * 100).toStringAsFixed(2)} %"),
-                    Text("${t.statCellNum.xpFrom0ToLevel(n: xpTableScuffed.keys.toList()[xpTableID])}: ${((player.xp / xpTableScuffed.values.toList()[xpTableID]) * 100).toStringAsFixed(2)} % (${NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 0).format(xpTableScuffed.values.toList()[xpTableID] - player.xp)} ${t.statCellNum.xpLeft})")],
-                  okText: t.popupActions.ok,
-                  higherIsBetter: true,
-                ),
-                if (player.gameTime >= Duration.zero)
-                  StatCellNum(
-                    playerStat: player.gameTime.inHours,
-                    playerStatLabel: t.statCellNum.hoursPlayed,
-                    isScreenBig: bigScreen,
-                    alertTitle: t.exactGametime,
-                    alertWidgets: [Text(player.gameTime.toString(), style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 24),)],
-                    higherIsBetter: true,),
-                if (player.gamesPlayed >= 0) 
-                  StatCellNum(
-                    playerStat: player.gamesPlayed,
-                    isScreenBig: bigScreen,
-                    playerStatLabel: t.statCellNum.onlineGames,
-                    higherIsBetter: true,),
-                if (player.gamesWon >= 0) 
-                  StatCellNum(
-                    playerStat: player.gamesWon,
-                    isScreenBig: bigScreen,
-                    playerStatLabel: t.statCellNum.gamesWon,
-                    higherIsBetter: true,),
-                if (player.friendCount > 0) 
-                  StatCellNum(
-                    playerStat: player.friendCount,
-                    isScreenBig: bigScreen,
-                    playerStatLabel: t.statCellNum.friends,
-                    higherIsBetter: true,),
-                ],
-              ),
-            if (player.role == "banned") Text(
-                t.bigRedBanned,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: "Eurostile Round Extended",
-                  fontWeight: FontWeight.w900,
-                  color: Colors.red,
-                  fontSize: bigScreen ? 60 : 45,
-                ),
-              ),
-            if (player.role == "p1nkl0bst3r") Text(
-              t.p1nkl0bst3rAlert,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontFamily: "Eurostile Round",
-                fontSize: 16,
-              )
-            ),
-        if (player.badstanding != null && player.badstanding!)
-          Text(
-            t.bigRedBadStanding,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: "Eurostile Round Extended",
-              fontWeight: FontWeight.w900,
-              color: Colors.red,
-              fontSize: bigScreen ? 60 : 45,
-            ),
-          ),
-        if (player.role != "p1nkl0bst3r") Padding(
-          padding: EdgeInsets.only(top: bigScreen ? 8 : 0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: RichText(
-                  textAlign: TextAlign.center,
-                  text: TextSpan(text: "", style: const TextStyle(
-                    fontFamily: "Eurostile Round",
-                    fontSize: 16,
-                    color: Colors.white,
                   ),
-                  children: [
-                    if (player.country != null) TextSpan(text: "${t.countries[player.country]} • "),
-                    TextSpan(text: "${t.playerRole[player.role]}${t.playerRoleAccount}${player.registrationTime == null ? t.wasFromBeginning : '${t.created} ${timestamp(player.registrationTime!)}'}"),
-                    if (player.supporterTier > 0) const TextSpan(text: " • "),
-                    if (player.supporterTier > 0) WidgetSpan(child: Icon(player.supporterTier > 1 ? Icons.star : Icons.star_border, color: player.supporterTier > 1 ? Colors.yellowAccent : Colors.white), alignment: PlaceholderAlignment.middle, baseline: TextBaseline.alphabetic),
-                    if (player.supporterTier > 0) TextSpan(text: player.supporterTier.toString(), style: TextStyle(color: player.supporterTier > 1 ? Colors.yellowAccent : Colors.white))
-                  ]
-                  )
-                ),
-                // Text(
-                //     "${player.country != null ? "${t.countries[player.country]} • " : ""}${t.playerRole[player.role]}${t.playerRoleAccount}${player.registrationTime == null ? t.wasFromBeginning : '${t.created} ${dateFormat.format(player.registrationTime!)}'}${player.botmaster != null ? " ${t.botCreatedBy} ${player.botmaster}" : ""} • ${player.supporterTier == 0 ? t.notSupporter : t.supporter(tier: player.supporterTier)}",
-                //     textAlign: TextAlign.center,
-                //     style: const TextStyle(
-                //       fontFamily: "Eurostile Round",
-                //       fontSize: 16,
-                //     )),
-              )
-            ],
-          ),
-        ),
-          Wrap(
-            direction: Axis.horizontal,
-            alignment: WrapAlignment.center,
-            spacing: 25,
-            crossAxisAlignment: WrapCrossAlignment.start,
-            clipBehavior: Clip.hardEdge,
-            children: [
-              for (var badge in player.badges)
-                IconButton(
-                    onPressed: () => showDialog<void>(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text(
-                                badge.label,
-                                style: const TextStyle(fontFamily: "Eurostile Round Extended"),
-                              ),
-                              content: SingleChildScrollView(
-                                child: ListBody(
-                                  children: [
-                                    Wrap(
-                                      direction: Axis.horizontal,
-                                      alignment: WrapAlignment.center,
-                                      crossAxisAlignment: WrapCrossAlignment.center,
-                                      spacing: 25,
-                                      children: [
-                                        Image.asset("res/tetrio_badges/${badge.badgeId}.png"),
-                                        Text(badge.ts != null
-                                            ? t.obtainDate(date: timestamp(badge.ts!))
-                                            : t.assignedManualy),
-                                      ],
-                                    )
-                                  ],
+                  Positioned(
+                    top: widget.player.bannerRevision != null ? 193.0 : 113.0,
+                    left: 160.0,
+                    child: SizedBox(
+                      width: 270,
+                      child: RichText(
+                        text: TextSpan(
+                          style: const TextStyle(fontFamily: "Eurostile Round", color: Colors.white),
+                          children: [
+                            TextSpan(text: timestamp(widget.player.registrationTime), style: const TextStyle(color: Colors.grey)),
+                            if (widget.player.country != null) TextSpan(text: " • ${t.countries[widget.player.country]}")
+                          ]
+                        )
+                      ),
+                    )
+                  ),
+                  Positioned(
+                    top: widget.player.bannerRevision != null ? 126.0 : 46.0,
+                    right: 16.0,
+                    child: RichText(
+                      textAlign: TextAlign.end,
+                      text: TextSpan(
+                        style: const TextStyle(fontFamily: "Eurostile Round", color: Colors.white),
+                        children: [
+                          TextSpan(text: "Level ${(widget.player.level.isNegative || widget.player.level.isNaN) ? "---" : intf.format(widget.player.level.floor())}", style: TextStyle(decoration: (widget.player.level.isNegative || widget.player.level.isNaN) ? null : TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted, color: (widget.player.level.isNegative || widget.player.level.isNaN) ? Colors.grey : Colors.white), recognizer: (widget.player.level.isNegative || widget.player.level.isNaN) ? null : TapGestureRecognizer()?..onTap = (){
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) => AlertDialog(
+                                title: Text("${t.stats.level.full} ${intf.format(widget.player.level.floor())}", textAlign: TextAlign.center),  
+                                content: SingleChildScrollView(
+                                  child: ListBody(children: [
+                                    Text(
+                                      "${NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 2).format(widget.player.xp)} ${t.stats.xp.short}",
+                                      style: const TextStyle(fontFamily: "Eurostile Round", fontWeight: FontWeight.bold)
+                                      ),
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                                      child: SfLinearGauge(
+                                        minimum: 0,
+                                        maximum: 1,
+                                        interval: 1, 
+                                        ranges: [
+                                          LinearGaugeRange(startValue: 0, endValue: widget.player.level - widget.player.level.floor(), color: Colors.cyanAccent),
+                                          LinearGaugeRange(startValue: 0, endValue: (widget.player.xp / xpTableScuffed.values.toList()[xpTableID]), color: Colors.redAccent, position: LinearElementPosition.cross)
+                                          ],
+                                        showTicks: true,
+                                        showLabels: false
+                                        ),
+                                    ),
+                                    Text(t.xp.progressToNextLevel(percentage: percentage.format((widget.player.level - widget.player.level.floor())))),
+                                    Text(t.xp.progressTowardsGoal(goal: xpTableScuffed.keys.toList()[xpTableID], percentage: percentage.format(widget.player.xp / xpTableScuffed.values.toList()[xpTableID]), left: NumberFormat.decimalPatternDigits(locale: LocaleSettings.currentLocale.languageCode, decimalDigits: 0).format(xpTableScuffed.values.toList()[xpTableID] - widget.player.xp)))
+                                    ]
+                                    ),
                                 ),
-                              ),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: Text(t.popupActions.ok),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: Text(t.actions.ok),
+                                    onPressed: () {Navigator.of(context).pop();}
+                                  )  
+                                ]
+                              )
                             );
-                          },
-                        ),
-                    tooltip: badge.label,
-                    icon: Image.asset(
-                      "res/tetrio_badges/${badge.badgeId}.png",
-                      height: 32,
-                      width: 32,
-                      errorBuilder: (context, error, stackTrace) {
-                        developer.log("Error with building $badge", name: "main_view", error: error, stackTrace: stackTrace);
-                        return Image.network(
-                          kIsWeb ? "https://ts.dan63.by/oskware_bridge.php?endpoint=TetrioBadge&badge=${badge.badgeId}" : "https://tetr.io/res/badges/${badge.badgeId}.png",
-                          height: 32,
-                          width: 32,
-                          errorBuilder:(context, error, stackTrace) {
-                            return Image.asset("res/icons/kagari.png", height: 32, width: 32);
-                          }
-                        ); 
+                          }),
+                          const TextSpan(text:"\n"),
+                          TextSpan(text: widget.player.gameTime.isNegative ? "-h --m" : playtime(widget.player.gameTime), style: TextStyle(color: widget.player.gameTime.isNegative ? Colors.grey : Colors.white, decoration: widget.player.gameTime.isNegative ? null : TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted), recognizer: !widget.player.gameTime.isNegative ? (TapGestureRecognizer()..onTap = (){
+                            Duration accountAge = DateTime.timestamp().difference(widget.player.registrationTime);
+                            Duration avgGametimeADay = Duration(microseconds: (widget.player.gameTime.inMicroseconds / accountAge.inDays).floor());
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) => AlertDialog(
+                                title: Text(t.gametime.title, textAlign: TextAlign.center),  
+                                content: SingleChildScrollView(
+                                  child: Column(
+                                    children: [
+                                    RichText(text: TextSpan(
+                                      style: TextStyle(fontFamily: "Eurostile Round", color: Colors.white, fontSize: 28),
+                                      children: [
+                                        TextSpan(text: "${intf.format(widget.player.gameTime.inHours)}"),
+                                        TextSpan(text: ":${nonsecs.format(widget.player.gameTime.inMinutes%60)}:${nonsecs.format(widget.player.gameTime.inSeconds%60)}"),
+                                        TextSpan(text: ".${nonsecs3.format(widget.player.gameTime.inMicroseconds%1000000)}", style: TextStyle(fontSize: 14))
+                                      ]
+                                    )),
+                                    Text(t.gametime.gametimeAday(gametime: playtime(avgGametimeADay))),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Text(
+                                        textAlign: TextAlign.center,
+                                        t.gametime.breakdown(
+                                          years: f4.format(widget.player.gameTime.inSeconds/31536000),
+                                          months: f4.format(widget.player.gameTime.inSeconds/2628000),
+                                          days: f4.format(widget.player.gameTime.inSeconds/86400),
+                                          minutes: f2.format(widget.player.gameTime.inMilliseconds/60000),
+                                          seconds: intf.format(widget.player.gameTime.inSeconds)
+                                        )
+                                      ),
+                                    )
+                                    ]
+                                    ),
+                                ),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: Text(t.actions.ok),
+                                    onPressed: () {Navigator.of(context).pop();}
+                                  )  
+                                ]
+                              )
+                            );
+                          }) : null),
+                          const TextSpan(text:"\n"),
+                          TextSpan(text: widget.player.gamesWon > -1 ? intf.format(widget.player.gamesWon) : "---", style: TextStyle(color: widget.player.gamesWon > -1 ? Colors.white : Colors.grey)),
+                          TextSpan(text: "/${widget.player.gamesPlayed > -1 ? intf.format(widget.player.gamesPlayed) : "---"}", style: const TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
+                        ]
+                      )
+                    )
+                  )
+                ],
+                ),
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: AnimatedBuilder(
+                    animation: _addToTrackAnim,
+                    builder: (context, child) {
+                      double firstButtonPosition = 0+(_addToTrackAnim.value as double)*25;
+                      double secondButtonPosition = -25+(_addToTrackAnim.value as double)*25;
+                      double firstButtonOpacity = 1-(_addToTrackAnim.value as double)*2;
+                      double secondButtonOpacity = _addToTrackAnim.value*2-1;
+                      return ElevatedButton.icon(
+                      onPressed: (){
+                        _addToTrackAnimController.value == 1 ? teto.deletePlayerToTrack(widget.player.userId) : teto.addPlayerToTrack(widget.player); 
+                        _addToTrackAnim.isCompleted ? _addToTrackAnimController.reverse() : _addToTrackAnimController.forward();
                       },
-                    ))
-            ],
-          ),
-        ],
+                      icon: _addToTrackAnim.value < 0.5 ? Opacity(
+                        opacity: min(1, firstButtonOpacity),
+                        child: Transform.translate(
+                          offset: Offset(0, _addToTrackAnim.status == AnimationStatus.forward ? firstButtonPosition*4 : firstButtonPosition),
+                          child: Transform.rotate(
+                            angle:_addToTrackAnim.status == AnimationStatus.forward ? (_addToTrackAnim.value as double)*2 : 0,
+                            child: const Icon(Icons.person_add),
+                          ),
+                        ),
+                      ) : Container(
+                        transform: Matrix4.translationValues(secondButtonPosition*5, -secondButtonPosition*25, 0),
+                        child: Opacity(
+                          opacity: max(0, min(1, secondButtonOpacity)),
+                          child: Transform.rotate(
+                            angle:_addToTrackAnim.status == AnimationStatus.reverse ? (1-_addToTrackAnim.value as double)*-20 : 0,
+                            child: const Icon(Icons.person_remove)
+                          )
+                        )
+                      ),
+                      label: _addToTrackAnim.value < 0.5 ? Container(
+                        transform: Matrix4.translationValues(0, firstButtonPosition, 0),
+                        child: Opacity(
+                          opacity: max(min(1, firstButtonOpacity), 0),
+                          child: Text(_addToTrackAnimController.isAnimating && _addToTrackAnim.status == AnimationStatus.forward ? t.settingsDestination.done : t.track)
+                        )
+                      ) : Container(
+                        transform: Matrix4.translationValues(0, secondButtonPosition, 0),
+                        child: Opacity(
+                          opacity: max(0, min(1, secondButtonOpacity)),
+                          child: Text(_addToTrackAnimController.isAnimating && _addToTrackAnim.status == AnimationStatus.reverse ? t.settingsDestination.done : t.stopTracking)
+                        )
+                      ),
+                      style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12.0))))));
+                    },
+                  )),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: (){
+                      Navigator.push(context, MaterialPageRoute(
+                        builder: (context) => CompareView(widget.player),
+                      ),
+                      );
+                    },
+                    icon: const Icon(Icons.balance),
+                    label: Text(t.compare),
+                    style: const ButtonStyle(shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomRight: Radius.circular(12.0)))))
+                  )
+                )
+              ],
+            )
+          ],
+        ),
       );
     });
   }

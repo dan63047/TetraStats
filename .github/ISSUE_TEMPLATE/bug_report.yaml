@@ -1,0 +1,63 @@
+name: Bug Report
+description: Tell me what is wrong with app by filling this form.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Please, make sure that your issue haven't been reported before!
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the issue you are experiencing right now
+      placeholder: This thing doesn't work as intended under certain circumstances
+    validations:
+      required: true
+  - type: textarea
+    id: reproducing
+    attributes:
+      label: How did that happened?
+      description: Describe in details what to do to get this issue
+      placeholder: "Steps to reproduce:\n1. Go here\n2. Click this\n3. Do that\netc..."
+    validations:
+      required: true
+  - type: textarea
+    id: expectations
+    attributes:
+      label: What did you expected?
+      description: What should have happened instead?
+      placeholder: There is supposed to be ... instead
+  - type: checkboxes
+    id: platform
+    attributes:
+      label: On which platforms you encountered this issue?
+      description: Tick the ones, where this issue can be reproduced
+      options:
+        - label: Web (ts.dan63.by)
+        - label: Windows
+        - label: Linux
+        - label: Android
+        - label: Web-beta (tsbeta.dan63.by)
+    validations:
+      required: true
+  - type: input
+    id: browsers
+    attributes:
+      label: What version of Tetra Stats did you used?
+      description: You can find that info in Information Center -> About Tetra Stats
+      placeholder: "2.0.0"
+    validations:
+      required: true
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: Have anything more to say about that issue?
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: My repo have [Code of Conduct](https://example.com), which means that you should behave well. 
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true

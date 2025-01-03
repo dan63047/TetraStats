@@ -38,7 +38,7 @@ jobs:
           discussionCategory: autobuilded-releases
           artifacts: "build/windows/x64/runner/Release/TetraStats-${{github.ref_name}}-windows.zip"
           tag: Auto-${{ github.run_number }}
-          body: Builded with GitHub Action workflow
+          body: Build with GitHub Action workflow
           token: ${{ secrets.TOKEN }}
   build-and-release-linux:
     name: Build Linux App
@@ -71,7 +71,7 @@ jobs:
           discussionCategory: autobuilded-releases
           artifacts: "build/linux/x64/release/bundle/TetraStats-${{github.ref_name}}-linux.zip"
           tag: Auto-${{ github.run_number }}
-          body: Builded with GitHub Action workflow
+          body: Build with GitHub Action workflow
           token: ${{ secrets.TOKEN }}
   # build-and-release-android:
   #   name: Build Android App
@@ -96,5 +96,5 @@ jobs:
   #         discussionCategory: autobuilded-releases
   #         artifacts: "build/app/outputs/flutter-apk/*"
   #         tag: Auto-${{ github.run_number }}
-  #         body: Builded with GitHub Action workflow
+  #         body: Build with GitHub Action workflow
   #         token: ${{ secrets.TOKEN }}

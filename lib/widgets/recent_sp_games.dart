@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:tetra_stats/data_objects/tetrio.dart';
+import 'package:tetra_stats/data_objects/record_single.dart';
+import 'package:tetra_stats/data_objects/singleplayer_stream.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
@@ -36,11 +37,11 @@ class RecentSingleplayerGames extends StatelessWidget{
           title: Text(
             switch (record.gamemode){
               "40l" => get40lTime(record.stats.finalTime.inMicroseconds),
-              "blitz" => t.blitzScore(p: NumberFormat.decimalPattern().format(record.stats.score)),
+              "blitz" => t.stats.blitzScore(p: NumberFormat.decimalPattern().format(record.stats.score)),
               "5mblast" => get40lTime(record.stats.finalTime.inMicroseconds),
               String() => "huh",
             },
-          style: const TextStyle(fontSize: 18)),
+          style: Theme.of(context).textTheme.displayLarge),
           subtitle: Text(timestamp(record.timestamp), style: const TextStyle(color: Colors.grey, height: 0.85)),
           trailing: SpTrailingStats(record, record.gamemode)
         )

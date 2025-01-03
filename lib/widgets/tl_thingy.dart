@@ -1,325 +1,137 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:tetra_stats/data_objects/tetrio.dart';
-import 'package:syncfusion_flutter_gauges/gauges.dart';
+import 'package:tetra_stats/data_objects/cutoff_tetrio.dart';
+import 'package:tetra_stats/data_objects/p1nkl0bst3r.dart';
+import 'package:tetra_stats/data_objects/player_leaderboard_position.dart';
+import 'package:tetra_stats/data_objects/tetra_league.dart';
+import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
-import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/utils/colors_functions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
-import 'package:tetra_stats/utils/relative_timestamps.dart';
-import 'package:tetra_stats/widgets/gauget_num.dart';
-import 'package:tetra_stats/widgets/graphs.dart';
-import 'package:tetra_stats/widgets/stat_sell_num.dart';
-import 'package:tetra_stats/widgets/text_timestamp.dart';
+import 'package:tetra_stats/widgets/gauget_thingy.dart';
 import 'package:tetra_stats/widgets/tl_progress_bar.dart';
 import 'package:tetra_stats/widgets/tl_rating_thingy.dart';
 
+class TetraLeagueThingy extends StatelessWidget{
+  final TetraLeague league;
+  final TetraLeague? toCompare;
+  final Cutoffs? cutoffs;
+  final CutoffTetrio? averages;
+  final PlayerLeaderboardPosition? lbPos;
+  final double width;
 
-var intFDiff = NumberFormat("+#,###.000;-#,###.000");
+  const TetraLeagueThingy({super.key, required this.league, this.toCompare, this.cutoffs, this.averages, this.lbPos, this.width = double.infinity});
 
-class TLThingy extends StatefulWidget {
-  final TetraLeague tl;
-  final String userID;
-  final List<TetraLeague> states;
-  final bool showTitle;
-  final bool bot;
-  final bool guest;
-  final double? topTR;
-  final PlayerLeaderboardPosition? lbPositions;
-  final TetraLeague? averages;
-  final double? thatRankCutoff;
-  final double? thatRankCutoffGlicko;
-  final double? thatRankTarget;
-  final double? nextRankCutoff;
-  final double? nextRankCutoffGlicko;
-  final double? nextRankTarget;
-  final DateTime? lastMatchPlayed;
-  const TLThingy({super.key, required this.tl, required this.userID, required this.states, this.showTitle = true, this.bot=false, this.guest=false, this.topTR, this.lbPositions, this.averages, this.nextRankCutoff, this.thatRankCutoff, this.thatRankCutoffGlicko, this.nextRankCutoffGlicko, this.nextRankTarget, this.thatRankTarget, this.lastMatchPlayed});
-
-  @override
-  State<TLThingy> createState() => _TLThingyState();
-}
-
-class _TLThingyState extends State<TLThingy> with TickerProviderStateMixin {
-  late bool oskKagariGimmick;
-  late TetraLeague? oldTl;
-  late TetraLeague currentTl;
-  late RangeValues _currentRangeValues;
-  late List<TetraLeague> sortedStates;
-
-@override
-  void initState() {
-    _currentRangeValues = const RangeValues(0, 1);
-    sortedStates = widget.states.reversed.toList();
-    oldTl = sortedStates.elementAtOrNull(1);
-    currentTl = widget.tl;
-    super.initState();
+  List<TableRow> secondColumn(){
+    return [
+      TableRow(children: [
+        Text(intf.format(league.gamesPlayed), textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18)),
+        Tooltip(
+          message: "${t.stats.gp.full}",
+          child: Text(" ${t.stats.gp.short}", style: TextStyle(fontSize: width > 768.0 ? 21 : 18))
+        ),
+        if (toCompare != null) Text(" (${comparef2.format(league.gamesPlayed-toCompare!.gamesPlayed)})", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: Colors.grey)),
+        if (lbPos != null) Text(lbPos?.gamesPlayed != null ? (lbPos!.gamesPlayed!.position >= 1000 ? " (${t.top} ${f2.format(lbPos!.gamesPlayed!.percentage*100)}%)" : " (№ ${lbPos!.gamesPlayed!.position})") : "(№ ---)", style: TextStyle(color: lbPos?.gamesPlayed != null ? getColorOfRank(lbPos!.gamesPlayed!.position) : null))
+      ]),
+      TableRow(children: [
+        Text(intf.format(league.gamesWon), textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18)),
+        Tooltip(
+          message: "${t.stats.gw.full}",
+          child: Text(" ${t.stats.gw.short}", style: TextStyle(fontSize: width > 768.0 ? 21 : 18))
+        ),
+        if (toCompare != null) Text(" (${comparef2.format(league.gamesWon-toCompare!.gamesWon)})", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: Colors.grey)),
+        if (lbPos != null) Text(lbPos?.gamesWon != null ? (lbPos!.gamesWon!.position >= 1000 ? " (${t.top} ${f2.format(lbPos!.gamesWon!.percentage*100)}%)" : " (№ ${lbPos!.gamesWon!.position})") : "(№ ---)", style: TextStyle(color: lbPos?.gamesWon != null ? getColorOfRank(lbPos!.gamesWon!.position) : null))
+      ]),
+      TableRow(children: [
+        Tooltip(child: Text("${league.gxe.isNegative ? "---" : f3.format(league.gxe)}", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: league.gxe.isNegative ? Colors.grey : Colors.white)), message: "${f2.format(league.s1tr)} S1 TR"),
+        Tooltip(
+          message: "${t.stats.glixare.full}",
+          child: Tooltip(child: Text(" ${t.stats.glixare.short}", style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: league.gxe.isNegative ? Colors.grey : Colors.white)), message: "Glixare")
+        ),
+        if (toCompare != null) Text(" (${comparef.format(league.gxe-toCompare!.gxe)})", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: getDifferenceColor(league.gxe-toCompare!.gxe))),
+        if (lbPos != null) Text(lbPos?.glixare != null ? (lbPos!.glixare!.position >= 1000 ? " (${t.top} ${f2.format(lbPos!.glixare!.percentage*100)}%)" : " (№ ${lbPos!.glixare!.position})") : "(№ ---)", style: TextStyle(color: lbPos?.glixare != null ? getColorOfRank(lbPos!.glixare!.position) : null))
+      ]),
+    ];
   }
-
+  
   @override
-  void dispose() {
-    super.dispose();
-  }
-
-
-  @override
-  Widget build(BuildContext context) { 
-  final t = Translations.of(context);
-  String decimalSeparator = f2.symbols.DECIMAL_SEP;
-  List<String> estTRformated = currentTl.estTr != null ? f2.format(currentTl.estTr!.esttr).split(decimalSeparator) : [];
-  List<String> estTRaccFormated = currentTl.esttracc != null ? intFDiff.format(currentTl.esttracc!).split(".") : [];
-    if (currentTl.gamesPlayed == 0) return Center(child: Text(widget.guest ? t.anonTL : widget.bot ? t.botTL : t.neverPlayedTL, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 28), textAlign: TextAlign.center,));
-    return LayoutBuilder(builder: (context, constraints) {
-    bool bigScreen = constraints.maxWidth >= 768;
-      return ListView.builder(
-        physics: const ClampingScrollPhysics(),
-        itemCount: 1,
-        itemBuilder: (BuildContext context, int index) {
-          return Column(
+  Widget build(BuildContext context) {
+    print(ranks2.indexOf(league.rank != "z" ? league.rank : league.percentileRank)-1);
+    return Card(
+      child: Column(
+        children: [
+          TLRatingThingy(userID: league.id, tlData: league, oldTl: toCompare, showPositions: true),
+          if (league.gamesPlayed > 9) TLProgress(
+            tlData: league,
+            previousRankTRcutoff: cutoffs != null ? cutoffs!.tr[league.rank != "z" ? league.rank : league.percentileRank] : null,
+            nextRankTRcutoff: cutoffs != null ? cutoffs!.tr[ranks2[ranks2.indexOf(league.rank != "z" ? league.rank : league.percentileRank)-1]] : null,
+            previousRankTRcutoffTarget: league.rank != "z" ? rankTargets[league.rank] : null,
+            nextRankTRcutoffTarget: (league.rank != "z" && league.rank != "x+") ? rankTargets[ranks2[ranks2.indexOf(league.rank != "z" ? league.rank : league.percentileRank)-1]] : null,
+            previousGlickoCutoff: cutoffs != null ? cutoffs!.glicko[league.rank != "z" ? league.rank : league.percentileRank] : null,
+            nextRankGlickoCutoff: cutoffs != null ? cutoffs!.glicko[ranks2[ranks2.indexOf(league.rank != "z" ? league.rank : league.percentileRank)-1]] : null,
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              if (widget.showTitle) Text(t.tetraLeague, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-              //if (DateTime.now().isBefore(seasonEnd)) Text(t.seasonEnds(countdown: countdown(seasonLeft)))
-              //else Text(t.seasonEnded),
-              if (oldTl != null) Text(t.comparingWith(newDate: timestamp(currentTl.timestamp), oldDate: timestamp(oldTl!.timestamp)),
-              textAlign: TextAlign.center,),
-              if (oldTl != null) RangeSlider(values: _currentRangeValues, max: widget.states.length.toDouble(),
-              labels: RangeLabels(
-                  _currentRangeValues.start.round().toString(),
-                  _currentRangeValues.end.round().toString(),
-                ),
-                onChanged: (RangeValues values) {
-                  setState(() {
-                    _currentRangeValues = values;
-                    if (values.start.round() == 0){
-                      currentTl = widget.tl;
-                    }else{
-                      currentTl = sortedStates[values.start.round()-1]!;
-                    }
-                    if (values.end.round() == 0){
-                      oldTl = widget.tl;
-                    }else{
-                      oldTl = sortedStates[values.end.round()-1];
-                    }
-                  });
-                },
-              ),
-              TLRatingThingy(userID: widget.userID, tlData: currentTl, oldTl: oldTl, topTR: widget.topTR, lastMatchPlayed: widget.lastMatchPlayed),
-              if (currentTl.gamesPlayed > 9) TLProgress(
-                tlData: currentTl,
-                previousRankTRcutoff: widget.thatRankCutoff,
-                previousGlickoCutoff: widget.thatRankCutoffGlicko,
-                previousRankTRcutoffTarget: widget.thatRankTarget,
-                nextRankTRcutoff: widget.nextRankCutoff,
-                nextRankGlickoCutoff: widget.nextRankCutoffGlicko,
-                nextRankTRcutoffTarget: widget.nextRankTarget,
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(8, 16, 8, 48),
-                child: Wrap(
-                  direction: Axis.horizontal,
-                  alignment: WrapAlignment.center,
-                  spacing: 25,
-                  crossAxisAlignment: WrapCrossAlignment.start,
-                  clipBehavior: Clip.hardEdge,
-                  children: [
-                    if (currentTl.apm != null) StatCellNum(playerStat: currentTl.apm!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.apm, higherIsBetter: true, oldPlayerStat: oldTl?.apm, pos: widget.lbPositions?.apm, averageStat: widget.averages?.apm),
-                    if (currentTl.pps != null) StatCellNum(playerStat: currentTl.pps!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.pps, higherIsBetter: true, oldPlayerStat: oldTl?.pps, pos: widget.lbPositions?.pps, averageStat: widget.averages?.pps, smallDecimal: false),
-                    if (currentTl.vs != null) StatCellNum(playerStat: currentTl.vs!, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.vs, higherIsBetter: true, oldPlayerStat: oldTl?.vs, pos: widget.lbPositions?.vs, averageStat: widget.averages?.vs),
-                    if (currentTl.standingLocal > 0) StatCellNum(playerStat: currentTl.standingLocal, isScreenBig: bigScreen, playerStatLabel: t.statCellNum.lbpc, higherIsBetter: false, oldPlayerStat: oldTl?.standingLocal),
-                    StatCellNum(playerStat: currentTl.gamesPlayed, isScreenBig: bigScreen, playerStatLabel: t.statCellNum.gamesPlayed, higherIsBetter: true, oldPlayerStat: oldTl?.gamesPlayed, pos: widget.lbPositions?.gamesPlayed),
-                    StatCellNum(playerStat: currentTl.gamesWon, isScreenBig: bigScreen, playerStatLabel: t.statCellNum.gamesWonTL, higherIsBetter: true, oldPlayerStat: oldTl?.gamesWon, pos: widget.lbPositions?.gamesWon),
-                    StatCellNum(playerStat: currentTl.winrate * 100, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.winrate, higherIsBetter: true, oldPlayerStat: oldTl != null ? oldTl!.winrate*100 : null, pos: widget.lbPositions?.winrate, averageStat: widget.averages != null ?  widget.averages!.winrate * 100 : null),
-                  ],
-                ),
-              ),
-              if (currentTl.nerdStats != null)
-                Column(
-                  children: [
-                    Text(t.nerdStats, style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28)),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 40, 0, 0),
-                      child: Wrap(
-                        direction: Axis.horizontal,
-                        alignment: WrapAlignment.center,
-                        spacing: 35,
-                        crossAxisAlignment: WrapCrossAlignment.start,
-                        clipBehavior: Clip.hardEdge,
-                        children: [
-                          GaugetNum(playerStat: currentTl.nerdStats!.app, playerStatLabel: t.statCellNum.app, higherIsBetter: true, minimum: 0, maximum: 1, ranges: [
-                            GaugeRange(startValue: 0, endValue: 0.2, color: Colors.red),
-                            GaugeRange(startValue: 0.2, endValue: 0.4, color: Colors.yellow),
-                            GaugeRange(startValue: 0.4, endValue: 0.6, color: Colors.green),
-                            GaugeRange(startValue: 0.6, endValue: 0.8, color: Colors.blue),
-                            GaugeRange(startValue: 0.8, endValue: 1, color: Colors.purple),
-                          ], alertWidgets: [
-                            Text(t.statCellNum.appDescription),
-                            Text("${t.exactValue}: ${currentTl.nerdStats!.app}")
-                          ], oldPlayerStat: oldTl?.nerdStats?.app, pos: widget.lbPositions?.app,
-                          averageStat: widget.averages?.nerdStats?.app),
-                          GaugetNum(playerStat: currentTl.nerdStats!.vsapm, playerStatLabel: "VS / APM", higherIsBetter: true, minimum: 1.8, maximum: 2.4, ranges: [
-                            GaugeRange(startValue: 1.8, endValue: 2.0, color: Colors.green),
-                            GaugeRange(startValue: 2.0, endValue: 2.2, color: Colors.blue),
-                            GaugeRange(startValue: 2.2, endValue: 2.4, color: Colors.purple),
-                          ], alertWidgets: [
-                            Text(t.statCellNum.vsapmDescription),
-                            Text("${t.exactValue}: ${currentTl.nerdStats!.vsapm}")
-                          ], oldPlayerStat: oldTl?.nerdStats?.vsapm, pos: widget.lbPositions?.vsapm,
-                          averageStat: widget.averages?.nerdStats?.vsapm)
-                      ]),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                      child: Wrap(
-                          direction: Axis.horizontal,
-                          alignment: WrapAlignment.center,
-                          spacing: 25,
-                          crossAxisAlignment: WrapCrossAlignment.start,
-                          clipBehavior: Clip.hardEdge,
-                          children: [
-                            StatCellNum(playerStat: currentTl.nerdStats!.dss, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.dss,
-                            pos: widget.lbPositions?.dss,
-                            averageStat: widget.averages?.nerdStats?.dss, smallDecimal: false,
-                            alertWidgets: [Text(t.statCellNum.dssDescription),
-                                Text("${t.formula}: (VS / 100) - (APM / 60)"),
-                                Text("${t.exactValue}: ${currentTl.nerdStats!.dss}"),],
-                                okText: t.popupActions.ok,
-                                higherIsBetter: true,
-                                oldPlayerStat: oldTl?.nerdStats?.dss,),
-                            StatCellNum(playerStat: currentTl.nerdStats!.dsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.dsp,
-                            pos: widget.lbPositions?.dsp,
-                            averageStat: widget.averages?.nerdStats?.dsp, smallDecimal: false, 
-                            alertWidgets: [Text(t.statCellNum.dspDescription),
-                                Text("${t.formula}: DS/S / PPS"),
-                                Text("${t.exactValue}: ${currentTl.nerdStats!.dsp}"),],
-                                okText: t.popupActions.ok,
-                                higherIsBetter: true,
-                                oldPlayerStat: oldTl?.nerdStats?.dsp,),
-                            StatCellNum(playerStat: currentTl.nerdStats!.appdsp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.appdsp,
-                            pos: widget.lbPositions?.appdsp,
-                            averageStat: widget.averages?.nerdStats?.appdsp, smallDecimal: false,
-                            alertWidgets: [Text(t.statCellNum.appdspDescription),
-                                Text("${t.formula}: APP + DS/P"),
-                                Text("${t.exactValue}: ${currentTl.nerdStats!.appdsp}"),],
-                                okText: t.popupActions.ok,
-                                higherIsBetter: true,
-                                oldPlayerStat: oldTl?.nerdStats?.appdsp,),
-                            StatCellNum(playerStat: currentTl.nerdStats!.cheese, isScreenBig: bigScreen, fractionDigits: 2, playerStatLabel: t.statCellNum.cheese,
-                            pos: widget.lbPositions?.cheese,
-                            //averageStat: rankAverages?.nerdStats?.cheese, TODO: questonable
-                            alertWidgets: [Text(t.statCellNum.cheeseDescription),
-                                Text("${t.formula}: (DS/P * 150) + ((VS/APM - 2) * 50) + (0.6 - APP) * 125"),
-                                Text("${t.exactValue}: ${currentTl.nerdStats!.cheese}"),],
-                                okText: t.popupActions.ok,
-                                higherIsBetter: false,
-                                oldPlayerStat: oldTl?.nerdStats?.cheese,),
-                            StatCellNum(playerStat: currentTl.nerdStats!.gbe, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.gbe,
-                            pos: widget.lbPositions?.gbe,
-                            averageStat: widget.averages?.nerdStats?.gbe, smallDecimal: false,
-                            alertWidgets: [Text(t.statCellNum.gbeDescription),
-                                Text("${t.formula}: APP * DS/P * 2"),
-                                Text("${t.exactValue}: ${currentTl.nerdStats!.gbe}"),],
-                                okText: t.popupActions.ok,
-                                higherIsBetter: true,
-                                oldPlayerStat: oldTl?.nerdStats?.gbe,),
-                            StatCellNum(playerStat: currentTl.nerdStats!.nyaapp, isScreenBig: bigScreen, fractionDigits: 3, playerStatLabel: t.statCellNum.nyaapp,
-                            pos: widget.lbPositions?.nyaapp,
-                            averageStat: widget.averages?.nerdStats?.nyaapp, smallDecimal: false,
-                            alertWidgets: [Text(t.statCellNum.nyaappDescription),
-                                Text("${t.formula}: APP - 5 * tan(radians((Cheese Index / -30) + 1))"),
-                                Text("${t.exactValue}:  ${currentTl.nerdStats!.nyaapp}"),],
-                                okText: t.popupActions.ok,
-                                higherIsBetter: true,
-                                oldPlayerStat: oldTl?.nerdStats?.nyaapp,),
-                            StatCellNum(playerStat: currentTl.nerdStats!.area, isScreenBig: bigScreen, fractionDigits: 1, playerStatLabel: t.statCellNum.area,
-                            pos: widget.lbPositions?.area,
-                            averageStat: widget.averages?.nerdStats?.area,
-                            alertWidgets: [Text(t.statCellNum.areaDescription),
-                                Text("${t.formula}: APM * 1 + PPS * 45 + VS * 0.444 + APP * 185 + DS/S * 175 + DS/P * 450 + Garbage Effi * 315"),
-                                Text("${t.exactValue}:  ${currentTl.nerdStats!.area}"),],
-                                okText: t.popupActions.ok,
-                                higherIsBetter: true,
-                                oldPlayerStat: oldTl?.nerdStats?.area,)
-                          ]),
-                    )
-                  ],
-                ),
-              if (currentTl.estTr != null)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 20, 8, 20),
-                  child: Container(
-                    height: 70,
-                    constraints: const BoxConstraints(maxWidth: 500),
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          left: 0,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                            Text(t.statCellNum.estOfTR, style: const TextStyle(height: 0.1),),
-                            RichText(
-                              text: TextSpan(
-                                text: estTRformated[0],
-                                style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 36 : 30, fontWeight: FontWeight.w500, color: Colors.white),
-                                children: [TextSpan(text: decimalSeparator+estTRformated[1], style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
-                                ),
-                              ),
-                            RichText(text: TextSpan(
-                              text: "",
-                              style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey, height: 0.5),
-                              children: [
-                                if (oldTl?.estTr?.esttr != null) TextSpan(text: comparef.format(currentTl.estTr!.esttr - oldTl!.estTr!.esttr), style: TextStyle(
-                                  color: oldTl!.estTr!.esttr > currentTl.estTr!.esttr ? Colors.redAccent : Colors.greenAccent
-                                ),),
-                                if (oldTl?.estTr?.esttr != null && widget.lbPositions?.estTr != null) const TextSpan(text: " • "),
-                                if (widget.lbPositions?.estTr != null) TextSpan(text: widget.lbPositions!.estTr!.position >= 1000 ? "${t.top} ${f2.format(widget.lbPositions!.estTr!.percentage*100)}%" : "№${widget.lbPositions!.estTr!.position}", style: TextStyle(color: getColorOfRank(widget.lbPositions!.estTr!.position))),
-                                if (widget.lbPositions?.estTr != null || oldTl?.estTr?.esttr != null) const TextSpan(text: " • "),
-                                TextSpan(text: "Glicko: ${f2.format(currentTl.estTr!.estglicko)}")
-                              ]
-                              ),
-                            ),
-                          ],),
+              Expanded(
+                child: Center(
+                  child: Table(
+                    defaultVerticalAlignment: TableCellVerticalAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    defaultColumnWidth:const IntrinsicColumnWidth(),
+                    children: [
+                      TableRow(children: [
+                        Text(league.apm != null ? f2.format(league.apm) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: league.apm != null ? getStatColor(league.apm!, averages?.apm, true) : Colors.grey)),
+                        Tooltip(
+                          message: "${t.stats.apm.full}${(averages != null) ? "\n${t.rankView.avgForRank(rank: league.percentileRank.toUpperCase())}: ${f2.format(averages!.apm)} ${t.stats.apm.short}" : ""}",
+                          child: Text(" ${t.stats.apm.short}", style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: league.apm != null ? getStatColor(league.apm!, averages?.apm, true) : Colors.grey))
                         ),
-                        Positioned(
-                          right: 0,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                            Text(t.statCellNum.accOfEst, style: const TextStyle(height: 0.1),),
-                            RichText(
-                              text: TextSpan(
-                                text: (currentTl.esttracc != null && currentTl.bestRank != "z") ? estTRaccFormated[0] : "---",
-                                style: TextStyle(fontFamily: "Eurostile Round", fontSize: bigScreen ? 36 : 30, fontWeight: FontWeight.w500, color: Colors.white),
-                                children: [
-                                  TextSpan(text: (currentTl.esttracc != null && currentTl.bestRank != "z") ? decimalSeparator+estTRaccFormated[1] : ".---", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))
-                                ]
-                                ),
-                              ),
-                            if ((oldTl?.esttracc != null || widget.lbPositions != null) && currentTl.bestRank != "z") RichText(text: TextSpan(
-                              text: "",
-                              style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey, height: 0.5),
-                              children: [
-                                if (oldTl?.esttracc != null) TextSpan(text: comparef.format(currentTl.esttracc! - oldTl!.esttracc!), style: TextStyle(
-                                  color: oldTl!.esttracc! > currentTl.esttracc! ? Colors.redAccent : Colors.greenAccent
-                                ),),
-                                if (oldTl?.esttracc != null && widget.lbPositions?.accOfEst != null) const TextSpan(text: " • "),
-                                if (widget.lbPositions?.accOfEst != null) TextSpan(text: widget.lbPositions!.accOfEst!.position >= 1000 ? "${t.top} ${f2.format(widget.lbPositions!.accOfEst!.percentage*100)}%" : "№${widget.lbPositions!.accOfEst!.position}", style: TextStyle(color: getColorOfRank(widget.lbPositions!.accOfEst!.position)))
-                              ]
-                              ),
-                            ),
-                          ],),
-                        )
-                      ],
-                    ),
-                  )
+                        if (toCompare != null) Text(" (${comparef2.format(league.apm!-toCompare!.apm!)})", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: getDifferenceColor(league.apm!-toCompare!.apm!))),
+                        if (lbPos != null) Text(lbPos?.apm != null ? (lbPos!.apm!.position >= 1000 ? " (${t.top} ${f2.format(lbPos!.apm!.percentage*100)}%)" : " (№ ${lbPos!.apm!.position})") : "(№ ---)", style: TextStyle(color: lbPos?.apm != null ? getColorOfRank(lbPos!.apm!.position) : null))
+                      ]),
+                      TableRow(children: [
+                        Text(league.pps != null ? f2.format(league.pps) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: league.pps != null ? getStatColor(league.pps!, averages?.pps, true) : Colors.grey)),
+                        Tooltip(
+                          message: "${t.stats.pps.full}${(averages != null) ? "\n${t.rankView.avgForRank(rank: league.percentileRank.toUpperCase())}: ${f2.format(averages!.pps)} ${t.stats.pps.short}" : ""}",
+                          child: Text(" ${t.stats.pps.short}", style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: league.pps != null ? getStatColor(league.pps!, averages?.pps, true) : Colors.grey))
+                        ),
+                        if (toCompare != null) Text(" (${comparef2.format(league.pps!-toCompare!.pps!)})", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: getDifferenceColor(league.pps!-toCompare!.pps!))),
+                        if (lbPos != null) Text(lbPos?.pps != null ? (lbPos!.pps!.position >= 1000 ? " (${t.top} ${f2.format(lbPos!.pps!.percentage*100)}%)" : " (№ ${lbPos!.pps!.position})") : "(№ ---)", style: TextStyle(color: lbPos?.pps != null ? getColorOfRank(lbPos!.pps!.position) : null))
+                      ]),
+                      TableRow(children: [
+                        Text(league.vs != null ? f2.format(league.vs) : "-.--", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: league.vs != null ? getStatColor(league.vs!, averages?.vs, true) : Colors.grey)),
+                        Tooltip(
+                          message: "${t.stats.vs.full}${(averages != null) ? "\n${t.rankView.avgForRank(rank: league.percentileRank.toUpperCase())}: ${f2.format(averages!.vs)} ${t.stats.vs.short}" : ""}",
+                          child: Text(" ${t.stats.vs.short}", style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: league.vs != null ? getStatColor(league.vs!, averages?.vs, true) : Colors.grey))
+                        ),
+                        if (toCompare != null) Text(" (${comparef2.format(league.vs!-toCompare!.vs!)})", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: getDifferenceColor(league.vs!-toCompare!.vs!))),
+                        if (lbPos != null) Text(lbPos?.vs != null ? (lbPos!.vs!.position >= 1000 ? " (${t.top} ${f2.format(lbPos!.vs!.percentage*100)}%)" : " (№ ${lbPos!.vs!.position})") : "(№ ---)", style: TextStyle(color: lbPos?.vs != null ? getColorOfRank(lbPos!.vs!.position) : null))
+                      ]),
+                      if (width <= 600) TableRow(children: [
+                        Text(!league.winrate.isNegative ? percentage.format(league.winrate) : "---", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: !league.winrate.isNegative ? Colors.white : Colors.grey)),
+                        Text(" ${t.stats.winrate.short}", style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: !league.winrate.isNegative ? Colors.white : Colors.grey)),
+                        if (toCompare != null) Text(" (${comparef2.format((league.winrate-toCompare!.winrate)*100)})", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: getDifferenceColor(league.winrate-toCompare!.winrate))),
+                        if (lbPos != null) Text(lbPos?.winrate != null ? (lbPos!.winrate!.position >= 1000 ? " (${t.top} ${f2.format(lbPos!.winrate!.percentage*100)}%)" : " (№ ${lbPos!.winrate!.position})") : "(№ ---)", style: TextStyle(color: lbPos?.winrate != null ? getColorOfRank(lbPos!.winrate!.position) : null))
+                      ]),
+                      if (width <= 400) ...secondColumn()
+                    ],
+                  ),
                 ),
-              if (currentTl.nerdStats != null) Graphs(currentTl.apm!, currentTl.pps!, currentTl.vs!, currentTl.nerdStats!, currentTl.playstyle!)
-            ]
-          );
-        },
-      );
-    });
+              ),
+              if (width > 600) GaugetThingy(value: league.winrate, min: 0, max: 1, tickInterval: 0.25, label: "Winrate", sideSize: 128, fractionDigits: 2, moreIsBetter: true, oldValue: toCompare?.winrate, percentileFormat: true, lbPos: lbPos?.winrate),
+              if (width > 400) Expanded(
+                child: Center(
+                  child: Table(
+                    defaultVerticalAlignment: TableCellVerticalAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    defaultColumnWidth:const IntrinsicColumnWidth(),
+                    children: secondColumn(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }

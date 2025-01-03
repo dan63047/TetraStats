@@ -7,10 +7,11 @@ import 'package:fl_chart/src/chart/radar_chart/radar_chart_painter.dart';
 import 'package:fl_chart/src/chart/radar_chart/radar_chart_renderer.dart';
 import 'package:fl_chart/src/chart/base/base_chart/base_chart_painter.dart';
 import 'package:fl_chart/src/utils/canvas_wrapper.dart';
-import 'package:fl_chart/src/utils/utils.dart';
+import 'package:tetra_stats/data_objects/nerd_stats.dart';
+import 'package:tetra_stats/data_objects/playstyle.dart';
+import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 import 'package:tetra_stats/main.dart' show prefs;
 import 'package:flutter/material.dart';
-import 'package:tetra_stats/data_objects/tetrio.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 
@@ -164,17 +165,17 @@ class MyRadarChartPainter extends RadarChartPainter{
           );
         }
 
-        _ticksTextPaint
-          ..text = TextSpan(
-            text: percentage.format(tick),
-            style: Utils().getThemeAwareTextStyle(context, data.ticksTextStyle),
-          )
-          ..textDirection = TextDirection.ltr
-          ..layout(maxWidth: size.width);
-        canvasWrapper.drawText(
-          _ticksTextPaint,
-          Offset(centerX + 5, centerY - tickRadius - _ticksTextPaint.height/2),
-        );
+        // _ticksTextPaint
+        //   ..text = TextSpan(
+        //     text: percentage.format(tick),
+        //     style: Utils().getThemeAwareTextStyle(context, data.ticksTextStyle),
+        //   )
+        //   ..textDirection = TextDirection.ltr
+        //   ..layout(maxWidth: size.width);
+        // canvasWrapper.drawText(
+        //   _ticksTextPaint,
+        //   Offset(centerX + 5, centerY - tickRadius - _ticksTextPaint.height/2),
+        // );
       },
     );
   }
@@ -286,205 +287,212 @@ class Graphs extends StatelessWidget{
     double speed = pps / 3.75;
     double defense = nerdStats.dss * 1.15;
     double cheese = nerdStats.cheese / 110;
-    return Wrap(
-      direction: Axis.horizontal,
-      alignment: WrapAlignment.center,
-      spacing: 25,
-      crossAxisAlignment: WrapCrossAlignment.start,
-      clipBehavior: Clip.hardEdge,
-      children: [
-        if (true) Padding( // vs graph
-          padding: const EdgeInsets.fromLTRB(18, 0, 18, 44),
-          child: SizedBox(
-            height: 310,
-            width: 310,
-            child: MyRadarChart(
-              RadarChartData(
-                radarShape: RadarShape.polygon,
-                tickCount: 4,
-                ticksTextStyle: const TextStyle(color: Colors.transparent, fontSize: 10),
-                radarBorderData: const BorderSide(color: Colors.transparent, width: 1),
-                gridBorderData: const BorderSide(color: Colors.white24, width: 1),
-                tickBorderData: const BorderSide(color: Colors.transparent, width: 1),
-                getTitle: (index, angle) {
-                  switch (index) {
-                    case 0:
-                      return RadarChartTitle(text: 'APM', angle: angle, positionPercentageOffset: 0.05);
-                    case 1:
-                      return RadarChartTitle(text: 'PPS', angle: angle, positionPercentageOffset: 0.05);
-                    case 2:
-                      return RadarChartTitle(text: 'VS', angle: angle, positionPercentageOffset: 0.05);
-                    case 3:
-                      return RadarChartTitle(text: 'APP', angle: angle + 180, positionPercentageOffset: 0.05);
-                    case 4:
-                      return RadarChartTitle(text: 'DS/S', angle: angle + 180, positionPercentageOffset: 0.05);
-                    case 5:
-                      return RadarChartTitle(text: 'DS/P', angle: angle + 180, positionPercentageOffset: 0.05);
-                    case 6:
-                      return RadarChartTitle(text: 'APP+DS/P', angle: angle + 180, positionPercentageOffset: 0.05);
-                    case 7:
-                      return RadarChartTitle(text: 'VS/APM', angle: angle + 180, positionPercentageOffset: 0.05);
-                    case 8:
-                      return RadarChartTitle(text: 'Cheese', angle: angle, positionPercentageOffset: 0.05);
-                    case 9:
-                      return RadarChartTitle(text: 'Gb Eff.', angle: angle, positionPercentageOffset: 0.05);
-                    default:
-                      return const RadarChartTitle(text: '');
-                  }
-                },
-                dataSets: [
-                  RadarDataSet(
-                    fillColor: Theme.of(context).colorScheme.primary.withAlpha(100),
-                    borderColor: Theme.of(context).colorScheme.primary,
-                    dataEntries: [
-                      RadarEntry(value: apm * apmWeight),
-                      RadarEntry(value: pps * ppsWeight),
-                      RadarEntry(value: vs * vsWeight),
-                      RadarEntry(value: nerdStats.app * appWeight),
-                      RadarEntry(value: nerdStats.dss * dssWeight),
-                      RadarEntry(value: nerdStats.dsp * dspWeight),
-                      RadarEntry(value: nerdStats.appdsp * appdspWeight),
-                      RadarEntry(value: nerdStats.vsapm * vsapmWeight),
-                      RadarEntry(value: nerdStats.cheese * cheeseWeight),
-                      RadarEntry(value: nerdStats.gbe * gbeWeight),
-                    ],
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 8.0),
+        child: Center(
+          child: Wrap(
+            direction: Axis.horizontal,
+            alignment: WrapAlignment.center,
+            spacing: 25,
+            crossAxisAlignment: WrapCrossAlignment.start,
+            clipBehavior: Clip.hardEdge,
+            children: [
+              if (true) Padding( // vs graph
+                padding: const EdgeInsets.fromLTRB(18, 0, 18, 22),
+                child: SizedBox(
+                  height: 310,
+                  width: 310,
+                  child: MyRadarChart(
+                    RadarChartData(
+                      radarShape: RadarShape.circle,
+                      tickCount: 4,
+                      radarBackgroundColor: Colors.black.withAlpha(170),
+                      radarBorderData: const BorderSide(color: Colors.white24, width: 1),
+                      gridBorderData: const BorderSide(color: Colors.white24, width: 1),
+                      tickBorderData: const BorderSide(color: Colors.white24, width: 1),
+                      getTitle: (index, angle) {
+                        switch (index) {
+                          case 0:
+                            return RadarChartTitle(text: t.stats.apm.short, angle: angle, positionPercentageOffset: 0.05);
+                          case 1:
+                            return RadarChartTitle(text: t.stats.pps.short, angle: angle, positionPercentageOffset: 0.05);
+                          case 2:
+                            return RadarChartTitle(text: t.stats.vs.short, angle: angle, positionPercentageOffset: 0.05);
+                          case 3:
+                            return RadarChartTitle(text: t.stats.app.short, angle: angle + 180, positionPercentageOffset: 0.05);
+                          case 4:
+                            return RadarChartTitle(text: t.stats.dss.short, angle: angle + 180, positionPercentageOffset: 0.05);
+                          case 5:
+                            return RadarChartTitle(text: t.stats.dsp.short, angle: angle + 180, positionPercentageOffset: 0.05);
+                          case 6:
+                            return RadarChartTitle(text: t.stats.appdsp.short, angle: angle + 180, positionPercentageOffset: 0.05);
+                          case 7:
+                            return RadarChartTitle(text: t.stats.vsapm.short, angle: angle + 180, positionPercentageOffset: 0.05);
+                          case 8:
+                            return RadarChartTitle(text: t.stats.cheese.short, angle: angle, positionPercentageOffset: 0.05);
+                          case 9:
+                            return RadarChartTitle(text: t.stats.gbe.short, angle: angle, positionPercentageOffset: 0.05);
+                          default:
+                            return const RadarChartTitle(text: '');
+                        }
+                      },
+                      dataSets: [
+                        RadarDataSet(
+                          fillColor: Theme.of(context).colorScheme.primary.withAlpha(170),
+                          borderColor: Theme.of(context).colorScheme.primary,
+                          dataEntries: [
+                            RadarEntry(value: apm * apmWeight),
+                            RadarEntry(value: pps * ppsWeight),
+                            RadarEntry(value: vs * vsWeight),
+                            RadarEntry(value: nerdStats.app * appWeight),
+                            RadarEntry(value: nerdStats.dss * dssWeight),
+                            RadarEntry(value: nerdStats.dsp * dspWeight),
+                            RadarEntry(value: nerdStats.appdsp * appdspWeight),
+                            RadarEntry(value: nerdStats.vsapm * vsapmWeight),
+                            RadarEntry(value: nerdStats.cheese * cheeseWeight),
+                            RadarEntry(value: nerdStats.gbe * gbeWeight),
+                          ],
+                        ),
+                        RadarDataSet(
+                          fillColor: Colors.transparent,
+                          borderColor: Colors.transparent,
+                          dataEntries: [
+                            const RadarEntry(value: 0),
+                            const RadarEntry(value: 180),
+                            const RadarEntry(value: 0),
+                            const RadarEntry(value: 0),
+                            const RadarEntry(value: 0),
+                            const RadarEntry(value: 0),
+                            const RadarEntry(value: 0),
+                            const RadarEntry(value: 0),
+                            const RadarEntry(value: 0),
+                            const RadarEntry(value: 0),
+                          ],
+                        )
+                      ],
+                    ),
+                    swapAnimationDuration: const Duration(milliseconds: 150), // Optional
+                    swapAnimationCurve: Curves.linear, // Optional
                   ),
-                  RadarDataSet(
-                    fillColor: Colors.transparent,
-                    borderColor: Colors.transparent,
-                    dataEntries: [
-                      const RadarEntry(value: 0),
-                      const RadarEntry(value: 180),
-                      const RadarEntry(value: 0),
-                      const RadarEntry(value: 0),
-                      const RadarEntry(value: 0),
-                      const RadarEntry(value: 0),
-                      const RadarEntry(value: 0),
-                      const RadarEntry(value: 0),
-                      const RadarEntry(value: 0),
-                      const RadarEntry(value: 0),
-                    ],
-                  )
-                ],
+                ),
               ),
-              swapAnimationDuration: const Duration(milliseconds: 150), // Optional
-              swapAnimationCurve: Curves.linear, // Optional
-            ),
-          ),
-        ),
-        Padding( // psq graph
-          padding: const EdgeInsets.fromLTRB(18, 0, 18, 44),
-          child: SizedBox(
-            height: 310,
-            width: 310,
-            child: MyRadarChart(
-              RadarChartData(
-                radarShape: RadarShape.polygon,
-                tickCount: 4,
-                ticksTextStyle: const TextStyle(color: Colors.white24, fontSize: 10),
-                radarBorderData: const BorderSide(color: Colors.transparent, width: 1),
-                gridBorderData: const BorderSide(color: Colors.white24, width: 1),
-                tickBorderData: const BorderSide(color: Colors.transparent, width: 1),
-                titleTextStyle: const TextStyle(height: 1.1),
-                radarTouchData: RadarTouchData(),
-                getTitle: (index, angle) {
-                  switch (index) {
-                    case 0:
-                      return RadarChartTitle(text: 'Opener\n${percentage.format(playstyle.opener)}', angle: 0, positionPercentageOffset: 0.05);
-                    case 1:
-                      return RadarChartTitle(text: 'Stride\n${percentage.format(playstyle.stride)}', angle: 0, positionPercentageOffset: 0.05);
-                    case 2:
-                      return RadarChartTitle(text: 'Inf DS\n${percentage.format(playstyle.infds)}', angle: angle + 180, positionPercentageOffset: 0.05);
-                    case 3:
-                      return RadarChartTitle(text: 'Plonk\n${percentage.format(playstyle.plonk)}', angle: 0, positionPercentageOffset: 0.05);
-                    default:
-                      return const RadarChartTitle(text: '');
-                  }
-                },
-                dataSets: [
-                  RadarDataSet(
-                    fillColor: Theme.of(context).colorScheme.primary.withAlpha(100),
-                    borderColor: Theme.of(context).colorScheme.primary,
-                    dataEntries: [
-                      RadarEntry(value: playstyle.opener),
-                      RadarEntry(value: playstyle.stride),
-                      RadarEntry(value: playstyle.infds),
-                      RadarEntry(value: playstyle.plonk),
-                    ],
+              Padding( // psq graph
+                padding: const EdgeInsets.fromLTRB(18, 0, 18, 22),
+                child: SizedBox(
+                  height: 310,
+                  width: 310,
+                  child: MyRadarChart(
+                    RadarChartData(
+                      radarShape: RadarShape.circle,
+                      tickCount: 4,
+                      radarBackgroundColor: Colors.black.withAlpha(170),
+                      radarBorderData: const BorderSide(color: Colors.white24, width: 1),
+                      gridBorderData: const BorderSide(color: Colors.white24, width: 1),
+                      tickBorderData: const BorderSide(color: Colors.white24, width: 1),
+                      titleTextStyle: const TextStyle(height: 1.1),
+                      radarTouchData: RadarTouchData(),
+                      getTitle: (index, angle) {
+                        switch (index) {
+                          case 0:
+                            return RadarChartTitle(text: '${t.stats.opener.short}\n${percentage.format(playstyle.opener)}', angle: 0, positionPercentageOffset: 0.05);
+                          case 1:
+                            return RadarChartTitle(text: '${t.stats.stride.short}\n${percentage.format(playstyle.stride)}', angle: 0, positionPercentageOffset: 0.05);
+                          case 2:
+                            return RadarChartTitle(text: '${t.stats.infds.short}\n${percentage.format(playstyle.infds)}', angle: angle + 180, positionPercentageOffset: 0.05);
+                          case 3:
+                            return RadarChartTitle(text: '${t.stats.plonk.short}\n${percentage.format(playstyle.plonk)}', angle: 0, positionPercentageOffset: 0.05);
+                          default:
+                            return const RadarChartTitle(text: '');
+                        }
+                      },
+                      dataSets: [
+                        RadarDataSet(
+                          fillColor: Theme.of(context).colorScheme.primary.withAlpha(170),
+                          borderColor: Theme.of(context).colorScheme.primary,
+                          dataEntries: [
+                            RadarEntry(value: playstyle.opener),
+                            RadarEntry(value: playstyle.stride),
+                            RadarEntry(value: playstyle.infds),
+                            RadarEntry(value: playstyle.plonk),
+                          ],
+                        ),
+                        RadarDataSet(
+                          fillColor: Colors.transparent,
+                          borderColor: Colors.transparent,
+                          dataEntries: [
+                            const RadarEntry(value: 0),
+                            const RadarEntry(value: 1),
+                            const RadarEntry(value: 0),
+                            const RadarEntry(value: 0),
+                          ],
+                        )
+                      ],
+                    ),
+                    swapAnimationDuration: const Duration(milliseconds: 150), // Optional
+                    swapAnimationCurve: Curves.linear, // Optional
                   ),
-                  RadarDataSet(
-                    fillColor: Colors.transparent,
-                    borderColor: Colors.transparent,
-                    dataEntries: [
-                      const RadarEntry(value: 0),
-                      const RadarEntry(value: 1),
-                      const RadarEntry(value: 0),
-                      const RadarEntry(value: 0),
-                    ],
-                  )
-                ],
+                ),
               ),
-              swapAnimationDuration: const Duration(milliseconds: 150), // Optional
-              swapAnimationCurve: Curves.linear, // Optional
-            ),
-          ),
-        ),
-        Padding( // sq graph
-          padding: const EdgeInsets.fromLTRB(18, 0, 18, 44),
-          child: SizedBox(
-            height: 310,
-            width: 310,
-            child: MyRadarChart(
-              RadarChartData(
-                radarShape: RadarShape.polygon,
-                tickCount: 4,
-                ticksTextStyle: const TextStyle(color: Colors.white24, fontSize: 10),
-                radarBorderData: const BorderSide(color: Colors.transparent, width: 1),
-                gridBorderData: const BorderSide(color: Colors.white24, width: 1),
-                tickBorderData: const BorderSide(color: Colors.transparent, width: 1),
-                titleTextStyle: const TextStyle(height: 1.1),
-                radarTouchData: RadarTouchData(),
-                getTitle: (index, angle) {
-                  switch (index) {
-                    case 0:
-                      return RadarChartTitle(text: '${t.graphs.attack}\n${f2.format(apm)} APM', angle: 0, positionPercentageOffset: 0.05);
-                    case 1:
-                      return RadarChartTitle(text: '${t.graphs.speed}\n${f2.format(pps)} PPS', angle: 0, positionPercentageOffset: 0.05);
-                    case 2:
-                      return RadarChartTitle(text: '${t.graphs.defense}\n${f2.format(nerdStats.dss)} DS/S', angle: angle + 180, positionPercentageOffset: 0.05);
-                    case 3:
-                      return RadarChartTitle(text: '${t.graphs.cheese}\n${f3.format(nerdStats.cheese)}', angle: 0, positionPercentageOffset: 0.05);
-                    default:
-                      return const RadarChartTitle(text: '');
-                  }
-                },
-                dataSets: [
-                  RadarDataSet(
-                    fillColor: Theme.of(context).colorScheme.primary.withAlpha(100),
-                    borderColor: Theme.of(context).colorScheme.primary,
-                    dataEntries: [
-                      RadarEntry(value: attack),
-                      RadarEntry(value: speed),
-                      RadarEntry(value: defense),
-                      RadarEntry(value: cheese),
-                    ],
-                  ),
-                  RadarDataSet(
-                    fillColor: Colors.transparent,
-                    borderColor: Colors.transparent,
-                    dataEntries: [
-                      const RadarEntry(value: 0),
-                      const RadarEntry(value: 1.2),
-                      const RadarEntry(value: 0),
-                      const RadarEntry(value: 0),
-                    ],
+              Padding( // sq graph
+                padding: const EdgeInsets.fromLTRB(18, 0, 18, 22),
+                child: SizedBox(
+                  height: 310,
+                  width: 310,
+                  child: MyRadarChart(
+                    RadarChartData(
+                      radarShape: RadarShape.circle,
+                      tickCount: 4,
+                      radarBackgroundColor: Colors.black.withAlpha(170),
+                      radarBorderData: const BorderSide(color: Colors.white24, width: 1),
+                      gridBorderData: const BorderSide(color: Colors.white24, width: 1),
+                      tickBorderData: const BorderSide(color: Colors.white24, width: 1),
+                      titleTextStyle: const TextStyle(height: 1.1),
+                      radarTouchData: RadarTouchData(),
+                      getTitle: (index, angle) {
+                        switch (index) {
+                          case 0:
+                            return RadarChartTitle(text: '${t.stats.graphs.attack}\n${f2.format(apm)} APM', angle: 0, positionPercentageOffset: 0.05);
+                          case 1:
+                            return RadarChartTitle(text: '${t.stats.graphs.speed}\n${f2.format(pps)} PPS', angle: 0, positionPercentageOffset: 0.05);
+                          case 2:
+                            return RadarChartTitle(text: '${t.stats.graphs.defense}\n${f2.format(nerdStats.dss)} DS/S', angle: angle + 180, positionPercentageOffset: 0.05);
+                          case 3:
+                            return RadarChartTitle(text: '${t.stats.graphs.cheese}\n${f3.format(nerdStats.cheese)}', angle: 0, positionPercentageOffset: 0.05);
+                          default:
+                            return const RadarChartTitle(text: '');
+                        }
+                      },
+                      dataSets: [
+                        RadarDataSet(
+                          fillColor: Theme.of(context).colorScheme.primary.withAlpha(170),
+                          borderColor: Theme.of(context).colorScheme.primary,
+                          dataEntries: [
+                            RadarEntry(value: attack),
+                            RadarEntry(value: speed),
+                            RadarEntry(value: defense),
+                            RadarEntry(value: cheese),
+                          ],
+                        ),
+                        RadarDataSet(
+                          fillColor: Colors.transparent,
+                          borderColor: Colors.transparent,
+                          dataEntries: [
+                            const RadarEntry(value: 0),
+                            const RadarEntry(value: 1.2),
+                            const RadarEntry(value: 0),
+                            const RadarEntry(value: 0),
+                          ],
+                        )
+                      ],
+                    )
                   )
-                ],
+                )
               )
-            )
-          )
-        )
-      ],
+            ],
+          ),
+        ),
+      ),
     );
   }
 

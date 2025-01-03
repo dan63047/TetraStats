@@ -1,7 +1,12 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'tetrio.dart';
+import 'package:tetra_stats/data_objects/clears.dart';
+import 'package:tetra_stats/data_objects/end_context_multi.dart';
+import 'package:tetra_stats/data_objects/est_tr.dart';
+import 'package:tetra_stats/data_objects/finesse.dart';
+import 'package:tetra_stats/data_objects/nerd_stats.dart';
+import 'package:tetra_stats/data_objects/playstyle.dart';
 
 // I want to implement those fancy TWC stats
 // So, i'm going to read replay for things
@@ -32,8 +37,11 @@ int biggestSpikeFromReplay(events){
 class Garbage{ // charsys where???
   late int sent;
   late int recived;
-  late int attack;
-  late int cleared;
+  int? attack;
+  int? cleared;
+  int? sent_normal;
+  int? maxspike;
+  int? maxspike_nomult;
 
   Garbage({
     required this.sent,
@@ -47,6 +55,9 @@ class Garbage{ // charsys where???
     recived = json['received'];
     attack = json['attack'];
     cleared = json['cleared'];
+    sent_normal = json['sent_normal'];
+    maxspike = json['maxspike'];
+    maxspike_nomult = json['maxspike_nomult'];
   }
 
   Garbage.toJson(){
@@ -54,7 +65,7 @@ class Garbage{ // charsys where???
   }
 
   Garbage operator + (Garbage other){
-    return Garbage(sent: sent + other.sent, recived: recived + other.recived, attack: attack + other.attack, cleared: cleared + other.cleared);
+    return Garbage(sent: sent + other.sent, recived: recived + other.recived, attack: attack??0 + (other.attack??0), cleared: (cleared??0) + (other.cleared??0));
   }
 }
 

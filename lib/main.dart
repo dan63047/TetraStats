@@ -7,30 +7,32 @@ import 'dart:developer' as developer;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart';
-import 'package:tetra_stats/views/customization_view.dart';
-import 'package:tetra_stats/views/ranks_averages_view.dart';
-import 'package:tetra_stats/views/sprint_and_blitz_averages.dart';
-import 'package:tetra_stats/views/tl_leaderboard_view.dart';
+import 'package:tetra_stats/views/first_time_view.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:tetra_stats/views/main_view.dart';
-import 'package:tetra_stats/views/settings_view.dart';
-import 'package:tetra_stats/views/tracked_players_view.dart';
-import 'package:tetra_stats/views/calc_view.dart';
 import 'package:go_router/go_router.dart';
 
 late final PackageInfo packageInfo;
 late SharedPreferences prefs;
 late TetrioService teto;
+late GoRouter router;
+
 ThemeData theme = ThemeData(
   fontFamily: 'Eurostile Round',
   colorScheme: const ColorScheme.dark(
     primary: Colors.cyanAccent,
     surface: Color.fromARGB(255, 10, 10, 10),
     secondary: Color(0xFF00838F),
+  ),
+  textTheme: TextTheme(
+    titleLarge: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42),
+    titleSmall: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, height: 0.9, fontWeight: FontWeight.w200),
+    headlineMedium: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36),
+    displayLarge: TextStyle(fontSize: 18),
   ),
   cardTheme: const CardTheme(surfaceTintColor: Color.fromARGB(255, 10, 10, 10)),
   drawerTheme: const DrawerThemeData(surfaceTintColor: Color.fromARGB(255, 10, 10, 10)),
@@ -44,65 +46,31 @@ ThemeData theme = ThemeData(
   ),
   segmentedButtonTheme: SegmentedButtonThemeData(
     style: ButtonStyle(
+      visualDensity: VisualDensity(horizontal: -4.0, vertical: -4.0),
       side: const WidgetStatePropertyAll(BorderSide(color: Colors.transparent)),
       surfaceTintColor: const WidgetStatePropertyAll(Colors.cyanAccent),
       iconColor: const WidgetStatePropertyAll(Colors.cyanAccent),
       shadowColor: WidgetStatePropertyAll(Colors.cyanAccent.shade200),
     )
   ),
-  scaffoldBackgroundColor: Colors.black
-);
-
-final router = GoRouter(
-  initialLocation: "/",
-  routes: [
-    GoRoute(
-      path: "/",
-      builder: (_, __) => const MainView(),
-      routes: [
-         GoRoute(
-          path: 'settings',
-          builder: (_, __) => const SettingsView(),
-          routes: [
-            GoRoute(
-              path: 'customization',
-              builder: (_, __) => const CustomizationView(),
-            ),
-          ]
-        ),
-        GoRoute(
-          path: "leaderboard",
-          builder: (_, __) => const TLLeaderboardView(),
-          routes: [
-            GoRoute(
-              path: "LBvalues",
-              builder: (_, __) => const RankAveragesView(),
-            ),
-          ]
-        ),
-        GoRoute(
-          path: "LBvalues",
-          builder: (_, __) => const RankAveragesView(),
-        ),
-        GoRoute(
-          path: 'states',
-          builder: (_, __) => const TrackedPlayersView(),
-        ),
-        GoRoute(
-          path: 'calc',
-          builder: (_, __) => const CalcView(),
-        ),
-        GoRoute(
-          path: 'sprintAndBlitzAverages',
-          builder: (_, __) => const SprintAndBlitzView(),
-        )
-      ]
-    ),
-    GoRoute( // that one intended for Android users, that can open https://ch.tetr.io/u/ links
-      path: "/u/:userId",
-      builder: (_, __) => MainView(player: __.pathParameters['userId'])
+  dividerColor: Color.fromARGB(50, 158, 158, 158),
+  dividerTheme: DividerThemeData(color: Color.fromARGB(50, 158, 158, 158)),
+  expansionTileTheme: ExpansionTileThemeData(
+    expansionAnimationStyle: AnimationStyle(curve: Easing.standard, reverseCurve: Easing.standard),
+    expandedAlignment: Alignment.bottomCenter,
+  ),
+  dropdownMenuTheme: DropdownMenuThemeData(textStyle: TextStyle(fontFamily: "Eurostile Round", fontSize: 18)),
+  scaffoldBackgroundColor: Colors.black,
+  tooltipTheme: TooltipThemeData(
+    textStyle: TextStyle(color: Colors.white),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.all(Radius.circular(8.0)),
+      border: Border.all(
+        color: Colors.white
+      ),
+      color: Colors.black,
     )
-  ],
+  )
 );
 
 void main() async {
@@ -127,6 +95,24 @@ void main() async {
   packageInfo = await PackageInfo.fromPlatform();
   prefs = await SharedPreferences.getInstance();
   teto = TetrioService();
+
+  router = GoRouter(
+    initialLocation: prefs.getBool("notFirstTime") == true ? "/" : "/hihello",
+    routes: [
+      GoRoute(
+        path: "/",
+        builder: (_, __) => const MainView(),
+      ),
+      GoRoute( // that one intended for Android users, that can open https://ch.tetr.io/u/ links
+        path: "/u/:userId",
+        builder: (_, __) => MainView(player: __.pathParameters['userId'])
+      ),
+      GoRoute(
+        path: "/hihello",
+        builder: (_, __) => const FirstTimeView(),
+      )
+    ],
+  );
 
   // Choosing the locale
   String? locale = prefs.getString("locale");
