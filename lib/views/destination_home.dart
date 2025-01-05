@@ -1249,7 +1249,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
               snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 45),
               snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 46),
               snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 51),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 54),
+              if (snapshot.data!.summaries!.achievements.any((e) => e.k == 54)) snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 54),
             ] : [];
             List<Achievement> qpExAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? <Achievement>[
               snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 19),
