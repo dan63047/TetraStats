@@ -898,7 +898,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
     }else{
       toSee = states[currentRangeValues.start.round()-1];
     }
-    if (currentRangeValues.end.round() == 1){
+    if (currentRangeValues.end.round() <= 1){
       toCompare = states.length >= 2 ? states.elementAtOrNull(2) : null;
     }else{
       toCompare = states[currentRangeValues.end.round()-1];
@@ -1276,6 +1276,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
               snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 39),
               snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 52),
             ] : [];
+            qpAchievements.sort((a, b) => a.o! - b.o!);
             return TweenAnimationBuilder(
               duration: Durations.long4,
               tween: Tween<double>(begin: 0, end: 1),
