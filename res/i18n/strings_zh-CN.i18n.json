@@ -53,7 +53,7 @@
     "dateAndTime": "日期和时间：",
     "TLfullLBnote": "很大，但允许你通过玩家的数据对玩家进行排序，还可以按段位筛选玩家",
     "rank": "段位",
-    "verdictGeneral": "比 $rank 段平均数据$n $verdict",
+    "verdictGeneral": "比 $rank 段平均数据$verdict $n",
     "verdictBetter": "好",
     "verdictWorse": "差",
     "localStanding": "本地",
@@ -172,7 +172,7 @@
         "refresh": "刷新"
     },
     "graphsDestination": {
-        "fetchAndsaveTLHistory": "获取玩家历史",
+        "fetchAndsaveTLHistory": "Fetch History",
         "fetchAndSaveOldTLmatches": "获取 Tetra 联赛历史记录",
         "fetchAndsaveTLHistoryResult": "找到 ${number} 个状态",
         "fetchAndSaveOldTLmatchesResult": "找到 ${number} 场比赛",
