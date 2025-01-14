@@ -172,7 +172,7 @@
         "refresh": "Refresh"
     },
     "graphsDestination": {
-        "fetchAndsaveTLHistory": "Get player history",
+        "fetchAndsaveTLHistory": "Fetch History",
         "fetchAndSaveOldTLmatches": "Get Tetra League matches history",
         "fetchAndsaveTLHistoryResult": "${number} states was found",
         "fetchAndSaveOldTLmatchesResult": "${number} matches was found",
