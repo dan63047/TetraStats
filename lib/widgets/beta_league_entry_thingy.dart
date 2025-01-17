@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:tetra_stats/data_objects/beta_record.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
@@ -9,8 +10,8 @@ import 'package:tetra_stats/widgets/text_timestamp.dart';
 class BetaLeagueEntryThingy extends StatelessWidget{
   final BetaRecord record;
   final String userID;
-  // TODO: Rating delta string is too long for small screens
-  const BetaLeagueEntryThingy(this.record, this.userID);
+  final bool wide;
+  const BetaLeagueEntryThingy(this.record, this.userID, this.wide);
 
   TextSpan matchResult(String result){
     return switch(result){
@@ -57,6 +58,7 @@ class BetaLeagueEntryThingy extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
+    NumberFormat diff = wide ? fDiff : comparef2; 
     double? deltaTR = (record.extras.league[userID]?[1]?.tr != null && record.extras.league[userID]?[0]?.tr != null) ? record.extras.league[userID]![1]!.tr - record.extras.league[userID]![0]!.tr : null;
     double? deltaGlicko = (record.extras.league[userID]?[1]?.glicko != null && record.extras.league[userID]?[0]?.glicko != null) ? record.extras.league[userID]![1]!.glicko - record.extras.league[userID]![0]!.glicko : null;
     double? deltaRD = (record.extras.league[userID]?[1]?.rd != null && record.extras.league[userID]?[0]?.rd != null) ? record.extras.league[userID]![1]!.rd - record.extras.league[userID]![0]!.rd : null;
@@ -88,7 +90,7 @@ class BetaLeagueEntryThingy extends StatelessWidget{
                       text: ", ${timestamp(record.ts)}\n"
                     ),
                     TextSpan(
-                      text: deltaTR != null ? "${fDiff.format(deltaTR)} TR" : "??? TR",
+                      text: deltaTR != null ? "${diff.format(deltaTR)} TR" : "??? TR",
                       style: TextStyle(
                         color: deltaColor(deltaTR)
                       )
@@ -97,7 +99,7 @@ class BetaLeagueEntryThingy extends StatelessWidget{
                       text: ", "
                     ),
                     TextSpan(
-                      text: deltaGlicko != null ? "${fDiff.format(deltaGlicko)} Glicko" : "??? Glicko",
+                      text: deltaGlicko != null ? "${diff.format(deltaGlicko)} Glicko" : "??? Glicko",
                       style: TextStyle(
                         color: deltaColor(deltaGlicko)
                       )
@@ -106,7 +108,7 @@ class BetaLeagueEntryThingy extends StatelessWidget{
                       text: ", "
                     ),
                     TextSpan(
-                      text: deltaRD != null ? "${fDiff.format(deltaRD)} RD" : "??? RD",
+                      text: deltaRD != null ? "${diff.format(deltaRD)} RD" : "??? RD",
                       style: TextStyle(
                         color: Colors.grey
                       )

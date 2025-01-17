@@ -6,7 +6,7 @@
 /// Locales: 3
 /// Strings: 2295 (765 per locale)
 ///
-/// Built on 2024-12-31 at 17:29 UTC
+/// Built on 2025-01-14 at 21:20 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -707,7 +707,7 @@ class _StringsGraphsDestinationEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
-	String get fetchAndsaveTLHistory => 'Get player history';
+	String get fetchAndsaveTLHistory => 'Fetch History';
 	String get fetchAndSaveOldTLmatches => 'Get Tetra League matches history';
 	String fetchAndsaveTLHistoryResult({required Object number}) => '${number} states was found';
 	String fetchAndSaveOldTLmatchesResult({required Object number}) => '${number} matches was found';
@@ -2247,7 +2247,7 @@ class _StringsGraphsDestinationRuRu implements _StringsGraphsDestinationEn {
 	@override final _StringsRuRu _root; // ignore: unused_field
 
 	// Translations
-	@override String get fetchAndsaveTLHistory => 'Получить историю игрока';
+	@override String get fetchAndsaveTLHistory => 'Получить историю';
 	@override String get fetchAndSaveOldTLmatches => 'Получить историю матчей Тетра Лиги';
 	@override String fetchAndsaveTLHistoryResult({required Object number}) => '${number} состояний было найдено';
 	@override String fetchAndSaveOldTLmatchesResult({required Object number}) => '${number} матчей было найдено';
@@ -4925,7 +4925,7 @@ extension on Translations {
 			case 'actions.ok': return 'OK';
 			case 'actions.apply': return 'Apply';
 			case 'actions.refresh': return 'Refresh';
-			case 'graphsDestination.fetchAndsaveTLHistory': return 'Get player history';
+			case 'graphsDestination.fetchAndsaveTLHistory': return 'Fetch History';
 			case 'graphsDestination.fetchAndSaveOldTLmatches': return 'Get Tetra League matches history';
 			case 'graphsDestination.fetchAndsaveTLHistoryResult': return ({required Object number}) => '${number} states was found';
 			case 'graphsDestination.fetchAndSaveOldTLmatchesResult': return ({required Object number}) => '${number} matches was found';
@@ -5739,7 +5739,7 @@ extension on _StringsRuRu {
 			case 'actions.ok': return 'ОК';
 			case 'actions.apply': return 'Применить';
 			case 'actions.refresh': return 'Обновить';
-			case 'graphsDestination.fetchAndsaveTLHistory': return 'Получить историю игрока';
+			case 'graphsDestination.fetchAndsaveTLHistory': return 'Получить историю';
 			case 'graphsDestination.fetchAndSaveOldTLmatches': return 'Получить историю матчей Тетра Лиги';
 			case 'graphsDestination.fetchAndsaveTLHistoryResult': return ({required Object number}) => '${number} состояний было найдено';
 			case 'graphsDestination.fetchAndSaveOldTLmatchesResult': return ({required Object number}) => '${number} матчей было найдено';

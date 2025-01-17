@@ -2,10 +2,11 @@ flutter_app:
   command: tetra_stats
   arch: x64
   parent: /usr/local/lib
+  nonInteractive: true
 
 control:
   Package: tetra-stats
-  Version: 0.2.0
+  Version: 2.0.3
   Architecture: amd64
   Essential: no
   Priority: optional

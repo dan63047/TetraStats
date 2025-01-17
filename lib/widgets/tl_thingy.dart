@@ -47,7 +47,7 @@ class TetraLeagueThingy extends StatelessWidget{
           message: "${t.stats.glixare.full}",
           child: Tooltip(child: Text(" ${t.stats.glixare.short}", style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: league.gxe.isNegative ? Colors.grey : Colors.white)), message: "Glixare")
         ),
-        if (toCompare != null) Text(" (${comparef.format(league.gxe-toCompare!.gxe)})", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: getDifferenceColor(league.gxe-toCompare!.gxe))),
+        if (toCompare != null) Text(toCompare!.gxe != -1 ? " (${comparef.format(league.gxe-toCompare!.gxe)})" : "(---)", textAlign: TextAlign.right, style: TextStyle(fontSize: width > 768.0 ? 21 : 18, color: toCompare!.gxe != -1 ? getDifferenceColor(league.gxe-toCompare!.gxe) : Colors.grey)),
         if (lbPos != null) Text(lbPos?.glixare != null ? (lbPos!.glixare!.position >= 1000 ? " (${t.top} ${f2.format(lbPos!.glixare!.percentage*100)}%)" : " (№ ${lbPos!.glixare!.position})") : "(№ ---)", style: TextStyle(color: lbPos?.glixare != null ? getColorOfRank(lbPos!.glixare!.position) : null))
       ]),
     ];
@@ -60,7 +60,7 @@ class TetraLeagueThingy extends StatelessWidget{
       child: Column(
         children: [
           TLRatingThingy(userID: league.id, tlData: league, oldTl: toCompare, showPositions: true),
-          if (league.gamesPlayed > 9) TLProgress(
+          if (league.gamesPlayed > 9 && league.percentileRank != "z") TLProgress(
             tlData: league,
             previousRankTRcutoff: cutoffs != null ? cutoffs!.tr[league.rank != "z" ? league.rank : league.percentileRank] : null,
             nextRankTRcutoff: cutoffs != null ? cutoffs!.tr[ranks2[ranks2.indexOf(league.rank != "z" ? league.rank : league.percentileRank)-1]] : null,

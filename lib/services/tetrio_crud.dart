@@ -4,9 +4,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
+import 'dart:math';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:tetra_stats/data_objects/beta_record.dart';
 import 'package:tetra_stats/data_objects/cutoff_tetrio.dart';
 import 'package:tetra_stats/data_objects/end_context_multi.dart';
 import 'package:tetra_stats/data_objects/news.dart';
@@ -24,8 +26,6 @@ import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
 import 'package:tetra_stats/data_objects/tetrio_player.dart';
 import 'package:tetra_stats/data_objects/tetrio_player_from_leaderboard.dart';
 import 'package:tetra_stats/data_objects/tetrio_players_leaderboard.dart';
-import 'package:tetra_stats/data_objects/tetrio_zen.dart';
-import 'package:tetra_stats/data_objects/user_records.dart';
 import 'package:tetra_stats/main.dart' show packageInfo;
 import 'package:flutter/foundation.dart';
 import 'package:tetra_stats/services/custom_http_client.dart';
@@ -372,7 +372,7 @@ class TetrioService extends DB {
       dbPath = join(docsPath.path, dbName);
     }
     var dbFile = File(dbPath);
-    var dbSize = (await dbFile.stat()).size;
+    var dbSize = kIsWeb ? -1 : (await dbFile.stat()).size;
     var dbTLRecordsQuery = (await db.rawQuery('SELECT COUNT(*) FROM `${tetraLeagueMatchesTable}`')).first['COUNT(*)']! as int;
     var dbTLStatesQuery = (await db.rawQuery('SELECT COUNT(*) FROM `${tetrioLeagueTable}`')).first['COUNT(*)']! as int;
     return (dbSize, dbTLRecordsQuery, dbTLStatesQuery);
@@ -673,8 +673,7 @@ class TetrioService extends DB {
 
   /// Retrieves Tetra League history from p1nkl0bst3r api for a player with given [id]. Returns a list of states
   /// (state = instance of [TetrioPlayer] at some point of time). Can throw an exception if fails to retrieve data.
-  Future<List<TetraLeague>> fetchAndsaveTLHistory(String id, int season) async { 
-    // TODO: find le way to get season 2 history
+  Future<List<TetraLeague>> fetchAndsaveS1TLHistory(String id) async {
     Uri url;
     if (kIsWeb) {
       url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "TLHistory", "user": id});
@@ -743,6 +742,70 @@ class TetrioService extends DB {
       developer.log("$e, $s");
       throw http.ClientException(e.message, e.uri);
     }
+  }
+
+  Future<List<TetraLeague>> fetchAndsaveS2TLHistory(String id) async {
+    final db = getDatabaseOrThrow();
+    List<BetaRecord> records = [];
+    int entries = 100;
+    String? prisecter;
+    while (entries > 0){
+      TetraLeagueBetaStream stream = await fetchTLStream(id, prisecter: prisecter);
+      if (stream.records.isEmpty) break;
+      records.addAll(stream.records);
+      prisecter = stream.records.last.prisecter.toString();
+      entries = stream.records.length;
+    }
+    //TetraLeague currentState = await fetchTLSummary(id);
+    List<TetraLeague> states = [];
+    //states.add(currentState);
+    int gp = 0;
+    int gw = 0;
+    List<double> last10apm = [];
+    List<double> last10pps = [];
+    List<double> last10vs = [];
+    int bestRankIndex = -1; // -1 - Z; 0 - D, 1 - D+ ... 18 - X+
+    Batch batch = db.batch();
+    for (BetaRecord match in records.reversed){
+      gp++;
+      if (match.extras.result.contains("victory")) gw++;
+      last10apm.add(match.results.leaderboard.firstWhere((e) => e.id == id).stats.apm);
+      if (last10apm.length > 10) last10apm.removeAt(0);
+      last10pps.add(match.results.leaderboard.firstWhere((e) => e.id == id).stats.pps);
+      if (last10pps.length > 10) last10pps.removeAt(0);
+      last10vs.add(match.results.leaderboard.firstWhere((e) => e.id == id).stats.vs);
+      if (last10vs.length > 10) last10vs.removeAt(0);
+      double apm = last10apm.reduce((v, e) => v + e) / last10apm.length;
+      double pps = last10pps.reduce((v, e) => v + e) / last10pps.length;
+      double vs = last10vs.reduce((v, e) => v + e) / last10vs.length;
+      TetraLeague state = TetraLeague(
+        id: id,
+        timestamp: match.ts,
+        gamesPlayed: gp,
+        gamesWon: gw,
+        bestRank: bestRankIndex != -1 ? ranks[bestRankIndex] : "z",
+        decaying: false,
+        tr: match.extras.league[id]?[1]?.tr??-1.0,
+        glicko: match.extras.league[id]?[1]?.glicko,
+        rd: match.extras.league[id]?[1]?.rd,
+        gxe: match.extras.league[id]?[1]?.glicko != null ? 10000 / (1 + pow(10, (((1500 - match.extras.league[id]![1]!.glicko) * pi / sqrt(3 * pow(ln10, 2) * pow(match.extras.league[id]![1]!.rd, 2) + 2500 * (64 * pow(pi, 2) + 147 * pow(ln10, 2))))))) / 100 : -1,
+        rank: match.extras.league[id]?[1]?.rank??"z",
+        percentileRank: match.extras.league[id]?[1]?.rank??"z",
+        percentile: match.extras.league[id]?[1]?.rank != null ? rankCutoffs[match.extras.league[id]![1]!.rank]! : -1,
+        standing: match.extras.league[id]?[1]?.placement??-1,
+        standingLocal: -1,
+        nextAt: -1,
+        prevAt: -1,
+        apm: apm,
+        pps: pps,
+        vs: vs,
+        season: currentSeason
+      );
+      states.add(state);
+      batch.insert(tetrioLeagueTable, state.toJson(), conflictAlgorithm: ConflictAlgorithm.replace);
+    }
+    batch.commit();
+    return states;
   }
 
   /// Docs later
@@ -1129,38 +1192,29 @@ class TetrioService extends DB {
     await db.delete(tetrioTLReplayStatsTable, where: '$idCol = ?', whereArgs: [rID]);
   }
 
-  /// Retrieves Blitz, 40 Lines and Zen records for a given [userID] from Tetra Channel api. Returns `UserRecords`.
-  /// Throws an exception if fails to retrieve.
-  Future<UserRecords> fetchRecords(String userID) async {
-    UserRecords? cached = _cache.get(userID, UserRecords);
+  Future<TetraLeague> fetchTLSummary(String id) async {
+    TetraLeague? cached = _cache.get(id, TetraLeague);
     if (cached != null) return cached;
-    
+
     Uri url;
     if (kIsWeb) {
-      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "tetrioUserRecords", "user": userID.toLowerCase().trim()});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "Summaries", "id": id});
     } else {
-      url = Uri.https('ch.tetr.io', 'api/users/${userID.toLowerCase().trim()}/records');
+      url = Uri.https('ch.tetr.io', 'api/users/$id/summaries/league');
     }
+
     try{
       final response = await client.get(url);
 
       switch (response.statusCode) {
         case 200:
           if (jsonDecode(response.body)['success']) {
-            Map jsonRecords = jsonDecode(response.body);
-              var sprint = jsonRecords['data']['records']['40l']['record'] != null
-                  ? RecordSingle.fromJson(jsonRecords['data']['records']['40l']['record'], jsonRecords['data']['records']['40l']['rank'], jsonRecords['data']['records']['40l']['rank_local'])
-                  : null;
-              var blitz = jsonRecords['data']['records']['blitz']['record'] != null
-                  ? RecordSingle.fromJson(jsonRecords['data']['records']['blitz']['record'], jsonRecords['data']['records']['blitz']['rank'], jsonRecords['data']['records']['blitz']['rank_local'])
-                  : null;
-              var zen = TetrioZen.fromJson(jsonRecords['data']['zen']);
-            UserRecords result = UserRecords(userID, sprint, blitz, zen);
-            _cache.store(result, jsonDecode(response.body)['cache']['cached_until']);
-            developer.log("fetchRecords: $userID records retrieved and cached", name: "services/tetrio_crud");
-            return result;
+            developer.log("fetchTLSummary: $id TL state retrieved and cached", name: "services/tetrio_crud");
+            TetraLeague league = TetraLeague.fromJson(jsonDecode(response.body)['data'], DateTime.now(), currentSeason, id);
+            _cache.store(league, jsonDecode(response.body)['cache']['cached_until']);
+            return league;
           } else {
-            developer.log("fetchRecords User dosen't exist", name: "services/tetrio_crud", error: response.body);
+            developer.log("fetchTLSummary: User dosen't exist", name: "services/tetrio_crud", error: response.body);
             throw TetrioPlayerNotExist();
           }
         case 403:
@@ -1175,7 +1229,7 @@ class TetrioService extends DB {
         case 504:
           throw TetrioInternalProblem();
         default:
-          developer.log("fetchRecords Failed to fetch records", name: "services/tetrio_crud", error: response.statusCode);
+          developer.log("fetchTLSummary Failed to fetch TL state", name: "services/tetrio_crud", error: response.statusCode);
           throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
       }
     } on http.ClientException catch (e, s) {
@@ -1427,15 +1481,4 @@ class TetrioService extends DB {
     }
     return data;
   }
-
-  // Future<void> fetchTracked() async {
-  //   for (String userID in (await getAllPlayerToTrack())) { 
-  //     TetrioPlayer player = await fetchPlayer(userID);
-  //     storeState(player);
-  //     sleep(Durations.extralong4);
-  //     TetraLeagueBetaStream matches = await fetchTLStream(userID);
-  //     saveTLMatchesFromStream(matches);
-  //     sleep(Durations.extralong4);
-  //   }
-  // }
 }

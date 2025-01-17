@@ -172,7 +172,7 @@
         "refresh": "Обновить"
     },
     "graphsDestination": {
-        "fetchAndsaveTLHistory": "Получить историю игрока",
+        "fetchAndsaveTLHistory": "Получить историю",
         "fetchAndSaveOldTLmatches": "Получить историю матчей Тетра Лиги",
         "fetchAndsaveTLHistoryResult": "${number} состояний было найдено",
         "fetchAndSaveOldTLmatchesResult": "${number} матчей было найдено",

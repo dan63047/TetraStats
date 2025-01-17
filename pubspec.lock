@@ -328,6 +328,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_to_debian:
+    dependency: "direct main"
+    description:
+      name: flutter_to_debian
+      sha256: d23534407334b331ce20fbaa8395b9ecc255d0c047136b8998715f36933ee696
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.2"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
@@ -509,6 +517,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
+  mime_type:
+    dependency: transitive
+    description:
+      name: mime_type
+      sha256: d652b613e84dac1af28030a9fba82c0999be05b98163f9e18a0849c6e63838bb
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   node_preamble:
     dependency: transitive
     description:

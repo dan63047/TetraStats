@@ -65,7 +65,7 @@ class TLRatingThingy extends StatelessWidget{
                 } : [TextSpan(text: "---\n", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: bigScreen ? 42 : 28, color: Colors.grey)), TextSpan(text: t.gamesUntilRanked(left: 10-tlData.gamesPlayed), style: const TextStyle(color: Colors.grey, fontSize: 14)),]
               )
             ),
-            if (oldTl != null) RichText(
+            if (oldTl != null && oldTl!.tr != -1.0) RichText(
               textAlign: TextAlign.center,
               softWrap: true,
               text: TextSpan(
