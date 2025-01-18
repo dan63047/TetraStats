@@ -172,7 +172,7 @@
         "refresh": "刷新"
     },
     "graphsDestination": {
-        "fetchAndsaveTLHistory": "Fetch History",
+        "fetchAndsaveTLHistory": "获取玩家历史",
         "fetchAndSaveOldTLmatches": "获取 Tetra 联赛历史记录",
         "fetchAndsaveTLHistoryResult": "找到 ${number} 个状态",
         "fetchAndSaveOldTLmatchesResult": "找到 ${number} 场比赛",
