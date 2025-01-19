@@ -750,6 +750,7 @@ class TetrioService extends DB {
     int entries = 100;
     String? prisecter;
     while (entries > 0){
+      await Future<void>.delayed(const Duration(seconds: 1));
       TetraLeagueBetaStream stream = await fetchTLStream(id, prisecter: prisecter);
       if (stream.records.isEmpty) break;
       records.addAll(stream.records);

@@ -593,10 +593,10 @@ class AchievementSummary extends StatelessWidget{
                     ),
                     child: ClipRect(
                       child: Align(
-                        alignment: Alignment.topLeft.add(Alignment(0.286 * (((achievement?.k??1) - 1) % 8), 0.286 * (((achievement?.k??0) - 1) / 8).floor())),
+                        alignment: Alignment.topLeft.add(Alignment(0.286 * (((achievement?.k??1) - 1) % 8), 0.286 * ((((achievement?.k??0) - 1) / 8).floor() % 8))),
                         heightFactor: 0.125,
                         widthFactor: 0.125,
-                        child: Image.asset("res/icons/achievements.png", width: 2048, height: 2048, scale: 1, color: achievement?.v == null ? Colors.grey : achievementColors[min(achievement!.rank!, 6)]),
+                        child: Image.asset("res/icons/achievements${(achievement?.k??1).floor() ~/ 64}.png", width: 2048, height: 2048, scale: 1, color: achievement?.v == null ? Colors.grey : achievementColors[min(achievement!.rank!, 6)]),
                       ),
                     ),
                   ),
@@ -1219,64 +1219,16 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
               closestAverageBlitz = blitzAverages.entries.last;
               blitzBetterThanClosestAverage = false;
             }
-            List<Achievement> tlAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? <Achievement>[
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 10),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 12),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 13),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 14),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 15),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 47),
-            ] : [];
-            List<Achievement> qpAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? <Achievement>[
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 16),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 17),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 18),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 20),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 21),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 22),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 23),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 24),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 25),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 26),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 27),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 28),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 29),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 30),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 33),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 41),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 43),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 44),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 45),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 46),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 51),
-              if (snapshot.data!.summaries!.achievements.any((e) => e.k == 54)) snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 54),
-            ] : [];
-            List<Achievement> qpExAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? <Achievement>[
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 19),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 31),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 32),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 34),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 40),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 49),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 50),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 53),
-            ] : [];
-            List<Achievement> sprintAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? <Achievement>[
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 5),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 7),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 8),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 9),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 36),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 37),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 38),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 48),
-            ] : [];
-            List<Achievement> blitzAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? <Achievement>[
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 6),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 39),
-              snapshot.data!.summaries!.achievements.firstWhere((e) => e.k == 52),
-            ] : [];
+            List<Achievement> tlAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? snapshot.data!.summaries!.achievements.where((e) => e.category == "league").toList() : [];
+            List<Achievement> qpAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? snapshot.data!.summaries!.achievements.where((e) => e.category == "zenith" && !e.object.contains("Expert Mode")).toList() : [];
+            List<Achievement> qpExAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? snapshot.data!.summaries!.achievements.where((e) => e.category == "zenith" && e.object.contains("Expert Mode")).toList() : [];
+            List<Achievement> sprintAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? snapshot.data!.summaries!.achievements.where((e) => e.category == "solo" && !e.object.contains("BLITZ")).toList() : [];
+            List<Achievement> blitzAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? snapshot.data!.summaries!.achievements.where((e) => e.category == "solo" && e.object.contains("BLITZ")).toList() : [];
+            tlAchievements.sort((a, b) => a.o! - b.o!);
             qpAchievements.sort((a, b) => a.o! - b.o!);
+            qpExAchievements.sort((a, b) => a.o! - b.o!);
+            sprintAchievements.sort((a, b) => a.o! - b.o!);
+            blitzAchievements.sort((a, b) => a.o! - b.o!);
             return TweenAnimationBuilder(
               duration: Durations.long4,
               tween: Tween<double>(begin: 0, end: 1),
