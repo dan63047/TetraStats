@@ -6,7 +6,7 @@ Tetra Stats works with TETR.IO Tetra Channel API, providing data from it and cal
 
 You can [download an app](https://github.com/dan63047/TetraStats/releases), or [use web version](https://ts.dan63.by).
 
-![Screenshot of the app 1](https://i.imgur.com/Hl02YkX.png)
+![Screenshot of the app 1](https://i.imgur.com/3nqyNcR.png)
 
 # Available functionality
 - Advanced stats for players
