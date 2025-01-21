@@ -806,7 +806,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                     const Divider(),
                     RecordSummary(record: summaries.zenith != null ? summaries.zenith : summaries.zenithCareerBest, hideRank: true, old: summaries.zenith == null),
                     const Divider(),
-                    Text(t.overallPB(pb: (summaries.achievements.isNotEmpty && summaries.achievements.firstWhere((e) => e.k == 18).v != null) ? f2.format(summaries.achievements.firstWhere((e) => e.k == 18).v!) : "-.--"), style: const TextStyle(color: Colors.grey))
+                    Text(t.overallPB(pb: (summaries.achievements.firstWhere((e) => e.k == 18, orElse: () => Achievement(k: 18, rt: 0, vt: 0, min: 0, deci: 0, name: "", object: "", category: "", hidden: true, art: 1, nolb: true, desc: "", n: "", a: 0)).v != null) ? f2.format(summaries.achievements.firstWhere((e) => e.k == 18).v!) : "-.--"), style: const TextStyle(color: Colors.grey))
                   ],
                 ),
               ),
@@ -821,7 +821,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                     const Divider(),
                     RecordSummary(record: summaries.zenithEx != null ? summaries.zenithEx : summaries.zenithExCareerBest, hideRank: true, old: summaries.zenith == null),
                     const Divider(),
-                    Text(t.overallPB(pb: (summaries.achievements.isNotEmpty && summaries.achievements.firstWhere((e) => e.k == 19).v != null) ? f2.format(summaries.achievements.firstWhere((e) => e.k == 19).v!) : "-.--"), style: const TextStyle(color: Colors.grey))
+                    Text(t.overallPB(pb: (summaries.achievements.firstWhere((e) => e.k == 19, orElse: () => Achievement(k: 19, rt: 0, vt: 0, min: 0, deci: 0, name: "", object: "", category: "", hidden: true, art: 1, nolb: true, desc: "", n: "", a: 0)).v != null) ? f2.format(summaries.achievements.firstWhere((e) => e.k == 19).v!) : "-.--"), style: const TextStyle(color: Colors.grey))
                   ],
                 ),
               ),
@@ -872,14 +872,14 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                       children: [
                         Text("${t.stats.piecesTotal}:"),
                         const Spacer(),
-                        Text((summaries.achievements.isNotEmpty && summaries.achievements.firstWhere((e) => e.k == 1).v != null) ? intf.format(summaries.achievements.firstWhere((e) => e.k == 1).v!) : "---"),
+                        Text((summaries.achievements.firstWhere((e) => e.k == 1, orElse: () => Achievement(k: 1, rt: 0, vt: 0, min: 0, deci: 0, name: "", object: "", category: "", hidden: true, art: 1, nolb: true, desc: "", n: "", a: 0)).v != null) ? intf.format(summaries.achievements.firstWhere((e) => e.k == 1).v!) : "---"),
                       ],
                     ),
                     Row(
                       children: [
                         Text(" - ${t.stats.piecesWithPerfectFinesse}:"),
                         const Spacer(),
-                        Text((summaries.achievements.isNotEmpty && summaries.achievements.firstWhere((e) => e.k == 4).v != null) ? intf.format(summaries.achievements.firstWhere((e) => e.k == 4).v!) : "---"),
+                        Text((summaries.achievements.firstWhere((e) => e.k == 4, orElse: () => Achievement(k: 4, rt: 0, vt: 0, min: 0, deci: 0, name: "", object: "", category: "", hidden: true, art: 1, nolb: true, desc: "", n: "", a: 0)).v != null) ? intf.format(summaries.achievements.firstWhere((e) => e.k == 4).v!) : "---"),
                       ],
                     )
                   ],
