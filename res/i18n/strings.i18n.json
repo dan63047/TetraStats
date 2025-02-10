@@ -3,7 +3,7 @@
         "en": "English",
         "ru-RU": "Russian (Русский)",
         "zh-CN": "Simplified Chinese (简体中文)",
-        "de": "German (Deutsch)"
+        "de-DE": "German (Deutsch)"
     },
     "gamemodes(map)":{
         "league": "Tetra League",
@@ -381,6 +381,7 @@
         "providedS1history": "Provided S1 history",
         "inoue": "Inoue (replay grabber)",
         "zhCNlocale": "Simplfied Chinese locale",
+        "deDElocale": "German locale",
         "supportHim": "Support him!"
     },
     "stats": {

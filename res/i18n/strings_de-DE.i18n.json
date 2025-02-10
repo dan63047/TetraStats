@@ -1,9 +1,9 @@
 {
     "locales(map)": {
         "en": "Englisch",
-        "ru-RU": "Russian (Русский)",
-        "zh-CN": "Simplified Chinese (简体中文)",
-        "de": "German (Deutsch)"
+        "ru-RU": "Russisch (Русский)",
+        "zh-CN": "Vereinfachtes Chinesisch (简体中文)",
+        "de-DE": "German (Deutsch)"
     },
     "gamemodes(map)":{
         "league": "Tetra League",
@@ -54,9 +54,9 @@
     "dateAndTime": "Datum & Zeit",
     "TLfullLBnote": "Intensiv, aber erlaubt dir Spieler nach deren Statistiken zu sortieren und nach Rängen zu filtern",
     "rank": "Rang",
-    "verdictGeneral": "$n $verdict von $rank Rangdurchschnitt",
-    "verdictBetter": "vorne",
-    "verdictWorse": "hinter",
+    "verdictGeneral": "$n $verdict als $rank Durchschnitt",
+    "verdictBetter": "besser",
+    "verdictWorse": "schlechter",
     "localStanding": "Lokal",
     "xp": {
         "title": "XP Level",
@@ -106,7 +106,7 @@
     },
     "newsEntries":{
         "leaderboard(rich)": "Erreicht № $rank in $gametype",
-        "personalbest(rich)": "Erreicht einen neuen PB in $gametype mit $pb",
+        "personalbest(rich)": "Erreicht einen neuen Rekord in $gametype mit $pb",
         "badge(rich)": "Erhielt Abzeichen $badge",
         "rankup(rich)": "Erreicht $rank in Tetra League",
         "supporter(rich)": "Wurde ein ${s(TETR.IO Unterstützer)}",
@@ -217,9 +217,9 @@
         "overpopulated": "Überpopuliert von $players Spielern",
         "underpopulated": "Unterpopuliert von $players Spielern",
         "PlayersEqualSupposedToBe": "cute",
-        "avgStats": "Durschnitts Statistik",
+        "avgStats": "Durchschnitts-Statistik",
         "avgForRank": "Durchschnitt für $rank Rang",
-        "avgNerdStats": "Durschnitts Statistiken für Nerds",
+        "avgNerdStats": "Durchschnitts-Statistiken für Nerds",
         "minimums": "Minimume",
         "maximums": "Maximume"
     },
@@ -267,7 +267,7 @@
     "infoDestination": {
         "title": "Informationscenter",
         "sprintAndBlitzAverages": "40 Lines & Blitz Durchschnitte",
-        "sprintAndBlitzAveragesDescription": "Da 40 Lines & Blitz durchschnitte zu berechnen ein intensiver Prozess ist, aktualisieren sich die Daten nach einer Weile. Drücke auf den Titel von dieser Meldung, um den vollen 40 Lines & Blitz Durschnittstabelle zu sehen",
+        "sprintAndBlitzAveragesDescription": "Da 40 Lines & Blitz durchschnitte zu berechnen ein intensiver Prozess ist, aktualisieren sich die Daten nach einer Weile. Drücke auf den Titel von dieser Meldung, um den vollen 40 Lines & Blitz Durchschnittstabelle zu sehen",
         "tetraStatsWiki": "Tetra Stats Wiki",
         "tetraStatsWikiDescription": "Mehr Information zu Tetra Stats funktionen und Statistiken die es bereitstellt findest du hier",
         "about": "Über Tetra Stats",
@@ -277,7 +277,7 @@
         "title": "Bestenliste",
         "tl": "Tetra League (Aktuelle Saison)",
         "fullTL": "Tetra League (Aktuelle Saison, komplett)",
-        "ar": "Errungschaftspunkte"
+        "ar": "Errungenschaftspunkte"
     },
     "savedDataDestination": {
         "title": "Gespeicherte Daten",
@@ -308,8 +308,8 @@
         },
         "updateInTheBackground": "Aktualisieren der Daten im Hintergrund",
         "updateInTheBackgroundDescription": "Falls aktiviert, wird Tetra Stats versuchen die neue Daten zu laden wenn der Cache abgelaufen ist. Das passiert meistens alle 5 Minuten",
-        "compareStats": "Vergleiche TL daten mit den Rangdurschnitt",
-        "compareStatsDescription": "Falls an, Tetra Stats wird weitere Parameter zur Verfügung stellen, welche es dir erlaubt dich mit den Durschnittsspieler in deinem Rang zu vergleichen. Du wirs es so sehen: Statistiken werden mit einer Farbe markiert, fahre über diese drüber um mehr zu erfahren.", 
+        "compareStats": "Vergleiche TL daten mit den Rangdurchschnitt",
+        "compareStatsDescription": "Falls an, Tetra Stats wird weitere Parameter zur Verfügung stellen, welche es dir erlaubt dich mit den Durchschnittsspieler in deinem Rang zu vergleichen. Du wirs es so sehen: Statistiken werden mit einer Farbe markiert, fahre über diese drüber um mehr zu erfahren.", 
         "showPosition": "Zeigt Position auf der Bestenliste nach Statistik",
         "showPositionDescription": "Dies kann einige Zeit und Daten in Anspruch nehmen, gibt dir aber die Möglichkeit deine Position in der Bestenliste zu sehen (nach Statistik sortiert)",
         "accentColor": "Akzentfarbe",
@@ -559,9 +559,9 @@
             "full": "Tastenanschläge pro Sekunden"
         },
         "blitzScore": "$p Punkte",
-        "levelUpRequirement": "Level up Vorraussetzung: $p",
-        "piecesTotal": "Insgesamt Steine platziert",
-        "piecesWithPerfectFinesse": "Plaziert mit perfekter Finesse",
+        "levelUpRequirement": "Level up in $p Punkten",
+        "piecesTotal": "Insgesamt platzierte Steine",
+        "piecesWithPerfectFinesse": "davon mit perfekter Finesse",
         "score": "Punkte",
         "lines": "Linien",
         "linesShort": "L",
@@ -668,7 +668,7 @@
         "spins": "Spins"
     },
     "countries(map)": {
-        "": "Worldwide",
+        "": "Weltweit",
 
         "AF": "Afghanistan",
         "AX": "\u00c5land Islands",
