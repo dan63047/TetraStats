@@ -1287,7 +1287,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                           ),
                         ),
                       ),
-                        if (modeButtons[rightCard]!.length > 1 && !widget.noSidebar) SegmentedButton<CardMod>(
+                        if (modeButtons[rightCard]!.length > 1 && widget.constraints.maxWidth >= 1030.00) SegmentedButton<CardMod>(
                           showSelectedIcon: false,
                           selected: <CardMod>{cardMod},
                           segments: modeButtons[rightCard]!,
@@ -1298,7 +1298,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                             });
                           },
                         ),
-                        if (!widget.noSidebar) SegmentedButton<Cards>(
+                        if (widget.constraints.maxWidth >= 1030.00) SegmentedButton<Cards>(
                           showSelectedIcon: false,
                           segments: <ButtonSegment<Cards>>[
                             ButtonSegment<Cards>(
