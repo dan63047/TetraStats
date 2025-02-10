@@ -1,0 +1,957 @@
+{
+    "locales(map)": {
+        "en": "Englisch",
+        "ru-RU": "Russisch (Русский)",
+        "zh-CN": "Vereinfachtes Chinesisch (简体中文)",
+        "de-DE": "German (Deutsch)"
+    },
+    "gamemodes(map)":{
+        "league": "Tetra League",
+        "zenith": "Quick Play",
+        "zenithex": "Quick Play Expert",
+        "40l": "40 Lines",
+        "blitz": "Blitz",
+        "5mblast": "5,000,000 Blast",
+        "zen": "Zen"
+    },
+    "destinations": {
+        "home": "Startseite",
+        "graphs": "Graphen",
+        "leaderboards": "Bestenlisten",
+        "cutoffs": "Grenzwerte",
+        "calc": "Rechner",
+        "info": "Informationscenter",
+        "data": "Gespeicherte Daten",
+        "settings": "Einstellungen"
+    },
+    "playerRole(map)": {
+        "user": "Nutzer",
+        "banned": "Gebannt",
+        "bot": "Bot",
+        "sysop": "Systemoperator",
+        "admin": "Admin",
+        "mod": "Moderator",
+        "halfmod": "Community Moderator",
+        "anon": "Anonym"
+    },
+    "goBackButton": "Zurück",
+    "nanow": "Aktuell nicht verfügbar...",
+    "seasonEnds": "Saison endet in ${countdown}",
+    "seasonEnded": "Saison ist vorbei",
+    "overallPB": "Gesamt PB: $pb m",
+    "gamesUntilRanked": "${left} spiele bis zum Rang",
+    "numOfVictories": "~${wins} Siege",
+    "promotionOnNextWin": "Aufstieg beim nächsten Sieg",
+    "numOfdefeats": "~${losses} Niederlagen",
+    "demotionOnNextLoss": "Abstieg bei nächster Niederlage",
+    "records": "Rekorde",
+    "nerdStats": "Statistiken für Nerds",
+    "playstyles": "Spielstile",
+    "horoscopes": "Horoskope",
+    "relatedAchievements": "Zugehörige Errungenschaften",
+    "season": "Saison",
+    "smooth": "Glatt",
+    "dateAndTime": "Datum & Zeit",
+    "TLfullLBnote": "Intensiv, aber erlaubt dir Spieler nach deren Statistiken zu sortieren und nach Rängen zu filtern",
+    "rank": "Rang",
+    "verdictGeneral": "$n $verdict als $rank Durchschnitt",
+    "verdictBetter": "besser",
+    "verdictWorse": "schlechter",
+    "localStanding": "Lokal",
+    "xp": {
+        "title": "XP Level",
+        "progressToNextLevel": "Fortschritt zum nächsten Level: $percentage",
+        "progressTowardsGoal": "Fortschritt von 0 XP zum Level $goal: $percentage ($left XP fehlen)"
+    },
+    "gametime":{
+        "title": "genaue Spielzeit",
+        "gametimeAday": "$gametime durchschnittliche Spielzeit am Tag",
+        "breakdown": "Das sind $years Jahre,\noder $months Monate,\noder $days Tage,\noder $minutes Minuten\noder $seconds Sekunden"
+    },
+    "track": "Erfassen",
+    "stopTracking": "Erfassen stoppen",
+    "supporter": "Unterstützer Stufe ${tier}",
+    "comparingWith": "Daten von ${newDate}, vergleiche mit ${oldDate}",
+    "compare": "Vergleich",
+    "comparison": "Vergleichen",
+    "enterUsername": "Benutzernamen eingeben \\$avgX (X ist Rang)",
+    "general": "Allgemein",
+    "badges": "Abzeichen",
+    "obtainDate": "Erhalten am ${date}",
+    "assignedManualy": "Dieses Abzeichen wurde per Hand von TETR.IO Admins vergeben",
+    "distinguishment": "Unterscheidung",
+    "banned": "Gebannt",
+    "bannedSubtext": "Banns werden vergeben wenn die TETR.IO Regeln oder Nutzungsvereinbarung gebrochen werden",
+    "badStanding": "Bad standing",
+    "badStandingSubtext": "Ein oder mehrere kürzliche Banns erhalten",
+    "botAccount": "Bot Account",
+    "botAccountSubtext": "Betrieben von $botMaintainers",
+    "copiedToClipboard": "In die Zwischenablage gespeichert!",
+    "bio": "Bio",
+    "news": "Neuigkeiten",
+    "matchResult": {
+        "victory": "Sieg",
+        "defeat": "Niederlage",
+        "tie": "Unentschieden",
+        "dqvictory": "Gegner wurde DQ'ed",
+        "dqdefeat": "Disqualifiziert",
+        "nocontest": "Kein Wettbewerb",
+        "nullified": "Annulliert"
+    },
+    "distinguishments": {
+        "noHeader": "Header ist nicht Vorhanden",
+        "noFooter": "Footer ist nicht Vorhanden",
+        "twc": "TETR.IO Weltmeister",
+        "twcYear": "$year TETR.IO Weltmeister"
+    },
+    "newsEntries":{
+        "leaderboard(rich)": "Erreicht № $rank in $gametype",
+        "personalbest(rich)": "Erreicht einen neuen Rekord in $gametype mit $pb",
+        "badge(rich)": "Erhielt Abzeichen $badge",
+        "rankup(rich)": "Erreicht $rank in Tetra League",
+        "supporter(rich)": "Wurde ein ${s(TETR.IO Unterstützer)}",
+        "supporter_gift(rich)": "Erhielt das Geschenk eines ${s(TETR.IO supporter)}",
+        "unknown(rich)": "Unbekannte Neuigkeiten vom Typ $type"
+    },
+    "rankupMiddle": "${r} Rang",
+    "copyUserID": "Klicke um Nutzer ID zu kopieren",
+    "searchHint": "Nutzername oder ID",
+    "navMenu": "Navigation",
+    "navMenuTooltip": "Öffne Navigation",
+    "refresh": "Daten aktualisieren",
+    "searchButton": "Suche",
+    "trackedPlayers": "Erfasste Benutzer",
+    "standing": "Stand",
+    "previousSeasons": "Vorhärige Saison",
+    "recent": "Kürzlich",
+    "top": "Top",
+    "noRecord": "Kein Rekord",
+    "sprintAndBlitsRelevance": "Relevanz: ${date}",
+    "snackBarMessages":{
+        "stateRemoved": "${date} Status wurde von der Datenbank entfernt!",
+        "matchRemoved": "${date} Match wurde aus der Datenbank entfernt!",
+        "notForWeb": "Funktion ist nicht verfügbar in der Webversion",
+        "importSuccess": "Import erfolgreich",
+        "importCancelled": "Import wurde abgebrochen"
+    },
+    "errors": {
+        "noRecords": "Keine Rekorde",
+        "notEnoughData": "Nicht genug Daten",
+        "noHistorySaved": "Keine Historie gespeichert",
+        "connection": "Netzwerkfehler: ${code} ${message}",
+        "noSuchUser": "Dieser User existiert nicht",
+        "noSuchUserSub": "Entweder hast du was falsch geschrieben, oder der Account existiert nicht mehr",
+        "discordNotAssigned": "Kein Nutzer mit dieser Discord ID gefunden",
+        "discordNotAssignedSub": "Stelle sicher das du eine gültige ID übergibst",
+        "history": "Historie des Nutzers fehlt",
+        "actionSuggestion": "Womöglich, möchtest du",
+        "p1nkl0bst3rTLmatches": "Keine Tetra League Matche gefunden",
+        "clientException": "Keine Internetverbindung",
+        "forbidden": "Deine IP-Adresse ist blockiert",
+        "forbiddenSub": "Wenn du ein VPN oder Proxy verwendest, deaktiviere es. Wenn das nicht helfen sollte kontaktiere $nickname",
+        "tooManyRequests": "Du hast das Anfragelimit erreicht.",
+        "tooManyRequestsSub": "Warte einen Moment und versuche es erneut",
+        "internal": "Irgendwas ist auf der tetr.io Seite passiert",
+        "internalSub": "osk, weiß warscheinlich schon Bescheid",
+        "internalWebVersion": "Irgendwas ist auf der tetr.io Seite passiert (oder auf oskware_bridge, ach was weiß ich)",
+        "internalWebVersionSub": "Wenn auf osk Statusseite alles in Ordnung ist, dann lass es dan63047 wissen",
+        "oskwareBridge": "Irgendwas ist mit oskware_bridge passiert",
+        "oskwareBridgeSub": "Lass es dan63047 wissen",
+        "p1nkl0bst3rForbidden": "Drittanbieter API ist von der IP-Adresse blockiert",
+        "p1nkl0bst3rTooManyRequests": "Zu viele Anfragen an Drittanbiete API. Versuche es später erneut",
+        "p1nkl0bst3rinternal": "Irgendwas ist auf der p1nkl0bst3r Seite passiert",
+        "p1nkl0bst3rinternalWebVersion": "Irgendwas ist auf der p1nkl0bst3r Seite passiert (oder oskware_bridge, ach was weiß ich)",
+        "replayAlreadySaved": "Wiederholung ist schon gespeichert",
+        "replayExpired": "Wiederholung ist abgelaufen und ist nicht mehr Verfügbar",
+        "replayRejected": "Drittanbieter API hat deine IP-Adresse blockiert"
+    },
+    "actions":{
+        "cancel": "Abbrechen",
+        "submit": "Absenden",
+        "ok": "OK",
+        "apply": "Anwenden",
+        "refresh": "Aktualisieren"
+    },
+    "graphsDestination": {
+        "fetchAndsaveTLHistory": "Historie abrufen",
+        "fetchAndSaveOldTLmatches": "Tetra League Matchhistorie abrufen",
+        "fetchAndsaveTLHistoryResult": "${number} Zustände was found",
+        "fetchAndSaveOldTLmatchesResult": "${number} Matches gefunden",
+        "gamesPlayed": "$games gespielt",
+        "dateAndTime": "Datum & Zeit",
+        "filterModaleTitle": "Filter Ränge oder Graphen"
+    },
+    "filterModale":{
+        "all": "Alle"
+    },
+    "cutoffsDestination": {
+        "title": "Tetra League Zustand",
+        "relevance": "stand vom $timestamp",
+        "actual": "Aktuell",
+        "target": "Ziel",
+        "cutoffTR": "Grenzwert TR",
+        "targetTR": "Ziel TR",
+        "state": "Zustand",
+        "advanced": "Erweitert",
+        "players": "Spieler ($n)",
+        "moreInfo": "Mehr Info",
+        "NumberOne": "№ 1 ist $tr TR",
+        "inflated": "Überfüllt ab $tr TR",
+        "notInflated": "Nicht überfüllt",
+        "deflated": "Unterfüllt ab $tr TR",
+        "notDeflated": "Nicht unterfüllt",
+        "wellDotDotDot": "Nun...",
+        "fromPlace": "von № $n",
+        "viewButton": "Ansicht"
+    },
+    "rankView":{
+        "rankTitle": "$rank Rangdaten",
+        "everyoneTitle": "Komplette Bestenliste",
+        "trRange": "TR Reichweite",
+        "supposedToBe": "Sollte sein",
+        "gap": "$value Lücke",
+        "trGap": "$value TR Lücke",
+        "deflationGap": "Unterfüllt-Lücke",
+        "inflationGap": "Überfüllt-Lücke",
+        "LBposRange": "LB positions Reichweite",
+        "overpopulated": "Überpopuliert von $players Spielern",
+        "underpopulated": "Unterpopuliert von $players Spielern",
+        "PlayersEqualSupposedToBe": "cute",
+        "avgStats": "Durchschnitts-Statistik",
+        "avgForRank": "Durchschnitt für $rank Rang",
+        "avgNerdStats": "Durchschnitts-Statistiken für Nerds",
+        "minimums": "Minimume",
+        "maximums": "Maximume"
+    },
+    "stateView": {
+        "title": "Zustand vom $date"
+    },
+    "tlMatchView": {
+        "match": "Match",
+        "vs": "vs",
+        "winner": "Sieger",
+        "roundNumber": "Runde $n",
+        "statsFor": "Statistik für",
+        "numberOfRounds": "Anzahl Runden",
+        "matchLength": "Match Länge",
+        "roundLength": "Round Länge",
+        "matchStats": "Match Statistik",
+        "downloadReplay": "Download .ttrm Wiederholung",
+        "openReplay": "Öffne Wiederholung in TETR.IO"
+    },
+    "calcDestination": {
+        "placeholders": "Gebe $stat ein",
+        "tip": "Gebe Wert ein und drücke \"Berechnen\", um Statistiken für Nerds zu sehen",
+        "statsCalcButton": "Berechnen",
+        "damageCalcTip": "Klicke auf die Aktionen zu deiner Linken, um diese hier hinzuzufügen",
+        "actions": "Aktionen",
+        "results": "Ergebnisse",
+        "rules": "Regeln",
+        "noSpinClears": "Keine Spin Clears",
+        "spins": "Spins",
+        "miniSpins": "Mini spins",
+        "noLineclear": "Kein lineclear (Combo unterbrochen)",
+        "custom": "Benutzerdefiniert",
+        "multiplier": "Multiplikator",
+        "pcDamage": "Perfect Clear Schaden",
+        "comboTable": "Combo Tabelle",
+        "b2bChaining": "Back-To-Back Chaining",
+        "surgeStartAtB2B": "Startet bei B2B",
+        "surgeStartAmount": "Start Wert",
+        "totalDamage": "Totaler Schaden",
+        "lineclears": "Lineclears",
+        "combo": "Combo",
+        "surge": "Surge",
+        "pcs": "PCs"
+    },
+    "infoDestination": {
+        "title": "Informationscenter",
+        "sprintAndBlitzAverages": "40 Lines & Blitz Durchschnitte",
+        "sprintAndBlitzAveragesDescription": "Da 40 Lines & Blitz durchschnitte zu berechnen ein intensiver Prozess ist, aktualisieren sich die Daten nach einer Weile. Drücke auf den Titel von dieser Meldung, um den vollen 40 Lines & Blitz Durchschnittstabelle zu sehen",
+        "tetraStatsWiki": "Tetra Stats Wiki",
+        "tetraStatsWikiDescription": "Mehr Information zu Tetra Stats funktionen und Statistiken die es bereitstellt findest du hier",
+        "about": "Über Tetra Stats",
+        "aboutDescription": "Entwickelt von dan63\n"
+    },
+    "leaderboardsDestination": {
+        "title": "Bestenliste",
+        "tl": "Tetra League (Aktuelle Saison)",
+        "fullTL": "Tetra League (Aktuelle Saison, komplett)",
+        "ar": "Errungenschaftspunkte"
+    },
+    "savedDataDestination": {
+        "title": "Gespeicherte Daten",
+        "tip": "Wähle Nutzername auf der linken aus um dessen Daten zu sehen",
+        "seasonTLstates": "S$s TL Statistiken",
+        "TLrecords": "TL Rekorde"
+    },
+    "settingsDestination": {
+        "title": "Einstellungen",
+        "general": "Allgemein",
+        "customization": "Personalisierung",
+        "database": "Lokale Datenbank",
+        "checking": "Überprüfen...",
+        "enterToSubmit": "Drücke Enter zum absenden",
+        "account": "Dein Account in TETR.IO",
+        "accountDescription": "Statistiken dieses Spielers direkt beim ersten Start der App geladen. Standardmäßig läd es meine (dan63) Statistiken. Um das zu ändern, gebe bitte deinen Nutzernamen ein.",
+        "done": "Fertig!",
+        "noSuchAccount": "Diesen Account gibt es nicht",
+        "language": "Sprache",
+        "languageDescription": "Tetra Stats wurde in $languages Sprachen übersetzt. Im Normalfall wird deine Systemsprache oder Englisch verwendet, falls deine Sprache nicht existiert.",
+        "languages(plural)": {
+            "zero": "Null Sprachen",
+            "one": "$n Sprache",
+            "two": "$n Sprachen",
+            "few": "$n Sprachen",
+            "many": "$n Sprachen",
+            "other": "$n Sprachen"
+        },
+        "updateInTheBackground": "Aktualisieren der Daten im Hintergrund",
+        "updateInTheBackgroundDescription": "Falls aktiviert, wird Tetra Stats versuchen die neue Daten zu laden wenn der Cache abgelaufen ist. Das passiert meistens alle 5 Minuten",
+        "compareStats": "Vergleiche TL daten mit den Rangdurchschnitt",
+        "compareStatsDescription": "Falls an, Tetra Stats wird weitere Parameter zur Verfügung stellen, welche es dir erlaubt dich mit den Durchschnittsspieler in deinem Rang zu vergleichen. Du wirs es so sehen: Statistiken werden mit einer Farbe markiert, fahre über diese drüber um mehr zu erfahren.", 
+        "showPosition": "Zeigt Position auf der Bestenliste nach Statistik",
+        "showPositionDescription": "Dies kann einige Zeit und Daten in Anspruch nehmen, gibt dir aber die Möglichkeit deine Position in der Bestenliste zu sehen (nach Statistik sortiert)",
+        "accentColor": "Akzentfarbe",
+        "accentColorDescription": "Die Farbe die verwendet werden soll um UI Elemente hervorzuheben.",
+        "accentColorModale": "Wähle eine Akzentfarbe aus",
+        "timestamps": "Zeitformat",
+        "timestampsDescriptionPart1": "Hier kannst du auswählen in welchen Format Zeitenpunkte dargestellt werden sollen. Standardmäßig werden diese in der GMT Zeitzone angezeigt und formatiert in folgendes format, Beispiel: $d.",
+        "timestampsDescriptionPart2": "Außerdem:\n• Lokale Zeitzone: $y\n• Relative Zeitzone: $r", 
+        "timestampsAbsoluteGMT": "Absolut (GMT)",
+        "timestampsAbsoluteLocalTime": "Absolute (Deine Zeitzone)",
+        "timestampsRelative": "Relative",
+        "sheetbotLikeGraphs": "Sheetbot-like Verhalten von Radargraphen",
+        "sheetbotLikeGraphsDescription": "Obwohl es von mir in Betracht gezogen wurde, dass die Funktionsweise von Diagrammen in SheetBot nicht sehr korrekt ist. Einige Leute waren verwirrt, als sie sahen, dass -0,5 Stride nicht so aussehen wie im SheetBot-Diagramm. Daher hier: Wenn dieser Schalter eingeschaltet ist, können Punkte in den Diagrammen auf der gegenüberliegenden Hälfte des Diagramms erscheinen, wenn der Wert negativ ist.",
+        "oskKagariGimmick": "Osk-Kagari gimmick",
+        "oskKagariGimmickDescription": "Falls an, anstelle von osk's Rang, :kagari: wird angezeigt.",
+        "bytesOfDataStored": "an Daten gespeichert",
+        "TLrecordsSaved": "Tetra League Rekorde gespeichert",
+        "TLplayerstatesSaved": "Tetra League Nutzerzustände gespeichert",
+        "fixButton": "Beheben",
+        "compressButton": "Kompressieren",
+        "exportDB": "Auf lokale Datenbank exportieren",
+        "desktopExportAlertTitle": "Desktop Export",
+        "desktopExportText": "Du verwendest anscheind die Desktop App.  Schau in deinen Dokumentenordner, dort findest du \"TetraStats.db\". Kopiere die irgendwo hin",
+        "androidExportAlertTitle": "Android export",
+        "androidExportText": "Exported.\n${exportedDB}",
+        "importDB": "Importiere lokale Datenbank",
+        "importDBDescription": "Stelle dein Backup wiederher. Bitte denke daran, dass deine bestehende Datenbank überschrieben wird",
+        "importWrongFileType": "Falsches Dateiformat"
+    },
+    "homeNavigation": {
+        "overview": "Übersicht",
+        "standing": "Platzierung",
+        "seasons": "Saisons",
+        "mathces": "Matches",
+        "pb": "PB",
+        "normal": "Normal",
+        "expert": "Expert",
+        "expertRecords": "Ex Rekorde"
+    },
+    "graphsNavigation": {
+        "history": "Spielerhistorie",
+        "league": "League Zustand",
+        "cutoffs": "Grenzwerte Historie"
+    },
+    "calcNavigation": {
+      "stats": "Statistikenrechner",
+      "damage": "Schadensrechner"
+    },
+    "firstTimeView": {
+        "welcome": "Willkommen auf Tetra Stats",
+        "description": "Ein Dienst, der es dir erlaubt verschiedene Statistiken von TETR.IO aufzuzeichen",
+        "nicknameQuestion": "Wie ist dein Nutzername?",
+        "inpuntHint": "Gebe ihn hier ein... (3-16 Zeichen)",
+        "emptyInputError": "Leereingaben funktionieren nicht",
+        "niceToSeeYou": "Schön dich zu sehen, $n",
+        "letsTakeALook": "Lass uns ein Blick auf deine Statistiken werfen...",
+        "skip": "Überspringen"
+    },
+    "aboutView": {
+        "title": "Über Tetra Stats",
+        "about": "Tetra Stats ist ein Dienst, der mit der TETR.IO Tetra Channel API läuft, um Daten zur Verfügung zu stellen und weitere Statistiken basieren auf den Daten zu berechnen. Der Dienst erlaubt es dir Benutzer Fortschitte mit der \"Aufzeichnen\" Funktion zu verfolgen, welches Tetra League Änderungen in einer lokalen Datenbank speichert und verwaltet (nicht automatisch, besuche deine Seite ab und zu mal), damit man sie in Graphen darstellen kann.\n\nBeanserver blaster ist ein Teil von Tetra Stats, was als serverseitiges Skript fungiert. Es bietet komplette Tetra League Bestenlisten, sowie sortierung nach jeden möglichen Wert um Graphen darauf auzubauen, sowie Nutzern die möglichkeit zu geben Trends zu verfolgen. Eine Historie von Tetra League Rankgrenzwerten ist auch vorhanden, welche ebenfalls als Graph dargestellt werden können.\n\nGeplant sind Wiederholungsanalysen, sowie eine Turnierhistorie. Sei gespannt!\n\nDieser Dienst steht nicht in Verbindung mit TETR.IO oder osk in irgendeiner Weise.",
+        "appVersion": "App Version",
+        "build": "Build $build",
+        "GHrepo": "GitHub Repository",
+        "submitAnIssue": "Melde ein Problem",
+        "credits": "Credits",
+        "authorAndDeveloper": "Author & Entwickler",
+        "providedFormulas": "Bereitgestellte Formeln",
+        "providedS1history": "Bereitgestellte S1 Historie",
+        "inoue": "Inoue (Wiederholungsschnapper)",
+        "zhCNlocale": "Vereinfachtes Chinesisch Übersetzung",
+        "deDElocale": "Deutsche Übersetzung",
+        "supportHim": "Unterstütze Ihn!"
+    },
+    "stats": {
+        "registrationDate": "Registrierungsdatum",
+        "gametime": "Spielzeit",
+        "ogp": "Onlinespiele gespielt",
+        "ogw": "Onlinespiele gewonnen",
+        "followers": "Followers",
+        "xp": {
+            "short": "XP",
+            "full": "Erfahrungspunkte"
+        },
+        "tr": {
+            "short": "TR",
+            "full": "Tetra Rating"
+        },
+        "glicko": {
+            "short": "Glicko",
+            "full": "Glicko"
+        },
+        "rd":{
+            "short": "RA",
+            "full": "Rating Abweichung"
+        },
+        "glixare": {
+            "short": "GXE",
+            "full": "GLIXARE"
+        },
+        "s1tr": {
+            "short": "S1 TR",
+            "full": "Season 1 ähnliche TR"
+        },
+        "gp":{
+            "short": "GP",
+            "full": "Spiele gespielt"
+        },
+        "gw":{
+            "short": "GW",
+            "full": "Spiele gewonnen"
+        },
+        "winrate":{
+            "short": "WR%",
+            "full": "Siegrate"
+        },
+        "apm":{
+            "short": "APM",
+            "full": "Attacken pro Minute"
+        },
+        "pps":{
+            "short": "PPS",
+            "full": "Steine pro Sekunde"
+        },
+        "vs":{
+            "short": "VS",
+            "full": "Versus Wertung"
+        },
+        "app":{
+            "short": "APP",
+            "full": "Attack pro Stein"
+        },
+        "vsapm":{
+            "short": "VS/APM",
+            "full": "VS / APM"
+        },
+        "dss":{
+            "short": "DS/S",
+            "full": "Downstack pro Sekunde"
+        },
+        "dsp":{
+            "short": "DS/P",
+            "full": "Downstack pro Stein"
+        },
+        "appdsp": {
+            "short": "APP+DSP",
+            "full": "APP + DSP"
+        },
+        "cheese":{
+            "short": "Cheese",
+            "full": "Cheese Index"
+        },
+        "gbe":{
+            "short": "GbE",
+            "full": "Garbage Effizienz"
+        },
+        "nyaapp":{
+            "short": "wAPP",
+            "full": "Gewichtete APP"
+        },
+        "area":{
+            "short": "Area",
+            "full": "Areal"
+        },
+        "etr":{
+            "short": "eTR",
+            "full": "Voraussichtlichen TR"
+        },
+        "etracc":{
+            "short": "±eTR",
+            "full": "Genauigkeit der voraussichtlichen TR"
+        },
+        "opener":{
+            "short": "Opener",
+            "full": "Opener"
+        },
+        "plonk":{
+            "short": "Plonk",
+            "full": "Plonk"
+        },
+        "stride":{
+            "short": "Stride",
+            "full": "Stride"
+        },
+        "infds":{
+            "short": "Inf. DS",
+            "full": "Infinite Downstack"
+        },
+        "altitude": {
+            "short": "m",
+            "full": "Höhe"
+        },
+        "climbSpeed": {
+            "short": "CSP",
+            "full": "Klettergeschwindkeit",
+            "gaugetTitle": "Kletter-\ngeschwindigkeit"
+        },
+        "peakClimbSpeed": {
+            "short": "Beste CSP",
+            "full": "Beste Klettergeschwindigkeit",
+            "gaugetTitle": "Beste"
+        },
+        "kos": {
+            "short": "KO's",
+            "full": "Eliminierungen"
+        },
+        "b2b":{
+            "short": "B2B",
+            "full": "Back-To-Back"
+        },
+        "finesse":{
+            "short": "F",
+            "full": "Finesse",
+            "widgetTitle": "inesse"
+        },
+        "finesseFaults":{
+            "short": "FF",
+            "full": "Finesse Fehler"
+        },
+        "totalTime":{
+            "short": "Zeit",
+            "full": "Gesamtzeit",
+            "widgetTitle": "Gesamt Zeit"
+        },
+        "level": {
+            "short": "Lvl",
+            "full": "Level"
+        },
+        "pieces": {
+            "short": "P",
+            "full": "Steine"
+        },
+        "spp": {
+            "short": "SPP",
+            "full": "Punkte pro Stein"
+        },
+        "kp": {
+            "short": "KP",
+            "full": "Tastenanschläge"
+        },
+        "kpp": {
+            "short": "KPP",
+            "full": "Tastenanschläge pro Stein"
+        },
+        "kps": {
+            "short": "KPS",
+            "full": "Tastenanschläge pro Sekunden"
+        },
+        "blitzScore": "$p Punkte",
+        "levelUpRequirement": "Level up in $p Punkten",
+        "piecesTotal": "Insgesamt platzierte Steine",
+        "piecesWithPerfectFinesse": "davon mit perfekter Finesse",
+        "score": "Punkte",
+        "lines": "Linien",
+        "linesShort": "L",
+        "pcs": "Perfect Clears",
+        "holds": "Gehalten",
+        "spike": "Top Spike",
+        "top": "Top $percentage",
+        "topRank": "Toprang: $rank",
+        "floor": "Ebene",
+        "split": "Split",
+        "total": "Total",
+        "sent": "Gesendet",
+        "received": "Erhalten",
+        "placement": "Platzierung",
+        "peak": "Beste",
+        "qpWithMods(plural)": {
+            "one": "Mit 1 Mod",
+            "two": "Mit $n Mods",
+            "few": "Mit $n Mods",
+            "many": "Mit $n Mods",
+            "other": "Mit $n Mods"
+        },
+        "inputs(plural)": {
+            "zero": "$n Tastenanschläge",
+            "one": "$n Tastenanschlag",
+            "two": "$n Tastenanschläge",
+            "few": "$n Tastenanschläge",
+            "many": "$n Tastenanschläge",
+            "other": "$n Tastenanschläge"
+        },
+        "tspinsTotal(plural)": {
+            "zero": "$n T-Spins gesamt",
+            "one": "$n T-Spin gesamt",
+            "two": "$n T-Spins gesamt",
+            "few": "$n T-Spins gesamt",
+            "many": "$n T-Spins gesamt",
+            "other": "$n T-Spins gesamt"
+        },
+        "linesCleared(plural)": {
+            "zero": "$n Linien geklärt",
+            "one": "$n Linie geklärt",
+            "two": "$n Linien geklärt",
+            "few": "$n Linien geklärt",
+            "many": "$n Linien geklärt",
+            "other": "$n Linien geklärt"
+        },
+        "graphs": {
+            "attack": "Attacke",
+            "speed": "Geschwindigkeit",
+            "defense": "Verteidigung",
+            "cheese": "Cheese"
+        },
+        "players(plural)":{
+            "zero": "$n Spieler",
+            "one": "$n Spieler",
+            "two": "$n Spieler",
+            "few": "$n Spieler",
+            "many": "$n Spieler",
+            "other": "$n Spieler"
+        },
+        "games(plural)": {
+            "zero": "$n Spiele",
+            "one": "$n Spiel",
+            "two": "$n Spiele",
+            "few": "$n Spiele",
+            "many": "$n Spiele",
+            "other": "$n Spiele"
+        },
+        "lineClear": {
+            "single": "Single",
+            "double": "Double",
+            "triple": "Triple",
+            "quad": "Quad",
+            "penta": "Penta",
+            "hexa": "Hexa",
+            "hepta": "Hepta",
+            "octa": "Octa",
+            "ennea": "Ennea",
+            "deca": "Deca",
+            "hendeca": "Hendeca",
+            "dodeca": "Dodeca",
+            "triadeca": "Triadeca",
+            "tessaradeca": "Tessaradeca",
+            "pentedeca": "Pentedeca",
+            "hexadeca": "Hexadeca",
+            "heptadeca": "Heptadeca",
+            "octadeca": "Octadeca",
+            "enneadeca": "Enneadeca",
+            "eicosa": "Eicosa",
+            "kagaris": "Kagaris"
+        },
+        "lineClears": {
+            "zero": "Zeros",
+            "single": "Singles",
+            "double": "Doubles",
+            "triple": "Triples",
+            "quad": "Quads",
+            "penta": "Pentas"
+        },
+        "mini": "Mini",
+        "tSpin": "T-Spin",
+        "tSpins": "T-Spins",
+        "spin": "Spin",
+        "spins": "Spins"
+    },
+    "countries(map)": {
+        "": "Weltweit",
+
+        "AF": "Afghanistan",
+        "AX": "\u00c5land Islands",
+        "AL": "Albania",
+        "DZ": "Algeria",
+        "AS": "American Samoa",
+        "AD": "Andorra",
+        "AO": "Angola",
+        "AI": "Anguilla",
+        "AQ": "Antarctica",
+        "AG": "Antigua and Barbuda",
+        "AR": "Argentina",
+        "AM": "Armenia",
+        "AW": "Aruba",
+        "AU": "Australia",
+        "AT": "Austria",
+        "AZ": "Azerbaijan",
+    
+        "BS": "Bahamas",
+        "BH": "Bahrain",
+        "BD": "Bangladesh",
+        "BB": "Barbados",
+        "BY": "Belarus",
+        "BE": "Belgium",
+        "BZ": "Belize",
+        "BJ": "Benin",
+        "BM": "Bermuda",
+        "BT": "Bhutan",
+        "BO": "Bolivia, Plurinational State of",
+        "BA": "Bosnia and Herzegovina",
+        "BW": "Botswana",
+        "BV": "Bouvet Island",
+        "BR": "Brazil",
+        "IO": "British Indian Ocean Territory",
+        "BN": "Brunei Darussalam",
+        "BG": "Bulgaria",
+        "BF": "Burkina Faso",
+        "BI": "Burundi",
+    
+        "KH": "Cambodia",
+        "CM": "Cameroon",
+        "CA": "Canada",
+        "CV": "Cape Verde",
+        "BQ": "Caribbean Netherlands",
+        "KY": "Cayman Islands",
+        "CF": "Central African Republic",
+        "TD": "Chad",
+        "CL": "Chile",
+        "CN": "China",
+        "CX": "Christmas Island",
+        "CC": "Cocos (Keeling) Islands",
+        "CO": "Colombia",
+        "KM": "Comoros",
+        "CG": "Congo",
+        "CD": "Congo, the Democratic Republic of the",
+        "CK": "Cook Islands",
+        "CR": "Costa Rica",
+        "CI": "C\u00f4te d'Ivoire",
+        "HR": "Croatia",
+        "CU": "Cuba",
+        "CW": "Cura\u00e7ao",
+        "CY": "Cyprus",
+        "CZ": "Czech Republic",
+    
+        "DK": "Denmark",
+        "DJ": "Djibouti",
+        "DM": "Dominica",
+        "DO": "Dominican Republic",
+    
+        "EC": "Ecuador",
+        "EG": "Egypt",
+        "SV": "El Salvador",
+        "GB-ENG": "England",
+        "GQ": "Equatorial Guinea",
+        "ER": "Eritrea",
+        "EE": "Estonia",
+        "ET": "Ethiopia",
+        "EU": "Europe",
+    
+        "FK": "Falkland Islands (Malvinas)",
+        "FO": "Faroe Islands",
+        "FJ": "Fiji",
+        "FI": "Finland",
+        "FR": "France",
+        "GF": "French Guiana",
+        "PF": "French Polynesia",
+        "TF": "French Southern Territories",
+    
+        "GA": "Gabon",
+        "GM": "Gambia",
+        "GE": "Georgia",
+        "DE": "Germany",
+        "GH": "Ghana",
+        "GI": "Gibraltar",
+        "GR": "Greece",
+        "GL": "Greenland",
+        "GD": "Grenada",
+        "GP": "Guadeloupe",
+        "GU": "Guam",
+        "GT": "Guatemala",
+        "GG": "Guernsey",
+        "GN": "Guinea",
+        "GW": "Guinea-Bissau",
+        "GY": "Guyana",
+    
+        "HT": "Haiti",
+        "HM": "Heard Island and McDonald Islands",
+        "VA": "Holy See (Vatican City State)",
+        "HN": "Honduras",
+        "HK": "Hong Kong",
+        "HU": "Hungary",
+    
+        "IS": "Iceland",
+        "IN": "India",
+        "ID": "Indonesia",
+        "IR": "Iran, Islamic Republic of",
+        "IQ": "Iraq",
+        "IE": "Ireland",
+        "IM": "Isle of Man",
+        "IL": "Israel",
+        "IT": "Italy",
+    
+        "JM": "Jamaica",
+        "JP": "Japan",
+        "JE": "Jersey",
+        "JO": "Jordan",
+    
+        "KZ": "Kazakhstan",
+        "KE": "Kenya",
+        "KI": "Kiribati",
+        "KP": "Korea, Democratic People's Republic of",
+        "KR": "Korea, Republic of",
+        "XK": "Kosovo",
+        "KW": "Kuwait",
+        "KG": "Kyrgyzstan",
+    
+        "LA": "Lao People's Democratic Republic",
+        "LV": "Latvia",
+        "LB": "Lebanon",
+        "LS": "Lesotho",
+        "LR": "Liberia",
+        "LY": "Libya",
+        "LI": "Liechtenstein",
+        "LT": "Lithuania",
+        "LU": "Luxembourg",
+    
+        "MO": "Macao",
+        "MK": "Macedonia, the former Yugoslav Republic of",
+        "MG": "Madagascar",
+        "MW": "Malawi",
+        "MY": "Malaysia",
+        "MV": "Maldives",
+        "ML": "Mali",
+        "MT": "Malta",
+        "MH": "Marshall Islands",
+        "MQ": "Martinique",
+        "MR": "Mauritania",
+        "MU": "Mauritius",
+        "YT": "Mayotte",
+        "MX": "Mexico",
+        "FM": "Micronesia, Federated States of",
+        "MD": "Moldova, Republic of",
+        "MC": "Monaco",
+        "ME": "Montenegro",
+        "MA": "Morocco",
+        "MN": "Mongolia",
+        "MS": "Montserrat",
+        "MZ": "Mozambique",
+        "MM": "Myanmar",
+    
+        "NA": "Namibia",
+        "NR": "Nauru",
+        "NP": "Nepal",
+        "NL": "Netherlands",
+        "AN": "Netherlands Antilles",
+        "NC": "New Caledonia",
+        "NZ": "New Zealand",
+        "NI": "Nicaragua",
+        "NE": "Niger",
+        "NG": "Nigeria",
+        "NU": "Niue",
+        "NF": "Norfolk Island",
+        "GB-NIR": "Northern Ireland",
+        "MP": "Northern Mariana Islands",
+        "NO": "Norway",
+    
+        "OM": "Oman",
+    
+        "PK": "Pakistan",
+        "PW": "Palau",
+        "PS": "Palestine",
+        "PA": "Panama",
+        "PG": "Papua New Guinea",
+        "PY": "Paraguay",
+        "PE": "Peru",
+        "PH": "Philippines",
+        "PN": "Pitcairn",
+        "PL": "Poland",
+        "PT": "Portugal",
+        "PR": "Puerto Rico",
+    
+        "QA": "Qatar",
+    
+        "RE": "Réunion",
+        "RO": "Romania",
+        "RU": "Russian Federation",
+        "RW": "Rwanda",
+    
+        "BL": "Saint Barthélemy",
+        "SH": "Saint Helena, Ascension and Tristan da Cunha",
+        "KN": "Saint Kitts and Nevis",
+        "LC": "Saint Lucia",
+        "MF": "Saint Martin",
+        "PM": "Saint Pierre and Miquelon",
+        "VC": "Saint Vincent and the Grenadines",
+        "WS": "Samoa",
+        "SM": "San Marino",
+        "ST": "Sao Tome and Principe",
+        "SA": "Saudi Arabia",
+        "GB-SCT": "Scotland",
+        "SN": "Senegal",
+        "RS": "Serbia",
+        "SC": "Seychelles",
+        "SL": "Sierra Leone",
+        "SG": "Singapore",
+        "SX": "Sint Maarten (Dutch part)",
+        "SK": "Slovakia",
+        "SI": "Slovenia",
+        "SB": "Solomon Islands",
+        "SO": "Somalia",
+        "ZA": "South Africa",
+        "GS": "South Georgia and the South Sandwich Islands",
+        "SS": "South Sudan",
+        "ES": "Spain",
+        "LK": "Sri Lanka",
+        "SD": "Sudan",
+        "SR": "Suriname",
+        "SJ": "Svalbard and Jan Mayen Islands",
+        "SZ": "Swaziland",
+        "SE": "Sweden",
+        "CH": "Switzerland",
+        "SY": "Syrian Arab Republic",
+    
+        "TW": "Taiwan",
+        "TJ": "Tajikistan",
+        "TZ": "Tanzania, United Republic of",
+        "TH": "Thailand",
+        "TL": "Timor-Leste",
+        "TG": "Togo",
+        "TK": "Tokelau",
+        "TO": "Tonga",
+        "TT": "Trinidad and Tobago",
+        "TN": "Tunisia",
+        "TR": "Turkey",
+        "TM": "Turkmenistan",
+        "TC": "Turks and Caicos Islands",
+        "TV": "Tuvalu",
+    
+        "UG": "Uganda",
+        "UA": "Ukraine",
+        "AE": "United Arab Emirates",
+        "GB": "United Kingdom",
+        "US": "United States",
+        "UY": "Uruguay",
+        "UM": "US Minor Outlying Islands",
+        "UZ": "Uzbekistan",
+    
+        "VU": "Vanuatu",
+        "VE": "Venezuela, Bolivarian Republic of",
+        "VN": "Vietnam",
+        "VG": "Virgin Islands, British",
+        "VI": "Virgin Islands, U.S.",
+    
+        "GB-WLS": "Wales",
+        "WF": "Wallis and Futuna Islands",
+        "EH": "Western Sahara",
+    
+        "YE": "Yemen",
+    
+        "ZM": "Zambia",
+        "ZW": "Zimbabwe",
+    
+        "XX": "Unbekannt",
+        "XM": "Der Mond"
+    }
+  }
