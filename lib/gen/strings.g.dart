@@ -6,7 +6,7 @@
 /// Locales: 4
 /// Strings: 3068 (767 per locale)
 ///
-/// Built on 2025-02-10 at 16:08 UTC
+/// Built on 2025-02-10 at 21:23 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -3237,7 +3237,7 @@ class _StringsRuRu implements Translations {
 		'en': 'Английский (English)',
 		'ru-RU': 'Русский',
 		'zh-CN': 'Упрощенный Китайский (简体中文)',
-		'de-DE': 'Nемецкий (Deutsch)',
+		'de-DE': 'Немецкий (Deutsch)',
 	};
 	@override Map<String, String> get gamemodes => {
 		'league': 'Тетра Лига',
@@ -4105,7 +4105,7 @@ class _StringsAboutViewRuRu implements _StringsAboutViewEn {
 	@override String get providedS1history => 'Предоставляет историю первого сезона лиги';
 	@override String get inoue => 'Inoue (достаёт повторы)';
 	@override String get zhCNlocale => 'Перевёл на упрощённый китайский';
-	@override String get deDElocale => 'German locale';
+	@override String get deDElocale => 'Перевёл на немецкий';
 	@override String get supportHim => 'Поддержите его!';
 }
 
@@ -4779,7 +4779,7 @@ class _StringsZhCn implements Translations {
 		'en': '英语 (English)',
 		'ru-RU': '俄语 (Русский)',
 		'zh-CN': '简体中文',
-		'de-DE': 'German (Deutsch)',
+		'de-DE': '德语 (Deutsch)',
 	};
 	@override Map<String, String> get gamemodes => {
 		'league': 'Tetra 联赛',
@@ -5646,7 +5646,7 @@ class _StringsAboutViewZhCn implements _StringsAboutViewEn {
 	@override String get providedS1history => '提供的 S1 历史';
 	@override String get inoue => 'Inoue (回放抓取器)';
 	@override String get zhCNlocale => '简中翻译员';
-	@override String get deDElocale => 'German locale';
+	@override String get deDElocale => '德国语言环境';
 	@override String get supportHim => '为他提供支持！';
 }
 
@@ -7932,7 +7932,7 @@ extension on _StringsRuRu {
 			case 'locales.en': return 'Английский (English)';
 			case 'locales.ru-RU': return 'Русский';
 			case 'locales.zh-CN': return 'Упрощенный Китайский (简体中文)';
-			case 'locales.de-DE': return 'Nемецкий (Deutsch)';
+			case 'locales.de-DE': return 'Немецкий (Deutsch)';
 			case 'gamemodes.league': return 'Тетра Лига';
 			case 'gamemodes.zenith': return 'Quick Play';
 			case 'gamemodes.zenithex': return 'Quick Play Expert';
@@ -8283,7 +8283,7 @@ extension on _StringsRuRu {
 			case 'aboutView.providedS1history': return 'Предоставляет историю первого сезона лиги';
 			case 'aboutView.inoue': return 'Inoue (достаёт повторы)';
 			case 'aboutView.zhCNlocale': return 'Перевёл на упрощённый китайский';
-			case 'aboutView.deDElocale': return 'German locale';
+			case 'aboutView.deDElocale': return 'Перевёл на немецкий';
 			case 'aboutView.supportHim': return 'Поддержите его!';
 			case 'stats.registrationDate': return 'Дата регистрации';
 			case 'stats.gametime': return 'Время в игре';
@@ -8748,7 +8748,7 @@ extension on _StringsZhCn {
 			case 'locales.en': return '英语 (English)';
 			case 'locales.ru-RU': return '俄语 (Русский)';
 			case 'locales.zh-CN': return '简体中文';
-			case 'locales.de-DE': return 'German (Deutsch)';
+			case 'locales.de-DE': return '德语 (Deutsch)';
 			case 'gamemodes.league': return 'Tetra 联赛';
 			case 'gamemodes.zenith': return '快速游戏';
 			case 'gamemodes.zenithex': return '快速游戏 · 专家模式';
@@ -9098,7 +9098,7 @@ extension on _StringsZhCn {
 			case 'aboutView.providedS1history': return '提供的 S1 历史';
 			case 'aboutView.inoue': return 'Inoue (回放抓取器)';
 			case 'aboutView.zhCNlocale': return '简中翻译员';
-			case 'aboutView.deDElocale': return 'German locale';
+			case 'aboutView.deDElocale': return '德国语言环境';
 			case 'aboutView.supportHim': return '为他提供支持！';
 			case 'stats.registrationDate': return '注册时间';
 			case 'stats.gametime': return '游玩时长';

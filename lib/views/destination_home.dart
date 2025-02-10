@@ -160,7 +160,7 @@ class ZenithCard extends StatelessWidget {
                 width: 300.0,
                 child: Table(
                   columnWidths: const {
-                    0: FixedColumnWidth(36)
+                    0: FixedColumnWidth(42)
                   },
                   children: [
                     TableRow(

@@ -135,6 +135,9 @@ class AboutState extends State<AboutView> {
                     FractionallySizedBox(widthFactor: 1/((MediaQuery.of(context).size.width/600).ceil()), child: AboutCard(t.aboutView.zhCNlocale, "neko_ab4093", null, [
                       //TextSpan(text: "Support him!", style: TextStyle(decoration: TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted, color: Theme.of(context).colorScheme.primary), recognizer: TapGestureRecognizer()..onTap = (){launchInBrowser(Uri.https("paypal.com", "paypalme/Kerrmunism"));})
                     ])),
+                    FractionallySizedBox(widthFactor: 1/((MediaQuery.of(context).size.width/600).ceil()), child: AboutCard(t.aboutView.deDElocale, "founntain", null, [
+                      //TextSpan(text: "Support him!", style: TextStyle(decoration: TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted, color: Theme.of(context).colorScheme.primary), recognizer: TapGestureRecognizer()..onTap = (){launchInBrowser(Uri.https("paypal.com", "paypalme/Kerrmunism"));})
+                    ])),
                   ],
                 ),
               ],

@@ -3,7 +3,7 @@
         "en": "Английский (English)",
         "ru-RU": "Русский",
         "zh-CN": "Упрощенный Китайский (简体中文)",
-        "de-DE": "Nемецкий (Deutsch)"
+        "de-DE": "Немецкий (Deutsch)"
     },
     "gamemodes(map)": {
         "league": "Тетра Лига",
@@ -381,7 +381,7 @@
         "providedS1history": "Предоставляет историю первого сезона лиги",
         "inoue": "Inoue (достаёт повторы)",
         "zhCNlocale": "Перевёл на упрощённый китайский",
-        "deDElocale": "German locale",
+        "deDElocale": "Перевёл на немецкий",
         "supportHim": "Поддержите его!"
     },
     "stats": {
