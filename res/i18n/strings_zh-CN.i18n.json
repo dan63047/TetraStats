@@ -2,6 +2,7 @@
     "locales(map)": {
         "en": "英语 (English)",
         "ru-RU": "俄语 (Русский)",
+        "ko-KR": "韩语 (한국인)",
         "zh-CN": "简体中文",
         "de-DE": "德语 (Deutsch)"
     },
@@ -54,7 +55,7 @@
     "dateAndTime": "日期和时间：",
     "TLfullLBnote": "很大，但允许你通过玩家的数据对玩家进行排序，还可以按段位筛选玩家",
     "rank": "段位",
-    "verdictGeneral": "比 $rank 段平均数据$n $verdict",
+    "verdictGeneral": "比 $rank 段平均数据$verdict $n",
     "verdictBetter": "好",
     "verdictWorse": "差",
     "localStanding": "本地",
@@ -100,7 +101,7 @@
     },
     "distinguishments": {
         "noHeader": "缺少标题",
-        "noFooter": "缺少标题",
+        "noFooter": "缺少页脚",
         "twc": "TETR.IO 世界冠军",
         "twcYear": "$year TETR.IO 世界杯"
     },
@@ -121,7 +122,7 @@
     "refresh": "刷新数据",
     "searchButton": "搜索",
     "trackedPlayers": "跟踪的玩家",
-    "standing": "名次",
+    "standing": "排行",
     "previousSeasons": "上赛季",
     "recent": "最近",
     "top": "前",
@@ -196,10 +197,10 @@
         "players": "玩家（$n）",
         "moreInfo": "更多信息",
         "NumberOne": "№ 1 is $tr TR",
-        "inflated": "高于目标 $tr",
-        "notInflated": "不偏高",
-        "deflated": "低于目标 $tr",
-        "notDeflated": "不偏低",
+        "inflated": "超标 $tr",
+        "notInflated": "未超标",
+        "deflated": "未达标 $tr",
+        "notDeflated": "达标",
         "wellDotDotDot": "嗯…",
         "fromPlace": "自 № $n",
         "viewButton": "查看"
@@ -360,7 +361,7 @@
     },
     "firstTimeView": {
         "welcome": "欢迎使用 Tetra Stats",
-        "description": "服务，允许您跟踪TETR.IO的各种数据",
+        "description": "您跟踪TETR.IO的各种数据的好帮手",
         "nicknameQuestion": "您的昵称是？",
         "inpuntHint": "在此处输入... (3-16个符号)",
         "emptyInputError": "不能提交空字符串",
@@ -381,7 +382,8 @@
         "providedS1history": "提供的 S1 历史",
         "inoue": "Inoue (回放抓取器)",
         "zhCNlocale": "简中翻译员",
-        "deDElocale": "德国语言环境",
+        "deDElocale": "德语翻译员",
+        "koKRlocale": "韩语翻译员",
         "supportHim": "为他提供支持！"
     },
     "stats": {
@@ -487,12 +489,12 @@
             "full": "定式"
         },
         "plonk": {
-            "short": "太极",
-            "full": "太极"
+            "short": "低速",
+            "full": "低速"
         },
         "stride": {
-            "short": "速度",
-            "full": "速度"
+            "short": "快速",
+            "full": "快速"
         },
         "infds": {
             "short": "挖掘",
@@ -508,7 +510,7 @@
             "gaugetTitle": "爬行速度"
         },
         "peakClimbSpeed": {
-            "short": "最高CSP",
+            "short": "最高速",
             "full": "最高爬行速度",
             "gaugetTitle": "最高"
         },
@@ -523,7 +525,7 @@
         "finesse": {
             "short": "极",
             "full": "极简率",
-            "widgetTitle": "简率"
+            "widgetTitle": "极简率"
         },
         "finesseFaults": {
             "short": "非极简",

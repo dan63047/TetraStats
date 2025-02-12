@@ -203,7 +203,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Text("Language", style: Theme.of(context).textTheme.displayLarge),
+                title: Text("${t.settingsDestination.language} (Language)", style: Theme.of(context).textTheme.displayLarge),
                 trailing: DropdownButton(
                   items: locales,
                   value: LocaleSettings.currentLocale,

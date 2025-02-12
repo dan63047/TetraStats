@@ -21,6 +21,7 @@ You can [download an app](https://github.com/dan63047/TetraStats/releases), or [
 - **p1nkl0bst3r** — providing players history and peak TR
 - **neko_ab4093** — Simplified Chinese localization
 - **founntain** — German localization
+- **Tau, ctpw, PyHoKxvx, muqhc, xantho, mazohu, CEL_ESTIAL, pensil** — Korean localization
 - **osk** and his team — TETR.IO
 
 ## Legal notes

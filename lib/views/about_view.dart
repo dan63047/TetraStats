@@ -21,10 +21,11 @@ class AboutView extends StatefulWidget {
 class AboutCard extends StatelessWidget{
   final String title;
   final String value;
+  final bool smallValue; // it's about size lol
   final String? undervalue; //what?
   final List<InlineSpan> endvalue; // ...
 
-  const AboutCard(this.title, this.value, this.undervalue, this.endvalue);
+  const AboutCard(this.title, this.value, this.undervalue, this.endvalue, {this.smallValue=false});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +33,7 @@ class AboutCard extends StatelessWidget{
       children: [
         Text(title, style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.center),
         Divider(),
-        Text(value, textAlign: TextAlign.center, style: Theme.of(context).textTheme.headlineMedium),
+        Text(value, textAlign: TextAlign.center, style: smallValue ? null : Theme.of(context).textTheme.headlineMedium),
         if (undervalue != null) Text(undervalue!, textAlign: TextAlign.center),
         Divider(),
         Padding(
@@ -124,20 +125,17 @@ class AboutState extends State<AboutView> {
                       TextSpan(text: t.aboutView.supportHim, style: TextStyle(decoration: TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted, color: Theme.of(context).colorScheme.primary), recognizer: TapGestureRecognizer()..onTap = (){launchInBrowser(Uri.https("dan63.by", "donate"));})
                     ])),
                     FractionallySizedBox(widthFactor: 1/((MediaQuery.of(context).size.width/600).ceil()), child: AboutCard(t.aboutView.providedFormulas, "kerrmunism", null, [
-                      //TextSpan(text: "Support him!", style: TextStyle(decoration: TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted, color: Theme.of(context).colorScheme.primary), recognizer: TapGestureRecognizer()..onTap = (){launchInBrowser(Uri.https("paypal.com", "paypalme/Kerrmunism"));})
                     ])),
                     FractionallySizedBox(widthFactor: 1/((MediaQuery.of(context).size.width/600).ceil()), child: AboutCard(t.aboutView.providedS1history, "p1nkl0bst3r", null, [
-                      //TextSpan(text: "Support him!", style: TextStyle(decoration: TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted, color: Theme.of(context).colorScheme.primary), recognizer: TapGestureRecognizer()..onTap = (){launchInBrowser(Uri.https("paypal.com", "paypalme/Kerrmunism"));})
                     ])),
                     FractionallySizedBox(widthFactor: 1/((MediaQuery.of(context).size.width/600).ceil()), child: AboutCard(t.aboutView.inoue, "szy", null, [
-                      //TextSpan(text: "Support him!", style: TextStyle(decoration: TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted, color: Theme.of(context).colorScheme.primary), recognizer: TapGestureRecognizer()..onTap = (){launchInBrowser(Uri.https("paypal.com", "paypalme/Kerrmunism"));})
                     ])),
                     FractionallySizedBox(widthFactor: 1/((MediaQuery.of(context).size.width/600).ceil()), child: AboutCard(t.aboutView.zhCNlocale, "neko_ab4093", null, [
-                      //TextSpan(text: "Support him!", style: TextStyle(decoration: TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted, color: Theme.of(context).colorScheme.primary), recognizer: TapGestureRecognizer()..onTap = (){launchInBrowser(Uri.https("paypal.com", "paypalme/Kerrmunism"));})
                     ])),
                     FractionallySizedBox(widthFactor: 1/((MediaQuery.of(context).size.width/600).ceil()), child: AboutCard(t.aboutView.deDElocale, "founntain", null, [
-                      //TextSpan(text: "Support him!", style: TextStyle(decoration: TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted, color: Theme.of(context).colorScheme.primary), recognizer: TapGestureRecognizer()..onTap = (){launchInBrowser(Uri.https("paypal.com", "paypalme/Kerrmunism"));})
                     ])),
+                    FractionallySizedBox(widthFactor: 1/((MediaQuery.of(context).size.width/600).ceil()), child: AboutCard(t.aboutView.koKRlocale, "Tau, ctpw, PyHoKxvx, muqhc,\nxantho, mazohu, CEL_ESTIAL, pensil", null, [
+                    ], smallValue: true)),
                   ],
                 ),
               ],

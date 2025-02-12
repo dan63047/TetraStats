@@ -32,7 +32,7 @@ class FinesseThingy extends StatelessWidget{
         Positioned(left: 25, top: 20, child: Text(t.stats.finesse.widgetTitle, style: TextStyle(fontFamily: "Eurostile Round Extended"))),
         Positioned(
           right: 0, top: 20,
-          child: Text("${finesse != null ? finesse!.faults : "---"}F", style: TextStyle(
+          child: Text("${finesse != null ? finesse!.faults : "---"}${t.stats.finesseFaults.short}", style: TextStyle(
             color: getFinesseColor()
           ))),
         Padding(
