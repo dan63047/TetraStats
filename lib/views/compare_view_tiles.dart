@@ -596,7 +596,7 @@ class CompareState extends State<CompareView> {
         summaries.reduce((curr, next) => (curr.league.rd??-1) < (next.league.rd??-1) ? curr : next).league.rd,
         summaries.reduce((curr, next) => curr.league.gxe > next.league.gxe ? curr : next).league.gxe,
         summaries.reduce((curr, next) => curr.league.s1tr > next.league.s1tr ? curr : next).league.s1tr,
-        summaries.reduce((curr, next) => curr.league.standing > next.league.standing ? curr : next).league.standing,
+        summaries.reduce((curr, next) => curr.league.standing < next.league.standing ? curr : next).league.standing,
         summaries.reduce((curr, next) => curr.league.gamesPlayed > next.league.gamesPlayed ? curr : next).league.gamesPlayed,
         summaries.reduce((curr, next) => curr.league.gamesWon > next.league.gamesWon ? curr : next).league.gamesWon,
         summaries.reduce((curr, next) => curr.league.winrate > next.league.winrate ? curr : next).league.winrate,
@@ -621,7 +621,7 @@ class CompareState extends State<CompareView> {
       ],
       [
         summaries.reduce((curr, next) => (curr.zenith?.stats.zenith?.altitude??-1) > (next.zenith?.stats.zenith?.altitude??-1) ? curr : next).zenith?.stats.zenith?.altitude??-1,
-        summaries.reduce((curr, next) => (curr.zenith?.rank??-1) > (next.zenith?.rank??-1) ? curr : next).zenith?.rank,
+        summaries.reduce((curr, next) => (curr.zenith?.rank??-1) < (next.zenith?.rank??-1) ? curr : next).zenith?.rank,
         summaries.reduce((curr, next) => (curr.zenith?.aggregateStats.apm??-1) > (next.zenith?.aggregateStats.apm??-1) ? curr : next).zenith?.aggregateStats.apm,
         summaries.reduce((curr, next) => (curr.zenith?.aggregateStats.pps??-1) > (next.zenith?.aggregateStats.pps??-1) ? curr : next).zenith?.aggregateStats.pps,
         summaries.reduce((curr, next) => (curr.zenith?.aggregateStats.vs??-1) > (next.zenith?.aggregateStats.vs??-1) ? curr : next).zenith?.aggregateStats.vs,
@@ -649,7 +649,7 @@ class CompareState extends State<CompareView> {
       ],
       [
         summaries.reduce((curr, next) => (curr.zenithEx?.stats.zenith?.altitude??-1) > (next.zenithEx?.stats.zenith?.altitude??-1) ? curr : next).zenithEx?.stats.zenith?.altitude??-1,
-        summaries.reduce((curr, next) => (curr.zenithEx?.rank??-1) > (next.zenithEx?.rank??-1) ? curr : next).zenithEx?.rank,
+        summaries.reduce((curr, next) => (curr.zenithEx?.rank??-1) < (next.zenithEx?.rank??-1) ? curr : next).zenithEx?.rank,
         summaries.reduce((curr, next) => (curr.zenithEx?.aggregateStats.apm??-1) > (next.zenithEx?.aggregateStats.apm??-1) ? curr : next).zenithEx?.aggregateStats.apm,
         summaries.reduce((curr, next) => (curr.zenithEx?.aggregateStats.pps??-1) > (next.zenithEx?.aggregateStats.pps??-1) ? curr : next).zenithEx?.aggregateStats.pps,
         summaries.reduce((curr, next) => (curr.zenithEx?.aggregateStats.vs??-1) > (next.zenithEx?.aggregateStats.vs??-1) ? curr : next).zenithEx?.aggregateStats.vs,

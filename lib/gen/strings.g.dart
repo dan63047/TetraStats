@@ -6,7 +6,7 @@
 /// Locales: 5
 /// Strings: 3845 (769 per locale)
 ///
-/// Built on 2025-02-12 at 14:03 UTC
+/// Built on 2025-03-25 at 23:31 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -3328,7 +3328,7 @@ class _StringsKoKr implements Translations {
 	@override String get recent => '최근';
 	@override String get top => '상위';
 	@override String get noRecord => '기록 없음';
-	@override String sprintAndBlitsRelevance({required Object date}) => '관련성: ${date}';
+	@override String sprintAndBlitsRelevance({required Object date}) => '갱신일: ${date}';
 	@override late final _StringsSnackBarMessagesKoKr snackBarMessages = _StringsSnackBarMessagesKoKr._(_root);
 	@override late final _StringsErrorsKoKr errors = _StringsErrorsKoKr._(_root);
 	@override late final _StringsActionsKoKr actions = _StringsActionsKoKr._(_root);
@@ -9621,7 +9621,7 @@ extension on _StringsKoKr {
 			case 'recent': return '최근';
 			case 'top': return '상위';
 			case 'noRecord': return '기록 없음';
-			case 'sprintAndBlitsRelevance': return ({required Object date}) => '관련성: ${date}';
+			case 'sprintAndBlitsRelevance': return ({required Object date}) => '갱신일: ${date}';
 			case 'snackBarMessages.stateRemoved': return ({required Object date}) => '${date} 상태가 데이터베이스에서 제거되었어요!';
 			case 'snackBarMessages.matchRemoved': return ({required Object date}) => '${date} 매치가 데이터베이스에서 제거되었어요!';
 			case 'snackBarMessages.notForWeb': return '웹 버전은 지원하지 않는 기능이에요';

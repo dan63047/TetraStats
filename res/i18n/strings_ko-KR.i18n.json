@@ -127,7 +127,7 @@
     "recent": "최근",
     "top": "상위",
     "noRecord": "기록 없음",
-    "sprintAndBlitsRelevance": "관련성: ${date}",
+    "sprintAndBlitsRelevance": "갱신일: ${date}",
     "snackBarMessages": {
         "stateRemoved": "${date} 상태가 데이터베이스에서 제거되었어요!",
         "matchRemoved": "${date} 매치가 데이터베이스에서 제거되었어요!",
