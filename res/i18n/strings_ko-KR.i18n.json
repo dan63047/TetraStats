@@ -173,6 +173,14 @@
         "apply": "적용",
         "refresh": "새로고침"
     },
+    "aprilFools": {
+        "fakeBanModaleTitle": "You have been permanently banned from Tetra Stats",
+        "fakeBanModaleBody": "Reason: gross violation of the Terms of Service\n\nIf you want to appeal, please, contact dan63.",
+        "fakeBanModaledan63Grin": "Fool...",
+        "SettingTitleUnfoolMyself": "Unfool myself",
+        "SettingButtonUnfool": "Unfool",
+        "SettingDescription": "That button will allow you re experience april fool prank once again"
+    },
     "graphsDestination": {
         "fetchAndsaveTLHistory": "기록 불러오기",
         "fetchAndSaveOldTLmatches": "테트라 리그 경기 기록 불러오기",

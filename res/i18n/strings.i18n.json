@@ -79,7 +79,7 @@
     "general": "General",
     "badges": "Badges",
     "obtainDate": "Obtained ${date}",
-    "assignedManualy": "That badge was assigned manualy by TETR.IO admins",
+    "assignedManualy": "That badge was assigned manually by TETR.IO admins",
     "distinguishment": "Distinguishment",
     "banned": "Banned",
     "bannedSubtext": "Bans are placed when TETR.IO rules or terms of service are broken",
@@ -172,6 +172,14 @@
         "ok": "OK",
         "apply": "Apply",
         "refresh": "Refresh"
+    },
+    "aprilFools": {
+        "fakeBanModaleTitle": "You have been permanently banned from Tetra Stats",
+        "fakeBanModaleBody": "Reason: gross violation of the Terms of Service\n\nIf you want to appeal, please, contact dan63.",
+        "fakeBanModaledan63Grin": "Fool...",
+        "SettingTitleUnfoolMyself": "Unfool myself",
+        "SettingButtonUnfool": "Unfool",
+        "SettingDescription": "That button will allow you re experience april fool prank once again"
     },
     "graphsDestination": {
         "fetchAndsaveTLHistory": "Fetch History",

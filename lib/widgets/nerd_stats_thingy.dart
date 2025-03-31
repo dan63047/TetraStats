@@ -11,11 +11,12 @@ import 'package:tetra_stats/widgets/gauget_thingy.dart';
 class NerdStatsThingy extends StatelessWidget{
 	final NerdStats nerdStats;
 	final NerdStats? oldNerdStats;
+  final String? rank;
 	final CutoffTetrio? averages;
 	final PlayerLeaderboardPosition? lbPos;
 	final double width;
 
-	const NerdStatsThingy({super.key, required this.nerdStats, this.oldNerdStats, this.averages, this.lbPos, this.width = double.infinity});
+	const NerdStatsThingy({super.key, required this.nerdStats, this.oldNerdStats, this.rank, this.averages, this.lbPos, this.width = double.infinity});
 
 	Widget big(){
 		return Stack(
@@ -130,7 +131,7 @@ class NerdStatsThingy extends StatelessWidget{
 			runAlignment: WrapAlignment.start,
 			children: [
 				Tooltip(
-					message: "${t.stats.dss.full}${(averages != null) ? "\n${t.rankView.avgForRank(rank: "lol")}: ${f3.format(averages?.nerdStats?.dss)} ${t.stats.dss.short}" : ""}",
+					message: "${t.stats.dss.full}${(averages != null) ? "\n${t.rankView.avgForRank(rank: rank??"lol")}: ${f3.format(averages?.nerdStats?.dss)} ${t.stats.dss.short}" : ""}",
 					child: GaugetThingy(
 						value: nerdStats.dss,
 						oldValue: oldNerdStats?.dss,
@@ -143,7 +144,7 @@ class NerdStatsThingy extends StatelessWidget{
 					)
 				),
 				Tooltip(
-					message: "${t.stats.dsp.full}${(averages != null) ? "\n${t.rankView.avgForRank(rank: "lol")}: ${f3.format(averages?.nerdStats?.dsp)} ${t.stats.dsp.short}" : ""}",
+					message: "${t.stats.dsp.full}${(averages != null) ? "\n${t.rankView.avgForRank(rank: rank??"lol")}: ${f3.format(averages?.nerdStats?.dsp)} ${t.stats.dsp.short}" : ""}",
 					child: GaugetThingy(
 						value: nerdStats.dsp,
 						oldValue: oldNerdStats?.dsp,
@@ -156,7 +157,7 @@ class NerdStatsThingy extends StatelessWidget{
 					),
 				),
 				Tooltip(
-					message: "${t.stats.appdsp.full}${(averages != null) ? "\n${t.rankView.avgForRank(rank: "lol")}: ${f3.format(averages?.nerdStats?.appdsp)} ${t.stats.appdsp.short}" : ""}",
+					message: "${t.stats.appdsp.full}${(averages != null) ? "\n${t.rankView.avgForRank(rank: rank??"lol")}: ${f3.format(averages?.nerdStats?.appdsp)} ${t.stats.appdsp.short}" : ""}",
 					child: GaugetThingy(
 						value: nerdStats.appdsp,
 						oldValue: oldNerdStats?.appdsp,
@@ -169,7 +170,7 @@ class NerdStatsThingy extends StatelessWidget{
 					),
 				),
 				Tooltip(
-					message: "${t.stats.cheese.full}${(averages != null) ? "\n${t.rankView.avgForRank(rank: "lol")}: ${f2.format(averages?.nerdStats?.cheese)} ${t.stats.cheese.short}" : ""}",
+					message: "${t.stats.cheese.full}${(averages != null) ? "\n${t.rankView.avgForRank(rank: rank??"lol")}: ${f2.format(averages?.nerdStats?.cheese)} ${t.stats.cheese.short}" : ""}",
 					child: GaugetThingy(
 						value: nerdStats.cheese,
 						oldValue: oldNerdStats?.cheese,
@@ -181,7 +182,7 @@ class NerdStatsThingy extends StatelessWidget{
 					),
 				),
 				Tooltip(
-					message: "${t.stats.gbe.full}${(averages != null) ? "\n${t.rankView.avgForRank(rank: "lol")}: ${f3.format(averages?.nerdStats?.gbe)} ${t.stats.gbe.short}" : ""}",
+					message: "${t.stats.gbe.full}${(averages != null) ? "\n${t.rankView.avgForRank(rank: rank??"lol")}: ${f3.format(averages?.nerdStats?.gbe)} ${t.stats.gbe.short}" : ""}",
 					child: GaugetThingy(
 						value: nerdStats.gbe,
 						oldValue: oldNerdStats?.gbe,
@@ -194,7 +195,7 @@ class NerdStatsThingy extends StatelessWidget{
 					),
 				),
 				Tooltip(
-					message: "${t.stats.nyaapp.full}${(averages != null) ? "\n${t.rankView.avgForRank(rank: "lol")}: ${f3.format(averages?.nerdStats?.nyaapp)} ${t.stats.nyaapp.short}" : ""}",
+					message: "${t.stats.nyaapp.full}${(averages != null) ? "\n${t.rankView.avgForRank(rank: rank??"lol")}: ${f3.format(averages?.nerdStats?.nyaapp)} ${t.stats.nyaapp.short}" : ""}",
 					child: GaugetThingy(
 						value: nerdStats.nyaapp,
 						oldValue: oldNerdStats?.nyaapp,
@@ -207,7 +208,7 @@ class NerdStatsThingy extends StatelessWidget{
 					),
 				),
 				Tooltip(
-					message: "${t.stats.area.full}${(averages != null) ? "\n${t.rankView.avgForRank(rank: "lol")}: ${f1.format(averages?.nerdStats?.area)} ${t.stats.area.short}" : ""}",
+					message: "${t.stats.area.full}${(averages != null) ? "\n${t.rankView.avgForRank(rank: rank??"lol")}: ${f1.format(averages?.nerdStats?.area)} ${t.stats.area.short}" : ""}",
 					child: GaugetThingy(
 						value: nerdStats.area,
 						oldValue: oldNerdStats?.area,

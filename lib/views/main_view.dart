@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -136,6 +138,35 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
       currentRangeValues = const RangeValues(0, 1);
       _searchFor = player;
       _data = getData(_searchFor);
+      if (Random().nextInt(15) == 7 && prefs.getBool("fooled") == null) Timer(Durations.extralong4, (){
+        prefs.setBool("fooled", true);
+        showDialog(
+          context: context, 
+          barrierDismissible: false,
+          barrierLabel: "banned",
+          builder: (context){
+            return AlertDialog(
+              backgroundColor: Colors.redAccent.shade700,
+              title: Text(t.aprilFools.fakeBanModaleTitle, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: [
+                    Text(t.aprilFools.fakeBanModaleBody),
+                    Text(t.aprilFools.fakeBanModaledan63Grin, style: TextStyle(color: const Color.fromARGB(255, 255, 0, 23)))
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text(t.actions.ok),
+                  onPressed: () {
+                    exit(0);
+                  },
+                ),
+              ],
+            );
+          });
+      });
     });
   }
 

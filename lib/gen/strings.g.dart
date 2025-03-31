@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 5
-/// Strings: 3845 (769 per locale)
+/// Strings: 3875 (775 per locale)
 ///
-/// Built on 2025-03-25 at 23:31 UTC
+/// Built on 2025-03-31 at 21:49 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -214,7 +214,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get general => 'General';
 	String get badges => 'Badges';
 	String obtainDate({required Object date}) => 'Obtained ${date}';
-	String get assignedManualy => 'That badge was assigned manualy by TETR.IO admins';
+	String get assignedManualy => 'That badge was assigned manually by TETR.IO admins';
 	String get distinguishment => 'Distinguishment';
 	String get banned => 'Banned';
 	String get bannedSubtext => 'Bans are placed when TETR.IO rules or terms of service are broken';
@@ -245,6 +245,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	late final _StringsSnackBarMessagesEn snackBarMessages = _StringsSnackBarMessagesEn._(_root);
 	late final _StringsErrorsEn errors = _StringsErrorsEn._(_root);
 	late final _StringsActionsEn actions = _StringsActionsEn._(_root);
+	late final _StringsAprilFoolsEn aprilFools = _StringsAprilFoolsEn._(_root);
 	late final _StringsGraphsDestinationEn graphsDestination = _StringsGraphsDestinationEn._(_root);
 	late final _StringsFilterModaleEn filterModale = _StringsFilterModaleEn._(_root);
 	late final _StringsCutoffsDestinationEn cutoffsDestination = _StringsCutoffsDestinationEn._(_root);
@@ -702,6 +703,21 @@ class _StringsActionsEn {
 	String get ok => 'OK';
 	String get apply => 'Apply';
 	String get refresh => 'Refresh';
+}
+
+// Path: aprilFools
+class _StringsAprilFoolsEn {
+	_StringsAprilFoolsEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get fakeBanModaleTitle => 'You have been permanently banned from Tetra Stats';
+	String get fakeBanModaleBody => 'Reason: gross violation of the Terms of Service\n\nIf you want to appeal, please, contact dan63.';
+	String get fakeBanModaledan63Grin => 'Fool...';
+	String get SettingTitleUnfoolMyself => 'Unfool myself';
+	String get SettingButtonUnfool => 'Unfool';
+	String get SettingDescription => 'That button will allow you re experience april fool prank once again';
 }
 
 // Path: graphsDestination
@@ -1789,6 +1805,7 @@ class _StringsDeDe implements Translations {
 	@override late final _StringsSnackBarMessagesDeDe snackBarMessages = _StringsSnackBarMessagesDeDe._(_root);
 	@override late final _StringsErrorsDeDe errors = _StringsErrorsDeDe._(_root);
 	@override late final _StringsActionsDeDe actions = _StringsActionsDeDe._(_root);
+	@override late final _StringsAprilFoolsDeDe aprilFools = _StringsAprilFoolsDeDe._(_root);
 	@override late final _StringsGraphsDestinationDeDe graphsDestination = _StringsGraphsDestinationDeDe._(_root);
 	@override late final _StringsFilterModaleDeDe filterModale = _StringsFilterModaleDeDe._(_root);
 	@override late final _StringsCutoffsDestinationDeDe cutoffsDestination = _StringsCutoffsDestinationDeDe._(_root);
@@ -2245,6 +2262,21 @@ class _StringsActionsDeDe implements _StringsActionsEn {
 	@override String get ok => 'OK';
 	@override String get apply => 'Anwenden';
 	@override String get refresh => 'Aktualisieren';
+}
+
+// Path: aprilFools
+class _StringsAprilFoolsDeDe implements _StringsAprilFoolsEn {
+	_StringsAprilFoolsDeDe._(this._root);
+
+	@override final _StringsDeDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get fakeBanModaleTitle => 'You have been permanently banned from Tetra Stats';
+	@override String get fakeBanModaleBody => 'Reason: gross violation of the Terms of Service\n\nIf you want to appeal, please, contact dan63.';
+	@override String get fakeBanModaledan63Grin => 'Fool...';
+	@override String get SettingTitleUnfoolMyself => 'Unfool myself';
+	@override String get SettingButtonUnfool => 'Unfool';
+	@override String get SettingDescription => 'That button will allow you re experience april fool prank once again';
 }
 
 // Path: graphsDestination
@@ -3332,6 +3364,7 @@ class _StringsKoKr implements Translations {
 	@override late final _StringsSnackBarMessagesKoKr snackBarMessages = _StringsSnackBarMessagesKoKr._(_root);
 	@override late final _StringsErrorsKoKr errors = _StringsErrorsKoKr._(_root);
 	@override late final _StringsActionsKoKr actions = _StringsActionsKoKr._(_root);
+	@override late final _StringsAprilFoolsKoKr aprilFools = _StringsAprilFoolsKoKr._(_root);
 	@override late final _StringsGraphsDestinationKoKr graphsDestination = _StringsGraphsDestinationKoKr._(_root);
 	@override late final _StringsFilterModaleKoKr filterModale = _StringsFilterModaleKoKr._(_root);
 	@override late final _StringsCutoffsDestinationKoKr cutoffsDestination = _StringsCutoffsDestinationKoKr._(_root);
@@ -3788,6 +3821,21 @@ class _StringsActionsKoKr implements _StringsActionsEn {
 	@override String get ok => '확인';
 	@override String get apply => '적용';
 	@override String get refresh => '새로고침';
+}
+
+// Path: aprilFools
+class _StringsAprilFoolsKoKr implements _StringsAprilFoolsEn {
+	_StringsAprilFoolsKoKr._(this._root);
+
+	@override final _StringsKoKr _root; // ignore: unused_field
+
+	// Translations
+	@override String get fakeBanModaleTitle => 'You have been permanently banned from Tetra Stats';
+	@override String get fakeBanModaleBody => 'Reason: gross violation of the Terms of Service\n\nIf you want to appeal, please, contact dan63.';
+	@override String get fakeBanModaledan63Grin => 'Fool...';
+	@override String get SettingTitleUnfoolMyself => 'Unfool myself';
+	@override String get SettingButtonUnfool => 'Unfool';
+	@override String get SettingDescription => 'That button will allow you re experience april fool prank once again';
 }
 
 // Path: graphsDestination
@@ -4875,6 +4923,7 @@ class _StringsRuRu implements Translations {
 	@override late final _StringsSnackBarMessagesRuRu snackBarMessages = _StringsSnackBarMessagesRuRu._(_root);
 	@override late final _StringsErrorsRuRu errors = _StringsErrorsRuRu._(_root);
 	@override late final _StringsActionsRuRu actions = _StringsActionsRuRu._(_root);
+	@override late final _StringsAprilFoolsRuRu aprilFools = _StringsAprilFoolsRuRu._(_root);
 	@override late final _StringsGraphsDestinationRuRu graphsDestination = _StringsGraphsDestinationRuRu._(_root);
 	@override late final _StringsFilterModaleRuRu filterModale = _StringsFilterModaleRuRu._(_root);
 	@override late final _StringsCutoffsDestinationRuRu cutoffsDestination = _StringsCutoffsDestinationRuRu._(_root);
@@ -5332,6 +5381,21 @@ class _StringsActionsRuRu implements _StringsActionsEn {
 	@override String get ok => 'ОК';
 	@override String get apply => 'Применить';
 	@override String get refresh => 'Обновить';
+}
+
+// Path: aprilFools
+class _StringsAprilFoolsRuRu implements _StringsAprilFoolsEn {
+	_StringsAprilFoolsRuRu._(this._root);
+
+	@override final _StringsRuRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get fakeBanModaleTitle => 'Вы были навсегда забанены в Tetra Stats';
+	@override String get fakeBanModaleBody => 'Причина: грубое нарушение условий использования\n\nЕсли вы хотите подать апелляцию, пожалуйста, свяжитесь с dan63.';
+	@override String get fakeBanModaledan63Grin => 'Дурак...';
+	@override String get SettingTitleUnfoolMyself => 'Разодурачить себя';
+	@override String get SettingButtonUnfool => 'Разодурачить';
+	@override String get SettingDescription => 'Эта кнопка позволит вам снова испытать на себе первоапрельский пранк';
 }
 
 // Path: graphsDestination
@@ -6419,6 +6483,7 @@ class _StringsZhCn implements Translations {
 	@override late final _StringsSnackBarMessagesZhCn snackBarMessages = _StringsSnackBarMessagesZhCn._(_root);
 	@override late final _StringsErrorsZhCn errors = _StringsErrorsZhCn._(_root);
 	@override late final _StringsActionsZhCn actions = _StringsActionsZhCn._(_root);
+	@override late final _StringsAprilFoolsZhCn aprilFools = _StringsAprilFoolsZhCn._(_root);
 	@override late final _StringsGraphsDestinationZhCn graphsDestination = _StringsGraphsDestinationZhCn._(_root);
 	@override late final _StringsFilterModaleZhCn filterModale = _StringsFilterModaleZhCn._(_root);
 	@override late final _StringsCutoffsDestinationZhCn cutoffsDestination = _StringsCutoffsDestinationZhCn._(_root);
@@ -6875,6 +6940,21 @@ class _StringsActionsZhCn implements _StringsActionsEn {
 	@override String get ok => '确定';
 	@override String get apply => '应用';
 	@override String get refresh => '刷新';
+}
+
+// Path: aprilFools
+class _StringsAprilFoolsZhCn implements _StringsAprilFoolsEn {
+	_StringsAprilFoolsZhCn._(this._root);
+
+	@override final _StringsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get fakeBanModaleTitle => 'You have been permanently banned from Tetra Stats';
+	@override String get fakeBanModaleBody => 'Reason: gross violation of the Terms of Service\n\nIf you want to appeal, please, contact dan63.';
+	@override String get fakeBanModaledan63Grin => 'Fool...';
+	@override String get SettingTitleUnfoolMyself => 'Unfool myself';
+	@override String get SettingButtonUnfool => 'Unfool';
+	@override String get SettingDescription => 'That button will allow you re experience april fool prank once again';
 }
 
 // Path: graphsDestination
@@ -7918,7 +7998,7 @@ extension on Translations {
 			case 'general': return 'General';
 			case 'badges': return 'Badges';
 			case 'obtainDate': return ({required Object date}) => 'Obtained ${date}';
-			case 'assignedManualy': return 'That badge was assigned manualy by TETR.IO admins';
+			case 'assignedManualy': return 'That badge was assigned manually by TETR.IO admins';
 			case 'distinguishment': return 'Distinguishment';
 			case 'banned': return 'Banned';
 			case 'bannedSubtext': return 'Bans are placed when TETR.IO rules or terms of service are broken';
@@ -8027,6 +8107,12 @@ extension on Translations {
 			case 'actions.ok': return 'OK';
 			case 'actions.apply': return 'Apply';
 			case 'actions.refresh': return 'Refresh';
+			case 'aprilFools.fakeBanModaleTitle': return 'You have been permanently banned from Tetra Stats';
+			case 'aprilFools.fakeBanModaleBody': return 'Reason: gross violation of the Terms of Service\n\nIf you want to appeal, please, contact dan63.';
+			case 'aprilFools.fakeBanModaledan63Grin': return 'Fool...';
+			case 'aprilFools.SettingTitleUnfoolMyself': return 'Unfool myself';
+			case 'aprilFools.SettingButtonUnfool': return 'Unfool';
+			case 'aprilFools.SettingDescription': return 'That button will allow you re experience april fool prank once again';
 			case 'graphsDestination.fetchAndsaveTLHistory': return 'Fetch History';
 			case 'graphsDestination.fetchAndSaveOldTLmatches': return 'Get Tetra League matches history';
 			case 'graphsDestination.fetchAndsaveTLHistoryResult': return ({required Object number}) => '${number} states was found';
@@ -8844,6 +8930,12 @@ extension on _StringsDeDe {
 			case 'actions.ok': return 'OK';
 			case 'actions.apply': return 'Anwenden';
 			case 'actions.refresh': return 'Aktualisieren';
+			case 'aprilFools.fakeBanModaleTitle': return 'You have been permanently banned from Tetra Stats';
+			case 'aprilFools.fakeBanModaleBody': return 'Reason: gross violation of the Terms of Service\n\nIf you want to appeal, please, contact dan63.';
+			case 'aprilFools.fakeBanModaledan63Grin': return 'Fool...';
+			case 'aprilFools.SettingTitleUnfoolMyself': return 'Unfool myself';
+			case 'aprilFools.SettingButtonUnfool': return 'Unfool';
+			case 'aprilFools.SettingDescription': return 'That button will allow you re experience april fool prank once again';
 			case 'graphsDestination.fetchAndsaveTLHistory': return 'Historie abrufen';
 			case 'graphsDestination.fetchAndSaveOldTLmatches': return 'Tetra League Matchhistorie abrufen';
 			case 'graphsDestination.fetchAndsaveTLHistoryResult': return ({required Object number}) => '${number} Zustände was found';
@@ -9661,6 +9753,12 @@ extension on _StringsKoKr {
 			case 'actions.ok': return '확인';
 			case 'actions.apply': return '적용';
 			case 'actions.refresh': return '새로고침';
+			case 'aprilFools.fakeBanModaleTitle': return 'You have been permanently banned from Tetra Stats';
+			case 'aprilFools.fakeBanModaleBody': return 'Reason: gross violation of the Terms of Service\n\nIf you want to appeal, please, contact dan63.';
+			case 'aprilFools.fakeBanModaledan63Grin': return 'Fool...';
+			case 'aprilFools.SettingTitleUnfoolMyself': return 'Unfool myself';
+			case 'aprilFools.SettingButtonUnfool': return 'Unfool';
+			case 'aprilFools.SettingDescription': return 'That button will allow you re experience april fool prank once again';
 			case 'graphsDestination.fetchAndsaveTLHistory': return '기록 불러오기';
 			case 'graphsDestination.fetchAndSaveOldTLmatches': return '테트라 리그 경기 기록 불러오기';
 			case 'graphsDestination.fetchAndsaveTLHistoryResult': return ({required Object number}) => '${number}개 상태가 발견됨';
@@ -10479,6 +10577,12 @@ extension on _StringsRuRu {
 			case 'actions.ok': return 'ОК';
 			case 'actions.apply': return 'Применить';
 			case 'actions.refresh': return 'Обновить';
+			case 'aprilFools.fakeBanModaleTitle': return 'Вы были навсегда забанены в Tetra Stats';
+			case 'aprilFools.fakeBanModaleBody': return 'Причина: грубое нарушение условий использования\n\nЕсли вы хотите подать апелляцию, пожалуйста, свяжитесь с dan63.';
+			case 'aprilFools.fakeBanModaledan63Grin': return 'Дурак...';
+			case 'aprilFools.SettingTitleUnfoolMyself': return 'Разодурачить себя';
+			case 'aprilFools.SettingButtonUnfool': return 'Разодурачить';
+			case 'aprilFools.SettingDescription': return 'Эта кнопка позволит вам снова испытать на себе первоапрельский пранк';
 			case 'graphsDestination.fetchAndsaveTLHistory': return 'Получить историю';
 			case 'graphsDestination.fetchAndSaveOldTLmatches': return 'Получить историю матчей Тетра Лиги';
 			case 'graphsDestination.fetchAndsaveTLHistoryResult': return ({required Object number}) => '${number} состояний было найдено';
@@ -11296,6 +11400,12 @@ extension on _StringsZhCn {
 			case 'actions.ok': return '确定';
 			case 'actions.apply': return '应用';
 			case 'actions.refresh': return '刷新';
+			case 'aprilFools.fakeBanModaleTitle': return 'You have been permanently banned from Tetra Stats';
+			case 'aprilFools.fakeBanModaleBody': return 'Reason: gross violation of the Terms of Service\n\nIf you want to appeal, please, contact dan63.';
+			case 'aprilFools.fakeBanModaledan63Grin': return 'Fool...';
+			case 'aprilFools.SettingTitleUnfoolMyself': return 'Unfool myself';
+			case 'aprilFools.SettingButtonUnfool': return 'Unfool';
+			case 'aprilFools.SettingDescription': return 'That button will allow you re experience april fool prank once again';
 			case 'graphsDestination.fetchAndsaveTLHistory': return '获取玩家历史';
 			case 'graphsDestination.fetchAndSaveOldTLmatches': return '获取 Tetra 联赛历史记录';
 			case 'graphsDestination.fetchAndsaveTLHistoryResult': return ({required Object number}) => '找到 ${number} 个状态';

@@ -173,6 +173,14 @@
         "apply": "Применить",
         "refresh": "Обновить"
     },
+    "aprilFools": {
+        "fakeBanModaleTitle": "Вы были навсегда забанены в Tetra Stats",
+        "fakeBanModaleBody": "Причина: грубое нарушение условий использования\n\nЕсли вы хотите подать апелляцию, пожалуйста, свяжитесь с dan63.",
+        "fakeBanModaledan63Grin": "Дурак...",
+        "SettingTitleUnfoolMyself": "Разодурачить себя",
+        "SettingButtonUnfool": "Разодурачить",
+        "SettingDescription": "Эта кнопка позволит вам снова испытать на себе первоапрельский пранк"
+    },
     "graphsDestination": {
         "fetchAndsaveTLHistory": "Получить историю",
         "fetchAndSaveOldTLmatches": "Получить историю матчей Тетра Лиги",
