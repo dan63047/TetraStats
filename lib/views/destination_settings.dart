@@ -289,27 +289,6 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
             ],
           ),
         ),
-        if (prefs.getBool("fooled") != null) Card(
-          surfaceTintColor: Colors.redAccent,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: Text(t.aprilFools.SettingTitleUnfoolMyself, style: Theme.of(context).textTheme.displayLarge),
-                trailing: TextButton(child: Text(t.aprilFools.SettingButtonUnfool), onPressed: (){
-                  setState(() {
-                    prefs.remove("fooled");
-                  });
-                }),
-              ),
-              Divider(),
-              Padding(
-                padding: descriptionPadding,
-                child: Text(t.aprilFools.SettingDescription),
-              )
-            ],
-          ),
-        )
       ]
     );
   }

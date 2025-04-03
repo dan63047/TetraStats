@@ -55,7 +55,6 @@ class TetraLeagueThingy extends StatelessWidget{
   
   @override
   Widget build(BuildContext context) {
-    print(ranks2.indexOf(league.rank != "z" ? league.rank : league.percentileRank)-1);
     return Card(
       child: Column(
         children: [
