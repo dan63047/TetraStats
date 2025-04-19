@@ -25,7 +25,7 @@ class ZenithThingy extends StatelessWidget{
         Text(" ${t.stats.b2b.short}", style: style)
       ]),
       TableRow(children: [
-        Text(zenith!.stats.garbage.maxspike_nomult.toString(), textAlign: TextAlign.right, style: style),
+        Text(zenith!.stats.garbage.maxspike.toString(), textAlign: TextAlign.right, style: style),
         Text(" ${t.stats.spike}", style: style)
       ]),
       if (width <= 600) TableRow(children: [
