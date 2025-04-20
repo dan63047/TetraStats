@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -41,7 +43,6 @@ Future<FetchResults> getData(String searchFor, {bool withHistory = false}) async
     }else{
       player = await teto.fetchPlayer(searchFor); // Otherwise it's probably a user id or username
     }
-    
   }on TetrioPlayerNotExist{
     return FetchResults(false, null, [], null, null, null, null, null, false, TetrioPlayerNotExist());
   }
@@ -62,7 +63,7 @@ Future<FetchResults> getData(String searchFor, {bool withHistory = false}) async
     cutoffs = requests.elementAtOrNull(2);
     averages = requests.elementAtOrNull(3);
 
-  if(withHistory) await teto.fetchAndsaveTLHistory(player.userId, 1); // Retrieve if needed
+  if(withHistory) await teto.fetchAndsaveS1TLHistory(player.userId); // Retrieve if needed
   } on Exception catch (e) {
     return FetchResults(false, null, [], null, null, null, null, null, false, e);
   }

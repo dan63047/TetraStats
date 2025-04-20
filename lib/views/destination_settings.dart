@@ -203,7 +203,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                title: Text("Language", style: Theme.of(context).textTheme.displayLarge),
+                title: Text("${t.settingsDestination.language} (Language)", style: Theme.of(context).textTheme.displayLarge),
                 trailing: DropdownButton(
                   items: locales,
                   value: LocaleSettings.currentLocale,
@@ -288,7 +288,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
               )
             ],
           ),
-        )
+        ),
       ]
     );
   }
@@ -447,7 +447,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
                           text: TextSpan(
                             style: TextStyle(fontFamily: "Eurostile Round", color: Colors.white),
                             children: [
-                              TextSpan(text: "${bytesToSize(snapshot.data!.$1)} ", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)),
+                              TextSpan(text: "${snapshot.data!.$1 == -1 ? "???" : bytesToSize(snapshot.data!.$1)} ", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)),
                               TextSpan(text: "${t.settingsDestination.bytesOfDataStored}\n"),
                               TextSpan(text: "${intf.format(snapshot.data!.$2)} ", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)),
                               TextSpan(text: "${t.settingsDestination.TLrecordsSaved}\n"),
@@ -457,7 +457,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
                           )
                         );
                       }
-                      if (snapshot.hasError){ return FutureError(snapshot); }
+                      if (snapshot.hasError){ return SizedBox(height: 500.0, child: FutureError(snapshot)); }
                     }
                   return Text("huh?");
                 }

@@ -251,7 +251,7 @@ class _UserThingyState extends State<UserThingy> with SingleTickerProviderStateM
                       text: TextSpan(
                         style: const TextStyle(fontFamily: "Eurostile Round", color: Colors.white),
                         children: [
-                          TextSpan(text: "Level ${(widget.player.level.isNegative || widget.player.level.isNaN) ? "---" : intf.format(widget.player.level.floor())}", style: TextStyle(decoration: (widget.player.level.isNegative || widget.player.level.isNaN) ? null : TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted, color: (widget.player.level.isNegative || widget.player.level.isNaN) ? Colors.grey : Colors.white), recognizer: (widget.player.level.isNegative || widget.player.level.isNaN) ? null : TapGestureRecognizer()?..onTap = (){
+                          TextSpan(text: "${t.stats.level.full} ${(widget.player.level.isNegative || widget.player.level.isNaN) ? "---" : intf.format(widget.player.level.floor())}", style: TextStyle(decoration: (widget.player.level.isNegative || widget.player.level.isNaN) ? null : TextDecoration.underline, decorationColor: Colors.white70, decorationStyle: TextDecorationStyle.dotted, color: (widget.player.level.isNegative || widget.player.level.isNaN) ? Colors.grey : Colors.white), recognizer: (widget.player.level.isNegative || widget.player.level.isNaN) ? null : TapGestureRecognizer()?..onTap = (){
                             showDialog(
                               context: context,
                               builder: (BuildContext context) => AlertDialog(

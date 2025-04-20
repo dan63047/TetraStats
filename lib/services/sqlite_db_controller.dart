@@ -88,7 +88,7 @@ class DB {
   }
 
   Future<bool> checkImportingDB(File db) async {
-    final newDB = await openDatabase(db.path);
+    final newDB = await openDatabase(db.path); // TODO: Maybe i should use arguments, that this method provides?
     var usersTable = await newDB.rawQuery("PRAGMA table_xinfo(`${tetrioUsersTable}`);");
     List<String> usersTableRows = [for (Map<String, Object?> row in usersTable) row["name"] as String];
     if (!listEquals(usersTableRows, tetrioUsersTableRows)) return false;

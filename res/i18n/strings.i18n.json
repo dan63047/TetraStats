@@ -2,7 +2,9 @@
     "locales(map)": {
         "en": "English",
         "ru-RU": "Russian (Русский)",
-        "zh-CN": "Simplified Chinese (简体中文)"
+        "ko-KR": "Korean (한국인)",
+        "zh-CN": "Simplified Chinese (简体中文)",
+        "de-DE": "German (Deutsch)"
     },
     "gamemodes(map)":{
         "league": "Tetra League",
@@ -77,7 +79,7 @@
     "general": "General",
     "badges": "Badges",
     "obtainDate": "Obtained ${date}",
-    "assignedManualy": "That badge was assigned manualy by TETR.IO admins",
+    "assignedManualy": "That badge was assigned manually by TETR.IO admins",
     "distinguishment": "Distinguishment",
     "banned": "Banned",
     "bannedSubtext": "Bans are placed when TETR.IO rules or terms of service are broken",
@@ -171,8 +173,16 @@
         "apply": "Apply",
         "refresh": "Refresh"
     },
+    "aprilFools": {
+        "fakeBanModaleTitle": "You have been permanently banned from Tetra Stats",
+        "fakeBanModaleBody": "Reason: gross violation of the Terms of Service\n\nIf you want to appeal, please, contact dan63.",
+        "fakeBanModaledan63Grin": "Fool...",
+        "SettingTitleUnfoolMyself": "Unfool myself",
+        "SettingButtonUnfool": "Unfool",
+        "SettingDescription": "That button will allow you re experience april fool prank once again"
+    },
     "graphsDestination": {
-        "fetchAndsaveTLHistory": "Get player history",
+        "fetchAndsaveTLHistory": "Fetch History",
         "fetchAndSaveOldTLmatches": "Get Tetra League matches history",
         "fetchAndsaveTLHistoryResult": "${number} states was found",
         "fetchAndSaveOldTLmatchesResult": "${number} matches was found",
@@ -276,7 +286,7 @@
         "title": "Leaderboards",
         "tl": "Tetra League (Current Season)",
         "fullTL": "Tetra League (Current Season, full one)",
-        "ar": "Acievement Points"
+        "ar": "Achievement Points"
     },
     "savedDataDestination": {
         "title": "Saved Data",
@@ -308,11 +318,11 @@
         "updateInTheBackground": "Update data in the background",
         "updateInTheBackgroundDescription": "If on, Tetra Stats will attempt to retrieve new info once cache expires. Usually that happen every 5 minutes",
         "compareStats": "Compare TL stats with rank averages",
-        "compareStatsDescription": "If on, Tetra Stats will provide additional metrics, which allow you to compare yourself with average player on your rank. The way you'll see it — stats will be highlited with corresponding color, hover over them with cursor for more info.", 
+        "compareStatsDescription": "If on, Tetra Stats will provide additional metrics, which allow you to compare yourself with average player on your rank. The way you'll see it — stats will be highlighted with corresponding color, hover over them with cursor for more info.", 
         "showPosition": "Show position on leaderboard by stats",
         "showPositionDescription": "This can take some time (and traffic) to load, but will allow you to see your position on the leaderboard, sorted by a stat",
         "accentColor": "Accent color",
-        "accentColorDescription": "That color is seen across this app and usually highlites interactive UI elements.",
+        "accentColorDescription": "That color is seen across this app and usually highlights interactive UI elements.",
         "accentColorModale": "Pick an accent color",
         "timestamps": "Timestamps format",
         "timestampsDescriptionPart1": "You can choose, in which way timestamps shows time. By default, they show time in GMT timezone, formatted according to chosen locale, example: $d.",
@@ -380,6 +390,8 @@
         "providedS1history": "Provided S1 history",
         "inoue": "Inoue (replay grabber)",
         "zhCNlocale": "Simplfied Chinese locale",
+        "deDElocale": "German locale",
+        "koKRlocale": "Korean locale",
         "supportHim": "Support him!"
     },
     "stats": {

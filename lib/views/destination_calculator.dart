@@ -76,7 +76,7 @@ class ClearData{
 
     if (rules.combo && rules.comboTable != ComboTables.none) {
       if (combo >= 1){
-        if (lines == 1 && rules.comboTable != ComboTables.multiplier) damage += combotable[rules.comboTable]![max(0, min(combo - 1, combotable[rules.comboTable]!.length - 1))];
+        if (rules.comboTable != ComboTables.multiplier) damage += combotable[rules.comboTable]![max(0, min(combo - 1, combotable[rules.comboTable]!.length - 1))];
         else damage *= (1 + COMBO_BONUS * (combo));
       }
       if (combo >= 2) {
@@ -166,7 +166,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
   List<ClearData> clears = [];
   Map<String, int> customClearsChoice = {
     t.calcDestination.noSpinClears: 5,
-    t.calcDestination.spins: 5
+    t.stats.spins: 5
   };
   int idCounter = 0;
   Rules rules = Rules();
@@ -400,7 +400,13 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
           ),
           onTap: (){
             setState((){
-              clears.add(ClearData("${key == t.calcDestination.spins ? "${t.stats.spin} " : ""}${clearNames[min(customClearsChoice[key]!, clearNames.length-1)]} (${customClearsChoice[key]!} ${t.stats.lines})", key == t.calcDestination.spins ? Lineclears.TSPIN_PENTA : Lineclears.PENTA, customClearsChoice[key]!, false, key == t.calcDestination.spins).cloneWith(idCounter));
+              clears.add(ClearData(
+                "${key == t.stats.spins ? "${t.stats.spin} " : ""}${clearNames[min(customClearsChoice[key]!, clearNames.length-1)]} (${customClearsChoice[key]!} ${t.stats.lines})",
+                key == t.stats.spins ? Lineclears.TSPIN_PENTA : Lineclears.PENTA,
+                customClearsChoice[key]!,
+                false,
+                key == t.stats.spins).cloneWith(idCounter)
+              );
             });
             idCounter++;
           },

@@ -2,7 +2,7 @@ name: tetra_stats
 description: Track your and other player stats in TETR.IO
 publish_to: 'none'
 
-version: 2.0.1+42
+version: 2.0.7+48
 
 environment:
   sdk: '>=3.0.0'
@@ -46,6 +46,7 @@ dependencies:
   flutter_layout_grid: ^2.0.0
   go_router: ^13.0.0
   syncfusion_flutter_charts: ^24.2.9
+  flutter_to_debian: ^2.0.2
 
 dev_dependencies:
   flutter_test:

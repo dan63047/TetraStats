@@ -6,7 +6,7 @@ Tetra Stats works with TETR.IO Tetra Channel API, providing data from it and cal
 
 You can [download an app](https://github.com/dan63047/TetraStats/releases), or [use web version](https://ts.dan63.by).
 
-![Screenshot of the app 1](https://imgur.com/e8CYvj3.png)
+![Screenshot of the app 1](https://i.imgur.com/3nqyNcR.png)
 
 # Available functionality
 - Advanced stats for players
@@ -20,6 +20,8 @@ You can [download an app](https://github.com/dan63047/TetraStats/releases), or [
 - **kerrmunism** — formulas
 - **p1nkl0bst3r** — providing players history and peak TR
 - **neko_ab4093** — Simplified Chinese localization
+- **founntain** — German localization
+- **Tau, ctpw, PyHoKxvx, muqhc, xantho, mazohu, CEL_ESTIAL, pensil** — Korean localization
 - **osk** and his team — TETR.IO
 
 ## Legal notes

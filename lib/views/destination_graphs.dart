@@ -51,6 +51,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
   ValueNotifier<String> historyPlayerUsername = ValueNotifier("");
   ValueNotifier<String> historyPlayerAvatarRevizion = ValueNotifier("");
   List<String> excludeRanks = [];
+  late Future<Map<int, Map<Stats, List<_HistoryChartSpot>>>> playerHistory = getHistoryData(fetchData);
   late Future<List<_MyScatterSpot>> futureLeague = getTetraLeagueData(_Xchart, Ychart);
   String searchLeague = "";
   int? TLstatePlayers;
@@ -143,9 +144,11 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
   }
 
   Future<Map<int, Map<Stats, List<_HistoryChartSpot>>>> getHistoryData(bool fetchHistory) async {
+    var playerID = (await teto.fetchPlayer(widget.searchFor)).userId;
     if(fetchHistory){
       try{
-        var history = await teto.fetchAndsaveTLHistory(widget.searchFor, 1);
+        //var history = await Future.wait([teto.fetchAndsaveS1TLHistory(widget.searchFor), teto.fetchAndsaveS2TLHistory(widget.searchFor)]); // S1 history unavaliable because of certificate issue on p1nkl0bst3r side
+        var history = await teto.fetchAndsaveS2TLHistory(playerID);
         if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.graphsDestination.fetchAndsaveTLHistoryResult(number: history.length))));
       }on TetrioHistoryNotExist{
         if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.errors.noHistorySaved)));
@@ -159,19 +162,19 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
     } 
 
     List<List<TetraLeague>> states = await Future.wait<List<TetraLeague>>([
-      teto.getStates(widget.searchFor, season: 1), teto.getStates(widget.searchFor, season: 2),
+      teto.getStates(playerID, season: 1), teto.getStates(playerID, season: 2),
     ]);
     Map<int, Map<Stats, List<_HistoryChartSpot>>> historyData = {}; // [season][metric][spot]
     for (int season = 0; season < currentSeason; season++){
       if (states[season].length >= 2){
       Map<Stats, List<_HistoryChartSpot>> statsMap = {};
-        for (var stat in Stats.values) statsMap[stat] = [for (var tl in states[season]) if (tl.getStatByEnum(stat) != null) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.getStatByEnum(stat)!.toDouble())];
+        for (var stat in Stats.values) statsMap[stat] = [for (var tl in states[season]) if (tl.getStatByEnum(stat) != null && tl.getStatByEnum(stat) != -1.00) _HistoryChartSpot(tl.timestamp, tl.gamesPlayed, tl.rank, tl.getStatByEnum(stat)!.toDouble())];
         historyData[season] = statsMap;
       }
     }
     fetchData = false;
 
-    historyPlayerUsername.value = await teto.getNicknameByID(widget.searchFor);
+    historyPlayerUsername.value = await teto.getNicknameByID(playerID);
 
     return historyData;
   }
@@ -234,7 +237,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                 trendlines:<Trendline>[
                   Trendline(
                     isVisible: _smooth,
-                    period: (selectedGraph.length/175).floor(),
+                    period: (selectedGraph.length/100).floor(),
                     type: TrendlineType.movingAverage,
                     color: Theme.of(context).colorScheme.primary)
                   ],
@@ -250,7 +253,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                   trendlines:<Trendline>[
                     Trendline(
                       isVisible: _smooth,
-                      period: (selectedGraph.length/175).floor(),
+                      period: (selectedGraph.length/100).floor(),
                       type: TrendlineType.movingAverage,
                       color: Theme.of(context).colorScheme.primary)
                   ],
@@ -532,7 +535,16 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                         );
                         });
                       }, icon: Icon(Icons.filter_alt)),
-                      IconButton(onPressed: () => _zoomPanBehavior.reset(), icon: const Icon(Icons.refresh), alignment: Alignment.center,)
+                      IconButton(onPressed: () => _zoomPanBehavior.reset(), icon: const Icon(Icons.refresh), alignment: Alignment.center,),
+                      if (graph == Graph.history) ElevatedButton.icon(
+                        onPressed: (){
+                          setState(() {
+                            fetchData = true;
+                          });
+                        },
+                        label: Text(t.graphsDestination.fetchAndsaveTLHistory),
+                        icon: Icon(Icons.download),
+                      )
                     ],
                   ),
                 ),
@@ -581,6 +593,11 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
       ),
     ); 
   }
+
+  void markNeedsBuild() {
+    
+  }
+
 }
 
 class _HistoryChartSpot{

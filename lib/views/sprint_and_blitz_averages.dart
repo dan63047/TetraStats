@@ -57,44 +57,38 @@ class SprintAndBlitzState extends State<SprintAndBlitzView> {
             constraints: const BoxConstraints(maxWidth: 600),
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+              child: Table(
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                border: TableBorder.all(color: Colors.grey.shade900),
+                columnWidths: const {0: FixedColumnWidth(48)},
                 children: [
-                  Table(
-                    defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                    border: TableBorder.all(color: Colors.grey.shade900),
-                    columnWidths: const {0: FixedColumnWidth(48)},
+                  TableRow(
                     children: [
-                      TableRow(
-                        children: [
-                          Text(t.rank, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: Text(t.gamemodes["40l"]!, textAlign: TextAlign.right, style: TextStyle(fontFamily: bigScreen ? "Eurostile Round" : "Eurostile Round Condensed", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white)),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: Text(t.gamemodes["blitz"]!, textAlign: TextAlign.right, style: TextStyle(fontFamily: bigScreen ? "Eurostile Round" : "Eurostile Round Condensed", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white)),
-                          ),
-                        ]
+                      Text(t.rank, textAlign: TextAlign.center, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Text(t.gamemodes["40l"]!, textAlign: TextAlign.right, style: TextStyle(fontFamily: bigScreen ? "Eurostile Round" : "Eurostile Round Condensed", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white)),
                       ),
-                      for (MapEntry<String, Duration> sprintEntry in sprintAverages.entries) TableRow(
-                        decoration: BoxDecoration(gradient: LinearGradient(colors: [rankColors[sprintEntry.key]!.withAlpha(100), rankColors[sprintEntry.key]!.withAlpha(200)])),
-                        children: [
-                          Container(decoration: BoxDecoration(boxShadow: [BoxShadow(color: Colors.black.withAlpha(132), blurRadius: 32.0, blurStyle: BlurStyle.inner)]), child: Image.asset("res/tetrio_tl_alpha_ranks/${sprintEntry.key}.png", height: 48)),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: Text(getALittleBitMoreNormalTime(sprintEntry.value), textAlign: TextAlign.right, style: TextStyle(fontFamily: bigScreen ? "Eurostile Round" : "Eurostile Round Condensed", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white, shadows: textShadow)),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: Text(NumberFormat.decimalPattern().format(blitzAverages[sprintEntry.key]), textAlign: TextAlign.right, style: TextStyle(fontFamily: bigScreen ? "Eurostile Round" : "Eurostile Round Condensed", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white, shadows: textShadow)),
-                          ),
-                        ]
-                      )
-                    ],
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Text(t.gamemodes["blitz"]!, textAlign: TextAlign.right, style: TextStyle(fontFamily: bigScreen ? "Eurostile Round" : "Eurostile Round Condensed", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white)),
+                      ),
+                    ]
                   ),
-                  Text(t.sprintAndBlitsRelevance(date: dateFormat.format(DateTime(2024, 8, 25))))
+                  for (MapEntry<String, Duration> sprintEntry in sprintAverages.entries) TableRow(
+                    decoration: BoxDecoration(gradient: LinearGradient(colors: [rankColors[sprintEntry.key]!.withAlpha(100), rankColors[sprintEntry.key]!.withAlpha(200)])),
+                    children: [
+                      Container(decoration: BoxDecoration(boxShadow: [BoxShadow(color: Colors.black.withAlpha(132), blurRadius: 32.0, blurStyle: BlurStyle.inner)]), child: Image.asset("res/tetrio_tl_alpha_ranks/${sprintEntry.key}.png", height: 48)),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Text(getALittleBitMoreNormalTime(sprintEntry.value), textAlign: TextAlign.right, style: TextStyle(fontFamily: bigScreen ? "Eurostile Round" : "Eurostile Round Condensed", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white, shadows: textShadow)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Text(NumberFormat.decimalPattern().format(blitzAverages[sprintEntry.key]), textAlign: TextAlign.right, style: TextStyle(fontFamily: bigScreen ? "Eurostile Round" : "Eurostile Round Condensed", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white, shadows: textShadow)),
+                      ),
+                    ]
+                  )
                 ],
               ),
             ),

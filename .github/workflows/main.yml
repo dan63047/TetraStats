@@ -62,6 +62,8 @@ jobs:
           type: 'zip'
           filename: TetraStats-${{github.ref_name}}-linux.zip
           directory: build/linux/x64/release/bundle
+      - name: Build .deb package
+        run: dart run flutter_to_debian
       - name: Push to Releases
         uses: ncipollo/release-action@v1
         with:
@@ -69,7 +71,7 @@ jobs:
           allowUpdates: true
           replacesArtifacts: false
           discussionCategory: autobuilded-releases
-          artifacts: "build/linux/x64/release/bundle/TetraStats-${{github.ref_name}}-linux.zip"
+          artifacts: "build/linux/x64/release/bundle/TetraStats-${{github.ref_name}}-linux.zip,build/linux/x64/release/debian/*"
           tag: Auto-${{ github.run_number }}
           body: Build with GitHub Action workflow
           token: ${{ secrets.TOKEN }}

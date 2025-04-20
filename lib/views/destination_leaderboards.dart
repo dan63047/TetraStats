@@ -136,7 +136,6 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
   }
 
   Widget rightSide(double width){
-    print(width);
     const double eukjsakjas = 450;
     TextStyle trailingStyle = TextStyle(fontSize: 28, fontFamily: width < eukjsakjas ? "Eurostile Round Condensed" : null);
     return SizedBox(

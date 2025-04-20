@@ -103,7 +103,7 @@ class _TLRecordsState extends State<TLRecords> {
                     ),
                   ),
                   itemBuilder: (BuildContext context, int index){
-                    return BetaLeagueEntryThingy(records[index], widget.userID);
+                    return BetaLeagueEntryThingy(records[index], widget.userID, MediaQuery.of(context).size.width >= 768.0);
                   }
                 ),
               );
