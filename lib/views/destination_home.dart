@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/data_objects/achievement.dart';
 import 'package:tetra_stats/data_objects/cutoff_tetrio.dart';
@@ -70,10 +72,10 @@ Map<Cards, List<ButtonSegment<CardMod>>> modeButtons = {
 				value: CardMod.info,
 				label: Text(t.homeNavigation.standing),
 			),
-		// ButtonSegment<CardMod>(
-		// 		value: CardMod.exRecords, // yeah i misusing my own Enum shut the fuck up
-		// 		label: Text("Analysis"),
-		// ),
+		ButtonSegment<CardMod>(
+				value: CardMod.exRecords, // yeah i misusing my own Enum shut the fuck up
+				label: Text("Analysis"),
+		),
 		ButtonSegment<CardMod>(
 				value: CardMod.ex,
 				label: Text(t.homeNavigation.seasons),
@@ -569,6 +571,53 @@ class RecordSummary extends StatelessWidget{
 	}
 }
 
+class ClearsChartData {
+	final String nick;
+	final int perfectClear;
+  final int allspin;
+  final int single;
+  final int tspinSingle;
+  final int double;
+  final int tspinDouble;
+  final int triple;
+  final int tspinTriple;
+  final int quad;
+	ClearsChartData(this.nick, this.perfectClear, this.allspin, this.single, this.tspinSingle, this.double, this.tspinDouble, this.triple, this.tspinTriple, this.quad);
+
+	get total => perfectClear + allspin + single + tspinSingle + double + tspinDouble + triple + tspinTriple + quad;
+	get clearName => [
+		t.stats.pcs,
+		"All Spins",
+		t.stats.lineClears.single,
+		"${t.stats.tSpin} ${t.stats.lineClears.single}",
+		t.stats.lineClears.double,
+		"${t.stats.tSpin} ${t.stats.lineClears.double}",
+		t.stats.lineClears.triple,
+		"${t.stats.tSpin} ${t.stats.lineClears.triple}",
+		t.stats.lineClears.quad,
+		"${t.stats.tSpin} ${t.stats.lineClears.quad}"
+	];
+	get color => [
+		Color.fromRGBO(75, 135, 185, 1),
+		Color.fromRGBO(192, 108, 132, 1),
+		Color.fromRGBO(246, 114, 128, 1),
+		Color.fromRGBO(248, 177, 149, 1),
+		Color.fromRGBO(116, 180, 155, 1),
+		Color.fromRGBO(0, 168, 181, 1),
+		Color.fromRGBO(73, 76, 162, 1),
+		Color.fromRGBO(255, 205, 96, 1),
+		Color.fromRGBO(255, 240, 219, 1),
+		Color.fromRGBO(238, 238, 238, 1)
+	];
+}
+
+class WellsData{
+	int well;
+	double value;
+
+	WellsData(this.well, this.value);
+}
+
 class AchievementSummary extends StatelessWidget{
 	final Achievement? achievement;
 
@@ -970,157 +1019,388 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 		);
 	}
 
-	// Widget getFreyhoeAnalysis(double width){
-	// 	return Column(
-	// 		children: [
-	// 			Text("This is just a mockup. WIP"),
-	// 			Card(
-	// 				child: Padding(
-	// 					padding: const EdgeInsets.only(bottom: 4.0),
-	// 					child: Center(
-	// 						child: Column(
-	// 							mainAxisSize: MainAxisSize.min,
-	// 							crossAxisAlignment: CrossAxisAlignment.center,
-	// 							children: [
-	// 								Text("Analysis", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleMedium),
-	// 								Padding(
-	// 									padding: const EdgeInsets.only(top: 4.0),
-	// 									child: Text("via MinoMuncher by Freyhoe", textAlign: TextAlign.center, style: widget.constraints.maxWidth > 768.0 ? null : TextStyle(fontSize: 12.0)),
-	// 								)
-	// 							],
-	// 						),
-	// 					),
-	// 				),
-	// 			),
-	// 			Card(
-	// 				child: Padding(
-	// 					padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
-	// 					child: Center(
-	// 						child: Column(
-	// 							mainAxisSize: MainAxisSize.min,
-	// 							crossAxisAlignment: CrossAxisAlignment.center,
-	// 							children: [
-	// 								SfLinearGauge(
-	// 									minimum: 0,
-	// 									maximum: 300,
-	// 									interval: 25, 
-	// 									ranges: [
-	// 										LinearGaugeRange(
-	// 											startValue: 0,
-	// 											endValue: 210,
-	// 											startWidth: 25,
-	// 											endWidth: 25,
-	// 											color: Colors.yellow,
-	// 											position: LinearElementPosition.cross
-	// 										),
-	// 										LinearGaugeRange(
-	// 											startValue: 0,
-	// 											endValue: 165,
-	// 											startWidth: 25,
-	// 											endWidth: 25,
-	// 											color: Colors.orange,
-	// 											position: LinearElementPosition.cross
-	// 										),
-	// 										LinearGaugeRange(
-	// 											startValue: 0,
-	// 											endValue: 150,
-	// 											startWidth: 25,
-	// 											endWidth: 25,
-	// 											color: Colors.red,
-	// 											position: LinearElementPosition.cross
-	// 										)
-	// 									],
-	// 									markerPointers: [
-	// 										LinearWidgetPointer(value: 0, child: Container(width: 36.0, child: Text("APM")), markerAlignment: LinearMarkerAlignment.end)
-	// 									],
-	// 									isMirrored: false,
-	// 									showTicks: true,
-	// 									showLabels: false
-	// 								),
-	// 								SizedBox(height: 8.0),
-	// 								SfLinearGauge(
-	// 									minimum: 0,
-	// 									maximum: 3.00,
-	// 									interval: 25, 
-	// 									ranges: [
-	// 										LinearGaugeRange(
-	// 											startValue: 0,
-	// 											endValue: 2.90,
-	// 											startWidth: 25,
-	// 											endWidth: 25,
-	// 											color: Colors.yellow,
-	// 											position: LinearElementPosition.cross
-	// 										),
-	// 										LinearGaugeRange(
-	// 											startValue: 0,
-	// 											endValue: 2.25,
-	// 											startWidth: 25,
-	// 											endWidth: 25,
-	// 											color: Colors.orange,
-	// 											position: LinearElementPosition.cross
-	// 										),
-	// 										LinearGaugeRange(
-	// 											startValue: 0,
-	// 											endValue: 2.10,
-	// 											startWidth: 25,
-	// 											endWidth: 25,
-	// 											color: Colors.red,
-	// 											position: LinearElementPosition.cross
-	// 										)
-	// 									],
-	// 									markerPointers: [
-	// 										LinearWidgetPointer(value: 0, child: Container(width: 36.0, child: Text("PPS")), markerAlignment: LinearMarkerAlignment.end)
-	// 									],
-	// 									isMirrored: false,
-	// 									showTicks: true,
-	// 									showLabels: false
-	// 								),
-	// 								SizedBox(height: 8.0),
-	// 								Wrap(
-	// 									direction: Axis.horizontal,
-	// 									crossAxisAlignment: WrapCrossAlignment.center,
-	// 									spacing: 20,
-	// 									children: [
-	// 										Row(
-	// 											mainAxisSize: MainAxisSize.min,
-	// 											children: [
-	// 												Padding(
-	// 													padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-	// 													child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.red)),
-	// 												),
-	// 												Text("Midgame: 150 APM, 2.1 PPS")
-	// 											],
-	// 										),
-	// 										Row(
-	// 											mainAxisSize: MainAxisSize.min,
-	// 											children: [
-	// 												Padding(
-	// 													padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-	// 													child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.orange)),
-	// 												),
-	// 												Text("Overall: 165 APM, 2.25 PPS")
-	// 											],
-	// 										),
-	// 										Row(
-	// 											mainAxisSize: MainAxisSize.min,
-	// 											children: [
-	// 												Padding(
-	// 													padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-	// 													child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.yellow)),
-	// 												),
-	// 												Text("Opener: 210 APM 2.90 PPS")
-	// 											],
-	// 										),
-	// 									],
-	// 								),
-	// 							],
-	// 						),
-	// 					),
-	// 				),
-	// 			),
-	// 		],
-	// 	);
-	// }
+	Widget getFreyhoeAnalysis(double width){
+		ClearsChartData clears = ClearsChartData("bozo", 3, 152, 237, 32, 59, 129, 16, 0, 147);
+		List<int> columns = [ 11, 10, 37, 41, 17, 5, 9, 21, 9, 22 ];
+		int columnsSum = columns.reduce((a, b) => a + b);
+		List<WellsData> distribution = [for (int i = 0; i <= 9; i++) WellsData(i+1, columns[i]/columnsSum)];
+		List<ClearsChartData> dataClears = [clears];
+		return Column(
+			children: [
+				Text("This is just a mockup. WIP"),
+				Card(
+					child: Padding(
+						padding: const EdgeInsets.only(bottom: 4.0),
+						child: Center(
+							child: Column(
+								mainAxisSize: MainAxisSize.min,
+								crossAxisAlignment: CrossAxisAlignment.center,
+								children: [
+									Text("Analysis", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleMedium),
+									Padding(
+										padding: const EdgeInsets.only(top: 4.0),
+										child: Text("via MinoMuncher by Freyhoe", textAlign: TextAlign.center, style: widget.constraints.maxWidth > 768.0 ? null : TextStyle(fontSize: 12.0)),
+									)
+								],
+							),
+						),
+					),
+				),
+				Card(
+					child: Padding(
+						padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
+						child: Center(
+							child: Column(
+								mainAxisSize: MainAxisSize.min,
+								crossAxisAlignment: CrossAxisAlignment.center,
+								children: [
+									SfLinearGauge(
+										minimum: 0,
+										maximum: 300,
+										interval: 25, 
+										ranges: [
+											LinearGaugeRange(
+												startValue: 0,
+												endValue: 210,
+												startWidth: 25,
+												endWidth: 25,
+												color: Colors.yellow,
+												position: LinearElementPosition.cross
+											),
+											LinearGaugeRange(
+												startValue: 0,
+												endValue: 165,
+												startWidth: 25,
+												endWidth: 25,
+												color: Colors.orange,
+												position: LinearElementPosition.cross
+											),
+											LinearGaugeRange(
+												startValue: 0,
+												endValue: 150,
+												startWidth: 25,
+												endWidth: 25,
+												color: Colors.red,
+												position: LinearElementPosition.cross
+											)
+										],
+										markerPointers: [
+											LinearWidgetPointer(value: 0, child: Container(width: 36.0, child: Text("APM")), markerAlignment: LinearMarkerAlignment.end)
+										],
+										isMirrored: false,
+										showTicks: true,
+										showLabels: false
+									),
+									SizedBox(height: 8.0),
+									SfLinearGauge(
+										minimum: 0,
+										maximum: 3.00,
+										interval: 25, 
+										ranges: [
+											LinearGaugeRange(
+												startValue: 0,
+												endValue: 2.90,
+												startWidth: 25,
+												endWidth: 25,
+												color: Colors.yellow,
+												position: LinearElementPosition.cross
+											),
+											LinearGaugeRange(
+												startValue: 0,
+												endValue: 2.25,
+												startWidth: 25,
+												endWidth: 25,
+												color: Colors.orange,
+												position: LinearElementPosition.cross
+											),
+											LinearGaugeRange(
+												startValue: 0,
+												endValue: 2.10,
+												startWidth: 25,
+												endWidth: 25,
+												color: Colors.red,
+												position: LinearElementPosition.cross
+											)
+										],
+										markerPointers: [
+											LinearWidgetPointer(value: 0, child: Container(width: 36.0, child: Text("PPS")), markerAlignment: LinearMarkerAlignment.end)
+										],
+										isMirrored: false,
+										showTicks: true,
+										showLabels: false
+									),
+									SizedBox(height: 8.0),
+									Wrap(
+										direction: Axis.horizontal,
+										crossAxisAlignment: WrapCrossAlignment.center,
+										spacing: 20,
+										children: [
+											Row(
+												mainAxisSize: MainAxisSize.min,
+												children: [
+													Padding(
+														padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+														child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.red)),
+													),
+													Text("Midgame: 150 APM, 2.1 PPS")
+												],
+											),
+											Row(
+												mainAxisSize: MainAxisSize.min,
+												children: [
+													Padding(
+														padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+														child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.orange)),
+													),
+													Text("Overall: 165 APM, 2.25 PPS")
+												],
+											),
+											Row(
+												mainAxisSize: MainAxisSize.min,
+												children: [
+													Padding(
+														padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+														child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.yellow)),
+													),
+													Text("Opener: 210 APM 2.90 PPS")
+												],
+											),
+										],
+									),
+								],
+							),
+						),
+					),
+				),
+				Card(
+					child: Padding(
+						padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0),
+						child: Column(
+							children: [
+								SfCartesianChart(
+									primaryXAxis: CategoryAxis(isVisible: false),
+									primaryYAxis: NumericAxis(minimum: 0, maximum: 100),
+									title: ChartTitle(text: "Clear Types", textStyle: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+									legend: Legend(
+										isVisible: true,
+										position: LegendPosition.left,
+										itemPadding: 2,
+										legendItemBuilder: (legendText, series, point, seriesIndex) {
+											return Container(
+												height: 20,
+												width: 210,
+												child: Row(
+													mainAxisAlignment: MainAxisAlignment.spaceBetween,
+													children: [
+														Row(
+															mainAxisSize: MainAxisSize.min,
+														  children: [
+																Padding(
+																	padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+																	child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: clears.color[seriesIndex])),
+																),
+														    Text("${clears.clearName[seriesIndex]}:"),
+														  ],
+														),
+														Text("${intf.format(point.y)} (${percentage.format(point.y!/clears.total)})")
+													],
+												),
+											);
+										}, 
+									),
+									series: width > 580 ? <CartesianSeries>[
+										StackedBar100Series<ClearsChartData, String>(
+											dataSource: dataClears,
+											xValueMapper: (ClearsChartData data, _) => data.nick,
+											yValueMapper: (ClearsChartData data, _) => data.perfectClear,
+											pointColorMapper: (ClearsChartData data, _) => data.color[0]
+										),
+										StackedBar100Series<ClearsChartData, String>(
+											dataSource: dataClears,
+											xValueMapper: (ClearsChartData data, _) => data.nick,
+											yValueMapper: (ClearsChartData data, _) => data.allspin,
+											pointColorMapper: (ClearsChartData data, _) => data.color[1]
+										),
+										StackedBar100Series<ClearsChartData, String>(
+											dataSource: dataClears,
+											xValueMapper: (ClearsChartData data, _) => data.nick,
+											yValueMapper: (ClearsChartData data, _) => data.single,
+											pointColorMapper: (ClearsChartData data, _) => data.color[2]
+										),
+										StackedBar100Series<ClearsChartData, String>(
+											dataSource: dataClears,
+											xValueMapper: (ClearsChartData data, _) => data.nick,
+											yValueMapper: (ClearsChartData data, _) => data.tspinSingle,
+											pointColorMapper: (ClearsChartData data, _) => data.color[3]
+										),
+										StackedBar100Series<ClearsChartData, String>(
+											dataSource: dataClears,
+											xValueMapper: (ClearsChartData data, _) => data.nick,
+											yValueMapper: (ClearsChartData data, _) => data.double,
+											pointColorMapper: (ClearsChartData data, _) => data.color[4]
+										),
+										StackedBar100Series<ClearsChartData, String>(
+											dataSource: dataClears,
+											xValueMapper: (ClearsChartData data, _) => data.nick,
+											yValueMapper: (ClearsChartData data, _) => data.tspinDouble,
+											pointColorMapper: (ClearsChartData data, _) => data.color[5]
+										),
+										StackedBar100Series<ClearsChartData, String>(
+											dataSource: dataClears,
+											xValueMapper: (ClearsChartData data, _) => data.nick,
+											yValueMapper: (ClearsChartData data, _) => data.triple,
+											pointColorMapper: (ClearsChartData data, _) => data.color[6]
+										),
+										StackedBar100Series<ClearsChartData, String>(
+											dataSource: dataClears,
+											xValueMapper: (ClearsChartData data, _) => data.nick,
+											yValueMapper: (ClearsChartData data, _) => data.tspinTriple,
+											pointColorMapper: (ClearsChartData data, _) => data.color[7]
+										),
+										StackedBar100Series<ClearsChartData, String>(
+											dataSource: dataClears,
+											xValueMapper: (ClearsChartData data, _) => data.nick,
+											yValueMapper: (ClearsChartData data, _) => data.quad,
+											pointColorMapper: (ClearsChartData data, _) => data.color[8]
+										),
+									] : <CartesianSeries>[
+										StackedColumn100Series<ClearsChartData, String>(
+											dataSource: dataClears,
+											xValueMapper: (ClearsChartData data, _) => data.nick,
+											yValueMapper: (ClearsChartData data, _) => data.perfectClear,
+											pointColorMapper: (ClearsChartData data, _) => data.color[0]
+										),
+										StackedColumn100Series<ClearsChartData, String>(
+											dataSource: dataClears,
+											xValueMapper: (ClearsChartData data, _) => data.nick,
+											yValueMapper: (ClearsChartData data, _) => data.allspin,
+											pointColorMapper: (ClearsChartData data, _) => data.color[1]
+										),
+										StackedColumn100Series<ClearsChartData, String>(
+											dataSource: dataClears,
+											xValueMapper: (ClearsChartData data, _) => data.nick,
+											yValueMapper: (ClearsChartData data, _) => data.single,
+											pointColorMapper: (ClearsChartData data, _) => data.color[2]
+										),
+										StackedColumn100Series<ClearsChartData, String>(
+											dataSource: dataClears,
+											xValueMapper: (ClearsChartData data, _) => data.nick,
+											yValueMapper: (ClearsChartData data, _) => data.tspinSingle,
+											pointColorMapper: (ClearsChartData data, _) => data.color[3]
+										),
+										StackedColumn100Series<ClearsChartData, String>(
+											dataSource: dataClears,
+											xValueMapper: (ClearsChartData data, _) => data.nick,
+											yValueMapper: (ClearsChartData data, _) => data.double,
+											pointColorMapper: (ClearsChartData data, _) => data.color[4]
+										),
+										StackedColumn100Series<ClearsChartData, String>(
+											dataSource: dataClears,
+											xValueMapper: (ClearsChartData data, _) => data.nick,
+											yValueMapper: (ClearsChartData data, _) => data.tspinDouble,
+											pointColorMapper: (ClearsChartData data, _) => data.color[5]
+										),
+										StackedColumn100Series<ClearsChartData, String>(
+											dataSource: dataClears,
+											xValueMapper: (ClearsChartData data, _) => data.nick,
+											yValueMapper: (ClearsChartData data, _) => data.triple,
+											pointColorMapper: (ClearsChartData data, _) => data.color[6]
+										),
+										StackedColumn100Series<ClearsChartData, String>(
+											dataSource: dataClears,
+											xValueMapper: (ClearsChartData data, _) => data.nick,
+											yValueMapper: (ClearsChartData data, _) => data.tspinTriple,
+											pointColorMapper: (ClearsChartData data, _) => data.color[7]
+										),
+										StackedColumn100Series<ClearsChartData, String>(
+											dataSource: dataClears,
+											xValueMapper: (ClearsChartData data, _) => data.nick,
+											yValueMapper: (ClearsChartData data, _) => data.quad,
+											pointColorMapper: (ClearsChartData data, _) => data.color[8]
+										),
+									]
+								),
+							],
+						),
+					)
+				),
+				Card(
+					child: Padding(
+						padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0),
+						child: Column(
+							children: [
+								SfCartesianChart(
+									primaryXAxis: CategoryAxis(),
+									primaryYAxis: NumericAxis(numberFormat: percentage),
+									tooltipBehavior: TooltipBehavior(
+										enable: true,
+										color: Colors.black,
+										borderColor: Colors.white,
+										animationDuration: 0,
+										builder: (dynamic data, dynamic point, dynamic series,
+											int pointIndex, int seriesIndex) {
+												return Padding(
+													padding: const EdgeInsets.all(8.0),
+													child: Text(
+														"${percentage.format(data.value)}",
+														style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 20),
+													),
+												);
+										}
+									),
+									title: ChartTitle(text: "Well Column Distribution", textStyle: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+									series: <CartesianSeries>[
+										ColumnSeries<WellsData, int>(
+												dataSource: distribution,
+												xValueMapper: (WellsData data, _) => data.well,
+												yValueMapper: (WellsData data, _) => data.value
+										)
+									]
+								),
+							],
+						),
+					)
+				),
+				Card(
+					child: Padding(
+						padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0),
+						child: Column(
+							children: [
+								SizedBox(
+									height: 310,
+                  width: 310,
+									child: MyRadarChart(
+										RadarChartData(
+											radarShape: RadarShape.circle,
+											tickCount: 4,
+											radarBackgroundColor: Colors.black.withAlpha(170),
+											radarBorderData: const BorderSide(color: Colors.white24, width: 1),
+											gridBorderData: const BorderSide(color: Colors.white24, width: 1),
+											tickBorderData: const BorderSide(color: Colors.white24, width: 1),
+											dataSets: [
+												RadarDataSet(
+													fillColor: Theme.of(context).colorScheme.primary.withAlpha(170),
+													borderColor: Theme.of(context).colorScheme.primary,
+													dataEntries: [
+														RadarEntry(value: 1.73), // Upstack APL
+														RadarEntry(value: 1.41), // Cheese APL
+														RadarEntry(value: 0.76), // T Piece Efficiency
+														RadarEntry(value: 1.52), // Downstack APL
+														RadarEntry(value: 1.66), // APL
+														RadarEntry(value: 0.29) // I Piece Efficiency
+													], // Yeah you're right i don't know the weight for that one
+												),
+											]
+										)
+									),
+								)
+							],
+						),
+					)
+				)
+			],
+		);
+	}
 
 	Widget getPreviousSeasonsList(Map<int, TetraLeague> pastLeague, double width){
 		return Column(
@@ -1321,7 +1601,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 			Cards.overview => getOverviewCard(snapshot.data!.summaries!, (snapshot.data!.averages != null && snapshot.data!.summaries!.league.rank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.rank] : (snapshot.data!.averages != null && snapshot.data!.summaries!.league.percentileRank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.percentileRank] : null, width),
 			Cards.tetraLeague => switch (cardMod){
 				CardMod.info => getTetraLeagueCard(snapshot.data!.summaries!.league, snapshot.data!.cutoffs, (snapshot.data!.averages != null && snapshot.data!.summaries!.league.rank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.rank] : (snapshot.data!.averages != null && snapshot.data!.summaries!.league.percentileRank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.percentileRank] : null, snapshot.data!.states, snapshot.data!.playerPos, width, tlAchievements),
-				//CardMod.exRecords => getFreyhoeAnalysis(width),
+				CardMod.exRecords => getFreyhoeAnalysis(width),
 				CardMod.ex => getPreviousSeasonsList(snapshot.data!.summaries!.pastLeague, width),
 				CardMod.records => getRecentTLrecords(widget.constraints, snapshot.data!.player!.userId),
 				_ => const Center(child: Text("huh?"))
