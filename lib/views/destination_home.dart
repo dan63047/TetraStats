@@ -618,6 +618,26 @@ class WellsData{
 	WellsData(this.well, this.value);
 }
 
+class LinesCancelledData {
+	final String nick;
+	final double clean;
+  final double cheesy;
+
+	LinesCancelledData(this.nick, this.clean, this.cheesy);
+
+	get sum => clean+cheesy;
+}
+
+class AttackCancelledData {
+	final String nick;
+	final double clean;
+  final double cheesy;
+
+	AttackCancelledData(this.nick, this.clean, this.cheesy);
+
+	get sum => clean+cheesy;
+}
+
 class AchievementSummary extends StatelessWidget{
 	final Achievement? achievement;
 
@@ -1021,6 +1041,8 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 
 	Widget getFreyhoeAnalysis(double width){
 		ClearsChartData clears = ClearsChartData("bozo", 3, 152, 237, 32, 59, 129, 16, 0, 147);
+		LinesCancelledData lines = LinesCancelledData("bozo", 0.32965931863727455, 0.7214912280701754);
+		AttackCancelledData attack = AttackCancelledData("bozo", 0.3386243386243386, 0.15763546798029557);
 		List<int> columns = [ 11, 10, 37, 41, 17, 5, 9, 21, 9, 22 ];
 		int columnsSum = columns.reduce((a, b) => a + b);
 		List<WellsData> distribution = [for (int i = 0; i <= 9; i++) WellsData(i+1, columns[i]/columnsSum)];
@@ -1363,40 +1385,139 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 				),
 				Card(
 					child: Padding(
-						padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0),
+						padding: const EdgeInsets.all(32.0),
+						child: SizedBox(
+							height: 330,
+							width: 330,
+							child: MyRadarChart(
+								RadarChartData(
+									radarShape: RadarShape.circle,
+									tickCount: 4,
+									radarBackgroundColor: Colors.black.withAlpha(170),
+									radarBorderData: const BorderSide(color: Colors.white24, width: 1),
+									gridBorderData: const BorderSide(color: Colors.white24, width: 1),
+									tickBorderData: const BorderSide(color: Colors.white24, width: 1),
+									getTitle: (index, angle) {
+										switch (index) {
+											case 0:
+												return RadarChartTitle(text: "Upstack APL\n1.73", positionPercentageOffset: 0.05);
+											case 1:
+												return RadarChartTitle(text: "Cheese APL\n1.41", positionPercentageOffset: 0.05);
+											case 2:
+												return RadarChartTitle(text: "T Piece Efficiency\n76%", positionPercentageOffset: 0.05);
+											case 3:
+												return RadarChartTitle(text: "Downstack APL\n1.52", positionPercentageOffset: 0.05);
+											case 4:
+												return RadarChartTitle(text: "Attack Per Line\n1.66", positionPercentageOffset: 0.05);
+											case 5:
+												return RadarChartTitle(text: "I Piece Efficiency\n29%", positionPercentageOffset: 0.05);
+											default:
+												return const RadarChartTitle(text: '');
+										}
+									},
+									dataSets: [
+										RadarDataSet(
+											fillColor: Theme.of(context).colorScheme.primary.withAlpha(170),
+											borderColor: Theme.of(context).colorScheme.primary,
+											dataEntries: [
+												RadarEntry(value: 1.73), // Upstack APL
+												RadarEntry(value: 1.41), // Cheese APL
+												RadarEntry(value: 0.76*3), // T Piece Efficiency
+												RadarEntry(value: 1.52), // Downstack APL
+												RadarEntry(value: 1.66), // APL
+												RadarEntry(value: 0.29*3) // I Piece Efficiency
+											],
+										),
+										RadarDataSet(
+											fillColor: Colors.transparent,
+											borderColor: Colors.transparent,
+											dataEntries: [
+												RadarEntry(value: 3),
+												RadarEntry(value: 0),
+												RadarEntry(value: 0),
+												RadarEntry(value: 0),
+												RadarEntry(value: 0),
+												RadarEntry(value: 0)
+											],
+										),
+									]
+								)
+							),
+						),
+					)
+				),
+				Card(
+					child: Padding(
+						padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 16.0),
 						child: Column(
 							children: [
-								SizedBox(
-									height: 310,
-                  width: 310,
-									child: MyRadarChart(
-										RadarChartData(
-											radarShape: RadarShape.circle,
-											tickCount: 4,
-											radarBackgroundColor: Colors.black.withAlpha(170),
-											radarBorderData: const BorderSide(color: Colors.white24, width: 1),
-											gridBorderData: const BorderSide(color: Colors.white24, width: 1),
-											tickBorderData: const BorderSide(color: Colors.white24, width: 1),
-											dataSets: [
-												RadarDataSet(
-													fillColor: Theme.of(context).colorScheme.primary.withAlpha(170),
-													borderColor: Theme.of(context).colorScheme.primary,
-													dataEntries: [
-														RadarEntry(value: 1.73), // Upstack APL
-														RadarEntry(value: 1.41), // Cheese APL
-														RadarEntry(value: 0.76), // T Piece Efficiency
-														RadarEntry(value: 1.52), // Downstack APL
-														RadarEntry(value: 1.66), // APL
-														RadarEntry(value: 0.29) // I Piece Efficiency
-													], // Yeah you're right i don't know the weight for that one
-												),
-											]
+								Text("Attacks Cancelled", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+								SfLinearGauge(
+									minimum: 0,
+									maximum: 3.00,
+									interval: 0.25, 
+									showAxisTrack: false,
+									ranges: [
+										LinearGaugeRange(
+											startValue: 0,
+											endValue: attack.clean,
+											startWidth: 25,
+											endWidth: 25,
+											color: Color.fromRGBO(116, 180, 155, 1),
+											position: LinearElementPosition.cross
+										),
+										LinearGaugeRange(
+											startValue: attack.clean,
+											endValue: attack.sum,
+											startWidth: 25,
+											endWidth: 25,
+											color: Color.fromRGBO(73, 76, 162, 1),
+											position: LinearElementPosition.cross
 										)
-									),
+									],
+									markerPointers: [
+										LinearWidgetPointer(value: 0, child: Container(width: 48.0, child: Text("Clean:\n${f3.format(attack.clean)}")), markerAlignment: LinearMarkerAlignment.end),
+										LinearWidgetPointer(value: attack.sum, child: Container(width: 52.0, child: Text("Cheesy:\n${f3.format(attack.cheesy)}", textAlign: TextAlign.end,)), markerAlignment: LinearMarkerAlignment.start)
+									],
+									isMirrored: false,
+									showTicks: true,
+									showLabels: false
+								),
+								Text("Lines Cancelled", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+								SfLinearGauge(
+									minimum: 0,
+									maximum: 3.00,
+									interval: 0.25,
+									showAxisTrack: false,
+									ranges: [
+										LinearGaugeRange(
+											startValue: 0,
+											endValue: lines.clean,
+											startWidth: 25,
+											endWidth: 25,
+											color: Color.fromRGBO(246, 114, 128, 1),
+											position: LinearElementPosition.cross
+										),
+										LinearGaugeRange(
+											startValue: lines.clean,
+											endValue: lines.sum,
+											startWidth: 25,
+											endWidth: 25,
+											color: Color.fromRGBO(248, 177, 149, 1),
+											position: LinearElementPosition.cross
+										)
+									],
+									markerPointers: [
+										LinearWidgetPointer(value: 0, child: Container(width: 48.0, child: Text("Clean:\n${f3.format(lines.clean)}")), markerAlignment: LinearMarkerAlignment.end),
+										LinearWidgetPointer(value: lines.sum, child: Container(width: 52.0, child: Text("Cheesy:\n${f3.format(lines.cheesy)}", textAlign: TextAlign.end,)), markerAlignment: LinearMarkerAlignment.start)
+									],
+									isMirrored: false,
+									showTicks: true,
+									showLabels: false
 								)
 							],
 						),
-					)
+					),
 				)
 			],
 		);
