@@ -10,6 +10,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/data_objects/achievement.dart';
 import 'package:tetra_stats/data_objects/cutoff_tetrio.dart';
+import 'package:tetra_stats/data_objects/minomuncher.dart';
 import 'package:tetra_stats/data_objects/news.dart';
 import 'package:tetra_stats/data_objects/p1nkl0bst3r.dart';
 import 'package:tetra_stats/data_objects/player_leaderboard_position.dart';
@@ -34,6 +35,7 @@ import 'package:tetra_stats/widgets/error_thingy.dart';
 import 'package:tetra_stats/widgets/fake_distinguishment_thingy.dart';
 import 'package:tetra_stats/widgets/finesse_thingy.dart';
 import 'package:tetra_stats/widgets/future_error.dart';
+import 'package:tetra_stats/widgets/gauget_thingy.dart';
 import 'package:tetra_stats/widgets/graphs.dart';
 import 'package:tetra_stats/widgets/lineclears_thingy.dart';
 import 'package:tetra_stats/widgets/nerd_stats_thingy.dart';
@@ -571,73 +573,6 @@ class RecordSummary extends StatelessWidget{
 	}
 }
 
-class ClearsChartData {
-	final String nick;
-	final int perfectClear;
-  final int allspin;
-  final int single;
-  final int tspinSingle;
-  final int double;
-  final int tspinDouble;
-  final int triple;
-  final int tspinTriple;
-  final int quad;
-	ClearsChartData(this.nick, this.perfectClear, this.allspin, this.single, this.tspinSingle, this.double, this.tspinDouble, this.triple, this.tspinTriple, this.quad);
-
-	get total => perfectClear + allspin + single + tspinSingle + double + tspinDouble + triple + tspinTriple + quad;
-	get clearName => [
-		t.stats.pcs,
-		"All Spins",
-		t.stats.lineClears.single,
-		"${t.stats.tSpin} ${t.stats.lineClears.single}",
-		t.stats.lineClears.double,
-		"${t.stats.tSpin} ${t.stats.lineClears.double}",
-		t.stats.lineClears.triple,
-		"${t.stats.tSpin} ${t.stats.lineClears.triple}",
-		t.stats.lineClears.quad,
-		"${t.stats.tSpin} ${t.stats.lineClears.quad}"
-	];
-	get color => [
-		Color.fromRGBO(75, 135, 185, 1),
-		Color.fromRGBO(192, 108, 132, 1),
-		Color.fromRGBO(246, 114, 128, 1),
-		Color.fromRGBO(248, 177, 149, 1),
-		Color.fromRGBO(116, 180, 155, 1),
-		Color.fromRGBO(0, 168, 181, 1),
-		Color.fromRGBO(73, 76, 162, 1),
-		Color.fromRGBO(255, 205, 96, 1),
-		Color.fromRGBO(255, 240, 219, 1),
-		Color.fromRGBO(238, 238, 238, 1)
-	];
-}
-
-class WellsData{
-	int well;
-	double value;
-
-	WellsData(this.well, this.value);
-}
-
-class LinesCancelledData {
-	final String nick;
-	final double clean;
-  final double cheesy;
-
-	LinesCancelledData(this.nick, this.clean, this.cheesy);
-
-	get sum => clean+cheesy;
-}
-
-class AttackCancelledData {
-	final String nick;
-	final double clean;
-  final double cheesy;
-
-	AttackCancelledData(this.nick, this.clean, this.cheesy);
-
-	get sum => clean+cheesy;
-}
-
 class AchievementSummary extends StatelessWidget{
 	final Achievement? achievement;
 
@@ -1040,486 +975,710 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 	}
 
 	Widget getFreyhoeAnalysis(double width){
-		ClearsChartData clears = ClearsChartData("bozo", 3, 152, 237, 32, 59, 129, 16, 0, 147);
-		LinesCancelledData lines = LinesCancelledData("bozo", 0.32965931863727455, 0.7214912280701754);
-		AttackCancelledData attack = AttackCancelledData("bozo", 0.3386243386243386, 0.15763546798029557);
-		List<int> columns = [ 11, 10, 37, 41, 17, 5, 9, 21, 9, 22 ];
-		int columnsSum = columns.reduce((a, b) => a + b);
-		List<WellsData> distribution = [for (int i = 0; i <= 9; i++) WellsData(i+1, columns[i]/columnsSum)];
-		List<ClearsChartData> dataClears = [clears];
-		return Column(
-			children: [
-				Text("This is just a mockup. WIP"),
-				Card(
-					child: Padding(
-						padding: const EdgeInsets.only(bottom: 4.0),
-						child: Center(
-							child: Column(
-								mainAxisSize: MainAxisSize.min,
-								crossAxisAlignment: CrossAxisAlignment.center,
-								children: [
-									Text("Analysis", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleMedium),
-									Padding(
-										padding: const EdgeInsets.only(top: 4.0),
-										child: Text("via MinoMuncher by Freyhoe", textAlign: TextAlign.center, style: widget.constraints.maxWidth > 768.0 ? null : TextStyle(fontSize: 12.0)),
-									)
-								],
-							),
-						),
-					),
-				),
-				Card(
-					child: Padding(
-						padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
-						child: Center(
-							child: Column(
-								mainAxisSize: MainAxisSize.min,
-								crossAxisAlignment: CrossAxisAlignment.center,
-								children: [
-									SfLinearGauge(
-										minimum: 0,
-										maximum: 300,
-										interval: 25, 
-										ranges: [
-											LinearGaugeRange(
-												startValue: 0,
-												endValue: 210,
-												startWidth: 25,
-												endWidth: 25,
-												color: Colors.yellow,
-												position: LinearElementPosition.cross
-											),
-											LinearGaugeRange(
-												startValue: 0,
-												endValue: 165,
-												startWidth: 25,
-												endWidth: 25,
-												color: Colors.orange,
-												position: LinearElementPosition.cross
-											),
-											LinearGaugeRange(
-												startValue: 0,
-												endValue: 150,
-												startWidth: 25,
-												endWidth: 25,
-												color: Colors.red,
-												position: LinearElementPosition.cross
-											)
-										],
-										markerPointers: [
-											LinearWidgetPointer(value: 0, child: Container(width: 36.0, child: Text("APM")), markerAlignment: LinearMarkerAlignment.end)
-										],
-										isMirrored: false,
-										showTicks: true,
-										showLabels: false
-									),
-									SizedBox(height: 8.0),
-									SfLinearGauge(
-										minimum: 0,
-										maximum: 3.00,
-										interval: 25, 
-										ranges: [
-											LinearGaugeRange(
-												startValue: 0,
-												endValue: 2.90,
-												startWidth: 25,
-												endWidth: 25,
-												color: Colors.yellow,
-												position: LinearElementPosition.cross
-											),
-											LinearGaugeRange(
-												startValue: 0,
-												endValue: 2.25,
-												startWidth: 25,
-												endWidth: 25,
-												color: Colors.orange,
-												position: LinearElementPosition.cross
-											),
-											LinearGaugeRange(
-												startValue: 0,
-												endValue: 2.10,
-												startWidth: 25,
-												endWidth: 25,
-												color: Colors.red,
-												position: LinearElementPosition.cross
-											)
-										],
-										markerPointers: [
-											LinearWidgetPointer(value: 0, child: Container(width: 36.0, child: Text("PPS")), markerAlignment: LinearMarkerAlignment.end)
-										],
-										isMirrored: false,
-										showTicks: true,
-										showLabels: false
-									),
-									SizedBox(height: 8.0),
-									Wrap(
-										direction: Axis.horizontal,
-										crossAxisAlignment: WrapCrossAlignment.center,
-										spacing: 20,
-										children: [
-											Row(
-												mainAxisSize: MainAxisSize.min,
-												children: [
-													Padding(
-														padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-														child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.red)),
-													),
-													Text("Midgame: 150 APM, 2.1 PPS")
-												],
-											),
-											Row(
-												mainAxisSize: MainAxisSize.min,
-												children: [
-													Padding(
-														padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-														child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.orange)),
-													),
-													Text("Overall: 165 APM, 2.25 PPS")
-												],
-											),
-											Row(
-												mainAxisSize: MainAxisSize.min,
-												children: [
-													Padding(
-														padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-														child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.yellow)),
-													),
-													Text("Opener: 210 APM 2.90 PPS")
-												],
-											),
-										],
-									),
-								],
-							),
-						),
-					),
-				),
-				Card(
-					child: Padding(
-						padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0),
-						child: Column(
+		return FutureBuilder<MinomuncherData>(
+			future: teto.fetchMinoMuncherStats("bozo"),
+			builder: (context, snapshot) {
+				switch (snapshot.connectionState){
+				case ConnectionState.none:
+				case ConnectionState.waiting:
+				case ConnectionState.active:
+					return const Center(child: CircularProgressIndicator());
+				case ConnectionState.done:
+					if (snapshot.hasData){
+						List<ClearsChartData> clearTypeList = [snapshot.data!.clearTypes];
+						return Column(
 							children: [
-								SfCartesianChart(
-									primaryXAxis: CategoryAxis(isVisible: false),
-									primaryYAxis: NumericAxis(minimum: 0, maximum: 100),
-									title: ChartTitle(text: "Clear Types", textStyle: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
-									legend: Legend(
-										isVisible: true,
-										position: LegendPosition.left,
-										itemPadding: 2,
-										legendItemBuilder: (legendText, series, point, seriesIndex) {
-											return Container(
-												height: 20,
-												width: 210,
-												child: Row(
-													mainAxisAlignment: MainAxisAlignment.spaceBetween,
+								Text("This card shows icly analysis. Just a design mockup. WIP"),
+								Card(
+									child: Padding(
+										padding: const EdgeInsets.only(bottom: 4.0),
+										child: Center(
+											child: Column(
+												mainAxisSize: MainAxisSize.min,
+												crossAxisAlignment: CrossAxisAlignment.center,
+												children: [
+													Text("Analysis", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleMedium),
+													Padding(
+														padding: const EdgeInsets.only(top: 4.0),
+														child: Text("via MinoMuncher by Freyhoe", textAlign: TextAlign.center, style: widget.constraints.maxWidth > 768.0 ? null : TextStyle(fontSize: 12.0)),
+													)
+												],
+											),
+										),
+									),
+								),
+								Card(
+									child: Padding(
+										padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
+										child: Center(
+											child: Column(
+												mainAxisSize: MainAxisSize.min,
+												crossAxisAlignment: CrossAxisAlignment.center,
+												children: [
+													SfLinearGauge(
+														minimum: 0,
+														maximum: 300,
+														interval: 25, 
+														ranges: [
+															LinearGaugeRange(
+																startValue: 0,
+																endValue: snapshot.data!.openerAPM,
+																startWidth: 25,
+																endWidth: 25,
+																color: Colors.yellow,
+																position: LinearElementPosition.cross
+															),
+															LinearGaugeRange(
+																startValue: 0,
+																endValue: snapshot.data!.APM,
+																startWidth: 25,
+																endWidth: 25,
+																color: Colors.orange,
+																position: LinearElementPosition.cross
+															),
+															LinearGaugeRange(
+																startValue: 0,
+																endValue: snapshot.data!.midgameAPM,
+																startWidth: 25,
+																endWidth: 25,
+																color: Colors.red,
+																position: LinearElementPosition.cross
+															)
+														],
+														markerPointers: [
+															LinearWidgetPointer(value: 0, child: Container(width: 36.0, child: Text("APM")), markerAlignment: LinearMarkerAlignment.end)
+														],
+														isMirrored: false,
+														showTicks: true,
+														showLabels: false
+													),
+													SizedBox(height: 8.0),
+													SfLinearGauge(
+														minimum: 0,
+														maximum: 3.00,
+														interval: 25, 
+														ranges: [
+															LinearGaugeRange(
+																startValue: 0,
+																endValue: snapshot.data!.openerPPS,
+																startWidth: 25,
+																endWidth: 25,
+																color: Colors.yellow,
+																position: LinearElementPosition.cross
+															),
+															LinearGaugeRange(
+																startValue: 0,
+																endValue: snapshot.data!.PPS,
+																startWidth: 25,
+																endWidth: 25,
+																color: Colors.orange,
+																position: LinearElementPosition.cross
+															),
+															LinearGaugeRange(
+																startValue: 0,
+																endValue: snapshot.data!.midgamePPS,
+																startWidth: 25,
+																endWidth: 25,
+																color: Colors.red,
+																position: LinearElementPosition.cross
+															)
+														],
+														markerPointers: [
+															LinearWidgetPointer(value: 0, child: Container(width: 36.0, child: Text("PPS")), markerAlignment: LinearMarkerAlignment.end)
+														],
+														isMirrored: false,
+														showTicks: true,
+														showLabels: false
+													),
+													SizedBox(height: 8.0),
+													Wrap(
+														direction: Axis.horizontal,
+														crossAxisAlignment: WrapCrossAlignment.center,
+														spacing: 20,
+														children: [
+															Row(
+																mainAxisSize: MainAxisSize.min,
+																children: [
+																	Padding(
+																		padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.red)),
+																	),
+																	Text("Midgame: ${f2.format(snapshot.data!.midgameAPM)} APM, ${f2.format(snapshot.data!.midgamePPS)} PPS")
+																],
+															),
+															Row(
+																mainAxisSize: MainAxisSize.min,
+																children: [
+																	Padding(
+																		padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.orange)),
+																	),
+																	Text("Overall: ${f2.format(snapshot.data!.APM)} APM, ${f2.format(snapshot.data!.PPS)} PPS")
+																],
+															),
+															Row(
+																mainAxisSize: MainAxisSize.min,
+																children: [
+																	Padding(
+																		padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.yellow)),
+																	),
+																	Text("Opener: ${f2.format(snapshot.data!.openerAPM)} APM, ${f2.format(snapshot.data!.openerPPS)} PPS")
+																],
+															),
+														],
+													),
+												],
+											),
+										),
+									),
+								),
+								Card(
+									child: Padding(
+										padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0),
+										child: Column(
+											children: [
+												SfCartesianChart(
+													primaryXAxis: CategoryAxis(isVisible: false),
+													primaryYAxis: NumericAxis(minimum: 0, maximum: 100),
+													title: ChartTitle(text: "Clear Types", textStyle: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+													legend: Legend(
+														isVisible: true,
+														position: LegendPosition.left,
+														itemPadding: 2,
+														legendItemBuilder: (legendText, series, point, seriesIndex) {
+															return Container(
+																height: 20,
+																width: 210,
+																child: Row(
+																	mainAxisAlignment: MainAxisAlignment.spaceBetween,
+																	children: [
+																		Row(
+																			mainAxisSize: MainAxisSize.min,
+																		children: [
+																				Padding(
+																					padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+																					child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: lineClearsColors[seriesIndex])),
+																				),
+																			Text("${snapshot.data!.clearTypes.clearName[seriesIndex]}:"),
+																		],
+																		),
+																		Text("${intf.format(point.y)} (${percentage.format(point.y!/snapshot.data!.clearTypes.total)})")
+																	],
+																),
+															);
+														}, 
+													),
+													series: width > 580 ? <CartesianSeries>[
+														StackedBar100Series<ClearsChartData, String>(
+															dataSource: clearTypeList,
+															xValueMapper: (ClearsChartData data, _) => data.nick,
+															yValueMapper: (ClearsChartData data, _) => data.perfectClear,
+															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[0]
+														),
+														StackedBar100Series<ClearsChartData, String>(
+															dataSource: clearTypeList,
+															xValueMapper: (ClearsChartData data, _) => data.nick,
+															yValueMapper: (ClearsChartData data, _) => data.allspin,
+															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[1]
+														),
+														StackedBar100Series<ClearsChartData, String>(
+															dataSource: clearTypeList,
+															xValueMapper: (ClearsChartData data, _) => data.nick,
+															yValueMapper: (ClearsChartData data, _) => data.single,
+															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[2]
+														),
+														StackedBar100Series<ClearsChartData, String>(
+															dataSource: clearTypeList,
+															xValueMapper: (ClearsChartData data, _) => data.nick,
+															yValueMapper: (ClearsChartData data, _) => data.tspinSingle,
+															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[3]
+														),
+														StackedBar100Series<ClearsChartData, String>(
+															dataSource: clearTypeList,
+															xValueMapper: (ClearsChartData data, _) => data.nick,
+															yValueMapper: (ClearsChartData data, _) => data.double,
+															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[4]
+														),
+														StackedBar100Series<ClearsChartData, String>(
+															dataSource: clearTypeList,
+															xValueMapper: (ClearsChartData data, _) => data.nick,
+															yValueMapper: (ClearsChartData data, _) => data.tspinDouble,
+															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[5]
+														),
+														StackedBar100Series<ClearsChartData, String>(
+															dataSource: clearTypeList,
+															xValueMapper: (ClearsChartData data, _) => data.nick,
+															yValueMapper: (ClearsChartData data, _) => data.triple,
+															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[6]
+														),
+														StackedBar100Series<ClearsChartData, String>(
+															dataSource: clearTypeList,
+															xValueMapper: (ClearsChartData data, _) => data.nick,
+															yValueMapper: (ClearsChartData data, _) => data.tspinTriple,
+															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[7]
+														),
+														StackedBar100Series<ClearsChartData, String>(
+															dataSource: clearTypeList,
+															xValueMapper: (ClearsChartData data, _) => data.nick,
+															yValueMapper: (ClearsChartData data, _) => data.quad,
+															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[8]
+														),
+													] : <CartesianSeries>[
+														StackedColumn100Series<ClearsChartData, String>(
+															dataSource: clearTypeList,
+															xValueMapper: (ClearsChartData data, _) => data.nick,
+															yValueMapper: (ClearsChartData data, _) => data.perfectClear,
+															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[0]
+														),
+														StackedColumn100Series<ClearsChartData, String>(
+															dataSource: clearTypeList,
+															xValueMapper: (ClearsChartData data, _) => data.nick,
+															yValueMapper: (ClearsChartData data, _) => data.allspin,
+															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[1]
+														),
+														StackedColumn100Series<ClearsChartData, String>(
+															dataSource: clearTypeList,
+															xValueMapper: (ClearsChartData data, _) => data.nick,
+															yValueMapper: (ClearsChartData data, _) => data.single,
+															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[2]
+														),
+														StackedColumn100Series<ClearsChartData, String>(
+															dataSource: clearTypeList,
+															xValueMapper: (ClearsChartData data, _) => data.nick,
+															yValueMapper: (ClearsChartData data, _) => data.tspinSingle,
+															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[3]
+														),
+														StackedColumn100Series<ClearsChartData, String>(
+															dataSource: clearTypeList,
+															xValueMapper: (ClearsChartData data, _) => data.nick,
+															yValueMapper: (ClearsChartData data, _) => data.double,
+															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[4]
+														),
+														StackedColumn100Series<ClearsChartData, String>(
+															dataSource: clearTypeList,
+															xValueMapper: (ClearsChartData data, _) => data.nick,
+															yValueMapper: (ClearsChartData data, _) => data.tspinDouble,
+															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[5]
+														),
+														StackedColumn100Series<ClearsChartData, String>(
+															dataSource: clearTypeList,
+															xValueMapper: (ClearsChartData data, _) => data.nick,
+															yValueMapper: (ClearsChartData data, _) => data.triple,
+															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[6]
+														),
+														StackedColumn100Series<ClearsChartData, String>(
+															dataSource: clearTypeList,
+															xValueMapper: (ClearsChartData data, _) => data.nick,
+															yValueMapper: (ClearsChartData data, _) => data.tspinTriple,
+															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[7]
+														),
+														StackedColumn100Series<ClearsChartData, String>(
+															dataSource: clearTypeList,
+															xValueMapper: (ClearsChartData data, _) => data.nick,
+															yValueMapper: (ClearsChartData data, _) => data.quad,
+															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[8]
+														),
+													]
+												),
+											],
+										),
+									)
+								),
+								Card(
+									child: Padding(
+										padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0),
+										child: Column(
+											children: [
+												SfCartesianChart(
+													primaryXAxis: CategoryAxis(),
+													primaryYAxis: NumericAxis(numberFormat: percentage),
+													tooltipBehavior: TooltipBehavior(
+														enable: true,
+														color: Colors.black,
+														borderColor: Colors.white,
+														animationDuration: 0,
+														builder: (dynamic data, dynamic point, dynamic series,
+															int pointIndex, int seriesIndex) {
+																return Padding(
+																	padding: const EdgeInsets.all(8.0),
+																	child: Text(
+																		"${percentage.format(data.value)}",
+																		style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 20),
+																	),
+																);
+														}
+													),
+													title: ChartTitle(text: "Well Column Distribution", textStyle: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+													series: <CartesianSeries>[
+														ColumnSeries<WellsData, int>(
+																dataSource: snapshot.data!.wellColumns,
+																xValueMapper: (WellsData data, _) => data.well,
+																yValueMapper: (WellsData data, _) => data.value
+														)
+													]
+												),
+											],
+										),
+									)
+								),
+								Card(
+									child: Padding(
+										padding: const EdgeInsets.all(32.0),
+										child: SizedBox(
+											height: 330,
+											width: 330,
+											child: MyRadarChart(
+												RadarChartData(
+													radarShape: RadarShape.circle,
+													tickCount: 4,
+													radarBackgroundColor: Colors.black.withAlpha(170),
+													radarBorderData: const BorderSide(color: Colors.white24, width: 1),
+													gridBorderData: const BorderSide(color: Colors.white24, width: 1),
+													tickBorderData: const BorderSide(color: Colors.white24, width: 1),
+													getTitle: (index, angle) {
+														switch (index) {
+															case 0: // TODO: Replace with Upstack APL when that becomes avaliable
+																return RadarChartTitle(text: "Upstack APL\n${f2.format(snapshot.data!.APL)}", positionPercentageOffset: 0.05);
+															case 1:
+																return RadarChartTitle(text: "Cheese APL\n${f2.format(snapshot.data!.cheeseAPL)}", positionPercentageOffset: 0.05);
+															case 2:
+																return RadarChartTitle(text: "T Piece Efficiency\n${percentage.format(snapshot.data!.tEfficiency)}", positionPercentageOffset: 0.05);
+															case 3:
+																return RadarChartTitle(text: "Downstack APL\n${f2.format(snapshot.data!.downstackAPL)}", positionPercentageOffset: 0.05);
+															case 4:
+																return RadarChartTitle(text: "Attack Per Line\n${f2.format(snapshot.data!.APL)}", positionPercentageOffset: 0.05);
+															case 5:
+																return RadarChartTitle(text: "I Piece Efficiency\n${percentage.format(snapshot.data!.iEfficiency)}", positionPercentageOffset: 0.05);
+															default:
+																return const RadarChartTitle(text: '');
+														}
+													},
+													dataSets: [
+														RadarDataSet(
+															fillColor: Theme.of(context).colorScheme.primary.withAlpha(170),
+															borderColor: Theme.of(context).colorScheme.primary,
+															dataEntries: [
+																RadarEntry(value: snapshot.data!.APL), // TODO: and here too
+																RadarEntry(value: snapshot.data!.cheeseAPL), // Cheese APL
+																RadarEntry(value: snapshot.data!.tEfficiency*3), // T Piece Efficiency
+																RadarEntry(value: snapshot.data!.downstackAPL), // Downstack APL
+																RadarEntry(value: snapshot.data!.APL), // APL
+																RadarEntry(value: snapshot.data!.iEfficiency*3) // I Piece Efficiency
+															],
+														),
+														RadarDataSet(
+															fillColor: Colors.transparent,
+															borderColor: Colors.transparent,
+															dataEntries: [
+																RadarEntry(value: 3),
+																RadarEntry(value: 0),
+																RadarEntry(value: 0),
+																RadarEntry(value: 0),
+																RadarEntry(value: 0),
+																RadarEntry(value: 0)
+															],
+														),
+													]
+												)
+											),
+										),
+									)
+								),
+								Card(
+									child: Padding(
+										padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+										child: Column(
+											children: [
+												Text("Attacks Cancelled", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+												SfLinearGauge(
+													minimum: 0,
+													maximum: 3.00,
+													interval: 0.25, 
+													showAxisTrack: false,
+													ranges: [
+														LinearGaugeRange(
+															startValue: 0,
+															endValue: snapshot.data!.attackCancelled.clean,
+															startWidth: 25,
+															endWidth: 25,
+															color: Color.fromRGBO(116, 180, 155, 1),
+															position: LinearElementPosition.cross
+														),
+														LinearGaugeRange(
+															startValue: snapshot.data!.attackCancelled.clean,
+															endValue: snapshot.data!.attackCancelled.sum,
+															startWidth: 25,
+															endWidth: 25,
+															color: Color.fromRGBO(73, 76, 162, 1),
+															position: LinearElementPosition.cross
+														)
+													],
+													isMirrored: false,
+													showTicks: true,
+													showLabels: false
+												),
+												Wrap(
+													direction: Axis.horizontal,
+													crossAxisAlignment: WrapCrossAlignment.center,
+													spacing: 20,
 													children: [
 														Row(
 															mainAxisSize: MainAxisSize.min,
-														  children: [
+															children: [
 																Padding(
 																	padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																	child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: clears.color[seriesIndex])),
+																	child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Color.fromRGBO(116, 180, 155, 1))),
 																),
-														    Text("${clears.clearName[seriesIndex]}:"),
-														  ],
+																Text("Clean: ${f3.format(snapshot.data!.attackCancelled.clean)}")
+															],
 														),
-														Text("${intf.format(point.y)} (${percentage.format(point.y!/clears.total)})")
+														Row(
+															mainAxisSize: MainAxisSize.min,
+															children: [
+																Padding(
+																	padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+																	child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Color.fromRGBO(73, 76, 162, 1))),
+																),
+																Text("Cheesy: ${f3.format(snapshot.data!.attackCancelled.cheesy)}")
+															],
+														),
 													],
 												),
-											);
-										}, 
+												SizedBox(height: 8.0),
+												Text("Lines Cancelled", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+												SfLinearGauge(
+													minimum: 0,
+													maximum: 3.00,
+													interval: 0.25,
+													showAxisTrack: false,
+													ranges: [
+														LinearGaugeRange(
+															startValue: 0,
+															endValue: snapshot.data!.linesCancelled.clean,
+															startWidth: 25,
+															endWidth: 25,
+															color: Color.fromRGBO(246, 114, 128, 1),
+															position: LinearElementPosition.cross
+														),
+														LinearGaugeRange(
+															startValue: snapshot.data!.linesCancelled.clean,
+															endValue: snapshot.data!.linesCancelled.sum,
+															startWidth: 25,
+															endWidth: 25,
+															color: Color.fromRGBO(248, 177, 149, 1),
+															position: LinearElementPosition.cross
+														)
+													],
+													isMirrored: false,
+													showTicks: true,
+													showLabels: false
+												),
+												Wrap(
+													direction: Axis.horizontal,
+													crossAxisAlignment: WrapCrossAlignment.center,
+													spacing: 20,
+													children: [
+														Row(
+															mainAxisSize: MainAxisSize.min,
+															children: [
+																Padding(
+																	padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+																	child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Color.fromRGBO(246, 114, 128, 1))),
+																),
+																Text("Clean: ${f3.format(snapshot.data!.linesCancelled.clean)}")
+															],
+														),
+														Row(
+															mainAxisSize: MainAxisSize.min,
+															children: [
+																Padding(
+																	padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+																	child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Color.fromRGBO(248, 177, 149, 1))),
+																),
+																Text("Cheesy: ${f3.format(snapshot.data!.linesCancelled.cheesy)}")
+															],
+														),
+													],
+												),
+											],
+										),
 									),
-									series: width > 580 ? <CartesianSeries>[
-										StackedBar100Series<ClearsChartData, String>(
-											dataSource: dataClears,
-											xValueMapper: (ClearsChartData data, _) => data.nick,
-											yValueMapper: (ClearsChartData data, _) => data.perfectClear,
-											pointColorMapper: (ClearsChartData data, _) => data.color[0]
-										),
-										StackedBar100Series<ClearsChartData, String>(
-											dataSource: dataClears,
-											xValueMapper: (ClearsChartData data, _) => data.nick,
-											yValueMapper: (ClearsChartData data, _) => data.allspin,
-											pointColorMapper: (ClearsChartData data, _) => data.color[1]
-										),
-										StackedBar100Series<ClearsChartData, String>(
-											dataSource: dataClears,
-											xValueMapper: (ClearsChartData data, _) => data.nick,
-											yValueMapper: (ClearsChartData data, _) => data.single,
-											pointColorMapper: (ClearsChartData data, _) => data.color[2]
-										),
-										StackedBar100Series<ClearsChartData, String>(
-											dataSource: dataClears,
-											xValueMapper: (ClearsChartData data, _) => data.nick,
-											yValueMapper: (ClearsChartData data, _) => data.tspinSingle,
-											pointColorMapper: (ClearsChartData data, _) => data.color[3]
-										),
-										StackedBar100Series<ClearsChartData, String>(
-											dataSource: dataClears,
-											xValueMapper: (ClearsChartData data, _) => data.nick,
-											yValueMapper: (ClearsChartData data, _) => data.double,
-											pointColorMapper: (ClearsChartData data, _) => data.color[4]
-										),
-										StackedBar100Series<ClearsChartData, String>(
-											dataSource: dataClears,
-											xValueMapper: (ClearsChartData data, _) => data.nick,
-											yValueMapper: (ClearsChartData data, _) => data.tspinDouble,
-											pointColorMapper: (ClearsChartData data, _) => data.color[5]
-										),
-										StackedBar100Series<ClearsChartData, String>(
-											dataSource: dataClears,
-											xValueMapper: (ClearsChartData data, _) => data.nick,
-											yValueMapper: (ClearsChartData data, _) => data.triple,
-											pointColorMapper: (ClearsChartData data, _) => data.color[6]
-										),
-										StackedBar100Series<ClearsChartData, String>(
-											dataSource: dataClears,
-											xValueMapper: (ClearsChartData data, _) => data.nick,
-											yValueMapper: (ClearsChartData data, _) => data.tspinTriple,
-											pointColorMapper: (ClearsChartData data, _) => data.color[7]
-										),
-										StackedBar100Series<ClearsChartData, String>(
-											dataSource: dataClears,
-											xValueMapper: (ClearsChartData data, _) => data.nick,
-											yValueMapper: (ClearsChartData data, _) => data.quad,
-											pointColorMapper: (ClearsChartData data, _) => data.color[8]
-										),
-									] : <CartesianSeries>[
-										StackedColumn100Series<ClearsChartData, String>(
-											dataSource: dataClears,
-											xValueMapper: (ClearsChartData data, _) => data.nick,
-											yValueMapper: (ClearsChartData data, _) => data.perfectClear,
-											pointColorMapper: (ClearsChartData data, _) => data.color[0]
-										),
-										StackedColumn100Series<ClearsChartData, String>(
-											dataSource: dataClears,
-											xValueMapper: (ClearsChartData data, _) => data.nick,
-											yValueMapper: (ClearsChartData data, _) => data.allspin,
-											pointColorMapper: (ClearsChartData data, _) => data.color[1]
-										),
-										StackedColumn100Series<ClearsChartData, String>(
-											dataSource: dataClears,
-											xValueMapper: (ClearsChartData data, _) => data.nick,
-											yValueMapper: (ClearsChartData data, _) => data.single,
-											pointColorMapper: (ClearsChartData data, _) => data.color[2]
-										),
-										StackedColumn100Series<ClearsChartData, String>(
-											dataSource: dataClears,
-											xValueMapper: (ClearsChartData data, _) => data.nick,
-											yValueMapper: (ClearsChartData data, _) => data.tspinSingle,
-											pointColorMapper: (ClearsChartData data, _) => data.color[3]
-										),
-										StackedColumn100Series<ClearsChartData, String>(
-											dataSource: dataClears,
-											xValueMapper: (ClearsChartData data, _) => data.nick,
-											yValueMapper: (ClearsChartData data, _) => data.double,
-											pointColorMapper: (ClearsChartData data, _) => data.color[4]
-										),
-										StackedColumn100Series<ClearsChartData, String>(
-											dataSource: dataClears,
-											xValueMapper: (ClearsChartData data, _) => data.nick,
-											yValueMapper: (ClearsChartData data, _) => data.tspinDouble,
-											pointColorMapper: (ClearsChartData data, _) => data.color[5]
-										),
-										StackedColumn100Series<ClearsChartData, String>(
-											dataSource: dataClears,
-											xValueMapper: (ClearsChartData data, _) => data.nick,
-											yValueMapper: (ClearsChartData data, _) => data.triple,
-											pointColorMapper: (ClearsChartData data, _) => data.color[6]
-										),
-										StackedColumn100Series<ClearsChartData, String>(
-											dataSource: dataClears,
-											xValueMapper: (ClearsChartData data, _) => data.nick,
-											yValueMapper: (ClearsChartData data, _) => data.tspinTriple,
-											pointColorMapper: (ClearsChartData data, _) => data.color[7]
-										),
-										StackedColumn100Series<ClearsChartData, String>(
-											dataSource: dataClears,
-											xValueMapper: (ClearsChartData data, _) => data.nick,
-											yValueMapper: (ClearsChartData data, _) => data.quad,
-											pointColorMapper: (ClearsChartData data, _) => data.color[8]
-										),
-									]
 								),
-							],
-						),
-					)
-				),
-				Card(
-					child: Padding(
-						padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0),
-						child: Column(
-							children: [
-								SfCartesianChart(
-									primaryXAxis: CategoryAxis(),
-									primaryYAxis: NumericAxis(numberFormat: percentage),
-									tooltipBehavior: TooltipBehavior(
-										enable: true,
-										color: Colors.black,
-										borderColor: Colors.white,
-										animationDuration: 0,
-										builder: (dynamic data, dynamic point, dynamic series,
-											int pointIndex, int seriesIndex) {
-												return Padding(
-													padding: const EdgeInsets.all(8.0),
-													child: Text(
-														"${percentage.format(data.value)}",
-														style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 20),
+								Card(
+									child: Padding(
+										padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+										child: Wrap(
+											spacing: 20.0,
+											runSpacing: 20.0,
+											children: [
+												Tooltip(
+													message: "calculated by looking at the send lines distribution of the player and seeing how hard it is to downstack it",
+													child: GaugetThingy(
+														value: snapshot.data!.attackCheesiness,
+														min: 0, max: 2.0, tickInterval: .5,
+														label: "Attack\nCheesiness",
+														sideSize: 128.0, fractionDigits: 3,
+														moreIsBetter: true,
+													)
+												),
+												Tooltip(
+													message: "iaiiaiaiaia",
+													child: GaugetThingy(
+														value: snapshot.data!.APL,
+														min: 0, max: 2.0, tickInterval: .5,
+														label: "Attack\nPer Line",
+														sideSize: 128.0, fractionDigits: 3,
+														moreIsBetter: true,
+													)
+												),
+												Tooltip(
+													message: "iaiiaiaiaia",
+													child: GaugetThingy(
+														value: snapshot.data!.APP,
+														min: 0, max: 2.0, tickInterval: .5,
+														label: "Attack\nPer Piece",
+														sideSize: 128.0, fractionDigits: 3,
+														moreIsBetter: true,
+													)
+												),
+												Tooltip(
+													message: "iaiiaiaiaia",
+													child: GaugetThingy(
+														value: snapshot.data!.KPP,
+														min: 0, max: 5.0, tickInterval: 1,
+														label: "Keypresses\nPer Piece",
+														sideSize: 128.0, fractionDigits: 3,
+														moreIsBetter: false,
+													)
+												),
+												Tooltip(
+													message: "iaiiaiaiaia",
+													child: GaugetThingy(
+														value: snapshot.data!.KPS,
+														min: 0, max: 20, tickInterval: 5,
+														label: "Keypresses\nPer Second",
+														sideSize: 128.0, fractionDigits: 2,
+														moreIsBetter: true,
+													)
+												),
+											],
+										),
+									),
+								),
+								Card(
+									child: Padding(
+										padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+										child: Column(
+										children: [
+											Text("Surge Stats", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+											Wrap(
+												spacing: 20.0,
+												runSpacing: 20.0,
+												children: [
+													Tooltip(
+														message: "wqeqwe",
+														child: GaugetThingy(
+															value: snapshot.data!.surgeAPM,
+															min: 0, max: 400.0, tickInterval: 100,
+															label: "Surge\nAPM",
+															sideSize: 128.0, fractionDigits: 2,
+															moreIsBetter: true,
+														)
 													),
-												);
-										}
+													Tooltip(
+														message: "iaiiaiaiaia",
+														child: GaugetThingy(
+															value: snapshot.data!.surgePPS,
+															min: 0, max: 3.0, tickInterval: 1.0,
+															label: "Surge\nPPS",
+															sideSize: 128.0, fractionDigits: 3,
+															moreIsBetter: false,
+														)
+													),
+													Tooltip(
+														message: "iaiiaiaiaia",
+														child: GaugetThingy(
+															value: snapshot.data!.surgeAPL,
+															min: 0, max: 4.0, tickInterval: 1.0,
+															label: "Surge\nAPL",
+															sideSize: 128.0, fractionDigits: 3,
+															moreIsBetter: true,
+														)
+													),
+													Tooltip(
+														message: "iaiiaiaiaia",
+														child: GaugetThingy(
+															value: snapshot.data!.surgeDS,
+															min: 0, max: 10.0, tickInterval: 2.0,
+															label: "Surge\nDownstack",
+															sideSize: 128.0, fractionDigits: 3,
+															moreIsBetter: true,
+														)
+													),
+													Tooltip(
+														message: "iaiiaiaiaia",
+														child: GaugetThingy(
+															value: snapshot.data!.surgeLength,
+															min: 0, max: 20, tickInterval: 5,
+															label: "Surge\nLength",
+															sideSize: 128.0, fractionDigits: 2,
+															moreIsBetter: true,
+														)
+													),
+													Tooltip(
+														message: "iaiiaiaiaia",
+														child: GaugetThingy(
+															value: snapshot.data!.surgeRate,
+															min: 0, max: 1, tickInterval: .2,
+															label: "Surge\nRate",
+															sideSize: 128.0, fractionDigits: 3,
+															moreIsBetter: true,
+														)
+													),
+													Tooltip(
+														message: "iaiiaiaiaia",
+														child: GaugetThingy(
+															value: snapshot.data!.surgeSecsPerCheese,
+															min: 0, max: 1, tickInterval: .2,
+															label: "Surge Secs\nPer Cheese",
+															sideSize: 128.0, fractionDigits: 3,
+															moreIsBetter: true,
+														)
+													),
+													Tooltip(
+														message: "iaiiaiaiaia",
+														child: GaugetThingy(
+															value: snapshot.data!.surgeSecsPerDS,
+															min: 0, max: 1, tickInterval: .2,
+															label: "Surge Secs\nPer DS",
+															sideSize: 128.0, fractionDigits: 3,
+															moreIsBetter: true,
+														)
+													),
+													Tooltip(
+														message: "iaiiaiaiaia",
+														child: GaugetThingy(
+															value: snapshot.data!.surgeAllspin,
+															min: 0, max: 1, tickInterval: .2,
+															label: "Surge\nAll Spin",
+															sideSize: 128.0, fractionDigits: 3,
+															moreIsBetter: true,
+														)
+													),
+												],
+											),
+										],
+										),
 									),
-									title: ChartTitle(text: "Well Column Distribution", textStyle: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
-									series: <CartesianSeries>[
-										ColumnSeries<WellsData, int>(
-												dataSource: distribution,
-												xValueMapper: (WellsData data, _) => data.well,
-												yValueMapper: (WellsData data, _) => data.value
-										)
-									]
-								),
-							],
-						),
-					)
-				),
-				Card(
-					child: Padding(
-						padding: const EdgeInsets.all(32.0),
-						child: SizedBox(
-							height: 330,
-							width: 330,
-							child: MyRadarChart(
-								RadarChartData(
-									radarShape: RadarShape.circle,
-									tickCount: 4,
-									radarBackgroundColor: Colors.black.withAlpha(170),
-									radarBorderData: const BorderSide(color: Colors.white24, width: 1),
-									gridBorderData: const BorderSide(color: Colors.white24, width: 1),
-									tickBorderData: const BorderSide(color: Colors.white24, width: 1),
-									getTitle: (index, angle) {
-										switch (index) {
-											case 0:
-												return RadarChartTitle(text: "Upstack APL\n1.73", positionPercentageOffset: 0.05);
-											case 1:
-												return RadarChartTitle(text: "Cheese APL\n1.41", positionPercentageOffset: 0.05);
-											case 2:
-												return RadarChartTitle(text: "T Piece Efficiency\n76%", positionPercentageOffset: 0.05);
-											case 3:
-												return RadarChartTitle(text: "Downstack APL\n1.52", positionPercentageOffset: 0.05);
-											case 4:
-												return RadarChartTitle(text: "Attack Per Line\n1.66", positionPercentageOffset: 0.05);
-											case 5:
-												return RadarChartTitle(text: "I Piece Efficiency\n29%", positionPercentageOffset: 0.05);
-											default:
-												return const RadarChartTitle(text: '');
-										}
-									},
-									dataSets: [
-										RadarDataSet(
-											fillColor: Theme.of(context).colorScheme.primary.withAlpha(170),
-											borderColor: Theme.of(context).colorScheme.primary,
-											dataEntries: [
-												RadarEntry(value: 1.73), // Upstack APL
-												RadarEntry(value: 1.41), // Cheese APL
-												RadarEntry(value: 0.76*3), // T Piece Efficiency
-												RadarEntry(value: 1.52), // Downstack APL
-												RadarEntry(value: 1.66), // APL
-												RadarEntry(value: 0.29*3) // I Piece Efficiency
-											],
-										),
-										RadarDataSet(
-											fillColor: Colors.transparent,
-											borderColor: Colors.transparent,
-											dataEntries: [
-												RadarEntry(value: 3),
-												RadarEntry(value: 0),
-												RadarEntry(value: 0),
-												RadarEntry(value: 0),
-												RadarEntry(value: 0),
-												RadarEntry(value: 0)
-											],
-										),
-									]
-								)
-							),
-						),
-					)
-				),
-				Card(
-					child: Padding(
-						padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 16.0),
-						child: Column(
-							children: [
-								Text("Attacks Cancelled", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
-								SfLinearGauge(
-									minimum: 0,
-									maximum: 3.00,
-									interval: 0.25, 
-									showAxisTrack: false,
-									ranges: [
-										LinearGaugeRange(
-											startValue: 0,
-											endValue: attack.clean,
-											startWidth: 25,
-											endWidth: 25,
-											color: Color.fromRGBO(116, 180, 155, 1),
-											position: LinearElementPosition.cross
-										),
-										LinearGaugeRange(
-											startValue: attack.clean,
-											endValue: attack.sum,
-											startWidth: 25,
-											endWidth: 25,
-											color: Color.fromRGBO(73, 76, 162, 1),
-											position: LinearElementPosition.cross
-										)
-									],
-									markerPointers: [
-										LinearWidgetPointer(value: 0, child: Container(width: 48.0, child: Text("Clean:\n${f3.format(attack.clean)}")), markerAlignment: LinearMarkerAlignment.end),
-										LinearWidgetPointer(value: attack.sum, child: Container(width: 52.0, child: Text("Cheesy:\n${f3.format(attack.cheesy)}", textAlign: TextAlign.end,)), markerAlignment: LinearMarkerAlignment.start)
-									],
-									isMirrored: false,
-									showTicks: true,
-									showLabels: false
-								),
-								Text("Lines Cancelled", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
-								SfLinearGauge(
-									minimum: 0,
-									maximum: 3.00,
-									interval: 0.25,
-									showAxisTrack: false,
-									ranges: [
-										LinearGaugeRange(
-											startValue: 0,
-											endValue: lines.clean,
-											startWidth: 25,
-											endWidth: 25,
-											color: Color.fromRGBO(246, 114, 128, 1),
-											position: LinearElementPosition.cross
-										),
-										LinearGaugeRange(
-											startValue: lines.clean,
-											endValue: lines.sum,
-											startWidth: 25,
-											endWidth: 25,
-											color: Color.fromRGBO(248, 177, 149, 1),
-											position: LinearElementPosition.cross
-										)
-									],
-									markerPointers: [
-										LinearWidgetPointer(value: 0, child: Container(width: 48.0, child: Text("Clean:\n${f3.format(lines.clean)}")), markerAlignment: LinearMarkerAlignment.end),
-										LinearWidgetPointer(value: lines.sum, child: Container(width: 52.0, child: Text("Cheesy:\n${f3.format(lines.cheesy)}", textAlign: TextAlign.end,)), markerAlignment: LinearMarkerAlignment.start)
-									],
-									isMirrored: false,
-									showTicks: true,
-									showLabels: false
 								)
 							],
-						),
-					),
-				)
-			],
+						);
+					}
+					if (snapshot.hasError){ return SizedBox(height: 720.0, child: FutureError(snapshot)); }
+				}
+			return const Text("what?");
+			},
 		);
 	}
 

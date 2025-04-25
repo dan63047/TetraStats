@@ -5,12 +5,14 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:math';
+import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:tetra_stats/data_objects/beta_record.dart';
 import 'package:tetra_stats/data_objects/cutoff_tetrio.dart';
 import 'package:tetra_stats/data_objects/end_context_multi.dart';
+import 'package:tetra_stats/data_objects/minomuncher.dart';
 import 'package:tetra_stats/data_objects/news.dart';
 import 'package:tetra_stats/data_objects/p1nkl0bst3r.dart';
 import 'package:tetra_stats/data_objects/player_leaderboard_position.dart';
@@ -376,6 +378,99 @@ class TetrioService extends DB {
     var dbTLRecordsQuery = (await db.rawQuery('SELECT COUNT(*) FROM `${tetraLeagueMatchesTable}`')).first['COUNT(*)']! as int;
     var dbTLStatesQuery = (await db.rawQuery('SELECT COUNT(*) FROM `${tetrioLeagueTable}`')).first['COUNT(*)']! as int;
     return (dbSize, dbTLRecordsQuery, dbTLStatesQuery);
+  }
+
+  /// Since Minomuncher endpoint is not ready yet, this metod will
+  /// return fake data
+  Future<MinomuncherData> fetchMinoMuncherStats(String userID){
+    // SingleplayerStream? cached = _cache.get(stream+userID, SingleplayerStream);
+    // if (cached != null) return cached;
+    
+    Uri url;
+    if (kIsWeb) {
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "Minomuncher", "user": userID.toLowerCase().trim()});
+    } else {
+      url = Uri.https('ch.tetr.io', 'bibibibibiibibibiibib');
+    }
+    try {
+      Map<String, Map> fakeData = {
+        "icly": {
+          "wellColumns": [ 11, 10, 37, 41, 17, 5, 9, 21, 9, 22 ],
+          "clearTypes": {
+            "perfectClear": 3,
+            "allspin": 152,
+            "single": 237,
+            "tspinSingle": 32,
+            "double": 59,
+            "tspinDouble": 129,
+            "triple": 16,
+            "tspinTriple": 0,
+            "quad": 147,
+          },
+          "tEfficiency": 0.48493975903614456,
+          "iEfficiency": 0.44410876132930516,
+          "cheeseAPL": 2.472027972027972,
+          "downstackAPL": 2.060882800608828,
+          "upstackAPL": 1.2545018007202882,
+          "APL": 1.6100671140939598,
+          "APP": 1.041684759009987,
+          "KPP": 3.5336517585757705,
+          "KPS": 10.527064697854616,
+          "APM": 186.19632497040962,
+          "PPS": 2.9790894567656894,
+          "midgameAPM": 194.85201210927227,
+          "midgamePPS": 3.0030788907741583,
+          "openerAPM": 142.04732280254106,
+          "openerPPS": 2.8567294919177706,
+          "attackCheesiness": 0.47707874789292537,
+          "cleanAttacksCancelled": 0.3386243386243386,
+          "cheesyAttacksCancelled": 0.15763546798029557,
+          "cleanLinesCancelled": 0.32965931863727455,
+          "cheesyLinesCancelled": 0.7214912280701754,
+          "surgeAPM": 212.01475625050423,
+          "surgeAPL": 2.1791044776119404,
+          "surgeDS": 7.146341463414634,
+          "surgePPS": 0.08800944634724127,
+          "surgeLength": 6.926829268292683,
+          "surgeRate": 0.13099041533546327,
+          "surgeSecsPerCheese": 0.7643478260869563,
+          "surgeSecsPerDS": 0.46352564102564087,
+          "surgeAllspin": 0.04878048780487805,
+        }
+      };
+      return Future.delayed(Durations.extralong4, () => MinomuncherData.fromJson(fakeData.entries.first));
+      // final response = await client.get(url);
+
+      // switch (response.statusCode) {
+      //   case 200:
+      //     if (jsonDecode(response.body)['success']) {
+      //       SingleplayerStream records = SingleplayerStream.fromJson(jsonDecode(response.body)['data']['entries'], userID, stream);
+      //       _cache.store(records, jsonDecode(response.body)['cache']['cached_until']);
+      //       developer.log("fetchSingleplayerStream: $stream $userID stream retrieved and cached", name: "services/tetrio_crud");
+      //       return records;
+      //     } else {
+      //       developer.log("fetchSingleplayerStream: User dosen't exist", name: "services/tetrio_crud", error: response.body);
+      //       throw TetrioPlayerNotExist();
+      //     }
+      //   case 403:
+      //     throw TetrioForbidden();
+      //   case 429:
+      //     throw TetrioTooManyRequests();
+      //   case 418:
+      //     throw TetrioOskwareBridgeProblem();
+      //   case 500:
+      //   case 502:
+      //   case 503:
+      //   case 504:
+      //     throw TetrioInternalProblem();
+      //   default:
+      //     developer.log("fetchSingleplayerStream: Failed to fetch stream $stream $userID", name: "services/tetrio_crud", error: response.statusCode);
+      //     throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
+      // }
+    } on http.ClientException catch (e, s) {
+      developer.log("$e, $s");
+      throw http.ClientException(e.message, e.uri);
+    }
   }
 
   /// Retrieves avaliable Tetra League matches from Tetra Channel api. Returns stream object (fake stream).
