@@ -986,6 +986,60 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 				case ConnectionState.done:
 					if (snapshot.hasData){
 						List<ClearsChartData> clearTypeList = [snapshot.data!.clearTypes];
+            List<LinearGaugeRange> apmRanges = [
+              LinearGaugeRange(
+                startValue: 0,
+                endValue: snapshot.data!.openerAPM,
+                startWidth: 25,
+                endWidth: 25,
+                color: Colors.yellow,
+                position: LinearElementPosition.cross
+              ),
+              LinearGaugeRange(
+                startValue: 0,
+                endValue: snapshot.data!.APM,
+                startWidth: 25,
+                endWidth: 25,
+                color: Colors.orange,
+                position: LinearElementPosition.cross
+              ),
+              LinearGaugeRange(
+                startValue: 0,
+                endValue: snapshot.data!.midgameAPM,
+                startWidth: 25,
+                endWidth: 25,
+                color: Colors.red,
+                position: LinearElementPosition.cross
+              )
+            ];
+            List<LinearGaugeRange> ppsRanges = [
+              LinearGaugeRange(
+                startValue: 0,
+                endValue: snapshot.data!.openerPPS,
+                startWidth: 25,
+                endWidth: 25,
+                color: Colors.yellow,
+                position: LinearElementPosition.cross
+              ),
+              LinearGaugeRange(
+                startValue: 0,
+                endValue: snapshot.data!.PPS,
+                startWidth: 25,
+                endWidth: 25,
+                color: Colors.orange,
+                position: LinearElementPosition.cross
+              ),
+              LinearGaugeRange(
+                startValue: 0,
+                endValue: snapshot.data!.midgamePPS,
+                startWidth: 25,
+                endWidth: 25,
+                color: Colors.red,
+                position: LinearElementPosition.cross
+              )
+            ];
+            apmRanges.sort((a, b) => a.endValue > b.endValue ? -1 : 1);
+            ppsRanges.sort((a, b) => a.endValue > b.endValue ? -1 : 1);
 						return Column(
 							children: [
 								Text("This card shows icly analysis. Just a design mockup. WIP"),
@@ -1019,32 +1073,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 														minimum: 0,
 														maximum: 300,
 														interval: 25, 
-														ranges: [
-															LinearGaugeRange(
-																startValue: 0,
-																endValue: snapshot.data!.openerAPM,
-																startWidth: 25,
-																endWidth: 25,
-																color: Colors.yellow,
-																position: LinearElementPosition.cross
-															),
-															LinearGaugeRange(
-																startValue: 0,
-																endValue: snapshot.data!.APM,
-																startWidth: 25,
-																endWidth: 25,
-																color: Colors.orange,
-																position: LinearElementPosition.cross
-															),
-															LinearGaugeRange(
-																startValue: 0,
-																endValue: snapshot.data!.midgameAPM,
-																startWidth: 25,
-																endWidth: 25,
-																color: Colors.red,
-																position: LinearElementPosition.cross
-															)
-														],
+														ranges: apmRanges,
 														markerPointers: [
 															LinearWidgetPointer(value: 0, child: Container(width: 36.0, child: Text("APM")), markerAlignment: LinearMarkerAlignment.end)
 														],
@@ -1055,34 +1084,9 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 													SizedBox(height: 8.0),
 													SfLinearGauge(
 														minimum: 0,
-														maximum: 3.00,
-														interval: 25, 
-														ranges: [
-															LinearGaugeRange(
-																startValue: 0,
-																endValue: snapshot.data!.openerPPS,
-																startWidth: 25,
-																endWidth: 25,
-																color: Colors.yellow,
-																position: LinearElementPosition.cross
-															),
-															LinearGaugeRange(
-																startValue: 0,
-																endValue: snapshot.data!.PPS,
-																startWidth: 25,
-																endWidth: 25,
-																color: Colors.orange,
-																position: LinearElementPosition.cross
-															),
-															LinearGaugeRange(
-																startValue: 0,
-																endValue: snapshot.data!.midgamePPS,
-																startWidth: 25,
-																endWidth: 25,
-																color: Colors.red,
-																position: LinearElementPosition.cross
-															)
-														],
+														maximum: 4.00,
+														interval: .25, 
+														ranges: ppsRanges,
 														markerPointers: [
 															LinearWidgetPointer(value: 0, child: Container(width: 36.0, child: Text("PPS")), markerAlignment: LinearMarkerAlignment.end)
 														],
