@@ -395,13 +395,13 @@ class Graphs extends StatelessWidget{
                       getTitle: (index, angle) {
                         switch (index) {
                           case 0:
-                            return RadarChartTitle(text: '${t.stats.opener.short}\n${percentage.format(playstyle.opener)}', angle: 0, positionPercentageOffset: 0.05);
+                            return RadarChartTitle(text: '${t.stats.opener.short}\n${f3.format(playstyle.opener)}', angle: 0, positionPercentageOffset: 0.05);
                           case 1:
-                            return RadarChartTitle(text: '${t.stats.stride.short}\n${percentage.format(playstyle.stride)}', angle: 0, positionPercentageOffset: 0.05);
+                            return RadarChartTitle(text: '${t.stats.stride.short}\n${f3.format(playstyle.stride)}', angle: 0, positionPercentageOffset: 0.05);
                           case 2:
-                            return RadarChartTitle(text: '${t.stats.infds.short}\n${percentage.format(playstyle.infds)}', angle: angle + 180, positionPercentageOffset: 0.05);
+                            return RadarChartTitle(text: '${t.stats.infds.short}\n${f3.format(playstyle.infds)}', angle: angle + 180, positionPercentageOffset: 0.05);
                           case 3:
-                            return RadarChartTitle(text: '${t.stats.plonk.short}\n${percentage.format(playstyle.plonk)}', angle: 0, positionPercentageOffset: 0.05);
+                            return RadarChartTitle(text: '${t.stats.plonk.short}\n${f3.format(playstyle.plonk)}', angle: 0, positionPercentageOffset: 0.05);
                           default:
                             return const RadarChartTitle(text: '');
                         }

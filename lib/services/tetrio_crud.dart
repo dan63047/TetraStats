@@ -37,7 +37,7 @@ import 'package:tetra_stats/services/sqlite_db_controller.dart';
 import 'package:csv/csv.dart';
 
 const String dbName = "TetraStats.db";
-const String webVersionDomain = "ts.dan63.by";
+const String webVersionDomain = "tsbeta.dan63.by";
 const String tetrioUsersTable = "tetrioUsers";
 const String tetrioUsersToTrackTable = "tetrioUsersToTrack";
 const String tetraLeagueMatchesTable = "tetrioAlphaLeagueMathces";
@@ -1468,19 +1468,19 @@ class TetrioService extends DB {
     if (result == 0) throw Exception("Failed to remove a row $dbID - it's probably not exist");
   }
 
-  /// Retrieves general stats of [user] (nickname or id) from Tetra Channel api. Returns [TetrioPlayer] object of this user.
-  /// If [isItDiscordID] is true, function expects [user] to be a discord user id. Throws an exception if fails to retrieve.
-  Future<TetrioPlayer> fetchPlayer(String user, {bool isItDiscordID = false}) async {
+  /// Retrieves general stats of [user] from Tetra Channel api. Returns [TetrioPlayer] object of this user.
+  /// [user] can be a search query. Throws an exception if fails to retrieve.
+  Future<TetrioPlayer> fetchPlayer(String user, {BuildContext? context}) async {
     TetrioPlayer? cached = _cache.get(user, TetrioPlayer);
     if (cached != null) return cached;
 
-    if (isItDiscordID){
-      // trying to find player with given discord id
+    if (user.contains(":")){
+      // trying to find player using search endpoint
       Uri dUrl;
       if (kIsWeb) {
-        dUrl = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "tetrioUserByDiscordID", "user": user.toLowerCase().trim()});
+        dUrl = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "tetrioSearch", "query": user.toLowerCase().trim()});
       } else {
-        dUrl = Uri.https('ch.tetr.io', 'api/users/search/discord:${user.toLowerCase().trim()}');
+        dUrl = Uri.https('ch.tetr.io', 'api/users/search/${user.toLowerCase().trim()}'); //enter the `user` like it described at https://tetr.io/about/api/#userssearchquery
       }
       try{
         final response = await client.get(dUrl);
@@ -1489,11 +1489,38 @@ class TetrioService extends DB {
           case 200:
             var json = jsonDecode(response.body);
             if (json['success'] && json['data'] != null) {
-              // success - rewrite user with tetrio user id and going to obtain data about him
-              user = json['data']['user']['_id'];
-            } else { // fail - throw an exception
-              developer.log("fetchPlayer User dosen't exist", name: "services/tetrio_crud", error: response.body);
-              throw TetrioDiscordNotExist();
+              switch (json['data']['users'].length){
+                case 0: // fail - throw an exception
+                  throw TetrioSearchFailed("No connections found");
+                case 1: // success - rewrite user with tetrio user id and going to obtain data about him
+                  user = json['data']['users'][0]['_id'];
+                  break;
+                default: // Multiple choice
+                  if (context != null){
+                    user = await showDialog(context: context, barrierDismissible: false, builder: (context) => AlertDialog(
+                      title: Text("Which one?", textAlign: TextAlign.center),
+                      content: SingleChildScrollView(
+                        child: ListBody(
+                          children: [ for (var entry in json['data']['users'])
+                            ListTile(
+                              title: Text(entry["username"], style: Theme.of(context).textTheme.titleSmall,),
+                              subtitle: Text(entry["_id"], style: TextStyle(fontFamily: "Eurostile Round Condensed", color: Colors.grey)),
+                              trailing: const Icon(Icons.arrow_forward_ios),
+                              onTap: (){
+                                Navigator.of(context).pop(entry["_id"]);
+                              },
+                            )
+                          ]
+                        ),
+                      ),
+                    ));
+                  } else {
+                    user = json['data']['users'][0]['_id']; //idc
+                  }
+              }
+            } else {
+              developer.log("fetchPlayer failed: ${json['error']}", name: "services/tetrio_crud", error: response.body);
+              throw TetrioSearchFailed(json['error']['msg']);
             }
             break;
           // more exceptions to god of exceptions
@@ -1501,6 +1528,8 @@ class TetrioService extends DB {
             throw TetrioForbidden();
           case 404:
             throw TetrioPlayerNotExist();
+          case 422:
+            throw TetrioSearchFailed(jsonDecode(response.body)['error']['msg']);
           case 429:
             throw TetrioTooManyRequests();
           case 418:

@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:http/http.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
+import 'package:tetra_stats/utils/open_in_browser.dart';
 import 'package:tetra_stats/views/destination_home.dart';
 
 class ErrorThingy extends StatelessWidget{
@@ -22,9 +24,9 @@ class ErrorThingy extends StatelessWidget{
       errText = t.errors.noSuchUser;
       subText = t.errors.noSuchUserSub;
       break;
-      case TetrioDiscordNotExist:
+      case TetrioSearchFailed:
       icon = Icons.search_off;
-      errText = t.errors.discordNotAssigned;
+      errText = (data!.exception as TetrioSearchFailed).message;
       subText = t.errors.discordNotAssignedSub;
       case ConnectionIssue:
       var err = data!.exception as ConnectionIssue;
@@ -74,7 +76,7 @@ class ErrorThingy extends StatelessWidget{
           Text(errText, style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 42, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
           if (subText != null) Padding(
             padding: const EdgeInsets.only(top: 8.0),
-            child: Text(subText, textAlign: TextAlign.center),
+            child: MarkdownBody(data: subText, styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.center), onTapLink: (String text, String? href, String title){launchInBrowser(Uri.parse(href!));},),
           ),
           Spacer()
         ],

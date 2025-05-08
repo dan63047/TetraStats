@@ -25,6 +25,7 @@ import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart';
 import 'package:tetra_stats/utils/colors_functions.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
+import 'package:tetra_stats/utils/open_in_browser.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
 import 'package:tetra_stats/views/main_view.dart';
@@ -727,6 +728,12 @@ class LeagueCard extends StatelessWidget{
 
 }
 
+class NickStat{
+	String nick;
+	num stat;
+	NickStat(this.nick, this.stat);
+}
+
 class _DestinationHomeState extends State<DestinationHome> with SingleTickerProviderStateMixin {
 	//Duration postSeasonLeft = seasonStart.difference(DateTime.now());
 	late MapEntry? closestAverageBlitz;
@@ -961,7 +968,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 					padding: const EdgeInsets.only(bottom: 4.0),
 					child: Text(t.nerdStats, style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center),
 				))),
-				if (data.nerdStats != null) NerdStatsThingy(nerdStats: toSee.nerdStats!, oldNerdStats: toCompare?.nerdStats, averages: averages, lbPos: lbPos, width: width, rank: toCompare != null ? (toCompare.rank != "z" ? toCompare.rank.toUpperCase() : toCompare.percentileRank.toUpperCase()) : null),
+				if (data.nerdStats != null) NerdStatsThingy(nerdStats: toSee.nerdStats!, oldNerdStats: toCompare?.nerdStats, averages: averages, lbPos: lbPos, width: width, rank: toSee.rank != "z" ? toSee.rank.toUpperCase() : toSee.percentileRank.toUpperCase()),
 				if (data.nerdStats != null) Graphs(toSee.apm!, toSee.pps!, toSee.vs!, toSee.nerdStats!, toSee.playstyle!),
 				Card(child: Center(child: Text(t.relatedAchievements, style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center))),
 				Wrap(
@@ -974,717 +981,785 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 		);
 	}
 
-	Widget getFreyhoeAnalysis(double width){
-		return FutureBuilder<MinomuncherData>(
-			future: teto.fetchMinoMuncherStats("bozo"),
-			builder: (context, snapshot) {
-				switch (snapshot.connectionState){
-				case ConnectionState.none:
-				case ConnectionState.waiting:
-				case ConnectionState.active:
-					return const Center(child: CircularProgressIndicator());
-				case ConnectionState.done:
-					if (snapshot.hasData){
-						List<ClearsChartData> clearTypeList = [snapshot.data!.clearTypes];
-            List<LinearGaugeRange> apmRanges = [
-              LinearGaugeRange(
-                startValue: 0,
-                endValue: snapshot.data!.openerAPM,
-                startWidth: 25,
-                endWidth: 25,
-                color: Colors.yellow,
-                position: LinearElementPosition.cross
-              ),
-              LinearGaugeRange(
-                startValue: 0,
-                endValue: snapshot.data!.APM,
-                startWidth: 25,
-                endWidth: 25,
-                color: Colors.orange,
-                position: LinearElementPosition.cross
-              ),
-              LinearGaugeRange(
-                startValue: 0,
-                endValue: snapshot.data!.midgameAPM,
-                startWidth: 25,
-                endWidth: 25,
-                color: Colors.red,
-                position: LinearElementPosition.cross
-              )
-            ];
-            List<LinearGaugeRange> ppsRanges = [
-              LinearGaugeRange(
-                startValue: 0,
-                endValue: snapshot.data!.openerPPS,
-                startWidth: 25,
-                endWidth: 25,
-                color: Colors.yellow,
-                position: LinearElementPosition.cross
-              ),
-              LinearGaugeRange(
-                startValue: 0,
-                endValue: snapshot.data!.PPS,
-                startWidth: 25,
-                endWidth: 25,
-                color: Colors.orange,
-                position: LinearElementPosition.cross
-              ),
-              LinearGaugeRange(
-                startValue: 0,
-                endValue: snapshot.data!.midgamePPS,
-                startWidth: 25,
-                endWidth: 25,
-                color: Colors.red,
-                position: LinearElementPosition.cross
-              )
-            ];
-            apmRanges.sort((a, b) => a.endValue > b.endValue ? -1 : 1);
-            ppsRanges.sort((a, b) => a.endValue > b.endValue ? -1 : 1);
-						return Column(
-							children: [
-								Text("This card shows icly analysis. Just a design mockup. WIP"),
-								Card(
-									child: Padding(
-										padding: const EdgeInsets.only(bottom: 4.0),
-										child: Center(
-											child: Column(
-												mainAxisSize: MainAxisSize.min,
-												crossAxisAlignment: CrossAxisAlignment.center,
-												children: [
-													Text("Analysis", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleMedium),
-													Padding(
-														padding: const EdgeInsets.only(top: 4.0),
-														child: Text("via MinoMuncher by Freyhoe", textAlign: TextAlign.center, style: widget.constraints.maxWidth > 768.0 ? null : TextStyle(fontSize: 12.0)),
-													)
-												],
-											),
-										),
-									),
-								),
-								Card(
-									child: Padding(
-										padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
-										child: Center(
-											child: Column(
-												mainAxisSize: MainAxisSize.min,
-												crossAxisAlignment: CrossAxisAlignment.center,
-												children: [
-													SfLinearGauge(
-														minimum: 0,
-														maximum: 300,
-														interval: 25, 
-														ranges: apmRanges,
-														markerPointers: [
-															LinearWidgetPointer(value: 0, child: Container(width: 36.0, child: Text("APM")), markerAlignment: LinearMarkerAlignment.end)
-														],
-														isMirrored: false,
-														showTicks: true,
-														showLabels: false
-													),
-													SizedBox(height: 8.0),
-													SfLinearGauge(
-														minimum: 0,
-														maximum: 4.00,
-														interval: .25, 
-														ranges: ppsRanges,
-														markerPointers: [
-															LinearWidgetPointer(value: 0, child: Container(width: 36.0, child: Text("PPS")), markerAlignment: LinearMarkerAlignment.end)
-														],
-														isMirrored: false,
-														showTicks: true,
-														showLabels: false
-													),
-													SizedBox(height: 8.0),
-													Wrap(
-														direction: Axis.horizontal,
-														crossAxisAlignment: WrapCrossAlignment.center,
-														spacing: 20,
-														children: [
-															Row(
-																mainAxisSize: MainAxisSize.min,
-																children: [
-																	Padding(
-																		padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.red)),
-																	),
-																	Text("Midgame: ${f2.format(snapshot.data!.midgameAPM)} APM, ${f2.format(snapshot.data!.midgamePPS)} PPS")
-																],
-															),
-															Row(
-																mainAxisSize: MainAxisSize.min,
-																children: [
-																	Padding(
-																		padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.orange)),
-																	),
-																	Text("Overall: ${f2.format(snapshot.data!.APM)} APM, ${f2.format(snapshot.data!.PPS)} PPS")
-																],
-															),
-															Row(
-																mainAxisSize: MainAxisSize.min,
-																children: [
-																	Padding(
-																		padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.yellow)),
-																	),
-																	Text("Opener: ${f2.format(snapshot.data!.openerAPM)} APM, ${f2.format(snapshot.data!.openerPPS)} PPS")
-																],
-															),
-														],
-													),
-												],
-											),
-										),
-									),
-								),
-								Card(
-									child: Padding(
-										padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0),
-										child: Column(
-											children: [
-												SfCartesianChart(
-													primaryXAxis: CategoryAxis(isVisible: false),
-													primaryYAxis: NumericAxis(minimum: 0, maximum: 100),
-													title: ChartTitle(text: "Clear Types", textStyle: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
-													legend: Legend(
-														isVisible: true,
-														position: LegendPosition.left,
-														itemPadding: 2,
-														legendItemBuilder: (legendText, series, point, seriesIndex) {
-															return Container(
-																height: 20,
-																width: 210,
-																child: Row(
-																	mainAxisAlignment: MainAxisAlignment.spaceBetween,
-																	children: [
-																		Row(
-																			mainAxisSize: MainAxisSize.min,
-																		children: [
-																				Padding(
-																					padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																					child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: lineClearsColors[seriesIndex])),
-																				),
-																			Text("${snapshot.data!.clearTypes.clearName[seriesIndex]}:"),
-																		],
-																		),
-																		Text("${intf.format(point.y)} (${percentage.format(point.y!/snapshot.data!.clearTypes.total)})")
-																	],
-																),
-															);
-														}, 
-													),
-													series: width > 580 ? <CartesianSeries>[
-														StackedBar100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.perfectClear,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[0]
-														),
-														StackedBar100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.allspin,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[1]
-														),
-														StackedBar100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.single,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[2]
-														),
-														StackedBar100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.tspinSingle,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[3]
-														),
-														StackedBar100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.double,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[4]
-														),
-														StackedBar100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.tspinDouble,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[5]
-														),
-														StackedBar100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.triple,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[6]
-														),
-														StackedBar100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.tspinTriple,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[7]
-														),
-														StackedBar100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.quad,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[8]
-														),
-													] : <CartesianSeries>[
-														StackedColumn100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.perfectClear,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[0]
-														),
-														StackedColumn100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.allspin,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[1]
-														),
-														StackedColumn100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.single,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[2]
-														),
-														StackedColumn100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.tspinSingle,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[3]
-														),
-														StackedColumn100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.double,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[4]
-														),
-														StackedColumn100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.tspinDouble,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[5]
-														),
-														StackedColumn100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.triple,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[6]
-														),
-														StackedColumn100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.tspinTriple,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[7]
-														),
-														StackedColumn100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.quad,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[8]
-														),
-													]
-												),
-											],
-										),
-									)
-								),
-								Card(
-									child: Padding(
-										padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0),
-										child: Column(
-											children: [
-												SfCartesianChart(
-													primaryXAxis: CategoryAxis(),
-													primaryYAxis: NumericAxis(numberFormat: percentage),
-													tooltipBehavior: TooltipBehavior(
-														enable: true,
-														color: Colors.black,
-														borderColor: Colors.white,
-														animationDuration: 0,
-														builder: (dynamic data, dynamic point, dynamic series,
-															int pointIndex, int seriesIndex) {
-																return Padding(
-																	padding: const EdgeInsets.all(8.0),
-																	child: Text(
-																		"${percentage.format(data.value)}",
-																		style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 20),
-																	),
-																);
-														}
-													),
-													title: ChartTitle(text: "Well Column Distribution", textStyle: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
-													series: <CartesianSeries>[
-														ColumnSeries<WellsData, int>(
-																dataSource: snapshot.data!.wellColumns,
-																xValueMapper: (WellsData data, _) => data.well,
-																yValueMapper: (WellsData data, _) => data.value
-														)
-													]
-												),
-											],
-										),
-									)
-								),
-								Card(
-									child: Padding(
-										padding: const EdgeInsets.all(32.0),
-										child: SizedBox(
-											height: 330,
-											width: 330,
-											child: MyRadarChart(
-												RadarChartData(
-													radarShape: RadarShape.circle,
-													tickCount: 4,
-													radarBackgroundColor: Colors.black.withAlpha(170),
-													radarBorderData: const BorderSide(color: Colors.white24, width: 1),
-													gridBorderData: const BorderSide(color: Colors.white24, width: 1),
-													tickBorderData: const BorderSide(color: Colors.white24, width: 1),
-													getTitle: (index, angle) {
-														switch (index) {
-															case 0: // TODO: Replace with Upstack APL when that becomes avaliable
-																return RadarChartTitle(text: "Upstack APL\n${f2.format(snapshot.data!.APL)}", positionPercentageOffset: 0.05);
-															case 1:
-																return RadarChartTitle(text: "Cheese APL\n${f2.format(snapshot.data!.cheeseAPL)}", positionPercentageOffset: 0.05);
-															case 2:
-																return RadarChartTitle(text: "T Piece Efficiency\n${percentage.format(snapshot.data!.tEfficiency)}", positionPercentageOffset: 0.05);
-															case 3:
-																return RadarChartTitle(text: "Downstack APL\n${f2.format(snapshot.data!.downstackAPL)}", positionPercentageOffset: 0.05);
-															case 4:
-																return RadarChartTitle(text: "Attack Per Line\n${f2.format(snapshot.data!.APL)}", positionPercentageOffset: 0.05);
-															case 5:
-																return RadarChartTitle(text: "I Piece Efficiency\n${percentage.format(snapshot.data!.iEfficiency)}", positionPercentageOffset: 0.05);
-															default:
-																return const RadarChartTitle(text: '');
-														}
-													},
-													dataSets: [
-														RadarDataSet(
-															fillColor: Theme.of(context).colorScheme.primary.withAlpha(170),
-															borderColor: Theme.of(context).colorScheme.primary,
-															dataEntries: [
-																RadarEntry(value: snapshot.data!.APL), // TODO: and here too
-																RadarEntry(value: snapshot.data!.cheeseAPL), // Cheese APL
-																RadarEntry(value: snapshot.data!.tEfficiency*3), // T Piece Efficiency
-																RadarEntry(value: snapshot.data!.downstackAPL), // Downstack APL
-																RadarEntry(value: snapshot.data!.APL), // APL
-																RadarEntry(value: snapshot.data!.iEfficiency*3) // I Piece Efficiency
-															],
-														),
-														RadarDataSet(
-															fillColor: Colors.transparent,
-															borderColor: Colors.transparent,
-															dataEntries: [
-																RadarEntry(value: 3),
-																RadarEntry(value: 0),
-																RadarEntry(value: 0),
-																RadarEntry(value: 0),
-																RadarEntry(value: 0),
-																RadarEntry(value: 0)
-															],
-														),
-													]
-												)
-											),
-										),
-									)
-								),
-								Card(
-									child: Padding(
-										padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-										child: Column(
-											children: [
-												Text("Attacks Cancelled", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
-												SfLinearGauge(
-													minimum: 0,
-													maximum: 3.00,
-													interval: 0.25, 
-													showAxisTrack: false,
-													ranges: [
-														LinearGaugeRange(
-															startValue: 0,
-															endValue: snapshot.data!.attackCancelled.clean,
-															startWidth: 25,
-															endWidth: 25,
-															color: Color.fromRGBO(116, 180, 155, 1),
-															position: LinearElementPosition.cross
-														),
-														LinearGaugeRange(
-															startValue: snapshot.data!.attackCancelled.clean,
-															endValue: snapshot.data!.attackCancelled.sum,
-															startWidth: 25,
-															endWidth: 25,
-															color: Color.fromRGBO(73, 76, 162, 1),
-															position: LinearElementPosition.cross
-														)
-													],
-													isMirrored: false,
-													showTicks: true,
-													showLabels: false
-												),
-												Wrap(
-													direction: Axis.horizontal,
-													crossAxisAlignment: WrapCrossAlignment.center,
-													spacing: 20,
-													children: [
-														Row(
-															mainAxisSize: MainAxisSize.min,
-															children: [
-																Padding(
-																	padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																	child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Color.fromRGBO(116, 180, 155, 1))),
-																),
-																Text("Clean: ${f3.format(snapshot.data!.attackCancelled.clean)}")
-															],
-														),
-														Row(
-															mainAxisSize: MainAxisSize.min,
-															children: [
-																Padding(
-																	padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																	child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Color.fromRGBO(73, 76, 162, 1))),
-																),
-																Text("Cheesy: ${f3.format(snapshot.data!.attackCancelled.cheesy)}")
-															],
-														),
-													],
-												),
-												SizedBox(height: 8.0),
-												Text("Lines Cancelled", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
-												SfLinearGauge(
-													minimum: 0,
-													maximum: 3.00,
-													interval: 0.25,
-													showAxisTrack: false,
-													ranges: [
-														LinearGaugeRange(
-															startValue: 0,
-															endValue: snapshot.data!.linesCancelled.clean,
-															startWidth: 25,
-															endWidth: 25,
-															color: Color.fromRGBO(246, 114, 128, 1),
-															position: LinearElementPosition.cross
-														),
-														LinearGaugeRange(
-															startValue: snapshot.data!.linesCancelled.clean,
-															endValue: snapshot.data!.linesCancelled.sum,
-															startWidth: 25,
-															endWidth: 25,
-															color: Color.fromRGBO(248, 177, 149, 1),
-															position: LinearElementPosition.cross
-														)
-													],
-													isMirrored: false,
-													showTicks: true,
-													showLabels: false
-												),
-												Wrap(
-													direction: Axis.horizontal,
-													crossAxisAlignment: WrapCrossAlignment.center,
-													spacing: 20,
-													children: [
-														Row(
-															mainAxisSize: MainAxisSize.min,
-															children: [
-																Padding(
-																	padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																	child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Color.fromRGBO(246, 114, 128, 1))),
-																),
-																Text("Clean: ${f3.format(snapshot.data!.linesCancelled.clean)}")
-															],
-														),
-														Row(
-															mainAxisSize: MainAxisSize.min,
-															children: [
-																Padding(
-																	padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																	child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Color.fromRGBO(248, 177, 149, 1))),
-																),
-																Text("Cheesy: ${f3.format(snapshot.data!.linesCancelled.cheesy)}")
-															],
-														),
-													],
-												),
-											],
-										),
-									),
-								),
-								Card(
-									child: Padding(
-										padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-										child: Wrap(
-											spacing: 20.0,
-											runSpacing: 20.0,
-											children: [
-												Tooltip(
-													message: "calculated by looking at the send lines distribution of the player and seeing how hard it is to downstack it",
-													child: GaugetThingy(
-														value: snapshot.data!.attackCheesiness,
-														min: 0, max: 2.0, tickInterval: .5,
-														label: "Attack\nCheesiness",
-														sideSize: 128.0, fractionDigits: 3,
-														moreIsBetter: true,
-													)
-												),
-												Tooltip(
-													message: "iaiiaiaiaia",
-													child: GaugetThingy(
-														value: snapshot.data!.APL,
-														min: 0, max: 2.0, tickInterval: .5,
-														label: "Attack\nPer Line",
-														sideSize: 128.0, fractionDigits: 3,
-														moreIsBetter: true,
-													)
-												),
-												Tooltip(
-													message: "iaiiaiaiaia",
-													child: GaugetThingy(
-														value: snapshot.data!.APP,
-														min: 0, max: 2.0, tickInterval: .5,
-														label: "Attack\nPer Piece",
-														sideSize: 128.0, fractionDigits: 3,
-														moreIsBetter: true,
-													)
-												),
-												Tooltip(
-													message: "iaiiaiaiaia",
-													child: GaugetThingy(
-														value: snapshot.data!.KPP,
-														min: 0, max: 5.0, tickInterval: 1,
-														label: "Keypresses\nPer Piece",
-														sideSize: 128.0, fractionDigits: 3,
-														moreIsBetter: false,
-													)
-												),
-												Tooltip(
-													message: "iaiiaiaiaia",
-													child: GaugetThingy(
-														value: snapshot.data!.KPS,
-														min: 0, max: 20, tickInterval: 5,
-														label: "Keypresses\nPer Second",
-														sideSize: 128.0, fractionDigits: 2,
-														moreIsBetter: true,
-													)
-												),
-											],
-										),
-									),
-								),
-								Card(
-									child: Padding(
-										padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-										child: Column(
-										children: [
-											Text("Surge Stats", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
-											Wrap(
-												spacing: 20.0,
-												runSpacing: 20.0,
-												children: [
-													Tooltip(
-														message: "wqeqwe",
-														child: GaugetThingy(
-															value: snapshot.data!.surgeAPM,
-															min: 0, max: 400.0, tickInterval: 100,
-															label: "Surge\nAPM",
-															sideSize: 128.0, fractionDigits: 2,
-															moreIsBetter: true,
-														)
-													),
-													Tooltip(
-														message: "iaiiaiaiaia",
-														child: GaugetThingy(
-															value: snapshot.data!.surgePPS,
-															min: 0, max: 3.0, tickInterval: 1.0,
-															label: "Surge\nPPS",
-															sideSize: 128.0, fractionDigits: 3,
-															moreIsBetter: false,
-														)
-													),
-													Tooltip(
-														message: "iaiiaiaiaia",
-														child: GaugetThingy(
-															value: snapshot.data!.surgeAPL,
-															min: 0, max: 4.0, tickInterval: 1.0,
-															label: "Surge\nAPL",
-															sideSize: 128.0, fractionDigits: 3,
-															moreIsBetter: true,
-														)
-													),
-													Tooltip(
-														message: "iaiiaiaiaia",
-														child: GaugetThingy(
-															value: snapshot.data!.surgeDS,
-															min: 0, max: 10.0, tickInterval: 2.0,
-															label: "Surge\nDownstack",
-															sideSize: 128.0, fractionDigits: 3,
-															moreIsBetter: true,
-														)
-													),
-													Tooltip(
-														message: "iaiiaiaiaia",
-														child: GaugetThingy(
-															value: snapshot.data!.surgeLength,
-															min: 0, max: 20, tickInterval: 5,
-															label: "Surge\nLength",
-															sideSize: 128.0, fractionDigits: 2,
-															moreIsBetter: true,
-														)
-													),
-													Tooltip(
-														message: "iaiiaiaiaia",
-														child: GaugetThingy(
-															value: snapshot.data!.surgeRate,
-															min: 0, max: 1, tickInterval: .2,
-															label: "Surge\nRate",
-															sideSize: 128.0, fractionDigits: 3,
-															moreIsBetter: true,
-														)
-													),
-													Tooltip(
-														message: "iaiiaiaiaia",
-														child: GaugetThingy(
-															value: snapshot.data!.surgeSecsPerCheese,
-															min: 0, max: 1, tickInterval: .2,
-															label: "Surge Secs\nPer Cheese",
-															sideSize: 128.0, fractionDigits: 3,
-															moreIsBetter: true,
-														)
-													),
-													Tooltip(
-														message: "iaiiaiaiaia",
-														child: GaugetThingy(
-															value: snapshot.data!.surgeSecsPerDS,
-															min: 0, max: 1, tickInterval: .2,
-															label: "Surge Secs\nPer DS",
-															sideSize: 128.0, fractionDigits: 3,
-															moreIsBetter: true,
-														)
-													),
-													Tooltip(
-														message: "iaiiaiaiaia",
-														child: GaugetThingy(
-															value: snapshot.data!.surgeAllspin,
-															min: 0, max: 1, tickInterval: .2,
-															label: "Surge\nAll Spin",
-															sideSize: 128.0, fractionDigits: 3,
-															moreIsBetter: true,
-														)
-													),
-												],
-											),
-										],
-										),
-									),
-								)
-							],
-						);
-					}
-					if (snapshot.hasError){ return SizedBox(height: 720.0, child: FutureError(snapshot)); }
-				}
-			return const Text("what?");
-			},
-		);
-	}
+	// Widget getFreyhoeAnalysis(double width){
+	// 	return FutureBuilder<MinomuncherData>(
+	// 		future: teto.fetchMinoMuncherStats("bozo"),
+	// 		builder: (context, snapshot) {
+	// 			switch (snapshot.connectionState){
+	// 			case ConnectionState.none:
+	// 			case ConnectionState.waiting:
+	// 			case ConnectionState.active:
+	// 				return const Center(child: CircularProgressIndicator());
+	// 			case ConnectionState.done:
+	// 				if (snapshot.hasData){
+	// 					List<ClearsChartData> clearTypeList = [snapshot.data!.clearTypes];
+	// 					List<LinearGaugeRange> apmRanges = [
+	// 					LinearGaugeRange(
+	// 						startValue: 0,
+	// 						endValue: snapshot.data!.openerAPM,
+	// 						startWidth: 25,
+	// 						endWidth: 25,
+	// 						color: Colors.yellow,
+	// 						position: LinearElementPosition.cross
+	// 					),
+	// 					LinearGaugeRange(
+	// 						startValue: 0,
+	// 						endValue: snapshot.data!.APM,
+	// 						startWidth: 25,
+	// 						endWidth: 25,
+	// 						color: Colors.orange,
+	// 						position: LinearElementPosition.cross
+	// 					),
+	// 					LinearGaugeRange(
+	// 						startValue: 0,
+	// 						endValue: snapshot.data!.midgameAPM,
+	// 						startWidth: 25,
+	// 						endWidth: 25,
+	// 						color: Colors.red,
+	// 						position: LinearElementPosition.cross
+	// 					)
+	// 					];
+	// 					List<LinearGaugeRange> ppsRanges = [
+	// 					LinearGaugeRange(
+	// 						startValue: 0,
+	// 						endValue: snapshot.data!.openerPPS,
+	// 						startWidth: 25,
+	// 						endWidth: 25,
+	// 						color: Colors.yellow,
+	// 						position: LinearElementPosition.cross
+	// 					),
+	// 					LinearGaugeRange(
+	// 						startValue: 0,
+	// 						endValue: snapshot.data!.PPS,
+	// 						startWidth: 25,
+	// 						endWidth: 25,
+	// 						color: Colors.orange,
+	// 						position: LinearElementPosition.cross
+	// 					),
+	// 					LinearGaugeRange(
+	// 						startValue: 0,
+	// 						endValue: snapshot.data!.midgamePPS,
+	// 						startWidth: 25,
+	// 						endWidth: 25,
+	// 						color: Colors.red,
+	// 						position: LinearElementPosition.cross
+	// 					)
+	// 					];
+	// 					apmRanges.sort((a, b) => a.endValue > b.endValue ? -1 : 1);
+	// 					ppsRanges.sort((a, b) => a.endValue > b.endValue ? -1 : 1);
+	// 					return Column(
+	// 						children: [
+	// 							Text("This card shows icly analysis. Just a design mockup. WIP"),
+	// 							Card(
+	// 								child: Padding(
+	// 									padding: const EdgeInsets.only(bottom: 4.0),
+	// 									child: Center(
+	// 										child: Column(
+	// 											mainAxisSize: MainAxisSize.min,
+	// 											crossAxisAlignment: CrossAxisAlignment.center,
+	// 											children: [
+	// 												Text("Analysis", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleMedium),
+	// 												Padding(
+	// 													padding: const EdgeInsets.only(top: 4.0),
+	// 													child: Text("via MinoMuncher by Freyhoe", textAlign: TextAlign.center, style: widget.constraints.maxWidth > 768.0 ? null : TextStyle(fontSize: 12.0)),
+	// 												)
+	// 											],
+	// 										),
+	// 									),
+	// 								),
+	// 							),
+	// 							Card(
+	// 								child: Padding(
+	// 									padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
+	// 									child: Center(
+	// 										child: Column(
+	// 											mainAxisSize: MainAxisSize.min,
+	// 											crossAxisAlignment: CrossAxisAlignment.center,
+	// 											children: [
+	// 												SfLinearGauge(
+	// 													minimum: 0,
+	// 													maximum: 300,
+	// 													interval: 25, 
+	// 													ranges: apmRanges,
+	// 													markerPointers: [
+	// 														LinearWidgetPointer(value: 0, child: Container(width: 36.0, child: Text("APM")), markerAlignment: LinearMarkerAlignment.end)
+	// 													],
+	// 													isMirrored: false,
+	// 													showTicks: true,
+	// 													showLabels: false
+	// 												),
+	// 												SizedBox(height: 8.0),
+	// 												SfLinearGauge(
+	// 													minimum: 0,
+	// 													maximum: 4.00,
+	// 													interval: .25, 
+	// 													ranges: ppsRanges,
+	// 													markerPointers: [
+	// 														LinearWidgetPointer(value: 0, child: Container(width: 36.0, child: Text("PPS")), markerAlignment: LinearMarkerAlignment.end)
+	// 													],
+	// 													isMirrored: false,
+	// 													showTicks: true,
+	// 													showLabels: false
+	// 												),
+	// 												SizedBox(height: 8.0),
+	// 												Wrap(
+	// 													direction: Axis.horizontal,
+	// 													crossAxisAlignment: WrapCrossAlignment.center,
+	// 													spacing: 20,
+	// 													children: [
+	// 														Row(
+	// 															mainAxisSize: MainAxisSize.min,
+	// 															children: [
+	// 																Padding(
+	// 																	padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+	// 																	child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.red)),
+	// 																),
+	// 																Text("Midgame: ${f2.format(snapshot.data!.midgameAPM)} APM, ${f2.format(snapshot.data!.midgamePPS)} PPS")
+	// 															],
+	// 														),
+	// 														Row(
+	// 															mainAxisSize: MainAxisSize.min,
+	// 															children: [
+	// 																Padding(
+	// 																	padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+	// 																	child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.orange)),
+	// 																),
+	// 																Text("Overall: ${f2.format(snapshot.data!.APM)} APM, ${f2.format(snapshot.data!.PPS)} PPS")
+	// 															],
+	// 														),
+	// 														Row(
+	// 															mainAxisSize: MainAxisSize.min,
+	// 															children: [
+	// 																Padding(
+	// 																	padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+	// 																	child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.yellow)),
+	// 																),
+	// 																Text("Opener: ${f2.format(snapshot.data!.openerAPM)} APM, ${f2.format(snapshot.data!.openerPPS)} PPS")
+	// 															],
+	// 														),
+	// 													],
+	// 												),
+	// 											],
+	// 										),
+	// 									),
+	// 								),
+	// 							),
+	// 							Card(
+	// 								child: Padding(
+	// 									padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0),
+	// 									child: Column(
+	// 										children: [
+	// 											SfCartesianChart(
+	// 												primaryXAxis: CategoryAxis(isVisible: false),
+	// 												primaryYAxis: NumericAxis(minimum: 0, maximum: 100),
+	// 												title: ChartTitle(text: "Clear Types", textStyle: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+	// 												legend: Legend(
+	// 													isVisible: true,
+	// 													position: LegendPosition.left,
+	// 													itemPadding: 2,
+	// 													legendItemBuilder: (legendText, series, point, seriesIndex) {
+	// 														return Container(
+	// 															height: 20,
+	// 															width: 210,
+	// 															child: Row(
+	// 																mainAxisAlignment: MainAxisAlignment.spaceBetween,
+	// 																children: [
+	// 																	Row(
+	// 																		mainAxisSize: MainAxisSize.min,
+	// 																	children: [
+	// 																			Padding(
+	// 																				padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+	// 																				child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: lineClearsColors[seriesIndex])),
+	// 																			),
+	// 																		Text("${snapshot.data!.clearTypes.clearName[seriesIndex]}:"),
+	// 																	],
+	// 																	),
+	// 																	Text("${intf.format(point.y)} (${percentage.format(point.y!/snapshot.data!.clearTypes.total)})")
+	// 																],
+	// 															),
+	// 														);
+	// 													}, 
+	// 												),
+	// 												series: width > 580 ? <CartesianSeries>[
+	// 													StackedBar100Series<ClearsChartData, String>(
+	// 														dataSource: clearTypeList,
+	// 														xValueMapper: (ClearsChartData data, _) => data.nick,
+	// 														yValueMapper: (ClearsChartData data, _) => data.perfectClear,
+	// 														pointColorMapper: (ClearsChartData data, _) => lineClearsColors[0]
+	// 													),
+	// 													StackedBar100Series<ClearsChartData, String>(
+	// 														dataSource: clearTypeList,
+	// 														xValueMapper: (ClearsChartData data, _) => data.nick,
+	// 														yValueMapper: (ClearsChartData data, _) => data.allspin,
+	// 														pointColorMapper: (ClearsChartData data, _) => lineClearsColors[1]
+	// 													),
+	// 													StackedBar100Series<ClearsChartData, String>(
+	// 														dataSource: clearTypeList,
+	// 														xValueMapper: (ClearsChartData data, _) => data.nick,
+	// 														yValueMapper: (ClearsChartData data, _) => data.single,
+	// 														pointColorMapper: (ClearsChartData data, _) => lineClearsColors[2]
+	// 													),
+	// 													StackedBar100Series<ClearsChartData, String>(
+	// 														dataSource: clearTypeList,
+	// 														xValueMapper: (ClearsChartData data, _) => data.nick,
+	// 														yValueMapper: (ClearsChartData data, _) => data.tspinSingle,
+	// 														pointColorMapper: (ClearsChartData data, _) => lineClearsColors[3]
+	// 													),
+	// 													StackedBar100Series<ClearsChartData, String>(
+	// 														dataSource: clearTypeList,
+	// 														xValueMapper: (ClearsChartData data, _) => data.nick,
+	// 														yValueMapper: (ClearsChartData data, _) => data.double,
+	// 														pointColorMapper: (ClearsChartData data, _) => lineClearsColors[4]
+	// 													),
+	// 													StackedBar100Series<ClearsChartData, String>(
+	// 														dataSource: clearTypeList,
+	// 														xValueMapper: (ClearsChartData data, _) => data.nick,
+	// 														yValueMapper: (ClearsChartData data, _) => data.tspinDouble,
+	// 														pointColorMapper: (ClearsChartData data, _) => lineClearsColors[5]
+	// 													),
+	// 													StackedBar100Series<ClearsChartData, String>(
+	// 														dataSource: clearTypeList,
+	// 														xValueMapper: (ClearsChartData data, _) => data.nick,
+	// 														yValueMapper: (ClearsChartData data, _) => data.triple,
+	// 														pointColorMapper: (ClearsChartData data, _) => lineClearsColors[6]
+	// 													),
+	// 													StackedBar100Series<ClearsChartData, String>(
+	// 														dataSource: clearTypeList,
+	// 														xValueMapper: (ClearsChartData data, _) => data.nick,
+	// 														yValueMapper: (ClearsChartData data, _) => data.tspinTriple,
+	// 														pointColorMapper: (ClearsChartData data, _) => lineClearsColors[7]
+	// 													),
+	// 													StackedBar100Series<ClearsChartData, String>(
+	// 														dataSource: clearTypeList,
+	// 														xValueMapper: (ClearsChartData data, _) => data.nick,
+	// 														yValueMapper: (ClearsChartData data, _) => data.quad,
+	// 														pointColorMapper: (ClearsChartData data, _) => lineClearsColors[8]
+	// 													),
+	// 												] : <CartesianSeries>[
+	// 													StackedColumn100Series<ClearsChartData, String>(
+	// 														dataSource: clearTypeList,
+	// 														xValueMapper: (ClearsChartData data, _) => data.nick,
+	// 														yValueMapper: (ClearsChartData data, _) => data.perfectClear,
+	// 														pointColorMapper: (ClearsChartData data, _) => lineClearsColors[0]
+	// 													),
+	// 													StackedColumn100Series<ClearsChartData, String>(
+	// 														dataSource: clearTypeList,
+	// 														xValueMapper: (ClearsChartData data, _) => data.nick,
+	// 														yValueMapper: (ClearsChartData data, _) => data.allspin,
+	// 														pointColorMapper: (ClearsChartData data, _) => lineClearsColors[1]
+	// 													),
+	// 													StackedColumn100Series<ClearsChartData, String>(
+	// 														dataSource: clearTypeList,
+	// 														xValueMapper: (ClearsChartData data, _) => data.nick,
+	// 														yValueMapper: (ClearsChartData data, _) => data.single,
+	// 														pointColorMapper: (ClearsChartData data, _) => lineClearsColors[2]
+	// 													),
+	// 													StackedColumn100Series<ClearsChartData, String>(
+	// 														dataSource: clearTypeList,
+	// 														xValueMapper: (ClearsChartData data, _) => data.nick,
+	// 														yValueMapper: (ClearsChartData data, _) => data.tspinSingle,
+	// 														pointColorMapper: (ClearsChartData data, _) => lineClearsColors[3]
+	// 													),
+	// 													StackedColumn100Series<ClearsChartData, String>(
+	// 														dataSource: clearTypeList,
+	// 														xValueMapper: (ClearsChartData data, _) => data.nick,
+	// 														yValueMapper: (ClearsChartData data, _) => data.double,
+	// 														pointColorMapper: (ClearsChartData data, _) => lineClearsColors[4]
+	// 													),
+	// 													StackedColumn100Series<ClearsChartData, String>(
+	// 														dataSource: clearTypeList,
+	// 														xValueMapper: (ClearsChartData data, _) => data.nick,
+	// 														yValueMapper: (ClearsChartData data, _) => data.tspinDouble,
+	// 														pointColorMapper: (ClearsChartData data, _) => lineClearsColors[5]
+	// 													),
+	// 													StackedColumn100Series<ClearsChartData, String>(
+	// 														dataSource: clearTypeList,
+	// 														xValueMapper: (ClearsChartData data, _) => data.nick,
+	// 														yValueMapper: (ClearsChartData data, _) => data.triple,
+	// 														pointColorMapper: (ClearsChartData data, _) => lineClearsColors[6]
+	// 													),
+	// 													StackedColumn100Series<ClearsChartData, String>(
+	// 														dataSource: clearTypeList,
+	// 														xValueMapper: (ClearsChartData data, _) => data.nick,
+	// 														yValueMapper: (ClearsChartData data, _) => data.tspinTriple,
+	// 														pointColorMapper: (ClearsChartData data, _) => lineClearsColors[7]
+	// 													),
+	// 													StackedColumn100Series<ClearsChartData, String>(
+	// 														dataSource: clearTypeList,
+	// 														xValueMapper: (ClearsChartData data, _) => data.nick,
+	// 														yValueMapper: (ClearsChartData data, _) => data.quad,
+	// 														pointColorMapper: (ClearsChartData data, _) => lineClearsColors[8]
+	// 													),
+	// 												]
+	// 											),
+	// 										],
+	// 									),
+	// 								)
+	// 							),
+	// 							Card(
+	// 								child: Padding(
+	// 									padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0),
+	// 									child: Column(
+	// 										children: [
+	// 											SfCartesianChart(
+	// 												primaryXAxis: CategoryAxis(),
+	// 												primaryYAxis: NumericAxis(numberFormat: percentage),
+	// 												tooltipBehavior: TooltipBehavior(
+	// 													enable: true,
+	// 													color: Colors.black,
+	// 													borderColor: Colors.white,
+	// 													animationDuration: 0,
+	// 													builder: (dynamic data, dynamic point, dynamic series,
+	// 														int pointIndex, int seriesIndex) {
+	// 															return Padding(
+	// 																padding: const EdgeInsets.all(8.0),
+	// 																child: Text(
+	// 																	"${percentage.format(data.value)}",
+	// 																	style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 20),
+	// 																),
+	// 															);
+	// 													}
+	// 												),
+	// 												title: ChartTitle(text: "Well Column Distribution", textStyle: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+	// 												series: <CartesianSeries>[
+	// 													ColumnSeries<WellsData, int>(
+	// 															dataSource: snapshot.data!.wellColumns,
+	// 															xValueMapper: (WellsData data, _) => data.well,
+	// 															yValueMapper: (WellsData data, _) => data.value
+	// 													)
+	// 												]
+	// 											),
+	// 										],
+	// 									),
+	// 								)
+	// 							),
+	// 							Card(
+	// 								child: Padding(
+	// 									padding: const EdgeInsets.all(32.0),
+	// 									child: Wrap(
+	// 										spacing: 25.0,
+	// 										runSpacing: 25.0,
+	// 									  	children: [
+	// 									    SizedBox(
+	// 									    	height: 330,
+	// 									    	width: 330,
+	// 									    	child: MyRadarChart(
+	// 									    		RadarChartData(
+	// 									    			radarShape: RadarShape.circle,
+	// 									    			tickCount: 4,
+	// 									    			radarBackgroundColor: Colors.black.withAlpha(170),
+	// 									    			radarBorderData: const BorderSide(color: Colors.white24, width: 1),
+	// 									    			gridBorderData: const BorderSide(color: Colors.white24, width: 1),
+	// 									    			tickBorderData: const BorderSide(color: Colors.white24, width: 1),
+	// 									    			getTitle: (index, angle) {
+	// 									    				switch (index) {
+	// 									    					case 0: // TODO: Replace with Upstack APL when that becomes avaliable
+	// 									    						return RadarChartTitle(text: "Upstack APL\n${f2.format(snapshot.data!.APL)}", positionPercentageOffset: 0.05);
+	// 									    					case 1:
+	// 									    						return RadarChartTitle(text: "Cheese APL\n${f2.format(snapshot.data!.cheeseAPL)}", positionPercentageOffset: 0.05);
+	// 									    					case 2:
+	// 									    						return RadarChartTitle(text: "T Piece Efficiency\n${percentage.format(snapshot.data!.tEfficiency)}", positionPercentageOffset: 0.05);
+	// 									    					case 3:
+	// 									    						return RadarChartTitle(text: "Downstack APL\n${f2.format(snapshot.data!.downstackAPL)}", positionPercentageOffset: 0.05);
+	// 									    					case 4:
+	// 									    						return RadarChartTitle(text: "Attack Per Line\n${f2.format(snapshot.data!.APL)}", positionPercentageOffset: 0.05);
+	// 									    					case 5:
+	// 									    						return RadarChartTitle(text: "I Piece Efficiency\n${percentage.format(snapshot.data!.iEfficiency)}", positionPercentageOffset: 0.05);
+	// 									    					default:
+	// 									    						return const RadarChartTitle(text: '');
+	// 									    				}
+	// 									    			},
+	// 									    			dataSets: [
+	// 									    				RadarDataSet(
+	// 									    					fillColor: Theme.of(context).colorScheme.primary.withAlpha(170),
+	// 									    					borderColor: Theme.of(context).colorScheme.primary,
+	// 									    					dataEntries: [
+	// 									    						RadarEntry(value: snapshot.data!.APL), // TODO: and here too
+	// 									    						RadarEntry(value: snapshot.data!.cheeseAPL), // Cheese APL
+	// 									    						RadarEntry(value: snapshot.data!.tEfficiency*3), // T Piece Efficiency
+	// 									    						RadarEntry(value: snapshot.data!.downstackAPL), // Downstack APL
+	// 									    						RadarEntry(value: snapshot.data!.APL), // APL
+	// 									    						RadarEntry(value: snapshot.data!.iEfficiency*3) // I Piece Efficiency
+	// 									    					],
+	// 									    				),
+	// 									    				RadarDataSet(
+	// 									    					fillColor: Colors.transparent,
+	// 									    					borderColor: Colors.transparent,
+	// 									    					dataEntries: [
+	// 									    						RadarEntry(value: 3),
+	// 									    						RadarEntry(value: 0),
+	// 									    						RadarEntry(value: 0),
+	// 									    						RadarEntry(value: 0),
+	// 									    						RadarEntry(value: 0),
+	// 									    						RadarEntry(value: 0)
+	// 									    					],
+	// 									    				),
+	// 									    			]
+	// 									    		)
+	// 									    	),
+	// 									    ),
+	// 										SizedBox(
+	// 											height: 330,
+	// 											width: 330,
+	// 											child: MyRadarChart(
+	// 											RadarChartData(
+	// 												radarShape: RadarShape.circle,
+	// 												tickCount: 4,
+	// 												radarBackgroundColor: Colors.black.withAlpha(170),
+	// 												radarBorderData: const BorderSide(color: Colors.white24, width: 1),
+	// 												gridBorderData: const BorderSide(color: Colors.white24, width: 1),
+	// 												tickBorderData: const BorderSide(color: Colors.white24, width: 1),
+	// 												getTitle: (index, angle) {
+	// 													switch (index) {
+	// 														case 0:
+	// 															return RadarChartTitle(text: "Surge APM\n${f2.format(snapshot.data!.surgeAPM)}", positionPercentageOffset: 0.05);
+	// 														case 1:
+	// 															return RadarChartTitle(text: "Surge PPS\n${f2.format(snapshot.data!.surgePPS)}", positionPercentageOffset: 0.05);
+	// 														case 2:
+	// 															return RadarChartTitle(text: "Surge APL\n${f2.format(snapshot.data!.surgeAPL)}", positionPercentageOffset: 0.05);
+	// 														case 3:
+	// 															return RadarChartTitle(text: "Surge DS\n${f2.format(snapshot.data!.surgeDS)}", positionPercentageOffset: 0.05);
+	// 														case 4:
+	// 															return RadarChartTitle(text: "Surge Length\n${f2.format(snapshot.data!.surgeLength)}", positionPercentageOffset: 0.05);
+	// 														case 5:
+	// 															return RadarChartTitle(text: "Surge Rate\n${percentage.format(snapshot.data!.surgeRate)}", positionPercentageOffset: 0.05);
+	// 														case 6:
+	// 															return RadarChartTitle(text: "Surge Allspin\n${percentage.format(snapshot.data!.surgeAllspin)}", positionPercentageOffset: 0.05);
+	// 														default:
+	// 															return const RadarChartTitle(text: '');
+	// 													}
+	// 												},
+	// 												dataSets: [
+	// 													RadarDataSet(
+	// 														fillColor: Theme.of(context).colorScheme.primary.withAlpha(170),
+	// 														borderColor: Theme.of(context).colorScheme.primary,
+	// 														dataEntries: [
+	// 															RadarEntry(value: snapshot.data!.surgeAPM/460),
+	// 															RadarEntry(value: snapshot.data!.surgePPS),
+	// 															RadarEntry(value: snapshot.data!.surgeAPL/3),
+	// 															RadarEntry(value: snapshot.data!.surgeDS/10),
+	// 															RadarEntry(value: snapshot.data!.surgeLength/10),
+	// 															RadarEntry(value: snapshot.data!.surgeRate),
+	// 															RadarEntry(value: snapshot.data!.surgeAllspin)
+	// 														],
+	// 													),
+	// 													RadarDataSet(
+	// 														fillColor: Colors.transparent,
+	// 														borderColor: Colors.transparent,
+	// 														dataEntries: [
+	// 															RadarEntry(value: 1),
+	// 															RadarEntry(value: 0),
+	// 															RadarEntry(value: 0),
+	// 															RadarEntry(value: 0),
+	// 															RadarEntry(value: 0),
+	// 															RadarEntry(value: 0),
+	// 															RadarEntry(value: 0)
+	// 														],
+	// 													),
+	// 												]
+	// 											)
+	// 											),
+	// 										),
+	// 									  ],
+	// 									),
+	// 								)
+	// 							),
+	// 							Card(
+	// 								child: Padding(
+	// 									padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+	// 									child: Column(
+	// 										children: [
+	// 											Text("Attacks Cancelled", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+	// 											SfLinearGauge(
+	// 												minimum: 0,
+	// 												maximum: 3.00,
+	// 												interval: 0.25, 
+	// 												showAxisTrack: false,
+	// 												ranges: [
+	// 													LinearGaugeRange(
+	// 														startValue: 0,
+	// 														endValue: snapshot.data!.attackCancelled.clean,
+	// 														startWidth: 25,
+	// 														endWidth: 25,
+	// 														color: Color.fromRGBO(116, 180, 155, 1),
+	// 														position: LinearElementPosition.cross
+	// 													),
+	// 													LinearGaugeRange(
+	// 														startValue: snapshot.data!.attackCancelled.clean,
+	// 														endValue: snapshot.data!.attackCancelled.sum,
+	// 														startWidth: 25,
+	// 														endWidth: 25,
+	// 														color: Color.fromRGBO(73, 76, 162, 1),
+	// 														position: LinearElementPosition.cross
+	// 													)
+	// 												],
+	// 												isMirrored: false,
+	// 												showTicks: true,
+	// 												showLabels: false
+	// 											),
+	// 											Wrap(
+	// 												direction: Axis.horizontal,
+	// 												crossAxisAlignment: WrapCrossAlignment.center,
+	// 												spacing: 20,
+	// 												children: [
+	// 													Row(
+	// 														mainAxisSize: MainAxisSize.min,
+	// 														children: [
+	// 															Padding(
+	// 																padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+	// 																child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Color.fromRGBO(116, 180, 155, 1))),
+	// 															),
+	// 															Text("Clean: ${f3.format(snapshot.data!.attackCancelled.clean)}")
+	// 														],
+	// 													),
+	// 													Row(
+	// 														mainAxisSize: MainAxisSize.min,
+	// 														children: [
+	// 															Padding(
+	// 																padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+	// 																child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Color.fromRGBO(73, 76, 162, 1))),
+	// 															),
+	// 															Text("Cheesy: ${f3.format(snapshot.data!.attackCancelled.cheesy)}")
+	// 														],
+	// 													),
+	// 												],
+	// 											),
+	// 											SizedBox(height: 8.0),
+	// 											Text("Lines Cancelled", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+	// 											SfLinearGauge(
+	// 												minimum: 0,
+	// 												maximum: 3.00,
+	// 												interval: 0.25,
+	// 												showAxisTrack: false,
+	// 												ranges: [
+	// 													LinearGaugeRange(
+	// 														startValue: 0,
+	// 														endValue: snapshot.data!.linesCancelled.clean,
+	// 														startWidth: 25,
+	// 														endWidth: 25,
+	// 														color: Color.fromRGBO(246, 114, 128, 1),
+	// 														position: LinearElementPosition.cross
+	// 													),
+	// 													LinearGaugeRange(
+	// 														startValue: snapshot.data!.linesCancelled.clean,
+	// 														endValue: snapshot.data!.linesCancelled.sum,
+	// 														startWidth: 25,
+	// 														endWidth: 25,
+	// 														color: Color.fromRGBO(248, 177, 149, 1),
+	// 														position: LinearElementPosition.cross
+	// 													)
+	// 												],
+	// 												isMirrored: false,
+	// 												showTicks: true,
+	// 												showLabels: false
+	// 											),
+	// 											Wrap(
+	// 												direction: Axis.horizontal,
+	// 												crossAxisAlignment: WrapCrossAlignment.center,
+	// 												spacing: 20,
+	// 												children: [
+	// 													Row(
+	// 														mainAxisSize: MainAxisSize.min,
+	// 														children: [
+	// 															Padding(
+	// 																padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+	// 																child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Color.fromRGBO(246, 114, 128, 1))),
+	// 															),
+	// 															Text("Clean: ${f3.format(snapshot.data!.linesCancelled.clean)}")
+	// 														],
+	// 													),
+	// 													Row(
+	// 														mainAxisSize: MainAxisSize.min,
+	// 														children: [
+	// 															Padding(
+	// 																padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+	// 																child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Color.fromRGBO(248, 177, 149, 1))),
+	// 															),
+	// 															Text("Cheesy: ${f3.format(snapshot.data!.linesCancelled.cheesy)}")
+	// 														],
+	// 													),
+	// 												],
+	// 											),
+	// 										],
+	// 									),
+	// 								),
+	// 							),
+	// 							Card(
+	// 								child: Padding(
+	// 									padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+	// 									child: Wrap(
+	// 										spacing: 20.0,
+	// 										runSpacing: 20.0,
+	// 										children: [
+	// 											Tooltip(
+	// 												message: "calculated by looking at the send lines distribution of the player and seeing how hard it is to downstack it",
+	// 												child: GaugetThingy(
+	// 													value: snapshot.data!.attackCheesiness,
+	// 													min: 0, max: 2.0, tickInterval: .5,
+	// 													label: "Attack\nCheesiness",
+	// 													sideSize: 128.0, fractionDigits: 3,
+	// 													moreIsBetter: true,
+	// 												)
+	// 											),
+	// 											Tooltip(
+	// 												message: "iaiiaiaiaia",
+	// 												child: GaugetThingy(
+	// 													value: snapshot.data!.APL,
+	// 													min: 0, max: 2.0, tickInterval: .5,
+	// 													label: "Attack\nPer Line",
+	// 													sideSize: 128.0, fractionDigits: 3,
+	// 													moreIsBetter: true,
+	// 												)
+	// 											),
+	// 											Tooltip(
+	// 												message: "iaiiaiaiaia",
+	// 												child: GaugetThingy(
+	// 													value: snapshot.data!.APP,
+	// 													min: 0, max: 2.0, tickInterval: .5,
+	// 													label: "Attack\nPer Piece",
+	// 													sideSize: 128.0, fractionDigits: 3,
+	// 													moreIsBetter: true,
+	// 												)
+	// 											),
+	// 											Tooltip(
+	// 												message: "iaiiaiaiaia",
+	// 												child: GaugetThingy(
+	// 													value: snapshot.data!.KPP,
+	// 													min: 0, max: 5.0, tickInterval: 1,
+	// 													label: "Keypresses\nPer Piece",
+	// 													sideSize: 128.0, fractionDigits: 3,
+	// 													moreIsBetter: false,
+	// 												)
+	// 											),
+	// 											Tooltip(
+	// 												message: "iaiiaiaiaia",
+	// 												child: GaugetThingy(
+	// 													value: snapshot.data!.KPS,
+	// 													min: 0, max: 20, tickInterval: 5,
+	// 													label: "Keypresses\nPer Second",
+	// 													sideSize: 128.0, fractionDigits: 2,
+	// 													moreIsBetter: true,
+	// 												)
+	// 											),
+	// 										],
+	// 									),
+	// 								),
+	// 							),
+	// 							// Card(
+	// 							// 	child: Padding(
+	// 							// 		padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+	// 							// 		child: Column(
+	// 							// 		children: [
+	// 							// 			Text("Surge Stats", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+	// 							// 			Wrap(
+	// 							// 				spacing: 20.0,
+	// 							// 				runSpacing: 20.0,
+	// 							// 				children: [
+	// 							// 					Tooltip(
+	// 							// 						message: "wqeqwe",
+	// 							// 						child: GaugetThingy(
+	// 							// 							value: snapshot.data!.surgeAPM,
+	// 							// 							min: 0, max: 400.0, tickInterval: 100,
+	// 							// 							label: "Surge\nAPM",
+	// 							// 							sideSize: 128.0, fractionDigits: 2,
+	// 							// 							moreIsBetter: true,
+	// 							// 						)
+	// 							// 					),
+	// 							// 					Tooltip(
+	// 							// 						message: "iaiiaiaiaia",
+	// 							// 						child: GaugetThingy(
+	// 							// 							value: snapshot.data!.surgePPS,
+	// 							// 							min: 0, max: 3.0, tickInterval: 1.0,
+	// 							// 							label: "Surge\nPPS",
+	// 							// 							sideSize: 128.0, fractionDigits: 3,
+	// 							// 							moreIsBetter: false,
+	// 							// 						)
+	// 							// 					),
+	// 							// 					Tooltip(
+	// 							// 						message: "iaiiaiaiaia",
+	// 							// 						child: GaugetThingy(
+	// 							// 							value: snapshot.data!.surgeAPL,
+	// 							// 							min: 0, max: 4.0, tickInterval: 1.0,
+	// 							// 							label: "Surge\nAPL",
+	// 							// 							sideSize: 128.0, fractionDigits: 3,
+	// 							// 							moreIsBetter: true,
+	// 							// 						)
+	// 							// 					),
+	// 							// 					Tooltip(
+	// 							// 						message: "iaiiaiaiaia",
+	// 							// 						child: GaugetThingy(
+	// 							// 							value: snapshot.data!.surgeDS,
+	// 							// 							min: 0, max: 10.0, tickInterval: 2.0,
+	// 							// 							label: "Surge\nDownstack",
+	// 							// 							sideSize: 128.0, fractionDigits: 3,
+	// 							// 							moreIsBetter: true,
+	// 							// 						)
+	// 							// 					),
+	// 							// 					Tooltip(
+	// 							// 						message: "iaiiaiaiaia",
+	// 							// 						child: GaugetThingy(
+	// 							// 							value: snapshot.data!.surgeLength,
+	// 							// 							min: 0, max: 20, tickInterval: 5,
+	// 							// 							label: "Surge\nLength",
+	// 							// 							sideSize: 128.0, fractionDigits: 2,
+	// 							// 							moreIsBetter: true,
+	// 							// 						)
+	// 							// 					),
+	// 							// 					Tooltip(
+	// 							// 						message: "iaiiaiaiaia",
+	// 							// 						child: GaugetThingy(
+	// 							// 							value: snapshot.data!.surgeRate,
+	// 							// 							min: 0, max: 1, tickInterval: .2,
+	// 							// 							label: "Surge\nRate",
+	// 							// 							sideSize: 128.0, fractionDigits: 3,
+	// 							// 							moreIsBetter: true,
+	// 							// 						)
+	// 							// 					),
+	// 							// 					Tooltip(
+	// 							// 						message: "iaiiaiaiaia",
+	// 							// 						child: GaugetThingy(
+	// 							// 							value: snapshot.data!.surgeSecsPerCheese,
+	// 							// 							min: 0, max: 1, tickInterval: .2,
+	// 							// 							label: "Surge Secs\nPer Cheese",
+	// 							// 							sideSize: 128.0, fractionDigits: 3,
+	// 							// 							moreIsBetter: true,
+	// 							// 						)
+	// 							// 					),
+	// 							// 					Tooltip(
+	// 							// 						message: "iaiiaiaiaia",
+	// 							// 						child: GaugetThingy(
+	// 							// 							value: snapshot.data!.surgeSecsPerDS,
+	// 							// 							min: 0, max: 1, tickInterval: .2,
+	// 							// 							label: "Surge Secs\nPer DS",
+	// 							// 							sideSize: 128.0, fractionDigits: 3,
+	// 							// 							moreIsBetter: true,
+	// 							// 						)
+	// 							// 					),
+	// 							// 					Tooltip(
+	// 							// 						message: "iaiiaiaiaia",
+	// 							// 						child: GaugetThingy(
+	// 							// 							value: snapshot.data!.surgeAllspin,
+	// 							// 							min: 0, max: 1, tickInterval: .2,
+	// 							// 							label: "Surge\nAll Spin",
+	// 							// 							sideSize: 128.0, fractionDigits: 3,
+	// 							// 							moreIsBetter: true,
+	// 							// 						)
+	// 							// 					),
+	// 							// 				],
+	// 							// 			),
+	// 							// 		],
+	// 							// 		),
+	// 							// 	),
+	// 							// ),
+	// 						],
+	// 					);
+	// 				}
+	// 				if (snapshot.hasError){ return SizedBox(height: 720.0, child: FutureError(snapshot)); }
+	// 			}
+	// 		return const Text("what?");
+	// 		},
+	// 	);
+	// }
 
 	Widget getPreviousSeasonsList(Map<int, TetraLeague> pastLeague, double width){
 		return Column(
@@ -1885,7 +1960,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 			Cards.overview => getOverviewCard(snapshot.data!.summaries!, (snapshot.data!.averages != null && snapshot.data!.summaries!.league.rank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.rank] : (snapshot.data!.averages != null && snapshot.data!.summaries!.league.percentileRank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.percentileRank] : null, width),
 			Cards.tetraLeague => switch (cardMod){
 				CardMod.info => getTetraLeagueCard(snapshot.data!.summaries!.league, snapshot.data!.cutoffs, (snapshot.data!.averages != null && snapshot.data!.summaries!.league.rank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.rank] : (snapshot.data!.averages != null && snapshot.data!.summaries!.league.percentileRank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.percentileRank] : null, snapshot.data!.states, snapshot.data!.playerPos, width, tlAchievements),
-				CardMod.exRecords => getFreyhoeAnalysis(width),
+				// CardMod.exRecords => getFreyhoeAnalysis(width),
 				CardMod.ex => getPreviousSeasonsList(snapshot.data!.summaries!.pastLeague, width),
 				CardMod.records => getRecentTLrecords(widget.constraints, snapshot.data!.player!.userId),
 				_ => const Center(child: Text("huh?"))
@@ -1985,7 +2060,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 															),
 															Padding(
 																padding: const EdgeInsets.only(bottom: 8.0),
-																child: MarkdownBody(data: snapshot.data!.player!.bio!, styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.center)),
+																child: MarkdownBody(data: snapshot.data!.player!.bio!, styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.center), onTapLink: (String text, String? href, String title){launchInBrowser(Uri.parse(href!));}),
 															)
 														],
 													),
@@ -2076,7 +2151,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 												),
 												Padding(
 													padding: const EdgeInsets.only(bottom: 8.0),
-													child: MarkdownBody(data: snapshot.data!.player!.bio!, styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.center)),
+													child: MarkdownBody(data: snapshot.data!.player!.bio!, styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.center), onTapLink: (String text, String? href, String title){launchInBrowser(Uri.parse(href!));}),
 												)
 											],
 										),

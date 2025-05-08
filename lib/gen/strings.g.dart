@@ -6,7 +6,7 @@
 /// Locales: 5
 /// Strings: 3875 (775 per locale)
 ///
-/// Built on 2025-03-31 at 21:49 UTC
+/// Built on 2025-05-08 at 17:19 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -666,8 +666,8 @@ class _StringsErrorsEn {
 	String connection({required Object code, required Object message}) => 'Some issue with connection: ${code} ${message}';
 	String get noSuchUser => 'No such user';
 	String get noSuchUserSub => 'Either you mistyped something, or the account no longer exists';
-	String get discordNotAssigned => 'No user assigned to given Discord ID';
-	String get discordNotAssignedSub => 'Make sure you provided valid ID';
+	String get discordNotAssigned => 'No connections found';
+	String get discordNotAssignedSub => 'Your query should look like described in [API guide](https://tetr.io/about/api/#userssearchquery)';
 	String get history => 'History for that player is missing';
 	String get actionSuggestion => 'Perhaps, you want to';
 	String get p1nkl0bst3rTLmatches => 'No Tetra League matches was found';
@@ -8079,8 +8079,8 @@ extension on Translations {
 			case 'errors.connection': return ({required Object code, required Object message}) => 'Some issue with connection: ${code} ${message}';
 			case 'errors.noSuchUser': return 'No such user';
 			case 'errors.noSuchUserSub': return 'Either you mistyped something, or the account no longer exists';
-			case 'errors.discordNotAssigned': return 'No user assigned to given Discord ID';
-			case 'errors.discordNotAssignedSub': return 'Make sure you provided valid ID';
+			case 'errors.discordNotAssigned': return 'No connections found';
+			case 'errors.discordNotAssignedSub': return 'Your query should look like described in [API guide](https://tetr.io/about/api/#userssearchquery)';
 			case 'errors.history': return 'History for that player is missing';
 			case 'errors.actionSuggestion': return 'Perhaps, you want to';
 			case 'errors.p1nkl0bst3rTLmatches': return 'No Tetra League matches was found';

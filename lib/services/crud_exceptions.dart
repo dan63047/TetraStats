@@ -14,7 +14,17 @@ class TetrioPlayerAlreadyExist implements Exception {}
 
 class TetrioPlayerNotExist implements Exception {}
 
-class TetrioDiscordNotExist implements Exception {}
+class TetrioSearchFailed implements Exception {
+  const TetrioSearchFailed(this.message);
+
+  final String message;
+
+  @override
+  String toString() {
+    String result = 'TetrioSearchFailed';
+    return '$result: $message';
+  }
+}
 
 class TetrioHistoryNotExist implements Exception {}
 

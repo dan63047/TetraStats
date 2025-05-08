@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:io';
-import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -35,16 +33,12 @@ int destination = 0;
 // - APP and VS/APM gadget
 // - different design for radar graphs
 // - i should put tooltips everywhere
-Future<FetchResults> getData(String searchFor, {bool withHistory = false}) async {
+Future<FetchResults> getData(String searchFor, {bool withHistory = false, BuildContext? context = null}) async {
   TetrioPlayer player;
   try{
-    if (searchFor.startsWith("ds:")){
-      player = await teto.fetchPlayer(searchFor.substring(3), isItDiscordID: true); // we trying to get him with that 
-    }else{
-      player = await teto.fetchPlayer(searchFor); // Otherwise it's probably a user id or username
-    }
-  }on TetrioPlayerNotExist{
-    return FetchResults(false, null, [], null, null, null, null, null, false, TetrioPlayerNotExist());
+    player = await teto.fetchPlayer(searchFor, context: context);
+  }on Exception catch (e){
+    return FetchResults(false, null, [], null, null, null, null, null, false, e);
   }
   late Summaries summaries;
   late News? news;
@@ -137,7 +131,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     setState(() {
       currentRangeValues = const RangeValues(0, 1);
       _searchFor = player;
-      _data = getData(_searchFor);
+      _data = getData(_searchFor, context: context);
     });
   }
 
