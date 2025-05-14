@@ -75,10 +75,10 @@ Map<Cards, List<ButtonSegment<CardMod>>> modeButtons = {
 				value: CardMod.info,
 				label: Text(t.homeNavigation.standing),
 			),
-		ButtonSegment<CardMod>(
-				value: CardMod.exRecords, // yeah i misusing my own Enum shut the fuck up
-				label: Text("Analysis"),
-		),
+		// ButtonSegment<CardMod>(
+		// 		value: CardMod.exRecords, // yeah i misusing my own Enum shut the fuck up
+		// 		label: Text("Analysis"),
+		// ),
 		ButtonSegment<CardMod>(
 				value: CardMod.ex,
 				label: Text(t.homeNavigation.seasons),

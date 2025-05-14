@@ -1,10 +1,16 @@
 // ignore_for_file: use_build_context_synchronously, type_literal_in_constant_pattern
 
 import 'dart:io';
+import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/data_objects/beta_record.dart';
+import 'package:tetra_stats/data_objects/minomuncher.dart';
+import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
+import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/widgets/compare_thingy.dart';
+import 'package:tetra_stats/widgets/future_error.dart';
 import 'package:tetra_stats/widgets/list_tile_trailing_stats.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
 import 'package:tetra_stats/widgets/vs_graphs.dart';
@@ -15,9 +21,12 @@ import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/open_in_browser.dart';
 import 'package:window_manager/window_manager.dart';
 
+import '../main.dart';
+
 
 int roundSelector = -1; // -1 = match averages, otherwise round number-1
 List<DropdownMenuItem> rounds = []; // index zero will be match stats
+Mod mod = Mod.info; // thing, that determines if i should show default stats or freyhoe stats
 bool timeWeightedStatsAvaliable = true;
 int greenSidePlayer = 0;
 int redSidePlayer = 1;
@@ -71,8 +80,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
     super.dispose();
   }
 
-  Widget buildComparison(double width, bool showMobileSelector){
-    bool bigScreen = width >= 768;
+  Widget mobileSelector(){
     if (roundSelector.isNegative){
       time = totalTime;
       readableTime = !time.isNegative ? "${t.tlMatchView.matchLength}: ${time.inMinutes}:${secs.format(time.inMicroseconds /1000000 % 60)}" : "${t.tlMatchView.matchLength}: ---";
@@ -81,6 +89,25 @@ class TlMatchResultState extends State<TlMatchResultView> {
       int alive = widget.record.results.rounds[roundSelector].indexWhere((element) => element.alive);
       readableTime = "${t.tlMatchView.roundLength}: ${!time.isNegative ? "${time.inMinutes}:${secs.format(time.inMicroseconds /1000000 % 60)}" : "---"}\n${t.tlMatchView.winner}: ${alive == -1 ? "idk" : widget.record.results.rounds[roundSelector][alive].username}";
     }
+    return Center(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.alphabetic,
+        children: [
+          Text("${t.tlMatchView.statsFor}: ",
+          style: const TextStyle(color: Colors.white, fontSize: 25)),
+          DropdownButton(items: rounds, value: roundSelector, onChanged: ((value) {
+            roundSelector = value;
+            setState(() {});
+          }),),
+        ],
+      ),
+    );
+  }
+
+  Widget buildComparison(double width, bool showMobileSelector){
+    bool bigScreen = width >= 768;
     return SizedBox(
       width: width,
       child: NestedScrollView(
@@ -145,23 +172,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
                   ),
                 ),
               ),
-              if (showMobileSelector) SliverToBoxAdapter(
-                child: Center(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
-                    children: [
-                      Text("${t.tlMatchView.statsFor}: ",
-                      style: const TextStyle(color: Colors.white, fontSize: 25)),
-                      DropdownButton(items: rounds, value: roundSelector, onChanged: ((value) {
-                        roundSelector = value;
-                        setState(() {});
-                      }),),
-                    ],
-                  ),
-                ),
-              ),
+              if (showMobileSelector) SliverToBoxAdapter(child: mobileSelector()),
               if (showMobileSelector) SliverToBoxAdapter(child: Center(child: Text(readableTime, textAlign: TextAlign.center))),
               const SliverToBoxAdapter(
                 child: Divider(),
@@ -358,123 +369,515 @@ class TlMatchResultState extends State<TlMatchResultView> {
     );
   }
 
-  Widget buildRoundSelector(double width){
-    return Padding(
-      padding: const EdgeInsets.all(8.000000),
-      child: SizedBox(
-        width: width,
-        child: NestedScrollView(
-          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) { 
-            return [
-              SliverToBoxAdapter(child: 
-                Wrap(
-                  alignment: WrapAlignment.spaceBetween,
-                  children: [
-                    Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                        Text(t.tlMatchView.matchLength),
-                        RichText(
-                          text: !totalTime.isNegative ? TextSpan(
-                          text: "${totalTime.inMinutes}:${NumberFormat("00", LocaleSettings.currentLocale.languageCode).format(totalTime.inSeconds%60)}",
-                          style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white),
-                          children: [TextSpan(text: ".${NumberFormat("000", LocaleSettings.currentLocale.languageCode).format(totalTime.inMilliseconds%1000)}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
-                          ) : const TextSpan(
-                          text: "-:--",
-                          style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.grey),
-                          children: [TextSpan(text: ".---", style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
-                          ),
-                        )
-                      ],),
-                     if (widget.record.id != widget.record.replayID) Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                      Text(t.tlMatchView.numberOfRounds),
-                      RichText(
-                        text: TextSpan(
-                          text: widget.record.results.rounds.length.toString(),
-                          style: const TextStyle(
-                            fontFamily: "Eurostile Round Extended",
-                            fontSize: 28,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white
-                            ),
-                          ),
-                        )
-                    ],),
-                  ],
+  Widget buildFreyhoeComparison(double width, bool showMobileSelector){
+    return SizedBox(
+      width: width,
+      child: FutureBuilder<MinomuncherData>(
+        future: teto.fetchMinoMuncherStats("bozo"),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState){
+              case ConnectionState.none:
+              case ConnectionState.waiting:
+              case ConnectionState.active:
+                return const Center(child: CircularProgressIndicator());
+              case ConnectionState.done:
+            if (snapshot.hasData){
+              MinomuncherData wow = MinomuncherData.fromJson(
+                MapEntry("skks", 
+                            {
+                    "wellColumns": [ 12, 9, 30, 52, 39, 8, 7, 25, 12, 28 ],
+                    "clearTypes": {
+                      "perfectClear": 3,
+                      "allspin": 27,
+                      "single": 151,
+                      "tspinSingle": 29,
+                      "double": 47,
+                      "tspinDouble": 219,
+                      "triple": 14,
+                      "tspinTriple": 1,
+                      "quad": 130,
+                    },
+                    "tEfficiency": 0.48493975903614456,
+                    "iEfficiency": 0.44410876132930516,
+                    "cheeseAPL": 2.472027972027972,
+                    "downstackAPL": 2.060882800608828,
+                    "upstackAPL": 1.2545018007202882,
+                    "APL": 1.6100671140939598,
+                    "APP": 1.041684759009987,
+                    "KPP": 3.5336517585757705,
+                    "KPS": 10.527064697854616,
+                    "APM": 197.9632497040962,
+                    "PPS": 3.190894567656894,
+                    "midgameAPM": 162.5201210927227,
+                    "midgamePPS": 3.4530788907741583,
+                    "openerAPM": 229.732280254106,
+                    "openerPPS": 4.8567294919177706,
+                    "attackCheesiness": 0.47707874789292537,
+                    "cleanAttacksCancelled": 0.3386243386243386,
+                    "cheesyAttacksCancelled": 0.15763546798029557,
+                    "cleanLinesCancelled": 0.32965931863727455,
+                    "cheesyLinesCancelled": 0.7214912280701754,
+                    "surgeAPM": 212.01475625050423,
+                    "surgeAPL": 2.1791044776119404,
+                    "surgeDS": 7.146341463414634,
+                    "surgePPS": 0.08800944634724127,
+                    "surgeLength": 6.926829268292683,
+                    "surgeRate": 0.13099041533546327,
+                    "surgeSecsPerCheese": 0.7643478260869563,
+                    "surgeSecsPerDS": 0.46352564102564087,
+                    "surgeAllspin": 0.04878048780487805,
+                  }
                 )
-              ),
-              SliverToBoxAdapter(
-                child: TextButton( style: roundSelector == -1 ? ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.grey.shade900)) : null,
-                  onPressed: () {
-                    roundSelector = -1;
-                    setState(() {});
-                  }, child: Text(t.tlMatchView.matchStats)),
-              )
-            ];
-           },
-          body: ListView.builder(itemCount: widget.record.results.rounds.length,
-            itemBuilder: (BuildContext context, int index) {
-              var accentColor = widget.record.results.rounds[index][0].id == widget.initPlayerId ? Colors.green : Colors.red;
-              var bgColor = roundSelector == index ? Colors.grey.shade900 : Colors.transparent;
-              var time = roundLengths[index];
-              return Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    stops: const [0, 0.05],
-                    colors: [accentColor, bgColor]
-                  )
-                ),
-                child: ListTile(
-                  leading:RichText(
-                    text: !time.isNegative ? TextSpan(
-                      text: "${time.inMinutes}:${NumberFormat("00", LocaleSettings.currentLocale.languageCode).format(time.inSeconds%60)}",
-                      style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 22, fontWeight: FontWeight.w500, color: Colors.white),
-                      children: [TextSpan(text: ".${NumberFormat("000", LocaleSettings.currentLocale.languageCode).format(time.inMilliseconds%1000)}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
-                    ) : const TextSpan(
-                      text: "-:--",
-                      style: TextStyle(fontFamily: "Eurostile Round", fontSize: 22, fontWeight: FontWeight.w500, color: Colors.grey),
-                      children: [TextSpan(text: ".---", style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
-                      ), 
-                  ),
-                  title: Text(widget.record.results.rounds[index][0].username, textAlign: TextAlign.center),
-                  trailing: TrailingStats(
-                    widget.record.results.rounds[index].firstWhere((element) => element.id == widget.initPlayerId).stats.apm,
-                    widget.record.results.rounds[index].firstWhere((element) => element.id == widget.initPlayerId).stats.pps,
-                    widget.record.results.rounds[index].firstWhere((element) => element.id == widget.initPlayerId).stats.vs,
-                    widget.record.results.rounds[index].firstWhere((element) => element.id != widget.initPlayerId).stats.apm,
-                    widget.record.results.rounds[index].firstWhere((element) => element.id != widget.initPlayerId).stats.pps,
-                    widget.record.results.rounds[index].firstWhere((element) => element.id != widget.initPlayerId).stats.vs
-                  ),
-                  onTap:(){
-                    roundSelector = index;
-                    setState(() {});
-                  },
-                ),
               );
-          })
-        ),
+              List<ClearsChartData> clearTypeListGreen = [snapshot.data!.clearTypes];
+              List<ClearsChartData> clearTypeListRed = [wow.clearTypes];
+              List<List<LinearGaugeRange>> apmRanges = [
+                for (int i = 0; i < 2; i++) [
+                  LinearGaugeRange(
+                  startValue: 0,
+                  endValue: i == 0 ? snapshot.data!.openerAPM : wow.openerAPM,
+                  startWidth: 25,
+                  endWidth: 25,
+                  color: Colors.yellow,
+                  position: LinearElementPosition.cross
+                ),
+                LinearGaugeRange(
+                  startValue: 0,
+                  endValue: i == 0 ? snapshot.data!.APM : wow.APM,
+                  startWidth: 25,
+                  endWidth: 25,
+                  color: Colors.orange,
+                  position: LinearElementPosition.cross
+                ),
+                LinearGaugeRange(
+                  startValue: 0,
+                  endValue: i == 0 ? snapshot.data!.midgameAPM : wow.midgameAPM,
+                  startWidth: 25,
+                  endWidth: 25,
+                  color: Colors.red,
+                  position: LinearElementPosition.cross
+                )
+                ]
+              ];
+              List<List<LinearGaugeRange>> ppsRanges = [
+                for (int i = 0; i < 2; i++) [
+                  LinearGaugeRange(
+                    startValue: 0,
+                    endValue: i == 0 ? snapshot.data!.openerPPS : wow.openerPPS,
+                    startWidth: 25,
+                    endWidth: 25,
+                    color: Colors.yellow,
+                    position: LinearElementPosition.cross
+                  ),
+                  LinearGaugeRange(
+                    startValue: 0,
+                    endValue: i == 0 ? snapshot.data!.PPS : wow.PPS,
+                    startWidth: 25,
+                    endWidth: 25,
+                    color: Colors.orange,
+                    position: LinearElementPosition.cross
+                  ),
+                  LinearGaugeRange(
+                    startValue: 0,
+                    endValue: i == 0 ? snapshot.data!.midgamePPS : wow.midgamePPS,
+                    startWidth: 25,
+                    endWidth: 25,
+                    color: Colors.red,
+                    position: LinearElementPosition.cross
+                  )
+                ]
+              ];
+              return Column(
+                children: [
+                  if (showMobileSelector) mobileSelector(),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            for (int i = 0; i < 2; i++) SfLinearGauge(
+                              minimum: 0,
+                              maximum: 300,
+                              interval: 25, 
+                              ranges: apmRanges[i],
+                              markerPointers: [
+                                LinearWidgetPointer(value: 0, child: Container(width: 36.0, child: Text("APM")), markerAlignment: LinearMarkerAlignment.end)
+                              ],
+                              isMirrored: false,
+                              showTicks: true,
+                              showLabels: false
+                            ),
+                            SizedBox(height: 8.0),
+                            for (int i = 0; i < 2; i++) SfLinearGauge(
+                              minimum: 0,
+                              maximum: 4.00,
+                              interval: .25, 
+                              ranges: ppsRanges[i],
+                              markerPointers: [
+                                LinearWidgetPointer(value: 0, child: Container(width: 36.0, child: Text("PPS")), markerAlignment: LinearMarkerAlignment.end)
+                              ],
+                              isMirrored: false,
+                              showTicks: true,
+                              showLabels: false
+                            ),
+                            SizedBox(height: 8.0),
+                            Wrap(
+                              direction: Axis.horizontal,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              spacing: 20,
+                              children: [
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+                                      child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.red)),
+                                    ),
+                                    Text("Midgame: ${f2.format(snapshot.data!.midgameAPM)} APM, ${f2.format(snapshot.data!.midgamePPS)} PPS")
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+                                      child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.orange)),
+                                    ),
+                                    Text("Overall: ${f2.format(snapshot.data!.APM)} APM, ${f2.format(snapshot.data!.PPS)} PPS")
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+                                      child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.yellow)),
+                                    ),
+                                    Text("Opener: ${f2.format(snapshot.data!.openerAPM)} APM, ${f2.format(snapshot.data!.openerPPS)} PPS")
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0),
+                      child: Row(
+                        children: [
+                          SfCartesianChart(
+                            primaryXAxis: CategoryAxis(isVisible: false),
+                            primaryYAxis: NumericAxis(minimum: 0, maximum: 100),
+                            title: ChartTitle(text: clearTypeListGreen.first.nick, textStyle: width > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+                            series: <CartesianSeries>[
+                              StackedColumn100Series<ClearsChartData, String>(
+                                dataSource: clearTypeListGreen,
+                                xValueMapper: (ClearsChartData data, _) => data.nick,
+                                yValueMapper: (ClearsChartData data, _) => data.perfectClear,
+                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[0],
+                              ),
+                              StackedColumn100Series<ClearsChartData, String>(
+                                dataSource: clearTypeListGreen,
+                                xValueMapper: (ClearsChartData data, _) => data.nick,
+                                yValueMapper: (ClearsChartData data, _) => data.allspin,
+                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[1],
+                              ),
+                              StackedColumn100Series<ClearsChartData, String>(
+                                dataSource: clearTypeListGreen,
+                                xValueMapper: (ClearsChartData data, _) => data.nick,
+                                yValueMapper: (ClearsChartData data, _) => data.single,
+                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[2],
+                              ),
+                              StackedColumn100Series<ClearsChartData, String>(
+                                dataSource: clearTypeListGreen,
+                                xValueMapper: (ClearsChartData data, _) => data.nick,
+                                yValueMapper: (ClearsChartData data, _) => data.tspinSingle,
+                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[3],
+                              ),
+                              StackedColumn100Series<ClearsChartData, String>(
+                                dataSource: clearTypeListGreen,
+                                xValueMapper: (ClearsChartData data, _) => data.nick,
+                                yValueMapper: (ClearsChartData data, _) => data.double,
+                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[4],
+                              ),
+                              StackedColumn100Series<ClearsChartData, String>(
+                                dataSource: clearTypeListGreen,
+                                xValueMapper: (ClearsChartData data, _) => data.nick,
+                                yValueMapper: (ClearsChartData data, _) => data.tspinDouble,
+                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[5],
+                              ),
+                              StackedColumn100Series<ClearsChartData, String>(
+                                dataSource: clearTypeListGreen,
+                                xValueMapper: (ClearsChartData data, _) => data.nick,
+                                yValueMapper: (ClearsChartData data, _) => data.triple,
+                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[6],
+                              ),
+                              StackedColumn100Series<ClearsChartData, String>(
+                                dataSource: clearTypeListGreen,
+                                xValueMapper: (ClearsChartData data, _) => data.nick,
+                                yValueMapper: (ClearsChartData data, _) => data.tspinTriple,
+                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[7],
+                              ),
+                              StackedColumn100Series<ClearsChartData, String>(
+                                dataSource: clearTypeListGreen,
+                                xValueMapper: (ClearsChartData data, _) => data.nick,
+                                yValueMapper: (ClearsChartData data, _) => data.quad,
+                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[8],
+                              ),
+                            ]
+                          ),
+                          Column(
+                            children: [
+                              for (int i = 0; i < snapshot.data!.clearTypes.byID.length; i++) Container(
+                                height: 20,
+                                width: 210,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                        Padding(
+                                          padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+                                          child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: lineClearsColors[i])),
+                                        ),
+                                      Text("${snapshot.data!.clearTypes.clearName[i]}:"),
+                                    ],
+                                    ),
+                                    Text("${intf.format(snapshot.data!.clearTypes.byID[i])} (${percentage.format(snapshot.data!.clearTypes.byID[i]/snapshot.data!.clearTypes.total)})")
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                          SfCartesianChart(
+                            plotAreaBorderWidth: 0.4,
+                            primaryXAxis: CategoryAxis(isVisible: false),
+                            primaryYAxis: NumericAxis(minimum: 0, maximum: 100, opposedPosition: true),
+                            title: ChartTitle(text: clearTypeListRed.first.nick, textStyle: width > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+                            series: <CartesianSeries>[
+                              StackedColumn100Series<ClearsChartData, String>(
+                                dataSource: clearTypeListRed,
+                                xValueMapper: (ClearsChartData data, _) => data.nick,
+                                yValueMapper: (ClearsChartData data, _) => data.perfectClear,
+                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[0],
+                              ),
+                              StackedColumn100Series<ClearsChartData, String>(
+                                dataSource: clearTypeListRed,
+                                xValueMapper: (ClearsChartData data, _) => data.nick,
+                                yValueMapper: (ClearsChartData data, _) => data.allspin,
+                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[1],
+                              ),
+                              StackedColumn100Series<ClearsChartData, String>(
+                                dataSource: clearTypeListRed,
+                                xValueMapper: (ClearsChartData data, _) => data.nick,
+                                yValueMapper: (ClearsChartData data, _) => data.single,
+                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[2],
+                              ),
+                              StackedColumn100Series<ClearsChartData, String>(
+                                dataSource: clearTypeListRed,
+                                xValueMapper: (ClearsChartData data, _) => data.nick,
+                                yValueMapper: (ClearsChartData data, _) => data.tspinSingle,
+                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[3],
+                              ),
+                              StackedColumn100Series<ClearsChartData, String>(
+                                dataSource: clearTypeListRed,
+                                xValueMapper: (ClearsChartData data, _) => data.nick,
+                                yValueMapper: (ClearsChartData data, _) => data.double,
+                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[4],
+                              ),
+                              StackedColumn100Series<ClearsChartData, String>(
+                                dataSource: clearTypeListRed,
+                                xValueMapper: (ClearsChartData data, _) => data.nick,
+                                yValueMapper: (ClearsChartData data, _) => data.tspinDouble,
+                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[5],
+                              ),
+                              StackedColumn100Series<ClearsChartData, String>(
+                                dataSource: clearTypeListRed,
+                                xValueMapper: (ClearsChartData data, _) => data.nick,
+                                yValueMapper: (ClearsChartData data, _) => data.triple,
+                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[6],
+                              ),
+                              StackedColumn100Series<ClearsChartData, String>(
+                                dataSource: clearTypeListRed,
+                                xValueMapper: (ClearsChartData data, _) => data.nick,
+                                yValueMapper: (ClearsChartData data, _) => data.tspinTriple,
+                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[7],
+                              ),
+                              StackedColumn100Series<ClearsChartData, String>(
+                                dataSource: clearTypeListRed,
+                                xValueMapper: (ClearsChartData data, _) => data.nick,
+                                yValueMapper: (ClearsChartData data, _) => data.quad,
+                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[8],
+                              ),
+                            ]
+                          ),
+                        ],
+                      ),
+                    )
+                  ),
+                ],
+              );
+            } if (snapshot.hasError){ return SizedBox(height: 720.0, child: FutureError(snapshot)); }
+          }
+          return const Text("what?");
+        }
+      ),
+    );
+  }
+
+  Widget buildRoundSelector(double width, double height){
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
+      child: Column(
+        children: [
+          SizedBox(
+            width: width,
+            height: height - 64,// - 72
+            child: NestedScrollView(
+              headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) { 
+                return [
+                  SliverToBoxAdapter(child: 
+                    Wrap(
+                      alignment: WrapAlignment.spaceBetween,
+                      children: [
+                        Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                            Text(t.tlMatchView.matchLength),
+                            RichText(
+                              text: !totalTime.isNegative ? TextSpan(
+                              text: "${totalTime.inMinutes}:${NumberFormat("00", LocaleSettings.currentLocale.languageCode).format(totalTime.inSeconds%60)}",
+                              style: const TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white),
+                              children: [TextSpan(text: ".${NumberFormat("000", LocaleSettings.currentLocale.languageCode).format(totalTime.inMilliseconds%1000)}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
+                              ) : const TextSpan(
+                              text: "-:--",
+                              style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, fontWeight: FontWeight.w500, color: Colors.grey),
+                              children: [TextSpan(text: ".---", style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
+                              ),
+                            )
+                          ],),
+                         if (widget.record.id != widget.record.replayID) Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                          Text(t.tlMatchView.numberOfRounds),
+                          RichText(
+                            text: TextSpan(
+                              text: widget.record.results.rounds.length.toString(),
+                              style: const TextStyle(
+                                fontFamily: "Eurostile Round Extended",
+                                fontSize: 28,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white
+                                ),
+                              ),
+                            )
+                        ],),
+                      ],
+                    )
+                  ),
+                  SliverToBoxAdapter(
+                    child: TextButton( style: roundSelector == -1 ? ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.grey.shade900)) : null,
+                      onPressed: () {
+                        roundSelector = -1;
+                        setState(() {});
+                      }, child: Text(t.tlMatchView.matchStats)),
+                  )
+                ];
+               },
+              body: ListView.builder(itemCount: widget.record.results.rounds.length,
+                itemBuilder: (BuildContext context, int index) {
+                  var accentColor = widget.record.results.rounds[index][0].id == widget.initPlayerId ? Colors.green : Colors.red;
+                  var bgColor = roundSelector == index ? Colors.grey.shade900 : Colors.transparent;
+                  var time = roundLengths[index];
+                  return Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        stops: const [0, 0.05],
+                        colors: [accentColor, bgColor]
+                      )
+                    ),
+                    child: ListTile(
+                      leading:RichText(
+                        text: !time.isNegative ? TextSpan(
+                          text: "${time.inMinutes}:${NumberFormat("00", LocaleSettings.currentLocale.languageCode).format(time.inSeconds%60)}",
+                          style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 22, fontWeight: FontWeight.w500, color: Colors.white),
+                          children: [TextSpan(text: ".${NumberFormat("000", LocaleSettings.currentLocale.languageCode).format(time.inMilliseconds%1000)}", style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
+                        ) : const TextSpan(
+                          text: "-:--",
+                          style: TextStyle(fontFamily: "Eurostile Round", fontSize: 22, fontWeight: FontWeight.w500, color: Colors.grey),
+                          children: [TextSpan(text: ".---", style: TextStyle(fontFamily: "Eurostile Round", fontSize: 14, fontWeight: FontWeight.w100))]
+                          ), 
+                      ),
+                      title: Text(widget.record.results.rounds[index][0].username, textAlign: TextAlign.center),
+                      trailing: TrailingStats(
+                        widget.record.results.rounds[index].firstWhere((element) => element.id == widget.initPlayerId).stats.apm,
+                        widget.record.results.rounds[index].firstWhere((element) => element.id == widget.initPlayerId).stats.pps,
+                        widget.record.results.rounds[index].firstWhere((element) => element.id == widget.initPlayerId).stats.vs,
+                        widget.record.results.rounds[index].firstWhere((element) => element.id != widget.initPlayerId).stats.apm,
+                        widget.record.results.rounds[index].firstWhere((element) => element.id != widget.initPlayerId).stats.pps,
+                        widget.record.results.rounds[index].firstWhere((element) => element.id != widget.initPlayerId).stats.vs
+                      ),
+                      onTap:(){
+                        roundSelector = index;
+                        setState(() {});
+                      },
+                    ),
+                  );
+              })
+              // TODO: insert tetrio/freyhoe switch someone there
+            ),
+          ),
+          // SizedBox(
+          //   width: width,
+          //   height: 40.000000,
+          //   child: SegmentedButton<Mod>(
+          //     showSelectedIcon: false,
+          //     selected: <Mod>{mod},
+          //     segments: <ButtonSegment<Mod>>[
+          //       ButtonSegment(
+          //         value: Mod.info,
+          //         label: Text(t.general)
+          //       ),
+          //       ButtonSegment(
+          //         value: Mod.analysis,
+          //         label: Text("Analysis")
+          //       )
+          //     ],
+          //     onSelectionChanged: (p0) {
+          //       setState(() {
+          //         mod = p0.first;
+          //       });
+          //     },
+          //   ),
+          // )
+        ],
       ),
     );
   }
   
-  Widget getMainWidget(double viewportWidth) {
-    if (viewportWidth <= 1200) {
+  Widget getMainWidget(Size size) {
+    if (size.width <= 1200) {
       return Center(
         child: Container(
           constraints: const BoxConstraints(maxWidth: 768),
-          child: buildComparison(viewportWidth, true)
+          child: mod == Mod.analysis ? buildFreyhoeComparison(size.width, true) : buildComparison(size.width, true)
         ),
       );
     } else {
-      double comparisonWidth = viewportWidth - 450 - 16;
+      double comparisonWidth = size.width - 450 - 16;
       comparisonWidth = comparisonWidth > 768 ? 768 : comparisonWidth;
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          buildComparison(comparisonWidth, false),
-          buildRoundSelector(450)
+          mod == Mod.analysis ? buildFreyhoeComparison(comparisonWidth, false) : buildComparison(comparisonWidth, false),
+          buildRoundSelector(450, size.height)
         ],
       );
     }
@@ -516,7 +919,9 @@ class TlMatchResultState extends State<TlMatchResultView> {
         ]
       ),
       backgroundColor: Colors.black,
-      body: getMainWidget(MediaQuery.of(context).size.width),
+      body: getMainWidget(MediaQuery.of(context).size),
       );
   }
 }
+
+enum Mod {info, analysis}

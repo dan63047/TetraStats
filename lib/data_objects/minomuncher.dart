@@ -79,6 +79,17 @@ class ClearsChartData {
 	ClearsChartData(this.nick, this.perfectClear, this.allspin, this.single, this.tspinSingle, this.double, this.tspinDouble, this.triple, this.tspinTriple, this.quad);
 
 	get total => perfectClear + allspin + single + tspinSingle + double + tspinDouble + triple + tspinTriple + quad;
+  get byID => [
+    perfectClear,
+    allspin,
+    single,
+    tspinSingle,
+    double,
+    tspinDouble,
+    triple,
+    tspinTriple,
+    quad,
+  ];
 	get clearName => [
 		t.stats.pcs,
 		"All Spins",
@@ -89,7 +100,7 @@ class ClearsChartData {
 		t.stats.lineClears.triple,
 		"${t.stats.tSpin} ${t.stats.lineClears.triple}",
 		t.stats.lineClears.quad,
-		"${t.stats.tSpin} ${t.stats.lineClears.quad}"
+		//"${t.stats.tSpin} ${t.stats.lineClears.quad}"
 	];
 }
 

@@ -45,3 +45,4 @@ app.*.map.json
 
 # My shit
 lib/views/tl_match_view web.dart
+web/indexbeta.html

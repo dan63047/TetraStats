@@ -6,7 +6,7 @@
 /// Locales: 5
 /// Strings: 3875 (775 per locale)
 ///
-/// Built on 2025-05-08 at 17:19 UTC
+/// Built on 2025-05-08 at 20:51 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -5344,8 +5344,8 @@ class _StringsErrorsRuRu implements _StringsErrorsEn {
 	@override String connection({required Object code, required Object message}) => 'Проблема с подключением: ${code} ${message}';
 	@override String get noSuchUser => 'Нет такого пользователя';
 	@override String get noSuchUserSub => 'Либо вы опечатались, либо аккаунт больше не существует';
-	@override String get discordNotAssigned => 'К данному Discord ID не привязан аккаунт';
-	@override String get discordNotAssignedSub => 'Убедитесь, что указан правильный ID';
+	@override String get discordNotAssigned => 'Нет связей с данным аккаунтом';
+	@override String get discordNotAssignedSub => 'Убедитесь, что ваш запрос соответствует формату, описанному в [документации API](https://tetr.io/about/api/#userssearchquery)';
 	@override String get history => 'История этого игрока отсутствует';
 	@override String get actionSuggestion => 'Возможно, вы хотите';
 	@override String get p1nkl0bst3rTLmatches => 'Матчей Тетра Лиги не найдено';
@@ -10549,8 +10549,8 @@ extension on _StringsRuRu {
 			case 'errors.connection': return ({required Object code, required Object message}) => 'Проблема с подключением: ${code} ${message}';
 			case 'errors.noSuchUser': return 'Нет такого пользователя';
 			case 'errors.noSuchUserSub': return 'Либо вы опечатались, либо аккаунт больше не существует';
-			case 'errors.discordNotAssigned': return 'К данному Discord ID не привязан аккаунт';
-			case 'errors.discordNotAssignedSub': return 'Убедитесь, что указан правильный ID';
+			case 'errors.discordNotAssigned': return 'Нет связей с данным аккаунтом';
+			case 'errors.discordNotAssignedSub': return 'Убедитесь, что ваш запрос соответствует формату, описанному в [документации API](https://tetr.io/about/api/#userssearchquery)';
 			case 'errors.history': return 'История этого игрока отсутствует';
 			case 'errors.actionSuggestion': return 'Возможно, вы хотите';
 			case 'errors.p1nkl0bst3rTLmatches': return 'Матчей Тетра Лиги не найдено';

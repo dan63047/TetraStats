@@ -67,7 +67,7 @@ class BetaLeagueEntryThingy extends StatelessWidget{
         title: Row(
           children: [
             Text(
-              "${record.results.leaderboard.firstWhere((element) => element.id != record.enemyID).wins} - ${record.results.leaderboard.firstWhere((element) => element.id == record.enemyID).wins} ",
+              "${record.results.leaderboard.firstWhere((element) => element.id == userID).wins} - ${record.results.leaderboard.firstWhere((element) => element.id != userID).wins} ",
               style: TextStyle(fontSize: 26, height: 0.75, fontWeight: FontWeight.bold),
             ),
             Text(
@@ -120,12 +120,12 @@ class BetaLeagueEntryThingy extends StatelessWidget{
           ),
         ),
         trailing: TrailingStats(
-          record.results.leaderboard.firstWhere((element) => element.id != record.enemyID).stats.apm,
-          record.results.leaderboard.firstWhere((element) => element.id != record.enemyID).stats.pps,
-          record.results.leaderboard.firstWhere((element) => element.id != record.enemyID).stats.vs,
-          record.results.leaderboard.firstWhere((element) => element.id == record.enemyID).stats.apm,
-          record.results.leaderboard.firstWhere((element) => element.id == record.enemyID).stats.pps,
-          record.results.leaderboard.firstWhere((element) => element.id == record.enemyID).stats.vs,
+          record.results.leaderboard.firstWhere((element) => element.id == userID).stats.apm,
+          record.results.leaderboard.firstWhere((element) => element.id == userID).stats.pps,
+          record.results.leaderboard.firstWhere((element) => element.id == userID).stats.vs,
+          record.results.leaderboard.firstWhere((element) => element.id != userID).stats.apm,
+          record.results.leaderboard.firstWhere((element) => element.id != userID).stats.pps,
+          record.results.leaderboard.firstWhere((element) => element.id != userID).stats.vs,
         ),
         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => TlMatchResultView(record: record, initPlayerId: userID))) //Navigator.push(context, MaterialPageRoute(builder: (context) => TlMatchResultView(record: data[index], initPlayerId: userID))),
       ),
