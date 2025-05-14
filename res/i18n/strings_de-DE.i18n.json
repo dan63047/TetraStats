@@ -142,7 +142,7 @@
         "connection": "Netzwerkfehler: ${code} ${message}",
         "noSuchUser": "Dieser User existiert nicht",
         "noSuchUserSub": "Entweder hast du was falsch geschrieben, oder der Account existiert nicht mehr",
-        "discordNotAssigned": "Keine Verknüpfnungen gefunden",
+        "discordNotAssigned": "Keine Verknüpfungen gefunden",
         "discordNotAssignedSub": "Deine Anfrage sollte dem [API Guide](https://tetr.io/about/api/#userssearchquery) entsprechen",
         "history": "Historie des Nutzers fehlt",
         "actionSuggestion": "Womöglich, möchtest du",
