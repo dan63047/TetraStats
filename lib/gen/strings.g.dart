@@ -6,7 +6,7 @@
 /// Locales: 5
 /// Strings: 3875 (775 per locale)
 ///
-/// Built on 2025-05-08 at 20:51 UTC
+/// Built on 2025-05-14 at 17:11 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -2225,8 +2225,8 @@ class _StringsErrorsDeDe implements _StringsErrorsEn {
 	@override String connection({required Object code, required Object message}) => 'Netzwerkfehler: ${code} ${message}';
 	@override String get noSuchUser => 'Dieser User existiert nicht';
 	@override String get noSuchUserSub => 'Entweder hast du was falsch geschrieben, oder der Account existiert nicht mehr';
-	@override String get discordNotAssigned => 'Kein Nutzer mit dieser Discord ID gefunden';
-	@override String get discordNotAssignedSub => 'Stelle sicher das du eine gültige ID übergibst';
+	@override String get discordNotAssigned => 'Keine Verknüpfungen gefunden';
+	@override String get discordNotAssignedSub => 'Deine Anfrage sollte dem [API Guide](https://tetr.io/about/api/#userssearchquery) entsprechen';
 	@override String get history => 'Historie des Nutzers fehlt';
 	@override String get actionSuggestion => 'Womöglich, möchtest du';
 	@override String get p1nkl0bst3rTLmatches => 'Keine Tetra League Matche gefunden';
@@ -3784,8 +3784,8 @@ class _StringsErrorsKoKr implements _StringsErrorsEn {
 	@override String connection({required Object code, required Object message}) => '연결 문제 발생: ${code} ${message}';
 	@override String get noSuchUser => '사용자를 찾을 수 없습니다';
 	@override String get noSuchUserSub => '당신이 오타를 냈거나, 그 계정이 사라졌을 수 있습니다';
-	@override String get discordNotAssigned => '주어진 Discord ID에 해당하는 사용자가 없습니다';
-	@override String get discordNotAssignedSub => '알맞은 ID를 입력하셨는지 다시 한번 확인해 주세요';
+	@override String get discordNotAssigned => '연결을 찾을 수 없습니다';
+	@override String get discordNotAssignedSub => '쿼리는 [API 가이드](https://tetr.io/about/api/#userssearchquery)에 설명된 대로 표시되어야 합니다';
 	@override String get history => '기록 찾기 실패';
 	@override String get actionSuggestion => '이것을 찾으셨나요?';
 	@override String get p1nkl0bst3rTLmatches => '테트라 리그 기록 없음';
@@ -6903,8 +6903,8 @@ class _StringsErrorsZhCn implements _StringsErrorsEn {
 	@override String connection({required Object code, required Object message}) => '连接错误：${code} ${message}';
 	@override String get noSuchUser => '用户不存在';
 	@override String get noSuchUserSub => '您输入的内容有误，或者用户不存在';
-	@override String get discordNotAssigned => '没有指定Discord ID的用户';
-	@override String get discordNotAssignedSub => '请确保您提供了有效的 ID';
+	@override String get discordNotAssigned => '未找到连接';
+	@override String get discordNotAssignedSub => '您的查询应该如 [API 指南](https://tetr.io/about/api/#userssearchquery)中所述';
 	@override String get history => '缺少该玩家的历史';
 	@override String get actionSuggestion => '也许，您想要';
 	@override String get p1nkl0bst3rTLmatches => '没有找到Tetra联赛比赛';
@@ -8902,8 +8902,8 @@ extension on _StringsDeDe {
 			case 'errors.connection': return ({required Object code, required Object message}) => 'Netzwerkfehler: ${code} ${message}';
 			case 'errors.noSuchUser': return 'Dieser User existiert nicht';
 			case 'errors.noSuchUserSub': return 'Entweder hast du was falsch geschrieben, oder der Account existiert nicht mehr';
-			case 'errors.discordNotAssigned': return 'Kein Nutzer mit dieser Discord ID gefunden';
-			case 'errors.discordNotAssignedSub': return 'Stelle sicher das du eine gültige ID übergibst';
+			case 'errors.discordNotAssigned': return 'Keine Verknüpfungen gefunden';
+			case 'errors.discordNotAssignedSub': return 'Deine Anfrage sollte dem [API Guide](https://tetr.io/about/api/#userssearchquery) entsprechen';
 			case 'errors.history': return 'Historie des Nutzers fehlt';
 			case 'errors.actionSuggestion': return 'Womöglich, möchtest du';
 			case 'errors.p1nkl0bst3rTLmatches': return 'Keine Tetra League Matche gefunden';
@@ -9725,8 +9725,8 @@ extension on _StringsKoKr {
 			case 'errors.connection': return ({required Object code, required Object message}) => '연결 문제 발생: ${code} ${message}';
 			case 'errors.noSuchUser': return '사용자를 찾을 수 없습니다';
 			case 'errors.noSuchUserSub': return '당신이 오타를 냈거나, 그 계정이 사라졌을 수 있습니다';
-			case 'errors.discordNotAssigned': return '주어진 Discord ID에 해당하는 사용자가 없습니다';
-			case 'errors.discordNotAssignedSub': return '알맞은 ID를 입력하셨는지 다시 한번 확인해 주세요';
+			case 'errors.discordNotAssigned': return '연결을 찾을 수 없습니다';
+			case 'errors.discordNotAssignedSub': return '쿼리는 [API 가이드](https://tetr.io/about/api/#userssearchquery)에 설명된 대로 표시되어야 합니다';
 			case 'errors.history': return '기록 찾기 실패';
 			case 'errors.actionSuggestion': return '이것을 찾으셨나요?';
 			case 'errors.p1nkl0bst3rTLmatches': return '테트라 리그 기록 없음';
@@ -11372,8 +11372,8 @@ extension on _StringsZhCn {
 			case 'errors.connection': return ({required Object code, required Object message}) => '连接错误：${code} ${message}';
 			case 'errors.noSuchUser': return '用户不存在';
 			case 'errors.noSuchUserSub': return '您输入的内容有误，或者用户不存在';
-			case 'errors.discordNotAssigned': return '没有指定Discord ID的用户';
-			case 'errors.discordNotAssignedSub': return '请确保您提供了有效的 ID';
+			case 'errors.discordNotAssigned': return '未找到连接';
+			case 'errors.discordNotAssignedSub': return '您的查询应该如 [API 指南](https://tetr.io/about/api/#userssearchquery)中所述';
 			case 'errors.history': return '缺少该玩家的历史';
 			case 'errors.actionSuggestion': return '也许，您想要';
 			case 'errors.p1nkl0bst3rTLmatches': return '没有找到Tetra联赛比赛';

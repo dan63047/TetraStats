@@ -28,6 +28,7 @@ import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
 import 'package:tetra_stats/data_objects/tetrio_player.dart';
 import 'package:tetra_stats/data_objects/tetrio_player_from_leaderboard.dart';
 import 'package:tetra_stats/data_objects/tetrio_players_leaderboard.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/main.dart' show packageInfo;
 import 'package:flutter/foundation.dart';
 import 'package:tetra_stats/services/custom_http_client.dart';
@@ -1491,7 +1492,7 @@ class TetrioService extends DB {
             if (json['success'] && json['data'] != null) {
               switch (json['data']['users'].length){
                 case 0: // fail - throw an exception
-                  throw TetrioSearchFailed("No connections found");
+                  throw TetrioSearchFailed(t.errors.discordNotAssigned);
                 case 1: // success - rewrite user with tetrio user id and going to obtain data about him
                   user = json['data']['users'][0]['_id'];
                   break;
