@@ -677,6 +677,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.2"
+  sankey_flutter:
+    dependency: "direct main"
+    description:
+      name: sankey_flutter
+      sha256: "28f130de88a5b5bf0a4fb6fe8b069c8ccf6ac54066e1ef1c1eb0c928db016167"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2"
   screen_retriever:
     dependency: transitive
     description:

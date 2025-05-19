@@ -383,65 +383,77 @@ class TetrioService extends DB {
 
   /// Since Minomuncher endpoint is not ready yet, this metod will
   /// return fake data
-  Future<MinomuncherData> fetchMinoMuncherStats(String userID){
+  Future<MinomuncherData> fetchMinoMuncherStats(String userID) async {
     // SingleplayerStream? cached = _cache.get(stream+userID, SingleplayerStream);
     // if (cached != null) return cached;
     
     Uri url;
     if (kIsWeb) {
-      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "Minomuncher", "user": userID.toLowerCase().trim()});
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "Minomuncher", "user": userID.toLowerCase().trim()}); // Not exist for now, TODO
     } else {
-      url = Uri.https('ch.tetr.io', 'bibibibibiibibibiibib');
+      url = Uri.https('REDACTED', 'api/minomuncher'); // TODO: change it on release to oskware bridge
     }
     try {
       Map<String, Map> fakeData = {
-        "icly": {
-          "wellColumns": [ 11, 10, 37, 41, 17, 5, 9, 21, 9, 22 ],
-          "clearTypes": {
-            "perfectClear": 3,
-            "allspin": 152,
-            "single": 237,
-            "tspinSingle": 32,
-            "double": 59,
-            "tspinDouble": 129,
-            "triple": 16,
-            "tspinTriple": 0,
-            "quad": 147,
-          },
-          "tEfficiency": 0.48493975903614456,
-          "iEfficiency": 0.44410876132930516,
-          "cheeseAPL": 2.472027972027972,
-          "downstackAPL": 2.060882800608828,
-          "upstackAPL": 1.2545018007202882,
-          "APL": 1.6100671140939598,
-          "APP": 1.041684759009987,
-          "KPP": 3.5336517585757705,
-          "KPS": 10.527064697854616,
-          "APM": 186.19632497040962,
-          "PPS": 2.9790894567656894,
-          "midgameAPM": 194.85201210927227,
-          "midgamePPS": 3.0030788907741583,
-          "openerAPM": 142.04732280254106,
-          "openerPPS": 2.8567294919177706,
-          "attackCheesiness": 0.47707874789292537,
-          "cleanAttacksCancelled": 0.3386243386243386,
-          "cheesyAttacksCancelled": 0.15763546798029557,
-          "cleanLinesCancelled": 0.32965931863727455,
-          "cheesyLinesCancelled": 0.7214912280701754,
-          "surgeAPM": 212.01475625050423,
-          "surgeAPL": 2.1791044776119404,
-          "surgeDS": 7.146341463414634,
-          "surgePPS": 0.08800944634724127,
-          "surgeLength": 6.926829268292683,
-          "surgeRate": 0.13099041533546327,
-          "surgeSecsPerCheese": 0.7643478260869563,
-          "surgeSecsPerDS": 0.46352564102564087,
-          "surgeAllspin": 0.04878048780487805,
+        "3cooo": {
+            "wellColumns": [79, 0, 0, 19, 11, 4, 18, 21, 12, 68],
+            "clearTypes": {
+                "perfectClear": 0,
+                "allspin": 14,
+                "single": 425,
+                "tspinSingle": 36,
+                "double": 107,
+                "tspinDouble": 61,
+                "triple": 24,
+                "tspinTriple": 0,
+                "quad": 67
+            },
+            "allspinEfficiency": 0.04105571847507331,
+            "tEfficiency": 0.27170868347338933,
+            "iEfficiency": 0.18820224719101122,
+            "cheeseAPL": 1.025974025974026,
+            "downstackAPL": 1.3297872340425532,
+            "upstackAPL": 0.7697516930022573,
+            "APL": 0.9049657534246576,
+            "APP": 0.4238171611868484,
+            "KPP": 3.867281475541299,
+            "KPS": 5.9276816690516005,
+            "APM": 38.97704214113556,
+            "PPS": 1.5327774061808908,
+            "midgameAPM": 25.785628226243237,
+            "midgamePPS": 1.4948766980954797,
+            "openerAPM": 50.366275896030324,
+            "openerPPS": 1.565500208046236,
+            "attackCheesiness": 0.9664530028488953,
+            "surgeAPM": 94.66185911529328,
+            "surgeAPL": 2.646017699115044,
+            "surgeDS": 0,
+            "surgePPS": 1.6040805557998417,
+            "surgeLength": 4.888888888888889,
+            "surgeRate": 0.01618705035971223,
+            "surgeSecsPerCheese": null,
+            "surgeSecsPerDS": null,
+            "surgeAllspin": 0,
+            "cleanLinesRecieved": 0.5962815405046481,
+            "cheeseLinesRecieved": 0.4037184594953519,
+            "cheeseLinesCancelled": 0.11952191235059761,
+            "cheeseLinesTanked": 0.28419654714475434,
+            "cleanLinesCancelled": 0.22310756972111553,
+            "cleanLinesTankedAsCheese": 0.041168658698539175,
+            "cleanLinesTankedAsClean": 0.33200531208499334
         }
-      };
+    };
+      // final response = await client.post(
+      //   url, 
+      //   headers: <String, String>{
+      //     'Content-Type': 'application/json; charset=UTF-8',
+      //   },
+      //   body: File.fromUri(Uri(path: "/home/dan63047/Archive/tetrio replays/beta/пустик.ttrm")).readAsBytesSync()
+      // );
+      // developer.log(response.statusCode.toString());
+      // developer.log(response.body);
       return Future.delayed(Durations.extralong4, () => MinomuncherData.fromJson(fakeData.entries.first));
-      // final response = await client.get(url);
-
+      // TODO: Figure out how to multiple users
       // switch (response.statusCode) {
       //   case 200:
       //     if (jsonDecode(response.body)['success']) {
