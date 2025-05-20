@@ -1002,7 +1002,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 endValue: snapshot.data!.openerAPM,
                 startWidth: 25,
                 endWidth: 25,
-                color: Colors.yellow,
+                color: Colors.yellow.shade300,
                 position: LinearElementPosition.cross
               ),
               LinearGaugeRange(
@@ -1010,7 +1010,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 endValue: snapshot.data!.APM,
                 startWidth: 25,
                 endWidth: 25,
-                color: Colors.red,
+                color: Colors.red.shade300,
                 position: LinearElementPosition.cross
               ),
               LinearGaugeRange(
@@ -1018,7 +1018,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 endValue: snapshot.data!.midgameAPM,
                 startWidth: 25,
                 endWidth: 25,
-                color: Colors.green,
+                color: Colors.green.shade300,
                 position: LinearElementPosition.cross
               )
 						];
@@ -1028,7 +1028,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 endValue: snapshot.data!.openerPPS,
                 startWidth: 25,
                 endWidth: 25,
-                color: Colors.yellow,
+                color: Colors.yellow.shade300,
                 position: LinearElementPosition.cross
               ),
               LinearGaugeRange(
@@ -1036,7 +1036,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 endValue: snapshot.data!.PPS,
                 startWidth: 25,
                 endWidth: 25,
-                color: Colors.red,
+                color: Colors.red.shade300,
                 position: LinearElementPosition.cross
               ),
               LinearGaugeRange(
@@ -1044,7 +1044,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 endValue: snapshot.data!.midgamePPS,
                 startWidth: 25,
                 endWidth: 25,
-                color: Colors.green,
+                color: Colors.green.shade300,
                 position: LinearElementPosition.cross
               )
 						];
@@ -1054,7 +1054,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 endValue: snapshot.data!.cheeseAPL,
                 startWidth: 25,
                 endWidth: 25,
-                color: Colors.yellow,
+                color: Colors.yellow.shade300,
                 position: LinearElementPosition.cross
               ),
               LinearGaugeRange(
@@ -1062,7 +1062,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 endValue: snapshot.data!.upstackAPL,
                 startWidth: 25,
                 endWidth: 25,
-                color: Colors.green,
+                color: Colors.green.shade300,
                 position: LinearElementPosition.cross
               ),
               LinearGaugeRange(
@@ -1070,7 +1070,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 endValue: snapshot.data!.downstackAPL,
                 startWidth: 25,
                 endWidth: 25,
-                color: Colors.red,
+                color: Colors.red.shade300,
                 position: LinearElementPosition.cross
               )
             ];
@@ -1096,11 +1096,17 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
             ];
             Map<String, Color> nodeColors = generateDefaultNodeColorMap(sankeyNodes);
             SankeyDataSet sankeyDataSet = SankeyDataSet(nodes: sankeyNodes, links: sankeyLinks);
-            int? selectedNodeId;
+            final sankey = generateSankeyLayout(
+              width: 800,
+              height: 400,
+              nodeWidth: 20,
+              nodePadding: 15,
+            );
+            sankeyDataSet.layout(sankey);
             const EdgeInsets paddings = const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0);
 						return Column(
 							children: [
-								Text("This card shows icly analysis. Just a design mockup. WIP"),
+								Text("Just a design mockup. WIP"),
 								Card(
 									child: Padding(
 										padding: const EdgeInsets.only(bottom: 4.0),
@@ -1112,7 +1118,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 													Text("Analysis", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleMedium),
 													Padding(
 														padding: const EdgeInsets.only(top: 4.0),
-														child: Text("via MinoMuncher by Freyhoe", textAlign: TextAlign.center, style: widget.constraints.maxWidth > 768.0 ? null : TextStyle(fontSize: 12.0)),
+														child: Text("via MinoMuncher by Freyhoe", textAlign: TextAlign.center, style: TextStyle(fontSize: widget.constraints.maxWidth > 768.0 ? null : 12.0, color: Colors.grey)),
 													)
 												],
 											),
@@ -1163,7 +1169,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 																children: [
 																	Padding(
 																		padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.green)),
+																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.green.shade300)),
 																	),
 																	Text("Midgame: ${f2.format(snapshot.data!.midgameAPM)} APM, ${f2.format(snapshot.data!.midgamePPS)} PPS")
 																],
@@ -1173,7 +1179,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 																children: [
 																	Padding(
 																		padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.red)),
+																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.red.shade300)),
 																	),
 																	Text("Overall: ${f2.format(snapshot.data!.APM)} APM, ${f2.format(snapshot.data!.PPS)} PPS")
 																],
@@ -1183,7 +1189,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 																children: [
 																	Padding(
 																		padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.yellow)),
+																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.yellow.shade300)),
 																	),
 																	Text("Opener: ${f2.format(snapshot.data!.openerAPM)} APM, ${f2.format(snapshot.data!.openerPPS)} PPS")
 																],
@@ -1203,17 +1209,14 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 												mainAxisSize: MainAxisSize.min,
 												crossAxisAlignment: CrossAxisAlignment.center,
 												children: [
-													SfLinearGauge(
+                          Text("Attack Per Line", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+													SizedBox(height: 8.0),
+                          SfLinearGauge(
 														minimum: 0,
 														maximum: 2,
 														interval: .25, 
 														ranges: aplRanges,
-														markerPointers: [
-															LinearWidgetPointer(value: 0, child: Container(width: 36.0, child: Text("APL")), markerAlignment: LinearMarkerAlignment.end)
-														],
-														isMirrored: false,
 														showTicks: true,
-														showLabels: false
 													),
 													SizedBox(height: 8.0),
 													Wrap(
@@ -1226,7 +1229,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 																children: [
 																	Padding(
 																		padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.green)),
+																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.green.shade300)),
 																	),
 																	Text("Upstack: ${f3.format(snapshot.data!.upstackAPL)} APL")
 																],
@@ -1236,7 +1239,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 																children: [
 																	Padding(
 																		padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.red)),
+																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.red.shade300)),
 																	),
 																	Text("Downstack: ${f3.format(snapshot.data!.downstackAPL)} APL")
 																],
@@ -1246,7 +1249,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 																children: [
 																	Padding(
 																		padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.yellow)),
+																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.yellow.shade300)),
 																	),
 																	Text("Cheese: ${f3.format(snapshot.data!.cheeseAPL)} APL")
 																],
@@ -1275,7 +1278,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                                 endValue: snapshot.data!.iEfficiency,
                                 startWidth: 25,
                                 endWidth: 25,
-                                color: Colors.blue,
+                                color: Colors.blue.shade300,
                                 position: LinearElementPosition.cross
                               ),
                               LinearGaugeRange(
@@ -1283,7 +1286,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                                 endValue: snapshot.data!.iEfficiency+snapshot.data!.tEfficiency,
                                 startWidth: 25,
                                 endWidth: 25,
-                                color: Colors.purple,
+                                color: Colors.purple.shade300,
                                 position: LinearElementPosition.cross
                               ),
                               LinearGaugeRange(
@@ -1291,7 +1294,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                                 endValue: snapshot.data!.iEfficiency+snapshot.data!.tEfficiency+snapshot.data!.allspinEfficiency,
                                 startWidth: 25,
                                 endWidth: 25,
-                                color: Colors.green,
+                                color: Colors.green.shade300,
                                 position: LinearElementPosition.cross
                               )
                             ],
@@ -1310,7 +1313,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 																children: [
 																	Padding(
 																		padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.blue)),
+																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.blue.shade300)),
 																	),
 																	Text("Quad efficiency: ${percentage.format(snapshot.data!.iEfficiency)}")
 																],
@@ -1320,7 +1323,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 																children: [
 																	Padding(
 																		padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.purple)),
+																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.purple.shade300)),
 																	),
 																	Text("T-spin efficiency: ${percentage.format(snapshot.data!.tEfficiency)}")
 																],
@@ -1330,7 +1333,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 																children: [
 																	Padding(
 																		padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.green)),
+																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.green.shade300)),
 																	),
 																	Text("Allspin efficiency: ${percentage.format(snapshot.data!.allspinEfficiency)}")
 																],
@@ -1537,6 +1540,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 										child: Column(
 										  children: [
                         Text("Surge", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+                        Center(child: SizedBox(width: 0.0, height: 16.0)),
                         SizedBox(
                           height: 330,
                           width: 330,
@@ -1550,12 +1554,12 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                             tickBorderData: const BorderSide(color: Colors.white24, width: 1),
                             getTitle: (index, angle) {
                               switch (index) {
-                                case 0: return RadarChartTitle(text: "${f2.format(snapshot.data!.surgeAPM)} APM", positionPercentageOffset: 0.05);
-                                case 1: return RadarChartTitle(text: "${f2.format(snapshot.data!.surgePPS)} PPS", positionPercentageOffset: 0.05, angle: 60.0);
-                                case 2: return RadarChartTitle(text: "Length: ${f2.format(snapshot.data!.surgeLength)}", positionPercentageOffset: 0.05, angle: -60.0);
-                                case 3: return RadarChartTitle(text: "${percentage.format(snapshot.data!.surgeRate)} Rate", positionPercentageOffset: 0.05);
-                                case 4: return RadarChartTitle(text: "${f2.format(snapshot.data!.surgeDS)} Secs/DS", positionPercentageOffset: 0.05, angle: 60.0);
-                                case 5: return RadarChartTitle(text: "Surge Allspin\n${percentage.format(snapshot.data!.surgeAllspin)}", positionPercentageOffset: 0.05, angle: -60.0);
+                                case 0: return RadarChartTitle(text: "APM\n${f2.format(snapshot.data!.surgeAPM)}", positionPercentageOffset: 0.05);
+                                case 1: return RadarChartTitle(text: "PPS\n${f2.format(snapshot.data!.surgePPS)}", positionPercentageOffset: 0.05, angle: 60.0);
+                                case 2: return RadarChartTitle(text: "Length\n${f2.format(snapshot.data!.surgeLength)}", positionPercentageOffset: 0.05, angle: -60.0);
+                                case 3: return RadarChartTitle(text: "Rate\n${percentage.format(snapshot.data!.surgeRate)}", positionPercentageOffset: 0.05);
+                                case 4: return RadarChartTitle(text: "Secs/DS\n${f2.format(snapshot.data!.surgeDS)}", positionPercentageOffset: 0.05, angle: 60.0);
+                                case 5: return RadarChartTitle(text: "Allspin\n${percentage.format(snapshot.data!.surgeAllspin)}", positionPercentageOffset: 0.05, angle: -60.0);
                                 default: return const RadarChartTitle(text: '');
                               }
                             },
@@ -1588,6 +1592,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                           )
                           ),
                         ),
+                        Center(child: SizedBox(width: 0.0, height: 16.0)),
 										  ],
 										),
 									)
@@ -1595,18 +1600,17 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 Card(
 									child: Padding(
 										padding: paddings,
-										child: SankeyDiagramWidget( // TODO: where???
-                      data: sankeyDataSet,
-                      nodeColors: nodeColors,
-                      selectedNodeId: selectedNodeId,
-                      onNodeTap: (int? nodeId) {
-                          setState(() {
-                            selectedNodeId = nodeId;
-                          });
-                        },
-                      size: const Size(1000, 600),
-                      showLabels: false,
-                    )
+										child: Column(
+										  children: [
+                        Text("Incoming Attack Sankey Chart", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+										    SankeyDiagramWidget(
+                          data: sankeyDataSet,
+                          nodeColors: nodeColors,
+                          size: const Size(800.0, 400.0),
+                          showLabels: true,
+                        ),
+										  ],
+										)
 									)
 								),
 							],
