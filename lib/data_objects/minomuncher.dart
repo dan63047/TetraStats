@@ -92,8 +92,8 @@ class ClearsChartData {
 	final int quad;
 	ClearsChartData(this.nick, this.perfectClear, this.allspin, this.single, this.tspinSingle, this.double, this.tspinDouble, this.triple, this.tspinTriple, this.quad);
 
-	get total => perfectClear + allspin + single + tspinSingle + double + tspinDouble + triple + tspinTriple + quad;
-  get byID => [
+	int get total => perfectClear + allspin + single + tspinSingle + double + tspinDouble + triple + tspinTriple + quad;
+  List<int> get byID => [
     perfectClear,
     allspin,
     single,
@@ -104,7 +104,7 @@ class ClearsChartData {
     tspinTriple,
     quad,
   ];
-	get clearName => [
+	List<String> get clearName => [
 		t.stats.pcs,
 		"All Spins",
 		t.stats.lineClears.single,

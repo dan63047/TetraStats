@@ -9,7 +9,11 @@ import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
+import 'package:tetra_stats/widgets/apl_ranges.dart';
+import 'package:tetra_stats/widgets/apm_pps_ranges.dart';
+import 'package:tetra_stats/widgets/clear_types_thingy.dart';
 import 'package:tetra_stats/widgets/compare_thingy.dart';
+import 'package:tetra_stats/widgets/efficiency_ranges.dart';
 import 'package:tetra_stats/widgets/future_error.dart';
 import 'package:tetra_stats/widgets/list_tile_trailing_stats.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
@@ -19,6 +23,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/open_in_browser.dart';
+import 'package:tetra_stats/widgets/well_columns_thingy.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../main.dart';
@@ -399,6 +404,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
                     },
                     "tEfficiency": 0.48493975903614456,
                     "iEfficiency": 0.44410876132930516,
+                    "allspinEfficiency": 0.33,
                     "cheeseAPL": 2.472027972027972,
                     "downstackAPL": 2.060882800608828,
                     "upstackAPL": 1.2545018007202882,
@@ -426,302 +432,32 @@ class TlMatchResultState extends State<TlMatchResultView> {
                     "surgeSecsPerCheese": 0.7643478260869563,
                     "surgeSecsPerDS": 0.46352564102564087,
                     "surgeAllspin": 0.04878048780487805,
+                    "cleanLinesRecieved": 0.5962815405046481,
+                    "cheeseLinesRecieved": 0.4037184594953519,
+                    "cheeseLinesCancelled": 0.11952191235059761,
+                    "cheeseLinesTanked": 0.28419654714475434,
+                    "cleanLinesTankedAsCheese": 0.041168658698539175,
+                    "cleanLinesTankedAsClean": 0.33200531208499334
                   }
                 )
               );
-              List<ClearsChartData> clearTypeListGreen = [snapshot.data!.clearTypes];
-              List<ClearsChartData> clearTypeListRed = [wow.clearTypes];
-              List<List<LinearGaugeRange>> apmRanges = [
-                for (int i = 0; i < 2; i++) [
-                  LinearGaugeRange(
-                  startValue: 0,
-                  endValue: i == 0 ? snapshot.data!.openerAPM : wow.openerAPM,
-                  startWidth: 25,
-                  endWidth: 25,
-                  color: Colors.yellow,
-                  position: LinearElementPosition.cross
-                ),
-                LinearGaugeRange(
-                  startValue: 0,
-                  endValue: i == 0 ? snapshot.data!.APM : wow.APM,
-                  startWidth: 25,
-                  endWidth: 25,
-                  color: Colors.orange,
-                  position: LinearElementPosition.cross
-                ),
-                LinearGaugeRange(
-                  startValue: 0,
-                  endValue: i == 0 ? snapshot.data!.midgameAPM : wow.midgameAPM,
-                  startWidth: 25,
-                  endWidth: 25,
-                  color: Colors.red,
-                  position: LinearElementPosition.cross
-                )
-                ]
-              ];
-              List<List<LinearGaugeRange>> ppsRanges = [
-                for (int i = 0; i < 2; i++) [
-                  LinearGaugeRange(
-                    startValue: 0,
-                    endValue: i == 0 ? snapshot.data!.openerPPS : wow.openerPPS,
-                    startWidth: 25,
-                    endWidth: 25,
-                    color: Colors.yellow,
-                    position: LinearElementPosition.cross
-                  ),
-                  LinearGaugeRange(
-                    startValue: 0,
-                    endValue: i == 0 ? snapshot.data!.PPS : wow.PPS,
-                    startWidth: 25,
-                    endWidth: 25,
-                    color: Colors.orange,
-                    position: LinearElementPosition.cross
-                  ),
-                  LinearGaugeRange(
-                    startValue: 0,
-                    endValue: i == 0 ? snapshot.data!.midgamePPS : wow.midgamePPS,
-                    startWidth: 25,
-                    endWidth: 25,
-                    color: Colors.red,
-                    position: LinearElementPosition.cross
-                  )
-                ]
-              ];
-              return Column(
+              return ListView(
                 children: [
                   if (showMobileSelector) mobileSelector(),
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
-                      child: Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            for (int i = 0; i < 2; i++) SfLinearGauge(
-                              minimum: 0,
-                              maximum: 300,
-                              interval: 25, 
-                              ranges: apmRanges[i],
-                              markerPointers: [
-                                LinearWidgetPointer(value: 0, child: Container(width: 36.0, child: Text("APM")), markerAlignment: LinearMarkerAlignment.end)
-                              ],
-                              isMirrored: false,
-                              showTicks: true,
-                              showLabels: false
-                            ),
-                            SizedBox(height: 8.0),
-                            for (int i = 0; i < 2; i++) SfLinearGauge(
-                              minimum: 0,
-                              maximum: 4.00,
-                              interval: .25, 
-                              ranges: ppsRanges[i],
-                              markerPointers: [
-                                LinearWidgetPointer(value: 0, child: Container(width: 36.0, child: Text("PPS")), markerAlignment: LinearMarkerAlignment.end)
-                              ],
-                              isMirrored: false,
-                              showTicks: true,
-                              showLabels: false
-                            ),
-                            SizedBox(height: 8.0),
-                            Wrap(
-                              direction: Axis.horizontal,
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              spacing: 20,
-                              children: [
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-                                      child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.red)),
-                                    ),
-                                    Text("Midgame: ${f2.format(snapshot.data!.midgameAPM)} APM, ${f2.format(snapshot.data!.midgamePPS)} PPS")
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-                                      child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.orange)),
-                                    ),
-                                    Text("Overall: ${f2.format(snapshot.data!.APM)} APM, ${f2.format(snapshot.data!.PPS)} PPS")
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-                                      child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.yellow)),
-                                    ),
-                                    Text("Opener: ${f2.format(snapshot.data!.openerAPM)} APM, ${f2.format(snapshot.data!.openerPPS)} PPS")
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0),
-                      child: Row(
-                        children: [
-                          SfCartesianChart(
-                            primaryXAxis: CategoryAxis(isVisible: false),
-                            primaryYAxis: NumericAxis(minimum: 0, maximum: 100),
-                            title: ChartTitle(text: clearTypeListGreen.first.nick, textStyle: width > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
-                            series: <CartesianSeries>[
-                              StackedColumn100Series<ClearsChartData, String>(
-                                dataSource: clearTypeListGreen,
-                                xValueMapper: (ClearsChartData data, _) => data.nick,
-                                yValueMapper: (ClearsChartData data, _) => data.perfectClear,
-                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[0],
-                              ),
-                              StackedColumn100Series<ClearsChartData, String>(
-                                dataSource: clearTypeListGreen,
-                                xValueMapper: (ClearsChartData data, _) => data.nick,
-                                yValueMapper: (ClearsChartData data, _) => data.allspin,
-                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[1],
-                              ),
-                              StackedColumn100Series<ClearsChartData, String>(
-                                dataSource: clearTypeListGreen,
-                                xValueMapper: (ClearsChartData data, _) => data.nick,
-                                yValueMapper: (ClearsChartData data, _) => data.single,
-                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[2],
-                              ),
-                              StackedColumn100Series<ClearsChartData, String>(
-                                dataSource: clearTypeListGreen,
-                                xValueMapper: (ClearsChartData data, _) => data.nick,
-                                yValueMapper: (ClearsChartData data, _) => data.tspinSingle,
-                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[3],
-                              ),
-                              StackedColumn100Series<ClearsChartData, String>(
-                                dataSource: clearTypeListGreen,
-                                xValueMapper: (ClearsChartData data, _) => data.nick,
-                                yValueMapper: (ClearsChartData data, _) => data.double,
-                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[4],
-                              ),
-                              StackedColumn100Series<ClearsChartData, String>(
-                                dataSource: clearTypeListGreen,
-                                xValueMapper: (ClearsChartData data, _) => data.nick,
-                                yValueMapper: (ClearsChartData data, _) => data.tspinDouble,
-                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[5],
-                              ),
-                              StackedColumn100Series<ClearsChartData, String>(
-                                dataSource: clearTypeListGreen,
-                                xValueMapper: (ClearsChartData data, _) => data.nick,
-                                yValueMapper: (ClearsChartData data, _) => data.triple,
-                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[6],
-                              ),
-                              StackedColumn100Series<ClearsChartData, String>(
-                                dataSource: clearTypeListGreen,
-                                xValueMapper: (ClearsChartData data, _) => data.nick,
-                                yValueMapper: (ClearsChartData data, _) => data.tspinTriple,
-                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[7],
-                              ),
-                              StackedColumn100Series<ClearsChartData, String>(
-                                dataSource: clearTypeListGreen,
-                                xValueMapper: (ClearsChartData data, _) => data.nick,
-                                yValueMapper: (ClearsChartData data, _) => data.quad,
-                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[8],
-                              ),
-                            ]
-                          ),
-                          Column(
-                            children: [
-                              for (int i = 0; i < snapshot.data!.clearTypes.byID.length; i++) Container(
-                                height: 20,
-                                width: 210,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                        Padding(
-                                          padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-                                          child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: lineClearsColors[i])),
-                                        ),
-                                      Text("${snapshot.data!.clearTypes.clearName[i]}:"),
-                                    ],
-                                    ),
-                                    Text("${intf.format(snapshot.data!.clearTypes.byID[i])} (${percentage.format(snapshot.data!.clearTypes.byID[i]/snapshot.data!.clearTypes.total)})")
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
-                          SfCartesianChart(
-                            plotAreaBorderWidth: 0.4,
-                            primaryXAxis: CategoryAxis(isVisible: false),
-                            primaryYAxis: NumericAxis(minimum: 0, maximum: 100, opposedPosition: true),
-                            title: ChartTitle(text: clearTypeListRed.first.nick, textStyle: width > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
-                            series: <CartesianSeries>[
-                              StackedColumn100Series<ClearsChartData, String>(
-                                dataSource: clearTypeListRed,
-                                xValueMapper: (ClearsChartData data, _) => data.nick,
-                                yValueMapper: (ClearsChartData data, _) => data.perfectClear,
-                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[0],
-                              ),
-                              StackedColumn100Series<ClearsChartData, String>(
-                                dataSource: clearTypeListRed,
-                                xValueMapper: (ClearsChartData data, _) => data.nick,
-                                yValueMapper: (ClearsChartData data, _) => data.allspin,
-                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[1],
-                              ),
-                              StackedColumn100Series<ClearsChartData, String>(
-                                dataSource: clearTypeListRed,
-                                xValueMapper: (ClearsChartData data, _) => data.nick,
-                                yValueMapper: (ClearsChartData data, _) => data.single,
-                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[2],
-                              ),
-                              StackedColumn100Series<ClearsChartData, String>(
-                                dataSource: clearTypeListRed,
-                                xValueMapper: (ClearsChartData data, _) => data.nick,
-                                yValueMapper: (ClearsChartData data, _) => data.tspinSingle,
-                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[3],
-                              ),
-                              StackedColumn100Series<ClearsChartData, String>(
-                                dataSource: clearTypeListRed,
-                                xValueMapper: (ClearsChartData data, _) => data.nick,
-                                yValueMapper: (ClearsChartData data, _) => data.double,
-                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[4],
-                              ),
-                              StackedColumn100Series<ClearsChartData, String>(
-                                dataSource: clearTypeListRed,
-                                xValueMapper: (ClearsChartData data, _) => data.nick,
-                                yValueMapper: (ClearsChartData data, _) => data.tspinDouble,
-                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[5],
-                              ),
-                              StackedColumn100Series<ClearsChartData, String>(
-                                dataSource: clearTypeListRed,
-                                xValueMapper: (ClearsChartData data, _) => data.nick,
-                                yValueMapper: (ClearsChartData data, _) => data.triple,
-                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[6],
-                              ),
-                              StackedColumn100Series<ClearsChartData, String>(
-                                dataSource: clearTypeListRed,
-                                xValueMapper: (ClearsChartData data, _) => data.nick,
-                                yValueMapper: (ClearsChartData data, _) => data.tspinTriple,
-                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[7],
-                              ),
-                              StackedColumn100Series<ClearsChartData, String>(
-                                dataSource: clearTypeListRed,
-                                xValueMapper: (ClearsChartData data, _) => data.nick,
-                                yValueMapper: (ClearsChartData data, _) => data.quad,
-                                pointColorMapper: (ClearsChartData data, _) => lineClearsColors[8],
-                              ),
-                            ]
-                          ),
-                        ],
-                      ),
-                    )
-                  ),
+                  ApmPpsThingy([
+                    ApmPps(snapshot.data!.nick, snapshot.data!.openerAPM, snapshot.data!.APM, snapshot.data!.midgameAPM, snapshot.data!.openerPPS, snapshot.data!.PPS, snapshot.data!.midgamePPS),
+                    ApmPps(wow.nick, wow.openerAPM, wow.APM, wow.midgameAPM, wow.openerPPS, wow.PPS, wow.midgamePPS)
+                  ]),
+                  AplThingy([
+                    Apl(snapshot.data!.nick, snapshot.data!.upstackAPL, snapshot.data!.downstackAPL, snapshot.data!.cheeseAPL),
+                    Apl(wow.nick, wow.upstackAPL, wow.downstackAPL, wow.cheeseAPL)
+                  ], width > 768),
+                  EffThingy([
+                    Eff(snapshot.data!.nick, snapshot.data!.iEfficiency, snapshot.data!.tEfficiency, snapshot.data!.allspinEfficiency),
+                    Eff(wow.nick, wow.iEfficiency, wow.tEfficiency, wow.allspinEfficiency)
+                  ], width > 768),
+                  ClearTypesThingy([snapshot.data!.clearTypes, wow.clearTypes], width),
+                  WellColumnsThingy([snapshot.data!.wellColumns, wow.wellColumns], [snapshot.data!.nick, wow.nick], width)
                 ],
               );
             } if (snapshot.hasError){ return SizedBox(height: 720.0, child: FutureError(snapshot)); }
@@ -739,7 +475,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
         children: [
           SizedBox(
             width: width,
-            height: height - 64,// - 72
+            height: height - 64 - 40,// - 72
             child: NestedScrollView(
               headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) { 
                 return [
@@ -834,29 +570,29 @@ class TlMatchResultState extends State<TlMatchResultView> {
               // TODO: insert tetrio/freyhoe switch someone there
             ),
           ),
-          // SizedBox(
-          //   width: width,
-          //   height: 40.000000,
-          //   child: SegmentedButton<Mod>(
-          //     showSelectedIcon: false,
-          //     selected: <Mod>{mod},
-          //     segments: <ButtonSegment<Mod>>[
-          //       ButtonSegment(
-          //         value: Mod.info,
-          //         label: Text(t.general)
-          //       ),
-          //       ButtonSegment(
-          //         value: Mod.analysis,
-          //         label: Text("Analysis")
-          //       )
-          //     ],
-          //     onSelectionChanged: (p0) {
-          //       setState(() {
-          //         mod = p0.first;
-          //       });
-          //     },
-          //   ),
-          // )
+          SizedBox(
+            width: width,
+            height: 40.000000,
+            child: SegmentedButton<Mod>(
+              showSelectedIcon: false,
+              selected: <Mod>{mod},
+              segments: <ButtonSegment<Mod>>[
+                ButtonSegment(
+                  value: Mod.info,
+                  label: Text(t.general)
+                ),
+                ButtonSegment(
+                  value: Mod.analysis,
+                  label: Text("Analysis")
+                )
+              ],
+              onSelectionChanged: (p0) {
+                setState(() {
+                  mod = p0.first;
+                });
+              },
+            ),
+          )
         ],
       ),
     );

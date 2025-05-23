@@ -6,9 +6,11 @@ import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
-import 'package:sankey_flutter/sankey_helpers.dart';
-import 'package:sankey_flutter/sankey_link.dart';
-import 'package:sankey_flutter/sankey_node.dart';
+import 'package:tetra_stats/widgets/apl_ranges.dart';
+import 'package:tetra_stats/widgets/apm_pps_ranges.dart';
+import 'package:tetra_stats/widgets/clear_types_thingy.dart';
+import 'package:tetra_stats/widgets/efficiency_ranges.dart';
+import 'package:tetra_stats/widgets/sankey_graph.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/data_objects/achievement.dart';
@@ -39,7 +41,6 @@ import 'package:tetra_stats/widgets/error_thingy.dart';
 import 'package:tetra_stats/widgets/fake_distinguishment_thingy.dart';
 import 'package:tetra_stats/widgets/finesse_thingy.dart';
 import 'package:tetra_stats/widgets/future_error.dart';
-import 'package:tetra_stats/widgets/gauget_thingy.dart';
 import 'package:tetra_stats/widgets/graphs.dart';
 import 'package:tetra_stats/widgets/lineclears_thingy.dart';
 import 'package:tetra_stats/widgets/nerd_stats_thingy.dart';
@@ -50,6 +51,7 @@ import 'package:tetra_stats/widgets/tl_rating_thingy.dart';
 import 'package:tetra_stats/widgets/tl_records_thingy.dart';
 import 'package:tetra_stats/widgets/tl_thingy.dart';
 import 'package:tetra_stats/widgets/user_thingy.dart';
+import 'package:tetra_stats/widgets/well_columns_thingy.dart';
 import 'package:tetra_stats/widgets/zenith_thingy.dart';
 
 class DestinationHome extends StatefulWidget{
@@ -996,114 +998,60 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 				case ConnectionState.done:
 					if (snapshot.hasData){
 						List<ClearsChartData> clearTypeList = [snapshot.data!.clearTypes];
-						List<LinearGaugeRange> apmRanges = [
-              LinearGaugeRange(
-                startValue: 0,
-                endValue: snapshot.data!.openerAPM,
-                startWidth: 25,
-                endWidth: 25,
-                color: Colors.yellow.shade300,
-                position: LinearElementPosition.cross
-              ),
-              LinearGaugeRange(
-                startValue: 0,
-                endValue: snapshot.data!.APM,
-                startWidth: 25,
-                endWidth: 25,
-                color: Colors.red.shade300,
-                position: LinearElementPosition.cross
-              ),
-              LinearGaugeRange(
-                startValue: 0,
-                endValue: snapshot.data!.midgameAPM,
-                startWidth: 25,
-                endWidth: 25,
-                color: Colors.green.shade300,
-                position: LinearElementPosition.cross
-              )
+						List<LinearGaugeRange> aplRanges = [
+							LinearGaugeRange(
+							startValue: 0,
+							endValue: snapshot.data!.cheeseAPL,
+							startWidth: 25,
+							endWidth: 25,
+							color: Colors.yellow.shade300,
+							position: LinearElementPosition.cross
+							),
+							LinearGaugeRange(
+							startValue: 0,
+							endValue: snapshot.data!.upstackAPL,
+							startWidth: 25,
+							endWidth: 25,
+							color: Colors.green.shade300,
+							position: LinearElementPosition.cross
+							),
+							LinearGaugeRange(
+							startValue: 0,
+							endValue: snapshot.data!.downstackAPL,
+							startWidth: 25,
+							endWidth: 25,
+							color: Colors.red.shade300,
+							position: LinearElementPosition.cross
+							)
 						];
-						List<LinearGaugeRange> ppsRanges = [
-              LinearGaugeRange(
-                startValue: 0,
-                endValue: snapshot.data!.openerPPS,
-                startWidth: 25,
-                endWidth: 25,
-                color: Colors.yellow.shade300,
-                position: LinearElementPosition.cross
-              ),
-              LinearGaugeRange(
-                startValue: 0,
-                endValue: snapshot.data!.PPS,
-                startWidth: 25,
-                endWidth: 25,
-                color: Colors.red.shade300,
-                position: LinearElementPosition.cross
-              ),
-              LinearGaugeRange(
-                startValue: 0,
-                endValue: snapshot.data!.midgamePPS,
-                startWidth: 25,
-                endWidth: 25,
-                color: Colors.green.shade300,
-                position: LinearElementPosition.cross
-              )
+						aplRanges.sort((a, b) => a.endValue > b.endValue ? -1 : 1);
+						List<SankeyNode> sankeyNodes = [
+							SankeyNode(id: 0, label: 'Incoming Attack'),
+							SankeyNode(id: 1, label: 'Cheese'),
+							SankeyNode(id: 2, label: 'Clean'),
+							SankeyNode(id: 3, label: 'Cancelled'),
+							SankeyNode(id: 4, label: 'CheeseTanked'),
+							SankeyNode(id: 5, label: 'CleanTanked'),
 						];
-            List<LinearGaugeRange> aplRanges = [
-              LinearGaugeRange(
-                startValue: 0,
-                endValue: snapshot.data!.cheeseAPL,
-                startWidth: 25,
-                endWidth: 25,
-                color: Colors.yellow.shade300,
-                position: LinearElementPosition.cross
-              ),
-              LinearGaugeRange(
-                startValue: 0,
-                endValue: snapshot.data!.upstackAPL,
-                startWidth: 25,
-                endWidth: 25,
-                color: Colors.green.shade300,
-                position: LinearElementPosition.cross
-              ),
-              LinearGaugeRange(
-                startValue: 0,
-                endValue: snapshot.data!.downstackAPL,
-                startWidth: 25,
-                endWidth: 25,
-                color: Colors.red.shade300,
-                position: LinearElementPosition.cross
-              )
-            ];
-						apmRanges.sort((a, b) => a.endValue > b.endValue ? -1 : 1);
-						ppsRanges.sort((a, b) => a.endValue > b.endValue ? -1 : 1);
-            aplRanges.sort((a, b) => a.endValue > b.endValue ? -1 : 1);
-            List<SankeyNode> sankeyNodes = [
-              SankeyNode(id: 0, label: 'Incoming Attack'),
-              SankeyNode(id: 1, label: 'Cheese'),
-              SankeyNode(id: 2, label: 'Clean'),
-              SankeyNode(id: 3, label: 'Cancelled'),
-              SankeyNode(id: 4, label: 'CheeseTanked'),
-              SankeyNode(id: 5, label: 'CleanTanked'),
-            ];
-            List<SankeyLink> sankeyLinks = [
-              SankeyLink(source: sankeyNodes[0], target: sankeyNodes[1], value: snapshot.data!.cheeseLinesRecieved * 100),
-              SankeyLink(source: sankeyNodes[0], target: sankeyNodes[2], value: snapshot.data!.cleanLinesRecieved * 100),
-              SankeyLink(source: sankeyNodes[1], target: sankeyNodes[3], value: snapshot.data!.cheeseLinesCancelled * 100),
-              SankeyLink(source: sankeyNodes[1], target: sankeyNodes[4], value: snapshot.data!.cheeseLinesTanked * 100),
-              SankeyLink(source: sankeyNodes[2], target: sankeyNodes[3], value: snapshot.data!.cheeseLinesCancelled * 100),
-              SankeyLink(source: sankeyNodes[2], target: sankeyNodes[4], value: snapshot.data!.cleanLinesTankedAsCheese * 100),
-              SankeyLink(source: sankeyNodes[2], target: sankeyNodes[5], value: snapshot.data!.cleanLinesTankedAsClean * 100)
-            ];
-            Map<String, Color> nodeColors = generateDefaultNodeColorMap(sankeyNodes);
-            SankeyDataSet sankeyDataSet = SankeyDataSet(nodes: sankeyNodes, links: sankeyLinks);
-            final sankey = generateSankeyLayout(
-              width: 800,
-              height: 400,
-              nodeWidth: 20,
-              nodePadding: 15,
-            );
-            sankeyDataSet.layout(sankey);
-            const EdgeInsets paddings = const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0);
+						List<SankeyLink> sankeyLinks = [
+							SankeyLink(source: sankeyNodes[0], target: sankeyNodes[1], value: snapshot.data!.cheeseLinesRecieved * 100),
+							SankeyLink(source: sankeyNodes[0], target: sankeyNodes[2], value: snapshot.data!.cleanLinesRecieved * 100),
+							SankeyLink(source: sankeyNodes[1], target: sankeyNodes[3], value: snapshot.data!.cheeseLinesCancelled * 100),
+							SankeyLink(source: sankeyNodes[1], target: sankeyNodes[4], value: snapshot.data!.cheeseLinesTanked * 100),
+							SankeyLink(source: sankeyNodes[2], target: sankeyNodes[3], value: snapshot.data!.cheeseLinesCancelled * 100),
+							SankeyLink(source: sankeyNodes[2], target: sankeyNodes[4], value: snapshot.data!.cleanLinesTankedAsCheese * 100),
+							SankeyLink(source: sankeyNodes[2], target: sankeyNodes[5], value: snapshot.data!.cleanLinesTankedAsClean * 100)
+						];
+						Map<String, Color> nodeColors = generateDefaultNodeColorMap(sankeyNodes);
+						SankeyDataSet sankeyDataSet = SankeyDataSet(nodes: sankeyNodes, links: sankeyLinks);
+						final sankey = generateSankeyLayout(
+							width: 800,
+							height: 400,
+							nodeWidth: 20,
+							nodePadding: 15,
+						);
+						sankeyDataSet.layout(sankey);
+						const EdgeInsets paddings = const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0);
 						return Column(
 							children: [
 								Text("Just a design mockup. WIP"),
@@ -1125,494 +1073,151 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 										),
 									),
 								),
-								Card(
-									child: Padding(
-										padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
-										child: Center(
-											child: Column(
-												mainAxisSize: MainAxisSize.min,
-												crossAxisAlignment: CrossAxisAlignment.center,
-												children: [
-													SfLinearGauge(
-														minimum: 0,
-														maximum: 300,
-														interval: 25, 
-														ranges: apmRanges,
-														markerPointers: [
-															LinearWidgetPointer(value: 0, child: Container(width: 36.0, child: Text("APM")), markerAlignment: LinearMarkerAlignment.end)
-														],
-														isMirrored: false,
-														showTicks: true,
-														showLabels: false
-													),
-													SizedBox(height: 8.0),
-													SfLinearGauge(
-														minimum: 0,
-														maximum: 4.00,
-														interval: .25, 
-														ranges: ppsRanges,
-														markerPointers: [
-															LinearWidgetPointer(value: 0, child: Container(width: 36.0, child: Text("PPS")), markerAlignment: LinearMarkerAlignment.end)
-														],
-														isMirrored: false,
-														showTicks: true,
-														showLabels: false
-													),
-													SizedBox(height: 8.0),
-													Wrap(
-														direction: Axis.horizontal,
-														crossAxisAlignment: WrapCrossAlignment.center,
-														spacing: 20,
-														children: [
-															Row(
-																mainAxisSize: MainAxisSize.min,
-																children: [
-																	Padding(
-																		padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.green.shade300)),
-																	),
-																	Text("Midgame: ${f2.format(snapshot.data!.midgameAPM)} APM, ${f2.format(snapshot.data!.midgamePPS)} PPS")
-																],
-															),
-															Row(
-																mainAxisSize: MainAxisSize.min,
-																children: [
-																	Padding(
-																		padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.red.shade300)),
-																	),
-																	Text("Overall: ${f2.format(snapshot.data!.APM)} APM, ${f2.format(snapshot.data!.PPS)} PPS")
-																],
-															),
-															Row(
-																mainAxisSize: MainAxisSize.min,
-																children: [
-																	Padding(
-																		padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.yellow.shade300)),
-																	),
-																	Text("Opener: ${f2.format(snapshot.data!.openerAPM)} APM, ${f2.format(snapshot.data!.openerPPS)} PPS")
-																],
-															),
-														],
-													),
-												],
-											),
-										),
-									),
-								),
-                Card(
-									child: Padding(
-										padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
-										child: Center(
-											child: Column(
-												mainAxisSize: MainAxisSize.min,
-												crossAxisAlignment: CrossAxisAlignment.center,
-												children: [
-                          Text("Attack Per Line", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
-													SizedBox(height: 8.0),
-                          SfLinearGauge(
-														minimum: 0,
-														maximum: 2,
-														interval: .25, 
-														ranges: aplRanges,
-														showTicks: true,
-													),
-													SizedBox(height: 8.0),
-													Wrap(
-														direction: Axis.horizontal,
-														crossAxisAlignment: WrapCrossAlignment.center,
-														spacing: 20,
-														children: [
-															Row(
-																mainAxisSize: MainAxisSize.min,
-																children: [
-																	Padding(
-																		padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.green.shade300)),
-																	),
-																	Text("Upstack: ${f3.format(snapshot.data!.upstackAPL)} APL")
-																],
-															),
-															Row(
-																mainAxisSize: MainAxisSize.min,
-																children: [
-																	Padding(
-																		padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.red.shade300)),
-																	),
-																	Text("Downstack: ${f3.format(snapshot.data!.downstackAPL)} APL")
-																],
-															),
-                              Row(
-																mainAxisSize: MainAxisSize.min,
-																children: [
-																	Padding(
-																		padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.yellow.shade300)),
-																	),
-																	Text("Cheese: ${f3.format(snapshot.data!.cheeseAPL)} APL")
-																],
-															),
-														],
-													),
-												],
-											),
-										),
-									),
-								),
-                Card(
-									child: Padding(
-										padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
-										child: Center(
-											child: Column(
-												mainAxisSize: MainAxisSize.min,
-												crossAxisAlignment: CrossAxisAlignment.center,
-												children: [
-													SfLinearGauge(
-														minimum: 0,
-														maximum: snapshot.data!.iEfficiency+snapshot.data!.tEfficiency+snapshot.data!.allspinEfficiency,
-														ranges: <LinearGaugeRange>[
-                              LinearGaugeRange(
-                                startValue: 0,
-                                endValue: snapshot.data!.iEfficiency,
-                                startWidth: 25,
-                                endWidth: 25,
-                                color: Colors.blue.shade300,
-                                position: LinearElementPosition.cross
-                              ),
-                              LinearGaugeRange(
-                                startValue: snapshot.data!.iEfficiency,
-                                endValue: snapshot.data!.iEfficiency+snapshot.data!.tEfficiency,
-                                startWidth: 25,
-                                endWidth: 25,
-                                color: Colors.purple.shade300,
-                                position: LinearElementPosition.cross
-                              ),
-                              LinearGaugeRange(
-                                startValue: snapshot.data!.iEfficiency+snapshot.data!.tEfficiency,
-                                endValue: snapshot.data!.iEfficiency+snapshot.data!.tEfficiency+snapshot.data!.allspinEfficiency,
-                                startWidth: 25,
-                                endWidth: 25,
-                                color: Colors.green.shade300,
-                                position: LinearElementPosition.cross
-                              )
-                            ],
-														isMirrored: false,
-														showTicks: true,
-														showLabels: false
-													),
-													SizedBox(height: 8.0),
-													Wrap(
-														direction: Axis.horizontal,
-														crossAxisAlignment: WrapCrossAlignment.center,
-														spacing: 20,
-														children: [
-															Row(
-																mainAxisSize: MainAxisSize.min,
-																children: [
-																	Padding(
-																		padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.blue.shade300)),
-																	),
-																	Text("Quad efficiency: ${percentage.format(snapshot.data!.iEfficiency)}")
-																],
-															),
-															Row(
-																mainAxisSize: MainAxisSize.min,
-																children: [
-																	Padding(
-																		padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.purple.shade300)),
-																	),
-																	Text("T-spin efficiency: ${percentage.format(snapshot.data!.tEfficiency)}")
-																],
-															),
-                              Row(
-																mainAxisSize: MainAxisSize.min,
-																children: [
-																	Padding(
-																		padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																		child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.green.shade300)),
-																	),
-																	Text("Allspin efficiency: ${percentage.format(snapshot.data!.allspinEfficiency)}")
-																],
-															),
-														],
-													),
-												],
-											),
-										),
-									),
-								),
-								Card(
-									child: Padding(
-										padding: paddings,
-										child: Column(
-											children: [
-												SfCartesianChart(
-													primaryXAxis: CategoryAxis(isVisible: false),
-													primaryYAxis: NumericAxis(minimum: 0, maximum: 100),
-													title: ChartTitle(text: "Clear Types", textStyle: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
-													legend: Legend(
-														isVisible: true,
-														position: LegendPosition.left,
-														itemPadding: 2,
-														legendItemBuilder: (legendText, series, point, seriesIndex) {
-															return Container(
-																height: 20,
-																width: 210,
-																child: Row(
-																	mainAxisAlignment: MainAxisAlignment.spaceBetween,
-																	children: [
-																		Row(
-																			mainAxisSize: MainAxisSize.min,
-																		children: [
-																				Padding(
-																					padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-																					child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: lineClearsColors[seriesIndex])),
-																				),
-																			Text("${snapshot.data!.clearTypes.clearName[seriesIndex]}:"),
-																		],
-																		),
-																		Text("${intf.format(point.y)} · ${percentage2f2.format(point.y!/snapshot.data!.clearTypes.total)}")
-																	],
-																),
-															);
-														}, 
-													),
-													series: width > 580 ? <CartesianSeries>[
-														StackedBar100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.perfectClear,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[0]
-														),
-														StackedBar100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.allspin,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[1]
-														),
-														StackedBar100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.single,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[2]
-														),
-														StackedBar100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.tspinSingle,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[3]
-														),
-														StackedBar100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.double,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[4]
-														),
-														StackedBar100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.tspinDouble,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[5]
-														),
-														StackedBar100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.triple,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[6]
-														),
-														StackedBar100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.tspinTriple,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[7]
-														),
-														StackedBar100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.quad,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[8]
-														),
-													] : <CartesianSeries>[
-														StackedColumn100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.perfectClear,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[0]
-														),
-														StackedColumn100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.allspin,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[1]
-														),
-														StackedColumn100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.single,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[2]
-														),
-														StackedColumn100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.tspinSingle,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[3]
-														),
-														StackedColumn100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.double,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[4]
-														),
-														StackedColumn100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.tspinDouble,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[5]
-														),
-														StackedColumn100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.triple,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[6]
-														),
-														StackedColumn100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.tspinTriple,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[7]
-														),
-														StackedColumn100Series<ClearsChartData, String>(
-															dataSource: clearTypeList,
-															xValueMapper: (ClearsChartData data, _) => data.nick,
-															yValueMapper: (ClearsChartData data, _) => data.quad,
-															pointColorMapper: (ClearsChartData data, _) => lineClearsColors[8]
-														),
-													]
-												),
-											],
-										),
-									)
-								),
-								Card(
-									child: Padding(
-										padding: paddings,
-										child: Column(
-											children: [
-												SfCartesianChart(
-													primaryXAxis: CategoryAxis(),
-													primaryYAxis: NumericAxis(numberFormat: percentage),
-													tooltipBehavior: TooltipBehavior(
-														enable: true,
-														color: Colors.black,
-														borderColor: Colors.white,
-														animationDuration: 0,
-														builder: (dynamic data, dynamic point, dynamic series,
-															int pointIndex, int seriesIndex) {
-																return Padding(
-																	padding: const EdgeInsets.all(8.0),
-																	child: Text(
-																		"${percentage.format(data.value)}",
-																		style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 20),
-																	),
-																);
-														}
-													),
-													title: ChartTitle(text: "Well Column Distribution", textStyle: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
-													series: <CartesianSeries>[
-														ColumnSeries<WellsData, int>(
-																dataSource: snapshot.data!.wellColumns,
-																xValueMapper: (WellsData data, _) => data.well,
-																yValueMapper: (WellsData data, _) => data.value
-														)
-													]
-												),
-											],
-										),
-									)
-								),
-                Card(
+								ApmPpsThingy([ApmPps("thing", snapshot.data!.openerAPM, snapshot.data!.APM, snapshot.data!.midgameAPM, snapshot.data!.openerPPS, snapshot.data!.PPS, snapshot.data!.midgamePPS)]),
+				        AplThingy([Apl("thing", snapshot.data!.upstackAPL, snapshot.data!.downstackAPL, snapshot.data!.cheeseAPL)], width > 768.0),
+                EffThingy([Eff("thing", snapshot.data!.iEfficiency, snapshot.data!.tEfficiency, snapshot.data!.allspinEfficiency)], width > 768.0),
+								ClearTypesThingy([snapshot.data!.clearTypes], width),
+								WellColumnsThingy([snapshot.data!.wellColumns], [snapshot.data!.nick], width),
+								Card( // TODO: move this and add new graphs
 									child: Padding(
 										padding: paddings,
 										child: Column(
 										  children: [
-                        Text("Surge", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
-                        Center(child: SizedBox(width: 0.0, height: 16.0)),
-                        SizedBox(
-                          height: 330,
-                          width: 330,
-                          child: MyRadarChart(
-                          RadarChartData(
-                            radarShape: RadarShape.circle,
-                            tickCount: 4,
-                            radarBackgroundColor: Colors.black.withAlpha(170),
-                            radarBorderData: const BorderSide(color: Colors.white24, width: 1),
-                            gridBorderData: const BorderSide(color: Colors.white24, width: 1),
-                            tickBorderData: const BorderSide(color: Colors.white24, width: 1),
-                            getTitle: (index, angle) {
-                              switch (index) {
-                                case 0: return RadarChartTitle(text: "APM\n${f2.format(snapshot.data!.surgeAPM)}", positionPercentageOffset: 0.05);
-                                case 1: return RadarChartTitle(text: "PPS\n${f2.format(snapshot.data!.surgePPS)}", positionPercentageOffset: 0.05, angle: 60.0);
-                                case 2: return RadarChartTitle(text: "Length\n${f2.format(snapshot.data!.surgeLength)}", positionPercentageOffset: 0.05, angle: -60.0);
-                                case 3: return RadarChartTitle(text: "Rate\n${percentage.format(snapshot.data!.surgeRate)}", positionPercentageOffset: 0.05);
-                                case 4: return RadarChartTitle(text: "Secs/DS\n${f2.format(snapshot.data!.surgeDS)}", positionPercentageOffset: 0.05, angle: 60.0);
-                                case 5: return RadarChartTitle(text: "Allspin\n${percentage.format(snapshot.data!.surgeAllspin)}", positionPercentageOffset: 0.05, angle: -60.0);
-                                default: return const RadarChartTitle(text: '');
-                              }
-                            },
-                            dataSets: [
-                              RadarDataSet(
-                                fillColor: Theme.of(context).colorScheme.primary.withAlpha(170),
-                                borderColor: Theme.of(context).colorScheme.primary,
-                                dataEntries: [
-                                  RadarEntry(value: snapshot.data!.surgeAPM/120),
-                                  RadarEntry(value: snapshot.data!.surgePPS),
-                                  RadarEntry(value: snapshot.data!.surgeLength/3),
-                                  RadarEntry(value: snapshot.data!.surgeRate/10),
-                                  RadarEntry(value: snapshot.data!.surgeDS/10),
-                                  RadarEntry(value: snapshot.data!.surgeAllspin)
-                                ],
-                              ),
-                              RadarDataSet(
-                                fillColor: Colors.transparent,
-                                borderColor: Colors.transparent,
-                                dataEntries: [
-                                  RadarEntry(value: 1),
-                                  RadarEntry(value: 0),
-                                  RadarEntry(value: 0),
-                                  RadarEntry(value: 0),
-                                  RadarEntry(value: 0),
-                                  RadarEntry(value: 0)
-                                ],
-                              ),
-                            ]
-                          )
-                          ),
-                        ),
-                        Center(child: SizedBox(width: 0.0, height: 16.0)),
+						Text("Surge", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+						Center(child: SizedBox(width: 0.0, height: 16.0)),
+						SizedBox(
+						  height: 330,
+						  width: 330,
+						  child: MyRadarChart(
+						  RadarChartData(
+							radarShape: RadarShape.circle,
+							tickCount: 4,
+							radarBackgroundColor: Colors.black.withAlpha(170),
+							radarBorderData: const BorderSide(color: Colors.white24, width: 1),
+							gridBorderData: const BorderSide(color: Colors.white24, width: 1),
+							tickBorderData: const BorderSide(color: Colors.white24, width: 1),
+							getTitle: (index, angle) {
+							  switch (index) {
+								case 0: return RadarChartTitle(text: "APM\n${f2.format(snapshot.data!.surgeAPM)}", positionPercentageOffset: 0.05);
+								case 1: return RadarChartTitle(text: "PPS\n${f2.format(snapshot.data!.surgePPS)}", positionPercentageOffset: 0.05, angle: 60.0);
+								case 2: return RadarChartTitle(text: "Length\n${f2.format(snapshot.data!.surgeLength)}", positionPercentageOffset: 0.05, angle: -60.0);
+								case 3: return RadarChartTitle(text: "Rate\n${percentage.format(snapshot.data!.surgeRate)}", positionPercentageOffset: 0.05);
+								case 4: return RadarChartTitle(text: "Secs/DS\n${f2.format(snapshot.data!.surgeDS)}", positionPercentageOffset: 0.05, angle: 60.0);
+								case 5: return RadarChartTitle(text: "Allspin\n${percentage.format(snapshot.data!.surgeAllspin)}", positionPercentageOffset: 0.05, angle: -60.0);
+								default: return const RadarChartTitle(text: '');
+							  }
+							},
+							dataSets: [
+							  RadarDataSet(
+								fillColor: Theme.of(context).colorScheme.primary.withAlpha(170),
+								borderColor: Theme.of(context).colorScheme.primary,
+								dataEntries: [
+								  RadarEntry(value: snapshot.data!.surgeAPM/120),
+								  RadarEntry(value: snapshot.data!.surgePPS),
+								  RadarEntry(value: snapshot.data!.surgeLength/3),
+								  RadarEntry(value: snapshot.data!.surgeRate/10),
+								  RadarEntry(value: snapshot.data!.surgeDS/10),
+								  RadarEntry(value: snapshot.data!.surgeAllspin)
+								],
+							  ),
+							  RadarDataSet(
+								fillColor: Colors.transparent,
+								borderColor: Colors.transparent,
+								dataEntries: [
+								  RadarEntry(value: 1),
+								  RadarEntry(value: 0),
+								  RadarEntry(value: 0),
+								  RadarEntry(value: 0),
+								  RadarEntry(value: 0),
+								  RadarEntry(value: 0)
+								],
+							  ),
+							]
+						  )
+						  ),
+						),
+						Center(child: SizedBox(width: 0.0, height: 16.0)),
 										  ],
 										),
 									)
 								),
-                Card(
+								Card(
 									child: Padding(
 										padding: paddings,
 										child: Column(
 										  children: [
-                        Text("Incoming Attack Sankey Chart", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
-										    SankeyDiagramWidget(
-                          data: sankeyDataSet,
-                          nodeColors: nodeColors,
-                          size: const Size(800.0, 400.0),
-                          showLabels: true,
-                        ),
+											Text("Incoming Attack Sankey Chart", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+																SankeyDiagramWidget(
+											data: sankeyDataSet,
+											nodeColors: nodeColors,
+											size: Size(width, 400.0),
+											showLabels: true,
+											),
 										  ],
 										)
 									)
 								),
+                Card(
+                  child: Padding(
+										padding: paddings,
+										child: SizedBox(
+                      height: 256.0,
+                      width: 256.0,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(1000),
+                        child: Container(
+                          decoration: BoxDecoration(gradient: RadialGradient(colors: [Colors.black12.withAlpha(100), Colors.black], radius: 0.6)),
+                          child: SfRadialGauge(
+                            axes: [
+                              RadialAxis(
+                              startAngle: 190,
+                              endAngle: 350,
+                              showLabels: false,
+                              showTicks: true,
+                              radiusFactor: 1,
+                              centerY: 0.5,
+                              minimum: 0,
+                              maximum: 1,
+                            ranges: [
+                              GaugeRange(startValue: 0, endValue: 0.2, color: Colors.red),
+                              GaugeRange(startValue: 0.2, endValue: 0.4, color: Colors.yellow),
+                              GaugeRange(startValue: 0.4, endValue: 0.6, color: Colors.green),
+                              GaugeRange(startValue: 0.6, endValue: 0.8, color: Colors.blue),
+                              GaugeRange(startValue: 0.8, endValue: 1, color: Colors.purple),
+                            ],
+                            pointers: [
+                              NeedlePointer(
+                                value: snapshot.data!.attackCheesiness,
+                                enableAnimation: true,
+                                needleLength: 0.9,
+                                needleStartWidth: 2,
+                                needleEndWidth: 15,
+                                knobStyle: const KnobStyle(color: Colors.transparent),
+                                gradient: const LinearGradient(colors: [Colors.transparent, Colors.white], begin: Alignment.bottomCenter, end: Alignment.topCenter, stops: [0.5, 1]),)
+                              ],
+                            annotations: [
+                              GaugeAnnotation(widget: Container(child:
+                              RichText(
+                                textAlign: TextAlign.center,
+                                text: TextSpan(
+                                  style: const TextStyle(fontFamily: "Eurostile Round", color: Colors.white),
+                                  children: [
+                                    TextSpan(text: "Attack\nCheesiness\n"),
+                                    TextSpan(text: f3.format(snapshot.data!.attackCheesiness), style: TextStyle(fontSize: 25, fontFamily: "Eurostile Round Extended", fontWeight: FontWeight.w100)),
+                                    // if (lbPos != null) TextSpan(text: lbPos!.app!.position >= 1000 ? "\n${t.top} ${f2.format(lbPos!.app!.percentage*100)}%" : "\n№${lbPos!.app!.position}", style: TextStyle(color: getColorOfRank(lbPos!.app!.position))),
+                                    // if (oldNerdStats != null) TextSpan(text: "\n${comparef.format(nerdStats.app - oldNerdStats!.app)}", style: TextStyle(color: getDifferenceColor(nerdStats.app - oldNerdStats!.app)))
+                                  ]
+                              ))),
+                              angle: 270,positionFactor: 0.5
+                              )],
+                              )
+                            ]
+                          ),
+                        ),
+                      ),
+                    ),
+									)
+                )
 							],
 						);
 					}
