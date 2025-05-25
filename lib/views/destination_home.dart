@@ -10,6 +10,8 @@ import 'package:tetra_stats/widgets/apl_ranges.dart';
 import 'package:tetra_stats/widgets/apm_pps_ranges.dart';
 import 'package:tetra_stats/widgets/clear_types_thingy.dart';
 import 'package:tetra_stats/widgets/efficiency_ranges.dart';
+import 'package:tetra_stats/widgets/etr_thingy.dart';
+import 'package:tetra_stats/widgets/kills_deaths_thingy.dart';
 import 'package:tetra_stats/widgets/sankey_graph.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
@@ -975,6 +977,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 				))),
 				if (data.nerdStats != null) NerdStatsThingy(nerdStats: toSee.nerdStats!, oldNerdStats: toCompare?.nerdStats, averages: averages, lbPos: lbPos, width: width, rank: toSee.rank != "z" ? toSee.rank.toUpperCase() : toSee.percentileRank.toUpperCase()),
 				if (data.nerdStats != null) Graphs(toSee.apm!, toSee.pps!, toSee.vs!, toSee.nerdStats!, toSee.playstyle!),
+        if (data.estTr != null) EtrThingy(data.estTr!, data.tr, widget.constraints.maxWidth > 768.0),
 				Card(child: Center(child: Text(t.relatedAchievements, style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center))),
 				Wrap(
 					direction: Axis.horizontal,
@@ -1081,62 +1084,119 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 								Card( // TODO: move this and add new graphs
 									child: Padding(
 										padding: paddings,
-										child: Column(
+										child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
 										  children: [
-						Text("Surge", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
-						Center(child: SizedBox(width: 0.0, height: 16.0)),
-						SizedBox(
-						  height: 330,
-						  width: 330,
-						  child: MyRadarChart(
-						  RadarChartData(
-							radarShape: RadarShape.circle,
-							tickCount: 4,
-							radarBackgroundColor: Colors.black.withAlpha(170),
-							radarBorderData: const BorderSide(color: Colors.white24, width: 1),
-							gridBorderData: const BorderSide(color: Colors.white24, width: 1),
-							tickBorderData: const BorderSide(color: Colors.white24, width: 1),
-							getTitle: (index, angle) {
-							  switch (index) {
-								case 0: return RadarChartTitle(text: "APM\n${f2.format(snapshot.data!.surgeAPM)}", positionPercentageOffset: 0.05);
-								case 1: return RadarChartTitle(text: "PPS\n${f2.format(snapshot.data!.surgePPS)}", positionPercentageOffset: 0.05, angle: 60.0);
-								case 2: return RadarChartTitle(text: "Length\n${f2.format(snapshot.data!.surgeLength)}", positionPercentageOffset: 0.05, angle: -60.0);
-								case 3: return RadarChartTitle(text: "Rate\n${percentage.format(snapshot.data!.surgeRate)}", positionPercentageOffset: 0.05);
-								case 4: return RadarChartTitle(text: "Secs/DS\n${f2.format(snapshot.data!.surgeDS)}", positionPercentageOffset: 0.05, angle: 60.0);
-								case 5: return RadarChartTitle(text: "Allspin\n${percentage.format(snapshot.data!.surgeAllspin)}", positionPercentageOffset: 0.05, angle: -60.0);
-								default: return const RadarChartTitle(text: '');
-							  }
-							},
-							dataSets: [
-							  RadarDataSet(
-								fillColor: Theme.of(context).colorScheme.primary.withAlpha(170),
-								borderColor: Theme.of(context).colorScheme.primary,
-								dataEntries: [
-								  RadarEntry(value: snapshot.data!.surgeAPM/120),
-								  RadarEntry(value: snapshot.data!.surgePPS),
-								  RadarEntry(value: snapshot.data!.surgeLength/3),
-								  RadarEntry(value: snapshot.data!.surgeRate/10),
-								  RadarEntry(value: snapshot.data!.surgeDS/10),
-								  RadarEntry(value: snapshot.data!.surgeAllspin)
-								],
-							  ),
-							  RadarDataSet(
-								fillColor: Colors.transparent,
-								borderColor: Colors.transparent,
-								dataEntries: [
-								  RadarEntry(value: 1),
-								  RadarEntry(value: 0),
-								  RadarEntry(value: 0),
-								  RadarEntry(value: 0),
-								  RadarEntry(value: 0),
-								  RadarEntry(value: 0)
-								],
-							  ),
-							]
-						  )
-						  ),
-						),
-						Center(child: SizedBox(width: 0.0, height: 16.0)),
+                        Column(
+										      children: [
+                            Text("PPS", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+                            Center(child: SizedBox(width: 0.0, height: 16.0)),
+                            SizedBox(
+                              height: 330,
+                              width: 330,
+                              child: MyRadarChart(
+                              RadarChartData(
+                              radarShape: RadarShape.circle,
+                              tickCount: 4,
+                              radarBackgroundColor: Colors.black.withAlpha(170),
+                              radarBorderData: const BorderSide(color: Colors.white24, width: 1),
+                              gridBorderData: const BorderSide(color: Colors.white24, width: 1),
+                              tickBorderData: const BorderSide(color: Colors.white24, width: 1),
+                              getTitle: (index, angle) {
+                                switch (index) {
+                                case 0: return RadarChartTitle(text: "Overall\n${f3.format(snapshot.data!.PPS)}", positionPercentageOffset: 0.05);
+                                case 1: return RadarChartTitle(text: "Plonk\n${f3.format(snapshot.data!.PlonkPPS)}", positionPercentageOffset: 0.05);
+                                case 2: return RadarChartTitle(text: "Variance\n${f3.format(snapshot.data!.PPSCoeff)}", positionPercentageOffset: 0.05);
+                                case 3: return RadarChartTitle(text: "Burst\n${f3.format(snapshot.data!.BurstPPS)}", positionPercentageOffset: 0.05);
+                                default: return const RadarChartTitle(text: '');
+                                }
+                              },
+                              dataSets: [
+                                RadarDataSet(
+                                fillColor: Theme.of(context).colorScheme.primary.withAlpha(170),
+                                borderColor: Theme.of(context).colorScheme.primary,
+                                dataEntries: [
+                                  RadarEntry(value: snapshot.data!.PPS),
+                                  RadarEntry(value: snapshot.data!.PlonkPPS),
+                                  RadarEntry(value: snapshot.data!.PPSCoeff), // variance
+                                  RadarEntry(value: snapshot.data!.BurstPPS),
+                                ],
+                                ),
+                                RadarDataSet(
+                                fillColor: Colors.transparent,
+                                borderColor: Colors.transparent,
+                                dataEntries: [
+                                  RadarEntry(value: 2),
+                                  RadarEntry(value: 0),
+                                  RadarEntry(value: 0),
+                                  RadarEntry(value: 0)
+                                ],
+                                ),
+                              ]
+                              )
+                              ),
+                            ),
+                            Center(child: SizedBox(width: 0.0, height: 16.0)),
+										      ],
+										    ),
+										    Column(
+										      children: [
+                            Text("Surge", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+                            Center(child: SizedBox(width: 0.0, height: 16.0)),
+                            SizedBox(
+                              height: 330,
+                              width: 330,
+                              child: MyRadarChart(
+                              RadarChartData(
+                              radarShape: RadarShape.circle,
+                              tickCount: 4,
+                              radarBackgroundColor: Colors.black.withAlpha(170),
+                              radarBorderData: const BorderSide(color: Colors.white24, width: 1),
+                              gridBorderData: const BorderSide(color: Colors.white24, width: 1),
+                              tickBorderData: const BorderSide(color: Colors.white24, width: 1),
+                              getTitle: (index, angle) {
+                                switch (index) {
+                                case 0: return RadarChartTitle(text: "APM\n${f2.format(snapshot.data!.surgeAPM)}", positionPercentageOffset: 0.05);
+                                case 1: return RadarChartTitle(text: "PPS\n${f2.format(snapshot.data!.surgePPS)}", positionPercentageOffset: 0.05, angle: 60.0);
+                                case 2: return RadarChartTitle(text: "Length\n${f2.format(snapshot.data!.surgeLength)}", positionPercentageOffset: 0.05, angle: -60.0);
+                                case 3: return RadarChartTitle(text: "Rate\n${percentage.format(snapshot.data!.surgeRate)}", positionPercentageOffset: 0.05);
+                                case 4: return RadarChartTitle(text: "Secs/DS\n${f2.format(snapshot.data!.surgeDS)}", positionPercentageOffset: 0.05, angle: 60.0);
+                                case 5: return RadarChartTitle(text: "Allspin\n${percentage.format(snapshot.data!.surgeAllspin)}", positionPercentageOffset: 0.05, angle: -60.0);
+                                default: return const RadarChartTitle(text: '');
+                                }
+                              },
+                              dataSets: [
+                                RadarDataSet(
+                                fillColor: Theme.of(context).colorScheme.primary.withAlpha(170),
+                                borderColor: Theme.of(context).colorScheme.primary,
+                                dataEntries: [
+                                  RadarEntry(value: snapshot.data!.surgeAPM/120),
+                                  RadarEntry(value: snapshot.data!.surgePPS),
+                                  RadarEntry(value: snapshot.data!.surgeLength/3),
+                                  RadarEntry(value: snapshot.data!.surgeRate/10),
+                                  RadarEntry(value: snapshot.data!.surgeDS/10),
+                                  RadarEntry(value: snapshot.data!.surgeAllspin)
+                                ],
+                                ),
+                                RadarDataSet(
+                                fillColor: Colors.transparent,
+                                borderColor: Colors.transparent,
+                                dataEntries: [
+                                  RadarEntry(value: 1),
+                                  RadarEntry(value: 0),
+                                  RadarEntry(value: 0),
+                                  RadarEntry(value: 0),
+                                  RadarEntry(value: 0),
+                                  RadarEntry(value: 0)
+                                ],
+                                ),
+                              ]
+                              )
+                              ),
+                            ),
+                            Center(child: SizedBox(width: 0.0, height: 16.0)),
+										      ],
+										    ),
 										  ],
 										),
 									)
@@ -1217,7 +1277,8 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                       ),
                     ),
 									)
-                )
+                ),
+                KillsDeathsThingy([KD("thing", snapshot.data!.killStats, snapshot.data!.deathStats)], width),
 							],
 						);
 					}

@@ -187,7 +187,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
     vs = double.tryParse(vsController.text);
     if (apm != null && pps != null && vs != null) {
       nerdStats = NerdStats(apm!, pps!, vs!);
-      estTr = EstTr(apm!, pps!, vs!, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp, nerdStats!.gbe);
+      estTr = EstTr(apm!, pps!, vs!, 16, noTrRd, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp, nerdStats!.gbe);
       playstyle = Playstyle(apm!, pps!, nerdStats!.app, nerdStats!.vsapm, nerdStats!.dsp, nerdStats!.gbe, estTr!.srarea, estTr!.statrank);
       setState(() {});
     } else {

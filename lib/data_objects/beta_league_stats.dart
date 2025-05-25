@@ -3,6 +3,7 @@
 import 'package:tetra_stats/data_objects/est_tr.dart';
 import 'package:tetra_stats/data_objects/nerd_stats.dart';
 import 'package:tetra_stats/data_objects/playstyle.dart';
+import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 
 class BetaLeagueStats{
   late double apm;
@@ -21,7 +22,7 @@ class BetaLeagueStats{
 
   BetaLeagueStats({required this.apm, required this.pps, required this.vs, required this.garbageSent, required this.garbageReceived, required this.kills, required this.altitude, required this.rank}){
     nerdStats = NerdStats(apm, pps, vs);
-    estTr = EstTr(apm, pps, vs, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
+    estTr = EstTr(apm, pps, vs, 16, noTrRd, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
     playstyle = Playstyle(apm, pps, nerdStats.app, nerdStats.vsapm, nerdStats.dsp, nerdStats.gbe, estTr.srarea, estTr.statrank);
   }
 
@@ -37,7 +38,7 @@ class BetaLeagueStats{
     targetingFactor = json['targetingfactor'];
     targetingRace = json['targetinggrace'];
     nerdStats = NerdStats(apm, pps, vs);
-    estTr = EstTr(apm, pps, vs, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
+    estTr = EstTr(apm, pps, vs, 16, noTrRd, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
     playstyle = Playstyle(apm, pps, nerdStats.app, nerdStats.vsapm, nerdStats.dsp, nerdStats.gbe, estTr.srarea, estTr.statrank);
   }
 }

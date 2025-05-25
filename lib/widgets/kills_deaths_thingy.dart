@@ -4,10 +4,17 @@ import 'package:tetra_stats/data_objects/minomuncher.dart';
 import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 
-class ClearTypesThingy extends StatelessWidget{
-  final List<ClearsChartData> data;
+class KD{
+  final String nickname;
+  final DeathData kills;
+  final DeathData deaths;
+  const KD(this.nickname, this.kills, this.deaths);
+}
+
+class KillsDeathsThingy extends StatelessWidget{
+  final List<KD> data;
   final double width;
-  const ClearTypesThingy(this.data, this.width, {super.key});
+  const KillsDeathsThingy(this.data, this.width, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +26,7 @@ class ClearTypesThingy extends StatelessWidget{
             SfCartesianChart(
               primaryXAxis: CategoryAxis(isVisible: data.length > 1),
               primaryYAxis: NumericAxis(minimum: 0, maximum: 100),
-              title: ChartTitle(text: "Clear Types", textStyle: width > 768 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+              title: ChartTitle(text: "Kills and Deaths Reasons", textStyle: width > 768 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
               legend: data.length == 1 ? Legend(
                 isVisible: true,
                 position: LegendPosition.left,
@@ -38,28 +45,28 @@ class ClearTypesThingy extends StatelessWidget{
                               padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
                               child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: lineClearsColors[seriesIndex])),
                             ),
-                          Text("${graphClearName[seriesIndex]}:"),
+                          Text("${killsLabels[seriesIndex]}:"),
                         ],
                         ),
-                        Text("${intf.format(point.y)} (${percentage.format(point.y!/data[0].total)})")
+                        Text("${intf.format(point.y)}")
                       ],
                     ),
                   );
                 }, 
               ) : const Legend(),
               series: width > 580 ? <CartesianSeries>[
-                for (int i = 0; i < data[0].byID.length; i++) StackedBar100Series<ClearsChartData, String>(
+                for (int i = 0; i < data[0].kills.values.length; i++) StackedBar100Series<KD, String>(
                   dataSource: data,
-                  xValueMapper: (ClearsChartData data, _) => data.nick,
-                  yValueMapper: (ClearsChartData data, _) => data.byID[i],
-                  pointColorMapper: (ClearsChartData data, _) => lineClearsColors[i]
+                  xValueMapper: (KD data, _) => data.nickname,
+                  yValueMapper: (KD data, _) => data.kills.values[i],
+                  pointColorMapper: (KD data, _) => lineClearsColors[i]
                 )
               ] : <CartesianSeries>[
-                for (int i = 0; i < data[0].byID.length; i++) StackedColumn100Series<ClearsChartData, String>(
+                for (int i = 0; i < data[0].kills.values.length; i++) StackedBar100Series<KD, String>(
                   dataSource: data,
-                  xValueMapper: (ClearsChartData data, _) => data.nick,
-                  yValueMapper: (ClearsChartData data, _) => data.byID[i],
-                  pointColorMapper: (ClearsChartData data, _) => lineClearsColors[i]
+                  xValueMapper: (KD data, _) => data.nickname,
+                  yValueMapper: (KD data, _) => data.kills.values[i],
+                  pointColorMapper: (KD data, _) => lineClearsColors[i]
                 )
               ]
             ),
@@ -72,10 +79,10 @@ class ClearTypesThingy extends StatelessWidget{
                 TableRow(
                   children: <Widget>[
                     Container(),
-                    for (ClearsChartData e in data) Text(e.nick, textAlign: TextAlign.end),
+                    for (KD e in data) Text(e.nickname, textAlign: TextAlign.end),
                   ],
                 ),
-                for (int i = 0; i < data[0].byID.length; i++) TableRow(
+                for (int i = 0; i < data[0].kills.values.length; i++) TableRow(
                   children: <Widget>[
                     Row(
                       mainAxisSize: MainAxisSize.min,
@@ -84,10 +91,10 @@ class ClearTypesThingy extends StatelessWidget{
                           padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
                           child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: lineClearsColors[i])),
                         ),
-                        Text("${graphClearName[i]}:")
+                        Text("${killsLabels[i]}:")
                       ],
                     ),
-                    for (ClearsChartData e in data) Text("${intf.format(e.byID[i])} (${percentage.format(e.byID[i]/e.total)})", textAlign: TextAlign.end)
+                    for (KD e in data) Text("${intf.format(e.kills.values[i])})", textAlign: TextAlign.end)
                   ],
                 ),
               ],

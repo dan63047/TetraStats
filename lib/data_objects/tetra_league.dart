@@ -62,7 +62,7 @@ class TetraLeague {
         ? NerdStats(apm!, pps!, vs!)
         : null;
     estTr = (nerdStats != null)
-        ? EstTr(apm!, pps!, vs!, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp,
+        ? EstTr(apm!, pps!, vs!, gamesWon, rd??noTrRd, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp,
             nerdStats!.gbe)
         : null;
     playstyle = (nerdStats != null)
@@ -113,7 +113,7 @@ class TetraLeague {
         ? NerdStats(apm!, pps!, vs!)
         : null;
     estTr = (nerdStats != null)
-        ? EstTr(apm!, pps!, vs!, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp,
+        ? EstTr(apm!, pps!, vs!, gamesWon, rd??noTrRd, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp,
             nerdStats!.gbe)
         : null;
     playstyle = (nerdStats != null)

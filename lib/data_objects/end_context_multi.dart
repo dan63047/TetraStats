@@ -4,6 +4,7 @@ import 'package:tetra_stats/data_objects/est_tr.dart';
 import 'package:tetra_stats/data_objects/handling.dart';
 import 'package:tetra_stats/data_objects/nerd_stats.dart';
 import 'package:tetra_stats/data_objects/playstyle.dart';
+import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 
 class EndContextMulti {
   late String userId;
@@ -46,8 +47,8 @@ class EndContextMulti {
       required this.success}){
         nerdStats = NerdStats(secondary, tertiary, extra);
         nerdStatsTracking = [for (int i = 0; i < secondaryTracking.length; i++) NerdStats(secondaryTracking[i], tertiaryTracking[i], extraTracking[i])];
-        estTr = EstTr(secondary, tertiary, extra, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
-        estTrTracking = [for (int i = 0; i < secondaryTracking.length; i++) EstTr(secondaryTracking[i], tertiaryTracking[i], extraTracking[i], nerdStatsTracking[i].app, nerdStatsTracking[i].dss, nerdStatsTracking[i].dsp, nerdStatsTracking[i].gbe)];
+        estTr = EstTr(secondary, tertiary, extra, 16, noTrRd, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
+        estTrTracking = [for (int i = 0; i < secondaryTracking.length; i++) EstTr(secondaryTracking[i], tertiaryTracking[i], extraTracking[i], 16, noTrRd, nerdStatsTracking[i].app, nerdStatsTracking[i].dss, nerdStatsTracking[i].dsp, nerdStatsTracking[i].gbe)];
         playstyle = Playstyle(secondary, tertiary, nerdStats.app, nerdStats.vsapm, nerdStats.dsp, nerdStats.gbe, estTr.srarea, estTr.statrank);
         playstyleTracking = [for (int i = 0; i < secondaryTracking.length; i++) Playstyle(secondaryTracking[i], tertiaryTracking[i], nerdStatsTracking[i].app, nerdStatsTracking[i].vsapm, nerdStatsTracking[i].dsp, nerdStatsTracking[i].gbe, estTrTracking[i].srarea, estTrTracking[i].statrank)];
       }
@@ -70,8 +71,8 @@ class EndContextMulti {
     extraTracking = json['points']['extraAvgTracking'] != null ? json['points']['extraAvgTracking']['aggregatestats___vsscore'].map((e) => e.toDouble()).toList() : [];
     nerdStats = NerdStats(secondary, tertiary, extra);
     nerdStatsTracking = [for (int i = 0; i < secondaryTracking.length; i++) NerdStats(secondaryTracking[i], tertiaryTracking[i], extraTracking[i])];
-    estTr = EstTr(secondary, tertiary, extra, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
-    estTrTracking = [for (int i = 0; i < secondaryTracking.length; i++) EstTr(secondaryTracking[i], tertiaryTracking[i], extraTracking[i], nerdStatsTracking[i].app, nerdStatsTracking[i].dss, nerdStatsTracking[i].dsp, nerdStatsTracking[i].gbe)];
+    estTr = EstTr(secondary, tertiary, extra, 16, noTrRd, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
+    estTrTracking = [for (int i = 0; i < secondaryTracking.length; i++) EstTr(secondaryTracking[i], tertiaryTracking[i], extraTracking[i], 16, noTrRd, nerdStatsTracking[i].app, nerdStatsTracking[i].dss, nerdStatsTracking[i].dsp, nerdStatsTracking[i].gbe)];
     playstyle = Playstyle(secondary, tertiary, nerdStats.app, nerdStats.vsapm, nerdStats.dsp, nerdStats.gbe, estTr.srarea, estTr.statrank);
     playstyleTracking = [for (int i = 0; i < secondaryTracking.length; i++) Playstyle(secondaryTracking[i], tertiaryTracking[i], nerdStatsTracking[i].app, nerdStatsTracking[i].vsapm, nerdStatsTracking[i].dsp, nerdStatsTracking[i].gbe, estTrTracking[i].srarea, estTrTracking[i].statrank)];
   }

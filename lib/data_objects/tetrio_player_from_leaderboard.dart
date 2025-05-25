@@ -61,7 +61,7 @@ class TetrioPlayerFromLeaderboard {
     this.playtime,
     this.ar){
       nerdStats =  NerdStats(apm, pps, vs);
-      estTr = EstTr(apm, pps, vs, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
+      estTr = EstTr(apm, pps, vs, gamesWon, rd??noTrRd, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
       playstyle = Playstyle(apm, pps, nerdStats.app, nerdStats.vsapm, nerdStats.dsp, nerdStats.gbe, estTr.srarea, estTr.statrank);
     }
 
@@ -100,7 +100,7 @@ class TetrioPlayerFromLeaderboard {
     }
     prisecter = Prisecter.fromJson(json['p']);
     nerdStats =  NerdStats(apm, pps, vs);
-    estTr = EstTr(apm, pps, vs, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
+    estTr = EstTr(apm, pps, vs, gamesWon, rd??noTrRd, nerdStats.app, nerdStats.dss, nerdStats.dsp, nerdStats.gbe);
     playstyle = Playstyle(apm, pps, nerdStats.app, nerdStats.vsapm, nerdStats.dsp, nerdStats.gbe, estTr.srarea, estTr.statrank);
   }
 
