@@ -7,6 +7,7 @@ import 'package:tetra_stats/data_objects/tetrio_prisecter.dart';
 class BetaRecord{
   late String id;
   late String replayID;
+  late bool stub;
   late String gamemode;
   late DateTime ts;
   late String enemyUsername;
@@ -20,6 +21,7 @@ class BetaRecord{
   BetaRecord.fromJson(Map<String, dynamic> json){
     id = json['_id'];
     replayID = json['replayid'];
+    stub = json['stub'];
     gamemode = json['gamemode'];
     ts = DateTime.parse(json['ts']);
     enemyUsername = json['otherusers'][0]['username'];

@@ -146,13 +146,17 @@ class CacheController {
         return "${object.runtimeType}topone";
       case SingleplayerStream:
         return object.type+object.userId;
+      case MinomuncherRaw:
+        return object.nick+"minomuncher";
       default:
         return object.runtimeType.toString()+object.id;
     }
   }
 
-  void store(dynamic object, int cachedUntil) async {
-    String key = _getObjectId(object) + cachedUntil.toString();
+  void store(dynamic object, int cachedUntil, {String? id}) async {
+    String key;
+    if (id != null) key = id + cachedUntil.toString();
+    else key = _getObjectId(object) + cachedUntil.toString();
     _cache[key] = object;
   }
 
@@ -166,7 +170,12 @@ class CacheController {
           if (id.length <= 16) id = _nicknames[id]??"huh?";
           break;
         case SingleplayerStream:
-          objectEntry = _cache.entries.firstWhere((element) => element.key.startsWith(id));
+          objectEntry = _cache.entries.firstWhere((el) => el.key.startsWith(id));
+          break;
+        case MinomuncherRaw:
+          id = id+"minomuncher";
+          objectEntry = _cache.entries.firstWhere((el) => el.key.startsWith(id));
+          break;
         default:
           objectEntry = _cache.entries.firstWhere((element) => element.key.startsWith(datatype.toString()+id));
           id = datatype.toString()+id;
@@ -381,244 +390,71 @@ class TetrioService extends DB {
     return (dbSize, dbTLRecordsQuery, dbTLStatesQuery);
   }
 
-  /// Since Minomuncher endpoint is not ready yet, this metod will
-  /// return fake data
-  Future<MinomuncherData> fetchMinoMuncherStats(String userID) async {
-    // SingleplayerStream? cached = _cache.get(stream+userID, SingleplayerStream);
-    // if (cached != null) return cached;
+  /// Minomuncher endpoint, that munches `replay`
+  /// returns munch results for both players in replay
+  Future<List<MinomuncherRaw>> minomuncherPostReplay(RawReplay replay, {String? id}) async {
+    List<MinomuncherRaw>? cached = _cache.get(replay.id, List<MinomuncherRaw>);
+    if (cached != null) return cached;
     
     Uri url;
     if (kIsWeb) {
-      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "Minomuncher", "user": userID.toLowerCase().trim()}); // Not exist for now, TODO
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "Minomuncher"}); // Not exist for now, TODO
     } else {
-      url = Uri.https('REDACTED', 'api/minomuncher'); // TODO: change it on release to oskware bridge
+      url = Uri.https('REDACTED', 'api/replay'); // TODO: change it on release to oskware bridge
     }
     try {
-      Map<String, Map> fakeData = {
-        "freyhoe": {
-        "wellColumns": [
-            0.049855072463768114,
-            0.01217391304347826,
-            0.07594202898550724,
-            0.21739130434782608,
-            0.1646376811594203,
-            0.2544927536231884,
-            0.1136231884057971,
-            0.04927536231884058,
-            0.016231884057971015,
-            0.0463768115942029
-        ],
-        "clearTypes": {
-            "perfectClear": 8,
-            "allspin": 141,
-            "single": 1260,
-            "tspinSingle": 105,
-            "double": 461,
-            "tspinDouble": 749,
-            "triple": 148,
-            "tspinTriple": 0,
-            "quad": 561
+      final response = await client.post(
+        url, 
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
         },
-        "allspinEfficiency": 0.1083781706379708,
-        "tEfficiency": 0.46590289143480634,
-        "iEfficiency": 0.3058887677208288,
-        "cheeseAPL": 1.686138613861386,
-        "downstackAPL": 1.6389294403892944,
-        "upstackAPL": 1.245550075058975,
-        "APL": 1.365882703185472,
-        "APP": 0.7136413128013688,
-        "KPP": 3.581039041841655,
-        "KPS": 11.29695615585359,
-        "APM": 135.07768880805196,
-        "PPS": 3.1546587523502105,
-        "ppsSegments": [
-            0,
-            0,
-            0,
-            0.00011732957878681215,
-            0.0002346591575736243,
-            0.0009386366302944972,
-            0.001525284524228558,
-            0.0024639211545230554,
-            0.0035198873636043647,
-            0.005397160624193359,
-            0.005631819781766983,
-            0.00598380851812742,
-            0.007861081778716415,
-            0.008565059251437288,
-            0.008330400093863663,
-            0.008917047987797723,
-            0.010442332512026281,
-            0.007743752199929602,
-            0.010559662090813094,
-            0.012319605772615276,
-            0.015370174821072393,
-            0.014314208611991083,
-            0.017716766396808636,
-            0.013492901560483397,
-            0.016074152293793265,
-            0.020767335445265753,
-            0.01677812976651414,
-            0.017012788924087762,
-            0.020884665024052562,
-            0.015018186084711956,
-            0.0251085298603778,
-            0.023583245336149243,
-            0.024404552387656927,
-            0.028511087645195353,
-            0.02663381438460636,
-            0.03484688489968321,
-            0.025929836911885485,
-            0.036724158160272205,
-            0.032382963745160157,
-            0.025225859439164614,
-            0.03508154405725684,
-            0.03109233837850522,
-            0.030271031326997537,
-            0.028511087645195353,
-            0.028863076381555792,
-            0.024756541124017366,
-            0.030740349642144785,
-            0.01525284524228558,
-            0.02874574680276898,
-            0.01795142555438226,
-            0.029684383433063476,
-            0.01795142555438226,
-            0.01689545934530095,
-            0.013023583245336149,
-            0.017716766396808636,
-            0.011732957878681215,
-            0.00926903672415816,
-            0.009738355039305409,
-            0.008917047987797723,
-            0.003871876099964801,
-            0.009621025460518597,
-            0.00598380851812742,
-            0.003754546521177989,
-            0.0058664789393406075,
-            0.0016426141030153702,
-            0.003989205678751613,
-            0.0024639211545230554,
-            0.0010559662090813093,
-            0.0005866478939340608,
-            0.0007039774727208729,
-            0.0005866478939340608,
-            0.0004693183151472486,
-            0.0002346591575736243,
-            0.00011732957878681215,
-            0,
-            0.0010559662090813093,
-            0.00011732957878681215,
-            0,
-            0.0002346591575736243,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0.00011732957878681215,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-        ],
-        "BurstPPS": 4.887703402902555,
-        "PlonkPPS": 2.3863090679100547,
-        "PPSCoeff": 1.9726939846765719,
-        "midgameAPM": 139.39851710264676,
-        "midgamePPS": 3.1531145468839124,
-        "openerAPM": 126.57019962340704,
-        "openerPPS": 3.15769921367098,
-        "attackCheesiness": 0.4034581663360658,
-        "surgeAPM": 238.66982798979114,
-        "surgeAPL": 2.1661184210526314,
-        "surgeDS": 3.4166666666666665,
-        "surgePPS": 3.2418663887924053,
-        "surgeLength": 6.46875,
-        "surgeRate": 0.10921501706484642,
-        "surgeSecsPerCheese": 6.023194444444445,
-        "surgeSecsPerDS": 4.309773662551441,
-        "surgeAllspin": 0.12,
-        "cleanLinesRecieved": 0.7205254515599343,
-        "cheeseLinesRecieved": 0.2794745484400657,
-        "cheeseLinesCancelled": 0.1566502463054187,
-        "cheeseLinesTanked": 0.12282430213464696,
-        "cleanLinesCancelled": 0.38801313628899836,
-        "cleanLinesTankedAsCheese": 0.05845648604269294,
-        "cleanLinesTankedAsClean": 0.274055829228243,
-        "deathStats": {
-            "Surge Conflict": 1,
-            "Surge Spike": 4,
-            "Cheese Spike": 0,
-            "Spike": 1,
-            "Cheese Pressure": 12,
-            "Pressure": 24
-        },
-        "killStats": {
-            "Surge Conflict": 0,
-            "Surge Spike": 7,
-            "Cheese Spike": 1,
-            "Spike": 9,
-            "Cheese Pressure": 14,
-            "Pressure": 31
-        },
-        "upstackPPS": 3.4027633046868293,
-        "downstackPPS": 3.094367778986985,
-        "downstackingRatio": 0.559168457324692
-    }
-    };
-      // final response = await client.post(
-      //   url, 
-      //   headers: <String, String>{
-      //     'Content-Type': 'application/json; charset=UTF-8',
-      //   },
-      //   body: File.fromUri(Uri(path: "/home/dan63047/Archive/tetrio replays/beta/пустик.ttrm")).readAsBytesSync()
-      // );
-      // developer.log(response.statusCode.toString());
-      // developer.log(response.body);
-      return Future.delayed(Durations.extralong4, () => MinomuncherData.fromJson(fakeData.entries.first));
-      // TODO: Figure out how to multiple users
-      // switch (response.statusCode) {
-      //   case 200:
-      //     if (jsonDecode(response.body)['success']) {
-      //       SingleplayerStream records = SingleplayerStream.fromJson(jsonDecode(response.body)['data']['entries'], userID, stream);
-      //       _cache.store(records, jsonDecode(response.body)['cache']['cached_until']);
-      //       developer.log("fetchSingleplayerStream: $stream $userID stream retrieved and cached", name: "services/tetrio_crud");
-      //       return records;
-      //     } else {
-      //       developer.log("fetchSingleplayerStream: User dosen't exist", name: "services/tetrio_crud", error: response.body);
-      //       throw TetrioPlayerNotExist();
-      //     }
-      //   case 403:
-      //     throw TetrioForbidden();
-      //   case 429:
-      //     throw TetrioTooManyRequests();
-      //   case 418:
-      //     throw TetrioOskwareBridgeProblem();
-      //   case 500:
-      //   case 502:
-      //   case 503:
-      //   case 504:
-      //     throw TetrioInternalProblem();
-      //   default:
-      //     developer.log("fetchSingleplayerStream: Failed to fetch stream $stream $userID", name: "services/tetrio_crud", error: response.statusCode);
-      //     throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
-      // }
+        body: replay.asBytes
+      );
+      switch (response.statusCode) {
+        case 200:
+          if (response.contentLength! > 0) {
+            Map<String, dynamic> json = jsonDecode(response.body);
+            List<MinomuncherRaw> result = [for (MapEntry<String, dynamic> e in json.entries) MinomuncherRaw.fromJson(e)];
+            //_cache.store(result, 999999999999999999);
+            developer.log("fetchMinoMuncherStats: replay ${replay.id} was munched");
+            return result;
+          } else {
+            developer.log("fetchSingleplayerStream: User dosen't exist", name: "services/tetrio_crud", error: response.body);
+            throw TetrioPlayerNotExist();
+          }
+        case 403:
+          throw TetrioForbidden();
+        case 429:
+          throw TetrioTooManyRequests();
+        case 418:
+          throw TetrioOskwareBridgeProblem();
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+          throw TetrioInternalProblem();
+        default:
+          developer.log("fetchMinoMuncherStats: $response", name: "services/tetrio_crud", error: response.statusCode);
+          throw ConnectionIssue(response.statusCode, response.reasonPhrase??"No reason");
+      }
     } on http.ClientException catch (e, s) {
       developer.log("$e, $s");
       throw http.ClientException(e.message, e.uri);
     }
+  }
+
+  Future<MinomuncherRaw> minomuncherMunchByID(String id) async {
+    MinomuncherRaw? cached = _cache.get(id, MinomuncherRaw);
+    if (cached != null) return cached;
+    TetraLeagueBetaStream stream = await fetchTLStream(id);
+    List<BetaRecord> avaliable = stream.records;
+    avaliable.removeWhere((element) => element.stub);
+    if (avaliable.isEmpty) throw TetrioNoReplays;
+    List<List<MinomuncherRaw>> raws = [for (BetaRecord e in avaliable.take(10)) await minomuncherPostReplay(await szyGetReplay(e.replayID))];
+    List<MinomuncherRaw> ourId = [for (List<MinomuncherRaw> e in raws) e.firstWhere((element) => element.nick == id)];
+    MinomuncherRaw output = ourId.reduce((a, b) => a + b);
+    _cache.store(output, DateTime.now().millisecondsSinceEpoch + 300000, id: id+"minomuncher");
+    return output;
   }
 
   /// Retrieves avaliable Tetra League matches from Tetra Channel api. Returns stream object (fake stream).

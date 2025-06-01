@@ -1,13 +1,9 @@
 // ignore_for_file: use_build_context_synchronously, type_literal_in_constant_pattern
 
 import 'dart:io';
-import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/data_objects/beta_record.dart';
 import 'package:tetra_stats/data_objects/minomuncher.dart';
-import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
-import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/widgets/apl_ranges.dart';
 import 'package:tetra_stats/widgets/apm_pps_ranges.dart';
@@ -374,11 +370,16 @@ class TlMatchResultState extends State<TlMatchResultView> {
     );
   }
 
+  Future<List<MinomuncherData>> ummm(String replayID) async {
+    List<MinomuncherRaw> raw = await teto.minomuncherPostReplay(await teto.szyGetReplay(replayID));
+    return [for (MinomuncherRaw e in raw) e.data];
+  }
+
   Widget buildFreyhoeComparison(double width, bool showMobileSelector){
     return SizedBox(
       width: width,
-      child: FutureBuilder<MinomuncherData>(
-        future: teto.fetchMinoMuncherStats("bozo"),
+      child: FutureBuilder<List<MinomuncherData>>(
+        future: ummm(widget.record.replayID),
         builder: (context, snapshot) {
           switch (snapshot.connectionState){
               case ConnectionState.none:
@@ -387,77 +388,14 @@ class TlMatchResultState extends State<TlMatchResultView> {
                 return const Center(child: CircularProgressIndicator());
               case ConnectionState.done:
             if (snapshot.hasData){
-              MinomuncherData wow = MinomuncherData.fromJson(
-                MapEntry("skks", 
-                            {
-                    "wellColumns": [ 12, 9, 30, 52, 39, 8, 7, 25, 12, 28 ],
-                    "clearTypes": {
-                      "perfectClear": 3,
-                      "allspin": 27,
-                      "single": 151,
-                      "tspinSingle": 29,
-                      "double": 47,
-                      "tspinDouble": 219,
-                      "triple": 14,
-                      "tspinTriple": 1,
-                      "quad": 130,
-                    },
-                    "tEfficiency": 0.48493975903614456,
-                    "iEfficiency": 0.44410876132930516,
-                    "allspinEfficiency": 0.33,
-                    "cheeseAPL": 2.472027972027972,
-                    "downstackAPL": 2.060882800608828,
-                    "upstackAPL": 1.2545018007202882,
-                    "APL": 1.6100671140939598,
-                    "APP": 1.041684759009987,
-                    "KPP": 3.5336517585757705,
-                    "KPS": 10.527064697854616,
-                    "APM": 197.9632497040962,
-                    "PPS": 3.190894567656894,
-                    "midgameAPM": 162.5201210927227,
-                    "midgamePPS": 3.4530788907741583,
-                    "openerAPM": 229.732280254106,
-                    "openerPPS": 4.8567294919177706,
-                    "attackCheesiness": 0.47707874789292537,
-                    "cleanAttacksCancelled": 0.3386243386243386,
-                    "cheesyAttacksCancelled": 0.15763546798029557,
-                    "cleanLinesCancelled": 0.32965931863727455,
-                    "cheesyLinesCancelled": 0.7214912280701754,
-                    "surgeAPM": 212.01475625050423,
-                    "surgeAPL": 2.1791044776119404,
-                    "surgeDS": 7.146341463414634,
-                    "surgePPS": 0.08800944634724127,
-                    "surgeLength": 6.926829268292683,
-                    "surgeRate": 0.13099041533546327,
-                    "surgeSecsPerCheese": 0.7643478260869563,
-                    "surgeSecsPerDS": 0.46352564102564087,
-                    "surgeAllspin": 0.04878048780487805,
-                    "cleanLinesRecieved": 0.5962815405046481,
-                    "cheeseLinesRecieved": 0.4037184594953519,
-                    "cheeseLinesCancelled": 0.11952191235059761,
-                    "cheeseLinesTanked": 0.28419654714475434,
-                    "cleanLinesTankedAsCheese": 0.041168658698539175,
-                    "cleanLinesTankedAsClean": 0.33200531208499334
-                  }
-                )
-              );
               return ListView(
                 children: [
                   if (showMobileSelector) mobileSelector(),
-                  ApmPpsThingy([
-                    ApmPps(snapshot.data!.nick, snapshot.data!.openerAPM, snapshot.data!.APM, snapshot.data!.midgameAPM, snapshot.data!.openerPPS, snapshot.data!.PPS, snapshot.data!.midgamePPS),
-                    ApmPps(wow.nick, wow.openerAPM, wow.APM, wow.midgameAPM, wow.openerPPS, wow.PPS, wow.midgamePPS)
-                  ]),
-                  AplThingy([
-                    Apl(snapshot.data!.nick, snapshot.data!.upstackAPL, snapshot.data!.downstackAPL, snapshot.data!.cheeseAPL),
-                    Apl(wow.nick, wow.upstackAPL, wow.downstackAPL, wow.cheeseAPL)
-                  ], width > 768),
-                  EffThingy([
-                    Eff(snapshot.data!.nick, snapshot.data!.iEfficiency, snapshot.data!.tEfficiency, snapshot.data!.allspinEfficiency),
-                    Eff(wow.nick, wow.iEfficiency, wow.tEfficiency, wow.allspinEfficiency)
-                  ], width > 768),
-                  ClearTypesThingy([snapshot.data!.clearTypes, wow.clearTypes], width),
-                  WellColumnsThingy([snapshot.data!.wellColumns, wow.wellColumns], [snapshot.data!.nick, wow.nick], width)
+                  ApmPpsThingy([for (MinomuncherData e in snapshot.data!) ApmPps(e.nick, e.openerAPM, e.APM, e.midgameAPM, e.openerPPS, e.PPS, e.midgamePPS)]),
+                  AplThingy([for (MinomuncherData e in snapshot.data!) Apl(e.nick, e.upstackAPL, e.downstackAPL, e.cheeseAPL)], width > 768),
+                  EffThingy([for (MinomuncherData e in snapshot.data!) Eff(e.nick, e.iEfficiency, e.tEfficiency, e.allspinEfficiency)], width > 768),
+                  ClearTypesThingy([for (MinomuncherData e in snapshot.data!) e.clearTypes], width),
+                  WellColumnsThingy([for (MinomuncherData e in snapshot.data!) e.wellColumns], [for (MinomuncherData e in snapshot.data!) e.nick], width)
                 ],
               );
             } if (snapshot.hasError){ return SizedBox(height: 720.0, child: FutureError(snapshot)); }
@@ -639,7 +577,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
               PopupMenuItem(
                 value: 2,
                 child: Text(t.tlMatchView.openReplay),
-              ),
+              )
             ],
             onSelected: (value) async {
               switch (value) {

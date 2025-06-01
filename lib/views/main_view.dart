@@ -12,7 +12,6 @@ import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 import 'package:tetra_stats/data_objects/tetrio_player.dart';
 import 'package:tetra_stats/data_objects/tetrio_players_leaderboard.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
-import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/views/destination_calculator.dart';
 import 'package:tetra_stats/views/destination_cutoffs.dart';
 import 'package:tetra_stats/views/destination_graphs.dart';

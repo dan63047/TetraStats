@@ -28,6 +28,8 @@ class TetrioSearchFailed implements Exception {
 
 class TetrioHistoryNotExist implements Exception {}
 
+class TetrioNoReplays implements Exception {}
+
 class TetrioTooManyRequests implements Exception {}
 
 class TetrioForbidden implements Exception {}

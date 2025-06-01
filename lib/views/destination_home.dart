@@ -751,6 +751,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 	late final Animation<Offset> _offsetAnimation;
 	bool? sprintBetterThanRankAverage;
 	bool? blitzBetterThanRankAverage;
+  late Future<MinomuncherRaw> munch;
 
 	Widget getOverviewCard(Summaries summaries, CutoffTetrio? averages, double width){
 		return LayoutGrid(
@@ -977,7 +978,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 				))),
 				if (data.nerdStats != null) NerdStatsThingy(nerdStats: toSee.nerdStats!, oldNerdStats: toCompare?.nerdStats, averages: averages, lbPos: lbPos, width: width, rank: toSee.rank != "z" ? toSee.rank.toUpperCase() : toSee.percentileRank.toUpperCase()),
 				if (data.nerdStats != null) Graphs(toSee.apm!, toSee.pps!, toSee.vs!, toSee.nerdStats!, toSee.playstyle!),
-        if (data.estTr != null) EtrThingy(data.estTr!, data.tr, widget.constraints.maxWidth > 768.0),
+        if (data.estTr != null) EtrThingy(data.estTr!, data.tr, widget.constraints.maxWidth > 768.0, oldEtr: toCompare?.estTr, lbPosition: lbPos?.estTr, oldTR: toCompare?.tr),
 				Card(child: Center(child: Text(t.relatedAchievements, style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center))),
 				Wrap(
 					direction: Axis.horizontal,
@@ -989,9 +990,9 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 		);
 	}
 
-	Widget getFreyhoeAnalysis(double width){
-		return FutureBuilder<MinomuncherData>(
-			future: teto.fetchMinoMuncherStats("bozo"),
+	Widget getFreyhoeAnalysis(String id, double width){
+		return FutureBuilder<MinomuncherRaw>(
+			future: teto.minomuncherMunchByID(id),
 			builder: (context, snapshot) {
 				switch (snapshot.connectionState){
 				case ConnectionState.none:
@@ -1000,34 +1001,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 					return const Center(child: CircularProgressIndicator());
 				case ConnectionState.done:
 					if (snapshot.hasData){
-						List<ClearsChartData> clearTypeList = [snapshot.data!.clearTypes];
-						List<LinearGaugeRange> aplRanges = [
-							LinearGaugeRange(
-							startValue: 0,
-							endValue: snapshot.data!.cheeseAPL,
-							startWidth: 25,
-							endWidth: 25,
-							color: Colors.yellow.shade300,
-							position: LinearElementPosition.cross
-							),
-							LinearGaugeRange(
-							startValue: 0,
-							endValue: snapshot.data!.upstackAPL,
-							startWidth: 25,
-							endWidth: 25,
-							color: Colors.green.shade300,
-							position: LinearElementPosition.cross
-							),
-							LinearGaugeRange(
-							startValue: 0,
-							endValue: snapshot.data!.downstackAPL,
-							startWidth: 25,
-							endWidth: 25,
-							color: Colors.red.shade300,
-							position: LinearElementPosition.cross
-							)
-						];
-						aplRanges.sort((a, b) => a.endValue > b.endValue ? -1 : 1);
+            MinomuncherData data = snapshot.data!.data;
 						List<SankeyNode> sankeyNodes = [
 							SankeyNode(id: 0, label: 'Incoming Attack'),
 							SankeyNode(id: 1, label: 'Cheese'),
@@ -1037,13 +1011,13 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 							SankeyNode(id: 5, label: 'CleanTanked'),
 						];
 						List<SankeyLink> sankeyLinks = [
-							SankeyLink(source: sankeyNodes[0], target: sankeyNodes[1], value: snapshot.data!.cheeseLinesRecieved * 100),
-							SankeyLink(source: sankeyNodes[0], target: sankeyNodes[2], value: snapshot.data!.cleanLinesRecieved * 100),
-							SankeyLink(source: sankeyNodes[1], target: sankeyNodes[3], value: snapshot.data!.cheeseLinesCancelled * 100),
-							SankeyLink(source: sankeyNodes[1], target: sankeyNodes[4], value: snapshot.data!.cheeseLinesTanked * 100),
-							SankeyLink(source: sankeyNodes[2], target: sankeyNodes[3], value: snapshot.data!.cheeseLinesCancelled * 100),
-							SankeyLink(source: sankeyNodes[2], target: sankeyNodes[4], value: snapshot.data!.cleanLinesTankedAsCheese * 100),
-							SankeyLink(source: sankeyNodes[2], target: sankeyNodes[5], value: snapshot.data!.cleanLinesTankedAsClean * 100)
+							SankeyLink(source: sankeyNodes[0], target: sankeyNodes[1], value: data.cheeseLinesRecieved * 100),
+							SankeyLink(source: sankeyNodes[0], target: sankeyNodes[2], value: data.cleanLinesRecieved * 100),
+							SankeyLink(source: sankeyNodes[1], target: sankeyNodes[3], value: data.cheeseLinesCancelled * 100),
+							SankeyLink(source: sankeyNodes[1], target: sankeyNodes[4], value: data.cheeseLinesTanked * 100),
+							SankeyLink(source: sankeyNodes[2], target: sankeyNodes[3], value: data.cheeseLinesCancelled * 100),
+							SankeyLink(source: sankeyNodes[2], target: sankeyNodes[4], value: data.cleanLinesTankedAsCheese * 100),
+							SankeyLink(source: sankeyNodes[2], target: sankeyNodes[5], value: data.cleanLinesTankedAsClean * 100)
 						];
 						Map<String, Color> nodeColors = generateDefaultNodeColorMap(sankeyNodes);
 						SankeyDataSet sankeyDataSet = SankeyDataSet(nodes: sankeyNodes, links: sankeyLinks);
@@ -1057,7 +1031,6 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 						const EdgeInsets paddings = const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0);
 						return Column(
 							children: [
-								Text("Just a design mockup. WIP"),
 								Card(
 									child: Padding(
 										padding: const EdgeInsets.only(bottom: 4.0),
@@ -1076,11 +1049,11 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 										),
 									),
 								),
-								ApmPpsThingy([ApmPps("thing", snapshot.data!.openerAPM, snapshot.data!.APM, snapshot.data!.midgameAPM, snapshot.data!.openerPPS, snapshot.data!.PPS, snapshot.data!.midgamePPS)]),
-				        AplThingy([Apl("thing", snapshot.data!.upstackAPL, snapshot.data!.downstackAPL, snapshot.data!.cheeseAPL)], width > 768.0),
-                EffThingy([Eff("thing", snapshot.data!.iEfficiency, snapshot.data!.tEfficiency, snapshot.data!.allspinEfficiency)], width > 768.0),
-								ClearTypesThingy([snapshot.data!.clearTypes], width),
-								WellColumnsThingy([snapshot.data!.wellColumns], [snapshot.data!.nick], width),
+								ApmPpsThingy([ApmPps(data.nick, data.openerAPM, data.APM, data.midgameAPM, data.openerPPS, data.PPS, data.midgamePPS)]),
+				        AplThingy([Apl(data.nick, data.upstackAPL, data.downstackAPL, data.cheeseAPL)], width > 768.0),
+                EffThingy([Eff(data.nick, data.iEfficiency, data.tEfficiency, data.allspinEfficiency)], width > 768.0),
+								ClearTypesThingy([data.clearTypes], width),
+								WellColumnsThingy([data.wellColumns], [data.nick], width),
 								Card( // TODO: move this and add new graphs
 									child: Padding(
 										padding: paddings,
@@ -1104,10 +1077,10 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                               tickBorderData: const BorderSide(color: Colors.white24, width: 1),
                               getTitle: (index, angle) {
                                 switch (index) {
-                                case 0: return RadarChartTitle(text: "Overall\n${f3.format(snapshot.data!.PPS)}", positionPercentageOffset: 0.05);
-                                case 1: return RadarChartTitle(text: "Plonk\n${f3.format(snapshot.data!.PlonkPPS)}", positionPercentageOffset: 0.05);
-                                case 2: return RadarChartTitle(text: "Variance\n${f3.format(snapshot.data!.PPSCoeff)}", positionPercentageOffset: 0.05);
-                                case 3: return RadarChartTitle(text: "Burst\n${f3.format(snapshot.data!.BurstPPS)}", positionPercentageOffset: 0.05);
+                                case 0: return RadarChartTitle(text: "Overall\n${f3.format(data.PPS)}", positionPercentageOffset: 0.05);
+                                case 1: return RadarChartTitle(text: "Plonk\n${f3.format(data.PlonkPPS)}", positionPercentageOffset: 0.05);
+                                case 2: return RadarChartTitle(text: "Variance\n${f3.format(data.PPSCoeff)}", positionPercentageOffset: 0.05);
+                                case 3: return RadarChartTitle(text: "Burst\n${f3.format(data.BurstPPS)}", positionPercentageOffset: 0.05);
                                 default: return const RadarChartTitle(text: '');
                                 }
                               },
@@ -1116,10 +1089,10 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                                 fillColor: Theme.of(context).colorScheme.primary.withAlpha(170),
                                 borderColor: Theme.of(context).colorScheme.primary,
                                 dataEntries: [
-                                  RadarEntry(value: snapshot.data!.PPS),
-                                  RadarEntry(value: snapshot.data!.PlonkPPS),
-                                  RadarEntry(value: snapshot.data!.PPSCoeff), // variance
-                                  RadarEntry(value: snapshot.data!.BurstPPS),
+                                  RadarEntry(value: data.PPS),
+                                  RadarEntry(value: data.PlonkPPS),
+                                  RadarEntry(value: data.PPSCoeff), // variance
+                                  RadarEntry(value: data.BurstPPS),
                                 ],
                                 ),
                                 RadarDataSet(
@@ -1156,12 +1129,12 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                               tickBorderData: const BorderSide(color: Colors.white24, width: 1),
                               getTitle: (index, angle) {
                                 switch (index) {
-                                case 0: return RadarChartTitle(text: "APM\n${f2.format(snapshot.data!.surgeAPM)}", positionPercentageOffset: 0.05);
-                                case 1: return RadarChartTitle(text: "PPS\n${f2.format(snapshot.data!.surgePPS)}", positionPercentageOffset: 0.05, angle: 60.0);
-                                case 2: return RadarChartTitle(text: "Length\n${f2.format(snapshot.data!.surgeLength)}", positionPercentageOffset: 0.05, angle: -60.0);
-                                case 3: return RadarChartTitle(text: "Rate\n${percentage.format(snapshot.data!.surgeRate)}", positionPercentageOffset: 0.05);
-                                case 4: return RadarChartTitle(text: "Secs/DS\n${f2.format(snapshot.data!.surgeDS)}", positionPercentageOffset: 0.05, angle: 60.0);
-                                case 5: return RadarChartTitle(text: "Allspin\n${percentage.format(snapshot.data!.surgeAllspin)}", positionPercentageOffset: 0.05, angle: -60.0);
+                                case 0: return RadarChartTitle(text: "APM\n${f2.format(data.surgeAPM)}", positionPercentageOffset: 0.05);
+                                case 1: return RadarChartTitle(text: "PPS\n${f2.format(data.surgePPS)}", positionPercentageOffset: 0.05, angle: 60.0);
+                                case 2: return RadarChartTitle(text: "Length\n${f2.format(data.surgeLength)}", positionPercentageOffset: 0.05, angle: -60.0);
+                                case 3: return RadarChartTitle(text: "Rate\n${percentage.format(data.surgeRate)}", positionPercentageOffset: 0.05);
+                                case 4: return RadarChartTitle(text: "Secs/DS\n${f2.format(data.surgeDS)}", positionPercentageOffset: 0.05, angle: 60.0);
+                                case 5: return RadarChartTitle(text: "Allspin\n${percentage.format(data.surgeAllspin)}", positionPercentageOffset: 0.05, angle: -60.0);
                                 default: return const RadarChartTitle(text: '');
                                 }
                               },
@@ -1170,12 +1143,12 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                                 fillColor: Theme.of(context).colorScheme.primary.withAlpha(170),
                                 borderColor: Theme.of(context).colorScheme.primary,
                                 dataEntries: [
-                                  RadarEntry(value: snapshot.data!.surgeAPM/120),
-                                  RadarEntry(value: snapshot.data!.surgePPS),
-                                  RadarEntry(value: snapshot.data!.surgeLength/3),
-                                  RadarEntry(value: snapshot.data!.surgeRate/10),
-                                  RadarEntry(value: snapshot.data!.surgeDS/10),
-                                  RadarEntry(value: snapshot.data!.surgeAllspin)
+                                  RadarEntry(value: data.surgeAPM/120),
+                                  RadarEntry(value: data.surgePPS),
+                                  RadarEntry(value: data.surgeLength/3),
+                                  RadarEntry(value: data.surgeRate/10),
+                                  RadarEntry(value: data.surgeDS/10),
+                                  RadarEntry(value: data.surgeAllspin)
                                 ],
                                 ),
                                 RadarDataSet(
@@ -1247,7 +1220,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                             ],
                             pointers: [
                               NeedlePointer(
-                                value: snapshot.data!.attackCheesiness,
+                                value: data.attackCheesiness,
                                 enableAnimation: true,
                                 needleLength: 0.9,
                                 needleStartWidth: 2,
@@ -1263,7 +1236,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                                   style: const TextStyle(fontFamily: "Eurostile Round", color: Colors.white),
                                   children: [
                                     TextSpan(text: "Attack\nCheesiness\n"),
-                                    TextSpan(text: f3.format(snapshot.data!.attackCheesiness), style: TextStyle(fontSize: 25, fontFamily: "Eurostile Round Extended", fontWeight: FontWeight.w100)),
+                                    TextSpan(text: f3.format(data.attackCheesiness), style: TextStyle(fontSize: 25, fontFamily: "Eurostile Round Extended", fontWeight: FontWeight.w100)),
                                     // if (lbPos != null) TextSpan(text: lbPos!.app!.position >= 1000 ? "\n${t.top} ${f2.format(lbPos!.app!.percentage*100)}%" : "\n№${lbPos!.app!.position}", style: TextStyle(color: getColorOfRank(lbPos!.app!.position))),
                                     // if (oldNerdStats != null) TextSpan(text: "\n${comparef.format(nerdStats.app - oldNerdStats!.app)}", style: TextStyle(color: getDifferenceColor(nerdStats.app - oldNerdStats!.app)))
                                   ]
@@ -1278,7 +1251,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                     ),
 									)
                 ),
-                KillsDeathsThingy([KD("thing", snapshot.data!.killStats, snapshot.data!.deathStats)], width),
+                KillsDeathsThingy([KD(data.nick, data.killStats, data.deathStats)], width),
 							],
 						);
 					}
@@ -1488,7 +1461,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 			Cards.overview => getOverviewCard(snapshot.data!.summaries!, (snapshot.data!.averages != null && snapshot.data!.summaries!.league.rank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.rank] : (snapshot.data!.averages != null && snapshot.data!.summaries!.league.percentileRank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.percentileRank] : null, width),
 			Cards.tetraLeague => switch (cardMod){
 				CardMod.info => getTetraLeagueCard(snapshot.data!.summaries!.league, snapshot.data!.cutoffs, (snapshot.data!.averages != null && snapshot.data!.summaries!.league.rank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.rank] : (snapshot.data!.averages != null && snapshot.data!.summaries!.league.percentileRank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.percentileRank] : null, snapshot.data!.states, snapshot.data!.playerPos, width, tlAchievements),
-				CardMod.exRecords => getFreyhoeAnalysis(width),
+				CardMod.exRecords => getFreyhoeAnalysis(snapshot.data!.player!.username, width),
 				CardMod.ex => getPreviousSeasonsList(snapshot.data!.summaries!.pastLeague, width),
 				CardMod.records => getRecentTLrecords(widget.constraints, snapshot.data!.player!.userId),
 				_ => const Center(child: Text("huh?"))
