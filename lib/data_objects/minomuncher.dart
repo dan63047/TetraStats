@@ -529,13 +529,13 @@ class ClearsChartData {
   List<int> get byID => [
     perfectClear,
     allspin,
-    single,
-    tspinSingle,
-    double,
-    tspinDouble,
-    triple,
     tspinTriple,
+    tspinDouble,
+    tspinSingle,
     quad,
+    triple,
+    double,
+    single
   ];
 
   ClearsChartData operator+(ClearsChartData other){
@@ -589,14 +589,13 @@ List<String> get killsLabels => [
 List<String> get graphClearName => [
 		t.stats.pcs,
 		"All Spins",
-		t.stats.lineClears.single,
-		"${t.stats.tSpin} ${t.stats.lineClears.single}",
+    "${t.stats.tSpin} ${t.stats.lineClears.triple}",
+    "${t.stats.tSpin} ${t.stats.lineClears.double}",
+    "${t.stats.tSpin} ${t.stats.lineClears.single}",
+    t.stats.lineClears.quad,
+    t.stats.lineClears.triple,
 		t.stats.lineClears.double,
-		"${t.stats.tSpin} ${t.stats.lineClears.double}",
-		t.stats.lineClears.triple,
-		"${t.stats.tSpin} ${t.stats.lineClears.triple}",
-		t.stats.lineClears.quad,
-		//"${t.stats.tSpin} ${t.stats.lineClears.quad}"
+		t.stats.lineClears.single,
 	];
 
 class WellsData{

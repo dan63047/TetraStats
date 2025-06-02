@@ -6,12 +6,15 @@ import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/widgets/apl_ranges.dart';
 import 'package:tetra_stats/widgets/apm_pps_ranges.dart';
 import 'package:tetra_stats/widgets/clear_types_thingy.dart';
 import 'package:tetra_stats/widgets/efficiency_ranges.dart';
 import 'package:tetra_stats/widgets/etr_thingy.dart';
 import 'package:tetra_stats/widgets/kills_deaths_thingy.dart';
+import 'package:tetra_stats/widgets/pps_distribution_thingy.dart';
+import 'package:tetra_stats/widgets/pps_surge_radars_thingy.dart';
 import 'package:tetra_stats/widgets/sankey_graph.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
@@ -47,6 +50,7 @@ import 'package:tetra_stats/widgets/graphs.dart';
 import 'package:tetra_stats/widgets/lineclears_thingy.dart';
 import 'package:tetra_stats/widgets/nerd_stats_thingy.dart';
 import 'package:tetra_stats/widgets/news_thingy.dart';
+import 'package:tetra_stats/widgets/sankey_thingy.dart';
 import 'package:tetra_stats/widgets/sp_trailing_stats.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
 import 'package:tetra_stats/widgets/tl_rating_thingy.dart';
@@ -1002,32 +1006,6 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 				case ConnectionState.done:
 					if (snapshot.hasData){
             MinomuncherData data = snapshot.data!.data;
-						List<SankeyNode> sankeyNodes = [
-							SankeyNode(id: 0, label: 'Incoming Attack'),
-							SankeyNode(id: 1, label: 'Cheese'),
-							SankeyNode(id: 2, label: 'Clean'),
-							SankeyNode(id: 3, label: 'Cancelled'),
-							SankeyNode(id: 4, label: 'CheeseTanked'),
-							SankeyNode(id: 5, label: 'CleanTanked'),
-						];
-						List<SankeyLink> sankeyLinks = [
-							SankeyLink(source: sankeyNodes[0], target: sankeyNodes[1], value: data.cheeseLinesRecieved * 100),
-							SankeyLink(source: sankeyNodes[0], target: sankeyNodes[2], value: data.cleanLinesRecieved * 100),
-							SankeyLink(source: sankeyNodes[1], target: sankeyNodes[3], value: data.cheeseLinesCancelled * 100),
-							SankeyLink(source: sankeyNodes[1], target: sankeyNodes[4], value: data.cheeseLinesTanked * 100),
-							SankeyLink(source: sankeyNodes[2], target: sankeyNodes[3], value: data.cheeseLinesCancelled * 100),
-							SankeyLink(source: sankeyNodes[2], target: sankeyNodes[4], value: data.cleanLinesTankedAsCheese * 100),
-							SankeyLink(source: sankeyNodes[2], target: sankeyNodes[5], value: data.cleanLinesTankedAsClean * 100)
-						];
-						Map<String, Color> nodeColors = generateDefaultNodeColorMap(sankeyNodes);
-						SankeyDataSet sankeyDataSet = SankeyDataSet(nodes: sankeyNodes, links: sankeyLinks);
-						final sankey = generateSankeyLayout(
-							width: 800,
-							height: 400,
-							nodeWidth: 20,
-							nodePadding: 15,
-						);
-						sankeyDataSet.layout(sankey);
 						const EdgeInsets paddings = const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0);
 						return Column(
 							children: [
@@ -1054,142 +1032,8 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                 EffThingy([Eff(data.nick, data.iEfficiency, data.tEfficiency, data.allspinEfficiency)], width > 768.0),
 								ClearTypesThingy([data.clearTypes], width),
 								WellColumnsThingy([data.wellColumns], [data.nick], width),
-								Card( // TODO: move this and add new graphs
-									child: Padding(
-										padding: paddings,
-										child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-										  children: [
-                        Column(
-										      children: [
-                            Text("PPS", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
-                            Center(child: SizedBox(width: 0.0, height: 16.0)),
-                            SizedBox(
-                              height: 330,
-                              width: 330,
-                              child: MyRadarChart(
-                              RadarChartData(
-                              radarShape: RadarShape.circle,
-                              tickCount: 4,
-                              radarBackgroundColor: Colors.black.withAlpha(170),
-                              radarBorderData: const BorderSide(color: Colors.white24, width: 1),
-                              gridBorderData: const BorderSide(color: Colors.white24, width: 1),
-                              tickBorderData: const BorderSide(color: Colors.white24, width: 1),
-                              getTitle: (index, angle) {
-                                switch (index) {
-                                case 0: return RadarChartTitle(text: "Overall\n${f3.format(data.PPS)}", positionPercentageOffset: 0.05);
-                                case 1: return RadarChartTitle(text: "Plonk\n${f3.format(data.PlonkPPS)}", positionPercentageOffset: 0.05);
-                                case 2: return RadarChartTitle(text: "Variance\n${f3.format(data.PPSCoeff)}", positionPercentageOffset: 0.05);
-                                case 3: return RadarChartTitle(text: "Burst\n${f3.format(data.BurstPPS)}", positionPercentageOffset: 0.05);
-                                default: return const RadarChartTitle(text: '');
-                                }
-                              },
-                              dataSets: [
-                                RadarDataSet(
-                                fillColor: Theme.of(context).colorScheme.primary.withAlpha(170),
-                                borderColor: Theme.of(context).colorScheme.primary,
-                                dataEntries: [
-                                  RadarEntry(value: data.PPS),
-                                  RadarEntry(value: data.PlonkPPS),
-                                  RadarEntry(value: data.PPSCoeff), // variance
-                                  RadarEntry(value: data.BurstPPS),
-                                ],
-                                ),
-                                RadarDataSet(
-                                fillColor: Colors.transparent,
-                                borderColor: Colors.transparent,
-                                dataEntries: [
-                                  RadarEntry(value: 2),
-                                  RadarEntry(value: 0),
-                                  RadarEntry(value: 0),
-                                  RadarEntry(value: 0)
-                                ],
-                                ),
-                              ]
-                              )
-                              ),
-                            ),
-                            Center(child: SizedBox(width: 0.0, height: 16.0)),
-										      ],
-										    ),
-										    Column(
-										      children: [
-                            Text("Surge", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
-                            Center(child: SizedBox(width: 0.0, height: 16.0)),
-                            SizedBox(
-                              height: 330,
-                              width: 330,
-                              child: MyRadarChart(
-                              RadarChartData(
-                              radarShape: RadarShape.circle,
-                              tickCount: 4,
-                              radarBackgroundColor: Colors.black.withAlpha(170),
-                              radarBorderData: const BorderSide(color: Colors.white24, width: 1),
-                              gridBorderData: const BorderSide(color: Colors.white24, width: 1),
-                              tickBorderData: const BorderSide(color: Colors.white24, width: 1),
-                              getTitle: (index, angle) {
-                                switch (index) {
-                                case 0: return RadarChartTitle(text: "APM\n${f2.format(data.surgeAPM)}", positionPercentageOffset: 0.05);
-                                case 1: return RadarChartTitle(text: "PPS\n${f2.format(data.surgePPS)}", positionPercentageOffset: 0.05, angle: 60.0);
-                                case 2: return RadarChartTitle(text: "Length\n${f2.format(data.surgeLength)}", positionPercentageOffset: 0.05, angle: -60.0);
-                                case 3: return RadarChartTitle(text: "Rate\n${percentage.format(data.surgeRate)}", positionPercentageOffset: 0.05);
-                                case 4: return RadarChartTitle(text: "Secs/DS\n${f2.format(data.surgeDS)}", positionPercentageOffset: 0.05, angle: 60.0);
-                                case 5: return RadarChartTitle(text: "Allspin\n${percentage.format(data.surgeAllspin)}", positionPercentageOffset: 0.05, angle: -60.0);
-                                default: return const RadarChartTitle(text: '');
-                                }
-                              },
-                              dataSets: [
-                                RadarDataSet(
-                                fillColor: Theme.of(context).colorScheme.primary.withAlpha(170),
-                                borderColor: Theme.of(context).colorScheme.primary,
-                                dataEntries: [
-                                  RadarEntry(value: data.surgeAPM/120),
-                                  RadarEntry(value: data.surgePPS),
-                                  RadarEntry(value: data.surgeLength/3),
-                                  RadarEntry(value: data.surgeRate/10),
-                                  RadarEntry(value: data.surgeDS/10),
-                                  RadarEntry(value: data.surgeAllspin)
-                                ],
-                                ),
-                                RadarDataSet(
-                                fillColor: Colors.transparent,
-                                borderColor: Colors.transparent,
-                                dataEntries: [
-                                  RadarEntry(value: 1),
-                                  RadarEntry(value: 0),
-                                  RadarEntry(value: 0),
-                                  RadarEntry(value: 0),
-                                  RadarEntry(value: 0),
-                                  RadarEntry(value: 0)
-                                ],
-                                ),
-                              ]
-                              )
-                              ),
-                            ),
-                            Center(child: SizedBox(width: 0.0, height: 16.0)),
-										      ],
-										    ),
-										  ],
-										),
-									)
-								),
-								Card(
-									child: Padding(
-										padding: paddings,
-										child: Column(
-										  children: [
-											Text("Incoming Attack Sankey Chart", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
-																SankeyDiagramWidget(
-											data: sankeyDataSet,
-											nodeColors: nodeColors,
-											size: Size(width, 400.0),
-											showLabels: true,
-											),
-										  ],
-										)
-									)
-								),
+								PPSSurgeThingy([data], width),
+								SankeyThingy([data], width),
                 Card(
                   child: Padding(
 										padding: paddings,
@@ -1252,10 +1096,14 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 									)
                 ),
                 KillsDeathsThingy([KD(data.nick, data.killStats, data.deathStats)], width),
+                PPSDistributionThingy([data.ppsSegments], [data.nick], width)
 							],
 						);
 					}
-					if (snapshot.hasError){ return SizedBox(height: 720.0, child: FutureError(snapshot)); }
+					if (snapshot.hasError){
+            if (snapshot.error is TetrioNoReplays) return SizedBox(height: 720.0, child: ErrorThingy(data: FetchResults(false, null, [], null, null, null, null, null, false, snapshot.error as Exception)));
+            return SizedBox(height: 720.0, child: FutureError(snapshot));
+          }
 				}
 			return const Text("what?");
 			},

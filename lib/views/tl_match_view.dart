@@ -12,6 +12,7 @@ import 'package:tetra_stats/widgets/compare_thingy.dart';
 import 'package:tetra_stats/widgets/efficiency_ranges.dart';
 import 'package:tetra_stats/widgets/future_error.dart';
 import 'package:tetra_stats/widgets/list_tile_trailing_stats.dart';
+import 'package:tetra_stats/widgets/pps_distribution_thingy.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
 import 'package:tetra_stats/widgets/vs_graphs.dart';
 import 'package:flutter/foundation.dart';
@@ -395,7 +396,8 @@ class TlMatchResultState extends State<TlMatchResultView> {
                   AplThingy([for (MinomuncherData e in snapshot.data!) Apl(e.nick, e.upstackAPL, e.downstackAPL, e.cheeseAPL)], width > 768),
                   EffThingy([for (MinomuncherData e in snapshot.data!) Eff(e.nick, e.iEfficiency, e.tEfficiency, e.allspinEfficiency)], width > 768),
                   ClearTypesThingy([for (MinomuncherData e in snapshot.data!) e.clearTypes], width),
-                  WellColumnsThingy([for (MinomuncherData e in snapshot.data!) e.wellColumns], [for (MinomuncherData e in snapshot.data!) e.nick], width)
+                  WellColumnsThingy([for (MinomuncherData e in snapshot.data!) e.wellColumns], [for (MinomuncherData e in snapshot.data!) e.nick], width),
+                  PPSDistributionThingy([for (MinomuncherData e in snapshot.data!) e.ppsSegments], [for (MinomuncherData e in snapshot.data!) e.nick], width)
                 ],
               );
             } if (snapshot.hasError){ return SizedBox(height: 720.0, child: FutureError(snapshot)); }
@@ -505,10 +507,9 @@ class TlMatchResultState extends State<TlMatchResultView> {
                     ),
                   );
               })
-              // TODO: insert tetrio/freyhoe switch someone there
             ),
           ),
-          SizedBox(
+          if (!widget.record.stub) SizedBox(
             width: width,
             height: 40.000000,
             child: SegmentedButton<Mod>(
@@ -560,6 +561,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
   @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);
+    if (widget.record.stub && mod == Mod.analysis) mod = Mod.info;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -568,7 +570,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
         ),
         actions: [
           PopupMenuButton(
-            enabled: widget.record.gamemode == "league",
+            enabled: widget.record.gamemode == "league" && !widget.record.stub,
             itemBuilder: (BuildContext context) => <PopupMenuEntry>[
               PopupMenuItem(
                 value: 1,

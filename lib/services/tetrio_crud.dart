@@ -148,6 +148,8 @@ class CacheController {
         return object.type+object.userId;
       case MinomuncherRaw:
         return object.nick+"minomuncher";
+      case const (List<MinomuncherRaw>):
+        return "lol";
       default:
         return object.runtimeType.toString()+object.id;
     }
@@ -415,7 +417,7 @@ class TetrioService extends DB {
           if (response.contentLength! > 0) {
             Map<String, dynamic> json = jsonDecode(response.body);
             List<MinomuncherRaw> result = [for (MapEntry<String, dynamic> e in json.entries) MinomuncherRaw.fromJson(e)];
-            //_cache.store(result, 999999999999999999);
+            _cache.store(result, 9999999999999, id: replay.id);
             developer.log("fetchMinoMuncherStats: replay ${replay.id} was munched");
             return result;
           } else {
@@ -449,7 +451,7 @@ class TetrioService extends DB {
     TetraLeagueBetaStream stream = await fetchTLStream(id);
     List<BetaRecord> avaliable = stream.records;
     avaliable.removeWhere((element) => element.stub);
-    if (avaliable.isEmpty) throw TetrioNoReplays;
+    if (avaliable.isEmpty) throw TetrioNoReplays();
     List<List<MinomuncherRaw>> raws = [for (BetaRecord e in avaliable.take(10)) await minomuncherPostReplay(await szyGetReplay(e.replayID))];
     List<MinomuncherRaw> ourId = [for (List<MinomuncherRaw> e in raws) e.firstWhere((element) => element.nick == id)];
     MinomuncherRaw output = ourId.reduce((a, b) => a + b);

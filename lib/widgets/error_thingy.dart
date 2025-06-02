@@ -28,6 +28,10 @@ class ErrorThingy extends StatelessWidget{
       icon = Icons.search_off;
       errText = (data!.exception as TetrioSearchFailed).message;
       subText = t.errors.discordNotAssignedSub;
+      case TetrioNoReplays:
+      icon = Icons.videogame_asset_off;
+      errText = "No replays avaliable for analysis";
+      subText = "mb ask that player to play TL?";
       case ConnectionIssue:
       var err = data!.exception as ConnectionIssue;
       errText = t.errors.connection(code: err.code, message: err.message);
