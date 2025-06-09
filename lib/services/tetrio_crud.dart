@@ -38,7 +38,7 @@ import 'package:tetra_stats/services/sqlite_db_controller.dart';
 import 'package:csv/csv.dart';
 
 const String dbName = "TetraStats.db";
-const String webVersionDomain = "ts.dan63.by";
+const String webVersionDomain = "tsbeta.dan63.by";
 const String tetrioUsersTable = "tetrioUsers";
 const String tetrioUsersToTrackTable = "tetrioUsersToTrack";
 const String tetraLeagueMatchesTable = "tetrioAlphaLeagueMathces";
@@ -185,7 +185,7 @@ class CacheController {
       }
     } on StateError{
       return null;
-    }     
+    }
     if (int.parse(objectEntry.key.substring(id.length)) <= DateTime.now().millisecondsSinceEpoch){
       _cache.remove(objectEntry.key);
       return null;
@@ -201,6 +201,14 @@ class CacheController {
   void reset(){
     _cache.clear();
   }
+}
+
+class MunchProgress{
+  List<BetaRecord> avaliable = [];
+  List<MinomuncherRaw> munched = [];
+  MinomuncherRaw? result;
+
+  toString() => "${munched.length}/${avaliable.length}, $result";
 }
 
 class TetrioService extends DB {
@@ -319,7 +327,7 @@ class TetrioService extends DB {
           DateTime now = DateTime.now();
           _cache.store(replay, now.millisecondsSinceEpoch + 3600000);
           return replay;
-        // if not 200 - throw a unique for each code exception  
+        // if not 200 - throw a unique for each code exception
         case 404:
           throw SzyNotFound();
         case 403:
@@ -397,16 +405,16 @@ class TetrioService extends DB {
   Future<List<MinomuncherRaw>> minomuncherPostReplay(RawReplay replay, {String? id}) async {
     List<MinomuncherRaw>? cached = _cache.get(replay.id, List<MinomuncherRaw>);
     if (cached != null) return cached;
-    
+
     Uri url;
     if (kIsWeb) {
-      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "Minomuncher"}); // Not exist for now, TODO
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "Minomuncher"});
     } else {
       url = Uri.https('REDACTED', 'api/replay'); // TODO: change it on release to oskware bridge
     }
     try {
       final response = await client.post(
-        url, 
+        url,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -445,18 +453,33 @@ class TetrioService extends DB {
     }
   }
 
-  Future<MinomuncherRaw> minomuncherMunchByID(String id) async {
+  Stream<MunchProgress> minomuncherMunchByIDStream(String id) async* {
+    MunchProgress progress = MunchProgress();
+    yield progress;
     MinomuncherRaw? cached = _cache.get(id, MinomuncherRaw);
-    if (cached != null) return cached;
-    TetraLeagueBetaStream stream = await fetchTLStream(id);
-    List<BetaRecord> avaliable = stream.records;
-    avaliable.removeWhere((element) => element.stub);
-    if (avaliable.isEmpty) throw TetrioNoReplays();
-    List<List<MinomuncherRaw>> raws = [for (BetaRecord e in avaliable.take(10)) await minomuncherPostReplay(await szyGetReplay(e.replayID))];
-    List<MinomuncherRaw> ourId = [for (List<MinomuncherRaw> e in raws) e.firstWhere((element) => element.nick == id)];
-    MinomuncherRaw output = ourId.reduce((a, b) => a + b);
-    _cache.store(output, DateTime.now().millisecondsSinceEpoch + 300000, id: id+"minomuncher");
-    return output;
+    if (cached != null){
+      progress.result = cached;
+      yield progress;
+    } else{
+      TetraLeagueBetaStream stream = await fetchTLStream(id);
+      List<BetaRecord> avaliable = stream.records;
+      avaliable.removeWhere((element) => element.stub);
+      if (avaliable.isEmpty) throw TetrioNoReplays();
+      progress.avaliable = avaliable.take(10).toList();
+      yield progress;
+      for (BetaRecord record in progress.avaliable){
+        // MinomuncherRaw? cached = _cache.get(record.replayID, MinomuncherRaw);
+        // if (cached != null){
+        //   progress.result = cached;
+        //   yield progress;
+        // }
+        List<MinomuncherRaw> raw = await minomuncherPostReplay(await szyGetReplay(record.replayID));
+        progress.munched.add(raw.firstWhere((element) => element.nick == id));
+        yield progress;
+      }
+      progress.result = progress.munched.reduce((a, b) => a + b);
+      yield progress;
+    }
   }
 
   /// Retrieves avaliable Tetra League matches from Tetra Channel api. Returns stream object (fake stream).
@@ -464,7 +487,7 @@ class TetrioService extends DB {
   Future<SingleplayerStream> fetchStream(String userID, String stream) async {
     SingleplayerStream? cached = _cache.get(stream+userID, SingleplayerStream);
     if (cached != null) return cached;
-    
+
     Uri url;
     if (kIsWeb) {
       url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "singleplayerStream", "user": userID.toLowerCase().trim(), "stream": stream});
@@ -532,7 +555,7 @@ class TetrioService extends DB {
           developer.log("fetchTopTR: Probably, player doesn't have top TR", name: "services/tetrio_crud", error: response.statusCode);
           _cache.store(result, DateTime.now().millisecondsSinceEpoch + 300000);
           return result;
-        // if not 200 or 404 - throw a unique for each code exception  
+        // if not 200 or 404 - throw a unique for each code exception
         case 403:
           throw P1nkl0bst3rForbidden();
         case 429:
@@ -583,7 +606,7 @@ class TetrioService extends DB {
         case 404:
           developer.log("fetchCutoffsTetrio: Cutoffs are gone", name: "services/tetrio_crud", error: response.statusCode);
           return null;
-        // if not 200 or 404 - throw a unique for each code exception  
+        // if not 200 or 404 - throw a unique for each code exception
         case 403:
           throw TetrioForbidden();
         case 429:
@@ -630,7 +653,7 @@ class TetrioService extends DB {
         case 404:
           developer.log("fetchCutoffsBeanserver: Cutoffs are gone", name: "services/tetrio_crud", error: response.statusCode);
           return null;
-        // if not 200 or 404 - throw a unique for each code exception  
+        // if not 200 or 404 - throw a unique for each code exception
         case 403:
           throw P1nkl0bst3rForbidden();
         case 429:
@@ -685,7 +708,7 @@ class TetrioService extends DB {
         case 404:
           developer.log("fetchCutoffsHistory: Cutoffs are gone", name: "services/tetrio_crud", error: response.statusCode);
           return [];
-        // if not 200 or 404 - throw a unique for each code exception  
+        // if not 200 or 404 - throw a unique for each code exception
         case 403:
           throw P1nkl0bst3rForbidden();
         case 429:
@@ -730,7 +753,7 @@ class TetrioService extends DB {
           return result;
         case 404:
           throw TetrioPlayerNotExist();
-        // if not 200 or 404 - throw a unique for each code exception  
+        // if not 200 or 404 - throw a unique for each code exception
         case 403:
           throw TetrioForbidden();
         case 429:
@@ -774,7 +797,7 @@ class TetrioService extends DB {
           Batch batch = db.batch();
           for (List<dynamic> entry in csv){ // each entry is one state
             TetraLeague state = TetraLeague(
-                id: id, 
+                id: id,
                 timestamp: DateTime.parse(entry[9]),
                 apm: entry[6] != '' ? entry[6] : null,
                 pps: entry[7] != '' ? entry[7] : null,
@@ -973,7 +996,7 @@ class TetrioService extends DB {
   Future<List<TetrioPlayerFromLeaderboard>> fetchTetrioLeaderboard({String? prisecter, String? lb, String? country}) async {
     // TetrioPlayersLeaderboard? cached = _cache.get("league", TetrioPlayersLeaderboard);
     // if (cached != null) return cached;
-     
+
     Uri url;
     if (kIsWeb) {
       url = Uri.https(webVersionDomain, 'oskware_bridge.php', {
@@ -1094,7 +1117,7 @@ class TetrioService extends DB {
   Future<News> fetchNews(String userID) async{
     News? cached = _cache.get("user_$userID", News);
     if (cached != null) return cached;
-    
+
     Uri url;
     if (kIsWeb) {
       url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "tetrioNews", "user": userID.toLowerCase().trim(), "limit": "100"});
@@ -1142,7 +1165,7 @@ class TetrioService extends DB {
   Future<TetraLeagueBetaStream> fetchTLStream(String userID, {String? prisecter}) async {
     // TetraLeagueBetaStream? cached = _cache.get(userID, TetraLeagueBetaStream);
     // if (cached != null) return cached;
-    
+
     Uri url;
     if (kIsWeb) {
       url = Uri.https(webVersionDomain, 'oskware_bridge.php', {
@@ -1215,18 +1238,18 @@ class TetrioService extends DB {
     await ensureDbIsOpen();
     final db = getDatabaseOrThrow();
     await db.execute("""
-      DELETE FROM $tetraLeagueMatchesTable 
-      WHERE 
+      DELETE FROM $tetraLeagueMatchesTable
+      WHERE
         $idCol IN (
-        SELECT 
-          $idCol 
+        SELECT
+          $idCol
         FROM (
-          SELECT 
+          SELECT
             $idCol,
             ROW_NUMBER() OVER (
               PARTITION BY $replayID
               ORDER BY $replayID) AS row_num
-          FROM $tetraLeagueMatchesTable    
+          FROM $tetraLeagueMatchesTable
         ) t
           WHERE row_num > 1
       );
@@ -1534,7 +1557,7 @@ class TetrioService extends DB {
         throw http.ClientException(e.message, e.uri);
       }
     }
-    
+
     // finally going to obtain
     Uri url;
     if (kIsWeb) {

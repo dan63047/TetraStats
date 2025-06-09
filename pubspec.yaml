@@ -1,11 +1,11 @@
 name: tetra_stats
 description: Track your and other player stats in TETR.IO
-publish_to: 'none'
+publish_to: "none"
 
-version: 2.0.8+49
+version: 2.1.0+50
 
 environment:
-  sdk: '>=3.0.0'
+  sdk: ">=3.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -25,7 +25,7 @@ dependencies:
   sqflite: ^2.2.8+2
   sqflite_common_ffi: any
   sqlite3_flutter_libs: ^0.5.15
-  sqflite_common_ffi_web: '>=0.1.0-dev.1'
+  sqflite_common_ffi_web: ">=0.1.0-dev.1"
   path_provider: ^2.0.15
   path: ^1.8.2
   fl_chart: ^0.66.0
@@ -55,7 +55,6 @@ dev_dependencies:
   flutter_launcher_icons: "^0.13.1"
   test: ^1.24.9
 
-
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
@@ -82,14 +81,13 @@ targets:
           input_directory: res/i18n
           output_directory: lib/i18n
 
-
 flutter:
   uses-material-design: true
   assets:
-     - res/avatars/
-     - res/icons/
-     - res/tetrio_tl_alpha_ranks/
-     - res/images/
+    - res/avatars/
+    - res/icons/
+    - res/tetrio_tl_alpha_ranks/
+    - res/images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

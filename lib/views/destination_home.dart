@@ -7,6 +7,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
+import 'package:tetra_stats/services/tetrio_crud.dart' show MunchProgress;
 import 'package:tetra_stats/widgets/apl_ranges.dart';
 import 'package:tetra_stats/widgets/apm_pps_ranges.dart';
 import 'package:tetra_stats/widgets/clear_types_thingy.dart';
@@ -15,8 +16,7 @@ import 'package:tetra_stats/widgets/etr_thingy.dart';
 import 'package:tetra_stats/widgets/kills_deaths_thingy.dart';
 import 'package:tetra_stats/widgets/pps_distribution_thingy.dart';
 import 'package:tetra_stats/widgets/pps_surge_radars_thingy.dart';
-import 'package:tetra_stats/widgets/sankey_graph.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
+
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/data_objects/achievement.dart';
 import 'package:tetra_stats/data_objects/cutoff_tetrio.dart';
@@ -138,6 +138,7 @@ Map<Cards, List<ButtonSegment<CardMod>>> modeButtons = {
 		)
 	]
 };
+double freyhoeStreamTextOpacity = 1.0;
 
 class ZenithCard extends StatelessWidget {
 	final RecordSingle? record;
@@ -290,7 +291,7 @@ class RecordCard extends StatelessWidget {
 	final double width;
 
 	const RecordCard(this.record, this.achievements, this.betterThanRankAverage, this.closestAverage, this.betterThanClosestAverage, this.rank, {this.width = double.infinity});
-	
+
 	Widget result(){
 		TextStyle tableTextStyle = TextStyle(fontSize: width > 768.0 ? 21 : 18);
 		return Card(
@@ -514,7 +515,7 @@ class RecordSummary extends StatelessWidget{
 	final double width;
 
 	const RecordSummary({super.key, required this.record, this.betterThanRankAverage, this.closestAverage, this.old = false, this.betterThanClosestAverage, this.rank, this.hideRank = false, this.width = double.infinity});
-	
+
 	@override
 	Widget build(BuildContext context) {
 		return Row(
@@ -669,7 +670,7 @@ class AchievementSummary extends StatelessWidget{
 			),
 		);
 	}
-	
+
 }
 
 class LeagueCard extends StatelessWidget{
@@ -994,73 +995,98 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 		);
 	}
 
-	Widget getFreyhoeAnalysis(String id, double width){
-		return FutureBuilder<MinomuncherRaw>(
-			future: teto.minomuncherMunchByID(id),
+	void _changefreyhoeStreamTextOpacity() {
+    setState(() => freyhoeStreamTextOpacity = freyhoeStreamTextOpacity == 0 ? 1.0 : 0.0);
+  }
+
+	Widget freyhoeStreamNotOnTwitch(String id, double width){
+	  return StreamBuilder<MunchProgress>(
+			stream: teto.minomuncherMunchByIDStream(id),
 			builder: (context, snapshot) {
-				switch (snapshot.connectionState){
-				case ConnectionState.none:
-				case ConnectionState.waiting:
-				case ConnectionState.active:
-					return const Center(child: CircularProgressIndicator());
-				case ConnectionState.done:
-					if (snapshot.hasData){
-            MinomuncherData data = snapshot.data!.data;
-						const EdgeInsets paddings = const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0);
-						return Column(
-							children: [
-								Card(
-									child: Padding(
-										padding: const EdgeInsets.only(bottom: 4.0),
-										child: Center(
-											child: Column(
-												mainAxisSize: MainAxisSize.min,
-												crossAxisAlignment: CrossAxisAlignment.center,
-												children: [
-													Text("Analysis", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleMedium),
-													Padding(
-														padding: const EdgeInsets.only(top: 4.0),
-														child: Text("via MinoMuncher by Freyhoe", textAlign: TextAlign.center, style: TextStyle(fontSize: widget.constraints.maxWidth > 768.0 ? null : 12.0, color: Colors.grey)),
-													)
-												],
-											),
-										),
-									),
-								),
-								ApmPpsThingy([ApmPps(data.nick, data.openerAPM, data.APM, data.midgameAPM, data.openerPPS, data.PPS, data.midgamePPS)]),
-				        AplThingy([Apl(data.nick, data.upstackAPL, data.downstackAPL, data.cheeseAPL)], width > 768.0),
-                EffThingy([Eff(data.nick, data.iEfficiency, data.tEfficiency, data.allspinEfficiency)], width > 768.0),
-								ClearTypesThingy([data.clearTypes], width),
-								WellColumnsThingy([data.wellColumns], [data.nick], width),
-								PPSSurgeThingy([data], width),
-								SankeyThingy([data], width),
-                Card(
-                  child: Padding(
-										padding: paddings,
-										child: SizedBox(
-                      height: 256.0,
-                      width: 256.0,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(1000),
-                        child: Container(
+			  switch (snapshot.connectionState){
+					case ConnectionState.none:
+					case ConnectionState.waiting:
+					case ConnectionState.active:
+     			  return Center(child: Column(
+     					children: [
+     			      CircularProgressIndicator(),
+     					  AnimatedOpacity(
+                  opacity: freyhoeStreamTextOpacity,
+                  duration: Duration(seconds:1),
+                  onEnd: _changefreyhoeStreamTextOpacity,
+     					    child: Text(
+                    snapshot.data!.avaliable.isEmpty ? "Fetching Records..." : "Munching...",
+                    style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)
+                  ),
+     					  ),
+        				if (snapshot.data!.avaliable.isNotEmpty) RichText(
+                  text: TextSpan(
+                    style: TextStyle(fontFamily: "Eurostile Round", color: Colors.white),
+                    children: [
+                      TextSpan(text: "${snapshot.data!.munched.length} ", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)),
+                      TextSpan(text: "out of"),
+                      TextSpan(text: " ${snapshot.data!.avaliable.length}\n", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)),
+                      TextSpan(text: "replays")
+                    ]
+                  )
+                ),
+     					]
+     			));
+					case ConnectionState.done:
+			      if (snapshot.hasData){
+              MinomuncherData data = snapshot.data!.result!.data;
+              const EdgeInsets paddings = const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0);
+  						return Column(
+                children: [
+  								Card(
+  								child: Padding(
+  										padding: const EdgeInsets.only(bottom: 4.0),
+  										child: Center(
+  										child: Column(
+  												mainAxisSize: MainAxisSize.min,
+  												crossAxisAlignment: CrossAxisAlignment.center,
+  												children: [
+  												Text("Analysis", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleMedium),
+  												Padding(
+  														padding: const EdgeInsets.only(top: 4.0),
+  														child: Text("via MinoMuncher by Freyhoe", textAlign: TextAlign.center, style: TextStyle(fontSize: widget.constraints.maxWidth > 768.0 ? null : 12.0, color: Colors.grey)),
+  												)
+  												],
+  										),
+  										),
+  								),
+  								),
+  								ApmPpsThingy([ApmPps(data.nick, data.openerAPM, data.APM, data.midgameAPM, data.openerPPS, data.PPS, data.midgamePPS)]),
+  				        AplThingy([Apl(data.nick, data.upstackAPL, data.downstackAPL, data.cheeseAPL)], width > 768.0),
+                  EffThingy([Eff(data.nick, data.iEfficiency, data.tEfficiency, data.allspinEfficiency)], width > 768.0),
+  								ClearTypesThingy([data.clearTypes], width),
+  								WellColumnsThingy([data.wellColumns], [data.nick], width),
+  								PPSSurgeThingy([data], width),
+  								SankeyThingy([data], width),
+                  Card(
+                    child: Padding(
+  										padding: paddings,
+  										child: ClipRRect(
+                          borderRadius: BorderRadius.circular(1000),
+                          child: Container(
                           decoration: BoxDecoration(gradient: RadialGradient(colors: [Colors.black12.withAlpha(100), Colors.black], radius: 0.6)),
                           child: SfRadialGauge(
                             axes: [
                               RadialAxis(
-                              startAngle: 190,
-                              endAngle: 350,
+                              startAngle: 220,
+                              endAngle: 320,
                               showLabels: false,
                               showTicks: true,
+                              canScaleToFit: true,
                               radiusFactor: 1,
-                              centerY: 0.5,
                               minimum: 0,
                               maximum: 1,
                             ranges: [
-                              GaugeRange(startValue: 0, endValue: 0.2, color: Colors.red),
-                              GaugeRange(startValue: 0.2, endValue: 0.4, color: Colors.yellow),
-                              GaugeRange(startValue: 0.4, endValue: 0.6, color: Colors.green),
-                              GaugeRange(startValue: 0.6, endValue: 0.8, color: Colors.blue),
-                              GaugeRange(startValue: 0.8, endValue: 1, color: Colors.purple),
+                              GaugeRange(startValue: 0, endValue: 0.2, color: Colors.blueGrey),
+                              GaugeRange(startValue: 0.2, endValue: 0.4, color: Colors.greenAccent),
+                              GaugeRange(startValue: 0.4, endValue: 0.6, color: Colors.yellowAccent),
+                              GaugeRange(startValue: 0.6, endValue: 0.8, color: Colors.orangeAccent),
+                              GaugeRange(startValue: 0.8, endValue: 1, color: Colors.redAccent),
                             ],
                             pointers: [
                               NeedlePointer(
@@ -1092,21 +1118,20 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                           ),
                         ),
                       ),
-                    ),
-									)
-                ),
-                KillsDeathsThingy([KD(data.nick, data.killStats, data.deathStats)], width),
-                PPSDistributionThingy([data.ppsSegments], [data.nick], width)
-							],
-						);
-					}
-					if (snapshot.hasError){
-            if (snapshot.error is TetrioNoReplays) return SizedBox(height: 720.0, child: ErrorThingy(data: FetchResults(false, null, [], null, null, null, null, null, false, snapshot.error as Exception)));
-            return SizedBox(height: 720.0, child: FutureError(snapshot));
-          }
+  								)
+                  ),
+                  KillsDeathsThingy([KD(data.nick, data.killStats, data.deathStats)], width),
+                  PPSDistributionThingy([data.ppsSegments], [data.nick], width)
+                ],
+				  );
 				}
-			return const Text("what?");
-			},
+				if (snapshot.hasError){
+          if (snapshot.error is TetrioNoReplays) return SizedBox(height: 720.0, child: ErrorThingy(data: FetchResults(false, null, [], null, null, null, null, null, false, snapshot.error as Exception)));
+          return SizedBox(height: 720.0, child: FutureError(snapshot));
+        }
+				}
+				return const Text("what?");
+			}
 		);
 	}
 
@@ -1263,7 +1288,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 								)
 							],
 						),
-					) 
+					)
 				),
 			],
 		);
@@ -1309,7 +1334,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 			Cards.overview => getOverviewCard(snapshot.data!.summaries!, (snapshot.data!.averages != null && snapshot.data!.summaries!.league.rank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.rank] : (snapshot.data!.averages != null && snapshot.data!.summaries!.league.percentileRank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.percentileRank] : null, width),
 			Cards.tetraLeague => switch (cardMod){
 				CardMod.info => getTetraLeagueCard(snapshot.data!.summaries!.league, snapshot.data!.cutoffs, (snapshot.data!.averages != null && snapshot.data!.summaries!.league.rank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.rank] : (snapshot.data!.averages != null && snapshot.data!.summaries!.league.percentileRank != "z") ? snapshot.data!.averages!.data[snapshot.data!.summaries!.league.percentileRank] : null, snapshot.data!.states, snapshot.data!.playerPos, width, tlAchievements),
-				CardMod.exRecords => getFreyhoeAnalysis(snapshot.data!.player!.username, width),
+				CardMod.exRecords => freyhoeStreamNotOnTwitch(snapshot.data!.player!.username, width),
 				CardMod.ex => getPreviousSeasonsList(snapshot.data!.summaries!.pastLeague, width),
 				CardMod.records => getRecentTLrecords(widget.constraints, snapshot.data!.player!.userId),
 				_ => const Center(child: Text("huh?"))
@@ -1402,7 +1427,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 														children: [
 															Row(
 																children: [
-																	const Spacer(), 
+																	const Spacer(),
 																	Text(t.bio, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
 																	const Spacer()
 																],
@@ -1493,7 +1518,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 											children: [
 												Row(
 													children: [
-														const Spacer(), 
+														const Spacer(),
 														Text(t.bio, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
 														const Spacer()
 													],

@@ -14,58 +14,20 @@ const double vsapmWeight = 60;
 const double cheeseWeight = 1.25;
 const double gbeWeight = 315;
 
-const Map<int, double> xpTableScuffed = { // level: xp required
-  05000:    67009018.4885772,
-  10000:   763653437.386,
-  15000:  2337651144.54149,
-  20000:  4572735210.50902,
-  25000:  7376166347.04745,
+const Map<int, double> xpTableScuffed = {
+  // level: xp required
+  05000: 67009018.4885772,
+  10000: 763653437.386,
+  15000: 2337651144.54149,
+  20000: 4572735210.50902,
+  25000: 7376166347.04745,
   30000: 10693620096.2168,
   40000: 18728882739.482,
   50000: 28468683855.2853
 };
 
-const List<String> ranks = [
-  "d",
-  "d+",
-  "c-",
-  "c",
-  "c+",
-  "b-",
-  "b",
-  "b+",
-  "a-",
-  "a",
-  "a+",
-  "s-",
-  "s",
-  "s+",
-  "ss",
-  "u",
-  "x",
-  "x+"
-];
-const List<String> ranks2 = [
-  "top1",
-  "x+",
-  "x",
-  "u",
-  "ss",
-  "s+",
-  "s",
-  "s-",
-  "a+",
-  "a",
-  "a-",
-  "b+",
-  "b",
-  "b-",
-  "c+",
-  "c",
-  "c-",
-  "d+",
-  "d"
-];
+const List<String> ranks = ["d", "d+", "c-", "c", "c+", "b-", "b", "b+", "a-", "a", "a+", "s-", "s", "s+", "ss", "u", "x", "x+"];
+const List<String> ranks2 = ["top1", "x+", "x", "u", "ss", "s+", "s", "s-", "a+", "a", "a-", "b+", "b", "b-", "c+", "c", "c-", "d+", "d"];
 const Map<String, double> rankCutoffs = {
   "x+": 0.002,
   "x": 0.01,
@@ -223,46 +185,46 @@ const List<Color> lineClearsColors = [
 ];
 
 const Map<String, Duration> sprintAverages = {
-  // based on https://discord.com/channels/673303546107658242/1260605501754839060/1329448681539244094
-  'x+': Duration(seconds: 19, milliseconds: 223),
-  'x': Duration(seconds: 24, milliseconds: 832),
-  'u': Duration(seconds: 32, milliseconds: 586),
-  'ss': Duration(seconds: 40, milliseconds: 011),
-  's+': Duration(seconds: 47, milliseconds: 963),
-  's': Duration(seconds: 54, milliseconds: 413),
-  's-': Duration(seconds: 61, milliseconds: 740),
-  'a+': Duration(seconds: 70, milliseconds: 101),
-  'a': Duration(seconds: 73, milliseconds: 294),
-  'a-': Duration(seconds: 81, milliseconds: 773),
-  'b+': Duration(seconds: 88, milliseconds: 647),
-  'b': Duration(seconds: 97, milliseconds: 699),
-  'b-': Duration(seconds: 105, milliseconds: 721),
-  'c+': Duration(seconds: 113, milliseconds: 229),
-  'c': Duration(seconds: 124, milliseconds: 740),
-  'c-': Duration(seconds: 129, milliseconds: 382),
-  'd+': Duration(seconds: 138, milliseconds: 947),
-  'd': Duration(seconds: 155, milliseconds: 190),
+  // based on https://discord.com/channels/673303546107658242/1260605501754839060/1379885551263420498
+  'x+': Duration(seconds: 19, milliseconds: 335),
+  'x': Duration(seconds: 24, milliseconds: 075),
+  'u': Duration(seconds: 31, milliseconds: 293),
+  'ss': Duration(seconds: 40, milliseconds: 283),
+  's+': Duration(seconds: 47, milliseconds: 511),
+  's': Duration(seconds: 54, milliseconds: 210),
+  's-': Duration(seconds: 60, milliseconds: 496),
+  'a+': Duration(seconds: 68, milliseconds: 767),
+  'a': Duration(seconds: 74, milliseconds: 417),
+  'a-': Duration(seconds: 77, milliseconds: 619),
+  'b+': Duration(seconds: 89, milliseconds: 294),
+  'b': Duration(seconds: 98, milliseconds: 297),
+  'b-': Duration(seconds: 105, milliseconds: 210),
+  'c+': Duration(seconds: 109, milliseconds: 148),
+  'c': Duration(seconds: 128, milliseconds: 228),
+  'c-': Duration(seconds: 138, milliseconds: 100),
+  'd+': Duration(seconds: 143, milliseconds: 767),
+  'd': Duration(seconds: 163, milliseconds: 389),
 };
 
 const Map<String, int> blitzAverages = {
-  'x+': 886046,
-  'x': 631014,
-  'u': 428799,
-  'ss': 296430,
-  's+': 212237,
-  's': 157234,
-  's-': 122791,
-  'a+': 103031,
-  'a': 90174,
-  'a-': 73474,
-  'b+': 60655,
-  'b': 52463,
-  'b-': 43877,
-  'c+': 36594,
-  'c': 34014,
-  'c-': 29613,
-  'd+': 31521,
-  'd': 23437,
+  'x+': 912418,
+  'x': 635169,
+  'u': 449225,
+  'ss': 294776,
+  's+': 212162,
+  's': 148476,
+  's-': 121513,
+  'a+': 104008,
+  'a': 79753,
+  'a-': 71817,
+  'b+': 61266,
+  'b': 51073,
+  'b-': 45213,
+  'c+': 40732,
+  'c': 30889,
+  'c-': 28593,
+  'd+': 25075,
+  'd': 20438,
 };
 
 List<DateTime> seasonStarts = [
@@ -276,9 +238,32 @@ List<DateTime> seasonEnds = [
 
 /// Stolen directly from TETR.IO, redone for the sake of me
 
-const List<String> clearNames = ["Zero", "Single", "Double", "Triple", "Quad", "Penta", "Hexa", "Hepta", "Octa", "Ennea", "Deca", "Hendeca", "Dodeca", "Triadeca", "Tessaradeca", "Pentedeca", "Hexadeca", "Heptadeca", "Octadeca", "Enneadeca", "Eicosa", "Kagaris"];
+const List<String> clearNames = [
+  "Zero",
+  "Single",
+  "Double",
+  "Triple",
+  "Quad",
+  "Penta",
+  "Hexa",
+  "Hepta",
+  "Octa",
+  "Ennea",
+  "Deca",
+  "Hendeca",
+  "Dodeca",
+  "Triadeca",
+  "Tessaradeca",
+  "Pentedeca",
+  "Hexadeca",
+  "Heptadeca",
+  "Octadeca",
+  "Enneadeca",
+  "Eicosa",
+  "Kagaris"
+];
 
-enum Lineclears{
+enum Lineclears {
   ZERO,
   SINGLE,
   DOUBLE,
@@ -298,12 +283,7 @@ enum Lineclears{
   TSPIN_PENTA,
 }
 
-enum ComboTables{
-  none,
-  classic,
-  modern,
-  multiplier
-}
+enum ComboTables { none, classic, modern, multiplier }
 
 Map<ComboTables, String> comboTablesNames = {
   ComboTables.none: "None",
@@ -339,7 +319,7 @@ const Map<Lineclears, int> garbage = {
 };
 
 const Map<ComboTables, List<int>> combotable = {
-    ComboTables.none: [0],
-    ComboTables.classic: [0, 1, 1, 2, 2, 3, 3, 4, 4, 4, 5],
-    ComboTables.modern: [0, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4]
+  ComboTables.none: [0],
+  ComboTables.classic: [0, 1, 1, 2, 2, 3, 3, 4, 4, 4, 5],
+  ComboTables.modern: [0, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4]
 };
