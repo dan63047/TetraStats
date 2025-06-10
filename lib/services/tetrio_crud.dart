@@ -406,12 +406,7 @@ class TetrioService extends DB {
     List<MinomuncherRaw>? cached = _cache.get(replay.id, List<MinomuncherRaw>);
     if (cached != null) return cached;
 
-    Uri url;
-    if (kIsWeb) {
-      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "Minomuncher"});
-    } else {
-      url = Uri.https('REDACTED', 'api/replay'); // TODO: change it on release to oskware bridge
-    }
+    Uri url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "Minomuncher"});
     try {
       final response = await client.post(
         url,
@@ -468,16 +463,17 @@ class TetrioService extends DB {
       progress.avaliable = avaliable.take(10).toList();
       yield progress;
       for (BetaRecord record in progress.avaliable){
-        // MinomuncherRaw? cached = _cache.get(record.replayID, MinomuncherRaw);
-        // if (cached != null){
-        //   progress.result = cached;
-        //   yield progress;
-        // }
-        List<MinomuncherRaw> raw = await minomuncherPostReplay(await szyGetReplay(record.replayID));
-        progress.munched.add(raw.firstWhere((element) => element.nick == id));
+        List<MinomuncherRaw>? cached = _cache.get(record.id, List<MinomuncherRaw>);
+        if (cached != null){
+          progress.munched.add(cached.firstWhere((element) => element.nick == id));;
+        }else{
+          List<MinomuncherRaw> raw = await minomuncherPostReplay(await szyGetReplay(record.replayID));
+          progress.munched.add(raw.firstWhere((element) => element.nick == id));
+        }
         yield progress;
       }
       progress.result = progress.munched.reduce((a, b) => a + b);
+      _cache.store(progress.result, DateTime.now().millisecondsSinceEpoch + 300000, id: id+"minomuncher");
       yield progress;
     }
   }
