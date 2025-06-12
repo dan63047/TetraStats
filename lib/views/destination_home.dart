@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -10,14 +9,13 @@ import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart' show MunchProgress;
 import 'package:tetra_stats/widgets/apl_ranges.dart';
 import 'package:tetra_stats/widgets/apm_pps_ranges.dart';
+import 'package:tetra_stats/widgets/cheese_ds_ratio_thingy.dart';
 import 'package:tetra_stats/widgets/clear_types_thingy.dart';
 import 'package:tetra_stats/widgets/efficiency_ranges.dart';
 import 'package:tetra_stats/widgets/etr_thingy.dart';
 import 'package:tetra_stats/widgets/kills_deaths_thingy.dart';
 import 'package:tetra_stats/widgets/pps_distribution_thingy.dart';
 import 'package:tetra_stats/widgets/pps_surge_radars_thingy.dart';
-
-import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:tetra_stats/data_objects/achievement.dart';
 import 'package:tetra_stats/data_objects/cutoff_tetrio.dart';
 import 'package:tetra_stats/data_objects/minomuncher.dart';
@@ -1056,7 +1054,6 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 					case ConnectionState.done:
 			      if (snapshot.hasData){
               MinomuncherData data = snapshot.data!.result!.data;
-              const EdgeInsets paddings = const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0);
   						return SingleChildScrollView(
                 child: Column(
                   children: [
@@ -1085,66 +1082,9 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                     WellColumnsThingy([data.wellColumns], [data.nick], width),
                     PPSSurgeThingy([data], width),
                     SankeyThingy([data], width),
-                    Card(
-                      child: Padding(
-                        padding: paddings,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(1000),
-                          child: Container(
-                            constraints: BoxConstraints(maxHeight: 200.00),
-                          decoration: BoxDecoration(gradient: RadialGradient(colors: [Colors.black12.withAlpha(100), Colors.black], radius: 0.6)),
-                          child: SfRadialGauge(
-                            axes: [
-                              RadialAxis(
-                              startAngle: 170,
-                              endAngle: 10,
-                              showLabels: false,
-                              showTicks: true,
-                              canScaleToFit: true,
-                              radiusFactor: 1,
-                              minimum: 0,
-                              maximum: 1,
-                            ranges: [
-                              GaugeRange(startValue: 0, endValue: 0.2, color: Colors.blueGrey),
-                              GaugeRange(startValue: 0.2, endValue: 0.4, color: Colors.greenAccent),
-                              GaugeRange(startValue: 0.4, endValue: 0.6, color: Colors.yellowAccent),
-                              GaugeRange(startValue: 0.6, endValue: 0.8, color: Colors.orangeAccent),
-                              GaugeRange(startValue: 0.8, endValue: 1, color: Colors.redAccent),
-                            ],
-                            pointers: [
-                              NeedlePointer(
-                                value: data.attackCheesiness,
-                                enableAnimation: true,
-                                needleLength: 0.9,
-                                needleStartWidth: 2,
-                                needleEndWidth: 15,
-                                knobStyle: const KnobStyle(color: Colors.transparent),
-                                gradient: const LinearGradient(colors: [Colors.transparent, Colors.white], begin: Alignment.bottomCenter, end: Alignment.topCenter, stops: [0.5, 1]),)
-                              ],
-                            annotations: [
-                              GaugeAnnotation(widget: Container(child:
-                              RichText(
-                                textAlign: TextAlign.center,
-                                text: TextSpan(
-                                  style: const TextStyle(fontFamily: "Eurostile Round", color: Colors.white),
-                                  children: [
-                                    TextSpan(text: "Attack Cheesiness\n"),
-                                    TextSpan(text: f3.format(data.attackCheesiness), style: TextStyle(fontSize: 25, fontFamily: "Eurostile Round Extended", fontWeight: FontWeight.w100)),
-                                    // if (lbPos != null) TextSpan(text: lbPos!.app!.position >= 1000 ? "\n${t.top} ${f2.format(lbPos!.app!.percentage*100)}%" : "\n№${lbPos!.app!.position}", style: TextStyle(color: getColorOfRank(lbPos!.app!.position))),
-                                    // if (oldNerdStats != null) TextSpan(text: "\n${comparef.format(nerdStats.app - oldNerdStats!.app)}", style: TextStyle(color: getDifferenceColor(nerdStats.app - oldNerdStats!.app)))
-                                  ]
-                              ))),
-                              angle: 270,positionFactor: 0.3
-                              )],
-                              )
-                            ]
-                          ),
-                        ),
-                      ),
-                    )
-                      ),
-                      KillsDeathsThingy([KD(data.nick, data.killStats, data.deathStats)], width),
-                      PPSDistributionThingy([data.ppsSegments], [data.nick], width)
+                    CheeseAndDSThingy([data.attackCheesiness], [data.downstackingRatio], [data.nick]),
+                    KillsDeathsThingy([KD(data.nick, data.killStats, data.deathStats)], width),
+                    PPSDistributionThingy([data.ppsSegments], [data.nick], width)
                     ],
               ),
               );
@@ -1361,7 +1301,6 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 				CardMod.exRecords => freyhoeStreamNotOnTwitch(snapshot.data!.player!.username, width),
 				CardMod.ex => getPreviousSeasonsList(snapshot.data!.summaries!.pastLeague, width),
 				CardMod.records => getRecentTLrecords(widget.constraints, snapshot.data!.player!.userId),
-				_ => const Center(child: Text("huh?"))
 			},
 			Cards.quickPlay => switch (cardMod){
 				CardMod.info => SingleChildScrollView(child: ZenithCard(snapshot.data?.summaries?.zenith != null ? snapshot.data!.summaries!.zenith : snapshot.data!.summaries?.zenithCareerBest, snapshot.data!.summaries?.zenith == null, qpAchievements, width: width)),

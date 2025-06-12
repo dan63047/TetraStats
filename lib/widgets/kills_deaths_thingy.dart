@@ -21,93 +21,97 @@ class KillsDeathsThingy extends StatelessWidget{
     return Card(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+        child: Column(
           children: [
-            SfCartesianChart(
-              primaryXAxis: CategoryAxis(isVisible: data.length > 1),
-              primaryYAxis: NumericAxis(minimum: 0, maximum: 100),
-              title: ChartTitle(text: "Kills", textStyle: width > 768 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
-              legend: data.length == 1 ? Legend(
-                isVisible: true,
-                position: LegendPosition.left,
-                itemPadding: 2,
-                legendItemBuilder: (legendText, series, point, seriesIndex) {
-                  return Container(
-                    height: 20,
-                    width: 160,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                        children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-                              child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: lineClearsColors[seriesIndex])),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                SfCartesianChart(
+                  primaryXAxis: CategoryAxis(isVisible: data.length > 1),
+                  primaryYAxis: NumericAxis(minimum: 0, maximum: 100),
+                  title: ChartTitle(text: "Kills", textStyle: width > 768 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+                  legend: data.length == 1 ? Legend(
+                    isVisible: true,
+                    position: LegendPosition.left,
+                    itemPadding: 2,
+                    legendItemBuilder: (legendText, series, point, seriesIndex) {
+                      return Container(
+                        height: 20,
+                        width: 160,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                            children: [
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+                                  child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: lineClearsColors[seriesIndex])),
+                                ),
+                              Text("${killsLabels[seriesIndex]}:"),
+                            ],
                             ),
-                          Text("${killsLabels[seriesIndex]}:"),
-                        ],
+                            Text("${intf.format(point.y)}")
+                          ],
                         ),
-                        Text("${intf.format(point.y)}")
-                      ],
-                    ),
-                  );
-                }, 
-              ) : const Legend(),
-              series: <CartesianSeries>[
-                for (int i = 0; i < data[0].kills.values.length; i++) StackedColumn100Series<KD, String>(
-                  dataSource: data,
-                  xValueMapper: (KD data, _) => data.nickname,
-                  yValueMapper: (KD data, _) => data.kills.values[i],
-                  pointColorMapper: (KD data, _) => lineClearsColors[i]
-                )
-              ]
-            ),
-            SfCartesianChart(
-              primaryXAxis: CategoryAxis(isVisible: data.length > 1),
-              primaryYAxis: NumericAxis(minimum: 0, maximum: 100, opposedPosition: true,),
-              title: ChartTitle(text: "Deaths", textStyle: width > 768 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
-              legend: data.length == 1 ? Legend(
-                isVisible: true,
-                position: LegendPosition.right,
-                itemPadding: 2,
-                legendItemBuilder: (legendText, series, point, seriesIndex) {
-                  return Container(
-                    height: 20,
-                    width: 160,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                        children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
-                              child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: lineClearsColors[seriesIndex])),
+                      );
+                    }, 
+                  ) : const Legend(),
+                  series: <CartesianSeries>[
+                    for (int i = 0; i < data[0].kills.values.length; i++) StackedColumn100Series<KD, String>(
+                      dataSource: data,
+                      xValueMapper: (KD data, _) => data.nickname,
+                      yValueMapper: (KD data, _) => data.kills.values[i],
+                      pointColorMapper: (KD data, _) => lineClearsColors[i]
+                    )
+                  ]
+                ),
+                SfCartesianChart(
+                  primaryXAxis: CategoryAxis(isVisible: data.length > 1),
+                  primaryYAxis: NumericAxis(minimum: 0, maximum: 100, opposedPosition: true,),
+                  title: ChartTitle(text: "Deaths", textStyle: width > 768 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+                  legend: data.length == 1 ? Legend(
+                    isVisible: true,
+                    position: LegendPosition.right,
+                    itemPadding: 2,
+                    legendItemBuilder: (legendText, series, point, seriesIndex) {
+                      return Container(
+                        height: 20,
+                        width: 160,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                            children: [
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
+                                  child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: lineClearsColors[seriesIndex])),
+                                ),
+                              Text("${killsLabels[seriesIndex]}:"),
+                            ],
                             ),
-                          Text("${killsLabels[seriesIndex]}:"),
-                        ],
+                            Text("${intf.format(point.y)}")
+                          ],
                         ),
-                        Text("${intf.format(point.y)}")
-                      ],
-                    ),
-                  );
-                }, 
-              ) : const Legend(),
-              series: <CartesianSeries>[
-                for (int i = 0; i < data[0].deaths.values.length; i++) StackedColumn100Series<KD, String>(
-                  dataSource: data,
-                  xValueMapper: (KD data, _) => data.nickname,
-                  yValueMapper: (KD data, _) => data.deaths.values[i],
-                  pointColorMapper: (KD data, _) => lineClearsColors[i]
-                )
-              ]
+                      );
+                    }, 
+                  ) : const Legend(),
+                  series: <CartesianSeries>[
+                    for (int i = 0; i < data[0].deaths.values.length; i++) StackedColumn100Series<KD, String>(
+                      dataSource: data,
+                      xValueMapper: (KD data, _) => data.nickname,
+                      yValueMapper: (KD data, _) => data.deaths.values[i],
+                      pointColorMapper: (KD data, _) => lineClearsColors[i]
+                    )
+                  ]
+                ),
+              ],
             ),
             if (data.length > 1) Table(
               defaultVerticalAlignment: TableCellVerticalAlignment.middle,
               columnWidths: {
-                0: FixedColumnWidth(120.0)
+                0: FixedColumnWidth(125.0)
               },
               children: <TableRow>[
                 TableRow(
@@ -128,7 +132,7 @@ class KillsDeathsThingy extends StatelessWidget{
                         Text("${killsLabels[i]}:")
                       ],
                     ),
-                    for (KD e in data) Text("${intf.format(e.kills.values[i])})", textAlign: TextAlign.end)
+                    for (KD e in data) Text("${intf.format(e.kills.values[i])}", textAlign: TextAlign.end)
                   ],
                 ),
               ],

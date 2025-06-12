@@ -7,12 +7,15 @@ import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
 import 'package:tetra_stats/utils/relative_timestamps.dart';
 import 'package:tetra_stats/widgets/apl_ranges.dart';
 import 'package:tetra_stats/widgets/apm_pps_ranges.dart';
+import 'package:tetra_stats/widgets/cheese_ds_ratio_thingy.dart';
 import 'package:tetra_stats/widgets/clear_types_thingy.dart';
 import 'package:tetra_stats/widgets/compare_thingy.dart';
 import 'package:tetra_stats/widgets/efficiency_ranges.dart';
 import 'package:tetra_stats/widgets/future_error.dart';
+import 'package:tetra_stats/widgets/kills_deaths_thingy.dart';
 import 'package:tetra_stats/widgets/list_tile_trailing_stats.dart';
 import 'package:tetra_stats/widgets/pps_distribution_thingy.dart';
+import 'package:tetra_stats/widgets/sankey_thingy.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
 import 'package:tetra_stats/widgets/vs_graphs.dart';
 import 'package:flutter/foundation.dart';
@@ -397,6 +400,9 @@ class TlMatchResultState extends State<TlMatchResultView> {
                   EffThingy([for (MinomuncherData e in snapshot.data!) Eff(e.nick, e.iEfficiency, e.tEfficiency, e.allspinEfficiency)], width > 768),
                   ClearTypesThingy([for (MinomuncherData e in snapshot.data!) e.clearTypes], width),
                   WellColumnsThingy([for (MinomuncherData e in snapshot.data!) e.wellColumns], [for (MinomuncherData e in snapshot.data!) e.nick], width),
+                  SankeyThingy([for (MinomuncherData e in snapshot.data!) e], width),
+                  CheeseAndDSThingy([for (MinomuncherData e in snapshot.data!) e.attackCheesiness], [for (MinomuncherData e in snapshot.data!) e.downstackingRatio], [for (MinomuncherData e in snapshot.data!) e.nick]),
+                  KillsDeathsThingy([for (MinomuncherData e in snapshot.data!) KD(e.nick, e.killStats, e.deathStats)], width),
                   PPSDistributionThingy([for (MinomuncherData e in snapshot.data!) e.ppsSegments], [for (MinomuncherData e in snapshot.data!) e.nick], width)
                 ],
               );

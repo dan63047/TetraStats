@@ -1,8 +1,7 @@
-import 'package:fl_chart/fl_chart.dart';
+import 'dart:math';
+
 import 'package:flutter/material.dart' hide Badge;
 import 'package:tetra_stats/data_objects/minomuncher.dart';
-import 'package:tetra_stats/utils/numers_formats.dart';
-import 'package:tetra_stats/widgets/graphs.dart';
 import 'package:tetra_stats/widgets/sankey_graph.dart';
 
 class SankeyThingy extends StatelessWidget{
@@ -12,6 +11,7 @@ class SankeyThingy extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
+    List<SankeyDataSet> sankeys = [];
     List<SankeyNode> sankeyNodes = [
       SankeyNode(id: 0, label: 'Incoming Attack'),
       SankeyNode(id: 1, label: 'Cheese'),
@@ -20,34 +20,39 @@ class SankeyThingy extends StatelessWidget{
       SankeyNode(id: 4, label: 'CheeseTanked'),
       SankeyNode(id: 5, label: 'CleanTanked'),
     ];
-    List<SankeyLink> sankeyLinks = [
-      SankeyLink(source: sankeyNodes[0], target: sankeyNodes[1], value: data[0].cheeseLinesRecieved * 100),
-      SankeyLink(source: sankeyNodes[0], target: sankeyNodes[2], value: data[0].cleanLinesRecieved * 100),
-      SankeyLink(source: sankeyNodes[1], target: sankeyNodes[3], value: data[0].cheeseLinesCancelled * 100),
-      SankeyLink(source: sankeyNodes[1], target: sankeyNodes[4], value: data[0].cheeseLinesTanked * 100),
-      SankeyLink(source: sankeyNodes[2], target: sankeyNodes[3], value: data[0].cheeseLinesCancelled * 100),
-      SankeyLink(source: sankeyNodes[2], target: sankeyNodes[4], value: data[0].cleanLinesTankedAsCheese * 100),
-      SankeyLink(source: sankeyNodes[2], target: sankeyNodes[5], value: data[0].cleanLinesTankedAsClean * 100)
-    ];
+    for (MinomuncherData e in data){
+      List<SankeyLink> sankeyLinks = [
+        SankeyLink(source: sankeyNodes[0], target: sankeyNodes[1], value: e.cheeseLinesRecieved * 100),
+        SankeyLink(source: sankeyNodes[0], target: sankeyNodes[2], value: e.cleanLinesRecieved * 100),
+        SankeyLink(source: sankeyNodes[1], target: sankeyNodes[3], value: e.cheeseLinesCancelled * 100),
+        SankeyLink(source: sankeyNodes[1], target: sankeyNodes[4], value: e.cheeseLinesTanked * 100),
+        SankeyLink(source: sankeyNodes[2], target: sankeyNodes[3], value: e.cheeseLinesCancelled * 100),
+        SankeyLink(source: sankeyNodes[2], target: sankeyNodes[4], value: e.cleanLinesTankedAsCheese * 100),
+        SankeyLink(source: sankeyNodes[2], target: sankeyNodes[5], value: e.cleanLinesTankedAsClean * 100)
+      ];
+      SankeyDataSet sankeyDataSet = SankeyDataSet(nodes: sankeyNodes, links: sankeyLinks);
+      final sankey = generateSankeyLayout(
+        width: min(width - 32, 768),
+        height: 400,
+        nodeWidth: 20,
+        nodePadding: 15,
+      );
+      sankeyDataSet.layout(sankey);
+      sankeys.add(sankeyDataSet);
+    }
     Map<String, Color> nodeColors = generateDefaultNodeColorMap(sankeyNodes);
-    SankeyDataSet sankeyDataSet = SankeyDataSet(nodes: sankeyNodes, links: sankeyLinks);
-    final sankey = generateSankeyLayout(
-      width: 800,
-      height: 400,
-      nodeWidth: 20,
-      nodePadding: 15,
-    );
-    sankeyDataSet.layout(sankey);
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text("Incoming Attack Sankey Chart", style: width > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
-              SankeyDiagramWidget(
-                data: sankeyDataSet,
+              for (int i = 0; i < data.length; i++) SankeyDiagramWidget(
+                data: sankeys[i],
                 nodeColors: nodeColors,
-                size: Size(width, 400.0),
+                size: Size(min(width - 32, 768), 400.0),
                 showLabels: true,
               ),
           ],
