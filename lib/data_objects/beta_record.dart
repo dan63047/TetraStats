@@ -2,6 +2,7 @@
 
 import 'package:tetra_stats/data_objects/beta_league_results.dart';
 import 'package:tetra_stats/data_objects/record_extras.dart';
+import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
 import 'package:tetra_stats/data_objects/tetrio_prisecter.dart';
 
 class BetaRecord{
@@ -15,19 +16,21 @@ class BetaRecord{
   late BetaLeagueResults results;
   late LeagueExtras extras;
   late Prisecter prisecter;
+  RawReplay? replay;
 
   BetaRecord({required this.id, required this.replayID, required this.gamemode, required this.ts, required this.enemyUsername, required this.enemyID, required this.results});
 
-  BetaRecord.fromJson(Map<String, dynamic> json){
-    id = json['_id'];
-    replayID = json['replayid'];
-    stub = json['stub'];
-    gamemode = json['gamemode'];
+  BetaRecord.fromJson(Map<String, dynamic> json, {RawReplay? r}){
+    replay = r;
+    id = json['_id'] ?? json['id'] ?? 'none';
+    replayID = json['replayid'] ?? json['id'] ?? 'none';
+    stub = json['stub'] ?? false;
+    gamemode = json['gamemode'] ?? 'custom';
     ts = DateTime.parse(json['ts']);
-    enemyUsername = json['otherusers'][0]['username'];
-    enemyID = json['otherusers'][0]['id'];
-    results = BetaLeagueResults.fromJson(json['results']);
-    prisecter = Prisecter.fromJson(json['p']);
-    extras = LeagueExtras.fromJson(json['extras']);
+    enemyUsername = json['otherusers'] != null ? json['otherusers'][0]['username'] : json['replay']['leaderboard'][1]['username'];
+    enemyID = json['otherusers'] != null ? json['otherusers'][0]['id'] : json['replay']['leaderboard'][1]['id'];
+    results = BetaLeagueResults.fromJson(json['results'] ?? json['replay']);
+    prisecter = json['p'] != null ? Prisecter.fromJson(json['p']) : Prisecter(ts.millisecondsSinceEpoch, 0, 0);
+    if (json['extras'] != null) extras = LeagueExtras.fromJson(json['extras']);
   }
 }

@@ -1,7 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:super_drag_and_drop/super_drag_and_drop.dart';
+import 'package:super_clipboard/src/formats_base.dart';
+import 'package:tetra_stats/data_objects/beta_record.dart';
 import 'package:tetra_stats/data_objects/cutoff_tetrio.dart';
 import 'package:tetra_stats/data_objects/news.dart';
 import 'package:tetra_stats/data_objects/p1nkl0bst3r.dart';
@@ -9,9 +14,11 @@ import 'package:tetra_stats/data_objects/player_leaderboard_position.dart';
 import 'package:tetra_stats/data_objects/summaries.dart';
 import 'package:tetra_stats/data_objects/tetra_league.dart';
 import 'package:tetra_stats/data_objects/tetrio_constants.dart';
+import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
 import 'package:tetra_stats/data_objects/tetrio_player.dart';
 import 'package:tetra_stats/data_objects/tetrio_players_leaderboard.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:tetra_stats/utils/text_shadow.dart';
 import 'package:tetra_stats/views/destination_calculator.dart';
 import 'package:tetra_stats/views/destination_cutoffs.dart';
 import 'package:tetra_stats/views/destination_graphs.dart';
@@ -21,11 +28,13 @@ import 'package:tetra_stats/views/destination_leaderboards.dart';
 import 'package:tetra_stats/views/destination_saved_data.dart';
 import 'package:tetra_stats/views/destination_settings.dart';
 import 'package:tetra_stats/main.dart';
+import 'package:tetra_stats/views/tl_match_view.dart';
 
 late Future<FetchResults> _data;
 TetrioPlayersLeaderboard? _everyone;
 late RangeValues currentRangeValues;
 int destination = 0;
+bool _isDragOver = false;
 
 // TODO: Redesign some widgets, so they could look nice on mobile view
 // - stats below TL progress bar & similar parts in other widgets
@@ -301,68 +310,165 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
           ],
         )],
         persistentFooterAlignment: AlignmentDirectional.bottomCenter,
-        body: SafeArea(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (screenIsBig) TweenAnimationBuilder(
-                child: NavigationRail(
-                  leading: FloatingActionButton(
-                    elevation: 0,
-                    onPressed: () {
-                      _scaffoldKey.currentState!.openDrawer();
-                      _searchController.clear();
-                    },
-                    child: const Icon(Icons.search),
+        body: DropRegion(
+          hitTestBehavior: HitTestBehavior.opaque,
+          formats: Formats.standardFormats,
+          onDropOver: (event) {
+            setState((){_isDragOver = true;});
+            // You can inspect local data here, as well as formats of each item.
+            // However on certain platforms (mobile / web) the actual data is
+            // only available when the drop is accepted (onPerformDrop).
+            final item = event.session.items.first;
+            if (item.localData is Map) {
+              // This is a drag within the app and has custom local data set.
+            }
+            if (item.canProvide(Formats.plainText)) {
+              // this item contains plain text.
+            }
+            // This drop region only supports copy operation.
+            if (event.session.allowedOperations.contains(DropOperation.copy)) {
+              return DropOperation.copy;
+            } else {
+              return DropOperation.none;
+            }
+          },
+          onDropEnter: (event) {
+            if (!mounted) {
+              return;
+            }
+          },
+          onDropLeave: (event) {
+            setState(() {
+              _isDragOver = false;
+            });
+          },
+          onPerformDrop: (event) async {
+            // Called when user dropped the item. You can now request the data.
+            // Note that data must be requested before the performDrop callback
+            // is over.
+            print(event.session.items.first.platformFormats);
+            final item = event.session.items.first;
+
+            // data reader is available now
+            final reader = item.dataReader!;
+            if (reader.canProvide(Formats.fileUri)){
+              reader.getValue<Uri>(Formats.fileUri, (value) {
+                if (value != null) {
+                  File replay = File.fromUri(value);
+                  var decodedReplay = jsonDecode(replay.readAsStringSync());
+                  RawReplay rawReplay = RawReplay(decodedReplay['id'] ?? "none", replay.readAsBytesSync(), replay.readAsStringSync());
+                  BetaRecord fromReplay = BetaRecord.fromJson(decodedReplay, r: rawReplay);
+                  print('Dropped the thingy: ${fromReplay}');
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => TlMatchResultView(record: fromReplay, initPlayerId: decodedReplay['users'][0]['id']))); //Navigator.push(context, MaterialPageRoute(builder: (context) => TlMatchResultView(record: data[index], initPlayerId: userID)))
+                }
+              }, onError: (error) {
+                print('Error reading value $error');
+              });
+            }
+            else{
+              print("lox");
+            }
+          },
+          child: SafeArea(
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (screenIsBig) TweenAnimationBuilder(
+                        child: NavigationRail(
+                          leading: FloatingActionButton(
+                            elevation: 0,
+                            onPressed: () {
+                              _scaffoldKey.currentState!.openDrawer();
+                              _searchController.clear();
+                            },
+                            child: const Icon(Icons.search),
+                          ),
+                          trailing: IconButton(
+                            tooltip: t.refresh,
+                            onPressed: () {
+                              changePlayer(_searchFor);
+                            },
+                            icon: const Icon(Icons.refresh),
+                          ),
+                          destinations: [
+                            getDestinationButton(Icons.home, t.destinations.home),
+                            getDestinationButton(Icons.data_thresholding_outlined, t.destinations.graphs),
+                            getDestinationButton(Icons.leaderboard, t.destinations.leaderboards),
+                            getDestinationButton(Icons.compress, t.destinations.cutoffs),
+                            getDestinationButton(Icons.calculate, t.destinations.calc),
+                            getDestinationButton(Icons.info_outline, t.destinations.info),
+                            getDestinationButton(Icons.storage, t.destinations.data),
+                            getDestinationButton(Icons.settings, t.destinations.settings),
+                          ],
+                          selectedIndex: destination,
+                          onDestinationSelected: (value) {
+                            setState(() {
+                              destination = value;
+                            });
+                          },
+                          ),
+                        duration: Durations.long4,
+                        tween: Tween<double>(begin: 0, end: 1),
+                        curve: Easing.standard,
+                        builder: (context, value, child) {
+                          return Container(
+                            transform: Matrix4.translationValues(-80+value*80, 0, 0),
+                            child: Opacity(opacity: value, child: child),
+                          );
+                        },
+                      ),
+                      Expanded(
+                        child: switch (destination){
+                          0 => DestinationHome(searchFor: _searchFor, constraints: constraints, dataFuture: _data, noSidebar: !screenIsBig),
+                          1 => DestinationGraphs(searchFor: _searchFor, constraints: constraints, noSidebar: !screenIsBig),
+                          2 => DestinationLeaderboards(constraints: constraints, noSidebar: !screenIsBig),
+                          3 => DestinationCutoffs(constraints: constraints),
+                          4 => DestinationCalculator(constraints: constraints),
+                          5 => DestinationInfo(constraints: constraints),
+                          6 => DestinationSavedData(constraints: constraints),
+                          7 => DestinationSettings(constraints: constraints),
+                          _ => Text("Unknown destination $destination")
+                        },
+                      )
+                    ]
                   ),
-                  trailing: IconButton(
-                    tooltip: t.refresh,
-                    onPressed: () {
-                      changePlayer(_searchFor);
-                    },
-                    icon: const Icon(Icons.refresh),
-                  ),
-                  destinations: [
-                    getDestinationButton(Icons.home, t.destinations.home),
-                    getDestinationButton(Icons.data_thresholding_outlined, t.destinations.graphs),
-                    getDestinationButton(Icons.leaderboard, t.destinations.leaderboards),
-                    getDestinationButton(Icons.compress, t.destinations.cutoffs),
-                    getDestinationButton(Icons.calculate, t.destinations.calc),
-                    getDestinationButton(Icons.info_outline, t.destinations.info),
-                    getDestinationButton(Icons.storage, t.destinations.data),
-                    getDestinationButton(Icons.settings, t.destinations.settings),
-                  ],
-                  selectedIndex: destination,
-                  onDestinationSelected: (value) {
-                    setState(() {
-                      destination = value;
-                    });
-                  },
-                  ),
-                duration: Durations.long4,
-                tween: Tween<double>(begin: 0, end: 1),
-                curve: Easing.standard,
-                builder: (context, value, child) {
-                  return Container(
-                    transform: Matrix4.translationValues(-80+value*80, 0, 0),
-                    child: Opacity(opacity: value, child: child),
-                  );
-                },
-              ),
-              Expanded(
-                child: switch (destination){
-                  0 => DestinationHome(searchFor: _searchFor, constraints: constraints, dataFuture: _data, noSidebar: !screenIsBig),
-                  1 => DestinationGraphs(searchFor: _searchFor, constraints: constraints, noSidebar: !screenIsBig),
-                  2 => DestinationLeaderboards(constraints: constraints, noSidebar: !screenIsBig),
-                  3 => DestinationCutoffs(constraints: constraints),
-                  4 => DestinationCalculator(constraints: constraints),
-                  5 => DestinationInfo(constraints: constraints),
-                  6 => DestinationSavedData(constraints: constraints),
-                  7 => DestinationSettings(constraints: constraints),
-                  _ => Text("Unknown destination $destination")
-                },
-              )
-            ]
+                ),
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: AnimatedOpacity(opacity: _isDragOver ? 1.0 : 0.0, duration: const Duration(milliseconds: 200),
+                    child: Container(
+                      color: Color.fromARGB(100, 0, 0, 0),
+                      child: Column(
+                        children: [
+                          Spacer(),
+                          Text("Drag your replay file here", style: TextStyle(fontSize: 32.0, shadows: textShadow)),
+                          Card(
+                            child: Container(
+                              margin: EdgeInsets.all(4.0),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: const Color.fromARGB(150, 255, 255, 255),
+                                  width: 2.0,
+                                ),
+                                borderRadius: BorderRadius.all(Radius.circular(12.0))
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Icon(Icons.file_upload_outlined, size: 72.0),
+                              ),
+                            ),
+                          ),
+                          Spacer()
+                        ]
+                      ),
+                    ),),
+                  )
+                )
+              ],
+            ),
           ),
         ));
       }

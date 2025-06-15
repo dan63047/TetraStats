@@ -233,7 +233,7 @@ class MinomuncherRaw {
       attackWithDownstack: json.value["placement"]["attackWithDownstack"],
       cleanLinesSent: json.value["placement"]["cleanLinesSent"],
       frameDelay: json.value["placement"]["frameDelay"].toDouble(),
-      cheeseScore: json.value["placement"]["cheeseScore"],
+      cheeseScore: json.value["placement"]["cheeseScore"].toDouble(),
       keypresses: json.value["placement"]["keypresses"],
       cheeseCleared: json.value["placement"]["cheeseCleared"],
       attackWithCheese: json.value["placement"]["attackWithCheese"],

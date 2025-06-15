@@ -15,6 +15,7 @@ import 'package:tetra_stats/widgets/future_error.dart';
 import 'package:tetra_stats/widgets/kills_deaths_thingy.dart';
 import 'package:tetra_stats/widgets/list_tile_trailing_stats.dart';
 import 'package:tetra_stats/widgets/pps_distribution_thingy.dart';
+import 'package:tetra_stats/widgets/pps_surge_radars_thingy.dart';
 import 'package:tetra_stats/widgets/sankey_thingy.dart';
 import 'package:tetra_stats/widgets/text_timestamp.dart';
 import 'package:tetra_stats/widgets/vs_graphs.dart';
@@ -375,7 +376,8 @@ class TlMatchResultState extends State<TlMatchResultView> {
   }
 
   Future<List<MinomuncherData>> ummm(String replayID) async {
-    List<MinomuncherRaw> raw = await teto.minomuncherPostReplay(await teto.szyGetReplay(replayID));
+    RawReplay replay = widget.record.replay ?? await teto.szyGetReplay(replayID);
+    List<MinomuncherRaw> raw = await teto.minomuncherPostReplay(replay);
     return [for (MinomuncherRaw e in raw) e.data];
   }
 
@@ -400,6 +402,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
                   EffThingy([for (MinomuncherData e in snapshot.data!) Eff(e.nick, e.iEfficiency, e.tEfficiency, e.allspinEfficiency)], width > 768),
                   ClearTypesThingy([for (MinomuncherData e in snapshot.data!) e.clearTypes], width),
                   WellColumnsThingy([for (MinomuncherData e in snapshot.data!) e.wellColumns], [for (MinomuncherData e in snapshot.data!) e.nick], width),
+                  PPSSurgeThingy([for (MinomuncherData e in snapshot.data!) e], width),
                   SankeyThingy([for (MinomuncherData e in snapshot.data!) e], width),
                   CheeseAndDSThingy([for (MinomuncherData e in snapshot.data!) e.attackCheesiness], [for (MinomuncherData e in snapshot.data!) e.downstackingRatio], [for (MinomuncherData e in snapshot.data!) e.nick]),
                   KillsDeathsThingy([for (MinomuncherData e in snapshot.data!) KD(e.nick, e.killStats, e.deathStats)], width),

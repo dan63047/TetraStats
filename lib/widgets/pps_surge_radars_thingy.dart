@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart' hide Badge;
 import 'package:tetra_stats/data_objects/minomuncher.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
+import 'package:tetra_stats/widgets/cheese_ds_ratio_thingy.dart';
 import 'package:tetra_stats/widgets/graphs.dart';
 
 class PPSSurgeThingy extends StatelessWidget{
@@ -44,16 +45,16 @@ class PPSSurgeThingy extends StatelessWidget{
                     }
                   },
                   dataSets: [
-                    for (MinomuncherData e in data) RadarDataSet(
-                    fillColor: Theme.of(context).colorScheme.primary.withAlpha(170),
-                    borderColor: Theme.of(context).colorScheme.primary,
+                    for (int i = 0; i < data.length; i++) RadarDataSet(
+                    fillColor: data.length == 1 ? Theme.of(context).colorScheme.primary.withAlpha(170) : palette[i].withAlpha(170),
+                    borderColor: data.length == 1 ? Theme.of(context).colorScheme.primary : palette[i],
                     dataEntries: [
-                      RadarEntry(value: e.PPS),
-                      RadarEntry(value: e.PlonkPPS),
-                      RadarEntry(value: e.upstackPPS),
-                      RadarEntry(value: e.PPSCoeff), // variance
-                      RadarEntry(value: e.downstackPPS),
-                      RadarEntry(value: e.BurstPPS),
+                      RadarEntry(value: data[i].PPS),
+                      RadarEntry(value: data[i].PlonkPPS),
+                      RadarEntry(value: data[i].upstackPPS),
+                      RadarEntry(value: data[i].PPSCoeff), // variance
+                      RadarEntry(value: data[i].downstackPPS),
+                      RadarEntry(value: data[i].BurstPPS),
                     ],
                     ),
                     RadarDataSet(
@@ -102,16 +103,16 @@ class PPSSurgeThingy extends StatelessWidget{
                     }
                   },
                   dataSets: [
-                    for (MinomuncherData e in data) RadarDataSet(
-                    fillColor: Theme.of(context).colorScheme.primary.withAlpha(170),
-                    borderColor: Theme.of(context).colorScheme.primary,
+                    for (int i = 0; i < data.length; i++) RadarDataSet(
+                    fillColor: data.length == 1 ? Theme.of(context).colorScheme.primary.withAlpha(170) : palette[i].withAlpha(170),
+                    borderColor: data.length == 1 ? Theme.of(context).colorScheme.primary : palette[i],
                     dataEntries: [
-                      RadarEntry(value: e.surgeAPM),
-                      RadarEntry(value: e.surgePPS * 60),
-                      RadarEntry(value: e.surgeLength * 30),
-                      RadarEntry(value: e.surgeRate * 2000),
-                      RadarEntry(value: e.surgeDS * 43),
-                      RadarEntry(value: e.surgeSecsPerCheese! * 13)
+                      RadarEntry(value: data[i].surgeAPM),
+                      RadarEntry(value: data[i].surgePPS * 60),
+                      RadarEntry(value: data[i].surgeLength * 30),
+                      RadarEntry(value: data[i].surgeRate * 2000),
+                      RadarEntry(value: data[i].surgeDS * 43),
+                      RadarEntry(value: data[i].surgeSecsPerCheese! * 13)
                     ],
                     ),
                     RadarDataSet(
