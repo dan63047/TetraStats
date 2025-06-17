@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart' hide Badge;
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:tetra_stats/data_objects/minomuncher.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 
 class WellColumnsThingy extends StatelessWidget{
@@ -35,7 +36,7 @@ class WellColumnsThingy extends StatelessWidget{
                     );
                 }
               ),
-              title: ChartTitle(text: "Well Column Distribution", textStyle: width > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+              title: ChartTitle(text: t.stats.wellColumnDistribution, textStyle: width > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
               series: <CartesianSeries>[
                 for (int i = 0; i < data.length; i++) ColumnSeries<WellsData, int>(
                     dataSource: data[i],

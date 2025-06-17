@@ -69,6 +69,7 @@
         "gametimeAday": "$gametime a day in average",
         "breakdown": "It's $years years,\nor $months months,\nor $days days,\nor $minutes minutes\nor $seconds seconds"
     },
+    "whichOne": "Which one?",
     "track": "Track",
     "stopTracking": "Stop tracking",
     "supporter": "Supporter tier ${tier}",
@@ -124,6 +125,13 @@
     "trackedPlayers": "Tracked Players",
     "standing": "Standing",
     "previousSeasons": "Previous Seasons",
+    "checkingCache": "Checking cache...",
+    "fetchingRecords": "Fetching Records...",
+    "munching": "Munching...",
+    "outOf": "out of",
+    "replaysDone": "replays done",
+    "analysis": "Analysis",
+    "minomuncherMention": "via MinoMuncher by Freyhoe",
     "recent": "Recent",
     "top": "Top",
     "noRecord": "No record",
@@ -172,14 +180,6 @@
         "ok": "OK",
         "apply": "Apply",
         "refresh": "Refresh"
-    },
-    "aprilFools": {
-        "fakeBanModaleTitle": "You have been permanently banned from Tetra Stats",
-        "fakeBanModaleBody": "Reason: gross violation of the Terms of Service\n\nIf you want to appeal, please, contact dan63.",
-        "fakeBanModaledan63Grin": "Fool...",
-        "SettingTitleUnfoolMyself": "Unfool myself",
-        "SettingButtonUnfool": "Unfool",
-        "SettingDescription": "That button will allow you re experience april fool prank once again"
     },
     "graphsDestination": {
         "fetchAndsaveTLHistory": "Fetch History",
@@ -251,8 +251,10 @@
     "calcDestination": {
         "placeholders": "Enter your $stat",
         "tip": "Enter values and press \"Calc\" to see Nerd Stats for them",
+        "invalidValues": "Please, enter valid values",
         "statsCalcButton": "Calc",
-        "damageCalcTip": "Click on the actions on the left to add them here",
+        "damageCalcTip": "Click on the actions on the left to add them here",    
+        "clearAll": "Clear all", 
         "actions": "Actions",
         "results": "Results",
         "rules": "Rules",
@@ -568,6 +570,22 @@
             "short": "KPS",
             "full": "Key presses Per Second"
         },
+        "apl": {
+            "short": "APL",
+            "full": "Attack Per Line"
+        },
+        "quadEfficiency":{
+            "short": "Q Eff.",
+            "full": "Quad efficiency"
+        },
+        "tspinEfficiency":{
+            "short": "T Eff.",
+            "full": "T-spin efficiency"
+        },
+        "allspinEfficiency":{
+            "short": "All Eff.",
+            "full": "All-spin efficiency" 
+        },
         "blitzScore": "$p points",
         "levelUpRequirement": "Level up requirement: $p",
         "piecesTotal": "Total pieces placed",
@@ -587,6 +605,31 @@
         "received": "Received",
         "placement": "Placement",
         "peak": "Peak",
+        "overall": "Overall",
+        "midgame": "Midgame",
+        "efficiency": "Efficiency",
+        "upstack": "Upstack",
+        "downstack": "Downstack",
+        "variance": "Variance",
+        "burst": "Burst",
+        "length": "Length",
+        "rate": "Rate",
+        "secsDS": "Secs/DS",
+        "secsCheese": "Secs/Cheese",
+        "attackCheesiness": "Attack Cheesiness",
+        "downstackingRatio": "Downstacking Ratio",
+        "clearTypes": "Clear Types",
+        "wellColumnDistribution": "Well Column Distribution",
+        "allSpins": "All Spins",
+        "sankeyTitle": "Incoming Attack Sankey Chart",
+        "incomingAttack": "Incoming Attack",
+        "clean": "Clean",
+        "cancelled": "Cancelled",
+        "cheeseTanked": "Cheese Tanked",
+        "cleanTanked": "Clean Tanked",
+        "kills": "Kills",
+        "deaths": "Deaths",
+        "ppsDistribution": "PPS distribution",
         "qpWithMods(plural)": {
             "one": "With 1 mod",
             "two": "With $n mods",

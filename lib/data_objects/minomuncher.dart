@@ -188,6 +188,7 @@ class MSurge{
 }
 
 class MinomuncherRaw {
+  late final String id;
   late final String nick;
   late final MPlacement placement;
   late final MGarbage garbage;
@@ -213,65 +214,66 @@ class MinomuncherRaw {
   }
 
   MinomuncherRaw.fromJson(MapEntry<String, dynamic> json){
-    nick = json.key;
+    id = json.key;
+    nick = json.value["username"];
     placement = MPlacement(
-      ppsSegments: json.value["placement"]["ppsSegments"].cast<int>(),
-      wellColumns: json.value["placement"]["wellColumns"].cast<int>(),
-      clearTypes: ClearsChartData(nick, json.value["placement"]["clearTypes"]["perfectClear"], json.value["placement"]["clearTypes"]["allspin"], json.value["placement"]["clearTypes"]["single"], json.value["placement"]["clearTypes"]["tspinSingle"], json.value["placement"]["clearTypes"]["double"], json.value["placement"]["clearTypes"]["tspinDouble"], json.value["placement"]["clearTypes"]["triple"], json.value["placement"]["clearTypes"]["tspinTriple"], json.value["placement"]["clearTypes"]["quad"]),
-      pieces: json.value["placement"]["pieces"],
-      openerAttack: json.value["placement"]["openerAttack"],
-      openerFrames: json.value["placement"]["openerFrames"].toDouble(),
-      openerBlocks: json.value["placement"]["openerBlocks"],
-      allspins: json.value["placement"]["allspins"],
-      iPieces: json.value["placement"]["iPieces"],
-      tPieces: json.value["placement"]["tPieces"],
-      attack: json.value["placement"]["attack"],
-      attackSent: json.value["placement"]["attacksSent"],
-      cleanAttacksSent: json.value["placement"]["cleanAttacksSent"],
-      linesCleared: json.value["placement"]["linesCleared"],
-      downstackCleared: json.value["placement"]["downstackCleared"],
-      attackWithDownstack: json.value["placement"]["attackWithDownstack"],
-      cleanLinesSent: json.value["placement"]["cleanLinesSent"],
-      frameDelay: json.value["placement"]["frameDelay"].toDouble(),
-      cheeseScore: json.value["placement"]["cheeseScore"].toDouble(),
-      keypresses: json.value["placement"]["keypresses"],
-      cheeseCleared: json.value["placement"]["cheeseCleared"],
-      attackWithCheese: json.value["placement"]["attackWithCheese"],
-      allPieces: json.value["placement"]["allPieces"],
-      linesSent: json.value["placement"]["linesSent"],
-      stackingTotalFrames: json.value["placement"]["stackSpeed"]["stacking"]["totalFrames"].toDouble(),
-      stackingTotalUpdates: json.value["placement"]["stackSpeed"]["stacking"]["totalUpdates"],
-      downstackingTotalFrames: json.value["placement"]["stackSpeed"]["downstacking"]["totalFrames"].toDouble(),
-      downstackingTotalUpdates: json.value["placement"]["stackSpeed"]["downstacking"]["totalUpdates"]
+      ppsSegments: json.value["stats"]["placement"]["ppsSegments"].cast<int>(),
+      wellColumns: json.value["stats"]["placement"]["wellColumns"].cast<int>(),
+      clearTypes: ClearsChartData(nick, json.value["stats"]["placement"]["clearTypes"]["perfectClear"], json.value["stats"]["placement"]["clearTypes"]["allspin"], json.value["stats"]["placement"]["clearTypes"]["single"], json.value["stats"]["placement"]["clearTypes"]["tspinSingle"], json.value["stats"]["placement"]["clearTypes"]["double"], json.value["stats"]["placement"]["clearTypes"]["tspinDouble"], json.value["stats"]["placement"]["clearTypes"]["triple"], json.value["stats"]["placement"]["clearTypes"]["tspinTriple"], json.value["stats"]["placement"]["clearTypes"]["quad"]),
+      pieces: json.value["stats"]["placement"]["pieces"],
+      openerAttack: json.value["stats"]["placement"]["openerAttack"],
+      openerFrames: json.value["stats"]["placement"]["openerFrames"].toDouble(),
+      openerBlocks: json.value["stats"]["placement"]["openerBlocks"],
+      allspins: json.value["stats"]["placement"]["allspins"],
+      iPieces: json.value["stats"]["placement"]["iPieces"],
+      tPieces: json.value["stats"]["placement"]["tPieces"],
+      attack: json.value["stats"]["placement"]["attack"],
+      attackSent: json.value["stats"]["placement"]["attacksSent"],
+      cleanAttacksSent: json.value["stats"]["placement"]["cleanAttacksSent"],
+      linesCleared: json.value["stats"]["placement"]["linesCleared"],
+      downstackCleared: json.value["stats"]["placement"]["downstackCleared"],
+      attackWithDownstack: json.value["stats"]["placement"]["attackWithDownstack"],
+      cleanLinesSent: json.value["stats"]["placement"]["cleanLinesSent"],
+      frameDelay: json.value["stats"]["placement"]["frameDelay"].toDouble(),
+      cheeseScore: json.value["stats"]["placement"]["cheeseScore"].toDouble(),
+      keypresses: json.value["stats"]["placement"]["keypresses"],
+      cheeseCleared: json.value["stats"]["placement"]["cheeseCleared"],
+      attackWithCheese: json.value["stats"]["placement"]["attackWithCheese"],
+      allPieces: json.value["stats"]["placement"]["allPieces"],
+      linesSent: json.value["stats"]["placement"]["linesSent"],
+      stackingTotalFrames: json.value["stats"]["placement"]["stackSpeed"]["stacking"]["totalFrames"].toDouble(),
+      stackingTotalUpdates: json.value["stats"]["placement"]["stackSpeed"]["stacking"]["totalUpdates"],
+      downstackingTotalFrames: json.value["stats"]["placement"]["stackSpeed"]["downstacking"]["totalFrames"].toDouble(),
+      downstackingTotalUpdates: json.value["stats"]["placement"]["stackSpeed"]["downstacking"]["totalUpdates"]
     );
     garbage = MGarbage(
-      linesReceived: json.value["garbage"]["linesReceived"],
-      cleanLinesRecieved: json.value["garbage"]["cleanLinesRecieved"],
-      cheeseLinesRecieved: json.value["garbage"]["cheeseLinesRecieved"],
-      cheeseLinesCancelled: json.value["garbage"]["cheeseLinesCancelled"],
-      cheeseLinesTanked: json.value["garbage"]["cheeseLinesTanked"],
-      cleanLinesCancelled: json.value["garbage"]["cleanLinesCancelled"],
-      cleanLinesTankedAsCheese: json.value["garbage"]["cleanLinesTankedAsCheese"],
-      cleanLinesTankedAsClean: json.value["garbage"]["cleanLinesTankedAsClean"]
+      linesReceived: json.value["stats"]["garbage"]["linesReceived"],
+      cleanLinesRecieved: json.value["stats"]["garbage"]["cleanLinesRecieved"],
+      cheeseLinesRecieved: json.value["stats"]["garbage"]["cheeseLinesRecieved"],
+      cheeseLinesCancelled: json.value["stats"]["garbage"]["cheeseLinesCancelled"],
+      cheeseLinesTanked: json.value["stats"]["garbage"]["cheeseLinesTanked"],
+      cleanLinesCancelled: json.value["stats"]["garbage"]["cleanLinesCancelled"],
+      cleanLinesTankedAsCheese: json.value["stats"]["garbage"]["cleanLinesTankedAsCheese"],
+      cleanLinesTankedAsClean: json.value["stats"]["garbage"]["cleanLinesTankedAsClean"]
     );
     surge = MSurge(
-      chains: json.value["surge"]["chains"],
-      btb: json.value["surge"]["btb"],
-      garbageCleared: json.value["surge"]["garbageCleared"],
-      linesCleared: json.value["surge"]["linesCleared"],
-      attack: json.value["surge"]["attack"],
-      frames: json.value["surge"]["frames"].toDouble(),
-      pieces: json.value["surge"]["pieces"],
-      fails: json.value["surge"]["fails"],
-      framesWithSurgeGarbage: json.value["surge"]["framesWithSurgeGarbage"].toDouble(),
-      surgeGarbageCleared: json.value["surge"]["surgeGarbageCleared"],
-      framesWithSurgeCheese: json.value["surge"]["framesWithSurgeCheese"].toDouble(),
-      surgeCheeseCleared: json.value["surge"]["surgeCheeseCleared"],
-      allspins: json.value["surge"]["allspins"],
-      btbClears: json.value["surge"]["btbClears"]
+      chains: json.value["stats"]["surge"]["chains"],
+      btb: json.value["stats"]["surge"]["btb"],
+      garbageCleared: json.value["stats"]["surge"]["garbageCleared"],
+      linesCleared: json.value["stats"]["surge"]["linesCleared"],
+      attack: json.value["stats"]["surge"]["attack"],
+      frames: json.value["stats"]["surge"]["frames"].toDouble(),
+      pieces: json.value["stats"]["surge"]["pieces"],
+      fails: json.value["stats"]["surge"]["fails"],
+      framesWithSurgeGarbage: json.value["stats"]["surge"]["framesWithSurgeGarbage"].toDouble(),
+      surgeGarbageCleared: json.value["stats"]["surge"]["surgeGarbageCleared"],
+      framesWithSurgeCheese: json.value["stats"]["surge"]["framesWithSurgeCheese"].toDouble(),
+      surgeCheeseCleared: json.value["stats"]["surge"]["surgeCheeseCleared"],
+      allspins: json.value["stats"]["surge"]["allspins"],
+      btbClears: json.value["stats"]["surge"]["btbClears"]
     );
-    death = DeathData.fromJson(json.value["death"], nick);
-    kill = DeathData.fromJson(json.value["kill"], nick);
+    death = DeathData.fromJson(json.value["stats"]["death"], nick);
+    kill = DeathData.fromJson(json.value["stats"]["kill"], nick);
   }
 
   MinomuncherData get data => MinomuncherData.fromRaw(this);
@@ -348,6 +350,7 @@ List<double> means(List<double> data){
 }
 
 class MinomuncherData {
+  late final String id; 
   late final String nick;
   late final List<WellsData> wellColumns;
   late final ClearsChartData clearTypes;
@@ -401,52 +404,53 @@ class MinomuncherData {
     double attackMins = attackSecs / 60;
     double surgeSecs = entry.value["surge"]["frames"] / 60;
     double surgeMins = surgeSecs / 60;
-    this.nick = entry.key;
-    this.wellColumns = [for (int i = 0; i <= 9; i++) WellsData(i+1, entry.value["placement"]["wellColumns"][i].toDouble())];
-    this.clearTypes = ClearsChartData(nick, entry.value["placement"]["clearTypes"]["perfectClear"], entry.value["placement"]["clearTypes"]["allspin"], entry.value["placement"]["clearTypes"]["single"], entry.value["placement"]["clearTypes"]["tspinSingle"], entry.value["placement"]["clearTypes"]["double"], entry.value["placement"]["clearTypes"]["tspinDouble"], entry.value["placement"]["clearTypes"]["triple"], entry.value["placement"]["clearTypes"]["tspinTriple"], entry.value["placement"]["clearTypes"]["quad"]);
-    this.allspinEfficiency = entry.value["placement"]["allspins"]/entry.value["placement"]["allPieces"];
-    this.tEfficiency = (clearTypes.tspinSingle+clearTypes.tspinDouble+clearTypes.tspinTriple)/entry.value["placement"]["tPieces"];
-    this.iEfficiency = clearTypes.quad/entry.value["placement"]["iPieces"];
-    this.cheeseAPL = entry.value["placement"]["attackWithCheese"]/entry.value["placement"]["cheeseCleared"];
-    this.downstackAPL = entry.value["placement"]["attackWithDownstack"]/entry.value["placement"]["downstackCleared"];
-    this.upstackAPL = (entry.value["placement"]["attack"]-entry.value["placement"]["attackWithDownstack"])/(entry.value["placement"]["linesCleared"]-entry.value["placement"]["downstackCleared"]);
-    this.APL = entry.value["placement"]["attack"]/entry.value["placement"]["linesCleared"];
-    this.APP = entry.value["placement"]["attack"]/entry.value["placement"]["pieces"];
-    this.KPP = entry.value["placement"]["keypresses"]/entry.value["placement"]["pieces"];
-    this.KPS = entry.value["placement"]["keypresses"]/secs;
-    this.APM = entry.value["placement"]["attack"]/mins;
-    this.PPS = entry.value["placement"]["pieces"]/secs;
-    this.ppsSegments = entry.value["placement"]["ppsSegments"].cast<double>();
+    this.id = entry.key;
+    this.nick = entry.value["username"];
+    this.wellColumns = [for (int i = 0; i <= 9; i++) WellsData(i+1, entry.value["stats"]["placement"]["wellColumns"][i].toDouble())];
+    this.clearTypes = ClearsChartData(nick, entry.value["stats"]["placement"]["clearTypes"]["perfectClear"], entry.value["stats"]["placement"]["clearTypes"]["allspin"], entry.value["stats"]["placement"]["clearTypes"]["single"], entry.value["stats"]["placement"]["clearTypes"]["tspinSingle"], entry.value["stats"]["placement"]["clearTypes"]["double"], entry.value["stats"]["placement"]["clearTypes"]["tspinDouble"], entry.value["stats"]["placement"]["clearTypes"]["triple"], entry.value["stats"]["placement"]["clearTypes"]["tspinTriple"], entry.value["stats"]["placement"]["clearTypes"]["quad"]);
+    this.allspinEfficiency = entry.value["stats"]["placement"]["allspins"]/entry.value["stats"]["placement"]["allPieces"];
+    this.tEfficiency = (clearTypes.tspinSingle+clearTypes.tspinDouble+clearTypes.tspinTriple)/entry.value["stats"]["placement"]["tPieces"];
+    this.iEfficiency = clearTypes.quad/entry.value["stats"]["placement"]["iPieces"];
+    this.cheeseAPL = entry.value["stats"]["placement"]["attackWithCheese"]/entry.value["stats"]["placement"]["cheeseCleared"];
+    this.downstackAPL = entry.value["stats"]["placement"]["attackWithDownstack"]/entry.value["stats"]["placement"]["downstackCleared"];
+    this.upstackAPL = (entry.value["stats"]["placement"]["attack"]-entry.value["stats"]["placement"]["attackWithDownstack"])/(entry.value["stats"]["placement"]["linesCleared"]-entry.value["stats"]["placement"]["downstackCleared"]);
+    this.APL = entry.value["stats"]["placement"]["attack"]/entry.value["stats"]["placement"]["linesCleared"];
+    this.APP = entry.value["stats"]["placement"]["attack"]/entry.value["stats"]["placement"]["pieces"];
+    this.KPP = entry.value["stats"]["placement"]["keypresses"]/entry.value["stats"]["placement"]["pieces"];
+    this.KPS = entry.value["stats"]["placement"]["keypresses"]/secs;
+    this.APM = entry.value["stats"]["placement"]["attack"]/mins;
+    this.PPS = entry.value["stats"]["placement"]["pieces"]/secs;
+    this.ppsSegments = entry.value["stats"]["placement"]["ppsSegments"].cast<double>();
     List<double> me = means(ppsSegments);
     this.BurstPPS = me.reduce(max); //entry.value["BurstPPS"];
     this.PlonkPPS = me.reduce(min); // entry.value["PlonkPPS"];
-    this.PPSCoeff = getVariance(entry.value["placement"]["ppsSegments"], PPS);
-    this.midgameAPM = (entry.value["placement"]["attack"] - entry.value["placement"]["openerAttack"]) / (mins - attackMins);
-    this.midgamePPS = (entry.value["placement"]["pieces"] - entry.value["placement"]["openerBlocks"]) / (secs - attackSecs);
-    this.openerAPM = entry.value["placement"]["openerAttack"]/attackMins;
-    this.openerPPS = entry.value["placement"]["openerBlocks"]/attackSecs;
-    this.attackCheesiness = sigmoid(entry.value["placement"]["cheeseScore"] / entry.value["placement"]["linesSent"]);
-    this.surgeAPM = entry.value["surge"]["attack"] / surgeMins;
-    this.surgeAPL = entry.value["surge"]["attack"] / entry.value["surge"]["linesCleared"];
-    this.surgeDS = entry.value["surge"]["garbageCleared"] / entry.value["surge"]["chains"];
-    this.surgePPS = entry.value["surge"]["pieces"] / surgeSecs;
-    this.surgeLength = entry.value["surge"]["btb"] / entry.value["surge"]["chains"];
-    this.surgeRate = entry.value["surge"]["chains"] / (entry.value["surge"]["chains"] + entry.value["surge"]["fails"]);
-    this.surgeSecsPerCheese = entry.value["surge"]["framesWithSurgeCheese"] / 60 / entry.value["surge"]["surgeCheeseCleared"];
-    this.surgeSecsPerDS = entry.value["surge"]["framesWithSurgeGarbage"] / 60 / entry.value["surge"]["surgeGarbageCleared"];
-    this.surgeAllspin = entry.value["surge"]["allspins"] / entry.value["surge"]["btbClears"];
-    this.cleanLinesRecieved = entry.value["garbage"]["cleanLinesRecieved"]/entry.value["garbage"]["linesReceived"];
-    this.cheeseLinesRecieved = entry.value["garbage"]["cheeseLinesRecieved"]/entry.value["garbage"]["linesReceived"];
-    this.cheeseLinesCancelled = entry.value["garbage"]["cheeseLinesCancelled"]/entry.value["garbage"]["linesReceived"];
-    this.cheeseLinesTanked = entry.value["garbage"]["cheeseLinesTanked"]/entry.value["garbage"]["linesReceived"];
-    this.cleanLinesCancelled = entry.value["garbage"]["cleanLinesCancelled"]/entry.value["garbage"]["linesReceived"];
-    this.cleanLinesTankedAsCheese = entry.value["garbage"]["cleanLinesTankedAsCheese"]/entry.value["garbage"]["linesReceived"];
-    this.cleanLinesTankedAsClean = entry.value["garbage"]["cleanLinesTankedAsClean"]/entry.value["garbage"]["linesReceived"];
-    this.deathStats = DeathData.fromJson(entry.value["death"], nick);
-    this.killStats = DeathData.fromJson(entry.value["kill"], nick);
-    this.upstackPPS = entry.value["placement"]["stackSpeed"]["stacking"]["totalUpdates"]/(entry.value["placement"]["stackSpeed"]["stacking"]["totalFrames"]/60);
-    this.downstackPPS = entry.value["placement"]["stackSpeed"]["downstacking"]["totalUpdates"]/(entry.value["placement"]["stackSpeed"]["downstacking"]["totalFrames"]/60);
-    this.downstackingRatio = entry.value["placement"]["stackSpeed"]["downstacking"]["totalFrames"]/(entry.value["placement"]["stackSpeed"]["stacking"]["totalFrames"]+entry.value["placement"]["stackSpeed"]["downstacking"]["totalFrames"]);
+    this.PPSCoeff = getVariance(entry.value["stats"]["placement"]["ppsSegments"], PPS);
+    this.midgameAPM = (entry.value["stats"]["placement"]["attack"] - entry.value["stats"]["placement"]["openerAttack"]) / (mins - attackMins);
+    this.midgamePPS = (entry.value["stats"]["placement"]["pieces"] - entry.value["stats"]["placement"]["openerBlocks"]) / (secs - attackSecs);
+    this.openerAPM = entry.value["stats"]["placement"]["openerAttack"]/attackMins;
+    this.openerPPS = entry.value["stats"]["placement"]["openerBlocks"]/attackSecs;
+    this.attackCheesiness = sigmoid(entry.value["stats"]["placement"]["cheeseScore"] / entry.value["stats"]["placement"]["linesSent"]);
+    this.surgeAPM = entry.value["stats"]["surge"]["attack"] / surgeMins;
+    this.surgeAPL = entry.value["stats"]["surge"]["attack"] / entry.value["stats"]["surge"]["linesCleared"];
+    this.surgeDS = entry.value["stats"]["surge"]["garbageCleared"] / entry.value["stats"]["surge"]["chains"];
+    this.surgePPS = entry.value["stats"]["surge"]["pieces"] / surgeSecs;
+    this.surgeLength = entry.value["stats"]["surge"]["btb"] / entry.value["stats"]["surge"]["chains"];
+    this.surgeRate = entry.value["stats"]["surge"]["chains"] / (entry.value["stats"]["surge"]["chains"] + entry.value["stats"]["surge"]["fails"]);
+    this.surgeSecsPerCheese = entry.value["stats"]["surge"]["framesWithSurgeCheese"] / 60 / entry.value["stats"]["surge"]["surgeCheeseCleared"];
+    this.surgeSecsPerDS = entry.value["stats"]["surge"]["framesWithSurgeGarbage"] / 60 / entry.value["stats"]["surge"]["surgeGarbageCleared"];
+    this.surgeAllspin = entry.value["stats"]["surge"]["allspins"] / entry.value["stats"]["surge"]["btbClears"];
+    this.cleanLinesRecieved = entry.value["stats"]["garbage"]["cleanLinesRecieved"]/entry.value["stats"]["garbage"]["linesReceived"];
+    this.cheeseLinesRecieved = entry.value["stats"]["garbage"]["cheeseLinesRecieved"]/entry.value["stats"]["garbage"]["linesReceived"];
+    this.cheeseLinesCancelled = entry.value["stats"]["garbage"]["cheeseLinesCancelled"]/entry.value["stats"]["garbage"]["linesReceived"];
+    this.cheeseLinesTanked = entry.value["stats"]["garbage"]["cheeseLinesTanked"]/entry.value["stats"]["garbage"]["linesReceived"];
+    this.cleanLinesCancelled = entry.value["stats"]["garbage"]["cleanLinesCancelled"]/entry.value["stats"]["garbage"]["linesReceived"];
+    this.cleanLinesTankedAsCheese = entry.value["stats"]["garbage"]["cleanLinesTankedAsCheese"]/entry.value["stats"]["garbage"]["linesReceived"];
+    this.cleanLinesTankedAsClean = entry.value["stats"]["garbage"]["cleanLinesTankedAsClean"]/entry.value["stats"]["garbage"]["linesReceived"];
+    this.deathStats = DeathData.fromJson(entry.value["stats"]["death"], nick);
+    this.killStats = DeathData.fromJson(entry.value["stats"]["kill"], nick);
+    this.upstackPPS = entry.value["stats"]["placement"]["stackSpeed"]["stacking"]["totalUpdates"]/(entry.value["stats"]["placement"]["stackSpeed"]["stacking"]["totalFrames"]/60);
+    this.downstackPPS = entry.value["stats"]["placement"]["stackSpeed"]["downstacking"]["totalUpdates"]/(entry.value["stats"]["placement"]["stackSpeed"]["downstacking"]["totalFrames"]/60);
+    this.downstackingRatio = entry.value["stats"]["placement"]["stackSpeed"]["downstacking"]["totalFrames"]/(entry.value["stats"]["placement"]["stackSpeed"]["stacking"]["totalFrames"]+entry.value["stats"]["placement"]["stackSpeed"]["downstacking"]["totalFrames"]);
     }
 
     MinomuncherData.fromRaw(MinomuncherRaw raw){
@@ -588,7 +592,7 @@ List<String> get killsLabels => [
 
 List<String> get graphClearName => [
 		t.stats.pcs,
-		"All Spins",
+		t.stats.allSpins,
     "${t.stats.tSpin} ${t.stats.lineClears.triple}",
     "${t.stats.tSpin} ${t.stats.lineClears.double}",
     "${t.stats.tSpin} ${t.stats.lineClears.single}",

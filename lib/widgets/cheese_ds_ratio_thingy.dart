@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Badge;
 import 'package:syncfusion_flutter_gauges/gauges.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 
 List <Color> palette = const <Color>[
@@ -27,7 +28,7 @@ class CheeseAndDSThingy extends StatelessWidget {
         child: Padding(
       padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0),
       child: Container(
-        constraints: BoxConstraints(maxHeight: 200.00, maxWidth: 200.00),
+        constraints: BoxConstraints(maxHeight: 200.00),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
@@ -71,7 +72,7 @@ class CheeseAndDSThingy extends StatelessWidget {
                           text: TextSpan(
                             style: const TextStyle(fontFamily: "Eurostile Round", color: Colors.white),
                             children: [
-                              TextSpan(text: "Attack Cheesiness\n"),
+                              TextSpan(text: "${t.stats.attackCheesiness}\n"),
                               if (atkCheesiness.length == 1) TextSpan(text: f3.format(atkCheesiness[0]), style: TextStyle(fontSize: 25, fontFamily: "Eurostile Round Extended", fontWeight: FontWeight.w100)),
                               if (atkCheesiness.length > 1) WidgetSpan(child: Column(
                                 children: [
@@ -142,7 +143,7 @@ class CheeseAndDSThingy extends StatelessWidget {
                           text: TextSpan(
                             style: const TextStyle(fontFamily: "Eurostile Round", color: Colors.white),
                             children: [
-                              TextSpan(text: "Downstacking Ratio\n"),
+                              TextSpan(text: "${t.stats.downstackingRatio}\n"),
                               if (DSratio.length == 1) TextSpan(text: f3.format(DSratio[0]), style: TextStyle(fontSize: 25, fontFamily: "Eurostile Round Extended", fontWeight: FontWeight.w100)),
                               if (DSratio.length > 1) WidgetSpan(child: Column(
                                 children: [

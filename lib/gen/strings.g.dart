@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 5
-/// Strings: 3875 (775 per locale)
+/// Strings: 4060 (812 per locale)
 ///
-/// Built on 2025-05-14 at 17:11 UTC
+/// Built on 2025-06-17 at 21:55 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -204,6 +204,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get localStanding => 'local';
 	late final _StringsXpEn xp = _StringsXpEn._(_root);
 	late final _StringsGametimeEn gametime = _StringsGametimeEn._(_root);
+	String get whichOne => 'Which one?';
 	String get track => 'Track';
 	String get stopTracking => 'Stop tracking';
 	String supporter({required Object tier}) => 'Supporter tier ${tier}';
@@ -238,6 +239,13 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get trackedPlayers => 'Tracked Players';
 	String get standing => 'Standing';
 	String get previousSeasons => 'Previous Seasons';
+	String get checkingCache => 'Checking cache...';
+	String get fetchingRecords => 'Fetching Records...';
+	String get munching => 'Munching...';
+	String get outOf => 'out of';
+	String get replaysDone => 'replays done';
+	String get analysis => 'Analysis';
+	String get minomuncherMention => 'via MinoMuncher by Freyhoe';
 	String get recent => 'Recent';
 	String get top => 'Top';
 	String get noRecord => 'No record';
@@ -245,7 +253,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	late final _StringsSnackBarMessagesEn snackBarMessages = _StringsSnackBarMessagesEn._(_root);
 	late final _StringsErrorsEn errors = _StringsErrorsEn._(_root);
 	late final _StringsActionsEn actions = _StringsActionsEn._(_root);
-	late final _StringsAprilFoolsEn aprilFools = _StringsAprilFoolsEn._(_root);
 	late final _StringsGraphsDestinationEn graphsDestination = _StringsGraphsDestinationEn._(_root);
 	late final _StringsFilterModaleEn filterModale = _StringsFilterModaleEn._(_root);
 	late final _StringsCutoffsDestinationEn cutoffsDestination = _StringsCutoffsDestinationEn._(_root);
@@ -705,21 +712,6 @@ class _StringsActionsEn {
 	String get refresh => 'Refresh';
 }
 
-// Path: aprilFools
-class _StringsAprilFoolsEn {
-	_StringsAprilFoolsEn._(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-	String get fakeBanModaleTitle => 'You have been permanently banned from Tetra Stats';
-	String get fakeBanModaleBody => 'Reason: gross violation of the Terms of Service\n\nIf you want to appeal, please, contact dan63.';
-	String get fakeBanModaledan63Grin => 'Fool...';
-	String get SettingTitleUnfoolMyself => 'Unfool myself';
-	String get SettingButtonUnfool => 'Unfool';
-	String get SettingDescription => 'That button will allow you re experience april fool prank once again';
-}
-
 // Path: graphsDestination
 class _StringsGraphsDestinationEn {
 	_StringsGraphsDestinationEn._(this._root);
@@ -838,8 +830,10 @@ class _StringsCalcDestinationEn {
 	// Translations
 	String placeholders({required Object stat}) => 'Enter your ${stat}';
 	String get tip => 'Enter values and press "Calc" to see Nerd Stats for them';
+	String get invalidValues => 'Please, enter valid values';
 	String get statsCalcButton => 'Calc';
 	String get damageCalcTip => 'Click on the actions on the left to add them here';
+	String get clearAll => 'Clear all';
 	String get actions => 'Actions';
 	String get results => 'Results';
 	String get rules => 'Rules';
@@ -1098,6 +1092,10 @@ class _StringsStatsEn {
 	late final _StringsStatsKpEn kp = _StringsStatsKpEn._(_root);
 	late final _StringsStatsKppEn kpp = _StringsStatsKppEn._(_root);
 	late final _StringsStatsKpsEn kps = _StringsStatsKpsEn._(_root);
+	late final _StringsStatsAplEn apl = _StringsStatsAplEn._(_root);
+	late final _StringsStatsQuadEfficiencyEn quadEfficiency = _StringsStatsQuadEfficiencyEn._(_root);
+	late final _StringsStatsTspinEfficiencyEn tspinEfficiency = _StringsStatsTspinEfficiencyEn._(_root);
+	late final _StringsStatsAllspinEfficiencyEn allspinEfficiency = _StringsStatsAllspinEfficiencyEn._(_root);
 	String blitzScore({required Object p}) => '${p} points';
 	String levelUpRequirement({required Object p}) => 'Level up requirement: ${p}';
 	String get piecesTotal => 'Total pieces placed';
@@ -1117,6 +1115,31 @@ class _StringsStatsEn {
 	String get received => 'Received';
 	String get placement => 'Placement';
 	String get peak => 'Peak';
+	String get overall => 'Overall';
+	String get midgame => 'Midgame';
+	String get efficiency => 'Efficiency';
+	String get upstack => 'Upstack';
+	String get downstack => 'Downstack';
+	String get variance => 'Variance';
+	String get burst => 'Burst';
+	String get length => 'Length';
+	String get rate => 'Rate';
+	String get secsDS => 'Secs/DS';
+	String get secsCheese => 'Secs/Cheese';
+	String get attackCheesiness => 'Attack Cheesiness';
+	String get downstackingRatio => 'Downstacking Ratio';
+	String get clearTypes => 'Clear Types';
+	String get wellColumnDistribution => 'Well Column Distribution';
+	String get allSpins => 'All Spins';
+	String get sankeyTitle => 'Incoming Attack Sankey Chart';
+	String get incomingAttack => 'Incoming Attack';
+	String get clean => 'Clean';
+	String get cancelled => 'Cancelled';
+	String get cheeseTanked => 'Cheese Tanked';
+	String get cleanTanked => 'Clean Tanked';
+	String get kills => 'Kills';
+	String get deaths => 'Deaths';
+	String get ppsDistribution => 'PPS distribution';
 	String qpWithMods({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
 		one: 'With 1 mod',
 		two: 'With ${n} mods',
@@ -1629,6 +1652,50 @@ class _StringsStatsKpsEn {
 	String get full => 'Key presses Per Second';
 }
 
+// Path: stats.apl
+class _StringsStatsAplEn {
+	_StringsStatsAplEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get short => 'APL';
+	String get full => 'Attack Per Line';
+}
+
+// Path: stats.quadEfficiency
+class _StringsStatsQuadEfficiencyEn {
+	_StringsStatsQuadEfficiencyEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get short => 'Q Eff.';
+	String get full => 'Quad efficiency';
+}
+
+// Path: stats.tspinEfficiency
+class _StringsStatsTspinEfficiencyEn {
+	_StringsStatsTspinEfficiencyEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get short => 'T Eff.';
+	String get full => 'T-spin efficiency';
+}
+
+// Path: stats.allspinEfficiency
+class _StringsStatsAllspinEfficiencyEn {
+	_StringsStatsAllspinEfficiencyEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get short => 'All Eff.';
+	String get full => 'All-spin efficiency';
+}
+
 // Path: stats.graphs
 class _StringsStatsGraphsEn {
 	_StringsStatsGraphsEn._(this._root);
@@ -1764,6 +1831,7 @@ class _StringsDeDe implements Translations {
 	@override String get localStanding => 'Lokal';
 	@override late final _StringsXpDeDe xp = _StringsXpDeDe._(_root);
 	@override late final _StringsGametimeDeDe gametime = _StringsGametimeDeDe._(_root);
+	@override String get whichOne => 'Which one?';
 	@override String get track => 'Erfassen';
 	@override String get stopTracking => 'Erfassen stoppen';
 	@override String supporter({required Object tier}) => 'Unterstützer Stufe ${tier}';
@@ -1798,6 +1866,13 @@ class _StringsDeDe implements Translations {
 	@override String get trackedPlayers => 'Erfasste Benutzer';
 	@override String get standing => 'Stand';
 	@override String get previousSeasons => 'Vorhärige Saison';
+	@override String get checkingCache => 'Checking cache...';
+	@override String get fetchingRecords => 'Fetching Records...';
+	@override String get munching => 'Munching...';
+	@override String get outOf => 'out of';
+	@override String get replaysDone => 'replays done';
+	@override String get analysis => 'Analysis';
+	@override String get minomuncherMention => 'via MinoMuncher by Freyhoe';
 	@override String get recent => 'Kürzlich';
 	@override String get top => 'Top';
 	@override String get noRecord => 'Kein Rekord';
@@ -1805,7 +1880,6 @@ class _StringsDeDe implements Translations {
 	@override late final _StringsSnackBarMessagesDeDe snackBarMessages = _StringsSnackBarMessagesDeDe._(_root);
 	@override late final _StringsErrorsDeDe errors = _StringsErrorsDeDe._(_root);
 	@override late final _StringsActionsDeDe actions = _StringsActionsDeDe._(_root);
-	@override late final _StringsAprilFoolsDeDe aprilFools = _StringsAprilFoolsDeDe._(_root);
 	@override late final _StringsGraphsDestinationDeDe graphsDestination = _StringsGraphsDestinationDeDe._(_root);
 	@override late final _StringsFilterModaleDeDe filterModale = _StringsFilterModaleDeDe._(_root);
 	@override late final _StringsCutoffsDestinationDeDe cutoffsDestination = _StringsCutoffsDestinationDeDe._(_root);
@@ -2264,21 +2338,6 @@ class _StringsActionsDeDe implements _StringsActionsEn {
 	@override String get refresh => 'Aktualisieren';
 }
 
-// Path: aprilFools
-class _StringsAprilFoolsDeDe implements _StringsAprilFoolsEn {
-	_StringsAprilFoolsDeDe._(this._root);
-
-	@override final _StringsDeDe _root; // ignore: unused_field
-
-	// Translations
-	@override String get fakeBanModaleTitle => 'You have been permanently banned from Tetra Stats';
-	@override String get fakeBanModaleBody => 'Reason: gross violation of the Terms of Service\n\nIf you want to appeal, please, contact dan63.';
-	@override String get fakeBanModaledan63Grin => 'Fool...';
-	@override String get SettingTitleUnfoolMyself => 'Unfool myself';
-	@override String get SettingButtonUnfool => 'Unfool';
-	@override String get SettingDescription => 'That button will allow you re experience april fool prank once again';
-}
-
 // Path: graphsDestination
 class _StringsGraphsDestinationDeDe implements _StringsGraphsDestinationEn {
 	_StringsGraphsDestinationDeDe._(this._root);
@@ -2397,8 +2456,10 @@ class _StringsCalcDestinationDeDe implements _StringsCalcDestinationEn {
 	// Translations
 	@override String placeholders({required Object stat}) => 'Gebe ${stat} ein';
 	@override String get tip => 'Gebe Wert ein und drücke "Berechnen", um Statistiken für Nerds zu sehen';
+	@override String get invalidValues => 'Please, enter valid values';
 	@override String get statsCalcButton => 'Berechnen';
 	@override String get damageCalcTip => 'Klicke auf die Aktionen zu deiner Linken, um diese hier hinzuzufügen';
+	@override String get clearAll => 'Clear all';
 	@override String get actions => 'Aktionen';
 	@override String get results => 'Ergebnisse';
 	@override String get rules => 'Regeln';
@@ -2657,6 +2718,10 @@ class _StringsStatsDeDe implements _StringsStatsEn {
 	@override late final _StringsStatsKpDeDe kp = _StringsStatsKpDeDe._(_root);
 	@override late final _StringsStatsKppDeDe kpp = _StringsStatsKppDeDe._(_root);
 	@override late final _StringsStatsKpsDeDe kps = _StringsStatsKpsDeDe._(_root);
+	@override late final _StringsStatsAplDeDe apl = _StringsStatsAplDeDe._(_root);
+	@override late final _StringsStatsQuadEfficiencyDeDe quadEfficiency = _StringsStatsQuadEfficiencyDeDe._(_root);
+	@override late final _StringsStatsTspinEfficiencyDeDe tspinEfficiency = _StringsStatsTspinEfficiencyDeDe._(_root);
+	@override late final _StringsStatsAllspinEfficiencyDeDe allspinEfficiency = _StringsStatsAllspinEfficiencyDeDe._(_root);
 	@override String blitzScore({required Object p}) => '${p} Punkte';
 	@override String levelUpRequirement({required Object p}) => 'Level up in ${p} Punkten';
 	@override String get piecesTotal => 'Insgesamt platzierte Steine';
@@ -2676,6 +2741,31 @@ class _StringsStatsDeDe implements _StringsStatsEn {
 	@override String get received => 'Erhalten';
 	@override String get placement => 'Platzierung';
 	@override String get peak => 'Beste';
+	@override String get overall => 'Overall';
+	@override String get midgame => 'Midgame';
+	@override String get efficiency => 'Efficiency';
+	@override String get upstack => 'Upstack';
+	@override String get downstack => 'Downstack';
+	@override String get variance => 'Variance';
+	@override String get burst => 'Burst';
+	@override String get length => 'Length';
+	@override String get rate => 'Rate';
+	@override String get secsDS => 'Secs/DS';
+	@override String get secsCheese => 'Secs/Cheese';
+	@override String get attackCheesiness => 'Attack Cheesiness';
+	@override String get downstackingRatio => 'Downstacking Ratio';
+	@override String get clearTypes => 'Clear Types';
+	@override String get wellColumnDistribution => 'Well Column Distribution';
+	@override String get allSpins => 'All Spins';
+	@override String get sankeyTitle => 'Incoming Attack Sankey Chart';
+	@override String get incomingAttack => 'Incoming Attack';
+	@override String get clean => 'Clean';
+	@override String get cancelled => 'Cancelled';
+	@override String get cheeseTanked => 'Cheese Tanked';
+	@override String get cleanTanked => 'Clean Tanked';
+	@override String get kills => 'Kills';
+	@override String get deaths => 'Deaths';
+	@override String get ppsDistribution => 'PPS distribution';
 	@override String qpWithMods({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n,
 		one: 'Mit 1 Mod',
 		two: 'Mit ${n} Mods',
@@ -3188,6 +3278,50 @@ class _StringsStatsKpsDeDe implements _StringsStatsKpsEn {
 	@override String get full => 'Tastenanschläge pro Sekunden';
 }
 
+// Path: stats.apl
+class _StringsStatsAplDeDe implements _StringsStatsAplEn {
+	_StringsStatsAplDeDe._(this._root);
+
+	@override final _StringsDeDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get short => 'APL';
+	@override String get full => 'Attack Per Line';
+}
+
+// Path: stats.quadEfficiency
+class _StringsStatsQuadEfficiencyDeDe implements _StringsStatsQuadEfficiencyEn {
+	_StringsStatsQuadEfficiencyDeDe._(this._root);
+
+	@override final _StringsDeDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get short => 'Q Eff.';
+	@override String get full => 'Quad efficiency';
+}
+
+// Path: stats.tspinEfficiency
+class _StringsStatsTspinEfficiencyDeDe implements _StringsStatsTspinEfficiencyEn {
+	_StringsStatsTspinEfficiencyDeDe._(this._root);
+
+	@override final _StringsDeDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get short => 'T Eff.';
+	@override String get full => 'T-spin efficiency';
+}
+
+// Path: stats.allspinEfficiency
+class _StringsStatsAllspinEfficiencyDeDe implements _StringsStatsAllspinEfficiencyEn {
+	_StringsStatsAllspinEfficiencyDeDe._(this._root);
+
+	@override final _StringsDeDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get short => 'All Eff.';
+	@override String get full => 'All-spin efficiency';
+}
+
 // Path: stats.graphs
 class _StringsStatsGraphsDeDe implements _StringsStatsGraphsEn {
 	_StringsStatsGraphsDeDe._(this._root);
@@ -3323,6 +3457,7 @@ class _StringsKoKr implements Translations {
 	@override String get localStanding => '국가 순위';
 	@override late final _StringsXpKoKr xp = _StringsXpKoKr._(_root);
 	@override late final _StringsGametimeKoKr gametime = _StringsGametimeKoKr._(_root);
+	@override String get whichOne => 'Which one?';
 	@override String get track => '추적하기';
 	@override String get stopTracking => '추적 취소하기';
 	@override String supporter({required Object tier}) => '서포터 ${tier}티어';
@@ -3357,6 +3492,13 @@ class _StringsKoKr implements Translations {
 	@override String get trackedPlayers => '추적된 플레이어들';
 	@override String get standing => '순위';
 	@override String get previousSeasons => '이전 시즌들';
+	@override String get checkingCache => 'Checking cache...';
+	@override String get fetchingRecords => 'Fetching Records...';
+	@override String get munching => 'Munching...';
+	@override String get outOf => 'out of';
+	@override String get replaysDone => 'replays done';
+	@override String get analysis => 'Analysis';
+	@override String get minomuncherMention => 'via MinoMuncher by Freyhoe';
 	@override String get recent => '최근';
 	@override String get top => '상위';
 	@override String get noRecord => '기록 없음';
@@ -3364,7 +3506,6 @@ class _StringsKoKr implements Translations {
 	@override late final _StringsSnackBarMessagesKoKr snackBarMessages = _StringsSnackBarMessagesKoKr._(_root);
 	@override late final _StringsErrorsKoKr errors = _StringsErrorsKoKr._(_root);
 	@override late final _StringsActionsKoKr actions = _StringsActionsKoKr._(_root);
-	@override late final _StringsAprilFoolsKoKr aprilFools = _StringsAprilFoolsKoKr._(_root);
 	@override late final _StringsGraphsDestinationKoKr graphsDestination = _StringsGraphsDestinationKoKr._(_root);
 	@override late final _StringsFilterModaleKoKr filterModale = _StringsFilterModaleKoKr._(_root);
 	@override late final _StringsCutoffsDestinationKoKr cutoffsDestination = _StringsCutoffsDestinationKoKr._(_root);
@@ -3823,21 +3964,6 @@ class _StringsActionsKoKr implements _StringsActionsEn {
 	@override String get refresh => '새로고침';
 }
 
-// Path: aprilFools
-class _StringsAprilFoolsKoKr implements _StringsAprilFoolsEn {
-	_StringsAprilFoolsKoKr._(this._root);
-
-	@override final _StringsKoKr _root; // ignore: unused_field
-
-	// Translations
-	@override String get fakeBanModaleTitle => 'You have been permanently banned from Tetra Stats';
-	@override String get fakeBanModaleBody => 'Reason: gross violation of the Terms of Service\n\nIf you want to appeal, please, contact dan63.';
-	@override String get fakeBanModaledan63Grin => 'Fool...';
-	@override String get SettingTitleUnfoolMyself => 'Unfool myself';
-	@override String get SettingButtonUnfool => 'Unfool';
-	@override String get SettingDescription => 'That button will allow you re experience april fool prank once again';
-}
-
 // Path: graphsDestination
 class _StringsGraphsDestinationKoKr implements _StringsGraphsDestinationEn {
 	_StringsGraphsDestinationKoKr._(this._root);
@@ -3956,8 +4082,10 @@ class _StringsCalcDestinationKoKr implements _StringsCalcDestinationEn {
 	// Translations
 	@override String placeholders({required Object stat}) => '당신의 ${stat}을 입력하세요';
 	@override String get tip => '값을 입력하고 "계산" 버튼을 눌러 세부 스탯을 확인하세요';
+	@override String get invalidValues => 'Please, enter valid values';
 	@override String get statsCalcButton => '계산';
 	@override String get damageCalcTip => '왼쪽에서 줄 클리어를 눌러 여기 추가하세요';
+	@override String get clearAll => 'Clear all';
 	@override String get actions => '줄 클리어';
 	@override String get results => '결과';
 	@override String get rules => '규칙';
@@ -4216,6 +4344,10 @@ class _StringsStatsKoKr implements _StringsStatsEn {
 	@override late final _StringsStatsKpKoKr kp = _StringsStatsKpKoKr._(_root);
 	@override late final _StringsStatsKppKoKr kpp = _StringsStatsKppKoKr._(_root);
 	@override late final _StringsStatsKpsKoKr kps = _StringsStatsKpsKoKr._(_root);
+	@override late final _StringsStatsAplKoKr apl = _StringsStatsAplKoKr._(_root);
+	@override late final _StringsStatsQuadEfficiencyKoKr quadEfficiency = _StringsStatsQuadEfficiencyKoKr._(_root);
+	@override late final _StringsStatsTspinEfficiencyKoKr tspinEfficiency = _StringsStatsTspinEfficiencyKoKr._(_root);
+	@override late final _StringsStatsAllspinEfficiencyKoKr allspinEfficiency = _StringsStatsAllspinEfficiencyKoKr._(_root);
 	@override String blitzScore({required Object p}) => '${p}점';
 	@override String levelUpRequirement({required Object p}) => '레벨업까지 ${p}점';
 	@override String get piecesTotal => '놓은 미노 수';
@@ -4235,6 +4367,31 @@ class _StringsStatsKoKr implements _StringsStatsEn {
 	@override String get received => '받은 줄';
 	@override String get placement => '위치';
 	@override String get peak => '고점';
+	@override String get overall => 'Overall';
+	@override String get midgame => 'Midgame';
+	@override String get efficiency => 'Efficiency';
+	@override String get upstack => 'Upstack';
+	@override String get downstack => 'Downstack';
+	@override String get variance => 'Variance';
+	@override String get burst => 'Burst';
+	@override String get length => 'Length';
+	@override String get rate => 'Rate';
+	@override String get secsDS => 'Secs/DS';
+	@override String get secsCheese => 'Secs/Cheese';
+	@override String get attackCheesiness => 'Attack Cheesiness';
+	@override String get downstackingRatio => 'Downstacking Ratio';
+	@override String get clearTypes => 'Clear Types';
+	@override String get wellColumnDistribution => 'Well Column Distribution';
+	@override String get allSpins => 'All Spins';
+	@override String get sankeyTitle => 'Incoming Attack Sankey Chart';
+	@override String get incomingAttack => 'Incoming Attack';
+	@override String get clean => 'Clean';
+	@override String get cancelled => 'Cancelled';
+	@override String get cheeseTanked => 'Cheese Tanked';
+	@override String get cleanTanked => 'Clean Tanked';
+	@override String get kills => 'Kills';
+	@override String get deaths => 'Deaths';
+	@override String get ppsDistribution => 'PPS distribution';
 	@override String qpWithMods({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n,
 		one: '1개 모드 사용',
 		two: '${n}개 모드 사용',
@@ -4747,6 +4904,50 @@ class _StringsStatsKpsKoKr implements _StringsStatsKpsEn {
 	@override String get full => '초당 키 입력';
 }
 
+// Path: stats.apl
+class _StringsStatsAplKoKr implements _StringsStatsAplEn {
+	_StringsStatsAplKoKr._(this._root);
+
+	@override final _StringsKoKr _root; // ignore: unused_field
+
+	// Translations
+	@override String get short => 'APL';
+	@override String get full => 'Attack Per Line';
+}
+
+// Path: stats.quadEfficiency
+class _StringsStatsQuadEfficiencyKoKr implements _StringsStatsQuadEfficiencyEn {
+	_StringsStatsQuadEfficiencyKoKr._(this._root);
+
+	@override final _StringsKoKr _root; // ignore: unused_field
+
+	// Translations
+	@override String get short => 'Q Eff.';
+	@override String get full => 'Quad efficiency';
+}
+
+// Path: stats.tspinEfficiency
+class _StringsStatsTspinEfficiencyKoKr implements _StringsStatsTspinEfficiencyEn {
+	_StringsStatsTspinEfficiencyKoKr._(this._root);
+
+	@override final _StringsKoKr _root; // ignore: unused_field
+
+	// Translations
+	@override String get short => 'T Eff.';
+	@override String get full => 'T-spin efficiency';
+}
+
+// Path: stats.allspinEfficiency
+class _StringsStatsAllspinEfficiencyKoKr implements _StringsStatsAllspinEfficiencyEn {
+	_StringsStatsAllspinEfficiencyKoKr._(this._root);
+
+	@override final _StringsKoKr _root; // ignore: unused_field
+
+	// Translations
+	@override String get short => 'All Eff.';
+	@override String get full => 'All-spin efficiency';
+}
+
 // Path: stats.graphs
 class _StringsStatsGraphsKoKr implements _StringsStatsGraphsEn {
 	_StringsStatsGraphsKoKr._(this._root);
@@ -4882,6 +5083,7 @@ class _StringsRuRu implements Translations {
 	@override String get localStanding => 'по стране';
 	@override late final _StringsXpRuRu xp = _StringsXpRuRu._(_root);
 	@override late final _StringsGametimeRuRu gametime = _StringsGametimeRuRu._(_root);
+	@override String get whichOne => 'Какой из?';
 	@override String get track => 'Отслеживать';
 	@override String get stopTracking => 'Не отслеживать';
 	@override String supporter({required Object tier}) => 'Спонсор ${tier}-го уровня';
@@ -4916,6 +5118,13 @@ class _StringsRuRu implements Translations {
 	@override String get trackedPlayers => 'Отслеживаемые игроки';
 	@override String get standing => 'Положение';
 	@override String get previousSeasons => 'Предыдущие сезоны';
+	@override String get checkingCache => 'Проверяем кеш...';
+	@override String get fetchingRecords => 'Получаем список матчей...';
+	@override String get munching => 'Анализируем...';
+	@override String get outOf => 'из';
+	@override String get replaysDone => 'повторов обработано';
+	@override String get analysis => 'Анализ';
+	@override String get minomuncherMention => 'с помощью MinoMuncher от Freyhoe';
 	@override String get recent => 'Недавние';
 	@override String get top => 'Топ';
 	@override String get noRecord => 'Нет записи';
@@ -4923,7 +5132,6 @@ class _StringsRuRu implements Translations {
 	@override late final _StringsSnackBarMessagesRuRu snackBarMessages = _StringsSnackBarMessagesRuRu._(_root);
 	@override late final _StringsErrorsRuRu errors = _StringsErrorsRuRu._(_root);
 	@override late final _StringsActionsRuRu actions = _StringsActionsRuRu._(_root);
-	@override late final _StringsAprilFoolsRuRu aprilFools = _StringsAprilFoolsRuRu._(_root);
 	@override late final _StringsGraphsDestinationRuRu graphsDestination = _StringsGraphsDestinationRuRu._(_root);
 	@override late final _StringsFilterModaleRuRu filterModale = _StringsFilterModaleRuRu._(_root);
 	@override late final _StringsCutoffsDestinationRuRu cutoffsDestination = _StringsCutoffsDestinationRuRu._(_root);
@@ -5383,21 +5591,6 @@ class _StringsActionsRuRu implements _StringsActionsEn {
 	@override String get refresh => 'Обновить';
 }
 
-// Path: aprilFools
-class _StringsAprilFoolsRuRu implements _StringsAprilFoolsEn {
-	_StringsAprilFoolsRuRu._(this._root);
-
-	@override final _StringsRuRu _root; // ignore: unused_field
-
-	// Translations
-	@override String get fakeBanModaleTitle => 'Вы были навсегда забанены в Tetra Stats';
-	@override String get fakeBanModaleBody => 'Причина: грубое нарушение условий использования\n\nЕсли вы хотите подать апелляцию, пожалуйста, свяжитесь с dan63.';
-	@override String get fakeBanModaledan63Grin => 'Дурак...';
-	@override String get SettingTitleUnfoolMyself => 'Разодурачить себя';
-	@override String get SettingButtonUnfool => 'Разодурачить';
-	@override String get SettingDescription => 'Эта кнопка позволит вам снова испытать на себе первоапрельский пранк';
-}
-
 // Path: graphsDestination
 class _StringsGraphsDestinationRuRu implements _StringsGraphsDestinationEn {
 	_StringsGraphsDestinationRuRu._(this._root);
@@ -5516,8 +5709,10 @@ class _StringsCalcDestinationRuRu implements _StringsCalcDestinationEn {
 	// Translations
 	@override String placeholders({required Object stat}) => 'Введите ваш ${stat}';
 	@override String get tip => 'Введите значения и нажмите "Считать", чтобы увидеть статистику для задротов';
+	@override String get invalidValues => 'Пожалуйста, введите корректные значения';
 	@override String get statsCalcButton => 'Считать';
 	@override String get damageCalcTip => 'Нажмите на действия слева, чтобы добавить их сюда';
+	@override String get clearAll => 'Очистить';
 	@override String get actions => 'Действия';
 	@override String get results => 'Результаты';
 	@override String get rules => 'Правила';
@@ -5776,6 +5971,10 @@ class _StringsStatsRuRu implements _StringsStatsEn {
 	@override late final _StringsStatsKpRuRu kp = _StringsStatsKpRuRu._(_root);
 	@override late final _StringsStatsKppRuRu kpp = _StringsStatsKppRuRu._(_root);
 	@override late final _StringsStatsKpsRuRu kps = _StringsStatsKpsRuRu._(_root);
+	@override late final _StringsStatsAplRuRu apl = _StringsStatsAplRuRu._(_root);
+	@override late final _StringsStatsQuadEfficiencyRuRu quadEfficiency = _StringsStatsQuadEfficiencyRuRu._(_root);
+	@override late final _StringsStatsTspinEfficiencyRuRu tspinEfficiency = _StringsStatsTspinEfficiencyRuRu._(_root);
+	@override late final _StringsStatsAllspinEfficiencyRuRu allspinEfficiency = _StringsStatsAllspinEfficiencyRuRu._(_root);
 	@override String blitzScore({required Object p}) => '${p} очков';
 	@override String levelUpRequirement({required Object p}) => 'Очков для повышения уровня: ${p}';
 	@override String get piecesTotal => 'Всего фигур установлено';
@@ -5795,6 +5994,31 @@ class _StringsStatsRuRu implements _StringsStatsEn {
 	@override String get received => 'Получено';
 	@override String get placement => 'Положение';
 	@override String get peak => 'Пик';
+	@override String get overall => 'В среднем';
+	@override String get midgame => 'Midgame';
+	@override String get efficiency => 'Эффективность';
+	@override String get upstack => 'Upstack';
+	@override String get downstack => 'Downstack';
+	@override String get variance => 'Дисперсия';
+	@override String get burst => 'Burst';
+	@override String get length => 'Длинна';
+	@override String get rate => 'Rate';
+	@override String get secsDS => 'Secs/DS';
+	@override String get secsCheese => 'Secs/Cheese';
+	@override String get attackCheesiness => 'Сырность атаки';
+	@override String get downstackingRatio => 'Downstacking Ratio';
+	@override String get clearTypes => 'Clear Types';
+	@override String get wellColumnDistribution => 'Распределение колодцев';
+	@override String get allSpins => 'All Spins';
+	@override String get sankeyTitle => 'График входящих атак';
+	@override String get incomingAttack => 'Входящие атаки';
+	@override String get clean => 'Clean';
+	@override String get cancelled => 'Cancelled';
+	@override String get cheeseTanked => 'Cheese Tanked';
+	@override String get cleanTanked => 'Clean Tanked';
+	@override String get kills => 'Убийств';
+	@override String get deaths => 'Смертей';
+	@override String get ppsDistribution => 'Распределение PPS';
 	@override String qpWithMods({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
 		one: 'С 1 модом',
 		two: 'С ${n} модами',
@@ -6307,6 +6531,50 @@ class _StringsStatsKpsRuRu implements _StringsStatsKpsEn {
 	@override String get full => 'Нажатий клавиш в Секунду';
 }
 
+// Path: stats.apl
+class _StringsStatsAplRuRu implements _StringsStatsAplEn {
+	_StringsStatsAplRuRu._(this._root);
+
+	@override final _StringsRuRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get short => 'APL';
+	@override String get full => 'Атаки на Линию';
+}
+
+// Path: stats.quadEfficiency
+class _StringsStatsQuadEfficiencyRuRu implements _StringsStatsQuadEfficiencyEn {
+	_StringsStatsQuadEfficiencyRuRu._(this._root);
+
+	@override final _StringsRuRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get short => 'Q Eff.';
+	@override String get full => 'Эффективность quad-ов';
+}
+
+// Path: stats.tspinEfficiency
+class _StringsStatsTspinEfficiencyRuRu implements _StringsStatsTspinEfficiencyEn {
+	_StringsStatsTspinEfficiencyRuRu._(this._root);
+
+	@override final _StringsRuRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get short => 'T Eff.';
+	@override String get full => 'Эффективность Т-спинов';
+}
+
+// Path: stats.allspinEfficiency
+class _StringsStatsAllspinEfficiencyRuRu implements _StringsStatsAllspinEfficiencyEn {
+	_StringsStatsAllspinEfficiencyRuRu._(this._root);
+
+	@override final _StringsRuRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get short => 'All Eff.';
+	@override String get full => 'Эффективность All-спинов';
+}
+
 // Path: stats.graphs
 class _StringsStatsGraphsRuRu implements _StringsStatsGraphsEn {
 	_StringsStatsGraphsRuRu._(this._root);
@@ -6442,6 +6710,7 @@ class _StringsZhCn implements Translations {
 	@override String get localStanding => '本地';
 	@override late final _StringsXpZhCn xp = _StringsXpZhCn._(_root);
 	@override late final _StringsGametimeZhCn gametime = _StringsGametimeZhCn._(_root);
+	@override String get whichOne => 'Which one?';
 	@override String get track => '跟踪';
 	@override String get stopTracking => '停止跟踪';
 	@override String supporter({required Object tier}) => '${tier}级会员';
@@ -6478,12 +6747,18 @@ class _StringsZhCn implements Translations {
 	@override String get previousSeasons => '上赛季';
 	@override String get recent => '最近';
 	@override String get top => '前';
+	@override String get checkingCache => 'Checking cache...';
+	@override String get fetchingRecords => 'Fetching Records...';
+	@override String get munching => 'Munching...';
+	@override String get outOf => 'out of';
+	@override String get replaysDone => 'replays done';
+	@override String get analysis => 'Analysis';
+	@override String get minomuncherMention => 'via MinoMuncher by Freyhoe';
 	@override String get noRecord => '暂无记录';
 	@override String sprintAndBlitsRelevance({required Object date}) => '${date}';
 	@override late final _StringsSnackBarMessagesZhCn snackBarMessages = _StringsSnackBarMessagesZhCn._(_root);
 	@override late final _StringsErrorsZhCn errors = _StringsErrorsZhCn._(_root);
 	@override late final _StringsActionsZhCn actions = _StringsActionsZhCn._(_root);
-	@override late final _StringsAprilFoolsZhCn aprilFools = _StringsAprilFoolsZhCn._(_root);
 	@override late final _StringsGraphsDestinationZhCn graphsDestination = _StringsGraphsDestinationZhCn._(_root);
 	@override late final _StringsFilterModaleZhCn filterModale = _StringsFilterModaleZhCn._(_root);
 	@override late final _StringsCutoffsDestinationZhCn cutoffsDestination = _StringsCutoffsDestinationZhCn._(_root);
@@ -6942,21 +7217,6 @@ class _StringsActionsZhCn implements _StringsActionsEn {
 	@override String get refresh => '刷新';
 }
 
-// Path: aprilFools
-class _StringsAprilFoolsZhCn implements _StringsAprilFoolsEn {
-	_StringsAprilFoolsZhCn._(this._root);
-
-	@override final _StringsZhCn _root; // ignore: unused_field
-
-	// Translations
-	@override String get fakeBanModaleTitle => 'You have been permanently banned from Tetra Stats';
-	@override String get fakeBanModaleBody => 'Reason: gross violation of the Terms of Service\n\nIf you want to appeal, please, contact dan63.';
-	@override String get fakeBanModaledan63Grin => 'Fool...';
-	@override String get SettingTitleUnfoolMyself => 'Unfool myself';
-	@override String get SettingButtonUnfool => 'Unfool';
-	@override String get SettingDescription => 'That button will allow you re experience april fool prank once again';
-}
-
 // Path: graphsDestination
 class _StringsGraphsDestinationZhCn implements _StringsGraphsDestinationEn {
 	_StringsGraphsDestinationZhCn._(this._root);
@@ -7075,8 +7335,10 @@ class _StringsCalcDestinationZhCn implements _StringsCalcDestinationEn {
 	// Translations
 	@override String placeholders({required Object stat}) => '输入你的${stat}';
 	@override String get tip => '输入值并按 "计算" 来查看TA的详细信息';
+	@override String get invalidValues => 'Please, enter valid values';
 	@override String get statsCalcButton => '计算';
 	@override String get damageCalcTip => '点击左侧的操作在此添加';
+	@override String get clearAll => 'Clear all';
 	@override String get actions => '操作';
 	@override String get results => '结果';
 	@override String get rules => '规则';
@@ -7335,6 +7597,10 @@ class _StringsStatsZhCn implements _StringsStatsEn {
 	@override late final _StringsStatsKpZhCn kp = _StringsStatsKpZhCn._(_root);
 	@override late final _StringsStatsKppZhCn kpp = _StringsStatsKppZhCn._(_root);
 	@override late final _StringsStatsKpsZhCn kps = _StringsStatsKpsZhCn._(_root);
+	@override late final _StringsStatsAplZhCn apl = _StringsStatsAplZhCn._(_root);
+	@override late final _StringsStatsQuadEfficiencyZhCn quadEfficiency = _StringsStatsQuadEfficiencyZhCn._(_root);
+	@override late final _StringsStatsTspinEfficiencyZhCn tspinEfficiency = _StringsStatsTspinEfficiencyZhCn._(_root);
+	@override late final _StringsStatsAllspinEfficiencyZhCn allspinEfficiency = _StringsStatsAllspinEfficiencyZhCn._(_root);
 	@override String blitzScore({required Object p}) => '${p} 分';
 	@override String levelUpRequirement({required Object p}) => '还需 ${p} 升到下一级';
 	@override String get piecesTotal => '放块总数';
@@ -7354,6 +7620,31 @@ class _StringsStatsZhCn implements _StringsStatsEn {
 	@override String get received => '已接收';
 	@override String get placement => '排名';
 	@override String get peak => '最高';
+	@override String get overall => 'Overall';
+	@override String get midgame => 'Midgame';
+	@override String get efficiency => 'Efficiency';
+	@override String get upstack => 'Upstack';
+	@override String get downstack => 'Downstack';
+	@override String get variance => 'Variance';
+	@override String get burst => 'Burst';
+	@override String get length => 'Length';
+	@override String get rate => 'Rate';
+	@override String get secsDS => 'Secs/DS';
+	@override String get secsCheese => 'Secs/Cheese';
+	@override String get attackCheesiness => 'Attack Cheesiness';
+	@override String get downstackingRatio => 'Downstacking Ratio';
+	@override String get clearTypes => 'Clear Types';
+	@override String get wellColumnDistribution => 'Well Column Distribution';
+	@override String get allSpins => 'All Spins';
+	@override String get sankeyTitle => 'Incoming Attack Sankey Chart';
+	@override String get incomingAttack => 'Incoming Attack';
+	@override String get clean => 'Clean';
+	@override String get cancelled => 'Cancelled';
+	@override String get cheeseTanked => 'Cheese Tanked';
+	@override String get cleanTanked => 'Clean Tanked';
+	@override String get kills => 'Kills';
+	@override String get deaths => 'Deaths';
+	@override String get ppsDistribution => 'PPS distribution';
 	@override String qpWithMods({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
 		one: '使用 1 个模组',
 		two: '使用 ${n} 个模组',
@@ -7866,6 +8157,50 @@ class _StringsStatsKpsZhCn implements _StringsStatsKpsEn {
 	@override String get full => '每秒按键数';
 }
 
+// Path: stats.apl
+class _StringsStatsAplZhCn implements _StringsStatsAplEn {
+	_StringsStatsAplZhCn._(this._root);
+
+	@override final _StringsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get short => 'APL';
+	@override String get full => 'Attack Per Line';
+}
+
+// Path: stats.quadEfficiency
+class _StringsStatsQuadEfficiencyZhCn implements _StringsStatsQuadEfficiencyEn {
+	_StringsStatsQuadEfficiencyZhCn._(this._root);
+
+	@override final _StringsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get short => 'Q Eff.';
+	@override String get full => 'Quad efficiency';
+}
+
+// Path: stats.tspinEfficiency
+class _StringsStatsTspinEfficiencyZhCn implements _StringsStatsTspinEfficiencyEn {
+	_StringsStatsTspinEfficiencyZhCn._(this._root);
+
+	@override final _StringsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get short => 'T Eff.';
+	@override String get full => 'T-spin efficiency';
+}
+
+// Path: stats.allspinEfficiency
+class _StringsStatsAllspinEfficiencyZhCn implements _StringsStatsAllspinEfficiencyEn {
+	_StringsStatsAllspinEfficiencyZhCn._(this._root);
+
+	@override final _StringsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get short => 'All Eff.';
+	@override String get full => 'All-spin efficiency';
+}
+
 // Path: stats.graphs
 class _StringsStatsGraphsZhCn implements _StringsStatsGraphsEn {
 	_StringsStatsGraphsZhCn._(this._root);
@@ -7988,6 +8323,7 @@ extension on Translations {
 			case 'gametime.title': return 'Exact gametime';
 			case 'gametime.gametimeAday': return ({required Object gametime}) => '${gametime} a day in average';
 			case 'gametime.breakdown': return ({required Object years, required Object months, required Object days, required Object minutes, required Object seconds}) => 'It\'s ${years} years,\nor ${months} months,\nor ${days} days,\nor ${minutes} minutes\nor ${seconds} seconds';
+			case 'whichOne': return 'Which one?';
 			case 'track': return 'Track';
 			case 'stopTracking': return 'Stop tracking';
 			case 'supporter': return ({required Object tier}) => 'Supporter tier ${tier}';
@@ -8064,6 +8400,13 @@ extension on Translations {
 			case 'trackedPlayers': return 'Tracked Players';
 			case 'standing': return 'Standing';
 			case 'previousSeasons': return 'Previous Seasons';
+			case 'checkingCache': return 'Checking cache...';
+			case 'fetchingRecords': return 'Fetching Records...';
+			case 'munching': return 'Munching...';
+			case 'outOf': return 'out of';
+			case 'replaysDone': return 'replays done';
+			case 'analysis': return 'Analysis';
+			case 'minomuncherMention': return 'via MinoMuncher by Freyhoe';
 			case 'recent': return 'Recent';
 			case 'top': return 'Top';
 			case 'noRecord': return 'No record';
@@ -8107,12 +8450,6 @@ extension on Translations {
 			case 'actions.ok': return 'OK';
 			case 'actions.apply': return 'Apply';
 			case 'actions.refresh': return 'Refresh';
-			case 'aprilFools.fakeBanModaleTitle': return 'You have been permanently banned from Tetra Stats';
-			case 'aprilFools.fakeBanModaleBody': return 'Reason: gross violation of the Terms of Service\n\nIf you want to appeal, please, contact dan63.';
-			case 'aprilFools.fakeBanModaledan63Grin': return 'Fool...';
-			case 'aprilFools.SettingTitleUnfoolMyself': return 'Unfool myself';
-			case 'aprilFools.SettingButtonUnfool': return 'Unfool';
-			case 'aprilFools.SettingDescription': return 'That button will allow you re experience april fool prank once again';
 			case 'graphsDestination.fetchAndsaveTLHistory': return 'Fetch History';
 			case 'graphsDestination.fetchAndSaveOldTLmatches': return 'Get Tetra League matches history';
 			case 'graphsDestination.fetchAndsaveTLHistoryResult': return ({required Object number}) => '${number} states was found';
@@ -8170,8 +8507,10 @@ extension on Translations {
 			case 'tlMatchView.openReplay': return 'Open replay in TETR.IO';
 			case 'calcDestination.placeholders': return ({required Object stat}) => 'Enter your ${stat}';
 			case 'calcDestination.tip': return 'Enter values and press "Calc" to see Nerd Stats for them';
+			case 'calcDestination.invalidValues': return 'Please, enter valid values';
 			case 'calcDestination.statsCalcButton': return 'Calc';
 			case 'calcDestination.damageCalcTip': return 'Click on the actions on the left to add them here';
+			case 'calcDestination.clearAll': return 'Clear all';
 			case 'calcDestination.actions': return 'Actions';
 			case 'calcDestination.results': return 'Results';
 			case 'calcDestination.rules': return 'Rules';
@@ -8385,6 +8724,14 @@ extension on Translations {
 			case 'stats.kpp.full': return 'Key presses Per Piece';
 			case 'stats.kps.short': return 'KPS';
 			case 'stats.kps.full': return 'Key presses Per Second';
+			case 'stats.apl.short': return 'APL';
+			case 'stats.apl.full': return 'Attack Per Line';
+			case 'stats.quadEfficiency.short': return 'Q Eff.';
+			case 'stats.quadEfficiency.full': return 'Quad efficiency';
+			case 'stats.tspinEfficiency.short': return 'T Eff.';
+			case 'stats.tspinEfficiency.full': return 'T-spin efficiency';
+			case 'stats.allspinEfficiency.short': return 'All Eff.';
+			case 'stats.allspinEfficiency.full': return 'All-spin efficiency';
 			case 'stats.blitzScore': return ({required Object p}) => '${p} points';
 			case 'stats.levelUpRequirement': return ({required Object p}) => 'Level up requirement: ${p}';
 			case 'stats.piecesTotal': return 'Total pieces placed';
@@ -8404,6 +8751,31 @@ extension on Translations {
 			case 'stats.received': return 'Received';
 			case 'stats.placement': return 'Placement';
 			case 'stats.peak': return 'Peak';
+			case 'stats.overall': return 'Overall';
+			case 'stats.midgame': return 'Midgame';
+			case 'stats.efficiency': return 'Efficiency';
+			case 'stats.upstack': return 'Upstack';
+			case 'stats.downstack': return 'Downstack';
+			case 'stats.variance': return 'Variance';
+			case 'stats.burst': return 'Burst';
+			case 'stats.length': return 'Length';
+			case 'stats.rate': return 'Rate';
+			case 'stats.secsDS': return 'Secs/DS';
+			case 'stats.secsCheese': return 'Secs/Cheese';
+			case 'stats.attackCheesiness': return 'Attack Cheesiness';
+			case 'stats.downstackingRatio': return 'Downstacking Ratio';
+			case 'stats.clearTypes': return 'Clear Types';
+			case 'stats.wellColumnDistribution': return 'Well Column Distribution';
+			case 'stats.allSpins': return 'All Spins';
+			case 'stats.sankeyTitle': return 'Incoming Attack Sankey Chart';
+			case 'stats.incomingAttack': return 'Incoming Attack';
+			case 'stats.clean': return 'Clean';
+			case 'stats.cancelled': return 'Cancelled';
+			case 'stats.cheeseTanked': return 'Cheese Tanked';
+			case 'stats.cleanTanked': return 'Clean Tanked';
+			case 'stats.kills': return 'Kills';
+			case 'stats.deaths': return 'Deaths';
+			case 'stats.ppsDistribution': return 'PPS distribution';
 			case 'stats.qpWithMods': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
 				one: 'With 1 mod',
 				two: 'With ${n} mods',
@@ -8812,6 +9184,7 @@ extension on _StringsDeDe {
 			case 'gametime.title': return 'genaue Spielzeit';
 			case 'gametime.gametimeAday': return ({required Object gametime}) => '${gametime} durchschnittliche Spielzeit am Tag';
 			case 'gametime.breakdown': return ({required Object years, required Object months, required Object days, required Object minutes, required Object seconds}) => 'Das sind ${years} Jahre,\noder ${months} Monate,\noder ${days} Tage,\noder ${minutes} Minuten\noder ${seconds} Sekunden';
+			case 'whichOne': return 'Which one?';
 			case 'track': return 'Erfassen';
 			case 'stopTracking': return 'Erfassen stoppen';
 			case 'supporter': return ({required Object tier}) => 'Unterstützer Stufe ${tier}';
@@ -8887,6 +9260,13 @@ extension on _StringsDeDe {
 			case 'trackedPlayers': return 'Erfasste Benutzer';
 			case 'standing': return 'Stand';
 			case 'previousSeasons': return 'Vorhärige Saison';
+			case 'checkingCache': return 'Checking cache...';
+			case 'fetchingRecords': return 'Fetching Records...';
+			case 'munching': return 'Munching...';
+			case 'outOf': return 'out of';
+			case 'replaysDone': return 'replays done';
+			case 'analysis': return 'Analysis';
+			case 'minomuncherMention': return 'via MinoMuncher by Freyhoe';
 			case 'recent': return 'Kürzlich';
 			case 'top': return 'Top';
 			case 'noRecord': return 'Kein Rekord';
@@ -8930,12 +9310,6 @@ extension on _StringsDeDe {
 			case 'actions.ok': return 'OK';
 			case 'actions.apply': return 'Anwenden';
 			case 'actions.refresh': return 'Aktualisieren';
-			case 'aprilFools.fakeBanModaleTitle': return 'You have been permanently banned from Tetra Stats';
-			case 'aprilFools.fakeBanModaleBody': return 'Reason: gross violation of the Terms of Service\n\nIf you want to appeal, please, contact dan63.';
-			case 'aprilFools.fakeBanModaledan63Grin': return 'Fool...';
-			case 'aprilFools.SettingTitleUnfoolMyself': return 'Unfool myself';
-			case 'aprilFools.SettingButtonUnfool': return 'Unfool';
-			case 'aprilFools.SettingDescription': return 'That button will allow you re experience april fool prank once again';
 			case 'graphsDestination.fetchAndsaveTLHistory': return 'Historie abrufen';
 			case 'graphsDestination.fetchAndSaveOldTLmatches': return 'Tetra League Matchhistorie abrufen';
 			case 'graphsDestination.fetchAndsaveTLHistoryResult': return ({required Object number}) => '${number} Zustände was found';
@@ -8993,8 +9367,10 @@ extension on _StringsDeDe {
 			case 'tlMatchView.openReplay': return 'Öffne Wiederholung in TETR.IO';
 			case 'calcDestination.placeholders': return ({required Object stat}) => 'Gebe ${stat} ein';
 			case 'calcDestination.tip': return 'Gebe Wert ein und drücke "Berechnen", um Statistiken für Nerds zu sehen';
+			case 'calcDestination.invalidValues': return 'Please, enter valid values';
 			case 'calcDestination.statsCalcButton': return 'Berechnen';
 			case 'calcDestination.damageCalcTip': return 'Klicke auf die Aktionen zu deiner Linken, um diese hier hinzuzufügen';
+			case 'calcDestination.clearAll': return 'Clear all';
 			case 'calcDestination.actions': return 'Aktionen';
 			case 'calcDestination.results': return 'Ergebnisse';
 			case 'calcDestination.rules': return 'Regeln';
@@ -9208,6 +9584,14 @@ extension on _StringsDeDe {
 			case 'stats.kpp.full': return 'Tastenanschläge pro Stein';
 			case 'stats.kps.short': return 'KPS';
 			case 'stats.kps.full': return 'Tastenanschläge pro Sekunden';
+			case 'stats.apl.short': return 'APL';
+			case 'stats.apl.full': return 'Attack Per Line';
+			case 'stats.quadEfficiency.short': return 'Q Eff.';
+			case 'stats.quadEfficiency.full': return 'Quad efficiency';
+			case 'stats.tspinEfficiency.short': return 'T Eff.';
+			case 'stats.tspinEfficiency.full': return 'T-spin efficiency';
+			case 'stats.allspinEfficiency.short': return 'All Eff.';
+			case 'stats.allspinEfficiency.full': return 'All-spin efficiency';
 			case 'stats.blitzScore': return ({required Object p}) => '${p} Punkte';
 			case 'stats.levelUpRequirement': return ({required Object p}) => 'Level up in ${p} Punkten';
 			case 'stats.piecesTotal': return 'Insgesamt platzierte Steine';
@@ -9227,6 +9611,31 @@ extension on _StringsDeDe {
 			case 'stats.received': return 'Erhalten';
 			case 'stats.placement': return 'Platzierung';
 			case 'stats.peak': return 'Beste';
+			case 'stats.overall': return 'Overall';
+			case 'stats.midgame': return 'Midgame';
+			case 'stats.efficiency': return 'Efficiency';
+			case 'stats.upstack': return 'Upstack';
+			case 'stats.downstack': return 'Downstack';
+			case 'stats.variance': return 'Variance';
+			case 'stats.burst': return 'Burst';
+			case 'stats.length': return 'Length';
+			case 'stats.rate': return 'Rate';
+			case 'stats.secsDS': return 'Secs/DS';
+			case 'stats.secsCheese': return 'Secs/Cheese';
+			case 'stats.attackCheesiness': return 'Attack Cheesiness';
+			case 'stats.downstackingRatio': return 'Downstacking Ratio';
+			case 'stats.clearTypes': return 'Clear Types';
+			case 'stats.wellColumnDistribution': return 'Well Column Distribution';
+			case 'stats.allSpins': return 'All Spins';
+			case 'stats.sankeyTitle': return 'Incoming Attack Sankey Chart';
+			case 'stats.incomingAttack': return 'Incoming Attack';
+			case 'stats.clean': return 'Clean';
+			case 'stats.cancelled': return 'Cancelled';
+			case 'stats.cheeseTanked': return 'Cheese Tanked';
+			case 'stats.cleanTanked': return 'Clean Tanked';
+			case 'stats.kills': return 'Kills';
+			case 'stats.deaths': return 'Deaths';
+			case 'stats.ppsDistribution': return 'PPS distribution';
 			case 'stats.qpWithMods': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n,
 				one: 'Mit 1 Mod',
 				two: 'Mit ${n} Mods',
@@ -9635,6 +10044,7 @@ extension on _StringsKoKr {
 			case 'gametime.title': return '정확한 플레이 시간';
 			case 'gametime.gametimeAday': return ({required Object gametime}) => '일평균 ${gametime}';
 			case 'gametime.breakdown': return ({required Object years, required Object months, required Object days, required Object minutes, required Object seconds}) => '${years}년, \n또는 ${months}개월,\n또는 ${days}일,\n또는 ${minutes}분,\n또는 ${seconds}초';
+			case 'whichOne': return 'Which one?';
 			case 'track': return '추적하기';
 			case 'stopTracking': return '추적 취소하기';
 			case 'supporter': return ({required Object tier}) => '서포터 ${tier}티어';
@@ -9710,6 +10120,13 @@ extension on _StringsKoKr {
 			case 'trackedPlayers': return '추적된 플레이어들';
 			case 'standing': return '순위';
 			case 'previousSeasons': return '이전 시즌들';
+			case 'checkingCache': return 'Checking cache...';
+			case 'fetchingRecords': return 'Fetching Records...';
+			case 'munching': return 'Munching...';
+			case 'outOf': return 'out of';
+			case 'replaysDone': return 'replays done';
+			case 'analysis': return 'Analysis';
+			case 'minomuncherMention': return 'via MinoMuncher by Freyhoe';
 			case 'recent': return '최근';
 			case 'top': return '상위';
 			case 'noRecord': return '기록 없음';
@@ -9753,12 +10170,6 @@ extension on _StringsKoKr {
 			case 'actions.ok': return '확인';
 			case 'actions.apply': return '적용';
 			case 'actions.refresh': return '새로고침';
-			case 'aprilFools.fakeBanModaleTitle': return 'You have been permanently banned from Tetra Stats';
-			case 'aprilFools.fakeBanModaleBody': return 'Reason: gross violation of the Terms of Service\n\nIf you want to appeal, please, contact dan63.';
-			case 'aprilFools.fakeBanModaledan63Grin': return 'Fool...';
-			case 'aprilFools.SettingTitleUnfoolMyself': return 'Unfool myself';
-			case 'aprilFools.SettingButtonUnfool': return 'Unfool';
-			case 'aprilFools.SettingDescription': return 'That button will allow you re experience april fool prank once again';
 			case 'graphsDestination.fetchAndsaveTLHistory': return '기록 불러오기';
 			case 'graphsDestination.fetchAndSaveOldTLmatches': return '테트라 리그 경기 기록 불러오기';
 			case 'graphsDestination.fetchAndsaveTLHistoryResult': return ({required Object number}) => '${number}개 상태가 발견됨';
@@ -9816,8 +10227,10 @@ extension on _StringsKoKr {
 			case 'tlMatchView.openReplay': return 'TETR.IO에서 리플레이 열기';
 			case 'calcDestination.placeholders': return ({required Object stat}) => '당신의 ${stat}을 입력하세요';
 			case 'calcDestination.tip': return '값을 입력하고 "계산" 버튼을 눌러 세부 스탯을 확인하세요';
+			case 'calcDestination.invalidValues': return 'Please, enter valid values';
 			case 'calcDestination.statsCalcButton': return '계산';
 			case 'calcDestination.damageCalcTip': return '왼쪽에서 줄 클리어를 눌러 여기 추가하세요';
+			case 'calcDestination.clearAll': return 'Clear all';
 			case 'calcDestination.actions': return '줄 클리어';
 			case 'calcDestination.results': return '결과';
 			case 'calcDestination.rules': return '규칙';
@@ -10031,6 +10444,14 @@ extension on _StringsKoKr {
 			case 'stats.kpp.full': return '미노당 키 입력';
 			case 'stats.kps.short': return 'KPS';
 			case 'stats.kps.full': return '초당 키 입력';
+			case 'stats.apl.short': return 'APL';
+			case 'stats.apl.full': return 'Attack Per Line';
+			case 'stats.quadEfficiency.short': return 'Q Eff.';
+			case 'stats.quadEfficiency.full': return 'Quad efficiency';
+			case 'stats.tspinEfficiency.short': return 'T Eff.';
+			case 'stats.tspinEfficiency.full': return 'T-spin efficiency';
+			case 'stats.allspinEfficiency.short': return 'All Eff.';
+			case 'stats.allspinEfficiency.full': return 'All-spin efficiency';
 			case 'stats.blitzScore': return ({required Object p}) => '${p}점';
 			case 'stats.levelUpRequirement': return ({required Object p}) => '레벨업까지 ${p}점';
 			case 'stats.piecesTotal': return '놓은 미노 수';
@@ -10050,6 +10471,31 @@ extension on _StringsKoKr {
 			case 'stats.received': return '받은 줄';
 			case 'stats.placement': return '위치';
 			case 'stats.peak': return '고점';
+			case 'stats.overall': return 'Overall';
+			case 'stats.midgame': return 'Midgame';
+			case 'stats.efficiency': return 'Efficiency';
+			case 'stats.upstack': return 'Upstack';
+			case 'stats.downstack': return 'Downstack';
+			case 'stats.variance': return 'Variance';
+			case 'stats.burst': return 'Burst';
+			case 'stats.length': return 'Length';
+			case 'stats.rate': return 'Rate';
+			case 'stats.secsDS': return 'Secs/DS';
+			case 'stats.secsCheese': return 'Secs/Cheese';
+			case 'stats.attackCheesiness': return 'Attack Cheesiness';
+			case 'stats.downstackingRatio': return 'Downstacking Ratio';
+			case 'stats.clearTypes': return 'Clear Types';
+			case 'stats.wellColumnDistribution': return 'Well Column Distribution';
+			case 'stats.allSpins': return 'All Spins';
+			case 'stats.sankeyTitle': return 'Incoming Attack Sankey Chart';
+			case 'stats.incomingAttack': return 'Incoming Attack';
+			case 'stats.clean': return 'Clean';
+			case 'stats.cancelled': return 'Cancelled';
+			case 'stats.cheeseTanked': return 'Cheese Tanked';
+			case 'stats.cleanTanked': return 'Clean Tanked';
+			case 'stats.kills': return 'Kills';
+			case 'stats.deaths': return 'Deaths';
+			case 'stats.ppsDistribution': return 'PPS distribution';
 			case 'stats.qpWithMods': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n,
 				one: '1개 모드 사용',
 				two: '${n}개 모드 사용',
@@ -10458,6 +10904,7 @@ extension on _StringsRuRu {
 			case 'gametime.title': return 'Времени проведено в игре';
 			case 'gametime.gametimeAday': return ({required Object gametime}) => '${gametime} в день в среднем';
 			case 'gametime.breakdown': return ({required Object years, required Object months, required Object days, required Object minutes, required Object seconds}) => 'Это ${years} лет,\nили ${months} месяцев,\nили ${days} дней,\nили ${minutes} минут\nили ${seconds} секунд';
+			case 'whichOne': return 'Какой из?';
 			case 'track': return 'Отслеживать';
 			case 'stopTracking': return 'Не отслеживать';
 			case 'supporter': return ({required Object tier}) => 'Спонсор ${tier}-го уровня';
@@ -10534,6 +10981,13 @@ extension on _StringsRuRu {
 			case 'trackedPlayers': return 'Отслеживаемые игроки';
 			case 'standing': return 'Положение';
 			case 'previousSeasons': return 'Предыдущие сезоны';
+			case 'checkingCache': return 'Проверяем кеш...';
+			case 'fetchingRecords': return 'Получаем список матчей...';
+			case 'munching': return 'Анализируем...';
+			case 'outOf': return 'из';
+			case 'replaysDone': return 'повторов обработано';
+			case 'analysis': return 'Анализ';
+			case 'minomuncherMention': return 'с помощью MinoMuncher от Freyhoe';
 			case 'recent': return 'Недавние';
 			case 'top': return 'Топ';
 			case 'noRecord': return 'Нет записи';
@@ -10577,12 +11031,6 @@ extension on _StringsRuRu {
 			case 'actions.ok': return 'ОК';
 			case 'actions.apply': return 'Применить';
 			case 'actions.refresh': return 'Обновить';
-			case 'aprilFools.fakeBanModaleTitle': return 'Вы были навсегда забанены в Tetra Stats';
-			case 'aprilFools.fakeBanModaleBody': return 'Причина: грубое нарушение условий использования\n\nЕсли вы хотите подать апелляцию, пожалуйста, свяжитесь с dan63.';
-			case 'aprilFools.fakeBanModaledan63Grin': return 'Дурак...';
-			case 'aprilFools.SettingTitleUnfoolMyself': return 'Разодурачить себя';
-			case 'aprilFools.SettingButtonUnfool': return 'Разодурачить';
-			case 'aprilFools.SettingDescription': return 'Эта кнопка позволит вам снова испытать на себе первоапрельский пранк';
 			case 'graphsDestination.fetchAndsaveTLHistory': return 'Получить историю';
 			case 'graphsDestination.fetchAndSaveOldTLmatches': return 'Получить историю матчей Тетра Лиги';
 			case 'graphsDestination.fetchAndsaveTLHistoryResult': return ({required Object number}) => '${number} состояний было найдено';
@@ -10640,8 +11088,10 @@ extension on _StringsRuRu {
 			case 'tlMatchView.openReplay': return 'Открыть повтор в TETR.IO';
 			case 'calcDestination.placeholders': return ({required Object stat}) => 'Введите ваш ${stat}';
 			case 'calcDestination.tip': return 'Введите значения и нажмите "Считать", чтобы увидеть статистику для задротов';
+			case 'calcDestination.invalidValues': return 'Пожалуйста, введите корректные значения';
 			case 'calcDestination.statsCalcButton': return 'Считать';
 			case 'calcDestination.damageCalcTip': return 'Нажмите на действия слева, чтобы добавить их сюда';
+			case 'calcDestination.clearAll': return 'Очистить';
 			case 'calcDestination.actions': return 'Действия';
 			case 'calcDestination.results': return 'Результаты';
 			case 'calcDestination.rules': return 'Правила';
@@ -10855,6 +11305,14 @@ extension on _StringsRuRu {
 			case 'stats.kpp.full': return 'Нажатий клавиш на Фигуру';
 			case 'stats.kps.short': return 'KPS';
 			case 'stats.kps.full': return 'Нажатий клавиш в Секунду';
+			case 'stats.apl.short': return 'APL';
+			case 'stats.apl.full': return 'Атаки на Линию';
+			case 'stats.quadEfficiency.short': return 'Q Eff.';
+			case 'stats.quadEfficiency.full': return 'Эффективность quad-ов';
+			case 'stats.tspinEfficiency.short': return 'T Eff.';
+			case 'stats.tspinEfficiency.full': return 'Эффективность Т-спинов';
+			case 'stats.allspinEfficiency.short': return 'All Eff.';
+			case 'stats.allspinEfficiency.full': return 'Эффективность All-спинов';
 			case 'stats.blitzScore': return ({required Object p}) => '${p} очков';
 			case 'stats.levelUpRequirement': return ({required Object p}) => 'Очков для повышения уровня: ${p}';
 			case 'stats.piecesTotal': return 'Всего фигур установлено';
@@ -10874,6 +11332,31 @@ extension on _StringsRuRu {
 			case 'stats.received': return 'Получено';
 			case 'stats.placement': return 'Положение';
 			case 'stats.peak': return 'Пик';
+			case 'stats.overall': return 'В среднем';
+			case 'stats.midgame': return 'Midgame';
+			case 'stats.efficiency': return 'Эффективность';
+			case 'stats.upstack': return 'Upstack';
+			case 'stats.downstack': return 'Downstack';
+			case 'stats.variance': return 'Дисперсия';
+			case 'stats.burst': return 'Burst';
+			case 'stats.length': return 'Длинна';
+			case 'stats.rate': return 'Rate';
+			case 'stats.secsDS': return 'Secs/DS';
+			case 'stats.secsCheese': return 'Secs/Cheese';
+			case 'stats.attackCheesiness': return 'Сырность атаки';
+			case 'stats.downstackingRatio': return 'Downstacking Ratio';
+			case 'stats.clearTypes': return 'Clear Types';
+			case 'stats.wellColumnDistribution': return 'Распределение колодцев';
+			case 'stats.allSpins': return 'All Spins';
+			case 'stats.sankeyTitle': return 'График входящих атак';
+			case 'stats.incomingAttack': return 'Входящие атаки';
+			case 'stats.clean': return 'Clean';
+			case 'stats.cancelled': return 'Cancelled';
+			case 'stats.cheeseTanked': return 'Cheese Tanked';
+			case 'stats.cleanTanked': return 'Clean Tanked';
+			case 'stats.kills': return 'Убийств';
+			case 'stats.deaths': return 'Смертей';
+			case 'stats.ppsDistribution': return 'Распределение PPS';
 			case 'stats.qpWithMods': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n,
 				one: 'С 1 модом',
 				two: 'С ${n} модами',
@@ -11282,6 +11765,7 @@ extension on _StringsZhCn {
 			case 'gametime.title': return '精确游戏时长';
 			case 'gametime.gametimeAday': return ({required Object gametime}) => '平均每天${gametime}';
 			case 'gametime.breakdown': return ({required Object years, required Object months, required Object days, required Object minutes, required Object seconds}) => '相当于 ${years} 年，\n${months} 月，\n${days} 天，\n${minutes} 分钟，\n${seconds} 秒';
+			case 'whichOne': return 'Which one?';
 			case 'track': return '跟踪';
 			case 'stopTracking': return '停止跟踪';
 			case 'supporter': return ({required Object tier}) => '${tier}级会员';
@@ -11359,6 +11843,13 @@ extension on _StringsZhCn {
 			case 'previousSeasons': return '上赛季';
 			case 'recent': return '最近';
 			case 'top': return '前';
+			case 'checkingCache': return 'Checking cache...';
+			case 'fetchingRecords': return 'Fetching Records...';
+			case 'munching': return 'Munching...';
+			case 'outOf': return 'out of';
+			case 'replaysDone': return 'replays done';
+			case 'analysis': return 'Analysis';
+			case 'minomuncherMention': return 'via MinoMuncher by Freyhoe';
 			case 'noRecord': return '暂无记录';
 			case 'sprintAndBlitsRelevance': return ({required Object date}) => '${date}';
 			case 'snackBarMessages.stateRemoved': return ({required Object date}) => '成功移除${date}时的状态！';
@@ -11400,12 +11891,6 @@ extension on _StringsZhCn {
 			case 'actions.ok': return '确定';
 			case 'actions.apply': return '应用';
 			case 'actions.refresh': return '刷新';
-			case 'aprilFools.fakeBanModaleTitle': return 'You have been permanently banned from Tetra Stats';
-			case 'aprilFools.fakeBanModaleBody': return 'Reason: gross violation of the Terms of Service\n\nIf you want to appeal, please, contact dan63.';
-			case 'aprilFools.fakeBanModaledan63Grin': return 'Fool...';
-			case 'aprilFools.SettingTitleUnfoolMyself': return 'Unfool myself';
-			case 'aprilFools.SettingButtonUnfool': return 'Unfool';
-			case 'aprilFools.SettingDescription': return 'That button will allow you re experience april fool prank once again';
 			case 'graphsDestination.fetchAndsaveTLHistory': return '获取玩家历史';
 			case 'graphsDestination.fetchAndSaveOldTLmatches': return '获取 Tetra 联赛历史记录';
 			case 'graphsDestination.fetchAndsaveTLHistoryResult': return ({required Object number}) => '找到 ${number} 个状态';
@@ -11463,8 +11948,10 @@ extension on _StringsZhCn {
 			case 'tlMatchView.openReplay': return '在 TETR.IO 中打开回放';
 			case 'calcDestination.placeholders': return ({required Object stat}) => '输入你的${stat}';
 			case 'calcDestination.tip': return '输入值并按 "计算" 来查看TA的详细信息';
+			case 'calcDestination.invalidValues': return 'Please, enter valid values';
 			case 'calcDestination.statsCalcButton': return '计算';
 			case 'calcDestination.damageCalcTip': return '点击左侧的操作在此添加';
+			case 'calcDestination.clearAll': return 'Clear all';
 			case 'calcDestination.actions': return '操作';
 			case 'calcDestination.results': return '结果';
 			case 'calcDestination.rules': return '规则';
@@ -11678,6 +12165,14 @@ extension on _StringsZhCn {
 			case 'stats.kpp.full': return '每块按键数';
 			case 'stats.kps.short': return 'KPS';
 			case 'stats.kps.full': return '每秒按键数';
+			case 'stats.apl.short': return 'APL';
+			case 'stats.apl.full': return 'Attack Per Line';
+			case 'stats.quadEfficiency.short': return 'Q Eff.';
+			case 'stats.quadEfficiency.full': return 'Quad efficiency';
+			case 'stats.tspinEfficiency.short': return 'T Eff.';
+			case 'stats.tspinEfficiency.full': return 'T-spin efficiency';
+			case 'stats.allspinEfficiency.short': return 'All Eff.';
+			case 'stats.allspinEfficiency.full': return 'All-spin efficiency';
 			case 'stats.blitzScore': return ({required Object p}) => '${p} 分';
 			case 'stats.levelUpRequirement': return ({required Object p}) => '还需 ${p} 升到下一级';
 			case 'stats.piecesTotal': return '放块总数';
@@ -11697,6 +12192,31 @@ extension on _StringsZhCn {
 			case 'stats.received': return '已接收';
 			case 'stats.placement': return '排名';
 			case 'stats.peak': return '最高';
+			case 'stats.overall': return 'Overall';
+			case 'stats.midgame': return 'Midgame';
+			case 'stats.efficiency': return 'Efficiency';
+			case 'stats.upstack': return 'Upstack';
+			case 'stats.downstack': return 'Downstack';
+			case 'stats.variance': return 'Variance';
+			case 'stats.burst': return 'Burst';
+			case 'stats.length': return 'Length';
+			case 'stats.rate': return 'Rate';
+			case 'stats.secsDS': return 'Secs/DS';
+			case 'stats.secsCheese': return 'Secs/Cheese';
+			case 'stats.attackCheesiness': return 'Attack Cheesiness';
+			case 'stats.downstackingRatio': return 'Downstacking Ratio';
+			case 'stats.clearTypes': return 'Clear Types';
+			case 'stats.wellColumnDistribution': return 'Well Column Distribution';
+			case 'stats.allSpins': return 'All Spins';
+			case 'stats.sankeyTitle': return 'Incoming Attack Sankey Chart';
+			case 'stats.incomingAttack': return 'Incoming Attack';
+			case 'stats.clean': return 'Clean';
+			case 'stats.cancelled': return 'Cancelled';
+			case 'stats.cheeseTanked': return 'Cheese Tanked';
+			case 'stats.cleanTanked': return 'Clean Tanked';
+			case 'stats.kills': return 'Kills';
+			case 'stats.deaths': return 'Deaths';
+			case 'stats.ppsDistribution': return 'PPS distribution';
 			case 'stats.qpWithMods': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
 				one: '使用 1 个模组',
 				two: '使用 ${n} 个模组',

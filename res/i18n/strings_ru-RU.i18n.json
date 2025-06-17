@@ -69,6 +69,7 @@
         "gametimeAday": "$gametime в день в среднем",
         "breakdown": "Это $years лет,\nили $months месяцев,\nили $days дней,\nили $minutes минут\nили $seconds секунд"
     },
+    "whichOne": "Какой из?",
     "track": "Отслеживать",
     "stopTracking": "Не отслеживать",
     "supporter": "Спонсор ${tier}-го уровня",
@@ -124,6 +125,13 @@
     "trackedPlayers": "Отслеживаемые игроки",
     "standing": "Положение",
     "previousSeasons": "Предыдущие сезоны",
+    "checkingCache": "Проверяем кеш...",
+    "fetchingRecords": "Получаем список матчей...",
+    "munching": "Анализируем...",
+    "outOf": "из",
+    "replaysDone": "повторов обработано",
+    "analysis": "Анализ",
+    "minomuncherMention": "с помощью MinoMuncher от Freyhoe",
     "recent": "Недавние",
     "top": "Топ",
     "noRecord": "Нет записи",
@@ -172,14 +180,6 @@
         "ok": "ОК",
         "apply": "Применить",
         "refresh": "Обновить"
-    },
-    "aprilFools": {
-        "fakeBanModaleTitle": "Вы были навсегда забанены в Tetra Stats",
-        "fakeBanModaleBody": "Причина: грубое нарушение условий использования\n\nЕсли вы хотите подать апелляцию, пожалуйста, свяжитесь с dan63.",
-        "fakeBanModaledan63Grin": "Дурак...",
-        "SettingTitleUnfoolMyself": "Разодурачить себя",
-        "SettingButtonUnfool": "Разодурачить",
-        "SettingDescription": "Эта кнопка позволит вам снова испытать на себе первоапрельский пранк"
     },
     "graphsDestination": {
         "fetchAndsaveTLHistory": "Получить историю",
@@ -251,8 +251,10 @@
     "calcDestination": {
         "placeholders": "Введите ваш $stat",
         "tip": "Введите значения и нажмите \"Считать\", чтобы увидеть статистику для задротов",
+        "invalidValues": "Пожалуйста, введите корректные значения",
         "statsCalcButton": "Считать",
         "damageCalcTip": "Нажмите на действия слева, чтобы добавить их сюда",
+        "clearAll": "Очистить",
         "actions": "Действия",
         "results": "Результаты",
         "rules": "Правила",
@@ -568,6 +570,22 @@
             "short": "KPS",
             "full": "Нажатий клавиш в Секунду"
         },
+        "apl": {
+            "short": "APL",
+            "full": "Атаки на Линию"
+        },
+        "quadEfficiency":{
+            "short": "Q Eff.",
+            "full": "Эффективность quad-ов"
+        },
+        "tspinEfficiency":{
+            "short": "T Eff.",
+            "full": "Эффективность Т-спинов"
+        },
+        "allspinEfficiency":{
+            "short": "All Eff.",
+            "full": "Эффективность All-спинов" 
+        },
         "blitzScore": "$p очков",
         "levelUpRequirement": "Очков для повышения уровня: $p",
         "piecesTotal": "Всего фигур установлено",
@@ -587,6 +605,31 @@
         "received": "Получено",
         "placement": "Положение",
         "peak": "Пик",
+        "overall": "В среднем",
+        "midgame": "Midgame",
+        "efficiency": "Эффективность",
+        "upstack": "Upstack",
+        "downstack": "Downstack",
+        "variance": "Дисперсия",
+        "burst": "Burst",
+        "length": "Длинна",
+        "rate": "Rate",
+        "secsDS": "Secs/DS",
+        "secsCheese": "Secs/Cheese",
+        "attackCheesiness": "Сырность атаки",
+        "downstackingRatio": "Downstacking Ratio",
+        "clearTypes": "Clear Types",
+        "wellColumnDistribution": "Распределение колодцев",
+        "allSpins": "All Spins",
+        "sankeyTitle": "График входящих атак",
+        "incomingAttack": "Входящие атаки",
+        "clean": "Clean",
+        "cancelled": "Cancelled",
+        "cheeseTanked": "Cheese Tanked",
+        "cleanTanked": "Clean Tanked",
+        "kills": "Убийств",
+        "deaths": "Смертей",
+        "ppsDistribution": "Распределение PPS",
         "qpWithMods(plural)": {
             "one": "С 1 модом",
             "two": "С $n модами",

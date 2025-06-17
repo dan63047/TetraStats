@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Badge;
 import 'package:syncfusion_flutter_gauges/gauges.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 
 class Apl{
@@ -58,7 +59,7 @@ class AplThingy extends StatelessWidget{
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text("Attack Per Line", style: wide ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+              Text(t.stats.apl.full, style: wide ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
               SizedBox(height: 8.0),
               for (int i = 0; i < data.length; i++) SfLinearGauge(
                 minimum: 0,
@@ -84,7 +85,7 @@ class AplThingy extends StatelessWidget{
                         padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
                         child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.green.shade300)),
                       ),
-                      Text("Upstack: ${f3.format(data[0].upstackAPL)} APL")
+                      Text("${t.stats.upstack}: ${f3.format(data[0].upstackAPL)} APL")
                     ],
                   ),
                   Row(
@@ -94,7 +95,7 @@ class AplThingy extends StatelessWidget{
                         padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
                         child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.red.shade300)),
                       ),
-                      Text("Downstack: ${f3.format(data[0].downstackAPL)} APL")
+                      Text("${t.stats.downstack}: ${f3.format(data[0].downstackAPL)} APL")
                     ],
                   ),
                   Row(
@@ -104,7 +105,7 @@ class AplThingy extends StatelessWidget{
                         padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
                         child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.yellow.shade300)),
                       ),
-                      Text("Cheese: ${f3.format(data[0].cheeseAPL)} APL")
+                      Text("${t.stats.cheese.short}: ${f3.format(data[0].cheeseAPL)} APL")
                     ],
                   ),
                 ],
@@ -130,7 +131,7 @@ class AplThingy extends StatelessWidget{
                             padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
                             child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.green.shade300)),
                           ),
-                          Text("Upstack:")
+                          Text("${t.stats.upstack}:")
                         ],
                       ),
                       for (Apl e in data) Text("${f3.format(e.upstackAPL)} APL", textAlign: TextAlign.end)
@@ -145,7 +146,7 @@ class AplThingy extends StatelessWidget{
                             padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
                             child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.red.shade300)),
                           ),
-                          Text("Downstack:")
+                          Text("${t.stats.downstack}:")
                         ],
                       ),
                       for (Apl e in data) Text("${f3.format(e.downstackAPL)} APL", textAlign: TextAlign.end)
@@ -160,7 +161,7 @@ class AplThingy extends StatelessWidget{
                             padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
                             child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.yellow.shade300)),
                           ),
-                          Text("Cheese:")
+                          Text("${t.stats.cheese.short}:")
                         ],
                       ),
                       for (Apl e in data) Text("${f3.format(e.cheeseAPL)} APL", textAlign: TextAlign.end)

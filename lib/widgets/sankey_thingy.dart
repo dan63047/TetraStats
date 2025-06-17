@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart' hide Badge;
 import 'package:tetra_stats/data_objects/minomuncher.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/widgets/sankey_graph.dart';
 
@@ -16,12 +17,12 @@ class SankeyThingy extends StatelessWidget{
     Map<String, Color> nodeColors = {};
     for (MinomuncherData e in data){
       List<SankeyNode> sankeyNodes = [
-        SankeyNode(id: 0, label: 'Incoming Attack ${percentage.format(1)}'),
-        SankeyNode(id: 1, label: 'Cheese ${percentage.format(e.cheeseLinesRecieved)}'),
-        SankeyNode(id: 2, label: 'Clean ${percentage.format(e.cleanLinesRecieved)}'),
-        SankeyNode(id: 3, label: 'Cancelled ${percentage.format(e.cheeseLinesCancelled)}'),
-        SankeyNode(id: 4, label: 'CheeseTanked ${percentage.format(e.cheeseLinesTanked)}'),
-        SankeyNode(id: 5, label: 'CleanTanked ${percentage.format(e.cleanLinesTankedAsClean)}'),
+        SankeyNode(id: 0, label: '${t.stats.incomingAttack} ${percentage.format(1)}'),
+        SankeyNode(id: 1, label: '${t.stats.cheese.short} ${percentage.format(e.cheeseLinesRecieved)}'),
+        SankeyNode(id: 2, label: '${t.stats.clean} ${percentage.format(e.cleanLinesRecieved)}'),
+        SankeyNode(id: 3, label: '${t.stats.cancelled} ${percentage.format(e.cheeseLinesCancelled)}'),
+        SankeyNode(id: 4, label: '${t.stats.cheeseTanked} ${percentage.format(e.cheeseLinesTanked)}'),
+        SankeyNode(id: 5, label: '${t.stats.cleanTanked} ${percentage.format(e.cleanLinesTankedAsClean)}'),
       ];
       List<SankeyLink> sankeyLinks = [
         SankeyLink(source: sankeyNodes[0], target: sankeyNodes[1], value: e.cheeseLinesRecieved * 100),
@@ -43,7 +44,7 @@ class SankeyThingy extends StatelessWidget{
       sankeys.add(sankeyDataSet);
       nodeColors = generateDefaultNodeColorMap(sankeyNodes);
     }
-    List<Widget> list = [Text("Incoming Attack Sankey Chart", style: width > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall)];
+    List<Widget> list = [Text(t.stats.sankeyTitle, style: width > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall)];
     for (int i = 0; i < data.length; i++){
       if (data.length > 1) list.add(Text(data[i].nick, style: Theme.of(context).textTheme.titleSmall));
       list.add(SankeyDiagramWidget(

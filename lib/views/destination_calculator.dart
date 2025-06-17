@@ -203,7 +203,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
       playstyle = Playstyle(apm!, pps!, nerdStats!.app, nerdStats!.vsapm, nerdStats!.dsp, nerdStats!.gbe, estTr!.srarea, estTr!.statrank);
       setState(() {});
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please, enter valid values")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.calcDestination.invalidValues)));
     }
   }
 
@@ -393,7 +393,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
                             });
                           },
                           icon: const Icon(Icons.clear),
-                          label: Text("Clear all"),
+                          label: Text(t.calcDestination.clearAll),
                           style: const ButtonStyle(
                               shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))))))
                     ],
@@ -525,7 +525,7 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
           ],
         ),
         title: Text(
-            "${lineclear.title}${lineclear.perfectClear ? " PC" : ""}${combo > 0 ? ", ${combo} combo" : ""}${b2b > 0 ? ", B2Bx${b2b}" : ""}"),
+            "${lineclear.title}${lineclear.perfectClear ? " PC" : ""}${combo > 0 ? ", ${combo} ${t.calcDestination.combo}" : ""}${b2b > 0 ? ", B2Bx${b2b}" : ""}"),
         subtitle: lineclear.lines > 0
             ? Text(
                 "${dmg == normalDmg ? "No bonuses" : ""}${b2bDmg > 0 ? "+${intf.format(b2bDmg)} for B2B" : ""}${(b2bDmg > 0 && comboDmg > 0) ? ", " : ""}${comboDmg > 0 ? "+${intf.format(comboDmg)} for combo" : ""}${(comboDmg > 0 && lineclear.perfectClear) ? ", " : ""}${lineclear.perfectClear ? "+${intf.format(pcDmg)} for PC" : ""}${(surgeDmg > 0 && (lineclear.perfectClear || comboDmg > 0)) ? ", " : ""}${surgeDmg > 0 ? "Surge released: +${intf.format(surgeDmg)}" : ""}",

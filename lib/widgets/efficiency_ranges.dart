@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Badge;
 import 'package:syncfusion_flutter_gauges/gauges.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 
 class Eff{
@@ -30,7 +31,7 @@ class EffThingy extends StatelessWidget{
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text("Efficiency", style: wide ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+              Text(t.stats.efficiency, style: wide ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
               SizedBox(height: 8.0),
               for (Eff e in data) SfLinearGauge(
                 minimum: 0,
@@ -81,7 +82,7 @@ class EffThingy extends StatelessWidget{
                         padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
                         child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.blue.shade300)),
                       ),
-                      Text("Quad efficiency: ${percentage.format(data[0].iEfficiency)}")
+                      Text("${t.stats.quadEfficiency.full}: ${percentage.format(data[0].iEfficiency)}")
                     ],
                   ),
                   Row(
@@ -91,7 +92,7 @@ class EffThingy extends StatelessWidget{
                         padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
                         child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.purple.shade300)),
                       ),
-                      Text("T-spin efficiency: ${percentage.format(data[0].tEfficiency)}")
+                      Text("${t.stats.tspinEfficiency.full}: ${percentage.format(data[0].tEfficiency)}")
                     ],
                   ),
                   Row(
@@ -101,7 +102,7 @@ class EffThingy extends StatelessWidget{
                         padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
                         child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.green.shade300)),
                       ),
-                      Text("Allspin efficiency: ${percentage.format(data[0].allspinEfficiency)}")
+                      Text("${t.stats.allspinEfficiency.full}: ${percentage.format(data[0].allspinEfficiency)}")
                     ],
                   ),
                 ],
@@ -127,7 +128,7 @@ class EffThingy extends StatelessWidget{
                             padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
                             child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.blue.shade300)),
                           ),
-                          Text("Quad efficiency:")
+                          Text("${t.stats.quadEfficiency.full}:")
                         ],
                       ),
                       for (Eff e in data) Text(percentage.format(e.iEfficiency), textAlign: TextAlign.end)
@@ -142,7 +143,7 @@ class EffThingy extends StatelessWidget{
                             padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
                             child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.purple.shade300)),
                           ),
-                          Text("T-spin efficiency:")
+                          Text("${t.stats.tspinEfficiency.full}:")
                         ],
                       ),
                       for (Eff e in data) Text(percentage.format(e.tEfficiency), textAlign: TextAlign.end)
@@ -157,7 +158,7 @@ class EffThingy extends StatelessWidget{
                             padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
                             child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.green.shade300)),
                           ),
-                          Text("Allspin efficiency:")
+                          Text("${t.stats.allspinEfficiency.full}:")
                         ],
                       ),
                       for (Eff e in data) Text(percentage.format(e.allspinEfficiency), textAlign: TextAlign.end)

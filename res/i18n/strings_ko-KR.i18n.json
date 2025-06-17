@@ -69,6 +69,7 @@
         "gametimeAday": "일평균 $gametime",
         "breakdown": "$years년, \n또는 $months개월,\n또는 $days일,\n또는 $minutes분,\n또는 $seconds초"
     },
+    "whichOne": "Which one?",
     "track": "추적하기",
     "stopTracking": "추적 취소하기",
     "supporter": "서포터 ${tier}티어",
@@ -124,6 +125,13 @@
     "trackedPlayers": "추적된 플레이어들",
     "standing": "순위",
     "previousSeasons": "이전 시즌들",
+    "checkingCache": "Checking cache...",
+    "fetchingRecords": "Fetching Records...",
+    "munching": "Munching...",
+    "outOf": "out of",
+    "replaysDone": "replays done",
+    "analysis": "Analysis",
+    "minomuncherMention": "via MinoMuncher by Freyhoe",
     "recent": "최근",
     "top": "상위",
     "noRecord": "기록 없음",
@@ -172,14 +180,6 @@
         "ok": "확인",
         "apply": "적용",
         "refresh": "새로고침"
-    },
-    "aprilFools": {
-        "fakeBanModaleTitle": "You have been permanently banned from Tetra Stats",
-        "fakeBanModaleBody": "Reason: gross violation of the Terms of Service\n\nIf you want to appeal, please, contact dan63.",
-        "fakeBanModaledan63Grin": "Fool...",
-        "SettingTitleUnfoolMyself": "Unfool myself",
-        "SettingButtonUnfool": "Unfool",
-        "SettingDescription": "That button will allow you re experience april fool prank once again"
     },
     "graphsDestination": {
         "fetchAndsaveTLHistory": "기록 불러오기",
@@ -251,8 +251,10 @@
     "calcDestination": {
         "placeholders": "당신의 $stat을 입력하세요",
         "tip": "값을 입력하고 \"계산\" 버튼을 눌러 세부 스탯을 확인하세요",
+        "invalidValues": "Please, enter valid values",
         "statsCalcButton": "계산",
         "damageCalcTip": "왼쪽에서 줄 클리어를 눌러 여기 추가하세요",
+        "clearAll": "Clear all",
         "actions": "줄 클리어",
         "results": "결과",
         "rules": "규칙",
@@ -568,6 +570,22 @@
             "short": "KPS",
             "full": "초당 키 입력"
         },
+        "apl": {
+            "short": "APL",
+            "full": "Attack Per Line"
+        },
+        "quadEfficiency":{
+            "short": "Q Eff.",
+            "full": "Quad efficiency"
+        },
+        "tspinEfficiency":{
+            "short": "T Eff.",
+            "full": "T-spin efficiency"
+        },
+        "allspinEfficiency":{
+            "short": "All Eff.",
+            "full": "All-spin efficiency" 
+        },
         "blitzScore": "$p점",
         "levelUpRequirement": "레벨업까지 $p점",
         "piecesTotal": "놓은 미노 수",
@@ -587,6 +605,31 @@
         "received": "받은 줄",
         "placement": "위치",
         "peak": "고점",
+        "overall": "Overall",
+        "midgame": "Midgame",
+        "efficiency": "Efficiency",
+        "upstack": "Upstack",
+        "downstack": "Downstack",
+        "variance": "Variance",
+        "burst": "Burst",
+        "length": "Length",
+        "rate": "Rate",
+        "secsDS": "Secs/DS",
+        "secsCheese": "Secs/Cheese",
+        "attackCheesiness": "Attack Cheesiness",
+        "downstackingRatio": "Downstacking Ratio",
+        "clearTypes": "Clear Types",
+        "wellColumnDistribution": "Well Column Distribution",
+        "allSpins": "All Spins",
+        "sankeyTitle": "Incoming Attack Sankey Chart",
+        "incomingAttack": "Incoming Attack",
+        "clean": "Clean",
+        "cancelled": "Cancelled",
+        "cheeseTanked": "Cheese Tanked",
+        "cleanTanked": "Clean Tanked",
+        "kills": "Kills",
+        "deaths": "Deaths",
+        "ppsDistribution": "PPS distribution",
         "qpWithMods(plural)": {
             "one": "1개 모드 사용",
             "two": "$n개 모드 사용",

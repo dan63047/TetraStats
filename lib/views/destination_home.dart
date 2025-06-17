@@ -13,6 +13,7 @@ import 'package:tetra_stats/widgets/cheese_ds_ratio_thingy.dart';
 import 'package:tetra_stats/widgets/clear_types_thingy.dart';
 import 'package:tetra_stats/widgets/efficiency_ranges.dart';
 import 'package:tetra_stats/widgets/etr_thingy.dart';
+import 'package:tetra_stats/widgets/gauget_thingy.dart';
 import 'package:tetra_stats/widgets/kills_deaths_thingy.dart';
 import 'package:tetra_stats/widgets/pps_distribution_thingy.dart';
 import 'package:tetra_stats/widgets/pps_surge_radars_thingy.dart';
@@ -86,7 +87,7 @@ Map<Cards, List<ButtonSegment<CardMod>>> modeButtons = {
 			),
 		ButtonSegment<CardMod>(
 				value: CardMod.exRecords, // yeah i misusing my own Enum shut the fuck up
-				label: Text("Analysis"),
+				label: Text(t.analysis),
 		),
 		ButtonSegment<CardMod>(
 				value: CardMod.ex,
@@ -1017,7 +1018,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                   duration: Duration(seconds:1),
                   onEnd: _changefreyhoeStreamTextOpacity,
      					    child: Text(
-                    "Checking cache...",
+                    t.checkingCache,
                     style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)
                   ),
      					  )
@@ -1033,7 +1034,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                   duration: Duration(seconds:1),
                   onEnd: _changefreyhoeStreamTextOpacity,
      					    child: Text(
-                    snapshot.data!.avaliable.isEmpty ? "Fetching Records..." : "Munching...",
+                    snapshot.data!.avaliable.isEmpty ? t.fetchingRecords : t.munching,
                     style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)
                   ),
      					  ),
@@ -1043,9 +1044,9 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                     style: TextStyle(fontFamily: "Eurostile Round", color: Colors.white),
                     children: [
                       TextSpan(text: "${snapshot.data!.munched.length} ", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)),
-                      TextSpan(text: "out of"),
+                      TextSpan(text: t.outOf),
                       TextSpan(text: " ${snapshot.data!.avaliable.length}\n", style: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28)),
-                      TextSpan(text: "replays done")
+                      TextSpan(text: t.replaysDone)
                     ]
                   )
                 ),
@@ -1065,10 +1066,10 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                            Text("Analysis", style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleMedium),
+                            Text(t.analysis, style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleMedium),
                             Padding(
                                 padding: const EdgeInsets.only(top: 4.0),
-                                child: Text("via MinoMuncher by Freyhoe", textAlign: TextAlign.center, style: TextStyle(fontSize: widget.constraints.maxWidth > 768.0 ? null : 12.0, color: Colors.grey)),
+                                child: Text(t.minomuncherMention, textAlign: TextAlign.center, style: TextStyle(fontSize: widget.constraints.maxWidth > 768.0 ? null : 12.0, color: Colors.grey)),
                             )
                             ],
                           ),
@@ -1083,6 +1084,23 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                     PPSSurgeThingy([data], width),
                     SankeyThingy([data], width),
                     CheeseAndDSThingy([data.attackCheesiness], [data.downstackingRatio], [data.nick]),
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
+                        child: Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 10.0,
+                          runSpacing: 10.0,
+                          runAlignment: WrapAlignment.start,
+                          children: [
+                            GaugetThingy(value: data.KPP, min: 0, max: 5, tickInterval: 1, label: t.stats.kpp.short, sideSize: 128, fractionDigits: 3, moreIsBetter: false),
+                            GaugetThingy(value: data.KPS, min: 0, max: 20, tickInterval: 4, label: t.stats.kps.short, sideSize: 128, fractionDigits: 2, moreIsBetter: false),
+                            GaugetThingy(value: data.APP, min: 0, max: 1.2, tickInterval: 0.2, label: t.stats.app.short, sideSize: 128, fractionDigits: 3, moreIsBetter: false),
+                            GaugetThingy(value: data.APL, min: 0, max: 2.4, tickInterval: 0.4, label: t.stats.apl.short, sideSize: 128, fractionDigits: 3, moreIsBetter: false),
+                          ],
+                        ),
+                      ),
+                    ),
                     KillsDeathsThingy([KD(data.nick, data.killStats, data.deathStats)], width),
                     PPSDistributionThingy([data.ppsSegments], [data.nick], width)
                     ],

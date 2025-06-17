@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart' hide Badge;
 import 'package:tetra_stats/data_objects/minomuncher.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 import 'package:tetra_stats/widgets/cheese_ds_ratio_thingy.dart';
 import 'package:tetra_stats/widgets/graphs.dart';
@@ -20,7 +21,7 @@ class PPSSurgeThingy extends StatelessWidget{
           children: [
             Column(
               children: [
-                Text("PPS", style: width > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+                Text(t.stats.pps.short, style: width > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
                 Center(child: SizedBox(width: 0.0, height: 16.0)),
                 SizedBox(
                   height: 330,
@@ -35,12 +36,12 @@ class PPSSurgeThingy extends StatelessWidget{
                   tickBorderData: const BorderSide(color: Colors.white24, width: 1),
                   getTitle: (index, angle) {
                     switch (index) {
-                    case 0: return RadarChartTitle(text: "Overall\n${f3.format(data[0].PPS)}", positionPercentageOffset: 0.05);
-                    case 1: return RadarChartTitle(text: "Plonk\n${f3.format(data[0].PlonkPPS)}", positionPercentageOffset: 0.05, angle: 60.0);
-                    case 2: return RadarChartTitle(text: "Upstack\n${f3.format(data[0].upstackPPS)}", positionPercentageOffset: 0.05, angle: -60.0);
-                    case 3: return RadarChartTitle(text: "Variance\n${f3.format(data[0].PPSCoeff)}", positionPercentageOffset: 0.05);
-                    case 4: return RadarChartTitle(text: "Downstack\n${f3.format(data[0].downstackPPS)}", positionPercentageOffset: 0.05, angle: 60.0);
-                    case 5: return RadarChartTitle(text: "Burst\n${f3.format(data[0].BurstPPS)}", positionPercentageOffset: 0.05, angle: -60.0);
+                    case 0: return RadarChartTitle(text: "${t.stats.overall}\n${f3.format(data[0].PPS)}", positionPercentageOffset: 0.05);
+                    case 1: return RadarChartTitle(text: "${t.stats.plonk.full}\n${f3.format(data[0].PlonkPPS)}", positionPercentageOffset: 0.05, angle: 60.0);
+                    case 2: return RadarChartTitle(text: "${t.stats.upstack}\n${f3.format(data[0].upstackPPS)}", positionPercentageOffset: 0.05, angle: -60.0);
+                    case 3: return RadarChartTitle(text: "${t.stats.variance}\n${f3.format(data[0].PPSCoeff)}", positionPercentageOffset: 0.05);
+                    case 4: return RadarChartTitle(text: "${t.stats.downstack}\n${f3.format(data[0].downstackPPS)}", positionPercentageOffset: 0.05, angle: 60.0);
+                    case 5: return RadarChartTitle(text: "${t.stats.burst}\n${f3.format(data[0].BurstPPS)}", positionPercentageOffset: 0.05, angle: -60.0);
                     default: return const RadarChartTitle(text: '');
                     }
                   },
@@ -78,7 +79,7 @@ class PPSSurgeThingy extends StatelessWidget{
             ),
             Column(
               children: [
-                Text("Surge", style: width > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+                Text(t.calcDestination.surge, style: width > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
                 Center(child: SizedBox(width: 0.0, height: 16.0)),
                 SizedBox(
                   height: 330,
@@ -93,12 +94,12 @@ class PPSSurgeThingy extends StatelessWidget{
                   tickBorderData: const BorderSide(color: Colors.white24, width: 1),
                   getTitle: (index, angle) {
                     switch (index) {
-                    case 0: return RadarChartTitle(text: "APM\n${f2.format(data[0].surgeAPM)}", positionPercentageOffset: 0.05);
-                    case 1: return RadarChartTitle(text: "PPS\n${f2.format(data[0].surgePPS)}", positionPercentageOffset: 0.05, angle: 60.0);
-                    case 2: return RadarChartTitle(text: "Length\n${f2.format(data[0].surgeLength)}", positionPercentageOffset: 0.05, angle: -60.0);
-                    case 3: return RadarChartTitle(text: "Rate\n${percentage.format(data[0].surgeRate)}", positionPercentageOffset: 0.05);
-                    case 4: return RadarChartTitle(text: "Secs/DS\n${f2.format(data[0].surgeDS)}", positionPercentageOffset: 0.05, angle: 60.0);
-                    case 5: return RadarChartTitle(text: "Secs/Cheese\n${f2.format(data[0].surgeSecsPerCheese)}", positionPercentageOffset: 0.05, angle: -60.0);
+                    case 0: return RadarChartTitle(text: "${t.stats.apm.short}\n${f2.format(data[0].surgeAPM)}", positionPercentageOffset: 0.05);
+                    case 1: return RadarChartTitle(text: "${t.stats.pps.short}\n${f2.format(data[0].surgePPS)}", positionPercentageOffset: 0.05, angle: 60.0);
+                    case 2: return RadarChartTitle(text: "${t.stats.length}\n${f2.format(data[0].surgeLength)}", positionPercentageOffset: 0.05, angle: -60.0);
+                    case 3: return RadarChartTitle(text: "${t.stats.rate}\n${percentage.format(data[0].surgeRate)}", positionPercentageOffset: 0.05);
+                    case 4: return RadarChartTitle(text: "${t.stats.secsDS}\n${f2.format(data[0].surgeDS)}", positionPercentageOffset: 0.05, angle: 60.0);
+                    case 5: return RadarChartTitle(text: "${t.stats.secsCheese}\n${f2.format(data[0].surgeSecsPerCheese)}", positionPercentageOffset: 0.05, angle: -60.0);
                     default: return const RadarChartTitle(text: '');
                     }
                   },

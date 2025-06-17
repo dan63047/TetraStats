@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Badge;
 import 'package:syncfusion_flutter_gauges/gauges.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 
 class ApmPps{
@@ -127,7 +128,7 @@ class ApmPpsThingy extends StatelessWidget{
                         padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
                         child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.green.shade300)),
                       ),
-                      Text("Midgame: ${f2.format(data[0].midgameAPM)} APM, ${f2.format(data[0].midgamePPS)} PPS")
+                      Text("${t.stats.midgame}: ${f2.format(data[0].midgameAPM)} APM, ${f2.format(data[0].midgamePPS)} PPS")
                     ],
                   ),
                   Row(
@@ -137,7 +138,7 @@ class ApmPpsThingy extends StatelessWidget{
                         padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
                         child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.red.shade300)),
                       ),
-                      Text("Overall: ${f2.format(data[0].APM)} APM, ${f2.format(data[0].PPS)} PPS")
+                      Text("${t.stats.overall}: ${f2.format(data[0].APM)} APM, ${f2.format(data[0].PPS)} PPS")
                     ],
                   ),
                   Row(
@@ -147,7 +148,7 @@ class ApmPpsThingy extends StatelessWidget{
                         padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
                         child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.yellow.shade300)),
                       ),
-                      Text("Opener: ${f2.format(data[0].openerAPM)} APM, ${f2.format(data[0].openerPPS)} PPS")
+                      Text("${t.stats.opener.full}: ${f2.format(data[0].openerAPM)} APM, ${f2.format(data[0].openerPPS)} PPS")
                     ],
                   ),
                 ],
@@ -173,7 +174,7 @@ class ApmPpsThingy extends StatelessWidget{
                             padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
                             child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.green.shade300)),
                           ),
-                          Text("Midgame:")
+                          Text("${t.stats.midgame}:")
                         ],
                       ),
                       for (ApmPps e in data) Text("${f2.format(e.midgameAPM)} APM, ${f2.format(e.midgamePPS)} PPS", textAlign: TextAlign.end)
@@ -188,7 +189,7 @@ class ApmPpsThingy extends StatelessWidget{
                             padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
                             child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.red.shade300)),
                           ),
-                          Text("Overall:")
+                          Text("${t.stats.overall}:")
                         ],
                       ),
                       for (ApmPps e in data) Text("${f2.format(e.APM)} APM, ${f2.format(e.PPS)} PPS", textAlign: TextAlign.end)
@@ -203,7 +204,7 @@ class ApmPpsThingy extends StatelessWidget{
                             padding: const EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 0.0),
                             child: Container(width: 10.0, height: 10.0, decoration: BoxDecoration(color: Colors.yellow.shade300)),
                           ),
-                          Text("Opener:")
+                          Text("${t.stats.opener.full}:")
                         ],
                       ),
                       for (ApmPps e in data) Text("${f2.format(e.openerAPM)} APM, ${f2.format(e.openerPPS)} PPS", textAlign: TextAlign.end)

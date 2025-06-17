@@ -531,7 +531,7 @@ class TlMatchResultState extends State<TlMatchResultView> {
                 ),
                 ButtonSegment(
                   value: Mod.analysis,
-                  label: Text("Analysis")
+                  label: Text(t.analysis)
                 )
               ],
               onSelectionChanged: (p0) {

@@ -1503,7 +1503,7 @@ class TetrioService extends DB {
                 default: // Multiple choice
                   if (context != null){
                     user = await showDialog(context: context, barrierDismissible: false, builder: (context) => AlertDialog(
-                      title: Text("Which one?", textAlign: TextAlign.center),
+                      title: Text(t.whichOne, textAlign: TextAlign.center),
                       content: SingleChildScrollView(
                         child: ListBody(
                           children: [ for (var entry in json['data']['users'])

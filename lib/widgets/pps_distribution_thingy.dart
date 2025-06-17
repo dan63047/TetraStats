@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Badge;
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 
 class Point{
@@ -24,7 +25,7 @@ class PPSDistributionThingy extends StatelessWidget{
         child: SfCartesianChart(
           primaryXAxis: NumericAxis(),
           primaryYAxis: NumericAxis(numberFormat: percentage),
-          title: ChartTitle(text: "PPS distribution", textStyle: width > 768 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+          title: ChartTitle(text: t.stats.ppsDistribution, textStyle: width > 768 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
           series: <CartesianSeries>[
             // Renders spline chart
             for (List<Point> e in finalData) SplineSeries<Point, double>(
