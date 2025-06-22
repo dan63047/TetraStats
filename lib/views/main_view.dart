@@ -364,6 +364,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                 print('Error reading value $error');
               });
             }
+            if(reader.canProvide(Formats.json)){print("yo");}
             else{
               print("lox");
             }

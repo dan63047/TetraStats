@@ -31,7 +31,7 @@ class EffThingy extends StatelessWidget{
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(t.stats.efficiency, style: wide ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+              Text(t.stats.efficiency, style: wide ? Theme.of(context).textTheme.titleSmall : Theme.of(context).textTheme.titleMedium),
               SizedBox(height: 8.0),
               for (Eff e in data) SfLinearGauge(
                 minimum: 0,

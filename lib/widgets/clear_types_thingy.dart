@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' hide Badge;
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:tetra_stats/data_objects/minomuncher.dart';
 import 'package:tetra_stats/data_objects/tetrio_constants.dart';
+import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 
 class ClearTypesThingy extends StatelessWidget{
@@ -19,7 +20,7 @@ class ClearTypesThingy extends StatelessWidget{
             SfCartesianChart(
               primaryXAxis: CategoryAxis(isVisible: data.length > 1),
               primaryYAxis: NumericAxis(minimum: 0, maximum: 100),
-              title: ChartTitle(text: "Clear Types", textStyle: width > 768 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+              title: ChartTitle(text: t.stats.clearTypes, textStyle: width > 768 ? Theme.of(context).textTheme.titleSmall : Theme.of(context).textTheme.titleMedium),
               legend: data.length == 1 ? Legend(
                 isVisible: true,
                 position: LegendPosition.left,

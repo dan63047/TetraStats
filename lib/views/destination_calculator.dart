@@ -228,7 +228,6 @@ class _DestinationCalculatorState extends State<DestinationCalculator> {
               padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
               child: Row(
                 children: [
-                  //TODO: animate those TextFields
                   Expanded(
                       child: Padding(
                     padding: const EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 0.0),

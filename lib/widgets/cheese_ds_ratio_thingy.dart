@@ -27,12 +27,15 @@ class CheeseAndDSThingy extends StatelessWidget {
     return Card(
         child: Padding(
       padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0),
-      child: Container(
-        constraints: BoxConstraints(maxHeight: 200.00),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            SfRadialGauge(axes: [
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        spacing: 10.0,
+        runSpacing: 10.0,
+        runAlignment: WrapAlignment.start,
+        children: [
+          Container(
+            constraints: BoxConstraints(maxWidth: 200.0, maxHeight: 200.0),
+            child: SfRadialGauge(axes: [
               RadialAxis(
                 startAngle: 170,
                 endAngle: 10,
@@ -103,7 +106,10 @@ class CheeseAndDSThingy extends StatelessWidget {
                 ],
               )
             ]),
-            SfRadialGauge(axes: [
+          ),
+          Container(
+            constraints: BoxConstraints(maxWidth: 200.0, maxHeight: 200.0),
+            child: SfRadialGauge(axes: [
               RadialAxis(
                 startAngle: 170,
                 endAngle: 10,
@@ -173,9 +179,9 @@ class CheeseAndDSThingy extends StatelessWidget {
                       positionFactor: 0.3)
                 ],
               )
-            ])
-          ],
-        ),
+            ]),
+          )
+        ],
       ),
     ));
   }

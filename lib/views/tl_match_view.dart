@@ -114,264 +114,292 @@ class TlMatchResultState extends State<TlMatchResultView> {
 
   Widget buildComparison(double width, bool showMobileSelector){
     bool bigScreen = width >= 768;
-    return SizedBox(
-      width: width,
-      child: NestedScrollView(
-          headerSliverBuilder: (context, value) {
-            return [
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                            colors: const [Colors.green, Colors.transparent],
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                            stops: [0.0, initPlayerWon ? 0.4 : 0.0],
-                          )),
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                            child: Column(children: [
-                              Text(widget.record.results.leaderboard[greenSidePlayer].username, style: bigScreen ? const TextStyle(
-                            fontFamily: "Eurostile Round Extended",
-                            fontSize: 28) : const TextStyle()),
-                              Text(widget.record.results.leaderboard[greenSidePlayer].wins.toString(), style: const TextStyle(
-                            fontFamily: "Eurostile Round Extended",
-                            fontSize: 42))
-                            ]),
-                          ),
-                        ),
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.only(top: 16),
-                        child: Text("VS"),
-                      ),
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                            colors: const [Colors.red, Colors.transparent],
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                            stops: [0.0, !initPlayerWon ? 0.4 : 0.0],
-                          )),
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                            child: Column(children: [
-                              Text(widget.record.results.leaderboard[redSidePlayer].username, style:  bigScreen ? const TextStyle(
-                            fontFamily: "Eurostile Round Extended",
-                            fontSize: 28) : const TextStyle()),
-                              Text(widget.record.results.leaderboard[redSidePlayer].wins.toString(), style: const TextStyle(
-                            fontFamily: "Eurostile Round Extended",
-                            fontSize: 42))
-                            ]),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              if (showMobileSelector) SliverToBoxAdapter(child: mobileSelector()),
-              if (showMobileSelector) SliverToBoxAdapter(child: Center(child: Text(readableTime, textAlign: TextAlign.center))),
-              const SliverToBoxAdapter(
-                child: Divider(),
-              )
-            ];
-          },
-          body: ListView(
-            children: [
-              Column(
-                children: [
-                    CompareThingy(
-                      label: t.stats.apm.short,
-                      greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.apm : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.apm,
-                      redSide: roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.apm : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.apm,
-                      fractionDigits: 2,
-                      higherIsBetter: true,
-                    ),
-                    CompareThingy(
-                      label: t.stats.pps.short,
-                      greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.pps : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.pps,
-                      redSide: roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.pps : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.pps,
-                      fractionDigits: 2,
-                      higherIsBetter: true,
-                    ),
-                    CompareThingy(
-                      label: t.stats.vs.short,
-                      greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.vs : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.vs,
-                      redSide: roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.vs : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.vs,
-                      fractionDigits: 2,
-                      higherIsBetter: true,
-                    ),
-                    if (widget.record.gamemode == "league") CompareThingy(greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.garbageSent : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.garbageSent,
-                      redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.garbageSent : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.garbageSent,
-                      label: t.stats.sent, higherIsBetter: true),
-                    if (widget.record.gamemode == "league") CompareThingy(greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.garbageReceived : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.garbageReceived,
-                      redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.garbageReceived : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.garbageReceived,
-                      label: t.stats.received, higherIsBetter: true),                    const Divider(),
-                      Column(
+    return Column(
+      children: [
+        SizedBox(
+          width: width,
+          height: !widget.record.stub && showMobileSelector ? MediaQuery.of(context).size.height - 96 : MediaQuery.of(context).size.height - 56,
+          child: NestedScrollView(
+              headerSliverBuilder: (context, value) {
+                return [
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: Text(t.nerdStats,
-                                style: TextStyle(
-                                    fontFamily: "Eurostile Round Extended",
-                                    fontSize: bigScreen ? 42 : 28)),
+                          Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                colors: const [Colors.green, Colors.transparent],
+                                begin: Alignment.bottomCenter,
+                                end: Alignment.topCenter,
+                                stops: [0.0, initPlayerWon ? 0.4 : 0.0],
+                              )),
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                                child: Column(children: [
+                                  Text(widget.record.results.leaderboard[greenSidePlayer].username, style: bigScreen ? const TextStyle(
+                                fontFamily: "Eurostile Round Extended",
+                                fontSize: 28) : const TextStyle()),
+                                  Text(widget.record.results.leaderboard[greenSidePlayer].wins.toString(), style: const TextStyle(
+                                fontFamily: "Eurostile Round Extended",
+                                fontSize: 42))
+                                ]),
+                              ),
+                            ),
                           ),
-                          CompareThingy(
-                            label: t.stats.app.short,
-                            greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.app : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.app,
-                            redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.app : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.app,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
+                          const Padding(
+                            padding: EdgeInsets.only(top: 16),
+                            child: Text("VS"),
                           ),
-                          CompareThingy(
-                            label: t.stats.vsapm.short,
-                            greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.vsapm : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.vsapm,
-                            redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.vsapm : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.vsapm,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
+                          Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                colors: const [Colors.red, Colors.transparent],
+                                begin: Alignment.bottomCenter,
+                                end: Alignment.topCenter,
+                                stops: [0.0, !initPlayerWon ? 0.4 : 0.0],
+                              )),
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                                child: Column(children: [
+                                  Text(widget.record.results.leaderboard[redSidePlayer].username, style:  bigScreen ? const TextStyle(
+                                fontFamily: "Eurostile Round Extended",
+                                fontSize: 28) : const TextStyle()),
+                                  Text(widget.record.results.leaderboard[redSidePlayer].wins.toString(), style: const TextStyle(
+                                fontFamily: "Eurostile Round Extended",
+                                fontSize: 42))
+                                ]),
+                              ),
+                            ),
                           ),
-                          CompareThingy(
-                            label: t.stats.dss.short,
-                            greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.dss : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.dss,
-                            redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.dss : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.dss,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: t.stats.dsp.short,
-                            greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.dsp : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.dsp,
-                            redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.dsp : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.dsp,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: t.stats.appdsp.short,
-                            greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.appdsp : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.appdsp,
-                            redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.appdsp : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.appdsp,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: t.stats.cheese.short,
-                            greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.cheese : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.cheese,
-                            redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.cheese : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.cheese,
-                            fractionDigits: 2,
-                            higherIsBetter: false,
-                          ),
-                          CompareThingy(
-                            label: t.stats.gbe.short,
-                            greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.gbe : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.gbe,
-                            redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.gbe : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.gbe,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: t.stats.nyaapp.short,
-                            greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.nyaapp : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.nyaapp,
-                            redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.nyaapp : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.nyaapp,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: t.stats.area.short,
-                            greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.area : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.area,
-                            redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.area : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.area,
-                            fractionDigits: 2,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: t.stats.etr.short,
-                            greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.estTr.esttr : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.estTr.esttr,
-                            redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.estTr.esttr : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.estTr.esttr,
-                            fractionDigits: 2,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: t.stats.opener.short,
-                            greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.playstyle.opener : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.playstyle.opener,
-                            redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.playstyle.opener : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.playstyle.opener,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: t.stats.plonk.short,
-                            greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.playstyle.plonk : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.playstyle.plonk,
-                            redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.playstyle.plonk : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.playstyle.plonk,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: t.stats.stride.short,
-                            greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.playstyle.stride : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.playstyle.stride,
-                            redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.playstyle.stride : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.playstyle.stride,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          CompareThingy(
-                            label: t.stats.infds.short,
-                            greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.playstyle.infds : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.playstyle.infds,
-                            redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.playstyle.infds : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.playstyle.infds,
-                            fractionDigits: 3,
-                            higherIsBetter: true,
-                          ),
-                          VsGraphs(
-                            roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.apm : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.apm,
-                            roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.pps : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.pps,
-                            roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.vs : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.vs,
-                            roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats,
-                            roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.playstyle : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.playstyle,
-                            roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.apm : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.apm,
-                            roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.pps : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.pps,
-                            roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.vs : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.vs,
-                            roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats,
-                            roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.playstyle : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.playstyle,
-                          )
                         ],
                       ),
-                      // if (widget.record.ownId != widget.record.replayId) const Divider(),
-                      // if (widget.record.ownId != widget.record.replayId) Column(
-                      //   children: [
-                      //     Padding(
-                      //       padding: const EdgeInsets.only(bottom: 16),
-                      //       child: Text("Handling",
-                      //           style: TextStyle(
-                      //               fontFamily: "Eurostile Round Extended",
-                      //               fontSize: bigScreen ? 42 : 28)),
-                      //     ),
-                      //     CompareThingy(
-                      //       greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.das,
-                      //       redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.das,
-                      //       label: "DAS", fractionDigits: 1, postfix: "F",
-                      //       higherIsBetter: false),
-                      //     CompareThingy(
-                      //       greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.arr,
-                      //       redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.arr,
-                      //       label: "ARR", fractionDigits: 1, postfix: "F",
-                      //       higherIsBetter: false),
-                      //     CompareThingy(
-                      //       greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.sdf,
-                      //       redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.sdf,
-                      //       label: "SDF", prefix: "x",
-                      //       higherIsBetter: true),
-                      //     CompareBoolThingy(
-                      //       greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.safeLock,
-                      //       redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.safeLock,
-                      //       label: "Safe HD",
-                      //       trueIsBetter: true)
-                      //   ],
-                      // )
-                  ],
+                    ),
+                  ),
+                  if (showMobileSelector) SliverToBoxAdapter(child: mobileSelector()),
+                  if (showMobileSelector) SliverToBoxAdapter(child: Center(child: Text(readableTime, textAlign: TextAlign.center))),
+                  const SliverToBoxAdapter(
+                    child: Divider(),
+                  )
+                ];
+              },
+              body: ListView(
+                children: [
+                  Column(
+                    children: [
+                        CompareThingy(
+                          label: t.stats.apm.short,
+                          greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.apm : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.apm,
+                          redSide: roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.apm : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.apm,
+                          fractionDigits: 2,
+                          higherIsBetter: true,
+                        ),
+                        CompareThingy(
+                          label: t.stats.pps.short,
+                          greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.pps : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.pps,
+                          redSide: roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.pps : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.pps,
+                          fractionDigits: 2,
+                          higherIsBetter: true,
+                        ),
+                        CompareThingy(
+                          label: t.stats.vs.short,
+                          greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.vs : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.vs,
+                          redSide: roundSelector == -1 ? widget.record.results.leaderboard[redSidePlayer].stats.vs : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.vs,
+                          fractionDigits: 2,
+                          higherIsBetter: true,
+                        ),
+                        if (widget.record.gamemode == "league") CompareThingy(greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.garbageSent : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.garbageSent,
+                          redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.garbageSent : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.garbageSent,
+                          label: t.stats.sent, higherIsBetter: true),
+                        if (widget.record.gamemode == "league") CompareThingy(greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.garbageReceived : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.garbageReceived,
+                          redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.garbageReceived : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.garbageReceived,
+                          label: t.stats.received, higherIsBetter: true),                    const Divider(),
+                          Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 16),
+                                child: Text(t.nerdStats,
+                                    style: TextStyle(
+                                        fontFamily: "Eurostile Round Extended",
+                                        fontSize: bigScreen ? 42 : 28)),
+                              ),
+                              CompareThingy(
+                                label: t.stats.app.short,
+                                greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.app : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.app,
+                                redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.app : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.app,
+                                fractionDigits: 3,
+                                higherIsBetter: true,
+                              ),
+                              CompareThingy(
+                                label: t.stats.vsapm.short,
+                                greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.vsapm : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.vsapm,
+                                redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.vsapm : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.vsapm,
+                                fractionDigits: 3,
+                                higherIsBetter: true,
+                              ),
+                              CompareThingy(
+                                label: t.stats.dss.short,
+                                greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.dss : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.dss,
+                                redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.dss : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.dss,
+                                fractionDigits: 3,
+                                higherIsBetter: true,
+                              ),
+                              CompareThingy(
+                                label: t.stats.dsp.short,
+                                greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.dsp : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.dsp,
+                                redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.dsp : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.dsp,
+                                fractionDigits: 3,
+                                higherIsBetter: true,
+                              ),
+                              CompareThingy(
+                                label: t.stats.appdsp.short,
+                                greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.appdsp : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.appdsp,
+                                redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.appdsp : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.appdsp,
+                                fractionDigits: 3,
+                                higherIsBetter: true,
+                              ),
+                              CompareThingy(
+                                label: t.stats.cheese.short,
+                                greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.cheese : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.cheese,
+                                redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.cheese : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.cheese,
+                                fractionDigits: 2,
+                                higherIsBetter: false,
+                              ),
+                              CompareThingy(
+                                label: t.stats.gbe.short,
+                                greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.gbe : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.gbe,
+                                redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.gbe : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.gbe,
+                                fractionDigits: 3,
+                                higherIsBetter: true,
+                              ),
+                              CompareThingy(
+                                label: t.stats.nyaapp.short,
+                                greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.nyaapp : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.nyaapp,
+                                redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.nyaapp : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.nyaapp,
+                                fractionDigits: 3,
+                                higherIsBetter: true,
+                              ),
+                              CompareThingy(
+                                label: t.stats.area.short,
+                                greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats.area : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats.area,
+                                redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats.area : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats.area,
+                                fractionDigits: 2,
+                                higherIsBetter: true,
+                              ),
+                              CompareThingy(
+                                label: t.stats.etr.short,
+                                greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.estTr.esttr : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.estTr.esttr,
+                                redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.estTr.esttr : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.estTr.esttr,
+                                fractionDigits: 2,
+                                higherIsBetter: true,
+                              ),
+                              CompareThingy(
+                                label: t.stats.opener.short,
+                                greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.playstyle.opener : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.playstyle.opener,
+                                redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.playstyle.opener : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.playstyle.opener,
+                                fractionDigits: 3,
+                                higherIsBetter: true,
+                              ),
+                              CompareThingy(
+                                label: t.stats.plonk.short,
+                                greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.playstyle.plonk : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.playstyle.plonk,
+                                redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.playstyle.plonk : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.playstyle.plonk,
+                                fractionDigits: 3,
+                                higherIsBetter: true,
+                              ),
+                              CompareThingy(
+                                label: t.stats.stride.short,
+                                greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.playstyle.stride : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.playstyle.stride,
+                                redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.playstyle.stride : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.playstyle.stride,
+                                fractionDigits: 3,
+                                higherIsBetter: true,
+                              ),
+                              CompareThingy(
+                                label: t.stats.infds.short,
+                                greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.playstyle.infds : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.playstyle.infds,
+                                redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.playstyle.infds : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.playstyle.infds,
+                                fractionDigits: 3,
+                                higherIsBetter: true,
+                              ),
+                              VsGraphs(
+                                roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.apm : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.apm,
+                                roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.pps : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.pps,
+                                roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.vs : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.vs,
+                                roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.nerdStats : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.nerdStats,
+                                roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.playstyle : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.playstyle,
+                                roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.apm : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.apm,
+                                roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.pps : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.pps,
+                                roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.vs : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.vs,
+                                roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.nerdStats : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.nerdStats,
+                                roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.playstyle : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.playstyle,
+                              )
+                            ],
+                          ),
+                          // if (widget.record.ownId != widget.record.replayId) const Divider(),
+                          // if (widget.record.ownId != widget.record.replayId) Column(
+                          //   children: [
+                          //     Padding(
+                          //       padding: const EdgeInsets.only(bottom: 16),
+                          //       child: Text("Handling",
+                          //           style: TextStyle(
+                          //               fontFamily: "Eurostile Round Extended",
+                          //               fontSize: bigScreen ? 42 : 28)),
+                          //     ),
+                          //     CompareThingy(
+                          //       greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.das,
+                          //       redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.das,
+                          //       label: "DAS", fractionDigits: 1, postfix: "F",
+                          //       higherIsBetter: false),
+                          //     CompareThingy(
+                          //       greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.arr,
+                          //       redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.arr,
+                          //       label: "ARR", fractionDigits: 1, postfix: "F",
+                          //       higherIsBetter: false),
+                          //     CompareThingy(
+                          //       greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.sdf,
+                          //       redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.sdf,
+                          //       label: "SDF", prefix: "x",
+                          //       higherIsBetter: true),
+                          //     CompareBoolThingy(
+                          //       greenSide: widget.record.endContext.firstWhere((element) => element.userId == widget.initPlayerId).handling.safeLock,
+                          //       redSide: widget.record.endContext.firstWhere((element) => element.userId != widget.initPlayerId).handling.safeLock,
+                          //       label: "Safe HD",
+                          //       trueIsBetter: true)
+                          //   ],
+                          // )
+                      ],
+                    )
+            ])),
+        ),
+        if (!widget.record.stub && showMobileSelector) SizedBox(
+            width: width,
+            height: 40.000000,
+            child: SegmentedButton<Mod>(
+              showSelectedIcon: false,
+              selected: <Mod>{mod},
+              segments: <ButtonSegment<Mod>>[
+                ButtonSegment(
+                  value: Mod.info,
+                  label: Text(t.general)
+                ),
+                ButtonSegment(
+                  value: Mod.analysis,
+                  label: Text(t.analysis)
                 )
-        ])),
+              ],
+              onSelectionChanged: (p0) {
+                setState(() {
+                  mod = p0.first;
+                });
+              },
+            ),
+          )
+      ],
     );
   }
 
@@ -382,38 +410,65 @@ class TlMatchResultState extends State<TlMatchResultView> {
   }
 
   Widget buildFreyhoeComparison(double width, bool showMobileSelector){
-    return SizedBox(
-      width: width,
-      child: FutureBuilder<List<MinomuncherData>>(
-        future: ummm(widget.record.replayID),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState){
-              case ConnectionState.none:
-              case ConnectionState.waiting:
-              case ConnectionState.active:
-                return const Center(child: CircularProgressIndicator());
-              case ConnectionState.done:
-            if (snapshot.hasData){
-              return ListView(
-                children: [
-                  if (showMobileSelector) mobileSelector(),
-                  ApmPpsThingy([for (MinomuncherData e in snapshot.data!) ApmPps(e.nick, e.openerAPM, e.APM, e.midgameAPM, e.openerPPS, e.PPS, e.midgamePPS)]),
-                  AplThingy([for (MinomuncherData e in snapshot.data!) Apl(e.nick, e.upstackAPL, e.downstackAPL, e.cheeseAPL)], width > 768),
-                  EffThingy([for (MinomuncherData e in snapshot.data!) Eff(e.nick, e.iEfficiency, e.tEfficiency, e.allspinEfficiency)], width > 768),
-                  ClearTypesThingy([for (MinomuncherData e in snapshot.data!) e.clearTypes], width),
-                  WellColumnsThingy([for (MinomuncherData e in snapshot.data!) e.wellColumns], [for (MinomuncherData e in snapshot.data!) e.nick], width),
-                  PPSSurgeThingy([for (MinomuncherData e in snapshot.data!) e], width),
-                  SankeyThingy([for (MinomuncherData e in snapshot.data!) e], width),
-                  CheeseAndDSThingy([for (MinomuncherData e in snapshot.data!) e.attackCheesiness], [for (MinomuncherData e in snapshot.data!) e.downstackingRatio], [for (MinomuncherData e in snapshot.data!) e.nick]),
-                  KillsDeathsThingy([for (MinomuncherData e in snapshot.data!) KD(e.nick, e.killStats, e.deathStats)], width),
-                  PPSDistributionThingy([for (MinomuncherData e in snapshot.data!) e.ppsSegments], [for (MinomuncherData e in snapshot.data!) e.nick], width)
-                ],
-              );
-            } if (snapshot.hasError){ return SizedBox(height: 720.0, child: FutureError(snapshot)); }
-          }
-          return const Text("what?");
-        }
-      ),
+    return Column(
+      children: [
+        SizedBox(
+          width: width,
+          height: !widget.record.stub && showMobileSelector ? MediaQuery.of(context).size.height - 96 : MediaQuery.of(context).size.height - 56,
+          child: FutureBuilder<List<MinomuncherData>>(
+            future: ummm(widget.record.replayID),
+            builder: (context, snapshot) {
+              switch (snapshot.connectionState){
+                  case ConnectionState.none:
+                  case ConnectionState.waiting:
+                  case ConnectionState.active:
+                    return const Center(child: CircularProgressIndicator());
+                  case ConnectionState.done:
+                if (snapshot.hasData){
+                  return ListView(
+                    children: [
+                      ApmPpsThingy([for (MinomuncherData e in snapshot.data!) ApmPps(e.nick, e.openerAPM, e.APM, e.midgameAPM, e.openerPPS, e.PPS, e.midgamePPS)]),
+                      AplThingy([for (MinomuncherData e in snapshot.data!) Apl(e.nick, e.upstackAPL, e.downstackAPL, e.cheeseAPL)], width > 768),
+                      EffThingy([for (MinomuncherData e in snapshot.data!) Eff(e.nick, e.iEfficiency, e.tEfficiency, e.allspinEfficiency)], width > 768),
+                      ClearTypesThingy([for (MinomuncherData e in snapshot.data!) e.clearTypes], width),
+                      WellColumnsThingy([for (MinomuncherData e in snapshot.data!) e.wellColumns], [for (MinomuncherData e in snapshot.data!) e.nick], width),
+                      PPSSurgeThingy([for (MinomuncherData e in snapshot.data!) e], width),
+                      SankeyThingy([for (MinomuncherData e in snapshot.data!) e], width),
+                      CheeseAndDSThingy([for (MinomuncherData e in snapshot.data!) e.attackCheesiness], [for (MinomuncherData e in snapshot.data!) e.downstackingRatio], [for (MinomuncherData e in snapshot.data!) e.nick]),
+                      KillsDeathsThingy([for (MinomuncherData e in snapshot.data!) KD(e.nick, e.killStats, e.deathStats)], width),
+                      PPSDistributionThingy([for (MinomuncherData e in snapshot.data!) e.ppsSegments], [for (MinomuncherData e in snapshot.data!) e.nick], width)
+                    ],
+                  );
+                } if (snapshot.hasError){ return SizedBox(height: 720.0, child: FutureError(snapshot)); }
+              }
+              return const Text("what?");
+            }
+          ),
+        ),
+        if (!widget.record.stub && showMobileSelector) SizedBox(
+            width: width,
+            height: 40.000000,
+            child: SegmentedButton<Mod>(
+              showSelectedIcon: false,
+              selected: <Mod>{mod},
+              segments: <ButtonSegment<Mod>>[
+                ButtonSegment(
+                  value: Mod.info,
+                  label: Text(t.general)
+                ),
+                ButtonSegment(
+                  value: Mod.analysis,
+                  label: Text(t.analysis)
+                )
+              ],
+              onSelectionChanged: (p0) {
+                setState(() {
+                  mod = p0.first;
+                });
+              },
+            ),
+          )
+      ],
     );
   }
 

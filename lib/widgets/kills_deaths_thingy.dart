@@ -24,13 +24,16 @@ class KillsDeathsThingy extends StatelessWidget{
         padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0),
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 10.0,
+              runSpacing: 10.0,
+              runAlignment: WrapAlignment.start,
               children: [
                 SfCartesianChart(
                   primaryXAxis: CategoryAxis(isVisible: data.length > 1),
                   primaryYAxis: NumericAxis(minimum: 0, maximum: 100),
-                  title: ChartTitle(text: t.stats.kills, textStyle: width > 768 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+                  title: ChartTitle(text: t.stats.kills, textStyle: width > 768 ? Theme.of(context).textTheme.titleSmall : Theme.of(context).textTheme.titleMedium),
                   legend: data.length == 1 ? Legend(
                     isVisible: true,
                     position: LegendPosition.left,
@@ -70,7 +73,7 @@ class KillsDeathsThingy extends StatelessWidget{
                 SfCartesianChart(
                   primaryXAxis: CategoryAxis(isVisible: data.length > 1),
                   primaryYAxis: NumericAxis(minimum: 0, maximum: 100, opposedPosition: true,),
-                  title: ChartTitle(text: t.stats.deaths, textStyle: width > 768 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+                  title: ChartTitle(text: t.stats.deaths, textStyle: width > 768 ? Theme.of(context).textTheme.titleSmall : Theme.of(context).textTheme.titleMedium),
                   legend: data.length == 1 ? Legend(
                     isVisible: true,
                     position: LegendPosition.right,

@@ -36,7 +36,7 @@ class WellColumnsThingy extends StatelessWidget{
                     );
                 }
               ),
-              title: ChartTitle(text: t.stats.wellColumnDistribution, textStyle: width > 768.0 ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+              title: ChartTitle(text: t.stats.wellColumnDistribution, textStyle: width > 768.0 ? Theme.of(context).textTheme.titleSmall : Theme.of(context).textTheme.titleMedium),
               series: <CartesianSeries>[
                 for (int i = 0; i < data.length; i++) ColumnSeries<WellsData, int>(
                     dataSource: data[i],

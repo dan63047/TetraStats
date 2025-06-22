@@ -59,7 +59,7 @@ class AplThingy extends StatelessWidget{
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(t.stats.apl.full, style: wide ? Theme.of(context).textTheme.titleMedium : Theme.of(context).textTheme.titleSmall),
+              Text(t.stats.apl.full, style: wide ? Theme.of(context).textTheme.titleSmall : Theme.of(context).textTheme.titleMedium),
               SizedBox(height: 8.0),
               for (int i = 0; i < data.length; i++) SfLinearGauge(
                 minimum: 0,

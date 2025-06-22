@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:tetra_stats/utils/gaussian_mixture.dart';
 
 class MPlacement{
   late final List<int> ppsSegments;
@@ -421,7 +422,9 @@ class MinomuncherData {
     this.APM = entry.value["stats"]["placement"]["attack"]/mins;
     this.PPS = entry.value["stats"]["placement"]["pieces"]/secs;
     this.ppsSegments = entry.value["stats"]["placement"]["ppsSegments"].cast<double>();
-    List<double> me = means(ppsSegments);
+    final gmm = GMM(3, null, null, null, {'initialize': true});
+    gmm.optimize(ppsSegments);
+    List<double> me = gmm.means;
     this.BurstPPS = me.reduce(max); //entry.value["BurstPPS"];
     this.PlonkPPS = me.reduce(min); // entry.value["PlonkPPS"];
     this.PPSCoeff = getVariance(entry.value["stats"]["placement"]["ppsSegments"], PPS);
@@ -483,7 +486,9 @@ class MinomuncherData {
         double PPS = i / 10;
         for (int j = 0; j < raw.placement.ppsSegments[i]; j++)  huhPPSSegments.add(PPS);
       }
-      List<double> me = means(huhPPSSegments);
+      final gmm = GMM(3, null, null, null, {'initialize': true});
+      gmm.optimize(huhPPSSegments);
+      List<double> me = gmm.means;
       this.BurstPPS = me.reduce(max);
       this.PlonkPPS = me.reduce(min);
       this.PPSCoeff = getVariance(huhPPSSegments, PPS);

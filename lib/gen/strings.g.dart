@@ -6,7 +6,7 @@
 /// Locales: 5
 /// Strings: 4060 (812 per locale)
 ///
-/// Built on 2025-06-17 at 21:55 UTC
+/// Built on 2025-06-22 at 13:34 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -6001,7 +6001,7 @@ class _StringsStatsRuRu implements _StringsStatsEn {
 	@override String get downstack => 'Downstack';
 	@override String get variance => 'Дисперсия';
 	@override String get burst => 'Burst';
-	@override String get length => 'Длинна';
+	@override String get length => 'Длина';
 	@override String get rate => 'Rate';
 	@override String get secsDS => 'Secs/DS';
 	@override String get secsCheese => 'Secs/Cheese';
@@ -6710,7 +6710,7 @@ class _StringsZhCn implements Translations {
 	@override String get localStanding => '本地';
 	@override late final _StringsXpZhCn xp = _StringsXpZhCn._(_root);
 	@override late final _StringsGametimeZhCn gametime = _StringsGametimeZhCn._(_root);
-	@override String get whichOne => 'Which one?';
+	@override String get whichOne => '哪一个？';
 	@override String get track => '跟踪';
 	@override String get stopTracking => '停止跟踪';
 	@override String supporter({required Object tier}) => '${tier}级会员';
@@ -6745,15 +6745,15 @@ class _StringsZhCn implements Translations {
 	@override String get trackedPlayers => '跟踪的玩家';
 	@override String get standing => '排行';
 	@override String get previousSeasons => '上赛季';
+	@override String get checkingCache => '正在检查缓存……';
+	@override String get fetchingRecords => '正在获取记录……';
+	@override String get munching => '分析中……';
+	@override String get outOf => '超出';
+	@override String get replaysDone => '已完成回放';
+	@override String get analysis => '分析';
+	@override String get minomuncherMention => '通过由 Freyhoe 提供的 MinoMuncher';
 	@override String get recent => '最近';
 	@override String get top => '前';
-	@override String get checkingCache => 'Checking cache...';
-	@override String get fetchingRecords => 'Fetching Records...';
-	@override String get munching => 'Munching...';
-	@override String get outOf => 'out of';
-	@override String get replaysDone => 'replays done';
-	@override String get analysis => 'Analysis';
-	@override String get minomuncherMention => 'via MinoMuncher by Freyhoe';
 	@override String get noRecord => '暂无记录';
 	@override String sprintAndBlitsRelevance({required Object date}) => '${date}';
 	@override late final _StringsSnackBarMessagesZhCn snackBarMessages = _StringsSnackBarMessagesZhCn._(_root);
@@ -7178,8 +7178,8 @@ class _StringsErrorsZhCn implements _StringsErrorsEn {
 	@override String connection({required Object code, required Object message}) => '连接错误：${code} ${message}';
 	@override String get noSuchUser => '用户不存在';
 	@override String get noSuchUserSub => '您输入的内容有误，或者用户不存在';
-	@override String get discordNotAssigned => '未找到连接';
-	@override String get discordNotAssignedSub => '您的查询应该如 [API 指南](https://tetr.io/about/api/#userssearchquery)中所述';
+	@override String get discordNotAssigned => '该Discord用户没有对应的TETR.IO账号';
+	@override String get discordNotAssignedSub => '你所查询应来自 [API 指南](https://tetr.io/about/api/#userssearchquery)';
 	@override String get history => '缺少该玩家的历史';
 	@override String get actionSuggestion => '也许，您想要';
 	@override String get p1nkl0bst3rTLmatches => '没有找到Tetra联赛比赛';
@@ -7335,10 +7335,10 @@ class _StringsCalcDestinationZhCn implements _StringsCalcDestinationEn {
 	// Translations
 	@override String placeholders({required Object stat}) => '输入你的${stat}';
 	@override String get tip => '输入值并按 "计算" 来查看TA的详细信息';
-	@override String get invalidValues => 'Please, enter valid values';
+	@override String get invalidValues => '请输入有效的值！';
 	@override String get statsCalcButton => '计算';
 	@override String get damageCalcTip => '点击左侧的操作在此添加';
-	@override String get clearAll => 'Clear all';
+	@override String get clearAll => '全部清除';
 	@override String get actions => '操作';
 	@override String get results => '结果';
 	@override String get rules => '规则';
@@ -7620,31 +7620,31 @@ class _StringsStatsZhCn implements _StringsStatsEn {
 	@override String get received => '已接收';
 	@override String get placement => '排名';
 	@override String get peak => '最高';
-	@override String get overall => 'Overall';
-	@override String get midgame => 'Midgame';
-	@override String get efficiency => 'Efficiency';
-	@override String get upstack => 'Upstack';
-	@override String get downstack => 'Downstack';
-	@override String get variance => 'Variance';
-	@override String get burst => 'Burst';
-	@override String get length => 'Length';
-	@override String get rate => 'Rate';
-	@override String get secsDS => 'Secs/DS';
-	@override String get secsCheese => 'Secs/Cheese';
-	@override String get attackCheesiness => 'Attack Cheesiness';
-	@override String get downstackingRatio => 'Downstacking Ratio';
-	@override String get clearTypes => 'Clear Types';
-	@override String get wellColumnDistribution => 'Well Column Distribution';
-	@override String get allSpins => 'All Spins';
-	@override String get sankeyTitle => 'Incoming Attack Sankey Chart';
-	@override String get incomingAttack => 'Incoming Attack';
-	@override String get clean => 'Clean';
-	@override String get cancelled => 'Cancelled';
-	@override String get cheeseTanked => 'Cheese Tanked';
-	@override String get cleanTanked => 'Clean Tanked';
-	@override String get kills => 'Kills';
-	@override String get deaths => 'Deaths';
-	@override String get ppsDistribution => 'PPS distribution';
+	@override String get overall => '总体';
+	@override String get midgame => '游戏中期';
+	@override String get efficiency => '效率';
+	@override String get upstack => '堆叠';
+	@override String get downstack => '挖掘';
+	@override String get variance => '方差';
+	@override String get burst => '爆发';
+	@override String get length => '长度';
+	@override String get rate => '评分';
+	@override String get secsDS => '秒/挖掘';
+	@override String get secsCheese => '秒/混乱';
+	@override String get attackCheesiness => '发送垃圾行混乱指数';
+	@override String get downstackingRatio => '挖掘比率';
+	@override String get clearTypes => '消除类型';
+	@override String get wellColumnDistribution => '井列分布';
+	@override String get allSpins => '全旋';
+	@override String get sankeyTitle => '受到攻击图表';
+	@override String get incomingAttack => '受到攻击';
+	@override String get clean => '整洁垃圾行';
+	@override String get cancelled => '垃圾行格挡';
+	@override String get cheeseTanked => '混乱垃圾行接受';
+	@override String get cleanTanked => '整洁垃圾行接受';
+	@override String get kills => '击杀次数';
+	@override String get deaths => '死亡次数';
+	@override String get ppsDistribution => 'PPS 分布';
 	@override String qpWithMods({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
 		one: '使用 1 个模组',
 		two: '使用 ${n} 个模组',
@@ -8165,7 +8165,7 @@ class _StringsStatsAplZhCn implements _StringsStatsAplEn {
 
 	// Translations
 	@override String get short => 'APL';
-	@override String get full => 'Attack Per Line';
+	@override String get full => '每行攻击数';
 }
 
 // Path: stats.quadEfficiency
@@ -8176,7 +8176,7 @@ class _StringsStatsQuadEfficiencyZhCn implements _StringsStatsQuadEfficiencyEn {
 
 	// Translations
 	@override String get short => 'Q Eff.';
-	@override String get full => 'Quad efficiency';
+	@override String get full => '四消效率';
 }
 
 // Path: stats.tspinEfficiency
@@ -8187,7 +8187,7 @@ class _StringsStatsTspinEfficiencyZhCn implements _StringsStatsTspinEfficiencyEn
 
 	// Translations
 	@override String get short => 'T Eff.';
-	@override String get full => 'T-spin efficiency';
+	@override String get full => 'T旋效率';
 }
 
 // Path: stats.allspinEfficiency
@@ -8198,7 +8198,7 @@ class _StringsStatsAllspinEfficiencyZhCn implements _StringsStatsAllspinEfficien
 
 	// Translations
 	@override String get short => 'All Eff.';
-	@override String get full => 'All-spin efficiency';
+	@override String get full => '全旋效率';
 }
 
 // Path: stats.graphs
@@ -11339,7 +11339,7 @@ extension on _StringsRuRu {
 			case 'stats.downstack': return 'Downstack';
 			case 'stats.variance': return 'Дисперсия';
 			case 'stats.burst': return 'Burst';
-			case 'stats.length': return 'Длинна';
+			case 'stats.length': return 'Длина';
 			case 'stats.rate': return 'Rate';
 			case 'stats.secsDS': return 'Secs/DS';
 			case 'stats.secsCheese': return 'Secs/Cheese';
@@ -11765,7 +11765,7 @@ extension on _StringsZhCn {
 			case 'gametime.title': return '精确游戏时长';
 			case 'gametime.gametimeAday': return ({required Object gametime}) => '平均每天${gametime}';
 			case 'gametime.breakdown': return ({required Object years, required Object months, required Object days, required Object minutes, required Object seconds}) => '相当于 ${years} 年，\n${months} 月，\n${days} 天，\n${minutes} 分钟，\n${seconds} 秒';
-			case 'whichOne': return 'Which one?';
+			case 'whichOne': return '哪一个？';
 			case 'track': return '跟踪';
 			case 'stopTracking': return '停止跟踪';
 			case 'supporter': return ({required Object tier}) => '${tier}级会员';
@@ -11841,15 +11841,15 @@ extension on _StringsZhCn {
 			case 'trackedPlayers': return '跟踪的玩家';
 			case 'standing': return '排行';
 			case 'previousSeasons': return '上赛季';
+			case 'checkingCache': return '正在检查缓存……';
+			case 'fetchingRecords': return '正在获取记录……';
+			case 'munching': return '分析中……';
+			case 'outOf': return '超出';
+			case 'replaysDone': return '已完成回放';
+			case 'analysis': return '分析';
+			case 'minomuncherMention': return '通过由 Freyhoe 提供的 MinoMuncher';
 			case 'recent': return '最近';
 			case 'top': return '前';
-			case 'checkingCache': return 'Checking cache...';
-			case 'fetchingRecords': return 'Fetching Records...';
-			case 'munching': return 'Munching...';
-			case 'outOf': return 'out of';
-			case 'replaysDone': return 'replays done';
-			case 'analysis': return 'Analysis';
-			case 'minomuncherMention': return 'via MinoMuncher by Freyhoe';
 			case 'noRecord': return '暂无记录';
 			case 'sprintAndBlitsRelevance': return ({required Object date}) => '${date}';
 			case 'snackBarMessages.stateRemoved': return ({required Object date}) => '成功移除${date}时的状态！';
@@ -11863,8 +11863,8 @@ extension on _StringsZhCn {
 			case 'errors.connection': return ({required Object code, required Object message}) => '连接错误：${code} ${message}';
 			case 'errors.noSuchUser': return '用户不存在';
 			case 'errors.noSuchUserSub': return '您输入的内容有误，或者用户不存在';
-			case 'errors.discordNotAssigned': return '未找到连接';
-			case 'errors.discordNotAssignedSub': return '您的查询应该如 [API 指南](https://tetr.io/about/api/#userssearchquery)中所述';
+			case 'errors.discordNotAssigned': return '该Discord用户没有对应的TETR.IO账号';
+			case 'errors.discordNotAssignedSub': return '你所查询应来自 [API 指南](https://tetr.io/about/api/#userssearchquery)';
 			case 'errors.history': return '缺少该玩家的历史';
 			case 'errors.actionSuggestion': return '也许，您想要';
 			case 'errors.p1nkl0bst3rTLmatches': return '没有找到Tetra联赛比赛';
@@ -11948,10 +11948,10 @@ extension on _StringsZhCn {
 			case 'tlMatchView.openReplay': return '在 TETR.IO 中打开回放';
 			case 'calcDestination.placeholders': return ({required Object stat}) => '输入你的${stat}';
 			case 'calcDestination.tip': return '输入值并按 "计算" 来查看TA的详细信息';
-			case 'calcDestination.invalidValues': return 'Please, enter valid values';
+			case 'calcDestination.invalidValues': return '请输入有效的值！';
 			case 'calcDestination.statsCalcButton': return '计算';
 			case 'calcDestination.damageCalcTip': return '点击左侧的操作在此添加';
-			case 'calcDestination.clearAll': return 'Clear all';
+			case 'calcDestination.clearAll': return '全部清除';
 			case 'calcDestination.actions': return '操作';
 			case 'calcDestination.results': return '结果';
 			case 'calcDestination.rules': return '规则';
@@ -12166,13 +12166,13 @@ extension on _StringsZhCn {
 			case 'stats.kps.short': return 'KPS';
 			case 'stats.kps.full': return '每秒按键数';
 			case 'stats.apl.short': return 'APL';
-			case 'stats.apl.full': return 'Attack Per Line';
+			case 'stats.apl.full': return '每行攻击数';
 			case 'stats.quadEfficiency.short': return 'Q Eff.';
-			case 'stats.quadEfficiency.full': return 'Quad efficiency';
+			case 'stats.quadEfficiency.full': return '四消效率';
 			case 'stats.tspinEfficiency.short': return 'T Eff.';
-			case 'stats.tspinEfficiency.full': return 'T-spin efficiency';
+			case 'stats.tspinEfficiency.full': return 'T旋效率';
 			case 'stats.allspinEfficiency.short': return 'All Eff.';
-			case 'stats.allspinEfficiency.full': return 'All-spin efficiency';
+			case 'stats.allspinEfficiency.full': return '全旋效率';
 			case 'stats.blitzScore': return ({required Object p}) => '${p} 分';
 			case 'stats.levelUpRequirement': return ({required Object p}) => '还需 ${p} 升到下一级';
 			case 'stats.piecesTotal': return '放块总数';
@@ -12192,31 +12192,31 @@ extension on _StringsZhCn {
 			case 'stats.received': return '已接收';
 			case 'stats.placement': return '排名';
 			case 'stats.peak': return '最高';
-			case 'stats.overall': return 'Overall';
-			case 'stats.midgame': return 'Midgame';
-			case 'stats.efficiency': return 'Efficiency';
-			case 'stats.upstack': return 'Upstack';
-			case 'stats.downstack': return 'Downstack';
-			case 'stats.variance': return 'Variance';
-			case 'stats.burst': return 'Burst';
-			case 'stats.length': return 'Length';
-			case 'stats.rate': return 'Rate';
-			case 'stats.secsDS': return 'Secs/DS';
-			case 'stats.secsCheese': return 'Secs/Cheese';
-			case 'stats.attackCheesiness': return 'Attack Cheesiness';
-			case 'stats.downstackingRatio': return 'Downstacking Ratio';
-			case 'stats.clearTypes': return 'Clear Types';
-			case 'stats.wellColumnDistribution': return 'Well Column Distribution';
-			case 'stats.allSpins': return 'All Spins';
-			case 'stats.sankeyTitle': return 'Incoming Attack Sankey Chart';
-			case 'stats.incomingAttack': return 'Incoming Attack';
-			case 'stats.clean': return 'Clean';
-			case 'stats.cancelled': return 'Cancelled';
-			case 'stats.cheeseTanked': return 'Cheese Tanked';
-			case 'stats.cleanTanked': return 'Clean Tanked';
-			case 'stats.kills': return 'Kills';
-			case 'stats.deaths': return 'Deaths';
-			case 'stats.ppsDistribution': return 'PPS distribution';
+			case 'stats.overall': return '总体';
+			case 'stats.midgame': return '游戏中期';
+			case 'stats.efficiency': return '效率';
+			case 'stats.upstack': return '堆叠';
+			case 'stats.downstack': return '挖掘';
+			case 'stats.variance': return '方差';
+			case 'stats.burst': return '爆发';
+			case 'stats.length': return '长度';
+			case 'stats.rate': return '评分';
+			case 'stats.secsDS': return '秒/挖掘';
+			case 'stats.secsCheese': return '秒/混乱';
+			case 'stats.attackCheesiness': return '发送垃圾行混乱指数';
+			case 'stats.downstackingRatio': return '挖掘比率';
+			case 'stats.clearTypes': return '消除类型';
+			case 'stats.wellColumnDistribution': return '井列分布';
+			case 'stats.allSpins': return '全旋';
+			case 'stats.sankeyTitle': return '受到攻击图表';
+			case 'stats.incomingAttack': return '受到攻击';
+			case 'stats.clean': return '整洁垃圾行';
+			case 'stats.cancelled': return '垃圾行格挡';
+			case 'stats.cheeseTanked': return '混乱垃圾行接受';
+			case 'stats.cleanTanked': return '整洁垃圾行接受';
+			case 'stats.kills': return '击杀次数';
+			case 'stats.deaths': return '死亡次数';
+			case 'stats.ppsDistribution': return 'PPS 分布';
 			case 'stats.qpWithMods': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
 				one: '使用 1 个模组',
 				two: '使用 ${n} 个模组',

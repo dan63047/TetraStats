@@ -1066,7 +1066,7 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                            Text(t.analysis, style: widget.constraints.maxWidth > 768.0 ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleMedium),
+                            Text(t.analysis, style: Theme.of(context).textTheme.titleLarge),
                             Padding(
                                 padding: const EdgeInsets.only(top: 4.0),
                                 child: Text(t.minomuncherMention, textAlign: TextAlign.center, style: TextStyle(fontSize: widget.constraints.maxWidth > 768.0 ? null : 12.0, color: Colors.grey)),

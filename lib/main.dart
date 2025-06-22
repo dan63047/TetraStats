@@ -126,7 +126,6 @@ void main() async {
   Timer.periodic(const Duration(minutes: 5), (Timer timer) { 
     teto.cacheRoutine();
     developer.log("Cache routine complete, next one in ${DateTime.now().add(const Duration(minutes: 5))}", name: "main");
-    // if (prefs.getBool("updateInBG") == true) teto.fetchTracked(); // TODO: Somehow avoid doing that in main isolate
   });
   
   runApp(TranslationProvider(

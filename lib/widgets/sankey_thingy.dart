@@ -20,8 +20,8 @@ class SankeyThingy extends StatelessWidget{
         SankeyNode(id: 0, label: '${t.stats.incomingAttack} ${percentage.format(1)}'),
         SankeyNode(id: 1, label: '${t.stats.cheese.short} ${percentage.format(e.cheeseLinesRecieved)}'),
         SankeyNode(id: 2, label: '${t.stats.clean} ${percentage.format(e.cleanLinesRecieved)}'),
-        SankeyNode(id: 3, label: '${t.stats.cancelled} ${percentage.format(e.cheeseLinesCancelled)}'),
-        SankeyNode(id: 4, label: '${t.stats.cheeseTanked} ${percentage.format(e.cheeseLinesTanked)}'),
+        SankeyNode(id: 3, label: '${t.stats.cancelled} ${percentage.format(e.cheeseLinesCancelled + e.cleanLinesCancelled)}'),
+        SankeyNode(id: 4, label: '${t.stats.cheeseTanked} ${percentage.format(e.cheeseLinesTanked + e.cleanLinesTankedAsCheese)}'),
         SankeyNode(id: 5, label: '${t.stats.cleanTanked} ${percentage.format(e.cleanLinesTankedAsClean)}'),
       ];
       List<SankeyLink> sankeyLinks = [

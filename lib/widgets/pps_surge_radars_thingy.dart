@@ -16,8 +16,11 @@ class PPSSurgeThingy extends StatelessWidget{
     return Card(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 10.0,
+          runSpacing: 10.0,
+          runAlignment: WrapAlignment.start,
           children: [
             Column(
               children: [

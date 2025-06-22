@@ -16,6 +16,7 @@ class EtrThingy extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
+    // TODO: do comparison with rank average
     String rawEtr = f2.format(etr.esttr);
     double etrAcc = etr.esttr - (tr??-1);
     double? oldEtrAcc = (oldTR != null && oldEtr != null) ? oldEtr!.esttr - oldTR! : null;

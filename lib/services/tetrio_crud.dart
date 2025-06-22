@@ -211,6 +211,14 @@ class MunchProgress{
   toString() => "${munched.length}/${avaliable.length}, $result";
 }
 
+class MultipleMunchProgress{
+  int avaliable = 0;
+  int munched = 0;
+  List<MinomuncherData>? result;
+
+  toString() => "${munched}/${avaliable}, $result";
+}
+
 class TetrioService extends DB {
   final Map<String, String> _players = {};
   final _cache = CacheController.init(); // I'm trying to send as less requests, as possible, so i'm caching the results of those requests.
@@ -445,6 +453,48 @@ class TetrioService extends DB {
     } on http.ClientException catch (e, s) {
       developer.log("$e, $s");
       throw http.ClientException(e.message, e.uri);
+    }
+  }
+
+  Stream<MultipleMunchProgress> minomuncherMunchByMultipleIDStream(List<String> id) async* {
+    MultipleMunchProgress progress = MultipleMunchProgress();
+    yield progress;
+    List<MinomuncherData>? cached = _cache.get(id.toString(), List<MinomuncherData>);
+    if (cached != null){
+      progress.result = cached;
+      yield progress;
+    } else{
+      progress.result = [];
+      List<List<BetaRecord>> avaliable = [];
+      for(int i=0; i < id.length; i++){
+        TetraLeagueBetaStream stream = await fetchTLStream(id[i]);
+        List<BetaRecord> a = stream.records;
+        a.removeWhere((element) => element.stub);
+        if (a.isEmpty) continue;
+        a = a.take(10).toList();
+        avaliable.add(a);
+        progress.avaliable += a.length;
+        yield progress;
+      }
+      if ((avaliable.isEmpty && id.length == 1) || (avaliable.length < 2 && id.length >= 2)) throw TetrioNoReplays();
+      for(int i=0; i < avaliable.length; i++){
+        List<MinomuncherRaw> munched = [];
+        for (BetaRecord record in avaliable[i]){
+          List<MinomuncherRaw>? cached = _cache.get(record.id, List<MinomuncherRaw>);
+          if (cached != null){
+            munched.add(cached.firstWhere((element) => element.nick == id[i]));
+          }else{
+            List<MinomuncherRaw> raw = await minomuncherPostReplay(await szyGetReplay(record.replayID));
+            munched.add(raw.firstWhere((element) => element.nick == id[i]));
+          }
+          progress.munched++;
+          yield progress;
+        }
+        progress.result!.add(munched.reduce((a, b) => a + b).data);
+        yield progress;
+      }
+      _cache.store(progress.result, DateTime.now().millisecondsSinceEpoch + 300000, id: id.toString());
+      yield progress;
     }
   }
 
@@ -1159,8 +1209,8 @@ class TetrioService extends DB {
   /// Retrieves avaliable Tetra League matches from Tetra Channel api. Returns stream object (fake stream).
   /// Throws an exception if fails to retrieve.
   Future<TetraLeagueBetaStream> fetchTLStream(String userID, {String? prisecter}) async {
-    // TetraLeagueBetaStream? cached = _cache.get(userID, TetraLeagueBetaStream);
-    // if (cached != null) return cached;
+    TetraLeagueBetaStream? cached = _cache.get(userID, TetraLeagueBetaStream);
+    if (cached != null) return cached;
 
     Uri url;
     if (kIsWeb) {
