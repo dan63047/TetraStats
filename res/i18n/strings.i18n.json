@@ -333,7 +333,7 @@
         "timestampsAbsoluteLocalTime": "Absolute (Your timezone)",
         "timestampsRelative": "Relative",
         "sheetbotLikeGraphs": "Sheetbot-like behavior for radar graphs",
-        "sheetbotLikeGraphsDescription": "Altough it was considered by me, that the way graphs work in SheetBot is not very correct, some people were confused to see, that -0.5 stride dosen't look the way it looks on SheetBot graph. Hence, he we are: if this toggle is on, points on the graphs can appear on the opposite half of the graph if value is negative.",
+        "sheetbotLikeGraphsDescription": "Altough it was considered by me, that the way graphs work in SheetBot is not very correct, some people were confused to see, that -0.5 stride doesn't look the way it looks on SheetBot graph. Hence, he we are: if this toggle is on, points on the graphs can appear on the opposite half of the graph if value is negative.",
         "oskKagariGimmick": "Osk-Kagari gimmick",
         "oskKagariGimmickDescription": "If on, instead of osk's rank, :kagari: will be rendered.",
         "bytesOfDataStored": "of data stored",
