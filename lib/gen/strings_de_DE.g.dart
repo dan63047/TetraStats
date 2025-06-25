@@ -42,6 +42,7 @@ class TranslationsDeDe implements Translations {
 		'ko-KR': 'Koreanisch (한국인)',
 		'zh-CN': 'Vereinfachtes Chinesisch (简体中文)',
 		'de-DE': 'German (Deutsch)',
+		'pl-PL': 'Polieren (Polski)',
 	};
 	@override Map<String, String> get gamemodes => {
 		'league': 'Tetra League',
@@ -124,13 +125,13 @@ class TranslationsDeDe implements Translations {
 	@override String get trackedPlayers => 'Erfasste Benutzer';
 	@override String get standing => 'Stand';
 	@override String get previousSeasons => 'Vorhärige Saison';
-	@override String get checkingCache => 'Checking cache...';
-	@override String get fetchingRecords => 'Fetching Records...';
-	@override String get munching => 'Munching...';
-	@override String get outOf => 'out of';
-	@override String get replaysDone => 'replays done';
-	@override String get analysis => 'Analysis';
-	@override String get minomuncherMention => 'via MinoMuncher by Freyhoe';
+	@override String get checkingCache => 'Prüfe cache...';
+	@override String get fetchingRecords => 'Rekorde laden...';
+	@override String get munching => 'Analysiere...';
+	@override String get outOf => 'von';
+	@override String get replaysDone => 'Replays fertig';
+	@override String get analysis => 'Analyse';
+	@override String get minomuncherMention => 'via MinoMuncher von Freyhoe';
 	@override String get recent => 'Kürzlich';
 	@override String get top => 'Top';
 	@override String get noRecord => 'Kein Rekord';
@@ -699,7 +700,7 @@ class _TranslationsTlMatchViewDeDe implements TranslationsTlMatchViewEn {
 	@override String get statsFor => 'Statistik für';
 	@override String get numberOfRounds => 'Anzahl Runden';
 	@override String get matchLength => 'Match Länge';
-	@override String get roundLength => 'Round Länge';
+	@override String get roundLength => 'Runden Länge';
 	@override String get matchStats => 'Match Statistik';
 	@override String get downloadReplay => 'Download .ttrm Wiederholung';
 	@override String get openReplay => 'Öffne Wiederholung in TETR.IO';
@@ -714,10 +715,10 @@ class _TranslationsCalcDestinationDeDe implements TranslationsCalcDestinationEn 
 	// Translations
 	@override String placeholders({required Object stat}) => 'Gebe ${stat} ein';
 	@override String get tip => 'Gebe Wert ein und drücke "Berechnen", um Statistiken für Nerds zu sehen';
-	@override String get invalidValues => 'Please, enter valid values';
+	@override String get invalidValues => 'Bitte, gebe ein validen Wert ein';
 	@override String get statsCalcButton => 'Berechnen';
 	@override String get damageCalcTip => 'Klicke auf die Aktionen zu deiner Linken, um diese hier hinzuzufügen';
-	@override String get clearAll => 'Clear all';
+	@override String get clearAll => 'Alles löschen';
 	@override String get actions => 'Aktionen';
 	@override String get results => 'Ergebnisse';
 	@override String get rules => 'Regeln';
@@ -919,7 +920,8 @@ class _TranslationsAboutViewDeDe implements TranslationsAboutViewEn {
 	@override String get inoue => 'Inoue (Wiederholungsschnapper)';
 	@override String get zhCNlocale => 'Vereinfachtes Chinesisch Übersetzung';
 	@override String get deDElocale => 'Deutsche Übersetzung';
-	@override String get koKRlocale => 'Korean locale';
+	@override String get koKRlocale => 'Koreanisch Übersetzung';
+	@override String get plPLlocale => 'Polieren Übersetzung';
 	@override String get supportHim => 'Unterstütze Ihn!';
 }
 
@@ -1001,7 +1003,7 @@ class _TranslationsStatsDeDe implements TranslationsStatsEn {
 	@override String get peak => 'Beste';
 	@override String get overall => 'Overall';
 	@override String get midgame => 'Midgame';
-	@override String get efficiency => 'Efficiency';
+	@override String get efficiency => 'Effizienz';
 	@override String get upstack => 'Upstack';
 	@override String get downstack => 'Downstack';
 	@override String get variance => 'Variance';
@@ -1010,19 +1012,19 @@ class _TranslationsStatsDeDe implements TranslationsStatsEn {
 	@override String get rate => 'Rate';
 	@override String get secsDS => 'Secs/DS';
 	@override String get secsCheese => 'Secs/Cheese';
-	@override String get attackCheesiness => 'Attack Cheesiness';
+	@override String get attackCheesiness => 'Attacken Cheesiness';
 	@override String get downstackingRatio => 'Downstacking Ratio';
 	@override String get clearTypes => 'Clear Types';
 	@override String get wellColumnDistribution => 'Well Column Distribution';
 	@override String get allSpins => 'All Spins';
-	@override String get sankeyTitle => 'Incoming Attack Sankey Chart';
-	@override String get incomingAttack => 'Incoming Attack';
+	@override String get sankeyTitle => 'Eingehende Attacke Sankey Chart';
+	@override String get incomingAttack => 'Eingehende Attacke';
 	@override String get clean => 'Clean';
 	@override String get cancelled => 'Cancelled';
 	@override String get cheeseTanked => 'Cheese Tanked';
 	@override String get cleanTanked => 'Clean Tanked';
 	@override String get kills => 'Kills';
-	@override String get deaths => 'Deaths';
+	@override String get deaths => 'Tode';
 	@override String get ppsDistribution => 'PPS distribution';
 	@override String qpWithMods({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n,
 		one: 'Mit 1 Mod',
@@ -1648,6 +1650,7 @@ extension on TranslationsDeDe {
 			case 'locales.ko-KR': return 'Koreanisch (한국인)';
 			case 'locales.zh-CN': return 'Vereinfachtes Chinesisch (简体中文)';
 			case 'locales.de-DE': return 'German (Deutsch)';
+			case 'locales.pl-PL': return 'Polieren (Polski)';
 			case 'gamemodes.league': return 'Tetra League';
 			case 'gamemodes.zenith': return 'Quick Play';
 			case 'gamemodes.zenithex': return 'Quick Play Expert';
@@ -1777,13 +1780,13 @@ extension on TranslationsDeDe {
 			case 'trackedPlayers': return 'Erfasste Benutzer';
 			case 'standing': return 'Stand';
 			case 'previousSeasons': return 'Vorhärige Saison';
-			case 'checkingCache': return 'Checking cache...';
-			case 'fetchingRecords': return 'Fetching Records...';
-			case 'munching': return 'Munching...';
-			case 'outOf': return 'out of';
-			case 'replaysDone': return 'replays done';
-			case 'analysis': return 'Analysis';
-			case 'minomuncherMention': return 'via MinoMuncher by Freyhoe';
+			case 'checkingCache': return 'Prüfe cache...';
+			case 'fetchingRecords': return 'Rekorde laden...';
+			case 'munching': return 'Analysiere...';
+			case 'outOf': return 'von';
+			case 'replaysDone': return 'Replays fertig';
+			case 'analysis': return 'Analyse';
+			case 'minomuncherMention': return 'via MinoMuncher von Freyhoe';
 			case 'recent': return 'Kürzlich';
 			case 'top': return 'Top';
 			case 'noRecord': return 'Kein Rekord';
@@ -1878,16 +1881,16 @@ extension on TranslationsDeDe {
 			case 'tlMatchView.statsFor': return 'Statistik für';
 			case 'tlMatchView.numberOfRounds': return 'Anzahl Runden';
 			case 'tlMatchView.matchLength': return 'Match Länge';
-			case 'tlMatchView.roundLength': return 'Round Länge';
+			case 'tlMatchView.roundLength': return 'Runden Länge';
 			case 'tlMatchView.matchStats': return 'Match Statistik';
 			case 'tlMatchView.downloadReplay': return 'Download .ttrm Wiederholung';
 			case 'tlMatchView.openReplay': return 'Öffne Wiederholung in TETR.IO';
 			case 'calcDestination.placeholders': return ({required Object stat}) => 'Gebe ${stat} ein';
 			case 'calcDestination.tip': return 'Gebe Wert ein und drücke "Berechnen", um Statistiken für Nerds zu sehen';
-			case 'calcDestination.invalidValues': return 'Please, enter valid values';
+			case 'calcDestination.invalidValues': return 'Bitte, gebe ein validen Wert ein';
 			case 'calcDestination.statsCalcButton': return 'Berechnen';
 			case 'calcDestination.damageCalcTip': return 'Klicke auf die Aktionen zu deiner Linken, um diese hier hinzuzufügen';
-			case 'calcDestination.clearAll': return 'Clear all';
+			case 'calcDestination.clearAll': return 'Alles löschen';
 			case 'calcDestination.actions': return 'Aktionen';
 			case 'calcDestination.results': return 'Ergebnisse';
 			case 'calcDestination.rules': return 'Regeln';
@@ -2008,7 +2011,8 @@ extension on TranslationsDeDe {
 			case 'aboutView.inoue': return 'Inoue (Wiederholungsschnapper)';
 			case 'aboutView.zhCNlocale': return 'Vereinfachtes Chinesisch Übersetzung';
 			case 'aboutView.deDElocale': return 'Deutsche Übersetzung';
-			case 'aboutView.koKRlocale': return 'Korean locale';
+			case 'aboutView.koKRlocale': return 'Koreanisch Übersetzung';
+			case 'aboutView.plPLlocale': return 'Polieren Übersetzung';
 			case 'aboutView.supportHim': return 'Unterstütze Ihn!';
 			case 'stats.registrationDate': return 'Registrierungsdatum';
 			case 'stats.gametime': return 'Spielzeit';
@@ -2130,7 +2134,7 @@ extension on TranslationsDeDe {
 			case 'stats.peak': return 'Beste';
 			case 'stats.overall': return 'Overall';
 			case 'stats.midgame': return 'Midgame';
-			case 'stats.efficiency': return 'Efficiency';
+			case 'stats.efficiency': return 'Effizienz';
 			case 'stats.upstack': return 'Upstack';
 			case 'stats.downstack': return 'Downstack';
 			case 'stats.variance': return 'Variance';
@@ -2139,19 +2143,19 @@ extension on TranslationsDeDe {
 			case 'stats.rate': return 'Rate';
 			case 'stats.secsDS': return 'Secs/DS';
 			case 'stats.secsCheese': return 'Secs/Cheese';
-			case 'stats.attackCheesiness': return 'Attack Cheesiness';
+			case 'stats.attackCheesiness': return 'Attacken Cheesiness';
 			case 'stats.downstackingRatio': return 'Downstacking Ratio';
 			case 'stats.clearTypes': return 'Clear Types';
 			case 'stats.wellColumnDistribution': return 'Well Column Distribution';
 			case 'stats.allSpins': return 'All Spins';
-			case 'stats.sankeyTitle': return 'Incoming Attack Sankey Chart';
-			case 'stats.incomingAttack': return 'Incoming Attack';
+			case 'stats.sankeyTitle': return 'Eingehende Attacke Sankey Chart';
+			case 'stats.incomingAttack': return 'Eingehende Attacke';
 			case 'stats.clean': return 'Clean';
 			case 'stats.cancelled': return 'Cancelled';
 			case 'stats.cheeseTanked': return 'Cheese Tanked';
 			case 'stats.cleanTanked': return 'Clean Tanked';
 			case 'stats.kills': return 'Kills';
-			case 'stats.deaths': return 'Deaths';
+			case 'stats.deaths': return 'Tode';
 			case 'stats.ppsDistribution': return 'PPS distribution';
 			case 'stats.qpWithMods': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n,
 				one: 'Mit 1 Mod',

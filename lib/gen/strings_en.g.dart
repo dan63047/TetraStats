@@ -45,6 +45,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 		'ko-KR': 'Korean (한국인)',
 		'zh-CN': 'Simplified Chinese (简体中文)',
 		'de-DE': 'German (Deutsch)',
+		'pl-PL': 'Polish (Polski)',
 	};
 	Map<String, String> get gamemodes => {
 		'league': 'Tetra League',
@@ -754,7 +755,7 @@ class TranslationsInfoDestinationEn {
 	String get sprintAndBlitzAverages => '40 Lines & Blitz Averages';
 	String get sprintAndBlitzAveragesDescription => 'Since calculating 40 Lines & Blitz averages is tedious process, it gets updated only once in a while. Click on the title of this card to see the full 40 Lines & Blitz averages table';
 	String get tetraStatsWiki => 'Tetra Stats Wiki';
-	String get tetraStatsWikiDescription => 'Find more information about Tetra Stats functions and statictic, that it provides';
+	String get tetraStatsWikiDescription => 'Find more information about Tetra Stats functions and statistics that it provides';
 	String get about => 'About Tetra Stats';
 	String get aboutDescription => 'Developed by dan63\n';
 }
@@ -813,9 +814,9 @@ class TranslationsSettingsDestinationEn {
 		other: '${n} languages',
 	);
 	String get updateInTheBackground => 'Update data in the background';
-	String get updateInTheBackgroundDescription => 'If on, Tetra Stats will attempt to retrieve new info once cache expires. Usually that happen every 5 minutes';
+	String get updateInTheBackgroundDescription => 'If on, Tetra Stats will attempt to retrieve new info once cache expires. Usually that happens every 5 minutes';
 	String get compareStats => 'Compare TL stats with rank averages';
-	String get compareStatsDescription => 'If on, Tetra Stats will provide additional metrics, which allow you to compare yourself with average player on your rank. The way you\'ll see it — stats will be highlighted with corresponding color, hover over them with cursor for more info.';
+	String get compareStatsDescription => 'If on, Tetra Stats will provide additional metrics, which allow you to compare yourself with average player on your rank. The way you\'ll see it — stats will be highlighted with corresponding color, hover over them with the cursor for more info.';
 	String get showPosition => 'Show position on leaderboard by stats';
 	String get showPositionDescription => 'This can take some time (and traffic) to load, but will allow you to see your position on the leaderboard, sorted by a stat';
 	String get accentColor => 'Accent color';
@@ -828,7 +829,7 @@ class TranslationsSettingsDestinationEn {
 	String get timestampsAbsoluteLocalTime => 'Absolute (Your timezone)';
 	String get timestampsRelative => 'Relative';
 	String get sheetbotLikeGraphs => 'Sheetbot-like behavior for radar graphs';
-	String get sheetbotLikeGraphsDescription => 'Altough it was considered by me, that the way graphs work in SheetBot is not very correct, some people were confused to see, that -0.5 stride dosen\'t look the way it looks on SheetBot graph. Hence, he we are: if this toggle is on, points on the graphs can appear on the opposite half of the graph if value is negative.';
+	String get sheetbotLikeGraphsDescription => 'Altough it was considered by me, that the way graphs work in SheetBot is not very correct, some people were confused to see, that -0.5 stride doesn\'t look the way it looks on SheetBot graph. Hence, here we are: if this toggle is on, points on the graphs can appear on the opposite half of the graph if value is negative.';
 	String get oskKagariGimmick => 'Osk-Kagari gimmick';
 	String get oskKagariGimmickDescription => 'If on, instead of osk\'s rank, :kagari: will be rendered.';
 	String get bytesOfDataStored => 'of data stored';
@@ -911,7 +912,7 @@ class TranslationsAboutViewEn {
 
 	// Translations
 	String get title => 'About Tetra Stats';
-	String get about => 'Tetra Stats is a service, that works with TETR.IO Tetra Channel API, providing data from it and calculating some addtitional metrics, based on this data. Service allows user to track their progress in Tetra League with "Track" function, which records every Tetra League change into local database (not automatically, you have to visit service from time to time), so these changes could be looked through graphs.\n\nBeanserver blaster is a part of a Tetra Stats, that decoupled into a serverside script. It provides full Tetra League leaderboard, allowing Tetra Stats to sort leaderboard by any metric and build scatter chart, that allows user to analyse Tetra League trends. It also provides history of Tetra League ranks cutoffs, which can be viewed by user via graph as well.\n\nThere is a plans to add replay analysis and tournaments history, so stay tuned!\n\nService is not associated with TETR.IO or osk in any capacity.';
+	String get about => 'Tetra Stats is a service, that works with TETR.IO Tetra Channel API, providing data from it and calculating some addtitional metrics, based on this data. Service allows user to track their progress in Tetra League with "Track" function, which records every Tetra League change into local database (not automatically, you have to visit service from time to time), so these changes could be looked through graphs.\n\nBeanserver blaster is a part of a Tetra Stats, that decoupled into a serverside script. It provides full Tetra League leaderboard, allowing Tetra Stats to sort leaderboard by any metric and build scatter chart, that allows user to analyse Tetra League trends. It also provides history of Tetra League ranks cutoffs, which can be viewed by user via graph as well.\n\nThere are plans to add replay analysis and tournaments history, so stay tuned!\n\nService is not associated with TETR.IO or osk in any capacity.';
 	String get appVersion => 'App Version';
 	String build({required Object build}) => 'Build ${build}';
 	String get GHrepo => 'GitHub Repository';
@@ -924,6 +925,7 @@ class TranslationsAboutViewEn {
 	String get zhCNlocale => 'Simplfied Chinese locale';
 	String get deDElocale => 'German locale';
 	String get koKRlocale => 'Korean locale';
+	String get plPLlocale => 'Polish locale';
 	String get supportHim => 'Support him!';
 }
 
@@ -1652,6 +1654,7 @@ extension on Translations {
 			case 'locales.ko-KR': return 'Korean (한국인)';
 			case 'locales.zh-CN': return 'Simplified Chinese (简体中文)';
 			case 'locales.de-DE': return 'German (Deutsch)';
+			case 'locales.pl-PL': return 'Polish (Polski)';
 			case 'gamemodes.league': return 'Tetra League';
 			case 'gamemodes.zenith': return 'Quick Play';
 			case 'gamemodes.zenithex': return 'Quick Play Expert';
@@ -1916,7 +1919,7 @@ extension on Translations {
 			case 'infoDestination.sprintAndBlitzAverages': return '40 Lines & Blitz Averages';
 			case 'infoDestination.sprintAndBlitzAveragesDescription': return 'Since calculating 40 Lines & Blitz averages is tedious process, it gets updated only once in a while. Click on the title of this card to see the full 40 Lines & Blitz averages table';
 			case 'infoDestination.tetraStatsWiki': return 'Tetra Stats Wiki';
-			case 'infoDestination.tetraStatsWikiDescription': return 'Find more information about Tetra Stats functions and statictic, that it provides';
+			case 'infoDestination.tetraStatsWikiDescription': return 'Find more information about Tetra Stats functions and statistics that it provides';
 			case 'infoDestination.about': return 'About Tetra Stats';
 			case 'infoDestination.aboutDescription': return 'Developed by dan63\n';
 			case 'leaderboardsDestination.title': return 'Leaderboards';
@@ -1948,9 +1951,9 @@ extension on Translations {
 				other: '${n} languages',
 			);
 			case 'settingsDestination.updateInTheBackground': return 'Update data in the background';
-			case 'settingsDestination.updateInTheBackgroundDescription': return 'If on, Tetra Stats will attempt to retrieve new info once cache expires. Usually that happen every 5 minutes';
+			case 'settingsDestination.updateInTheBackgroundDescription': return 'If on, Tetra Stats will attempt to retrieve new info once cache expires. Usually that happens every 5 minutes';
 			case 'settingsDestination.compareStats': return 'Compare TL stats with rank averages';
-			case 'settingsDestination.compareStatsDescription': return 'If on, Tetra Stats will provide additional metrics, which allow you to compare yourself with average player on your rank. The way you\'ll see it — stats will be highlighted with corresponding color, hover over them with cursor for more info.';
+			case 'settingsDestination.compareStatsDescription': return 'If on, Tetra Stats will provide additional metrics, which allow you to compare yourself with average player on your rank. The way you\'ll see it — stats will be highlighted with corresponding color, hover over them with the cursor for more info.';
 			case 'settingsDestination.showPosition': return 'Show position on leaderboard by stats';
 			case 'settingsDestination.showPositionDescription': return 'This can take some time (and traffic) to load, but will allow you to see your position on the leaderboard, sorted by a stat';
 			case 'settingsDestination.accentColor': return 'Accent color';
@@ -1963,7 +1966,7 @@ extension on Translations {
 			case 'settingsDestination.timestampsAbsoluteLocalTime': return 'Absolute (Your timezone)';
 			case 'settingsDestination.timestampsRelative': return 'Relative';
 			case 'settingsDestination.sheetbotLikeGraphs': return 'Sheetbot-like behavior for radar graphs';
-			case 'settingsDestination.sheetbotLikeGraphsDescription': return 'Altough it was considered by me, that the way graphs work in SheetBot is not very correct, some people were confused to see, that -0.5 stride dosen\'t look the way it looks on SheetBot graph. Hence, he we are: if this toggle is on, points on the graphs can appear on the opposite half of the graph if value is negative.';
+			case 'settingsDestination.sheetbotLikeGraphsDescription': return 'Altough it was considered by me, that the way graphs work in SheetBot is not very correct, some people were confused to see, that -0.5 stride doesn\'t look the way it looks on SheetBot graph. Hence, here we are: if this toggle is on, points on the graphs can appear on the opposite half of the graph if value is negative.';
 			case 'settingsDestination.oskKagariGimmick': return 'Osk-Kagari gimmick';
 			case 'settingsDestination.oskKagariGimmickDescription': return 'If on, instead of osk\'s rank, :kagari: will be rendered.';
 			case 'settingsDestination.bytesOfDataStored': return 'of data stored';
@@ -2001,7 +2004,7 @@ extension on Translations {
 			case 'firstTimeView.letsTakeALook': return 'Let\'s take a look at your stats...';
 			case 'firstTimeView.skip': return 'Skip';
 			case 'aboutView.title': return 'About Tetra Stats';
-			case 'aboutView.about': return 'Tetra Stats is a service, that works with TETR.IO Tetra Channel API, providing data from it and calculating some addtitional metrics, based on this data. Service allows user to track their progress in Tetra League with "Track" function, which records every Tetra League change into local database (not automatically, you have to visit service from time to time), so these changes could be looked through graphs.\n\nBeanserver blaster is a part of a Tetra Stats, that decoupled into a serverside script. It provides full Tetra League leaderboard, allowing Tetra Stats to sort leaderboard by any metric and build scatter chart, that allows user to analyse Tetra League trends. It also provides history of Tetra League ranks cutoffs, which can be viewed by user via graph as well.\n\nThere is a plans to add replay analysis and tournaments history, so stay tuned!\n\nService is not associated with TETR.IO or osk in any capacity.';
+			case 'aboutView.about': return 'Tetra Stats is a service, that works with TETR.IO Tetra Channel API, providing data from it and calculating some addtitional metrics, based on this data. Service allows user to track their progress in Tetra League with "Track" function, which records every Tetra League change into local database (not automatically, you have to visit service from time to time), so these changes could be looked through graphs.\n\nBeanserver blaster is a part of a Tetra Stats, that decoupled into a serverside script. It provides full Tetra League leaderboard, allowing Tetra Stats to sort leaderboard by any metric and build scatter chart, that allows user to analyse Tetra League trends. It also provides history of Tetra League ranks cutoffs, which can be viewed by user via graph as well.\n\nThere are plans to add replay analysis and tournaments history, so stay tuned!\n\nService is not associated with TETR.IO or osk in any capacity.';
 			case 'aboutView.appVersion': return 'App Version';
 			case 'aboutView.build': return ({required Object build}) => 'Build ${build}';
 			case 'aboutView.GHrepo': return 'GitHub Repository';
@@ -2014,6 +2017,7 @@ extension on Translations {
 			case 'aboutView.zhCNlocale': return 'Simplfied Chinese locale';
 			case 'aboutView.deDElocale': return 'German locale';
 			case 'aboutView.koKRlocale': return 'Korean locale';
+			case 'aboutView.plPLlocale': return 'Polish locale';
 			case 'aboutView.supportHim': return 'Support him!';
 			case 'stats.registrationDate': return 'Registration Date';
 			case 'stats.gametime': return 'Time Played';

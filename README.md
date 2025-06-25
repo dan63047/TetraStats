@@ -22,6 +22,7 @@ You can [download an app](https://github.com/dan63047/TetraStats/releases), or [
 - **neko_ab4093** — Simplified Chinese localization
 - **founntain** — German localization
 - **Tau, ctpw, PyHoKxvx, muqhc, xantho, mazohu, CEL_ESTIAL, pensil** — Korean localization
+- **xMelisek** — Polish localization
 - **osk** and his team — TETR.IO
 
 ## Legal notes

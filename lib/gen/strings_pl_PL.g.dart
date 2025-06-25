@@ -922,6 +922,7 @@ class _TranslationsAboutViewPlPl implements TranslationsAboutViewEn {
 	@override String get zhCNlocale => 'Język Chiński Uproszczony';
 	@override String get deDElocale => 'Język Niemiecki';
 	@override String get koKRlocale => 'Język Koreański';
+	@override String get plPLlocale => 'Język Polski';
 	@override String get supportHim => 'Wesprzyj go!';
 }
 
@@ -2013,6 +2014,7 @@ extension on TranslationsPlPl {
 			case 'aboutView.zhCNlocale': return 'Język Chiński Uproszczony';
 			case 'aboutView.deDElocale': return 'Język Niemiecki';
 			case 'aboutView.koKRlocale': return 'Język Koreański';
+			case 'aboutView.plPLlocale': return 'Język Polski';
 			case 'aboutView.supportHim': return 'Wesprzyj go!';
 			case 'stats.registrationDate': return 'Data rejestracji';
 			case 'stats.gametime': return 'Czas gry';

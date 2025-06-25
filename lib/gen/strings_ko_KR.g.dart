@@ -42,6 +42,7 @@ class TranslationsKoKr implements Translations {
 		'ko-KR': '한국어',
 		'zh-CN': '중국어 간체 (简体中文)',
 		'de-DE': '독일어 (Deutsch)',
+		'pl-PL': '광택 (Polski)',
 	};
 	@override Map<String, String> get gamemodes => {
 		'league': '테트라 리그',
@@ -920,6 +921,7 @@ class _TranslationsAboutViewKoKr implements TranslationsAboutViewEn {
 	@override String get zhCNlocale => '중국어 간체 번역';
 	@override String get deDElocale => '독일어 번역';
 	@override String get koKRlocale => '한국어 번역';
+	@override String get plPLlocale => '광택 번역';
 	@override String get supportHim => '후원하기';
 }
 
@@ -1648,6 +1650,7 @@ extension on TranslationsKoKr {
 			case 'locales.ko-KR': return '한국어';
 			case 'locales.zh-CN': return '중국어 간체 (简体中文)';
 			case 'locales.de-DE': return '독일어 (Deutsch)';
+			case 'locales.pl-PL': return '광택 (Polski)';
 			case 'gamemodes.league': return '테트라 리그';
 			case 'gamemodes.zenith': return '퀵 플레이';
 			case 'gamemodes.zenithex': return '전문가용 퀵 플레이';
@@ -2009,6 +2012,7 @@ extension on TranslationsKoKr {
 			case 'aboutView.zhCNlocale': return '중국어 간체 번역';
 			case 'aboutView.deDElocale': return '독일어 번역';
 			case 'aboutView.koKRlocale': return '한국어 번역';
+			case 'aboutView.plPLlocale': return '광택 번역';
 			case 'aboutView.supportHim': return '후원하기';
 			case 'stats.registrationDate': return '가입일';
 			case 'stats.gametime': return '플레이 시간';

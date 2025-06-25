@@ -42,6 +42,7 @@ class TranslationsRuRu implements Translations {
 		'ko-KR': 'Корейский (한국인)',
 		'zh-CN': 'Упрощенный Китайский (简体中文)',
 		'de-DE': 'Немецкий (Deutsch)',
+		'pl-PL': 'Польский (Polski)',
 	};
 	@override Map<String, String> get gamemodes => {
 		'league': 'Тетра Лига',
@@ -921,6 +922,7 @@ class _TranslationsAboutViewRuRu implements TranslationsAboutViewEn {
 	@override String get zhCNlocale => 'Перевёл на упрощённый китайский';
 	@override String get deDElocale => 'Перевёл на немецкий';
 	@override String get koKRlocale => 'Перевели на корейский';
+	@override String get plPLlocale => 'Перевёл на польский';
 	@override String get supportHim => 'Поддержите его!';
 }
 
@@ -1649,6 +1651,7 @@ extension on TranslationsRuRu {
 			case 'locales.ko-KR': return 'Корейский (한국인)';
 			case 'locales.zh-CN': return 'Упрощенный Китайский (简体中文)';
 			case 'locales.de-DE': return 'Немецкий (Deutsch)';
+			case 'locales.pl-PL': return 'Польский (Polski)';
 			case 'gamemodes.league': return 'Тетра Лига';
 			case 'gamemodes.zenith': return 'Quick Play';
 			case 'gamemodes.zenithex': return 'Quick Play Expert';
@@ -2011,6 +2014,7 @@ extension on TranslationsRuRu {
 			case 'aboutView.zhCNlocale': return 'Перевёл на упрощённый китайский';
 			case 'aboutView.deDElocale': return 'Перевёл на немецкий';
 			case 'aboutView.koKRlocale': return 'Перевели на корейский';
+			case 'aboutView.plPLlocale': return 'Перевёл на польский';
 			case 'aboutView.supportHim': return 'Поддержите его!';
 			case 'stats.registrationDate': return 'Дата регистрации';
 			case 'stats.gametime': return 'Время в игре';

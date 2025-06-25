@@ -42,6 +42,7 @@ class TranslationsZhCn implements Translations {
 		'ko-KR': '韩语 (한국인)',
 		'zh-CN': '简体中文',
 		'de-DE': '德语 (Deutsch)',
+		'pl-PL': '拋光 (Polski)',
 	};
 	@override Map<String, String> get gamemodes => {
 		'league': 'Tetra 联赛',
@@ -920,6 +921,7 @@ class _TranslationsAboutViewZhCn implements TranslationsAboutViewEn {
 	@override String get zhCNlocale => '简中翻译员';
 	@override String get deDElocale => '德语翻译员';
 	@override String get koKRlocale => '韩语翻译员';
+	@override String get plPLlocale => '拋光翻译员';
 	@override String get supportHim => '为他提供支持！';
 }
 
@@ -1648,6 +1650,7 @@ extension on TranslationsZhCn {
 			case 'locales.ko-KR': return '韩语 (한국인)';
 			case 'locales.zh-CN': return '简体中文';
 			case 'locales.de-DE': return '德语 (Deutsch)';
+			case 'locales.pl-PL': return '拋光 (Polski)';
 			case 'gamemodes.league': return 'Tetra 联赛';
 			case 'gamemodes.zenith': return '快速游戏';
 			case 'gamemodes.zenithex': return '快速游戏 · 专家模式';
@@ -2009,6 +2012,7 @@ extension on TranslationsZhCn {
 			case 'aboutView.zhCNlocale': return '简中翻译员';
 			case 'aboutView.deDElocale': return '德语翻译员';
 			case 'aboutView.koKRlocale': return '韩语翻译员';
+			case 'aboutView.plPLlocale': return '拋光翻译员';
 			case 'aboutView.supportHim': return '为他提供支持！';
 			case 'stats.registrationDate': return '注册时间';
 			case 'stats.gametime': return '游玩时长';
