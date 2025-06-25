@@ -43,13 +43,18 @@ class GaugetThingy extends StatelessWidget{
               showLabels: false,
               interval: tickInterval,
               minorTicksPerInterval: 0,
+              majorTickStyle: MajorTickStyle(
+                thickness: 1.0,
+                color: Colors.grey.shade800
+              ),
               ranges:[
-                GaugeRange(startValue: 0, endValue: (value != null && !value!.isNaN) ? value! : 0, color: theme.colorScheme.primary)
+                GaugeRange(startValue: min, endValue: max, color: Colors.grey.shade800),
+                GaugeRange(startValue: 0, endValue: (value != null && !value!.isNaN) ? value! : 0, color: theme.colorScheme.primary),
               ],
               annotations: [
                 GaugeAnnotation(widget: Container(child:
                 Text((value != null && !value!.isNaN) ? percentileFormat ? percentage.format(value) : f.format(value) : "---", textAlign: TextAlign.center, style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: (value != null && !value!.isNaN) ? getStatColor(value!, avgValue, moreIsBetter) : Colors.grey))),
-                angle: 90,positionFactor: 0.10
+                angle: 90,positionFactor: 0.0
                 ),
                 GaugeAnnotation(widget: Container(child:
                 Text(label, textAlign: TextAlign.center, style: TextStyle(height: .9, color: (value != null && !value!.isNaN) ? null : Colors.grey))),

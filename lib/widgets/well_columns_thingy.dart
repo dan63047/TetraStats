@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart' hide Badge;
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:tetra_stats/data_objects/minomuncher.dart';
+import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 
@@ -20,6 +21,7 @@ class WellColumnsThingy extends StatelessWidget{
             SfCartesianChart(
               primaryXAxis: CategoryAxis(),
               primaryYAxis: NumericAxis(numberFormat: percentage),
+              palette: lineClearsColors,
               tooltipBehavior: TooltipBehavior(
                 enable: true,
                 color: Colors.black,

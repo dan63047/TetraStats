@@ -220,8 +220,9 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
           return SfCartesianChart(
             tooltipBehavior: _historyTooltipBehavior,
             zoomPanBehavior: _zoomPanBehavior,
-            primaryXAxis: _gamesPlayedInsteadOfDateAndTime ? const NumericAxis() : const DateTimeAxis(),
-            primaryYAxis: const NumericAxis(
+            primaryXAxis: _gamesPlayedInsteadOfDateAndTime ? NumericAxis(majorGridLines: MajorGridLines(color: Colors.grey.shade800),) : DateTimeAxis(majorGridLines: MajorGridLines(color: Colors.grey.shade800),),
+            primaryYAxis: NumericAxis(
+              majorGridLines: MajorGridLines(color: Colors.grey.shade800),
               rangePadding: ChartRangePadding.additional,
             ),
             margin: const EdgeInsets.all(0),
@@ -280,7 +281,8 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
           return SfCartesianChart(
             tooltipBehavior: _tooltipBehavior,
             zoomPanBehavior: _zoomPanBehavior,
-            //primaryXAxis: CategoryAxis(),
+            primaryXAxis: NumericAxis(majorGridLines: MajorGridLines(color: Colors.grey.shade800)),
+            primaryYAxis: NumericAxis(majorGridLines: MajorGridLines(color: Colors.grey.shade800)),
             series: [
               ScatterSeries(
                 enableTooltip: true,

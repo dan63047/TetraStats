@@ -38,7 +38,7 @@ import 'package:tetra_stats/services/sqlite_db_controller.dart';
 import 'package:csv/csv.dart';
 
 const String dbName = "TetraStats.db";
-const String webVersionDomain = "tsbeta.dan63.by";
+const String webVersionDomain = "ts.dan63.by";
 const String tetrioUsersTable = "tetrioUsers";
 const String tetrioUsersToTrackTable = "tetrioUsersToTrack";
 const String tetraLeagueMatchesTable = "tetrioAlphaLeagueMathces";
@@ -515,7 +515,7 @@ class TetrioService extends DB {
       for (BetaRecord record in progress.avaliable){
         List<MinomuncherRaw>? cached = _cache.get(record.id, List<MinomuncherRaw>);
         if (cached != null){
-          progress.munched.add(cached.firstWhere((element) => element.nick == id));;
+          progress.munched.add(cached.firstWhere((element) => element.nick == id));
         }else{
           List<MinomuncherRaw> raw = await minomuncherPostReplay(await szyGetReplay(record.replayID));
           progress.munched.add(raw.firstWhere((element) => element.nick == id));

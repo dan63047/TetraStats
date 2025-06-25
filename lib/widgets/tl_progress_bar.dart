@@ -72,6 +72,7 @@ class TLProgress extends StatelessWidget{
             maximum: 1,
             interval: 1, 
             ranges: [
+              LinearGaugeRange(startValue: 0, endValue: 1, color: Colors.black, position: LinearElementPosition.cross),
               if (previousRankTRcutoff != null && nextRankTRcutoff != null) LinearGaugeRange(endValue: getBarTR(tlData.tr)!, color: Theme.of(context).colorScheme.primary, position: LinearElementPosition.cross)
               else if (tlData.standing != -1) LinearGaugeRange(endValue: getBarPosition(), color: Theme.of(context).colorScheme.primary, position: LinearElementPosition.cross),
               if (previousRankTRcutoff != null && previousRankTRcutoffTarget != null) LinearGaugeRange(endValue: getBarTR(previousRankTRcutoffTarget!)!, color: Colors.greenAccent.withAlpha(175), position: LinearElementPosition.inside),

@@ -39,6 +39,14 @@ class NerdStatsThingy extends StatelessWidget{
 		    					centerY: 0.5,
 		    					minimum: 0,
 		    					maximum: 1,
+                  majorTickStyle: MajorTickStyle(
+                thickness: 1.0,
+                color: Colors.grey.shade800
+              ),
+                  minorTickStyle: MinorTickStyle(
+                thickness: 1.0,
+                color: Colors.grey.shade800
+              ),
 		    				ranges: [
 		    					GaugeRange(startValue: 0, endValue: 0.2, color: Colors.red),
 		    					GaugeRange(startValue: 0.2, endValue: 0.4, color: Colors.yellow),
@@ -82,6 +90,14 @@ class NerdStatsThingy extends StatelessWidget{
 		    						centerY: 0.5,
 		    						minimum: 1.8,
 		    						maximum: 2.4,
+                    majorTickStyle: MajorTickStyle(
+                thickness: 1.0,
+                color: Colors.grey.shade800
+              ),
+                  minorTickStyle: MinorTickStyle(
+                thickness: 1.0,
+                color: Colors.grey.shade800
+              ),
 		    					ranges: [
 		    						GaugeRange(startValue: 1.8, endValue: 2.0, color: Colors.green),
 		    						GaugeRange(startValue: 2.0, endValue: 2.2, color: Colors.blue),

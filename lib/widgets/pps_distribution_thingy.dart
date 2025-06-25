@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Badge;
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/utils/numers_formats.dart';
 
@@ -23,8 +24,9 @@ class PPSDistributionThingy extends StatelessWidget{
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0),
         child: SfCartesianChart(
-          primaryXAxis: NumericAxis(),
-          primaryYAxis: NumericAxis(numberFormat: percentage),
+          primaryXAxis: NumericAxis(majorGridLines: MajorGridLines(color: Colors.grey.shade800)),
+          primaryYAxis: NumericAxis(numberFormat: percentage, majorGridLines: MajorGridLines(color: Colors.grey.shade800)),
+          palette: lineClearsColors,
           tooltipBehavior: TooltipBehavior(
             enable: true,
             color: Colors.black,

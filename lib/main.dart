@@ -34,7 +34,7 @@ ThemeData theme = ThemeData(
     headlineMedium: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36),
     displayLarge: TextStyle(fontSize: 18),
   ),
-  cardTheme: const CardTheme(surfaceTintColor: Color.fromARGB(255, 10, 10, 10)),
+  cardTheme: const CardThemeData(surfaceTintColor: Color.fromARGB(255, 10, 10, 10)),
   drawerTheme: const DrawerThemeData(surfaceTintColor: Color.fromARGB(255, 10, 10, 10)),
   searchBarTheme: const SearchBarThemeData(
     shadowColor: WidgetStatePropertyAll(Colors.black),
@@ -62,7 +62,7 @@ ThemeData theme = ThemeData(
   dropdownMenuTheme: DropdownMenuThemeData(textStyle: TextStyle(fontFamily: "Eurostile Round", fontSize: 18)),
   scaffoldBackgroundColor: Colors.black,
   tooltipTheme: TooltipThemeData(
-    textStyle: TextStyle(color: Colors.white),
+    textStyle: TextStyle(color: Colors.white, fontFamily: "Eurostile Round"),
     decoration: BoxDecoration(
       borderRadius: BorderRadius.all(Radius.circular(8.0)),
       border: Border.all(

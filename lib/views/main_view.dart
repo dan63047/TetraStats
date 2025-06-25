@@ -342,13 +342,7 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
             });
           },
           onPerformDrop: (event) async {
-            // Called when user dropped the item. You can now request the data.
-            // Note that data must be requested before the performDrop callback
-            // is over.
-            print(event.session.items.first.platformFormats);
             final item = event.session.items.first;
-
-            // data reader is available now
             final reader = item.dataReader!;
             if (reader.canProvide(Formats.fileUri)){
               reader.getValue<Uri>(Formats.fileUri, (value) {
@@ -357,16 +351,21 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
                   var decodedReplay = jsonDecode(replay.readAsStringSync());
                   RawReplay rawReplay = RawReplay(decodedReplay['id'] ?? "none", replay.readAsBytesSync(), replay.readAsStringSync());
                   BetaRecord fromReplay = BetaRecord.fromJson(decodedReplay, r: rawReplay);
-                  print('Dropped the thingy: ${fromReplay}');
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => TlMatchResultView(record: fromReplay, initPlayerId: decodedReplay['users'][0]['id']))); //Navigator.push(context, MaterialPageRoute(builder: (context) => TlMatchResultView(record: data[index], initPlayerId: userID)))
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => TlMatchResultView(record: fromReplay, initPlayerId: decodedReplay['users'][0]['id'])));
                 }
               }, onError: (error) {
                 print('Error reading value $error');
               });
             }
-            if(reader.canProvide(Formats.json)){print("yo");}
             else{
-              print("lox");
+              print(item);
+              reader.getFile(null, (value) async {
+                Uint8List content = await value.readAll();
+                RawReplay replay = RawReplay("none", content, String.fromCharCodes(content));
+                var decodedReplay = jsonDecode(replay.asString);
+                BetaRecord fromReplay = BetaRecord.fromJson(decodedReplay, r: replay);
+                Navigator.push(context, MaterialPageRoute(builder: (context) => TlMatchResultView(record: fromReplay, initPlayerId: decodedReplay['users'][0]['id'])));
+              }, onError: (object){print("ti pidor");});
             }
           },
           child: SafeArea(

@@ -28,7 +28,6 @@ import 'package:tetra_stats/widgets/clear_types_thingy.dart';
 import 'package:tetra_stats/widgets/efficiency_ranges.dart';
 import 'package:tetra_stats/widgets/error_thingy.dart';
 import 'package:tetra_stats/widgets/future_error.dart';
-import 'package:tetra_stats/widgets/gauget_thingy.dart';
 import 'package:tetra_stats/widgets/graphs.dart';
 import 'package:tetra_stats/widgets/kills_deaths_thingy.dart';
 import 'package:tetra_stats/widgets/pps_distribution_thingy.dart';
