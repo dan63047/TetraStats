@@ -318,9 +318,9 @@
             "other": "$n languages"
         },
         "updateInTheBackground": "Update data in the background",
-        "updateInTheBackgroundDescription": "If on, Tetra Stats will attempt to retrieve new info once cache expires. Usually that happen every 5 minutes",
+        "updateInTheBackgroundDescription": "If on, Tetra Stats will attempt to retrieve new info once cache expires. Usually that happens every 5 minutes",
         "compareStats": "Compare TL stats with rank averages",
-        "compareStatsDescription": "If on, Tetra Stats will provide additional metrics, which allow you to compare yourself with average player on your rank. The way you'll see it — stats will be highlighted with corresponding color, hover over them with cursor for more info.", 
+        "compareStatsDescription": "If on, Tetra Stats will provide additional metrics, which allow you to compare yourself with average player on your rank. The way you'll see it — stats will be highlighted with corresponding color, hover over them with the cursor for more info.", 
         "showPosition": "Show position on leaderboard by stats",
         "showPositionDescription": "This can take some time (and traffic) to load, but will allow you to see your position on the leaderboard, sorted by a stat",
         "accentColor": "Accent color",
