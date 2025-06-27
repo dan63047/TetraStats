@@ -137,6 +137,7 @@ class AboutState extends State<AboutView> {
                     FractionallySizedBox(widthFactor: 1/((MediaQuery.of(context).size.width/600).ceil()), child: AboutCard(t.aboutView.koKRlocale, "Tau, ctpw, PyHoKxvx, muqhc,\nxantho, mazohu, CEL_ESTIAL, pensil", null, [
                     ], smallValue: true)),
                     FractionallySizedBox(widthFactor: 1/((MediaQuery.of(context).size.width/600).ceil()), child: AboutCard(t.aboutView.plPLlocale, "xMelisek", null, [
+                      TextSpan(text: t.aboutView.withFixesBy(username: "goSciu"))
                     ])),
                   ],
                 ),

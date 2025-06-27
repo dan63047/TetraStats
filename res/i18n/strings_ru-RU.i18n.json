@@ -396,6 +396,7 @@
         "deDElocale": "Перевёл на немецкий",
         "koKRlocale": "Перевели на корейский",
         "plPLlocale": "Перевёл на польский",
+        "withFixesBy": "С исправлениями от $username",
         "supportHim": "Поддержите его!"
     },
     "stats": {

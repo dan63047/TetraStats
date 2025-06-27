@@ -922,6 +922,7 @@ class _TranslationsAboutViewZhCn implements TranslationsAboutViewEn {
 	@override String get deDElocale => '德语翻译员';
 	@override String get koKRlocale => '韩语翻译员';
 	@override String get plPLlocale => '拋光翻译员';
+	@override String withFixesBy({required Object username}) => '修复方式如下 ${username}';
 	@override String get supportHim => '为他提供支持！';
 }
 
@@ -2013,6 +2014,7 @@ extension on TranslationsZhCn {
 			case 'aboutView.deDElocale': return '德语翻译员';
 			case 'aboutView.koKRlocale': return '韩语翻译员';
 			case 'aboutView.plPLlocale': return '拋光翻译员';
+			case 'aboutView.withFixesBy': return ({required Object username}) => '修复方式如下 ${username}';
 			case 'aboutView.supportHim': return '为他提供支持！';
 			case 'stats.registrationDate': return '注册时间';
 			case 'stats.gametime': return '游玩时长';

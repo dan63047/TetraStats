@@ -923,6 +923,7 @@ class _TranslationsAboutViewRuRu implements TranslationsAboutViewEn {
 	@override String get deDElocale => 'Перевёл на немецкий';
 	@override String get koKRlocale => 'Перевели на корейский';
 	@override String get plPLlocale => 'Перевёл на польский';
+	@override String withFixesBy({required Object username}) => 'С исправлениями от ${username}';
 	@override String get supportHim => 'Поддержите его!';
 }
 
@@ -2015,6 +2016,7 @@ extension on TranslationsRuRu {
 			case 'aboutView.deDElocale': return 'Перевёл на немецкий';
 			case 'aboutView.koKRlocale': return 'Перевели на корейский';
 			case 'aboutView.plPLlocale': return 'Перевёл на польский';
+			case 'aboutView.withFixesBy': return ({required Object username}) => 'С исправлениями от ${username}';
 			case 'aboutView.supportHim': return 'Поддержите его!';
 			case 'stats.registrationDate': return 'Дата регистрации';
 			case 'stats.gametime': return 'Время в игре';

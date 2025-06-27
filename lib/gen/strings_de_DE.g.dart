@@ -922,6 +922,7 @@ class _TranslationsAboutViewDeDe implements TranslationsAboutViewEn {
 	@override String get deDElocale => 'Deutsche Übersetzung';
 	@override String get koKRlocale => 'Koreanisch Übersetzung';
 	@override String get plPLlocale => 'Polieren Übersetzung';
+	@override String withFixesBy({required Object username}) => 'Mit Korrekturen von ${username}';
 	@override String get supportHim => 'Unterstütze Ihn!';
 }
 
@@ -2013,6 +2014,7 @@ extension on TranslationsDeDe {
 			case 'aboutView.deDElocale': return 'Deutsche Übersetzung';
 			case 'aboutView.koKRlocale': return 'Koreanisch Übersetzung';
 			case 'aboutView.plPLlocale': return 'Polieren Übersetzung';
+			case 'aboutView.withFixesBy': return ({required Object username}) => 'Mit Korrekturen von ${username}';
 			case 'aboutView.supportHim': return 'Unterstütze Ihn!';
 			case 'stats.registrationDate': return 'Registrierungsdatum';
 			case 'stats.gametime': return 'Spielzeit';

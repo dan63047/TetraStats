@@ -138,41 +138,42 @@ class _DestinationSavedData extends State<DestinationSavedData> {
               children: [
                 SizedBox(
                   width: widget.constraints.maxWidth > 900.0 ? 350 : widget.constraints.maxWidth - (widget.constraints.maxWidth <= 768.0 ? 0 : 80),
-                  child: Column(
-                    children: [
-                      Card(
-                        child: Center(child: Text(t.savedDataDestination.title, style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.center)),
-                      ),
-                      for (String id in snapshot.data!.keys) Card(
-                        child: ListTile(
-                          title: Text(snapshot.data![id]!),
-                          //subtitle: Text("NaN states, NaN TL records", style: TextStyle(color: Colors.grey)),
-                          onTap: () => setState(() {
-                            selectedID = id;
-                            if (widget.constraints.maxWidth <= 900.0) Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Scaffold(
-                                floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-                                floatingActionButton: Padding(
-                                  padding: const EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 0.0),
-                                  child: FloatingActionButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    tooltip: t.goBackButton,
-                                    child: const Icon(Icons.arrow_back),
-                                  ),
-                                ),
-                                body: SafeArea(
-                                  child: rightSide(widget.constraints.maxWidth, false)
-                                  )
-                                ),
-                              
-                            ),
-                          );
-                          }),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Card(
+                          child: Center(child: Text(t.savedDataDestination.title, style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.center)),
                         ),
-                      )
-                    ],
+                        for (String id in snapshot.data!.keys) Card(
+                          child: ListTile(
+                            title: Text(snapshot.data![id]!),
+                            selected: id == selectedID,
+                            onTap: () => setState(() {
+                              selectedID = id;
+                              if (widget.constraints.maxWidth <= 900.0) Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Scaffold(
+                                  floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+                                  floatingActionButton: Padding(
+                                    padding: const EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 0.0),
+                                    child: FloatingActionButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      tooltip: t.goBackButton,
+                                      child: const Icon(Icons.arrow_back),
+                                    ),
+                                  ),
+                                  body: SafeArea(
+                                    child: rightSide(widget.constraints.maxWidth, false)
+                                    )
+                                  ),
+                              ),
+                            );
+                            }),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 ),
                 if (widget.constraints.maxWidth > 900.0) rightSide(widget.constraints.maxWidth - 350, true)

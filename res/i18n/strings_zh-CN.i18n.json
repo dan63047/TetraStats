@@ -396,6 +396,7 @@
         "deDElocale": "德语翻译员",
         "koKRlocale": "韩语翻译员",
         "plPLlocale": "拋光翻译员",
+        "withFixesBy": "修复方式如下 $username",
         "supportHim": "为他提供支持！"
     },
     "stats": {

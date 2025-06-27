@@ -396,6 +396,7 @@
         "deDElocale": "Deutsche Übersetzung",
         "koKRlocale": "Koreanisch Übersetzung",
         "plPLlocale": "Polieren Übersetzung",
+        "withFixesBy": "Mit Korrekturen von $username",
         "supportHim": "Unterstütze Ihn!"
     },
     "stats": {

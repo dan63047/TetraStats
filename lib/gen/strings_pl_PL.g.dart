@@ -82,7 +82,7 @@ class TranslationsPlPl implements Translations {
 	@override String get season => 'Sezon';
 	@override String get smooth => 'Wygładź';
 	@override String get dateAndTime => 'Data i Czas';
-	@override String get TLfullLBnote => ', ale pozwala ci sortować graczy za pomocą ich statystyk i rang';
+	@override String get TLfullLBnote => 'Wymagające, ale pozwala ci sortować graczy za pomocą ich statystyk i rang';
 	@override String get rank => 'Ranga';
 	@override String verdictGeneral({required Object n, required Object verdict, required Object rank}) => '${n} ${verdict} ${rank}';
 	@override String get verdictBetter => 'powyżej średniej';
@@ -106,7 +106,7 @@ class TranslationsPlPl implements Translations {
 	@override String get banned => 'Zbanowany';
 	@override String get bannedSubtext => 'Bany są nakładane kiedy zasady TETR.IO są złamane';
 	@override String get badStanding => 'Złe zachowanie';
-	@override String get badStandingSubtext => 'Jeden lub więcej nałozonych banów';
+	@override String get badStandingSubtext => 'Jeden lub więcej nałożonych banów';
 	@override String get botAccount => 'Konto Bota';
 	@override String botAccountSubtext({required Object botMaintainers}) => 'Operowany przez ${botMaintainers}';
 	@override String get copiedToClipboard => 'Skopiowano do schowka!';
@@ -213,106 +213,106 @@ class TranslationsPlPl implements Translations {
 		'CK': 'Wyspy Cooka',
 		'CR': 'Kostaryka',
 		'CI': 'Wybrzeże Kości Słoniowej',
-		'HR': 'Croatia',
-		'CU': 'Cuba',
-		'CW': 'Curaçao',
-		'CY': 'Cyprus',
-		'CZ': 'Czech Republic',
-		'DK': 'Denmark',
-		'DJ': 'Djibouti',
-		'DM': 'Dominica',
-		'DO': 'Dominican Republic',
-		'EC': 'Ecuador',
-		'EG': 'Egypt',
+		'HR': 'Chorwacja',
+		'CU': 'Kuba',
+		'CW': 'Curacao',
+		'CY': 'Cypr',
+		'CZ': 'Republika Czeska',
+		'DK': 'Dania',
+		'DJ': 'Dżibuti',
+		'DM': 'Dominikana',
+		'DO': 'Republika Dominikany',
+		'EC': 'Ekwador',
+		'EG': 'Egipt',
 		'SV': 'El Salvador',
-		'GB-ENG': 'England',
-		'GQ': 'Equatorial Guinea',
-		'ER': 'Eritrea',
+		'GB-ENG': 'Anglia',
+		'GQ': 'Gwinea Równikowa',
+		'ER': 'Erytrea',
 		'EE': 'Estonia',
-		'ET': 'Ethiopia',
-		'EU': 'Europe',
-		'FK': 'Falkland Islands (Malvinas)',
-		'FO': 'Faroe Islands',
-		'FJ': 'Fiji',
-		'FI': 'Finland',
-		'FR': 'France',
-		'GF': 'French Guiana',
-		'PF': 'French Polynesia',
-		'TF': 'French Southern Territories',
+		'ET': 'Etiopia',
+		'EU': 'Europa',
+		'FK': 'Falklandy (Malwiny)',
+		'FO': 'Wyspy Owcze',
+		'FJ': 'Fidżi',
+		'FI': 'Finlandia',
+		'FR': 'Francja',
+		'GF': 'Gujana Francuska',
+		'PF': 'Polinezja Francuska',
+		'TF': 'Francuskie Terytoria Południowe i Antarktyczne',
 		'GA': 'Gabon',
 		'GM': 'Gambia',
-		'GE': 'Georgia',
-		'DE': 'Germany',
+		'GE': 'Gruzja',
+		'DE': 'Niemcy',
 		'GH': 'Ghana',
 		'GI': 'Gibraltar',
-		'GR': 'Greece',
-		'GL': 'Greenland',
+		'GR': 'Grecja',
+		'GL': 'Grenlandia',
 		'GD': 'Grenada',
-		'GP': 'Guadeloupe',
+		'GP': 'Gwadelupa',
 		'GU': 'Guam',
-		'GT': 'Guatemala',
-		'GG': 'Guernsey',
-		'GN': 'Guinea',
-		'GW': 'Guinea-Bissau',
-		'GY': 'Guyana',
+		'GT': 'Gwatemala',
+		'GG': 'Wyspa Guernsey',
+		'GN': 'Gwinea',
+		'GW': 'Gwinea Bissau',
+		'GY': 'Gujana',
 		'HT': 'Haiti',
-		'HM': 'Heard Island and McDonald Islands',
-		'VA': 'Holy See (Vatican City State)',
+		'HM': 'Wyspy Heard i McDonalda',
+		'VA': 'Stolica Apostolska (Watykan)',
 		'HN': 'Honduras',
-		'HK': 'Hong Kong',
-		'HU': 'Hungary',
-		'IS': 'Iceland',
-		'IN': 'India',
-		'ID': 'Indonesia',
-		'IR': 'Iran, Islamic Republic of',
-		'IQ': 'Iraq',
-		'IE': 'Ireland',
-		'IM': 'Isle of Man',
-		'IL': 'Israel',
-		'IT': 'Italy',
-		'JM': 'Jamaica',
-		'JP': 'Japan',
+		'HK': 'Hongkong',
+		'HU': 'Węgry',
+		'IS': 'Islandia',
+		'IN': 'Indie',
+		'ID': 'Indonezja',
+		'IR': 'Iran',
+		'IQ': 'Irak',
+		'IE': 'Irlandia',
+		'IM': 'Wyspa Man',
+		'IL': 'Izrael',
+		'IT': 'Włochy',
+		'JM': 'Jamajka',
+		'JP': 'Japonia',
 		'JE': 'Jersey',
-		'JO': 'Jordan',
-		'KZ': 'Kazakhstan',
-		'KE': 'Kenya',
+		'JO': 'Jordania',
+		'KZ': 'Kazachstan',
+		'KE': 'Kenia',
 		'KI': 'Kiribati',
-		'KP': 'Korea, Democratic People\'s Republic of',
-		'KR': 'Korea, Republic of',
-		'XK': 'Kosovo',
-		'KW': 'Kuwait',
-		'KG': 'Kyrgyzstan',
-		'LA': 'Lao People\'s Democratic Republic',
-		'LV': 'Latvia',
+		'KP': 'Koreańska Republika Ludowo-Demokratyczna',
+		'KR': 'Korea Południowa',
+		'XK': 'Kosowo',
+		'KW': 'Kuwejt',
+		'KG': 'Kirgistan',
+		'LA': 'Laotańska Republika Ludowo-Demokratyczna',
+		'LV': 'Łotwa',
 		'LB': 'Lebanon',
 		'LS': 'Lesotho',
-		'LR': 'Liberia',
-		'LY': 'Libya',
+		'LR': 'Republika Liberii',
+		'LY': 'Libia',
 		'LI': 'Liechtenstein',
-		'LT': 'Lithuania',
-		'LU': 'Luxembourg',
-		'MO': 'Macao',
-		'MK': 'Macedonia, the former Yugoslav Republic of',
-		'MG': 'Madagascar',
+		'LT': 'Litwa',
+		'LU': 'Luksemburg',
+		'MO': 'Makau',
+		'MK': 'Republika Macedonii Północnej',
+		'MG': 'Madagaskar',
 		'MW': 'Malawi',
-		'MY': 'Malaysia',
-		'MV': 'Maldives',
+		'MY': 'Malezja',
+		'MV': 'Malediwy',
 		'ML': 'Mali',
 		'MT': 'Malta',
-		'MH': 'Marshall Islands',
-		'MQ': 'Martinique',
-		'MR': 'Mauritania',
+		'MH': 'Wyspy Marshalla',
+		'MQ': 'Martynika',
+		'MR': 'Mauretania',
 		'MU': 'Mauritius',
-		'YT': 'Mayotte',
-		'MX': 'Mexico',
-		'FM': 'Micronesia, Federated States of',
-		'MD': 'Moldova, Republic of',
-		'MC': 'Monaco',
-		'ME': 'Montenegro',
-		'MA': 'Morocco',
+		'YT': 'Majotta',
+		'MX': 'Meksyk',
+		'FM': 'Mikronezja',
+		'MD': 'Republika Mołdowy',
+		'MC': 'Monako',
+		'ME': 'Czarnogóra',
+		'MA': 'Maroko',
 		'MN': 'Mongolia',
 		'MS': 'Montserrat',
-		'MZ': 'Mozambique',
+		'MZ': 'Mozambik',
 		'MM': 'Mjanma',
 		'NA': 'Namibia',
 		'NR': 'Nauru',
@@ -486,7 +486,7 @@ class _TranslationsDistinguishmentsPlPl implements TranslationsDistinguishmentsE
 	@override String get noHeader => 'Brak nagłówka';
 	@override String get noFooter => 'Brak stopki';
 	@override String get twc => 'Światowy Czempion TETR.IO';
-	@override String twcYear({required Object year}) => '${year} Mistrzostwa Świata TETR.IO';
+	@override String twcYear({required Object year}) => 'Mistrzostwa Świata w TETR.IO ${year}';
 }
 
 // Path: newsEntries
@@ -527,7 +527,7 @@ class _TranslationsNewsEntriesPlPl implements TranslationsNewsEntriesEn {
 		s('TETR.IO supporter'),
 	]);
 	@override TextSpan unknown({required InlineSpan type}) => TextSpan(children: [
-		const TextSpan(text: 'Nieznane wiesci typu '),
+		const TextSpan(text: 'Nieznane wieści typu '),
 		type,
 	]);
 }
@@ -540,8 +540,8 @@ class _TranslationsSnackBarMessagesPlPl implements TranslationsSnackBarMessagesE
 
 	// Translations
 	@override String stateRemoved({required Object date}) => 'Stan ${date} został usunięty z bazy danych!';
-	@override String matchRemoved({required Object date}) => '${date} mecz został usunięty z bazy danych!';
-	@override String get notForWeb => 'Funkcja nie jest dostępna dla wersji internetowej';
+	@override String matchRemoved({required Object date}) => 'Mecz z ${date} został usunięty z bazy danych!';
+	@override String get notForWeb => 'Funkcja nie jest dostępna w wersji internetowej';
 	@override String get importSuccess => 'Zaimportowano pomyślnie';
 	@override String get importCancelled => 'Anulowano importowanie';
 }
@@ -570,8 +570,8 @@ class _TranslationsErrorsPlPl implements TranslationsErrorsEn {
 	@override String get tooManyRequests => 'Zostałeś ograniczony.';
 	@override String get tooManyRequestsSub => 'Zaczekaj chwilę i spróbuj ponownie.';
 	@override String get internal => 'Coś się stało po stronie tetr.io';
-	@override String get internalSub => 'osk, prawdopodobnie już o tym wie';
-	@override String get internalWebVersion => 'Coś się stało po stronie tetr.io (lub na oskware_bridge, idk)';
+	@override String get internalSub => 'osk, prawdopodobnie, już o tym wie';
+	@override String get internalWebVersion => 'Coś się stało po stronie tetr.io (lub na oskware_bridge, nwm wsm)';
 	@override String get internalWebVersionSub => 'Jeśli strona statusu osk mówi, że wszystko jest w porządku, poinformuj dan63047 o tym problemie';
 	@override String get oskwareBridge => 'Coś się stało z oskware_bridge';
 	@override String get oskwareBridgeSub => 'Daj znać dan63047';
@@ -610,7 +610,7 @@ class _TranslationsGraphsDestinationPlPl implements TranslationsGraphsDestinatio
 	@override String fetchAndsaveTLHistoryResult({required Object number}) => 'Znaleziono ${number} stanów';
 	@override String fetchAndSaveOldTLmatchesResult({required Object number}) => 'Znaleziono ${number} meczy';
 	@override String gamesPlayed({required Object games}) => 'Zagrano ${games} gier';
-	@override String get dateAndTime => 'Data i Czas';
+	@override String get dateAndTime => 'Data i czas';
 	@override String get filterModaleTitle => 'Filtruj rangi na wykresie';
 }
 
@@ -648,7 +648,7 @@ class _TranslationsCutoffsDestinationPlPl implements TranslationsCutoffsDestinat
 	@override String get notDeflated => 'Nie jest obniżone';
 	@override String get wellDotDotDot => 'Cóż...';
 	@override String fromPlace({required Object n}) => 'z № ${n}';
-	@override String get viewButton => 'Widok';
+	@override String get viewButton => 'Pokaż';
 }
 
 // Path: rankView
@@ -700,9 +700,9 @@ class _TranslationsTlMatchViewPlPl implements TranslationsTlMatchViewEn {
 	@override String roundNumber({required Object n}) => 'Runda ${n}';
 	@override String get statsFor => 'Statystyki dla';
 	@override String get numberOfRounds => 'Ilość rund';
-	@override String get matchLength => 'Długość Meczu';
-	@override String get roundLength => 'Długość Rundy';
-	@override String get matchStats => 'Statystyki Meczu';
+	@override String get matchLength => 'Długość meczu';
+	@override String get roundLength => 'Długość rundy';
+	@override String get matchStats => 'Statystyki meczu';
 	@override String get downloadReplay => 'Pobierz powtórkę .ttrm';
 	@override String get openReplay => 'Otwórz powtórkę w TETR.IO';
 }
@@ -715,7 +715,7 @@ class _TranslationsCalcDestinationPlPl implements TranslationsCalcDestinationEn 
 
 	// Translations
 	@override String placeholders({required Object stat}) => 'Wprowadź ${stat}';
-	@override String get tip => 'Wprowadź wartości i naciśnij "Calc", aby zobaczyć wykalkulowane statystyki dla Nerdów';
+	@override String get tip => 'Wprowadź wartości i naciśnij "Kalkuluj", aby zobaczyć wykalkulowane statystyki dla Nerdów';
 	@override String get invalidValues => 'Podaj prawidłową wartość';
 	@override String get statsCalcButton => 'Kalkuluj';
 	@override String get damageCalcTip => 'Kliknij na akcje po lewej stronie, aby dodać je tutaj';
@@ -778,8 +778,8 @@ class _TranslationsSavedDataDestinationPlPl implements TranslationsSavedDataDest
 
 	// Translations
 	@override String get title => 'Zapisane Dane';
-	@override String get tip => 'Wybierz nazwę użytkownika po lewej stronie aby zobaczyć powiązane z nią dane';
-	@override String seasonTLstates({required Object s}) => 'Stan TL Sezonu ${s}';
+	@override String get tip => 'Wybierz nazwę użytkownika po lewej stronie, aby zobaczyć powiązane z nią dane';
+	@override String seasonTLstates({required Object s}) => 'Stany Sezonu ${s} TL';
 	@override String get TLrecords => 'Rekordy TL';
 }
 
@@ -795,13 +795,13 @@ class _TranslationsSettingsDestinationPlPl implements TranslationsSettingsDestin
 	@override String get customization => 'Personalizacja';
 	@override String get database => 'Lokalna baza danych';
 	@override String get checking => 'Sprawdzanie...';
-	@override String get enterToSubmit => 'Naciśnij Enter aby przesłać';
+	@override String get enterToSubmit => 'Naciśnij Enter, aby przesłać';
 	@override String get account => 'Twoje konto w TETR.IO';
 	@override String get accountDescription => 'Statystyki tego gracza zostaną załadowane początkowo zaraz po uruchomieniu aplikacji. Domyślnie ładuje moje statystyki (dan63). Aby to zmienić, wprowadź swój nick tutaj.';
 	@override String get done => 'Gotowe!';
 	@override String get noSuchAccount => 'Nie ma takiego konta';
 	@override String get language => 'Język';
-	@override String languageDescription({required Object languages}) => 'Tetra Stats zostałe przetłumaczone na ${languages}. Domyślnie aplikacja wybierze twój język systemowy lub Angielski, jesli ustawienia regionalne twojego systemu nie są dostępne.';
+	@override String languageDescription({required Object languages}) => 'Tetra Stats zostały przetłumaczone na ${languages}. Domyślnie aplikacja wybierze twój język systemowy lub angielski, jeśli ustawienia regionalne twojego systemu nie są dostępne.';
 	@override String languages({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('pl'))(n,
 		zero: 'zero języków',
 		one: '${n} język',
@@ -813,20 +813,20 @@ class _TranslationsSettingsDestinationPlPl implements TranslationsSettingsDestin
 	@override String get updateInTheBackground => 'Aktualizuj dane w tle';
 	@override String get updateInTheBackgroundDescription => 'Jeśli włączone, Tetra Stats będzie próbowało otrzymać nowe informacje po wygaśnięciu pamięci podręcznej. Zwykle dzieje się to co 5 minut';
 	@override String get compareStats => 'Porównaj statystyki TL ze średnimi rang';
-	@override String get compareStatsDescription => 'Jeśli włączone, Tetra Stats zapewni dodatkowe pomiary, które pozwolą ci porównać siebie do średniego gracza w twojej randze. Będzie to widoczne w ten sposób - statystyki będą podświetlane odpowiednim kolorem, najedź na nie kursorem, aby zobaczyć więcej informacji.';
+	@override String get compareStatsDescription => 'Jeśli włączone, Tetra Stats zapewni dodatkowe pomiary, które pozwolą ci porównać siebie do średniego gracza w twojej randze. Będzie to widoczne w ten sposób — statystyki będą podświetlane odpowiednim kolorem, najedź na nie kursorem, aby zobaczyć więcej informacji.';
 	@override String get showPosition => 'Pokaż pozycję w rankingu według statystyk';
 	@override String get showPositionDescription => 'To może zająć trochę czasu (i ruchu), ale pozwoli Ci zobaczyć swoją pozycję na tablicy wyników, posortowaną według statystyk';
-	@override String get accentColor => 'Kolor akcentowy';
-	@override String get accentColorDescription => 'Ten kolor jest widoczny w tej aplikacji i zazwyczaj podświetla interaktywne elementy interfejsu użytkownika.';
-	@override String get accentColorModale => 'Wybierz kolor akcentowy';
+	@override String get accentColor => 'Kolor akcentu';
+	@override String get accentColorDescription => 'Ten kolor jest widoczny w tej aplikacji i zazwyczaj podkreśla interaktywne elementy interfejsu użytkownika.';
+	@override String get accentColorModale => 'Wybierz kolor akcentu';
 	@override String get timestamps => 'Format znaczników czasu';
 	@override String timestampsDescriptionPart1({required Object d}) => 'Możesz wybrać, w jaki sposób znaczniki czasu pokazują czas. Domyślnie pokazują czas w strefie czasowej GMT, sformatowany zgodnie z wybraną lokalizacją, przykład: ${d}.';
-	@override String timestampsDescriptionPart2({required Object y, required Object r}) => 'Jest również:\n• Ustawienia regionalne sformatowane w twojej strefie czasowej: ${y}\n• względny znacznik czasu: ${r}';
+	@override String timestampsDescriptionPart2({required Object y, required Object r}) => 'Jest również:\n• Ustawienia regionalne sformatowane w twojej strefie czasowej: ${y}\n• Względny znacznik czasu: ${r}';
 	@override String get timestampsAbsoluteGMT => 'Bezwzględny (GMT)';
-	@override String get timestampsAbsoluteLocalTime => 'Bezwzględny (Twoja Strefa Czasowa)';
+	@override String get timestampsAbsoluteLocalTime => 'Bezwzględny (Twoja strefa czasowa)';
 	@override String get timestampsRelative => 'Względny';
 	@override String get sheetbotLikeGraphs => 'Zachowanie wykresów radarowych podobne do Sheetbota';
-	@override String get sheetbotLikeGraphsDescription => 'Mimo tego że zostało to uznane przeze mnie, sposób działania wykresów w SheetBocie nie jest zbyt poprawny, niektórzy byli zdziwieni, że -0.5 stride nie wygląda w ten sam sposób jak pokazane na wykresach SheetBota. Więc jesteśmy tutaj: jeśli ta opcje jest włączona, punkty na wykresie mogą wyświetlić się po przeciwnej stronie wykresu jeśli wartości są negatywne.';
+	@override String get sheetbotLikeGraphsDescription => 'Mimo tego, że rozważałem to, sposób działania wykresów w SheetBocie nie jest zbyt poprawny, niektórzy byli zdziwieni, że -0,5 stride nie wygląda w ten sam sposób jak jest to pokazane na wykresach SheetBota. Więc jesteśmy tutaj: jeśli ta opcja jest włączona, punkty na wykresie mogą wyświetlić się po przeciwnej stronie wykresu, jeśli wartości są negatywne.';
 	@override String get oskKagariGimmick => 'Osk-Kagari gimmick';
 	@override String get oskKagariGimmickDescription => 'Jeśli włączone, zamiast rangi oska, :kagari: zostanie wyrenderowana.';
 	@override String get bytesOfDataStored => 'przechowywanych danych';
@@ -881,7 +881,7 @@ class _TranslationsCalcNavigationPlPl implements TranslationsCalcNavigationEn {
 
 	// Translations
 	@override String get stats => 'Kalkulator statystyk';
-	@override String get damage => 'Kalkulator Obrażeń';
+	@override String get damage => 'Kalkulator obrażeń';
 }
 
 // Path: firstTimeView
@@ -892,11 +892,11 @@ class _TranslationsFirstTimeViewPlPl implements TranslationsFirstTimeViewEn {
 
 	// Translations
 	@override String get welcome => 'Witaj w Tetra Stats';
-	@override String get description => 'Usługa umożliwiająca śledzenie różnych statystyk dla TETR.IO';
+	@override String get description => 'Serwis umożliwiający śledzenie różnych statystyk dla TETR.IO';
 	@override String get nicknameQuestion => 'Jaki jest Twój nick?';
 	@override String get inpuntHint => 'Wpisz tutaj... (3-16 symboli)';
 	@override String get emptyInputError => 'Nie można przesłać pustego ciągu';
-	@override String niceToSeeYou({required Object n}) => 'Miło cię zobaczyć, ${n}';
+	@override String niceToSeeYou({required Object n}) => 'Miło cię widzieć, ${n}';
 	@override String get letsTakeALook => 'Spójrzmy na Twoje statystyki...';
 	@override String get skip => 'Pomiń';
 }
@@ -909,20 +909,21 @@ class _TranslationsAboutViewPlPl implements TranslationsAboutViewEn {
 
 	// Translations
 	@override String get title => 'O Tetra Stats';
-	@override String get about => 'Tetra Stats to serwis, który działa za pomocą Tetra Channel API TETR.IO, dostarczając z niego dane i kalkulowanie własnych pomiarów, na podstawie tych danych. Serwis pozwala użytkownikowi śledzić swoje postępy w Tetra League za pomocą funkcji "Śledź", która zapisuje wszystkie zmiany w Tetra League do lokalnej bazy danych (nie jest to automatyczne, musisz odwiedzać serwis od czasu do czasu), aby zobaczyć te zmiany na wykresach.\n\nBeanserver blaster jest częścią Tetra Stats, który oddzielił się w skrypt serwerowy. Zapewnia pełną tablicę rankingów Tetra League, pozwalając Tetra Stats sortować rankingi za pomocą jakichkolwiek paramterów i budować wykresy punktowe, które pozwalają uzytkownikowi analizować swoje trendy Tetra League. Daje także dostęp do histori cutoffów Tetra League, które mogę być oglądane przez uzytkownika za pomocą wykresów.\n\nSą plany aby dodać analizę powtórek i historię turniejów, więc bądź czujny!\n\nSerwis nie jest powiązany z TETR.IO lub oskiem w jakikolwiek sposób.';
-	@override String get appVersion => 'Wersja Aplikacji';
+	@override String get about => 'Tetra Stats to serwis, który działa za pomocą API TETR.IO Tetra Channel, dostarczając z niego dane i kalkulując dodatkowe metryki na podstawie tych danych. Serwis pozwala użytkownikowi śledzić swoje postępy w Tetra League za pomocą funkcji "Śledź", która zapisuje wszystkie zmiany w Tetra League do lokalnej bazy danych (nie jest to automatyczne, musisz odwiedzać serwis od czasu do czasu), aby gracz mógł przejrzeć te zmiany na wykresach.\n\nBeanserver blaster jest częścią Tetra Stats, który oddzielił się w skrypt serwerowy. Zapewnia pełną tablicę rankingów Tetra League, pozwalając Tetra Stats sortować rankingi za pomocą jakichkolwiek parametrów i budować wykresy punktowe, które pozwalają użytkownikowi analizować swoje tendencje w Tetra League. Daje także dostęp do historii cutoffów Tetra League, które mogą być przeglądane przez użytkownika zna wykresach.\n\nW planach jest dodanie analizy powtórek i historii turniejów, więc oczekujcie nowości!\n\nSerwis nie jest powiązany z TETR.IO lub oskiem w jakikolwiek sposób.';
+	@override String get appVersion => 'Wersja aplikacji';
 	@override String build({required Object build}) => 'Build ${build}';
 	@override String get GHrepo => 'Repozytorium GitHub';
 	@override String get submitAnIssue => 'Zgłoś problem';
 	@override String get credits => 'Podziękowania';
-	@override String get authorAndDeveloper => 'Autor & deweloper';
+	@override String get authorAndDeveloper => 'Autor i deweloper';
 	@override String get providedFormulas => 'Dostarczył(a) formuły';
 	@override String get providedS1history => 'Dostarczył(a) historię S1';
 	@override String get inoue => 'Inoue (graber powtórek)';
-	@override String get zhCNlocale => 'Język Chiński Uproszczony';
-	@override String get deDElocale => 'Język Niemiecki';
-	@override String get koKRlocale => 'Język Koreański';
-	@override String get plPLlocale => 'Język Polski';
+	@override String get zhCNlocale => 'Język chiński uproszczony';
+	@override String get deDElocale => 'Język niemiecki';
+	@override String get koKRlocale => 'Język koreański';
+	@override String get plPLlocale => 'Język polski';
+	@override String withFixesBy({required Object username}) => 'Z poprawkami ${username}';
 	@override String get supportHim => 'Wesprzyj go!';
 }
 
@@ -935,9 +936,9 @@ class _TranslationsStatsPlPl implements TranslationsStatsEn {
 	// Translations
 	@override String get registrationDate => 'Data rejestracji';
 	@override String get gametime => 'Czas gry';
-	@override String get ogp => 'Rozegrane Gry Online';
-	@override String get ogw => 'Wygrane Gry Online';
-	@override String get followers => 'Obserwujący';
+	@override String get ogp => 'Rozegrane gry online';
+	@override String get ogw => 'Wygrane gry online';
+	@override String get followers => 'Obserwujących';
 	@override late final _TranslationsStatsXpPlPl xp = _TranslationsStatsXpPlPl._(_root);
 	@override late final _TranslationsStatsTrPlPl tr = _TranslationsStatsTrPlPl._(_root);
 	@override late final _TranslationsStatsGlickoPlPl glicko = _TranslationsStatsGlickoPlPl._(_root);
@@ -990,7 +991,7 @@ class _TranslationsStatsPlPl implements TranslationsStatsEn {
 	@override String get score => 'Wynik';
 	@override String get lines => 'Linie';
 	@override String get linesShort => 'L';
-	@override String get pcs => 'Perfekcyjne Cleary';
+	@override String get pcs => 'Czyste Pola';
 	@override String get holds => 'Przechowania';
 	@override String get spike => 'Najwyższy Spike';
 	@override String top({required Object percentage}) => 'Top ${percentage}';
@@ -1000,7 +1001,7 @@ class _TranslationsStatsPlPl implements TranslationsStatsEn {
 	@override String get total => 'Łącznie';
 	@override String get sent => 'Wysłano';
 	@override String get received => 'Otrzymane';
-	@override String get placement => 'Położenie';
+	@override String get placement => 'Pozycja';
 	@override String get peak => 'Szczyt';
 	@override String get overall => 'Ogólnie';
 	@override String get midgame => 'Środek gry';
@@ -1013,17 +1014,17 @@ class _TranslationsStatsPlPl implements TranslationsStatsEn {
 	@override String get rate => 'Częstość';
 	@override String get secsDS => 'Secs/DS';
 	@override String get secsCheese => 'Secs/Ser';
-	@override String get attackCheesiness => 'Nieład Ataków';
-	@override String get downstackingRatio => 'Współczynnik Downstackowania';
+	@override String get attackCheesiness => 'Nieład ataków';
+	@override String get downstackingRatio => 'Współczynnik downstackowania';
 	@override String get clearTypes => 'Typy Clearów';
 	@override String get wellColumnDistribution => 'Dystrybucja ';
 	@override String get allSpins => 'All Spiny';
-	@override String get sankeyTitle => 'Wykres Sankey Nadchodzących Ataków';
-	@override String get incomingAttack => 'Nadchodzący Atak';
+	@override String get sankeyTitle => 'Wykres nadchodzących ataków Sankey';
+	@override String get incomingAttack => 'Nadchodzący atak';
 	@override String get clean => 'Czyste śmieci';
 	@override String get cancelled => 'Anulowane';
-	@override String get cheeseTanked => 'Ser Przyjęty';
-	@override String get cleanTanked => 'Czyste Śmieci Przyjęte';
+	@override String get cheeseTanked => 'Przyjęty ser';
+	@override String get cleanTanked => 'Przyjęte czyste śmieci';
 	@override String get kills => 'Zabójstwa';
 	@override String get deaths => 'Śmierci';
 	@override String get ppsDistribution => 'Rozkład PPS';
@@ -1043,12 +1044,12 @@ class _TranslationsStatsPlPl implements TranslationsStatsEn {
 		other: '${n} naciśnięć klawiszy',
 	);
 	@override String tspinsTotal({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('pl'))(n,
-		zero: '${n} łącznych T-Spinów',
-		one: '${n} łączny T-Spin',
-		two: '${n} łączne T-Spiny',
-		few: '${n} łączne T-Spiny',
-		many: '${n} łącznych T-Spinów',
-		other: '${n} łącznych T-Spinów',
+		zero: '${n} T-spinów łącznie',
+		one: '${n} T-spin łącznie',
+		two: '${n} T-spiny łącznie',
+		few: '${n} T-spiny łącznie',
+		many: '${n} T-spinów łącznie',
+		other: '${n} T-spinów łącznie',
 	);
 	@override String linesCleared({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('pl'))(n,
 		zero: '${n} linii wyczyszczonych',
@@ -1147,7 +1148,7 @@ class _TranslationsStatsS1trPlPl implements TranslationsStatsS1trEn {
 
 	// Translations
 	@override String get short => 'S1 TR';
-	@override String get full => 'TR podobne do Sezonu 1';
+	@override String get full => 'TR w stylu Sezonu 1';
 }
 
 // Path: stats.gp
@@ -1157,7 +1158,7 @@ class _TranslationsStatsGpPlPl implements TranslationsStatsGpEn {
 	final TranslationsPlPl _root; // ignore: unused_field
 
 	// Translations
-	@override String get short => 'GP';
+	@override String get short => 'RG';
 	@override String get full => 'Rozegrane gry';
 }
 
@@ -1168,8 +1169,8 @@ class _TranslationsStatsGwPlPl implements TranslationsStatsGwEn {
 	final TranslationsPlPl _root; // ignore: unused_field
 
 	// Translations
-	@override String get short => 'GW';
-	@override String get full => 'Wygrane Gry';
+	@override String get short => 'WG';
+	@override String get full => 'Wygrane gry';
 }
 
 // Path: stats.winrate
@@ -1179,8 +1180,8 @@ class _TranslationsStatsWinratePlPl implements TranslationsStatsWinrateEn {
 	final TranslationsPlPl _root; // ignore: unused_field
 
 	// Translations
-	@override String get short => 'WR%';
-	@override String get full => 'Współczynnik Zwycięstw';
+	@override String get short => '%WG';
+	@override String get full => 'Współczynnik zwycięstw';
 }
 
 // Path: stats.apm
@@ -1191,7 +1192,7 @@ class _TranslationsStatsApmPlPl implements TranslationsStatsApmEn {
 
 	// Translations
 	@override String get short => 'APM';
-	@override String get full => 'Atak Na Minutę';
+	@override String get full => 'Atak na minutę';
 }
 
 // Path: stats.pps
@@ -1202,7 +1203,7 @@ class _TranslationsStatsPpsPlPl implements TranslationsStatsPpsEn {
 
 	// Translations
 	@override String get short => 'PPS';
-	@override String get full => 'Klocki Na Sekundę';
+	@override String get full => 'Klocki na sekundę';
 }
 
 // Path: stats.vs
@@ -1224,7 +1225,7 @@ class _TranslationsStatsAppPlPl implements TranslationsStatsAppEn {
 
 	// Translations
 	@override String get short => 'APP';
-	@override String get full => 'Atak Na Klocek';
+	@override String get full => 'Atak na klocek';
 }
 
 // Path: stats.vsapm
@@ -1246,7 +1247,7 @@ class _TranslationsStatsDssPlPl implements TranslationsStatsDssEn {
 
 	// Translations
 	@override String get short => 'DS/S';
-	@override String get full => 'Downstack Na Sekundę';
+	@override String get full => 'Downstack na sekundę';
 }
 
 // Path: stats.dsp
@@ -1257,7 +1258,7 @@ class _TranslationsStatsDspPlPl implements TranslationsStatsDspEn {
 
 	// Translations
 	@override String get short => 'DS/P';
-	@override String get full => 'Downstack Na Klocek';
+	@override String get full => 'Downstack na klocek';
 }
 
 // Path: stats.appdsp
@@ -1290,7 +1291,7 @@ class _TranslationsStatsGbePlPl implements TranslationsStatsGbeEn {
 
 	// Translations
 	@override String get short => 'GbE';
-	@override String get full => 'Wydajność Śmieci';
+	@override String get full => 'Wydajność śmieci';
 }
 
 // Path: stats.nyaapp
@@ -1311,7 +1312,7 @@ class _TranslationsStatsAreaPlPl implements TranslationsStatsAreaEn {
 	final TranslationsPlPl _root; // ignore: unused_field
 
 	// Translations
-	@override String get short => 'Area';
+	@override String get short => 'Obszar';
 	@override String get full => 'Obszar';
 }
 
@@ -1334,7 +1335,7 @@ class _TranslationsStatsEtraccPlPl implements TranslationsStatsEtraccEn {
 
 	// Translations
 	@override String get short => '±eTR';
-	@override String get full => 'Dokładność Szacowanego TR';
+	@override String get full => 'Dokładność szacowanego TR';
 }
 
 // Path: stats.opener
@@ -1400,8 +1401,8 @@ class _TranslationsStatsClimbSpeedPlPl implements TranslationsStatsClimbSpeedEn 
 
 	// Translations
 	@override String get short => 'CSP';
-	@override String get full => 'Prędkość Wspinania';
-	@override String get gaugetTitle => 'Prędkość\nWspinania';
+	@override String get full => 'Prędkość wspinaczki';
+	@override String get gaugetTitle => 'Prędkość\nwspinaczki';
 }
 
 // Path: stats.peakClimbSpeed
@@ -1411,7 +1412,7 @@ class _TranslationsStatsPeakClimbSpeedPlPl implements TranslationsStatsPeakClimb
 	final TranslationsPlPl _root; // ignore: unused_field
 
 	// Translations
-	@override String get short => 'Najwyższy CSP';
+	@override String get short => 'Najwyższe CSP';
 	@override String get full => 'Najwyższa prędkość wspinania';
 	@override String get gaugetTitle => 'Szczyt';
 }
@@ -1469,7 +1470,7 @@ class _TranslationsStatsTotalTimePlPl implements TranslationsStatsTotalTimeEn {
 
 	// Translations
 	@override String get short => 'Czas';
-	@override String get full => 'Łączny Czas';
+	@override String get full => 'Łączny czas';
 	@override String get widgetTitle => 'ączny czas';
 }
 
@@ -1503,7 +1504,7 @@ class _TranslationsStatsSppPlPl implements TranslationsStatsSppEn {
 
 	// Translations
 	@override String get short => 'SPP';
-	@override String get full => 'Wynik Na Klocek';
+	@override String get full => 'Punkty na klocek';
 }
 
 // Path: stats.kp
@@ -1525,7 +1526,7 @@ class _TranslationsStatsKppPlPl implements TranslationsStatsKppEn {
 
 	// Translations
 	@override String get short => 'KPP';
-	@override String get full => 'Naciśnięcia klawiszy Na Klocek';
+	@override String get full => 'Naciśnięcia klawiszy na klocek';
 }
 
 // Path: stats.kps
@@ -1536,7 +1537,7 @@ class _TranslationsStatsKpsPlPl implements TranslationsStatsKpsEn {
 
 	// Translations
 	@override String get short => 'KPS';
-	@override String get full => 'Naciśnięcia klawiszy Na Sekundę';
+	@override String get full => 'Naciśnięcia klawiszy na sekundę';
 }
 
 // Path: stats.apl
@@ -1547,7 +1548,7 @@ class _TranslationsStatsAplPlPl implements TranslationsStatsAplEn {
 
 	// Translations
 	@override String get short => 'APL';
-	@override String get full => 'Atak Na Linię';
+	@override String get full => 'Atak na linię';
 }
 
 // Path: stats.quadEfficiency
@@ -1693,7 +1694,7 @@ extension on TranslationsPlPl {
 			case 'season': return 'Sezon';
 			case 'smooth': return 'Wygładź';
 			case 'dateAndTime': return 'Data i Czas';
-			case 'TLfullLBnote': return ', ale pozwala ci sortować graczy za pomocą ich statystyk i rang';
+			case 'TLfullLBnote': return 'Wymagające, ale pozwala ci sortować graczy za pomocą ich statystyk i rang';
 			case 'rank': return 'Ranga';
 			case 'verdictGeneral': return ({required Object n, required Object verdict, required Object rank}) => '${n} ${verdict} ${rank}';
 			case 'verdictBetter': return 'powyżej średniej';
@@ -1721,7 +1722,7 @@ extension on TranslationsPlPl {
 			case 'banned': return 'Zbanowany';
 			case 'bannedSubtext': return 'Bany są nakładane kiedy zasady TETR.IO są złamane';
 			case 'badStanding': return 'Złe zachowanie';
-			case 'badStandingSubtext': return 'Jeden lub więcej nałozonych banów';
+			case 'badStandingSubtext': return 'Jeden lub więcej nałożonych banów';
 			case 'botAccount': return 'Konto Bota';
 			case 'botAccountSubtext': return ({required Object botMaintainers}) => 'Operowany przez ${botMaintainers}';
 			case 'copiedToClipboard': return 'Skopiowano do schowka!';
@@ -1737,7 +1738,7 @@ extension on TranslationsPlPl {
 			case 'distinguishments.noHeader': return 'Brak nagłówka';
 			case 'distinguishments.noFooter': return 'Brak stopki';
 			case 'distinguishments.twc': return 'Światowy Czempion TETR.IO';
-			case 'distinguishments.twcYear': return ({required Object year}) => '${year} Mistrzostwa Świata TETR.IO';
+			case 'distinguishments.twcYear': return ({required Object year}) => 'Mistrzostwa Świata w TETR.IO ${year}';
 			case 'newsEntries.leaderboard': return ({required InlineSpan rank, required InlineSpan gametype}) => TextSpan(children: [
 				const TextSpan(text: 'Zdobył(a) № '),
 				rank,
@@ -1769,7 +1770,7 @@ extension on TranslationsPlPl {
 				s('TETR.IO supporter'),
 			]);
 			case 'newsEntries.unknown': return ({required InlineSpan type}) => TextSpan(children: [
-				const TextSpan(text: 'Nieznane wiesci typu '),
+				const TextSpan(text: 'Nieznane wieści typu '),
 				type,
 			]);
 			case 'rankupMiddle': return ({required Object r}) => 'ranga ${r}';
@@ -1794,8 +1795,8 @@ extension on TranslationsPlPl {
 			case 'noRecord': return 'Brak rekordu';
 			case 'sprintAndBlitsRelevance': return ({required Object date}) => 'Istotność: ${date}';
 			case 'snackBarMessages.stateRemoved': return ({required Object date}) => 'Stan ${date} został usunięty z bazy danych!';
-			case 'snackBarMessages.matchRemoved': return ({required Object date}) => '${date} mecz został usunięty z bazy danych!';
-			case 'snackBarMessages.notForWeb': return 'Funkcja nie jest dostępna dla wersji internetowej';
+			case 'snackBarMessages.matchRemoved': return ({required Object date}) => 'Mecz z ${date} został usunięty z bazy danych!';
+			case 'snackBarMessages.notForWeb': return 'Funkcja nie jest dostępna w wersji internetowej';
 			case 'snackBarMessages.importSuccess': return 'Zaimportowano pomyślnie';
 			case 'snackBarMessages.importCancelled': return 'Anulowano importowanie';
 			case 'errors.noRecords': return 'Brak wpisów';
@@ -1815,8 +1816,8 @@ extension on TranslationsPlPl {
 			case 'errors.tooManyRequests': return 'Zostałeś ograniczony.';
 			case 'errors.tooManyRequestsSub': return 'Zaczekaj chwilę i spróbuj ponownie.';
 			case 'errors.internal': return 'Coś się stało po stronie tetr.io';
-			case 'errors.internalSub': return 'osk, prawdopodobnie już o tym wie';
-			case 'errors.internalWebVersion': return 'Coś się stało po stronie tetr.io (lub na oskware_bridge, idk)';
+			case 'errors.internalSub': return 'osk, prawdopodobnie, już o tym wie';
+			case 'errors.internalWebVersion': return 'Coś się stało po stronie tetr.io (lub na oskware_bridge, nwm wsm)';
 			case 'errors.internalWebVersionSub': return 'Jeśli strona statusu osk mówi, że wszystko jest w porządku, poinformuj dan63047 o tym problemie';
 			case 'errors.oskwareBridge': return 'Coś się stało z oskware_bridge';
 			case 'errors.oskwareBridgeSub': return 'Daj znać dan63047';
@@ -1837,7 +1838,7 @@ extension on TranslationsPlPl {
 			case 'graphsDestination.fetchAndsaveTLHistoryResult': return ({required Object number}) => 'Znaleziono ${number} stanów';
 			case 'graphsDestination.fetchAndSaveOldTLmatchesResult': return ({required Object number}) => 'Znaleziono ${number} meczy';
 			case 'graphsDestination.gamesPlayed': return ({required Object games}) => 'Zagrano ${games} gier';
-			case 'graphsDestination.dateAndTime': return 'Data i Czas';
+			case 'graphsDestination.dateAndTime': return 'Data i czas';
 			case 'graphsDestination.filterModaleTitle': return 'Filtruj rangi na wykresie';
 			case 'filterModale.all': return 'Wszystkie';
 			case 'cutoffsDestination.title': return 'Stan Tetra League';
@@ -1857,7 +1858,7 @@ extension on TranslationsPlPl {
 			case 'cutoffsDestination.notDeflated': return 'Nie jest obniżone';
 			case 'cutoffsDestination.wellDotDotDot': return 'Cóż...';
 			case 'cutoffsDestination.fromPlace': return ({required Object n}) => 'z № ${n}';
-			case 'cutoffsDestination.viewButton': return 'Widok';
+			case 'cutoffsDestination.viewButton': return 'Pokaż';
 			case 'rankView.rankTitle': return ({required Object rank}) => 'Dane rangi ${rank}';
 			case 'rankView.everyoneTitle': return 'Cały ranking';
 			case 'rankView.trRange': return 'Zakres TR';
@@ -1882,13 +1883,13 @@ extension on TranslationsPlPl {
 			case 'tlMatchView.roundNumber': return ({required Object n}) => 'Runda ${n}';
 			case 'tlMatchView.statsFor': return 'Statystyki dla';
 			case 'tlMatchView.numberOfRounds': return 'Ilość rund';
-			case 'tlMatchView.matchLength': return 'Długość Meczu';
-			case 'tlMatchView.roundLength': return 'Długość Rundy';
-			case 'tlMatchView.matchStats': return 'Statystyki Meczu';
+			case 'tlMatchView.matchLength': return 'Długość meczu';
+			case 'tlMatchView.roundLength': return 'Długość rundy';
+			case 'tlMatchView.matchStats': return 'Statystyki meczu';
 			case 'tlMatchView.downloadReplay': return 'Pobierz powtórkę .ttrm';
 			case 'tlMatchView.openReplay': return 'Otwórz powtórkę w TETR.IO';
 			case 'calcDestination.placeholders': return ({required Object stat}) => 'Wprowadź ${stat}';
-			case 'calcDestination.tip': return 'Wprowadź wartości i naciśnij "Calc", aby zobaczyć wykalkulowane statystyki dla Nerdów';
+			case 'calcDestination.tip': return 'Wprowadź wartości i naciśnij "Kalkuluj", aby zobaczyć wykalkulowane statystyki dla Nerdów';
 			case 'calcDestination.invalidValues': return 'Podaj prawidłową wartość';
 			case 'calcDestination.statsCalcButton': return 'Kalkuluj';
 			case 'calcDestination.damageCalcTip': return 'Kliknij na akcje po lewej stronie, aby dodać je tutaj';
@@ -1924,21 +1925,21 @@ extension on TranslationsPlPl {
 			case 'leaderboardsDestination.fullTL': return 'Tetra League (Obecny Sezon, pełny)';
 			case 'leaderboardsDestination.ar': return 'Punkty osiągnięć';
 			case 'savedDataDestination.title': return 'Zapisane Dane';
-			case 'savedDataDestination.tip': return 'Wybierz nazwę użytkownika po lewej stronie aby zobaczyć powiązane z nią dane';
-			case 'savedDataDestination.seasonTLstates': return ({required Object s}) => 'Stan TL Sezonu ${s}';
+			case 'savedDataDestination.tip': return 'Wybierz nazwę użytkownika po lewej stronie, aby zobaczyć powiązane z nią dane';
+			case 'savedDataDestination.seasonTLstates': return ({required Object s}) => 'Stany Sezonu ${s} TL';
 			case 'savedDataDestination.TLrecords': return 'Rekordy TL';
 			case 'settingsDestination.title': return 'Ustawienia';
 			case 'settingsDestination.general': return 'Ogólne';
 			case 'settingsDestination.customization': return 'Personalizacja';
 			case 'settingsDestination.database': return 'Lokalna baza danych';
 			case 'settingsDestination.checking': return 'Sprawdzanie...';
-			case 'settingsDestination.enterToSubmit': return 'Naciśnij Enter aby przesłać';
+			case 'settingsDestination.enterToSubmit': return 'Naciśnij Enter, aby przesłać';
 			case 'settingsDestination.account': return 'Twoje konto w TETR.IO';
 			case 'settingsDestination.accountDescription': return 'Statystyki tego gracza zostaną załadowane początkowo zaraz po uruchomieniu aplikacji. Domyślnie ładuje moje statystyki (dan63). Aby to zmienić, wprowadź swój nick tutaj.';
 			case 'settingsDestination.done': return 'Gotowe!';
 			case 'settingsDestination.noSuchAccount': return 'Nie ma takiego konta';
 			case 'settingsDestination.language': return 'Język';
-			case 'settingsDestination.languageDescription': return ({required Object languages}) => 'Tetra Stats zostałe przetłumaczone na ${languages}. Domyślnie aplikacja wybierze twój język systemowy lub Angielski, jesli ustawienia regionalne twojego systemu nie są dostępne.';
+			case 'settingsDestination.languageDescription': return ({required Object languages}) => 'Tetra Stats zostały przetłumaczone na ${languages}. Domyślnie aplikacja wybierze twój język systemowy lub angielski, jeśli ustawienia regionalne twojego systemu nie są dostępne.';
 			case 'settingsDestination.languages': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('pl'))(n,
 				zero: 'zero języków',
 				one: '${n} język',
@@ -1950,20 +1951,20 @@ extension on TranslationsPlPl {
 			case 'settingsDestination.updateInTheBackground': return 'Aktualizuj dane w tle';
 			case 'settingsDestination.updateInTheBackgroundDescription': return 'Jeśli włączone, Tetra Stats będzie próbowało otrzymać nowe informacje po wygaśnięciu pamięci podręcznej. Zwykle dzieje się to co 5 minut';
 			case 'settingsDestination.compareStats': return 'Porównaj statystyki TL ze średnimi rang';
-			case 'settingsDestination.compareStatsDescription': return 'Jeśli włączone, Tetra Stats zapewni dodatkowe pomiary, które pozwolą ci porównać siebie do średniego gracza w twojej randze. Będzie to widoczne w ten sposób - statystyki będą podświetlane odpowiednim kolorem, najedź na nie kursorem, aby zobaczyć więcej informacji.';
+			case 'settingsDestination.compareStatsDescription': return 'Jeśli włączone, Tetra Stats zapewni dodatkowe pomiary, które pozwolą ci porównać siebie do średniego gracza w twojej randze. Będzie to widoczne w ten sposób — statystyki będą podświetlane odpowiednim kolorem, najedź na nie kursorem, aby zobaczyć więcej informacji.';
 			case 'settingsDestination.showPosition': return 'Pokaż pozycję w rankingu według statystyk';
 			case 'settingsDestination.showPositionDescription': return 'To może zająć trochę czasu (i ruchu), ale pozwoli Ci zobaczyć swoją pozycję na tablicy wyników, posortowaną według statystyk';
-			case 'settingsDestination.accentColor': return 'Kolor akcentowy';
-			case 'settingsDestination.accentColorDescription': return 'Ten kolor jest widoczny w tej aplikacji i zazwyczaj podświetla interaktywne elementy interfejsu użytkownika.';
-			case 'settingsDestination.accentColorModale': return 'Wybierz kolor akcentowy';
+			case 'settingsDestination.accentColor': return 'Kolor akcentu';
+			case 'settingsDestination.accentColorDescription': return 'Ten kolor jest widoczny w tej aplikacji i zazwyczaj podkreśla interaktywne elementy interfejsu użytkownika.';
+			case 'settingsDestination.accentColorModale': return 'Wybierz kolor akcentu';
 			case 'settingsDestination.timestamps': return 'Format znaczników czasu';
 			case 'settingsDestination.timestampsDescriptionPart1': return ({required Object d}) => 'Możesz wybrać, w jaki sposób znaczniki czasu pokazują czas. Domyślnie pokazują czas w strefie czasowej GMT, sformatowany zgodnie z wybraną lokalizacją, przykład: ${d}.';
-			case 'settingsDestination.timestampsDescriptionPart2': return ({required Object y, required Object r}) => 'Jest również:\n• Ustawienia regionalne sformatowane w twojej strefie czasowej: ${y}\n• względny znacznik czasu: ${r}';
+			case 'settingsDestination.timestampsDescriptionPart2': return ({required Object y, required Object r}) => 'Jest również:\n• Ustawienia regionalne sformatowane w twojej strefie czasowej: ${y}\n• Względny znacznik czasu: ${r}';
 			case 'settingsDestination.timestampsAbsoluteGMT': return 'Bezwzględny (GMT)';
-			case 'settingsDestination.timestampsAbsoluteLocalTime': return 'Bezwzględny (Twoja Strefa Czasowa)';
+			case 'settingsDestination.timestampsAbsoluteLocalTime': return 'Bezwzględny (Twoja strefa czasowa)';
 			case 'settingsDestination.timestampsRelative': return 'Względny';
 			case 'settingsDestination.sheetbotLikeGraphs': return 'Zachowanie wykresów radarowych podobne do Sheetbota';
-			case 'settingsDestination.sheetbotLikeGraphsDescription': return 'Mimo tego że zostało to uznane przeze mnie, sposób działania wykresów w SheetBocie nie jest zbyt poprawny, niektórzy byli zdziwieni, że -0.5 stride nie wygląda w ten sam sposób jak pokazane na wykresach SheetBota. Więc jesteśmy tutaj: jeśli ta opcje jest włączona, punkty na wykresie mogą wyświetlić się po przeciwnej stronie wykresu jeśli wartości są negatywne.';
+			case 'settingsDestination.sheetbotLikeGraphsDescription': return 'Mimo tego, że rozważałem to, sposób działania wykresów w SheetBocie nie jest zbyt poprawny, niektórzy byli zdziwieni, że -0,5 stride nie wygląda w ten sam sposób jak jest to pokazane na wykresach SheetBota. Więc jesteśmy tutaj: jeśli ta opcja jest włączona, punkty na wykresie mogą wyświetlić się po przeciwnej stronie wykresu, jeśli wartości są negatywne.';
 			case 'settingsDestination.oskKagariGimmick': return 'Osk-Kagari gimmick';
 			case 'settingsDestination.oskKagariGimmickDescription': return 'Jeśli włączone, zamiast rangi oska, :kagari: zostanie wyrenderowana.';
 			case 'settingsDestination.bytesOfDataStored': return 'przechowywanych danych';
@@ -1991,36 +1992,37 @@ extension on TranslationsPlPl {
 			case 'graphsNavigation.league': return 'Stan Ligi';
 			case 'graphsNavigation.cutoffs': return 'Historia Cutoffów';
 			case 'calcNavigation.stats': return 'Kalkulator statystyk';
-			case 'calcNavigation.damage': return 'Kalkulator Obrażeń';
+			case 'calcNavigation.damage': return 'Kalkulator obrażeń';
 			case 'firstTimeView.welcome': return 'Witaj w Tetra Stats';
-			case 'firstTimeView.description': return 'Usługa umożliwiająca śledzenie różnych statystyk dla TETR.IO';
+			case 'firstTimeView.description': return 'Serwis umożliwiający śledzenie różnych statystyk dla TETR.IO';
 			case 'firstTimeView.nicknameQuestion': return 'Jaki jest Twój nick?';
 			case 'firstTimeView.inpuntHint': return 'Wpisz tutaj... (3-16 symboli)';
 			case 'firstTimeView.emptyInputError': return 'Nie można przesłać pustego ciągu';
-			case 'firstTimeView.niceToSeeYou': return ({required Object n}) => 'Miło cię zobaczyć, ${n}';
+			case 'firstTimeView.niceToSeeYou': return ({required Object n}) => 'Miło cię widzieć, ${n}';
 			case 'firstTimeView.letsTakeALook': return 'Spójrzmy na Twoje statystyki...';
 			case 'firstTimeView.skip': return 'Pomiń';
 			case 'aboutView.title': return 'O Tetra Stats';
-			case 'aboutView.about': return 'Tetra Stats to serwis, który działa za pomocą Tetra Channel API TETR.IO, dostarczając z niego dane i kalkulowanie własnych pomiarów, na podstawie tych danych. Serwis pozwala użytkownikowi śledzić swoje postępy w Tetra League za pomocą funkcji "Śledź", która zapisuje wszystkie zmiany w Tetra League do lokalnej bazy danych (nie jest to automatyczne, musisz odwiedzać serwis od czasu do czasu), aby zobaczyć te zmiany na wykresach.\n\nBeanserver blaster jest częścią Tetra Stats, który oddzielił się w skrypt serwerowy. Zapewnia pełną tablicę rankingów Tetra League, pozwalając Tetra Stats sortować rankingi za pomocą jakichkolwiek paramterów i budować wykresy punktowe, które pozwalają uzytkownikowi analizować swoje trendy Tetra League. Daje także dostęp do histori cutoffów Tetra League, które mogę być oglądane przez uzytkownika za pomocą wykresów.\n\nSą plany aby dodać analizę powtórek i historię turniejów, więc bądź czujny!\n\nSerwis nie jest powiązany z TETR.IO lub oskiem w jakikolwiek sposób.';
-			case 'aboutView.appVersion': return 'Wersja Aplikacji';
+			case 'aboutView.about': return 'Tetra Stats to serwis, który działa za pomocą API TETR.IO Tetra Channel, dostarczając z niego dane i kalkulując dodatkowe metryki na podstawie tych danych. Serwis pozwala użytkownikowi śledzić swoje postępy w Tetra League za pomocą funkcji "Śledź", która zapisuje wszystkie zmiany w Tetra League do lokalnej bazy danych (nie jest to automatyczne, musisz odwiedzać serwis od czasu do czasu), aby gracz mógł przejrzeć te zmiany na wykresach.\n\nBeanserver blaster jest częścią Tetra Stats, który oddzielił się w skrypt serwerowy. Zapewnia pełną tablicę rankingów Tetra League, pozwalając Tetra Stats sortować rankingi za pomocą jakichkolwiek parametrów i budować wykresy punktowe, które pozwalają użytkownikowi analizować swoje tendencje w Tetra League. Daje także dostęp do historii cutoffów Tetra League, które mogą być przeglądane przez użytkownika zna wykresach.\n\nW planach jest dodanie analizy powtórek i historii turniejów, więc oczekujcie nowości!\n\nSerwis nie jest powiązany z TETR.IO lub oskiem w jakikolwiek sposób.';
+			case 'aboutView.appVersion': return 'Wersja aplikacji';
 			case 'aboutView.build': return ({required Object build}) => 'Build ${build}';
 			case 'aboutView.GHrepo': return 'Repozytorium GitHub';
 			case 'aboutView.submitAnIssue': return 'Zgłoś problem';
 			case 'aboutView.credits': return 'Podziękowania';
-			case 'aboutView.authorAndDeveloper': return 'Autor & deweloper';
+			case 'aboutView.authorAndDeveloper': return 'Autor i deweloper';
 			case 'aboutView.providedFormulas': return 'Dostarczył(a) formuły';
 			case 'aboutView.providedS1history': return 'Dostarczył(a) historię S1';
 			case 'aboutView.inoue': return 'Inoue (graber powtórek)';
-			case 'aboutView.zhCNlocale': return 'Język Chiński Uproszczony';
-			case 'aboutView.deDElocale': return 'Język Niemiecki';
-			case 'aboutView.koKRlocale': return 'Język Koreański';
-			case 'aboutView.plPLlocale': return 'Język Polski';
+			case 'aboutView.zhCNlocale': return 'Język chiński uproszczony';
+			case 'aboutView.deDElocale': return 'Język niemiecki';
+			case 'aboutView.koKRlocale': return 'Język koreański';
+			case 'aboutView.plPLlocale': return 'Język polski';
+			case 'aboutView.withFixesBy': return ({required Object username}) => 'Z poprawkami ${username}';
 			case 'aboutView.supportHim': return 'Wesprzyj go!';
 			case 'stats.registrationDate': return 'Data rejestracji';
 			case 'stats.gametime': return 'Czas gry';
-			case 'stats.ogp': return 'Rozegrane Gry Online';
-			case 'stats.ogw': return 'Wygrane Gry Online';
-			case 'stats.followers': return 'Obserwujący';
+			case 'stats.ogp': return 'Rozegrane gry online';
+			case 'stats.ogw': return 'Wygrane gry online';
+			case 'stats.followers': return 'Obserwujących';
 			case 'stats.xp.short': return 'XP';
 			case 'stats.xp.full': return 'Punkty doświadczenia';
 			case 'stats.tr.short': return 'TR';
@@ -2032,41 +2034,41 @@ extension on TranslationsPlPl {
 			case 'stats.glixare.short': return 'GXE';
 			case 'stats.glixare.full': return 'GLIXARE';
 			case 'stats.s1tr.short': return 'S1 TR';
-			case 'stats.s1tr.full': return 'TR podobne do Sezonu 1';
-			case 'stats.gp.short': return 'GP';
+			case 'stats.s1tr.full': return 'TR w stylu Sezonu 1';
+			case 'stats.gp.short': return 'RG';
 			case 'stats.gp.full': return 'Rozegrane gry';
-			case 'stats.gw.short': return 'GW';
-			case 'stats.gw.full': return 'Wygrane Gry';
-			case 'stats.winrate.short': return 'WR%';
-			case 'stats.winrate.full': return 'Współczynnik Zwycięstw';
+			case 'stats.gw.short': return 'WG';
+			case 'stats.gw.full': return 'Wygrane gry';
+			case 'stats.winrate.short': return '%WG';
+			case 'stats.winrate.full': return 'Współczynnik zwycięstw';
 			case 'stats.apm.short': return 'APM';
-			case 'stats.apm.full': return 'Atak Na Minutę';
+			case 'stats.apm.full': return 'Atak na minutę';
 			case 'stats.pps.short': return 'PPS';
-			case 'stats.pps.full': return 'Klocki Na Sekundę';
+			case 'stats.pps.full': return 'Klocki na sekundę';
 			case 'stats.vs.short': return 'VS';
 			case 'stats.vs.full': return 'Wynik Versus';
 			case 'stats.app.short': return 'APP';
-			case 'stats.app.full': return 'Atak Na Klocek';
+			case 'stats.app.full': return 'Atak na klocek';
 			case 'stats.vsapm.short': return 'VS/APM';
 			case 'stats.vsapm.full': return 'VS / APM';
 			case 'stats.dss.short': return 'DS/S';
-			case 'stats.dss.full': return 'Downstack Na Sekundę';
+			case 'stats.dss.full': return 'Downstack na sekundę';
 			case 'stats.dsp.short': return 'DS/P';
-			case 'stats.dsp.full': return 'Downstack Na Klocek';
+			case 'stats.dsp.full': return 'Downstack na klocek';
 			case 'stats.appdsp.short': return 'APP+DSP';
 			case 'stats.appdsp.full': return 'APP + DSP';
 			case 'stats.cheese.short': return 'Ser';
 			case 'stats.cheese.full': return 'Indeks Sera';
 			case 'stats.gbe.short': return 'GbE';
-			case 'stats.gbe.full': return 'Wydajność Śmieci';
+			case 'stats.gbe.full': return 'Wydajność śmieci';
 			case 'stats.nyaapp.short': return 'wAPP';
 			case 'stats.nyaapp.full': return 'Ważone APP';
-			case 'stats.area.short': return 'Area';
+			case 'stats.area.short': return 'Obszar';
 			case 'stats.area.full': return 'Obszar';
 			case 'stats.etr.short': return 'eTR';
 			case 'stats.etr.full': return 'Szacowane TR';
 			case 'stats.etracc.short': return '±eTR';
-			case 'stats.etracc.full': return 'Dokładność Szacowanego TR';
+			case 'stats.etracc.full': return 'Dokładność szacowanego TR';
 			case 'stats.opener.short': return 'Opener';
 			case 'stats.opener.full': return 'Opener';
 			case 'stats.plonk.short': return 'Plonk';
@@ -2078,9 +2080,9 @@ extension on TranslationsPlPl {
 			case 'stats.altitude.short': return 'm';
 			case 'stats.altitude.full': return 'Wysokość';
 			case 'stats.climbSpeed.short': return 'CSP';
-			case 'stats.climbSpeed.full': return 'Prędkość Wspinania';
-			case 'stats.climbSpeed.gaugetTitle': return 'Prędkość\nWspinania';
-			case 'stats.peakClimbSpeed.short': return 'Najwyższy CSP';
+			case 'stats.climbSpeed.full': return 'Prędkość wspinaczki';
+			case 'stats.climbSpeed.gaugetTitle': return 'Prędkość\nwspinaczki';
+			case 'stats.peakClimbSpeed.short': return 'Najwyższe CSP';
 			case 'stats.peakClimbSpeed.full': return 'Najwyższa prędkość wspinania';
 			case 'stats.peakClimbSpeed.gaugetTitle': return 'Szczyt';
 			case 'stats.kos.short': return 'KO';
@@ -2093,22 +2095,22 @@ extension on TranslationsPlPl {
 			case 'stats.finesseFaults.short': return 'FF';
 			case 'stats.finesseFaults.full': return 'Błędy Finezji';
 			case 'stats.totalTime.short': return 'Czas';
-			case 'stats.totalTime.full': return 'Łączny Czas';
+			case 'stats.totalTime.full': return 'Łączny czas';
 			case 'stats.totalTime.widgetTitle': return 'ączny czas';
 			case 'stats.level.short': return 'Lvl';
 			case 'stats.level.full': return 'Poziom';
 			case 'stats.pieces.short': return 'P';
 			case 'stats.pieces.full': return 'Klocki';
 			case 'stats.spp.short': return 'SPP';
-			case 'stats.spp.full': return 'Wynik Na Klocek';
+			case 'stats.spp.full': return 'Punkty na klocek';
 			case 'stats.kp.short': return 'KP';
 			case 'stats.kp.full': return 'Naciśnięte klawisze';
 			case 'stats.kpp.short': return 'KPP';
-			case 'stats.kpp.full': return 'Naciśnięcia klawiszy Na Klocek';
+			case 'stats.kpp.full': return 'Naciśnięcia klawiszy na klocek';
 			case 'stats.kps.short': return 'KPS';
-			case 'stats.kps.full': return 'Naciśnięcia klawiszy Na Sekundę';
+			case 'stats.kps.full': return 'Naciśnięcia klawiszy na sekundę';
 			case 'stats.apl.short': return 'APL';
-			case 'stats.apl.full': return 'Atak Na Linię';
+			case 'stats.apl.full': return 'Atak na linię';
 			case 'stats.quadEfficiency.short': return 'Wyd. Q';
 			case 'stats.quadEfficiency.full': return 'Wydajność Quadów';
 			case 'stats.tspinEfficiency.short': return 'Wyd. T';
@@ -2122,7 +2124,7 @@ extension on TranslationsPlPl {
 			case 'stats.score': return 'Wynik';
 			case 'stats.lines': return 'Linie';
 			case 'stats.linesShort': return 'L';
-			case 'stats.pcs': return 'Perfekcyjne Cleary';
+			case 'stats.pcs': return 'Czyste Pola';
 			case 'stats.holds': return 'Przechowania';
 			case 'stats.spike': return 'Najwyższy Spike';
 			case 'stats.top': return ({required Object percentage}) => 'Top ${percentage}';
@@ -2132,7 +2134,7 @@ extension on TranslationsPlPl {
 			case 'stats.total': return 'Łącznie';
 			case 'stats.sent': return 'Wysłano';
 			case 'stats.received': return 'Otrzymane';
-			case 'stats.placement': return 'Położenie';
+			case 'stats.placement': return 'Pozycja';
 			case 'stats.peak': return 'Szczyt';
 			case 'stats.overall': return 'Ogólnie';
 			case 'stats.midgame': return 'Środek gry';
@@ -2145,17 +2147,17 @@ extension on TranslationsPlPl {
 			case 'stats.rate': return 'Częstość';
 			case 'stats.secsDS': return 'Secs/DS';
 			case 'stats.secsCheese': return 'Secs/Ser';
-			case 'stats.attackCheesiness': return 'Nieład Ataków';
-			case 'stats.downstackingRatio': return 'Współczynnik Downstackowania';
+			case 'stats.attackCheesiness': return 'Nieład ataków';
+			case 'stats.downstackingRatio': return 'Współczynnik downstackowania';
 			case 'stats.clearTypes': return 'Typy Clearów';
 			case 'stats.wellColumnDistribution': return 'Dystrybucja ';
 			case 'stats.allSpins': return 'All Spiny';
-			case 'stats.sankeyTitle': return 'Wykres Sankey Nadchodzących Ataków';
-			case 'stats.incomingAttack': return 'Nadchodzący Atak';
+			case 'stats.sankeyTitle': return 'Wykres nadchodzących ataków Sankey';
+			case 'stats.incomingAttack': return 'Nadchodzący atak';
 			case 'stats.clean': return 'Czyste śmieci';
 			case 'stats.cancelled': return 'Anulowane';
-			case 'stats.cheeseTanked': return 'Ser Przyjęty';
-			case 'stats.cleanTanked': return 'Czyste Śmieci Przyjęte';
+			case 'stats.cheeseTanked': return 'Przyjęty ser';
+			case 'stats.cleanTanked': return 'Przyjęte czyste śmieci';
 			case 'stats.kills': return 'Zabójstwa';
 			case 'stats.deaths': return 'Śmierci';
 			case 'stats.ppsDistribution': return 'Rozkład PPS';
@@ -2175,12 +2177,12 @@ extension on TranslationsPlPl {
 				other: '${n} naciśnięć klawiszy',
 			);
 			case 'stats.tspinsTotal': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('pl'))(n,
-				zero: '${n} łącznych T-Spinów',
-				one: '${n} łączny T-Spin',
-				two: '${n} łączne T-Spiny',
-				few: '${n} łączne T-Spiny',
-				many: '${n} łącznych T-Spinów',
-				other: '${n} łącznych T-Spinów',
+				zero: '${n} T-spinów łącznie',
+				one: '${n} T-spin łącznie',
+				two: '${n} T-spiny łącznie',
+				few: '${n} T-spiny łącznie',
+				many: '${n} T-spinów łącznie',
+				other: '${n} T-spinów łącznie',
 			);
 			case 'stats.linesCleared': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('pl'))(n,
 				zero: '${n} linii wyczyszczonych',
@@ -2298,106 +2300,106 @@ extension on TranslationsPlPl {
 			case 'countries.CK': return 'Wyspy Cooka';
 			case 'countries.CR': return 'Kostaryka';
 			case 'countries.CI': return 'Wybrzeże Kości Słoniowej';
-			case 'countries.HR': return 'Croatia';
-			case 'countries.CU': return 'Cuba';
-			case 'countries.CW': return 'Curaçao';
-			case 'countries.CY': return 'Cyprus';
-			case 'countries.CZ': return 'Czech Republic';
-			case 'countries.DK': return 'Denmark';
-			case 'countries.DJ': return 'Djibouti';
-			case 'countries.DM': return 'Dominica';
-			case 'countries.DO': return 'Dominican Republic';
-			case 'countries.EC': return 'Ecuador';
-			case 'countries.EG': return 'Egypt';
+			case 'countries.HR': return 'Chorwacja';
+			case 'countries.CU': return 'Kuba';
+			case 'countries.CW': return 'Curacao';
+			case 'countries.CY': return 'Cypr';
+			case 'countries.CZ': return 'Republika Czeska';
+			case 'countries.DK': return 'Dania';
+			case 'countries.DJ': return 'Dżibuti';
+			case 'countries.DM': return 'Dominikana';
+			case 'countries.DO': return 'Republika Dominikany';
+			case 'countries.EC': return 'Ekwador';
+			case 'countries.EG': return 'Egipt';
 			case 'countries.SV': return 'El Salvador';
-			case 'countries.GB-ENG': return 'England';
-			case 'countries.GQ': return 'Equatorial Guinea';
-			case 'countries.ER': return 'Eritrea';
+			case 'countries.GB-ENG': return 'Anglia';
+			case 'countries.GQ': return 'Gwinea Równikowa';
+			case 'countries.ER': return 'Erytrea';
 			case 'countries.EE': return 'Estonia';
-			case 'countries.ET': return 'Ethiopia';
-			case 'countries.EU': return 'Europe';
-			case 'countries.FK': return 'Falkland Islands (Malvinas)';
-			case 'countries.FO': return 'Faroe Islands';
-			case 'countries.FJ': return 'Fiji';
-			case 'countries.FI': return 'Finland';
-			case 'countries.FR': return 'France';
-			case 'countries.GF': return 'French Guiana';
-			case 'countries.PF': return 'French Polynesia';
-			case 'countries.TF': return 'French Southern Territories';
+			case 'countries.ET': return 'Etiopia';
+			case 'countries.EU': return 'Europa';
+			case 'countries.FK': return 'Falklandy (Malwiny)';
+			case 'countries.FO': return 'Wyspy Owcze';
+			case 'countries.FJ': return 'Fidżi';
+			case 'countries.FI': return 'Finlandia';
+			case 'countries.FR': return 'Francja';
+			case 'countries.GF': return 'Gujana Francuska';
+			case 'countries.PF': return 'Polinezja Francuska';
+			case 'countries.TF': return 'Francuskie Terytoria Południowe i Antarktyczne';
 			case 'countries.GA': return 'Gabon';
 			case 'countries.GM': return 'Gambia';
-			case 'countries.GE': return 'Georgia';
-			case 'countries.DE': return 'Germany';
+			case 'countries.GE': return 'Gruzja';
+			case 'countries.DE': return 'Niemcy';
 			case 'countries.GH': return 'Ghana';
 			case 'countries.GI': return 'Gibraltar';
-			case 'countries.GR': return 'Greece';
-			case 'countries.GL': return 'Greenland';
+			case 'countries.GR': return 'Grecja';
+			case 'countries.GL': return 'Grenlandia';
 			case 'countries.GD': return 'Grenada';
-			case 'countries.GP': return 'Guadeloupe';
+			case 'countries.GP': return 'Gwadelupa';
 			case 'countries.GU': return 'Guam';
-			case 'countries.GT': return 'Guatemala';
-			case 'countries.GG': return 'Guernsey';
-			case 'countries.GN': return 'Guinea';
-			case 'countries.GW': return 'Guinea-Bissau';
-			case 'countries.GY': return 'Guyana';
+			case 'countries.GT': return 'Gwatemala';
+			case 'countries.GG': return 'Wyspa Guernsey';
+			case 'countries.GN': return 'Gwinea';
+			case 'countries.GW': return 'Gwinea Bissau';
+			case 'countries.GY': return 'Gujana';
 			case 'countries.HT': return 'Haiti';
-			case 'countries.HM': return 'Heard Island and McDonald Islands';
-			case 'countries.VA': return 'Holy See (Vatican City State)';
+			case 'countries.HM': return 'Wyspy Heard i McDonalda';
+			case 'countries.VA': return 'Stolica Apostolska (Watykan)';
 			case 'countries.HN': return 'Honduras';
-			case 'countries.HK': return 'Hong Kong';
-			case 'countries.HU': return 'Hungary';
-			case 'countries.IS': return 'Iceland';
-			case 'countries.IN': return 'India';
-			case 'countries.ID': return 'Indonesia';
-			case 'countries.IR': return 'Iran, Islamic Republic of';
-			case 'countries.IQ': return 'Iraq';
-			case 'countries.IE': return 'Ireland';
-			case 'countries.IM': return 'Isle of Man';
-			case 'countries.IL': return 'Israel';
-			case 'countries.IT': return 'Italy';
-			case 'countries.JM': return 'Jamaica';
-			case 'countries.JP': return 'Japan';
+			case 'countries.HK': return 'Hongkong';
+			case 'countries.HU': return 'Węgry';
+			case 'countries.IS': return 'Islandia';
+			case 'countries.IN': return 'Indie';
+			case 'countries.ID': return 'Indonezja';
+			case 'countries.IR': return 'Iran';
+			case 'countries.IQ': return 'Irak';
+			case 'countries.IE': return 'Irlandia';
+			case 'countries.IM': return 'Wyspa Man';
+			case 'countries.IL': return 'Izrael';
+			case 'countries.IT': return 'Włochy';
+			case 'countries.JM': return 'Jamajka';
+			case 'countries.JP': return 'Japonia';
 			case 'countries.JE': return 'Jersey';
-			case 'countries.JO': return 'Jordan';
-			case 'countries.KZ': return 'Kazakhstan';
-			case 'countries.KE': return 'Kenya';
+			case 'countries.JO': return 'Jordania';
+			case 'countries.KZ': return 'Kazachstan';
+			case 'countries.KE': return 'Kenia';
 			case 'countries.KI': return 'Kiribati';
-			case 'countries.KP': return 'Korea, Democratic People\'s Republic of';
-			case 'countries.KR': return 'Korea, Republic of';
-			case 'countries.XK': return 'Kosovo';
-			case 'countries.KW': return 'Kuwait';
-			case 'countries.KG': return 'Kyrgyzstan';
-			case 'countries.LA': return 'Lao People\'s Democratic Republic';
-			case 'countries.LV': return 'Latvia';
+			case 'countries.KP': return 'Koreańska Republika Ludowo-Demokratyczna';
+			case 'countries.KR': return 'Korea Południowa';
+			case 'countries.XK': return 'Kosowo';
+			case 'countries.KW': return 'Kuwejt';
+			case 'countries.KG': return 'Kirgistan';
+			case 'countries.LA': return 'Laotańska Republika Ludowo-Demokratyczna';
+			case 'countries.LV': return 'Łotwa';
 			case 'countries.LB': return 'Lebanon';
 			case 'countries.LS': return 'Lesotho';
-			case 'countries.LR': return 'Liberia';
-			case 'countries.LY': return 'Libya';
+			case 'countries.LR': return 'Republika Liberii';
+			case 'countries.LY': return 'Libia';
 			case 'countries.LI': return 'Liechtenstein';
-			case 'countries.LT': return 'Lithuania';
-			case 'countries.LU': return 'Luxembourg';
-			case 'countries.MO': return 'Macao';
-			case 'countries.MK': return 'Macedonia, the former Yugoslav Republic of';
-			case 'countries.MG': return 'Madagascar';
+			case 'countries.LT': return 'Litwa';
+			case 'countries.LU': return 'Luksemburg';
+			case 'countries.MO': return 'Makau';
+			case 'countries.MK': return 'Republika Macedonii Północnej';
+			case 'countries.MG': return 'Madagaskar';
 			case 'countries.MW': return 'Malawi';
-			case 'countries.MY': return 'Malaysia';
-			case 'countries.MV': return 'Maldives';
+			case 'countries.MY': return 'Malezja';
+			case 'countries.MV': return 'Malediwy';
 			case 'countries.ML': return 'Mali';
 			case 'countries.MT': return 'Malta';
-			case 'countries.MH': return 'Marshall Islands';
-			case 'countries.MQ': return 'Martinique';
-			case 'countries.MR': return 'Mauritania';
+			case 'countries.MH': return 'Wyspy Marshalla';
+			case 'countries.MQ': return 'Martynika';
+			case 'countries.MR': return 'Mauretania';
 			case 'countries.MU': return 'Mauritius';
-			case 'countries.YT': return 'Mayotte';
-			case 'countries.MX': return 'Mexico';
-			case 'countries.FM': return 'Micronesia, Federated States of';
-			case 'countries.MD': return 'Moldova, Republic of';
-			case 'countries.MC': return 'Monaco';
-			case 'countries.ME': return 'Montenegro';
-			case 'countries.MA': return 'Morocco';
+			case 'countries.YT': return 'Majotta';
+			case 'countries.MX': return 'Meksyk';
+			case 'countries.FM': return 'Mikronezja';
+			case 'countries.MD': return 'Republika Mołdowy';
+			case 'countries.MC': return 'Monako';
+			case 'countries.ME': return 'Czarnogóra';
+			case 'countries.MA': return 'Maroko';
 			case 'countries.MN': return 'Mongolia';
 			case 'countries.MS': return 'Montserrat';
-			case 'countries.MZ': return 'Mozambique';
+			case 'countries.MZ': return 'Mozambik';
 			case 'countries.MM': return 'Mjanma';
 			case 'countries.NA': return 'Namibia';
 			case 'countries.NR': return 'Nauru';

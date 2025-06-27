@@ -396,6 +396,7 @@
         "deDElocale": "German locale",
         "koKRlocale": "Korean locale",
         "plPLlocale": "Polish locale",
+        "withFixesBy": "With fixes by $username",
         "supportHim": "Support him!"
     },
     "stats": {

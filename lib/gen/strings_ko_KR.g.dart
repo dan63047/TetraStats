@@ -922,6 +922,7 @@ class _TranslationsAboutViewKoKr implements TranslationsAboutViewEn {
 	@override String get deDElocale => '독일어 번역';
 	@override String get koKRlocale => '한국어 번역';
 	@override String get plPLlocale => '광택 번역';
+	@override String withFixesBy({required Object username}) => '수정 사항으로 ${username}';
 	@override String get supportHim => '후원하기';
 }
 
@@ -2013,6 +2014,7 @@ extension on TranslationsKoKr {
 			case 'aboutView.deDElocale': return '독일어 번역';
 			case 'aboutView.koKRlocale': return '한국어 번역';
 			case 'aboutView.plPLlocale': return '광택 번역';
+			case 'aboutView.withFixesBy': return ({required Object username}) => '수정 사항으로 ${username}';
 			case 'aboutView.supportHim': return '후원하기';
 			case 'stats.registrationDate': return '가입일';
 			case 'stats.gametime': return '플레이 시간';

@@ -5,7 +5,7 @@
         "ko-KR": "Koreański (한국인)",
         "zh-CN": "Chiński uproszczony (简体中文)",
         "de-DE": "Niemiecki (Deutsch)",
-	"pl-PL": "Polski"
+        "pl-PL": "Polski"
     },
     "gamemodes(map)": {
         "league": "Tetra League",
@@ -54,7 +54,7 @@
     "season": "Sezon",
     "smooth": "Wygładź",
     "dateAndTime": "Data i Czas",
-    "TLfullLBnote": ", ale pozwala ci sortować graczy za pomocą ich statystyk i rang",
+    "TLfullLBnote": "Wymagające, ale pozwala ci sortować graczy za pomocą ich statystyk i rang",
     "rank": "Ranga",
     "verdictGeneral": "$n $verdict $rank",
     "verdictBetter": "powyżej średniej",
@@ -86,7 +86,7 @@
     "banned": "Zbanowany",
     "bannedSubtext": "Bany są nakładane kiedy zasady TETR.IO są złamane",
     "badStanding": "Złe zachowanie",
-    "badStandingSubtext": "Jeden lub więcej nałozonych banów",
+    "badStandingSubtext": "Jeden lub więcej nałożonych banów",
     "botAccount": "Konto Bota",
     "botAccountSubtext": "Operowany przez $botMaintainers",
     "copiedToClipboard": "Skopiowano do schowka!",
@@ -105,7 +105,7 @@
         "noHeader": "Brak nagłówka",
         "noFooter": "Brak stopki",
         "twc": "Światowy Czempion TETR.IO",
-        "twcYear": "$year Mistrzostwa Świata TETR.IO"
+        "twcYear": "Mistrzostwa Świata w TETR.IO $year"
     },
     "newsEntries": {
         "leaderboard(rich)": "Zdobył(a) № $rank w $gametype",
@@ -114,7 +114,7 @@
         "rankup(rich)": "Zdobył(a) rangę $rank w Tetra League",
         "supporter(rich)": "Został(a) ${s(TETR.IO supporter)}em",
         "supporter_gift(rich)": "Otrzymał(a) prezent ${s(TETR.IO supporter)}",
-        "unknown(rich)": "Nieznane wiesci typu $type"
+        "unknown(rich)": "Nieznane wieści typu $type"
     },
     "rankupMiddle": "ranga ${r}",
     "copyUserID": "Kliknij aby skopiować ID użytkownika",
@@ -139,8 +139,8 @@
     "sprintAndBlitsRelevance": "Istotność: ${date}",
     "snackBarMessages": {
         "stateRemoved": "Stan ${date} został usunięty z bazy danych!",
-        "matchRemoved": "${date} mecz został usunięty z bazy danych!",
-        "notForWeb": "Funkcja nie jest dostępna dla wersji internetowej",
+        "matchRemoved": "Mecz z ${date} został usunięty z bazy danych!",
+        "notForWeb": "Funkcja nie jest dostępna w wersji internetowej",
         "importSuccess": "Zaimportowano pomyślnie",
         "importCancelled": "Anulowano importowanie"
     },
@@ -162,8 +162,8 @@
         "tooManyRequests": "Zostałeś ograniczony.",
         "tooManyRequestsSub": "Zaczekaj chwilę i spróbuj ponownie.",
         "internal": "Coś się stało po stronie tetr.io",
-        "internalSub": "osk, prawdopodobnie już o tym wie",
-        "internalWebVersion": "Coś się stało po stronie tetr.io (lub na oskware_bridge, idk)",
+        "internalSub": "osk, prawdopodobnie, już o tym wie",
+        "internalWebVersion": "Coś się stało po stronie tetr.io (lub na oskware_bridge, nwm wsm)",
         "internalWebVersionSub": "Jeśli strona statusu osk mówi, że wszystko jest w porządku, poinformuj dan63047 o tym problemie",
         "oskwareBridge": "Coś się stało z oskware_bridge",
         "oskwareBridgeSub": "Daj znać dan63047",
@@ -188,7 +188,7 @@
         "fetchAndsaveTLHistoryResult": "Znaleziono ${number} stanów",
         "fetchAndSaveOldTLmatchesResult": "Znaleziono ${number} meczy",
         "gamesPlayed": "Zagrano $games gier",
-        "dateAndTime": "Data i Czas",
+        "dateAndTime": "Data i czas",
         "filterModaleTitle": "Filtruj rangi na wykresie"
     },
     "filterModale": {
@@ -212,7 +212,7 @@
         "notDeflated": "Nie jest obniżone",
         "wellDotDotDot": "Cóż...",
         "fromPlace": "z № $n",
-        "viewButton": "Widok"
+        "viewButton": "Pokaż"
     },
     "rankView": {
         "rankTitle": "Dane rangi $rank",
@@ -243,15 +243,15 @@
         "roundNumber": "Runda $n",
         "statsFor": "Statystyki dla",
         "numberOfRounds": "Ilość rund",
-        "matchLength": "Długość Meczu",
-        "roundLength": "Długość Rundy",
-        "matchStats": "Statystyki Meczu",
+        "matchLength": "Długość meczu",
+        "roundLength": "Długość rundy",
+        "matchStats": "Statystyki meczu",
         "downloadReplay": "Pobierz powtórkę .ttrm",
         "openReplay": "Otwórz powtórkę w TETR.IO"
     },
     "calcDestination": {
         "placeholders": "Wprowadź $stat",
-        "tip": "Wprowadź wartości i naciśnij \"Calc\", aby zobaczyć wykalkulowane statystyki dla Nerdów",
+        "tip": "Wprowadź wartości i naciśnij \"Kalkuluj\", aby zobaczyć wykalkulowane statystyki dla Nerdów",
         "invalidValues": "Podaj prawidłową wartość",
         "statsCalcButton": "Kalkuluj",
         "damageCalcTip": "Kliknij na akcje po lewej stronie, aby dodać je tutaj",
@@ -293,8 +293,8 @@
     },
     "savedDataDestination": {
         "title": "Zapisane Dane",
-        "tip": "Wybierz nazwę użytkownika po lewej stronie aby zobaczyć powiązane z nią dane",
-        "seasonTLstates": "Stan TL Sezonu $s",
+        "tip": "Wybierz nazwę użytkownika po lewej stronie, aby zobaczyć powiązane z nią dane",
+        "seasonTLstates": "Stany Sezonu $s TL",
         "TLrecords": "Rekordy TL"
     },
     "settingsDestination": {
@@ -303,13 +303,13 @@
         "customization": "Personalizacja",
         "database": "Lokalna baza danych",
         "checking": "Sprawdzanie...",
-        "enterToSubmit": "Naciśnij Enter aby przesłać",
+        "enterToSubmit": "Naciśnij Enter, aby przesłać",
         "account": "Twoje konto w TETR.IO",
         "accountDescription": "Statystyki tego gracza zostaną załadowane początkowo zaraz po uruchomieniu aplikacji. Domyślnie ładuje moje statystyki (dan63). Aby to zmienić, wprowadź swój nick tutaj.",
         "done": "Gotowe!",
         "noSuchAccount": "Nie ma takiego konta",
         "language": "Język",
-        "languageDescription": "Tetra Stats zostałe przetłumaczone na $languages. Domyślnie aplikacja wybierze twój język systemowy lub Angielski, jesli ustawienia regionalne twojego systemu nie są dostępne.",
+        "languageDescription": "Tetra Stats zostały przetłumaczone na $languages. Domyślnie aplikacja wybierze twój język systemowy lub angielski, jeśli ustawienia regionalne twojego systemu nie są dostępne.",
         "languages(plural)": {
             "zero": "zero języków",
             "one": "$n język",
@@ -321,20 +321,20 @@
         "updateInTheBackground": "Aktualizuj dane w tle",
         "updateInTheBackgroundDescription": "Jeśli włączone, Tetra Stats będzie próbowało otrzymać nowe informacje po wygaśnięciu pamięci podręcznej. Zwykle dzieje się to co 5 minut",
         "compareStats": "Porównaj statystyki TL ze średnimi rang",
-        "compareStatsDescription": "Jeśli włączone, Tetra Stats zapewni dodatkowe pomiary, które pozwolą ci porównać siebie do średniego gracza w twojej randze. Będzie to widoczne w ten sposób - statystyki będą podświetlane odpowiednim kolorem, najedź na nie kursorem, aby zobaczyć więcej informacji.",
+        "compareStatsDescription": "Jeśli włączone, Tetra Stats zapewni dodatkowe pomiary, które pozwolą ci porównać siebie do średniego gracza w twojej randze. Będzie to widoczne w ten sposób — statystyki będą podświetlane odpowiednim kolorem, najedź na nie kursorem, aby zobaczyć więcej informacji.",
         "showPosition": "Pokaż pozycję w rankingu według statystyk",
         "showPositionDescription": "To może zająć trochę czasu (i ruchu), ale pozwoli Ci zobaczyć swoją pozycję na tablicy wyników, posortowaną według statystyk",
-        "accentColor": "Kolor akcentowy",
-        "accentColorDescription": "Ten kolor jest widoczny w tej aplikacji i zazwyczaj podświetla interaktywne elementy interfejsu użytkownika.",
-        "accentColorModale": "Wybierz kolor akcentowy",
+        "accentColor": "Kolor akcentu",
+        "accentColorDescription": "Ten kolor jest widoczny w tej aplikacji i zazwyczaj podkreśla interaktywne elementy interfejsu użytkownika.",
+        "accentColorModale": "Wybierz kolor akcentu",
         "timestamps": "Format znaczników czasu",
         "timestampsDescriptionPart1": "Możesz wybrać, w jaki sposób znaczniki czasu pokazują czas. Domyślnie pokazują czas w strefie czasowej GMT, sformatowany zgodnie z wybraną lokalizacją, przykład: $d.",
-        "timestampsDescriptionPart2": "Jest również:\n• Ustawienia regionalne sformatowane w twojej strefie czasowej: $y\n• względny znacznik czasu: $r",
+        "timestampsDescriptionPart2": "Jest również:\n• Ustawienia regionalne sformatowane w twojej strefie czasowej: $y\n• Względny znacznik czasu: $r",
         "timestampsAbsoluteGMT": "Bezwzględny (GMT)",
-        "timestampsAbsoluteLocalTime": "Bezwzględny (Twoja Strefa Czasowa)",
+        "timestampsAbsoluteLocalTime": "Bezwzględny (Twoja strefa czasowa)",
         "timestampsRelative": "Względny",
         "sheetbotLikeGraphs": "Zachowanie wykresów radarowych podobne do Sheetbota",
-        "sheetbotLikeGraphsDescription": "Mimo tego że zostało to uznane przeze mnie, sposób działania wykresów w SheetBocie nie jest zbyt poprawny, niektórzy byli zdziwieni, że -0.5 stride nie wygląda w ten sam sposób jak pokazane na wykresach SheetBota. Więc jesteśmy tutaj: jeśli ta opcje jest włączona, punkty na wykresie mogą wyświetlić się po przeciwnej stronie wykresu jeśli wartości są negatywne.",
+        "sheetbotLikeGraphsDescription": "Mimo tego, że rozważałem to, sposób działania wykresów w SheetBocie nie jest zbyt poprawny, niektórzy byli zdziwieni, że -0,5 stride nie wygląda w ten sam sposób jak jest to pokazane na wykresach SheetBota. Więc jesteśmy tutaj: jeśli ta opcja jest włączona, punkty na wykresie mogą wyświetlić się po przeciwnej stronie wykresu, jeśli wartości są negatywne.",
         "oskKagariGimmick": "Osk-Kagari gimmick",
         "oskKagariGimmickDescription": "Jeśli włączone, zamiast rangi oska, :kagari: zostanie wyrenderowana.",
         "bytesOfDataStored": "przechowywanych danych",
@@ -368,42 +368,43 @@
     },
     "calcNavigation": {
         "stats": "Kalkulator statystyk",
-        "damage": "Kalkulator Obrażeń"
+        "damage": "Kalkulator obrażeń"
     },
     "firstTimeView": {
         "welcome": "Witaj w Tetra Stats",
-        "description": "Usługa umożliwiająca śledzenie różnych statystyk dla TETR.IO",
+        "description": "Serwis umożliwiający śledzenie różnych statystyk dla TETR.IO",
         "nicknameQuestion": "Jaki jest Twój nick?",
         "inpuntHint": "Wpisz tutaj... (3-16 symboli)",
         "emptyInputError": "Nie można przesłać pustego ciągu",
-        "niceToSeeYou": "Miło cię zobaczyć, $n",
+        "niceToSeeYou": "Miło cię widzieć, $n",
         "letsTakeALook": "Spójrzmy na Twoje statystyki...",
         "skip": "Pomiń"
     },
     "aboutView": {
         "title": "O Tetra Stats",
-        "about": "Tetra Stats to serwis, który działa za pomocą Tetra Channel API TETR.IO, dostarczając z niego dane i kalkulowanie własnych pomiarów, na podstawie tych danych. Serwis pozwala użytkownikowi śledzić swoje postępy w Tetra League za pomocą funkcji \"Śledź\", która zapisuje wszystkie zmiany w Tetra League do lokalnej bazy danych (nie jest to automatyczne, musisz odwiedzać serwis od czasu do czasu), aby zobaczyć te zmiany na wykresach.\n\nBeanserver blaster jest częścią Tetra Stats, który oddzielił się w skrypt serwerowy. Zapewnia pełną tablicę rankingów Tetra League, pozwalając Tetra Stats sortować rankingi za pomocą jakichkolwiek paramterów i budować wykresy punktowe, które pozwalają uzytkownikowi analizować swoje trendy Tetra League. Daje także dostęp do histori cutoffów Tetra League, które mogę być oglądane przez uzytkownika za pomocą wykresów.\n\nSą plany aby dodać analizę powtórek i historię turniejów, więc bądź czujny!\n\nSerwis nie jest powiązany z TETR.IO lub oskiem w jakikolwiek sposób.",
-        "appVersion": "Wersja Aplikacji",
+        "about": "Tetra Stats to serwis, który działa za pomocą API TETR.IO Tetra Channel, dostarczając z niego dane i kalkulując dodatkowe metryki na podstawie tych danych. Serwis pozwala użytkownikowi śledzić swoje postępy w Tetra League za pomocą funkcji \"Śledź\", która zapisuje wszystkie zmiany w Tetra League do lokalnej bazy danych (nie jest to automatyczne, musisz odwiedzać serwis od czasu do czasu), aby gracz mógł przejrzeć te zmiany na wykresach.\n\nBeanserver blaster jest częścią Tetra Stats, który oddzielił się w skrypt serwerowy. Zapewnia pełną tablicę rankingów Tetra League, pozwalając Tetra Stats sortować rankingi za pomocą jakichkolwiek parametrów i budować wykresy punktowe, które pozwalają użytkownikowi analizować swoje tendencje w Tetra League. Daje także dostęp do historii cutoffów Tetra League, które mogą być przeglądane przez użytkownika zna wykresach.\n\nW planach jest dodanie analizy powtórek i historii turniejów, więc oczekujcie nowości!\n\nSerwis nie jest powiązany z TETR.IO lub oskiem w jakikolwiek sposób.",
+        "appVersion": "Wersja aplikacji",
         "build": "Build $build",
         "GHrepo": "Repozytorium GitHub",
         "submitAnIssue": "Zgłoś problem",
         "credits": "Podziękowania",
-        "authorAndDeveloper": "Autor & deweloper",
+        "authorAndDeveloper": "Autor i deweloper",
         "providedFormulas": "Dostarczył(a) formuły",
         "providedS1history": "Dostarczył(a) historię S1",
         "inoue": "Inoue (graber powtórek)",
-        "zhCNlocale": "Język Chiński Uproszczony",
-        "deDElocale": "Język Niemiecki",
-        "koKRlocale": "Język Koreański",
-        "plPLlocale": "Język Polski",
+        "zhCNlocale": "Język chiński uproszczony",
+        "deDElocale": "Język niemiecki",
+        "koKRlocale": "Język koreański",
+        "plPLlocale": "Język polski",
+        "withFixesBy": "Z poprawkami $username",
         "supportHim": "Wesprzyj go!"
     },
     "stats": {
         "registrationDate": "Data rejestracji",
         "gametime": "Czas gry",
-        "ogp": "Rozegrane Gry Online",
-        "ogw": "Wygrane Gry Online",
-        "followers": "Obserwujący",
+        "ogp": "Rozegrane gry online",
+        "ogw": "Wygrane gry online",
+        "followers": "Obserwujących",
         "xp": {
             "short": "XP",
             "full": "Punkty doświadczenia"
@@ -426,27 +427,27 @@
         },
         "s1tr": {
             "short": "S1 TR",
-            "full": "TR podobne do Sezonu 1"
+            "full": "TR w stylu Sezonu 1"
         },
         "gp": {
-            "short": "GP",
+            "short": "RG",
             "full": "Rozegrane gry"
         },
         "gw": {
-            "short": "GW",
-            "full": "Wygrane Gry"
+            "short": "WG",
+            "full": "Wygrane gry"
         },
         "winrate": {
-            "short": "WR%",
-            "full": "Współczynnik Zwycięstw"
+            "short": "%WG",
+            "full": "Współczynnik zwycięstw"
         },
         "apm": {
             "short": "APM",
-            "full": "Atak Na Minutę"
+            "full": "Atak na minutę"
         },
         "pps": {
             "short": "PPS",
-            "full": "Klocki Na Sekundę"
+            "full": "Klocki na sekundę"
         },
         "vs": {
             "short": "VS",
@@ -454,7 +455,7 @@
         },
         "app": {
             "short": "APP",
-            "full": "Atak Na Klocek"
+            "full": "Atak na klocek"
         },
         "vsapm": {
             "short": "VS/APM",
@@ -462,11 +463,11 @@
         },
         "dss": {
             "short": "DS/S",
-            "full": "Downstack Na Sekundę"
+            "full": "Downstack na sekundę"
         },
         "dsp": {
             "short": "DS/P",
-            "full": "Downstack Na Klocek"
+            "full": "Downstack na klocek"
         },
         "appdsp": {
             "short": "APP+DSP",
@@ -478,14 +479,14 @@
         },
         "gbe": {
             "short": "GbE",
-            "full": "Wydajność Śmieci"
+            "full": "Wydajność śmieci"
         },
         "nyaapp": {
             "short": "wAPP",
             "full": "Ważone APP"
         },
         "area": {
-            "short": "Area",
+            "short": "Obszar",
             "full": "Obszar"
         },
         "etr": {
@@ -494,7 +495,7 @@
         },
         "etracc": {
             "short": "±eTR",
-            "full": "Dokładność Szacowanego TR"
+            "full": "Dokładność szacowanego TR"
         },
         "opener": {
             "short": "Opener",
@@ -518,11 +519,11 @@
         },
         "climbSpeed": {
             "short": "CSP",
-            "full": "Prędkość Wspinania",
-            "gaugetTitle": "Prędkość\nWspinania"
+            "full": "Prędkość wspinaczki",
+            "gaugetTitle": "Prędkość\nwspinaczki"
         },
         "peakClimbSpeed": {
-            "short": "Najwyższy CSP",
+            "short": "Najwyższe CSP",
             "full": "Najwyższa prędkość wspinania",
             "gaugetTitle": "Szczyt"
         },
@@ -545,7 +546,7 @@
         },
         "totalTime": {
             "short": "Czas",
-            "full": "Łączny Czas",
+            "full": "Łączny czas",
             "widgetTitle": "ączny czas"
         },
         "level": {
@@ -558,7 +559,7 @@
         },
         "spp": {
             "short": "SPP",
-            "full": "Wynik Na Klocek"
+            "full": "Punkty na klocek"
         },
         "kp": {
             "short": "KP",
@@ -566,15 +567,15 @@
         },
         "kpp": {
             "short": "KPP",
-            "full": "Naciśnięcia klawiszy Na Klocek"
+            "full": "Naciśnięcia klawiszy na klocek"
         },
         "kps": {
             "short": "KPS",
-            "full": "Naciśnięcia klawiszy Na Sekundę"
+            "full": "Naciśnięcia klawiszy na sekundę"
         },
         "apl": {
             "short": "APL",
-            "full": "Atak Na Linię"
+            "full": "Atak na linię"
         },
         "quadEfficiency": {
             "short": "Wyd. Q",
@@ -595,7 +596,7 @@
         "score": "Wynik",
         "lines": "Linie",
         "linesShort": "L",
-        "pcs": "Perfekcyjne Cleary",
+        "pcs": "Czyste Pola",
         "holds": "Przechowania",
         "spike": "Najwyższy Spike",
         "top": "Top $percentage",
@@ -605,7 +606,7 @@
         "total": "Łącznie",
         "sent": "Wysłano",
         "received": "Otrzymane",
-        "placement": "Położenie",
+        "placement": "Pozycja",
         "peak": "Szczyt",
         "overall": "Ogólnie",
         "midgame": "Środek gry",
@@ -618,17 +619,17 @@
         "rate": "Częstość",
         "secsDS": "Secs/DS",
         "secsCheese": "Secs/Ser",
-        "attackCheesiness": "Nieład Ataków",
-        "downstackingRatio": "Współczynnik Downstackowania",
+        "attackCheesiness": "Nieład ataków",
+        "downstackingRatio": "Współczynnik downstackowania",
         "clearTypes": "Typy Clearów",
         "wellColumnDistribution": "Dystrybucja ",
         "allSpins": "All Spiny",
-        "sankeyTitle": "Wykres Sankey Nadchodzących Ataków",
-        "incomingAttack": "Nadchodzący Atak",
+        "sankeyTitle": "Wykres nadchodzących ataków Sankey",
+        "incomingAttack": "Nadchodzący atak",
         "clean": "Czyste śmieci",
         "cancelled": "Anulowane",
-        "cheeseTanked": "Ser Przyjęty",
-        "cleanTanked": "Czyste Śmieci Przyjęte",
+        "cheeseTanked": "Przyjęty ser",
+        "cleanTanked": "Przyjęte czyste śmieci",
         "kills": "Zabójstwa",
         "deaths": "Śmierci",
         "ppsDistribution": "Rozkład PPS",
@@ -648,12 +649,12 @@
             "other": "$n naciśnięć klawiszy"
         },
         "tspinsTotal(plural)": {
-            "zero": "$n łącznych T-Spinów",
-            "one": "$n łączny T-Spin",
-            "two": "$n łączne T-Spiny",
-            "few": "$n łączne T-Spiny",
-            "many": "$n łącznych T-Spinów",
-            "other": "$n łącznych T-Spinów"
+            "zero": "$n T-spinów łącznie",
+            "one": "$n T-spin łącznie",
+            "two": "$n T-spiny łącznie",
+            "few": "$n T-spiny łącznie",
+            "many": "$n T-spinów łącznie",
+            "other": "$n T-spinów łącznie"
         },
         "linesCleared(plural)": {
             "zero": "$n linii wyczyszczonych",
@@ -779,106 +780,106 @@
         "CK": "Wyspy Cooka",
         "CR": "Kostaryka",
         "CI": "Wybrzeże Kości Słoniowej",
-        "HR": "Croatia",
-        "CU": "Cuba",
-        "CW": "Curaçao",
-        "CY": "Cyprus",
-        "CZ": "Czech Republic",
-        "DK": "Denmark",
-        "DJ": "Djibouti",
-        "DM": "Dominica",
-        "DO": "Dominican Republic",
-        "EC": "Ecuador",
-        "EG": "Egypt",
+        "HR": "Chorwacja",
+        "CU": "Kuba",
+        "CW": "Curacao",
+        "CY": "Cypr",
+        "CZ": "Republika Czeska",
+        "DK": "Dania",
+        "DJ": "Dżibuti",
+        "DM": "Dominikana",
+        "DO": "Republika Dominikany",
+        "EC": "Ekwador",
+        "EG": "Egipt",
         "SV": "El Salvador",
-        "GB-ENG": "England",
-        "GQ": "Equatorial Guinea",
-        "ER": "Eritrea",
+        "GB-ENG": "Anglia",
+        "GQ": "Gwinea Równikowa",
+        "ER": "Erytrea",
         "EE": "Estonia",
-        "ET": "Ethiopia",
-        "EU": "Europe",
-        "FK": "Falkland Islands (Malvinas)",
-        "FO": "Faroe Islands",
-        "FJ": "Fiji",
-        "FI": "Finland",
-        "FR": "France",
-        "GF": "French Guiana",
-        "PF": "French Polynesia",
-        "TF": "French Southern Territories",
+        "ET": "Etiopia",
+        "EU": "Europa",
+        "FK": "Falklandy (Malwiny)",
+        "FO": "Wyspy Owcze",
+        "FJ": "Fidżi",
+        "FI": "Finlandia",
+        "FR": "Francja",
+        "GF": "Gujana Francuska",
+        "PF": "Polinezja Francuska",
+        "TF": "Francuskie Terytoria Południowe i Antarktyczne",
         "GA": "Gabon",
         "GM": "Gambia",
-        "GE": "Georgia",
-        "DE": "Germany",
+        "GE": "Gruzja",
+        "DE": "Niemcy",
         "GH": "Ghana",
         "GI": "Gibraltar",
-        "GR": "Greece",
-        "GL": "Greenland",
+        "GR": "Grecja",
+        "GL": "Grenlandia",
         "GD": "Grenada",
-        "GP": "Guadeloupe",
+        "GP": "Gwadelupa",
         "GU": "Guam",
-        "GT": "Guatemala",
-        "GG": "Guernsey",
-        "GN": "Guinea",
-        "GW": "Guinea-Bissau",
-        "GY": "Guyana",
+        "GT": "Gwatemala",
+        "GG": "Wyspa Guernsey",
+        "GN": "Gwinea",
+        "GW": "Gwinea Bissau",
+        "GY": "Gujana",
         "HT": "Haiti",
-        "HM": "Heard Island and McDonald Islands",
-        "VA": "Holy See (Vatican City State)",
+        "HM": "Wyspy Heard i McDonalda",
+        "VA": "Stolica Apostolska (Watykan)",
         "HN": "Honduras",
-        "HK": "Hong Kong",
-        "HU": "Hungary",
-        "IS": "Iceland",
-        "IN": "India",
-        "ID": "Indonesia",
-        "IR": "Iran, Islamic Republic of",
-        "IQ": "Iraq",
-        "IE": "Ireland",
-        "IM": "Isle of Man",
-        "IL": "Israel",
-        "IT": "Italy",
-        "JM": "Jamaica",
-        "JP": "Japan",
+        "HK": "Hongkong",
+        "HU": "Węgry",
+        "IS": "Islandia",
+        "IN": "Indie",
+        "ID": "Indonezja",
+        "IR": "Iran",
+        "IQ": "Irak",
+        "IE": "Irlandia",
+        "IM": "Wyspa Man",
+        "IL": "Izrael",
+        "IT": "Włochy",
+        "JM": "Jamajka",
+        "JP": "Japonia",
         "JE": "Jersey",
-        "JO": "Jordan",
-        "KZ": "Kazakhstan",
-        "KE": "Kenya",
+        "JO": "Jordania",
+        "KZ": "Kazachstan",
+        "KE": "Kenia",
         "KI": "Kiribati",
-        "KP": "Korea, Democratic People's Republic of",
-        "KR": "Korea, Republic of",
-        "XK": "Kosovo",
-        "KW": "Kuwait",
-        "KG": "Kyrgyzstan",
-        "LA": "Lao People's Democratic Republic",
-        "LV": "Latvia",
+        "KP": "Koreańska Republika Ludowo-Demokratyczna",
+        "KR": "Korea Południowa",
+        "XK": "Kosowo",
+        "KW": "Kuwejt",
+        "KG": "Kirgistan",
+        "LA": "Laotańska Republika Ludowo-Demokratyczna",
+        "LV": "Łotwa",
         "LB": "Lebanon",
         "LS": "Lesotho",
-        "LR": "Liberia",
-        "LY": "Libya",
+        "LR": "Republika Liberii",
+        "LY": "Libia",
         "LI": "Liechtenstein",
-        "LT": "Lithuania",
-        "LU": "Luxembourg",
-        "MO": "Macao",
-        "MK": "Macedonia, the former Yugoslav Republic of",
-        "MG": "Madagascar",
+        "LT": "Litwa",
+        "LU": "Luksemburg",
+        "MO": "Makau",
+        "MK": "Republika Macedonii Północnej",
+        "MG": "Madagaskar",
         "MW": "Malawi",
-        "MY": "Malaysia",
-        "MV": "Maldives",
+        "MY": "Malezja",
+        "MV": "Malediwy",
         "ML": "Mali",
         "MT": "Malta",
-        "MH": "Marshall Islands",
-        "MQ": "Martinique",
-        "MR": "Mauritania",
+        "MH": "Wyspy Marshalla",
+        "MQ": "Martynika",
+        "MR": "Mauretania",
         "MU": "Mauritius",
-        "YT": "Mayotte",
-        "MX": "Mexico",
-        "FM": "Micronesia, Federated States of",
-        "MD": "Moldova, Republic of",
-        "MC": "Monaco",
-        "ME": "Montenegro",
-        "MA": "Morocco",
+        "YT": "Majotta",
+        "MX": "Meksyk",
+        "FM": "Mikronezja",
+        "MD": "Republika Mołdowy",
+        "MC": "Monako",
+        "ME": "Czarnogóra",
+        "MA": "Maroko",
         "MN": "Mongolia",
         "MS": "Montserrat",
-        "MZ": "Mozambique",
+        "MZ": "Mozambik",
         "MM": "Mjanma",
         "NA": "Namibia",
         "NR": "Nauru",

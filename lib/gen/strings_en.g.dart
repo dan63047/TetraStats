@@ -926,6 +926,7 @@ class TranslationsAboutViewEn {
 	String get deDElocale => 'German locale';
 	String get koKRlocale => 'Korean locale';
 	String get plPLlocale => 'Polish locale';
+	String withFixesBy({required Object username}) => 'With fixes by ${username}';
 	String get supportHim => 'Support him!';
 }
 
@@ -2018,6 +2019,7 @@ extension on Translations {
 			case 'aboutView.deDElocale': return 'German locale';
 			case 'aboutView.koKRlocale': return 'Korean locale';
 			case 'aboutView.plPLlocale': return 'Polish locale';
+			case 'aboutView.withFixesBy': return ({required Object username}) => 'With fixes by ${username}';
 			case 'aboutView.supportHim': return 'Support him!';
 			case 'stats.registrationDate': return 'Registration Date';
 			case 'stats.gametime': return 'Time Played';
