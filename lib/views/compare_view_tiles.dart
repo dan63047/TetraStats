@@ -62,6 +62,7 @@ class CompareState extends State<CompareView> {
   List<TetrioPlayer> players = [];
   List<Summaries> summaries = [];
   List<String> nicknames = [];
+  List<String> ids = [];
   Map<String, List<String>> TitesForStats = {
     t.general: [
       t.stats.registrationDate,
@@ -748,6 +749,7 @@ class CompareState extends State<CompareView> {
   void getSummariesForInit() async {
     summaries.add(await teto.fetchSummaries(widget.initPlayer.userId));
     nicknames.add(players[0].username);
+    ids.add(players[0].userId);
     addvaluesEntrys(players.first, summaries.first);
     best = recalculateBestEntries();
     setState(() {
@@ -942,7 +944,7 @@ class CompareState extends State<CompareView> {
             },
             title: Text(t.analysis, style: _expansionTileTitleTextStyle),
             children: [
-              StreamBuilder(stream: teto.minomuncherMunchByMultipleIDStream(nicknames), builder: (context, snapshot){
+              StreamBuilder(stream: teto.minomuncherMunchByMultipleIDStream(ids), builder: (context, snapshot){
                 switch (snapshot.connectionState) {
                   case ConnectionState.none:
                   case ConnectionState.waiting:
@@ -982,7 +984,7 @@ class CompareState extends State<CompareView> {
                     if (snapshot.hasData){
                       double width = 300+300*summaries.length.toDouble();
                       List<MinomuncherData> data = snapshot.data!.result!;
-                      return SingleChildScrollView(
+                      if (data.length > 1) return SingleChildScrollView(
                         child: Column(
                           children: [
                             ApmPpsThingy([for (MinomuncherData e in data) ApmPps(e.nick, e.openerAPM, e.APM, e.midgameAPM, e.openerPPS, e.PPS, e.midgamePPS)]),
@@ -1014,7 +1016,9 @@ class CompareState extends State<CompareView> {
                             PPSDistributionThingy([for (MinomuncherData e in data) e.ppsSegments], [for (MinomuncherData e in data) e.nick], width)
                             ],
                       ),
-                  );
+                  ); else {
+                    return SizedBox(height: 256.0, child: ErrorThingy(eText: t.errors.notEnoughData));
+                  }
                 }
                 if (snapshot.hasError){
                   if (snapshot.error is TetrioNoReplays) return SizedBox(height: 256.0, child: ErrorThingy(data: FetchResults(false, null, [], null, null, null, null, null, false, snapshot.error as Exception)));

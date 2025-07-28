@@ -482,10 +482,10 @@ class TetrioService extends DB {
         for (BetaRecord record in avaliable[i]){
           List<MinomuncherRaw>? cached = _cache.get(record.id, List<MinomuncherRaw>);
           if (cached != null){
-            munched.add(cached.firstWhere((element) => element.nick == id[i]));
+            munched.add(cached.firstWhere((element) => element.id == id[i]));
           }else{
             List<MinomuncherRaw> raw = await minomuncherPostReplay(await szyGetReplay(record.replayID));
-            munched.add(raw.firstWhere((element) => element.nick == id[i]));
+            munched.add(raw.firstWhere((element) => element.id == id[i]));
           }
           progress.munched++;
           yield progress;
@@ -515,10 +515,10 @@ class TetrioService extends DB {
       for (BetaRecord record in progress.avaliable){
         List<MinomuncherRaw>? cached = _cache.get(record.id, List<MinomuncherRaw>);
         if (cached != null){
-          progress.munched.add(cached.firstWhere((element) => element.nick == id));
+          progress.munched.add(cached.firstWhere((element) => element.id == id));
         }else{
           List<MinomuncherRaw> raw = await minomuncherPostReplay(await szyGetReplay(record.replayID));
-          progress.munched.add(raw.firstWhere((element) => element.nick == id));
+          progress.munched.add(raw.firstWhere((element) => element.id == id));
         }
         yield progress;
       }

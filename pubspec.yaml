@@ -57,9 +57,9 @@ dev_dependencies:
   test: ^1.24.9
 
 flutter_launcher_icons:
-  android: "launcher_icon"
+  android: true
   ios: true
-  image_path: "res/icons/app.png"
+  image_path_android: "res/icons/app.png"
   min_sdk_android: 23 # android min sdk min:16, default 21
   web:
     generate: true
