@@ -812,6 +812,9 @@ class _TranslationsSettingsDestinationPlPl implements TranslationsSettingsDestin
 	);
 	@override String get updateInTheBackground => 'Aktualizuj dane w tle';
 	@override String get updateInTheBackgroundDescription => 'Jeśli włączone, Tetra Stats będzie próbowało otrzymać nowe informacje po wygaśnięciu pamięci podręcznej. Zwykle dzieje się to co 5 minut';
+	@override String get munchLimit => 'Limit for Minomuncher analysis';
+	@override String get munchLimitDescription => 'By default, minomuncher will analyse first 10 available replays. If you want more, you can adjust it here (max of 25).';
+	@override String get munchLimitTooMuch => 'Too much, rejected';
 	@override String get compareStats => 'Porównaj statystyki TL ze średnimi rang';
 	@override String get compareStatsDescription => 'Jeśli włączone, Tetra Stats zapewni dodatkowe pomiary, które pozwolą ci porównać siebie do średniego gracza w twojej randze. Będzie to widoczne w ten sposób — statystyki będą podświetlane odpowiednim kolorem, najedź na nie kursorem, aby zobaczyć więcej informacji.';
 	@override String get showPosition => 'Pokaż pozycję w rankingu według statystyk';
@@ -1950,6 +1953,9 @@ extension on TranslationsPlPl {
 			);
 			case 'settingsDestination.updateInTheBackground': return 'Aktualizuj dane w tle';
 			case 'settingsDestination.updateInTheBackgroundDescription': return 'Jeśli włączone, Tetra Stats będzie próbowało otrzymać nowe informacje po wygaśnięciu pamięci podręcznej. Zwykle dzieje się to co 5 minut';
+			case 'settingsDestination.munchLimit': return 'Limit for Minomuncher analysis';
+			case 'settingsDestination.munchLimitDescription': return 'By default, minomuncher will analyse first 10 available replays. If you want more, you can adjust it here (max of 25).';
+			case 'settingsDestination.munchLimitTooMuch': return 'Too much, rejected';
 			case 'settingsDestination.compareStats': return 'Porównaj statystyki TL ze średnimi rang';
 			case 'settingsDestination.compareStatsDescription': return 'Jeśli włączone, Tetra Stats zapewni dodatkowe pomiary, które pozwolą ci porównać siebie do średniego gracza w twojej randze. Będzie to widoczne w ten sposób — statystyki będą podświetlane odpowiednim kolorem, najedź na nie kursorem, aby zobaczyć więcej informacji.';
 			case 'settingsDestination.showPosition': return 'Pokaż pozycję w rankingu według statystyk';

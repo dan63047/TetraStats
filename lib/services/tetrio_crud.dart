@@ -29,7 +29,7 @@ import 'package:tetra_stats/data_objects/tetrio_player.dart';
 import 'package:tetra_stats/data_objects/tetrio_player_from_leaderboard.dart';
 import 'package:tetra_stats/data_objects/tetrio_players_leaderboard.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
-import 'package:tetra_stats/main.dart' show packageInfo;
+import 'package:tetra_stats/main.dart' show packageInfo, prefs;
 import 'package:flutter/foundation.dart';
 import 'package:tetra_stats/services/custom_http_client.dart';
 import 'package:http/http.dart' as http;
@@ -510,7 +510,7 @@ class TetrioService extends DB {
       List<BetaRecord> avaliable = stream.records;
       avaliable.removeWhere((element) => element.stub);
       if (avaliable.isEmpty) throw TetrioNoReplays();
-      progress.avaliable = avaliable.take(10).toList();
+      progress.avaliable = avaliable.take(prefs.getInt("munchLimit")??10).toList();
       yield progress;
       for (BetaRecord record in progress.avaliable){
         List<MinomuncherRaw>? cached = _cache.get(record.id, List<MinomuncherRaw>);

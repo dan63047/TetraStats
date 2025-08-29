@@ -811,6 +811,9 @@ class _TranslationsSettingsDestinationZhCn implements TranslationsSettingsDestin
 	);
 	@override String get updateInTheBackground => '后台更新数据';
 	@override String get updateInTheBackgroundDescription => '如果开启，Tetra Stats将尝试在缓存过期后查询新信息。通常一次/5分钟。';
+	@override String get munchLimit => 'Limit for Minomuncher analysis';
+	@override String get munchLimitDescription => 'By default, minomuncher will analyse first 10 available replays. If you want more, you can adjust it here (max of 25).';
+	@override String get munchLimitTooMuch => 'Too much, rejected';
 	@override String get compareStats => '将TL数据与段位平均水平作比较';
 	@override String get compareStatsDescription => '如果开启，Tetra Stats将提供额外的量度，使您能够将自己与普通玩家的等级相比较。 你看到它的方式——统计信息将以相应的颜色高亮，用光标悬停在它们上面以获取更多信息。';
 	@override String get showPosition => '显示排行榜中的位置';
@@ -1948,6 +1951,9 @@ extension on TranslationsZhCn {
 			);
 			case 'settingsDestination.updateInTheBackground': return '后台更新数据';
 			case 'settingsDestination.updateInTheBackgroundDescription': return '如果开启，Tetra Stats将尝试在缓存过期后查询新信息。通常一次/5分钟。';
+			case 'settingsDestination.munchLimit': return 'Limit for Minomuncher analysis';
+			case 'settingsDestination.munchLimitDescription': return 'By default, minomuncher will analyse first 10 available replays. If you want more, you can adjust it here (max of 25).';
+			case 'settingsDestination.munchLimitTooMuch': return 'Too much, rejected';
 			case 'settingsDestination.compareStats': return '将TL数据与段位平均水平作比较';
 			case 'settingsDestination.compareStatsDescription': return '如果开启，Tetra Stats将提供额外的量度，使您能够将自己与普通玩家的等级相比较。 你看到它的方式——统计信息将以相应的颜色高亮，用光标悬停在它们上面以获取更多信息。';
 			case 'settingsDestination.showPosition': return '显示排行榜中的位置';

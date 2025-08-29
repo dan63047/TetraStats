@@ -812,6 +812,9 @@ class _TranslationsSettingsDestinationRuRu implements TranslationsSettingsDestin
 	);
 	@override String get updateInTheBackground => 'Обновлять данные в фоновом режиме';
 	@override String get updateInTheBackgroundDescription => 'Пока Tetra Stats работает, он может обновлять статистику самостоятельно когда кэш истекает. Обычно это происходит каждые 5 минут';
+	@override String get munchLimit => 'Лимит повторов для анализа';
+	@override String get munchLimitDescription => 'По умолчанию, Minomuncher обработает первые 10 доступных повторов. Если хочется больше, то это можно изменить здесь (максимум до 25 повторов).';
+	@override String get munchLimitTooMuch => 'Слишком много, отклонено';
 	@override String get compareStats => 'Сравнивать статистику со средними значениями ранга';
 	@override String get compareStatsDescription => 'Если включено, Tetra Stats загрузит средние значения и будет сравнивать вас со средними значениями вашего ранга. В результате этого почти каждый пункт статистики обретёт цвет, наводите курсор, чтобы узнать больше.';
 	@override String get showPosition => 'Показывать позиции по статам';
@@ -1950,6 +1953,9 @@ extension on TranslationsRuRu {
 			);
 			case 'settingsDestination.updateInTheBackground': return 'Обновлять данные в фоновом режиме';
 			case 'settingsDestination.updateInTheBackgroundDescription': return 'Пока Tetra Stats работает, он может обновлять статистику самостоятельно когда кэш истекает. Обычно это происходит каждые 5 минут';
+			case 'settingsDestination.munchLimit': return 'Лимит повторов для анализа';
+			case 'settingsDestination.munchLimitDescription': return 'По умолчанию, Minomuncher обработает первые 10 доступных повторов. Если хочется больше, то это можно изменить здесь (максимум до 25 повторов).';
+			case 'settingsDestination.munchLimitTooMuch': return 'Слишком много, отклонено';
 			case 'settingsDestination.compareStats': return 'Сравнивать статистику со средними значениями ранга';
 			case 'settingsDestination.compareStatsDescription': return 'Если включено, Tetra Stats загрузит средние значения и будет сравнивать вас со средними значениями вашего ранга. В результате этого почти каждый пункт статистики обретёт цвет, наводите курсор, чтобы узнать больше.';
 			case 'settingsDestination.showPosition': return 'Показывать позиции по статам';

@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
@@ -48,6 +49,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
   late bool sheetbotRadarGraphs;
   late int ratingMode;
   late int timestampMode;
+  late int munchLimit;
   late bool showPositions;
   late bool showAverages;
   late bool updateInBG;
@@ -56,7 +58,9 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
   late Animation _badDefaultNicknameAnim;
   late Animation _defaultNicknameAnim = _goodDefaultNicknameAnim;
   double helperTextOpacity = 0;
+  double munchHelperTextOpacity = 0;
   String helperText = t.settingsDestination.enterToSubmit;
+  String munchHelperText = t.settingsDestination.enterToSubmit;
 
   @override
   void initState() {
@@ -77,7 +81,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
       curve: Easing.emphasizedAccelerate,
       //reverseCurve: Cubic(0,.99,.99,1.01)
     ))..addStatusListener((status) {
-      if (status.index == 3) setState((){helperText = t.settingsDestination.enterToSubmit; helperTextOpacity = 0;});
+      if (status.index == 3) setState((){helperText = t.settingsDestination.enterToSubmit; munchHelperText = t.settingsDestination.enterToSubmit; helperTextOpacity = 0; munchHelperTextOpacity = 0;});
     });
     _badDefaultNicknameAnim = new ColorTween(
       begin: Colors.redAccent,
@@ -87,7 +91,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
       curve: Easing.emphasizedAccelerate,
       //reverseCurve: Cubic(0,.99,.99,1.01)
     ))..addStatusListener((status) {
-      if (status.index == 3) setState((){helperText = t.settingsDestination.enterToSubmit; helperTextOpacity = 0;});
+      if (status.index == 3) setState((){helperText = t.settingsDestination.enterToSubmit; munchHelperText = t.settingsDestination.enterToSubmit; helperTextOpacity = 0; munchHelperTextOpacity = 0;});
     });
     _getPreferences();
     super.initState();
@@ -111,6 +115,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
     sheetbotRadarGraphs = prefs.getBool("sheetbotRadarGraphs")?? false;
     ratingMode = prefs.getInt("ratingMode") ?? 0;
     timestampMode = prefs.getInt("timestampMode") ?? 0;
+    munchLimit = prefs.getInt("munchLimit") ?? 10;
     _setDefaultNickname(prefs.getString("player")??"").then((v){setState((){});});
     defaultID = prefs.getString("playerID")??"";
   }
@@ -242,6 +247,53 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
               Padding(
                 padding: descriptionPadding,
                 child: Text(t.settingsDestination.updateInTheBackgroundDescription),
+              )
+            ],
+          ),
+        ),
+        Card(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text(t.settingsDestination.munchLimit, style: Theme.of(context).textTheme.displayLarge),
+                trailing: SizedBox(width: 120.0, child: TextField(
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: InputDecoration(
+                    hintText: munchLimit.toString(),
+                    helper: AnimatedOpacity(
+                      opacity: munchHelperTextOpacity,
+                      duration: Durations.long1,
+                      curve: Easing.standardDecelerate,
+                      child: Text(munchHelperText, style: TextStyle(color: _defaultNicknameAnim.value, height: 0.2))
+                    ),
+                  ),
+                  onChanged: (value){
+                    setState(() {munchHelperTextOpacity = 1;});
+                  },
+                  onSubmitted: (value) {
+                    int v = int.parse(value);
+                    munchHelperTextOpacity = 1;
+                    if (0 < v && v <= 25){
+                      prefs.setInt("munchLimit", v);
+                      munchLimit = v;
+                      _defaultNicknameAnim = _goodDefaultNicknameAnim;
+                      munchHelperText = t.settingsDestination.done;
+                      _defaultNicknameAnimController.forward(from: 0);
+                    }else{
+                      _defaultNicknameAnim = _badDefaultNicknameAnim;
+                      munchHelperText = v == 0 ? "???" : t.settingsDestination.munchLimitTooMuch;
+                      _defaultNicknameAnimController.forward(from: 0);
+                    }
+                    setState(() {});
+                  },
+                )),
+              ),
+              Divider(),
+              Padding(
+                padding: descriptionPadding,
+                child: Text(t.settingsDestination.munchLimitDescription),
               )
             ],
           ),

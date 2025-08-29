@@ -811,6 +811,9 @@ class _TranslationsSettingsDestinationDeDe implements TranslationsSettingsDestin
 	);
 	@override String get updateInTheBackground => 'Aktualisieren der Daten im Hintergrund';
 	@override String get updateInTheBackgroundDescription => 'Falls aktiviert, wird Tetra Stats versuchen die neue Daten zu laden wenn der Cache abgelaufen ist. Das passiert meistens alle 5 Minuten';
+	@override String get munchLimit => 'Limit for Minomuncher analysis';
+	@override String get munchLimitDescription => 'By default, minomuncher will analyse first 10 available replays. If you want more, you can adjust it here (max of 25).';
+	@override String get munchLimitTooMuch => 'Too much, rejected';
 	@override String get compareStats => 'Vergleiche TL daten mit den Rangdurchschnitt';
 	@override String get compareStatsDescription => 'Falls an, Tetra Stats wird weitere Parameter zur Verfügung stellen, welche es dir erlaubt dich mit den Durchschnittsspieler in deinem Rang zu vergleichen. Du wirs es so sehen: Statistiken werden mit einer Farbe markiert, fahre über diese drüber um mehr zu erfahren.';
 	@override String get showPosition => 'Zeigt Position auf der Bestenliste nach Statistik';
@@ -1948,6 +1951,9 @@ extension on TranslationsDeDe {
 			);
 			case 'settingsDestination.updateInTheBackground': return 'Aktualisieren der Daten im Hintergrund';
 			case 'settingsDestination.updateInTheBackgroundDescription': return 'Falls aktiviert, wird Tetra Stats versuchen die neue Daten zu laden wenn der Cache abgelaufen ist. Das passiert meistens alle 5 Minuten';
+			case 'settingsDestination.munchLimit': return 'Limit for Minomuncher analysis';
+			case 'settingsDestination.munchLimitDescription': return 'By default, minomuncher will analyse first 10 available replays. If you want more, you can adjust it here (max of 25).';
+			case 'settingsDestination.munchLimitTooMuch': return 'Too much, rejected';
 			case 'settingsDestination.compareStats': return 'Vergleiche TL daten mit den Rangdurchschnitt';
 			case 'settingsDestination.compareStatsDescription': return 'Falls an, Tetra Stats wird weitere Parameter zur Verfügung stellen, welche es dir erlaubt dich mit den Durchschnittsspieler in deinem Rang zu vergleichen. Du wirs es so sehen: Statistiken werden mit einer Farbe markiert, fahre über diese drüber um mehr zu erfahren.';
 			case 'settingsDestination.showPosition': return 'Zeigt Position auf der Bestenliste nach Statistik';

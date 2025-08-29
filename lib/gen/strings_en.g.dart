@@ -432,7 +432,7 @@ class TranslationsDestinationsEn {
 	String get home => 'Home';
 	String get graphs => 'Graphs';
 	String get leaderboards => 'Leaderboards';
-	String get cutoffs => 'Cutoffs';
+	String get cutoffs => 'Rank Averages';
 	String get calc => 'Calculator';
 	String get info => 'Info Center';
 	String get data => 'Saved Data';
@@ -781,7 +781,7 @@ class TranslationsSavedDataDestinationEn {
 
 	// Translations
 	String get title => 'Saved Data';
-	String get tip => 'Select nickname on the left to see data assosiated with it';
+	String get tip => 'Select nickname on the left to see data associated with it';
 	String seasonTLstates({required Object s}) => 'S${s} TL States';
 	String get TLrecords => 'TL Records';
 }
@@ -815,6 +815,9 @@ class TranslationsSettingsDestinationEn {
 	);
 	String get updateInTheBackground => 'Update data in the background';
 	String get updateInTheBackgroundDescription => 'If on, Tetra Stats will attempt to retrieve new info once cache expires. Usually that happens every 5 minutes';
+	String get munchLimit => 'Limit for Minomuncher analysis';
+	String get munchLimitDescription => 'By default, minomuncher will analyse first 10 available replays. If you want more, you can adjust it here (max of 25).';
+	String get munchLimitTooMuch => 'Too much, rejected';
 	String get compareStats => 'Compare TL stats with rank averages';
 	String get compareStatsDescription => 'If on, Tetra Stats will provide additional metrics, which allow you to compare yourself with average player on your rank. The way you\'ll see it — stats will be highlighted with corresponding color, hover over them with the cursor for more info.';
 	String get showPosition => 'Show position on leaderboard by stats';
@@ -1666,7 +1669,7 @@ extension on Translations {
 			case 'destinations.home': return 'Home';
 			case 'destinations.graphs': return 'Graphs';
 			case 'destinations.leaderboards': return 'Leaderboards';
-			case 'destinations.cutoffs': return 'Cutoffs';
+			case 'destinations.cutoffs': return 'Rank Averages';
 			case 'destinations.calc': return 'Calculator';
 			case 'destinations.info': return 'Info Center';
 			case 'destinations.data': return 'Saved Data';
@@ -1928,7 +1931,7 @@ extension on Translations {
 			case 'leaderboardsDestination.fullTL': return 'Tetra League (Current Season, full one)';
 			case 'leaderboardsDestination.ar': return 'Achievement Points';
 			case 'savedDataDestination.title': return 'Saved Data';
-			case 'savedDataDestination.tip': return 'Select nickname on the left to see data assosiated with it';
+			case 'savedDataDestination.tip': return 'Select nickname on the left to see data associated with it';
 			case 'savedDataDestination.seasonTLstates': return ({required Object s}) => 'S${s} TL States';
 			case 'savedDataDestination.TLrecords': return 'TL Records';
 			case 'settingsDestination.title': return 'Settings';
@@ -1953,6 +1956,9 @@ extension on Translations {
 			);
 			case 'settingsDestination.updateInTheBackground': return 'Update data in the background';
 			case 'settingsDestination.updateInTheBackgroundDescription': return 'If on, Tetra Stats will attempt to retrieve new info once cache expires. Usually that happens every 5 minutes';
+			case 'settingsDestination.munchLimit': return 'Limit for Minomuncher analysis';
+			case 'settingsDestination.munchLimitDescription': return 'By default, minomuncher will analyse first 10 available replays. If you want more, you can adjust it here (max of 25).';
+			case 'settingsDestination.munchLimitTooMuch': return 'Too much, rejected';
 			case 'settingsDestination.compareStats': return 'Compare TL stats with rank averages';
 			case 'settingsDestination.compareStatsDescription': return 'If on, Tetra Stats will provide additional metrics, which allow you to compare yourself with average player on your rank. The way you\'ll see it — stats will be highlighted with corresponding color, hover over them with the cursor for more info.';
 			case 'settingsDestination.showPosition': return 'Show position on leaderboard by stats';

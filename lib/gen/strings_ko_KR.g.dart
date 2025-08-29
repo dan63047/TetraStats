@@ -811,6 +811,9 @@ class _TranslationsSettingsDestinationKoKr implements TranslationsSettingsDestin
 	);
 	@override String get updateInTheBackground => '백그라운드에서 정보 업데이트';
 	@override String get updateInTheBackgroundDescription => '켜져 있다면, Tetra Stats는 캐시가 만료될 때마다 새로운 정보를 받으려고 시도할 것입니다. 주로 이는 5분마다 일어납니다.';
+	@override String get munchLimit => 'Limit for Minomuncher analysis';
+	@override String get munchLimitDescription => 'By default, minomuncher will analyse first 10 available replays. If you want more, you can adjust it here (max of 25).';
+	@override String get munchLimitTooMuch => 'Too much, rejected';
 	@override String get compareStats => '테트라 리그 스탯을 랭크 평균과 비교하기';
 	@override String get compareStatsDescription => '켜져 있다면, Tetra Stats는 당신이 당신의 랭크의 평균적인 플레이어와 스탯을 비교할 수 있도록 당신의 스탯을 알맞은 색으로 강조할 것입니다. 스탯 위에 커서를 올려 더 많은 정보를 확인하세요.';
 	@override String get showPosition => '리더보드에서 스탯별 순위 표시';
@@ -1948,6 +1951,9 @@ extension on TranslationsKoKr {
 			);
 			case 'settingsDestination.updateInTheBackground': return '백그라운드에서 정보 업데이트';
 			case 'settingsDestination.updateInTheBackgroundDescription': return '켜져 있다면, Tetra Stats는 캐시가 만료될 때마다 새로운 정보를 받으려고 시도할 것입니다. 주로 이는 5분마다 일어납니다.';
+			case 'settingsDestination.munchLimit': return 'Limit for Minomuncher analysis';
+			case 'settingsDestination.munchLimitDescription': return 'By default, minomuncher will analyse first 10 available replays. If you want more, you can adjust it here (max of 25).';
+			case 'settingsDestination.munchLimitTooMuch': return 'Too much, rejected';
 			case 'settingsDestination.compareStats': return '테트라 리그 스탯을 랭크 평균과 비교하기';
 			case 'settingsDestination.compareStatsDescription': return '켜져 있다면, Tetra Stats는 당신이 당신의 랭크의 평균적인 플레이어와 스탯을 비교할 수 있도록 당신의 스탯을 알맞은 색으로 강조할 것입니다. 스탯 위에 커서를 올려 더 많은 정보를 확인하세요.';
 			case 'settingsDestination.showPosition': return '리더보드에서 스탯별 순위 표시';

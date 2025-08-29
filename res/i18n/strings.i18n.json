@@ -20,7 +20,7 @@
         "home": "Home",
         "graphs": "Graphs",
         "leaderboards": "Leaderboards",
-        "cutoffs": "Cutoffs",
+        "cutoffs": "Rank Averages",
         "calc": "Calculator",
         "info": "Info Center",
         "data": "Saved Data",
@@ -293,7 +293,7 @@
     },
     "savedDataDestination": {
         "title": "Saved Data",
-        "tip": "Select nickname on the left to see data assosiated with it",
+        "tip": "Select nickname on the left to see data associated with it",
         "seasonTLstates": "S$s TL States",
         "TLrecords": "TL Records"
     },
@@ -320,6 +320,9 @@
         },
         "updateInTheBackground": "Update data in the background",
         "updateInTheBackgroundDescription": "If on, Tetra Stats will attempt to retrieve new info once cache expires. Usually that happens every 5 minutes",
+        "munchLimit": "Limit for Minomuncher analysis",
+        "munchLimitDescription": "By default, minomuncher will analyse first 10 available replays. If you want more, you can adjust it here (max of 25).",
+        "munchLimitTooMuch": "Too much, rejected",
         "compareStats": "Compare TL stats with rank averages",
         "compareStatsDescription": "If on, Tetra Stats will provide additional metrics, which allow you to compare yourself with average player on your rank. The way you'll see it — stats will be highlighted with corresponding color, hover over them with the cursor for more info.", 
         "showPosition": "Show position on leaderboard by stats",
