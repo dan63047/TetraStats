@@ -12,6 +12,8 @@ class DistinguishmentThingy extends StatelessWidget{
   List<InlineSpan> getDistinguishmentTitle(String? text) {
     // TWC champions don't have header in their distinguishments
     if (distinguishment.type == "twc") return [TextSpan(text: t.distinguishments.twc, style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.yellowAccent))];
+    // ??? something, that's not documented
+    if (distinguishment.detail == "x-multiple") return [TextSpan(text: distinguishment.text, style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.yellowAccent))];
     // In case if it missing for some other reason, return this 
     if (text == null) return [TextSpan(text: t.distinguishments.noHeader, style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.redAccent))];
     
@@ -96,7 +98,7 @@ class DistinguishmentThingy extends StatelessWidget{
               children: getDistinguishmentTitle(distinguishment.header),
             ),
           ),
-          Padding(
+          if (distinguishment.detail != "x-multiple") Padding(
             padding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
             child: Text(getDistinguishmentSubtitle(distinguishment.footer), style: Theme.of(context).textTheme.displayLarge, textAlign: TextAlign.center),
           ),
