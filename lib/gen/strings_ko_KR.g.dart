@@ -611,6 +611,7 @@ class _TranslationsGraphsDestinationKoKr implements TranslationsGraphsDestinatio
 	@override String gamesPlayed({required Object games}) => '${games} 판 플레이함';
 	@override String get dateAndTime => '날짜 및 시간';
 	@override String get filterModaleTitle => '랭크별로 그래프 필터링하기';
+	@override late final _TranslationsGraphsDestinationHistoryKoKr history = _TranslationsGraphsDestinationHistoryKoKr._(_root);
 }
 
 // Path: filterModale
@@ -1085,6 +1086,19 @@ class _TranslationsStatsKoKr implements TranslationsStatsEn {
 	@override String get tSpins => 'T스핀';
 	@override String get spin => '스핀';
 	@override String get spins => '스핀';
+}
+
+// Path: graphsDestination.history
+class _TranslationsGraphsDestinationHistoryKoKr implements TranslationsGraphsDestinationHistoryEn {
+	_TranslationsGraphsDestinationHistoryKoKr._(this._root);
+
+	final TranslationsKoKr _root; // ignore: unused_field
+
+	// Translations
+	@override String get last7 => 'Last 7 Days';
+	@override String get last30 => 'Last 30 Days';
+	@override String get last90 => 'Last 90 Days';
+	@override String get full => 'Full History';
 }
 
 // Path: stats.xp
@@ -1841,6 +1855,10 @@ extension on TranslationsKoKr {
 			case 'graphsDestination.gamesPlayed': return ({required Object games}) => '${games} 판 플레이함';
 			case 'graphsDestination.dateAndTime': return '날짜 및 시간';
 			case 'graphsDestination.filterModaleTitle': return '랭크별로 그래프 필터링하기';
+			case 'graphsDestination.history.last7': return 'Last 7 Days';
+			case 'graphsDestination.history.last30': return 'Last 30 Days';
+			case 'graphsDestination.history.last90': return 'Last 90 Days';
+			case 'graphsDestination.history.full': return 'Full History';
 			case 'filterModale.all': return '모두';
 			case 'cutoffsDestination.title': return '테트라 리그 상황';
 			case 'cutoffsDestination.relevance': return ({required Object timestamp}) => '${timestamp} 기준';

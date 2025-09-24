@@ -615,6 +615,7 @@ class TranslationsGraphsDestinationEn {
 	String gamesPlayed({required Object games}) => '${games} played';
 	String get dateAndTime => 'Date & Time';
 	String get filterModaleTitle => 'Filter ranks on graph';
+	late final TranslationsGraphsDestinationHistoryEn history = TranslationsGraphsDestinationHistoryEn._(_root);
 }
 
 // Path: filterModale
@@ -1089,6 +1090,19 @@ class TranslationsStatsEn {
 	String get tSpins => 'T-spins';
 	String get spin => 'Spin';
 	String get spins => 'Spins';
+}
+
+// Path: graphsDestination.history
+class TranslationsGraphsDestinationHistoryEn {
+	TranslationsGraphsDestinationHistoryEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get last7 => 'Last 7 Days';
+	String get last30 => 'Last 30 Days';
+	String get last90 => 'Last 90 Days';
+	String get full => 'Full History';
 }
 
 // Path: stats.xp
@@ -1846,6 +1860,10 @@ extension on Translations {
 			case 'graphsDestination.gamesPlayed': return ({required Object games}) => '${games} played';
 			case 'graphsDestination.dateAndTime': return 'Date & Time';
 			case 'graphsDestination.filterModaleTitle': return 'Filter ranks on graph';
+			case 'graphsDestination.history.last7': return 'Last 7 Days';
+			case 'graphsDestination.history.last30': return 'Last 30 Days';
+			case 'graphsDestination.history.last90': return 'Last 90 Days';
+			case 'graphsDestination.history.full': return 'Full History';
 			case 'filterModale.all': return 'All';
 			case 'cutoffsDestination.title': return 'Tetra League State';
 			case 'cutoffsDestination.relevance': return ({required Object timestamp}) => 'as of ${timestamp}';

@@ -189,7 +189,13 @@
         "fetchAndSaveOldTLmatchesResult": "${number} 개의 경기를 찾았습니다",
         "gamesPlayed": "$games 판 플레이함",
         "dateAndTime": "날짜 및 시간",
-        "filterModaleTitle": "랭크별로 그래프 필터링하기"
+        "filterModaleTitle": "랭크별로 그래프 필터링하기",
+        "history": {
+            "last7": "Last 7 Days",
+            "last30": "Last 30 Days",
+            "last90": "Last 90 Days",
+            "full": "Full History"
+        }
     },
     "filterModale": {
         "all": "모두"

@@ -722,8 +722,8 @@ class TetrioService extends DB {
     }
   }
 
-  Future<List<Cutoffs>> fetchCutoffsHistory() async {
-    Uri url = Uri.https(webVersionDomain, 'beanserver_blaster/history.csv');
+  Future<List<Cutoffs>> fetchCutoffsHistory(String csvName) async {
+    Uri url = Uri.https(webVersionDomain, 'beanserver_blaster/$csvName.csv');
 
     try{
       final response = await client.get(url);

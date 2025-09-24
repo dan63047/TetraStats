@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tetra_stats/data_objects/record_single.dart';
+import 'package:tetra_stats/data_objects/singleplayer_grading.dart';
 import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
 import 'package:tetra_stats/views/destination_home.dart';
@@ -28,7 +29,8 @@ class SingleplayerRecord extends StatelessWidget {
       closestAverageBlitz = blitzAverages.entries.singleWhere((element) => element.value == blitzAverages.values.reduce((a, b) => (a-record!.stats.score).abs() < (b -record!.stats.score).abs() ? a : b));
       blitzBetterThanClosestAverage = record!.stats.score > closestAverageBlitz.value;
     }
-    
+    Grade runGrade = record!.gamemode == "40l" ? sprintToGrade(record!) : Grade(grade: "d", score: 18.0);
+    print("${runGrade.grade} (${runGrade.score}) - time: ${(runGrade as SprintGrade).timeGrade}");
     return RecordCard(record, [], record!.gamemode == "40l" ? sprintBetterThanRankAverage : blitzBetterThanRankAverage, record!.gamemode == "40l" ? closestAverageSprint : closestAverageBlitz, record!.gamemode == "40l" ? sprintBetterThanClosestAverage : blitzBetterThanClosestAverage, rank);
   }
 }

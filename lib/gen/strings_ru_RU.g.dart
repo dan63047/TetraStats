@@ -612,6 +612,7 @@ class _TranslationsGraphsDestinationRuRu implements TranslationsGraphsDestinatio
 	@override String gamesPlayed({required Object games}) => '${games} сыграно';
 	@override String get dateAndTime => 'Дата и время';
 	@override String get filterModaleTitle => 'Фильтровать график по рангам';
+	@override late final _TranslationsGraphsDestinationHistoryRuRu history = _TranslationsGraphsDestinationHistoryRuRu._(_root);
 }
 
 // Path: filterModale
@@ -1086,6 +1087,19 @@ class _TranslationsStatsRuRu implements TranslationsStatsEn {
 	@override String get tSpins => 'T-spins';
 	@override String get spin => 'Spin';
 	@override String get spins => 'Spins';
+}
+
+// Path: graphsDestination.history
+class _TranslationsGraphsDestinationHistoryRuRu implements TranslationsGraphsDestinationHistoryEn {
+	_TranslationsGraphsDestinationHistoryRuRu._(this._root);
+
+	final TranslationsRuRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get last7 => 'Последние 7 дней';
+	@override String get last30 => 'Последние 30 дней';
+	@override String get last90 => 'Последние 90 дней';
+	@override String get full => 'Вся история';
 }
 
 // Path: stats.xp
@@ -1843,6 +1857,10 @@ extension on TranslationsRuRu {
 			case 'graphsDestination.gamesPlayed': return ({required Object games}) => '${games} сыграно';
 			case 'graphsDestination.dateAndTime': return 'Дата и время';
 			case 'graphsDestination.filterModaleTitle': return 'Фильтровать график по рангам';
+			case 'graphsDestination.history.last7': return 'Последние 7 дней';
+			case 'graphsDestination.history.last30': return 'Последние 30 дней';
+			case 'graphsDestination.history.last90': return 'Последние 90 дней';
+			case 'graphsDestination.history.full': return 'Вся история';
 			case 'filterModale.all': return 'Все';
 			case 'cutoffsDestination.title': return 'Состояние Тетра Лиги';
 			case 'cutoffsDestination.relevance': return ({required Object timestamp}) => 'на момент ${timestamp}';

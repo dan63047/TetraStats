@@ -29,11 +29,19 @@ class DestinationGraphs extends StatefulWidget{
 
 Graph graph = Graph.history;
 Stats Ychart = Stats.tr;
+CutoffsHistoryGraphMode cutoffsHistoryGraphMode = CutoffsHistoryGraphMode.last7days;
 
 enum Graph{
   history,
   leagueState,
   leagueCutoffs
+}
+
+enum CutoffsHistoryGraphMode{
+  last7days, // 1 entry/hour
+  last30days, // 3 entry/day
+  last90days, // 1 entry/day
+  fullHistory, // 1 entry/week
 }
 
 class _DestinationGraphsState extends State<DestinationGraphs> {
@@ -306,8 +314,19 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
   }
 
   Widget getCutoffsHistory(){
+    String csvName = "";
+    switch (cutoffsHistoryGraphMode){
+      case CutoffsHistoryGraphMode.last7days:
+        csvName = "history7";
+      case CutoffsHistoryGraphMode.last30days:
+        csvName = "history30";
+      case CutoffsHistoryGraphMode.last90days:
+        csvName = "history90";
+      case CutoffsHistoryGraphMode.fullHistory:
+        csvName = "history1entryweek";
+    }
     return FutureBuilder<List<Cutoffs>>(
-    future: teto.fetchCutoffsHistory(),
+    future: teto.fetchCutoffsHistory(csvName),
     builder: (context, snapshot) {
       switch (snapshot.connectionState){
         case ConnectionState.none:
@@ -331,7 +350,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
             ),
             margin: const EdgeInsets.all(0),
             series: <CartesianSeries>[
-              for (String rank in ranks) StepLineSeries<Cutoffs, DateTime>(
+              for (String rank in ranks) SplineSeries<Cutoffs, DateTime>(
                 enableTooltip: true,
                 dataSource: snapshot.data,
                 animationDuration: 0,
@@ -546,6 +565,15 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
                         },
                         label: Text(t.graphsDestination.fetchAndsaveTLHistory),
                         icon: Icon(Icons.download),
+                      ),
+                      if (graph == Graph.leagueCutoffs) DropdownButton<CutoffsHistoryGraphMode>(
+                        items: [DropdownMenuItem(value: CutoffsHistoryGraphMode.last7days, child: Text(t.graphsDestination.history.last7)), DropdownMenuItem(value: CutoffsHistoryGraphMode.last30days, child: Text(t.graphsDestination.history.last30)), DropdownMenuItem(value: CutoffsHistoryGraphMode.last90days, child: Text(t.graphsDestination.history.last90)), DropdownMenuItem(value: CutoffsHistoryGraphMode.fullHistory, child: Text(t.graphsDestination.history.full))],
+                        value: cutoffsHistoryGraphMode,
+                        onChanged: (value) {
+                          setState(() {
+                            cutoffsHistoryGraphMode = value!;
+                          });
+                        }
                       )
                     ],
                   ),

@@ -189,7 +189,13 @@
         "fetchAndSaveOldTLmatchesResult": "找到 ${number} 场比赛",
         "gamesPlayed": "游玩次数：$games",
         "dateAndTime": "日期和时间",
-        "filterModaleTitle": "在图表上筛选等级"
+        "filterModaleTitle": "在图表上筛选等级",
+        "history": {
+            "last7": "Last 7 Days",
+            "last30": "Last 30 Days",
+            "last90": "Last 90 Days",
+            "full": "Full History"
+        }
     },
     "filterModale": {
         "all": "全部"

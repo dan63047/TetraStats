@@ -611,6 +611,7 @@ class _TranslationsGraphsDestinationDeDe implements TranslationsGraphsDestinatio
 	@override String gamesPlayed({required Object games}) => '${games} gespielt';
 	@override String get dateAndTime => 'Datum & Zeit';
 	@override String get filterModaleTitle => 'Filter Ränge oder Graphen';
+	@override late final _TranslationsGraphsDestinationHistoryDeDe history = _TranslationsGraphsDestinationHistoryDeDe._(_root);
 }
 
 // Path: filterModale
@@ -811,9 +812,9 @@ class _TranslationsSettingsDestinationDeDe implements TranslationsSettingsDestin
 	);
 	@override String get updateInTheBackground => 'Aktualisieren der Daten im Hintergrund';
 	@override String get updateInTheBackgroundDescription => 'Falls aktiviert, wird Tetra Stats versuchen die neue Daten zu laden wenn der Cache abgelaufen ist. Das passiert meistens alle 5 Minuten';
-	@override String get munchLimit => 'Limit for Minomuncher analysis';
-	@override String get munchLimitDescription => 'By default, minomuncher will analyse first 10 available replays. If you want more, you can adjust it here (max of 25).';
-	@override String get munchLimitTooMuch => 'Too much, rejected';
+	@override String get munchLimit => 'Limit für Minomuncher Analyse';
+	@override String get munchLimitDescription => 'Standardmäßig, analysiert minomuncher die ersten 10 Replays. Wenn du mehr möchtest kannst du das hier anpassen (max 25).';
+	@override String get munchLimitTooMuch => 'Zu viel! Abgelehnt';
 	@override String get compareStats => 'Vergleiche TL daten mit den Rangdurchschnitt';
 	@override String get compareStatsDescription => 'Falls an, Tetra Stats wird weitere Parameter zur Verfügung stellen, welche es dir erlaubt dich mit den Durchschnittsspieler in deinem Rang zu vergleichen. Du wirs es so sehen: Statistiken werden mit einer Farbe markiert, fahre über diese drüber um mehr zu erfahren.';
 	@override String get showPosition => 'Zeigt Position auf der Bestenliste nach Statistik';
@@ -1085,6 +1086,19 @@ class _TranslationsStatsDeDe implements TranslationsStatsEn {
 	@override String get tSpins => 'T-Spins';
 	@override String get spin => 'Spin';
 	@override String get spins => 'Spins';
+}
+
+// Path: graphsDestination.history
+class _TranslationsGraphsDestinationHistoryDeDe implements TranslationsGraphsDestinationHistoryEn {
+	_TranslationsGraphsDestinationHistoryDeDe._(this._root);
+
+	final TranslationsDeDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get last7 => 'Last 7 Days';
+	@override String get last30 => 'Last 30 Days';
+	@override String get last90 => 'Last 90 Days';
+	@override String get full => 'Full History';
 }
 
 // Path: stats.xp
@@ -1841,6 +1855,10 @@ extension on TranslationsDeDe {
 			case 'graphsDestination.gamesPlayed': return ({required Object games}) => '${games} gespielt';
 			case 'graphsDestination.dateAndTime': return 'Datum & Zeit';
 			case 'graphsDestination.filterModaleTitle': return 'Filter Ränge oder Graphen';
+			case 'graphsDestination.history.last7': return 'Last 7 Days';
+			case 'graphsDestination.history.last30': return 'Last 30 Days';
+			case 'graphsDestination.history.last90': return 'Last 90 Days';
+			case 'graphsDestination.history.full': return 'Full History';
 			case 'filterModale.all': return 'Alle';
 			case 'cutoffsDestination.title': return 'Tetra League Zustand';
 			case 'cutoffsDestination.relevance': return ({required Object timestamp}) => 'stand vom ${timestamp}';
@@ -1951,9 +1969,9 @@ extension on TranslationsDeDe {
 			);
 			case 'settingsDestination.updateInTheBackground': return 'Aktualisieren der Daten im Hintergrund';
 			case 'settingsDestination.updateInTheBackgroundDescription': return 'Falls aktiviert, wird Tetra Stats versuchen die neue Daten zu laden wenn der Cache abgelaufen ist. Das passiert meistens alle 5 Minuten';
-			case 'settingsDestination.munchLimit': return 'Limit for Minomuncher analysis';
-			case 'settingsDestination.munchLimitDescription': return 'By default, minomuncher will analyse first 10 available replays. If you want more, you can adjust it here (max of 25).';
-			case 'settingsDestination.munchLimitTooMuch': return 'Too much, rejected';
+			case 'settingsDestination.munchLimit': return 'Limit für Minomuncher Analyse';
+			case 'settingsDestination.munchLimitDescription': return 'Standardmäßig, analysiert minomuncher die ersten 10 Replays. Wenn du mehr möchtest kannst du das hier anpassen (max 25).';
+			case 'settingsDestination.munchLimitTooMuch': return 'Zu viel! Abgelehnt';
 			case 'settingsDestination.compareStats': return 'Vergleiche TL daten mit den Rangdurchschnitt';
 			case 'settingsDestination.compareStatsDescription': return 'Falls an, Tetra Stats wird weitere Parameter zur Verfügung stellen, welche es dir erlaubt dich mit den Durchschnittsspieler in deinem Rang zu vergleichen. Du wirs es so sehen: Statistiken werden mit einer Farbe markiert, fahre über diese drüber um mehr zu erfahren.';
 			case 'settingsDestination.showPosition': return 'Zeigt Position auf der Bestenliste nach Statistik';

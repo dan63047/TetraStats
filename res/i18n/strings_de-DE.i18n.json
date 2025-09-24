@@ -189,7 +189,13 @@
         "fetchAndSaveOldTLmatchesResult": "${number} Matches gefunden",
         "gamesPlayed": "$games gespielt",
         "dateAndTime": "Datum & Zeit",
-        "filterModaleTitle": "Filter Ränge oder Graphen"
+        "filterModaleTitle": "Filter Ränge oder Graphen",
+        "history": {
+            "last7": "Last 7 Days",
+            "last30": "Last 30 Days",
+            "last90": "Last 90 Days",
+            "full": "Full History"
+        }
     },
     "filterModale":{
         "all": "Alle"

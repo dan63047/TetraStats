@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 const int currentSeason = 2;
-final DateTime sprintAndBlitzRelevance = DateTime(2025, 6, 4);
+final DateTime sprintAndBlitzRelevance = DateTime(2025, 9, 10);
 const double noTrRd = 60.9;
 const double apmWeight = 1;
 const double ppsWeight = 45;
@@ -186,45 +186,45 @@ const List<Color> lineClearsColors = [
 
 const Map<String, Duration> sprintAverages = {
   // based on https://discord.com/channels/673303546107658242/1260605501754839060/1379885551263420498
-  'x+': Duration(seconds: 19, milliseconds: 335),
-  'x': Duration(seconds: 24, milliseconds: 075),
-  'u': Duration(seconds: 31, milliseconds: 293),
-  'ss': Duration(seconds: 40, milliseconds: 283),
-  's+': Duration(seconds: 47, milliseconds: 511),
-  's': Duration(seconds: 54, milliseconds: 210),
-  's-': Duration(seconds: 60, milliseconds: 496),
-  'a+': Duration(seconds: 68, milliseconds: 767),
-  'a': Duration(seconds: 74, milliseconds: 417),
-  'a-': Duration(seconds: 77, milliseconds: 619),
-  'b+': Duration(seconds: 89, milliseconds: 294),
-  'b': Duration(seconds: 98, milliseconds: 297),
-  'b-': Duration(seconds: 105, milliseconds: 210),
-  'c+': Duration(seconds: 109, milliseconds: 148),
-  'c': Duration(seconds: 128, milliseconds: 228),
-  'c-': Duration(seconds: 138, milliseconds: 100),
-  'd+': Duration(seconds: 143, milliseconds: 767),
-  'd': Duration(seconds: 163, milliseconds: 389),
+  'x+': Duration(seconds: 19, milliseconds: 013),
+  'x': Duration(seconds: 23, milliseconds: 555),
+  'u': Duration(seconds: 31, milliseconds: 251),
+  'ss': Duration(seconds: 37, milliseconds: 873),
+  's+': Duration(seconds: 45, milliseconds: 502),
+  's': Duration(seconds: 50, milliseconds: 563),
+  's-': Duration(seconds: 56, milliseconds: 355),
+  'a+': Duration(seconds: 63, milliseconds: 231),
+  'a': Duration(seconds: 74, milliseconds: 374),
+  'a-': Duration(seconds: 77, milliseconds: 774),
+  'b+': Duration(seconds: 85, milliseconds: 978),
+  'b': Duration(seconds: 92, milliseconds: 220),
+  'b-': Duration(seconds: 101, milliseconds: 100),
+  'c+': Duration(seconds: 118, milliseconds: 148241),
+  'c': Duration(seconds: 119, milliseconds: 770),
+  'c-': Duration(seconds: 129, milliseconds: 699),
+  'd+': Duration(seconds: 137, milliseconds: 404),
+  'd': Duration(seconds: 162, milliseconds: 752),
 };
 
 const Map<String, int> blitzAverages = {
-  'x+': 912418,
-  'x': 635169,
-  'u': 449225,
-  'ss': 294776,
-  's+': 212162,
-  's': 148476,
-  's-': 121513,
-  'a+': 104008,
-  'a': 79753,
-  'a-': 71817,
-  'b+': 61266,
-  'b': 51073,
-  'b-': 45213,
-  'c+': 40732,
-  'c': 30889,
-  'c-': 28593,
-  'd+': 25075,
-  'd': 20438,
+  'x+': 926338,
+  'x': 666454,
+  'u': 459537,
+  'ss': 332738,
+  's+': 219171,
+  's': 172789,
+  's-': 148801,
+  'a+': 108074,
+  'a': 93672,
+  'a-': 74324,
+  'b+': 64242,
+  'b': 58210,
+  'b-': 47648,
+  'c+': 37157,
+  'c': 34793,
+  'c-': 30780,
+  'd+': 27968,
+  'd': 21582,
 };
 
 List<DateTime> seasonStarts = [

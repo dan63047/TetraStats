@@ -612,6 +612,7 @@ class _TranslationsGraphsDestinationPlPl implements TranslationsGraphsDestinatio
 	@override String gamesPlayed({required Object games}) => 'Zagrano ${games} gier';
 	@override String get dateAndTime => 'Data i czas';
 	@override String get filterModaleTitle => 'Filtruj rangi na wykresie';
+	@override late final _TranslationsGraphsDestinationHistoryPlPl history = _TranslationsGraphsDestinationHistoryPlPl._(_root);
 }
 
 // Path: filterModale
@@ -1086,6 +1087,19 @@ class _TranslationsStatsPlPl implements TranslationsStatsEn {
 	@override String get tSpins => 'T-spiny';
 	@override String get spin => 'Spin';
 	@override String get spins => 'Spiny';
+}
+
+// Path: graphsDestination.history
+class _TranslationsGraphsDestinationHistoryPlPl implements TranslationsGraphsDestinationHistoryEn {
+	_TranslationsGraphsDestinationHistoryPlPl._(this._root);
+
+	final TranslationsPlPl _root; // ignore: unused_field
+
+	// Translations
+	@override String get last7 => 'Last 7 Days';
+	@override String get last30 => 'Last 30 Days';
+	@override String get last90 => 'Last 90 Days';
+	@override String get full => 'Full History';
 }
 
 // Path: stats.xp
@@ -1843,6 +1857,10 @@ extension on TranslationsPlPl {
 			case 'graphsDestination.gamesPlayed': return ({required Object games}) => 'Zagrano ${games} gier';
 			case 'graphsDestination.dateAndTime': return 'Data i czas';
 			case 'graphsDestination.filterModaleTitle': return 'Filtruj rangi na wykresie';
+			case 'graphsDestination.history.last7': return 'Last 7 Days';
+			case 'graphsDestination.history.last30': return 'Last 30 Days';
+			case 'graphsDestination.history.last90': return 'Last 90 Days';
+			case 'graphsDestination.history.full': return 'Full History';
 			case 'filterModale.all': return 'Wszystkie';
 			case 'cutoffsDestination.title': return 'Stan Tetra League';
 			case 'cutoffsDestination.relevance': return ({required Object timestamp}) => 'z ${timestamp}';

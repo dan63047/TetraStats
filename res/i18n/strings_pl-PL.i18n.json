@@ -189,7 +189,13 @@
         "fetchAndSaveOldTLmatchesResult": "Znaleziono ${number} meczy",
         "gamesPlayed": "Zagrano $games gier",
         "dateAndTime": "Data i czas",
-        "filterModaleTitle": "Filtruj rangi na wykresie"
+        "filterModaleTitle": "Filtruj rangi na wykresie",
+        "history": {
+            "last7": "Last 7 Days",
+            "last30": "Last 30 Days",
+            "last90": "Last 90 Days",
+            "full": "Full History"
+        }
     },
     "filterModale": {
         "all": "Wszystkie"

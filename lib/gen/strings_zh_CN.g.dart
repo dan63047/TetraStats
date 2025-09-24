@@ -611,6 +611,7 @@ class _TranslationsGraphsDestinationZhCn implements TranslationsGraphsDestinatio
 	@override String gamesPlayed({required Object games}) => '游玩次数：${games}';
 	@override String get dateAndTime => '日期和时间';
 	@override String get filterModaleTitle => '在图表上筛选等级';
+	@override late final _TranslationsGraphsDestinationHistoryZhCn history = _TranslationsGraphsDestinationHistoryZhCn._(_root);
 }
 
 // Path: filterModale
@@ -1085,6 +1086,19 @@ class _TranslationsStatsZhCn implements TranslationsStatsEn {
 	@override String get tSpins => 'T-spins';
 	@override String get spin => 'Spin';
 	@override String get spins => 'Spins';
+}
+
+// Path: graphsDestination.history
+class _TranslationsGraphsDestinationHistoryZhCn implements TranslationsGraphsDestinationHistoryEn {
+	_TranslationsGraphsDestinationHistoryZhCn._(this._root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get last7 => 'Last 7 Days';
+	@override String get last30 => 'Last 30 Days';
+	@override String get last90 => 'Last 90 Days';
+	@override String get full => 'Full History';
 }
 
 // Path: stats.xp
@@ -1841,6 +1855,10 @@ extension on TranslationsZhCn {
 			case 'graphsDestination.gamesPlayed': return ({required Object games}) => '游玩次数：${games}';
 			case 'graphsDestination.dateAndTime': return '日期和时间';
 			case 'graphsDestination.filterModaleTitle': return '在图表上筛选等级';
+			case 'graphsDestination.history.last7': return 'Last 7 Days';
+			case 'graphsDestination.history.last30': return 'Last 30 Days';
+			case 'graphsDestination.history.last90': return 'Last 90 Days';
+			case 'graphsDestination.history.full': return 'Full History';
 			case 'filterModale.all': return '全部';
 			case 'cutoffsDestination.title': return 'Tetra 联赛 状态';
 			case 'cutoffsDestination.relevance': return ({required Object timestamp}) => '${timestamp}';

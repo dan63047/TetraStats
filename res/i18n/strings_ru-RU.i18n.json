@@ -189,7 +189,13 @@
         "fetchAndSaveOldTLmatchesResult": "${number} матчей было найдено",
         "gamesPlayed": "$games сыграно",
         "dateAndTime": "Дата и время",
-        "filterModaleTitle": "Фильтровать график по рангам"
+        "filterModaleTitle": "Фильтровать график по рангам",
+        "history": {
+            "last7": "Последние 7 дней",
+            "last30": "Последние 30 дней",
+            "last90": "Последние 90 дней",
+            "full": "Вся история"
+        }
     },
     "filterModale": {
         "all": "Все"
