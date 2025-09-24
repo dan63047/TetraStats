@@ -199,7 +199,7 @@ const Map<String, Duration> sprintAverages = {
   'b+': Duration(seconds: 85, milliseconds: 978),
   'b': Duration(seconds: 92, milliseconds: 220),
   'b-': Duration(seconds: 101, milliseconds: 100),
-  'c+': Duration(seconds: 118, milliseconds: 148241),
+  'c+': Duration(seconds: 118, milliseconds: 241),
   'c': Duration(seconds: 119, milliseconds: 770),
   'c-': Duration(seconds: 129, milliseconds: 699),
   'd+': Duration(seconds: 137, milliseconds: 404),
