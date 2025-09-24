@@ -5,7 +5,6 @@ import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
-import 'package:tetra_stats/data_objects/singleplayer_grading.dart';
 import 'package:tetra_stats/services/crud_exceptions.dart';
 import 'package:tetra_stats/services/tetrio_crud.dart' show MunchProgress;
 import 'package:tetra_stats/widgets/apl_ranges.dart';
@@ -1355,9 +1354,6 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 					case ConnectionState.done:
 					if (snapshot.hasError){ return FutureError(snapshot); }
 					if (snapshot.hasData){
-            SprintGrade? sprintGrade = sprintToGrade(snapshot.data?.summaries?.sprint);
-            BlitzGrade? blitzGrade = blitzToGrade(snapshot.data?.summaries?.blitz);
-			print("${sprintGrade.timeGrade} (${sprintGrade.timeScore}) | ${blitzGrade.scoreGrade} (${blitzGrade.scoreScore})");
 						if (!snapshot.data!.success) return ErrorThingy(data: snapshot.data!);
 						blitzBetterThanRankAverage = (snapshot.data!.summaries!.league.rank != "z" && snapshot.data!.summaries!.blitz != null) ? snapshot.data!.summaries!.blitz!.stats.score > blitzAverages[snapshot.data!.summaries!.league.rank]! : null;
 						sprintBetterThanRankAverage = (snapshot.data!.summaries!.league.rank != "z" && snapshot.data!.summaries!.sprint != null) ? snapshot.data!.summaries!.sprint!.stats.finalTime < sprintAverages[snapshot.data!.summaries!.league.rank]! : null;
