@@ -13,7 +13,7 @@ import package_info_plus
 import path_provider_foundation
 import screen_retriever_macos
 import shared_preferences_foundation
-import sqflite
+import sqflite_darwin
 import sqlite3_flutter_libs
 import super_native_extensions
 import url_launcher_macos
