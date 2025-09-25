@@ -28,7 +28,7 @@ dependencies:
   sqflite_common_ffi_web: ">=0.1.0-dev.1"
   path_provider: ^2.0.15
   path: ^1.8.2
-  fl_chart: ^1.1.1
+  fl_chart: ^1.0.0
   package_info_plus: ^8.3.0
   shared_preferences: ^2.1.1
   intl: ^0.20.2
