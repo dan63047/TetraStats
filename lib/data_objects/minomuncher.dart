@@ -304,52 +304,6 @@ double getVariance(List<double> arr, double mean) {
     })/arr.length;
   }
 
-/// Part of gaussian-mixture thing
-/// dude i don't want to reimplement entire js library for that
-List<double> means(List<double> data){
-  List<double> me = [];
-  int n = data.length;
-  Random rand = Random();
-  const int nComponents = 3;
-  // Find the first seed at random
-  me.add(data[(rand.nextDouble() * (n - 1)).round()]);
-  var distances = [];
-
-  // Chose all other seeds
-  for (var m = 1; m < nComponents; m++) {
-    // Compute the distance from each datapoint
-    double dsum = 0;
-    for (var i = 0; i < n; i++) {
-      var meansDistances = me.map((x) { return (x - data[i]) * (x - data[i]); });
-      var d = meansDistances.reduce((a, b) { return min(a, b); });
-      try{
-        distances[i] = d;
-      }on RangeError{
-        distances.add(d);
-      }
-      dsum += d;
-    }
-
-    // Chose the next seed at random with probabilities d / dsum
-    var r = rand.nextDouble();
-    var c;
-    for (var j = 0; j < n; j++) {
-      double p = dsum > 0 ? (distances[j] / dsum) : 0;
-      if (p > r || j == (n - 1)) {
-        c = data[j];
-        break;
-      } else {
-        r -= p;
-      }
-    }
-
-    me.add(c);
-  }
-
-  me.sort((a, b) { return (a - b).round(); });
-  return me;
-}
-
 class MinomuncherData {
   late final String id; 
   late final String nick;
@@ -423,7 +377,7 @@ class MinomuncherData {
     this.PPS = entry.value["stats"]["placement"]["pieces"]/secs;
     this.ppsSegments = entry.value["stats"]["placement"]["ppsSegments"].cast<double>();
     final gmm = GMM(3, null, null, null, {'initialize': true});
-    gmm.optimize(ppsSegments);
+    gmm.optimize(ppsSegments.where((e) => e != 9.9).toList());
     List<double> me = gmm.means;
     this.BurstPPS = me.reduce(max); //entry.value["BurstPPS"];
     this.PlonkPPS = me.reduce(min); // entry.value["PlonkPPS"];
@@ -487,7 +441,7 @@ class MinomuncherData {
         for (int j = 0; j < raw.placement.ppsSegments[i]; j++)  huhPPSSegments.add(PPS);
       }
       final gmm = GMM(3, null, null, null, {'initialize': true});
-      gmm.optimize(huhPPSSegments);
+      gmm.optimize(huhPPSSegments.where((e) => e != 9.9).toList());
       List<double> me = gmm.means;
       this.BurstPPS = me.reduce(max);
       this.PlonkPPS = me.reduce(min);
