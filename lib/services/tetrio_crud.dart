@@ -1209,8 +1209,8 @@ class TetrioService extends DB {
   /// Retrieves avaliable Tetra League matches from Tetra Channel api. Returns stream object (fake stream).
   /// Throws an exception if fails to retrieve.
   Future<TetraLeagueBetaStream> fetchTLStream(String userID, {String? prisecter}) async {
-    TetraLeagueBetaStream? cached = _cache.get(userID, TetraLeagueBetaStream);
-    if (cached != null) return cached;
+    // TetraLeagueBetaStream? cached = _cache.get(userID, TetraLeagueBetaStream);
+    // if (cached != null) return cached;
 
     Uri url;
     if (kIsWeb) {
