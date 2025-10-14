@@ -14,7 +14,7 @@ class EstTr {
     if (statrank <= 0) statrank = 0.001;
     //estglicko = (4.0867 * srarea + 186.68);
     double ntemp = pps*(150+(((vs/apm) - 1.66)*35))+app*290+dsp*700;
-    estglicko = 0.000013*pow(ntemp, 3) - 0.0196 *pow(ntemp, 2) + (12.645*ntemp)-1005.4;
+    estglicko = (0.000013*pow(ntemp, 3) - 0.0196 *pow(ntemp, 2) + (12.645*ntemp)-1005.4) * 0.9211 - 49.086;
 
     // osk's stuff
     final F = min(1, 0.5 + 0.5 * (wincount / 18)); // Falloff   - pulls the graph down
