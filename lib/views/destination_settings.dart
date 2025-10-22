@@ -50,6 +50,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
   late int ratingMode;
   late int timestampMode;
   late int munchLimit;
+  late String statsPreference;
   late bool showPositions;
   late bool showAverages;
   late bool updateInBG;
@@ -116,6 +117,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
     ratingMode = prefs.getInt("ratingMode") ?? 0;
     timestampMode = prefs.getInt("timestampMode") ?? 0;
     munchLimit = prefs.getInt("munchLimit") ?? 10;
+    statsPreference = prefs.getString("statsPreference") ?? "sheetbot";
     _setDefaultNickname(prefs.getString("player")??"").then((v){setState((){});});
     defaultID = prefs.getString("playerID")??"";
   }
@@ -247,6 +249,35 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
               Padding(
                 padding: descriptionPadding,
                 child: Text(t.settingsDestination.updateInTheBackgroundDescription),
+              )
+            ],
+          ),
+        ),
+        Card(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text(t.settingsDestination.statsPreferencesTitle, style: Theme.of(context).textTheme.displayLarge),
+                trailing: SegmentedButton(
+                  style: ButtonStyle(
+                    side: const WidgetStatePropertyAll(BorderSide(color: Colors.grey)),
+                  ),
+                  onSelectionChanged: (Set<String> newSelection){
+                    setState(() {
+                      prefs.setString("statsPreference", newSelection.first);
+                      statsPreference = newSelection.first;
+                    });
+                  },
+                segments: [
+                  ButtonSegment(value: "sheetbot", label: Text("SheetBot")),
+                  ButtonSegment(value: "minomuncher", label: Text("MinoMuncher")),
+                ], selected: <String>{statsPreference}),
+              ),
+              Divider(),
+              Padding(
+                padding: descriptionPadding,
+                child: Text(t.settingsDestination.statsPreferencesDescription),
               )
             ],
           ),

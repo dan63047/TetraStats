@@ -64,6 +64,8 @@ class TranslationsZhCn implements Translations {
 		'halfmod': '社区管理员',
 		'anon': '匿名用户',
 	};
+	@override late final _TranslationsDialog212ZhCn dialog212 = _TranslationsDialog212ZhCn._(_root);
+	@override late final _TranslationsChangeLogDialogZhCn changeLogDialog = _TranslationsChangeLogDialogZhCn._(_root);
 	@override String get goBackButton => '返回';
 	@override String get nanow => '目前不可用...';
 	@override String seasonEnds({required Object countdown}) => '当前赛季还有${countdown}结束';
@@ -434,6 +436,30 @@ class _TranslationsDestinationsZhCn implements TranslationsDestinationsEn {
 	@override String get info => '信息中心';
 	@override String get data => '已保存的数据';
 	@override String get settings => '设置';
+}
+
+// Path: dialog212
+class _TranslationsDialog212ZhCn implements TranslationsDialog212En {
+	_TranslationsDialog212ZhCn._(this._root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Question about your preferences';
+	@override String get question => 'Which graphs, in your opinion, are more useful?';
+	@override String get explanation => 'Your choice will determine, which graphs you gonna see in Standing section of Tetra League stats';
+}
+
+// Path: changeLogDialog
+class _TranslationsChangeLogDialogZhCn implements TranslationsChangeLogDialogEn {
+	_TranslationsChangeLogDialogZhCn._(this._root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Tetra Stats has been updated!';
+	@override String ver({required Object ver, required Object build}) => 'Now current version is ${ver} build number ${build}';
+	@override String get changesMD => '### Changes relative to v2.1.1:\n* Now you can change, what set of graphs to show in Standing section of Tetra League stats\n* This popup. It\'s gonna appear once every update\n\nChanges, that was applied before version number change:\n* Additional mesuares to prevent 9.9 burst PPS in minomuncher analysis\n* Est TR formula was updated';
 }
 
 // Path: xp
@@ -812,6 +838,10 @@ class _TranslationsSettingsDestinationZhCn implements TranslationsSettingsDestin
 	);
 	@override String get updateInTheBackground => '后台更新数据';
 	@override String get updateInTheBackgroundDescription => '如果开启，Tetra Stats将尝试在缓存过期后查询新信息。通常一次/5分钟。';
+	@override String get statsPreferencesTitle => 'Stats preferences';
+	@override String get statsPreferencesDescription => 'If you believe, that SheetBot graphs are useless, you can set MinoMuncher graphs to appear in Standing section of Tetra League stats';
+	@override String get sheetbot => 'SheetBot';
+	@override String get minomuncher => 'MinoMuncher';
 	@override String get munchLimit => 'Limit for Minomuncher analysis';
 	@override String get munchLimitDescription => 'By default, minomuncher will analyse first 10 available replays. If you want more, you can adjust it here (max of 25).';
 	@override String get munchLimitTooMuch => 'Too much, rejected';
@@ -1692,6 +1722,12 @@ extension on TranslationsZhCn {
 			case 'playerRole.mod': return '管理员';
 			case 'playerRole.halfmod': return '社区管理员';
 			case 'playerRole.anon': return '匿名用户';
+			case 'dialog212.title': return 'Question about your preferences';
+			case 'dialog212.question': return 'Which graphs, in your opinion, are more useful?';
+			case 'dialog212.explanation': return 'Your choice will determine, which graphs you gonna see in Standing section of Tetra League stats';
+			case 'changeLogDialog.title': return 'Tetra Stats has been updated!';
+			case 'changeLogDialog.ver': return ({required Object ver, required Object build}) => 'Now current version is ${ver} build number ${build}';
+			case 'changeLogDialog.changesMD': return '### Changes relative to v2.1.1:\n* Now you can change, what set of graphs to show in Standing section of Tetra League stats\n* This popup. It\'s gonna appear once every update\n\nChanges, that was applied before version number change:\n* Additional mesuares to prevent 9.9 burst PPS in minomuncher analysis\n* Est TR formula was updated';
 			case 'goBackButton': return '返回';
 			case 'nanow': return '目前不可用...';
 			case 'seasonEnds': return ({required Object countdown}) => '当前赛季还有${countdown}结束';
@@ -1969,6 +2005,10 @@ extension on TranslationsZhCn {
 			);
 			case 'settingsDestination.updateInTheBackground': return '后台更新数据';
 			case 'settingsDestination.updateInTheBackgroundDescription': return '如果开启，Tetra Stats将尝试在缓存过期后查询新信息。通常一次/5分钟。';
+			case 'settingsDestination.statsPreferencesTitle': return 'Stats preferences';
+			case 'settingsDestination.statsPreferencesDescription': return 'If you believe, that SheetBot graphs are useless, you can set MinoMuncher graphs to appear in Standing section of Tetra League stats';
+			case 'settingsDestination.sheetbot': return 'SheetBot';
+			case 'settingsDestination.minomuncher': return 'MinoMuncher';
 			case 'settingsDestination.munchLimit': return 'Limit for Minomuncher analysis';
 			case 'settingsDestination.munchLimitDescription': return 'By default, minomuncher will analyse first 10 available replays. If you want more, you can adjust it here (max of 25).';
 			case 'settingsDestination.munchLimitTooMuch': return 'Too much, rejected';

@@ -67,78 +67,217 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 		'halfmod': 'Community moderator',
 		'anon': 'Anonymous',
 	};
+	late final TranslationsDialog212En dialog212 = TranslationsDialog212En._(_root);
+	late final TranslationsChangeLogDialogEn changeLogDialog = TranslationsChangeLogDialogEn._(_root);
+
+	/// en: 'Go Back'
 	String get goBackButton => 'Go Back';
+
+	/// en: 'Not avaliable for now...'
 	String get nanow => 'Not avaliable for now...';
+
+	/// en: 'Season ends in ${countdown}'
 	String seasonEnds({required Object countdown}) => 'Season ends in ${countdown}';
+
+	/// en: 'Season has ended'
 	String get seasonEnded => 'Season has ended';
+
+	/// en: 'Overall PB: $pb m'
 	String overallPB({required Object pb}) => 'Overall PB: ${pb} m';
+
+	/// en: '${left} games until being ranked'
 	String gamesUntilRanked({required Object left}) => '${left} games until being ranked';
+
+	/// en: '~${wins} victories'
 	String numOfVictories({required Object wins}) => '~${wins} victories';
+
+	/// en: 'Promotion on next win'
 	String get promotionOnNextWin => 'Promotion on next win';
+
+	/// en: '~${losses} defeats'
 	String numOfdefeats({required Object losses}) => '~${losses} defeats';
+
+	/// en: 'Demotion on next loss'
 	String get demotionOnNextLoss => 'Demotion on next loss';
+
+	/// en: 'Records'
 	String get records => 'Records';
+
+	/// en: 'Nerd Stats'
 	String get nerdStats => 'Nerd Stats';
+
+	/// en: 'Playstyles'
 	String get playstyles => 'Playstyles';
+
+	/// en: 'Horoscopes'
 	String get horoscopes => 'Horoscopes';
+
+	/// en: 'Related Achievements'
 	String get relatedAchievements => 'Related Achievements';
+
+	/// en: 'Season'
 	String get season => 'Season';
+
+	/// en: 'Smooth'
 	String get smooth => 'Smooth';
+
+	/// en: 'Date & Time'
 	String get dateAndTime => 'Date & Time';
+
+	/// en: 'Heavy, but allows you to sort players by their stats and filter them by ranks'
 	String get TLfullLBnote => 'Heavy, but allows you to sort players by their stats and filter them by ranks';
+
+	/// en: 'Rank'
 	String get rank => 'Rank';
+
+	/// en: '$n $verdict of $rank rank avg'
 	String verdictGeneral({required Object n, required Object verdict, required Object rank}) => '${n} ${verdict} of ${rank} rank avg';
+
+	/// en: 'ahead'
 	String get verdictBetter => 'ahead';
+
+	/// en: 'behind'
 	String get verdictWorse => 'behind';
+
+	/// en: 'local'
 	String get localStanding => 'local';
+
 	late final TranslationsXpEn xp = TranslationsXpEn._(_root);
 	late final TranslationsGametimeEn gametime = TranslationsGametimeEn._(_root);
+
+	/// en: 'Which one?'
 	String get whichOne => 'Which one?';
+
+	/// en: 'Track'
 	String get track => 'Track';
+
+	/// en: 'Stop tracking'
 	String get stopTracking => 'Stop tracking';
+
+	/// en: 'Supporter tier ${tier}'
 	String supporter({required Object tier}) => 'Supporter tier ${tier}';
+
+	/// en: 'Data from ${newDate} comparing with ${oldDate}'
 	String comparingWith({required Object newDate, required Object oldDate}) => 'Data from ${newDate} comparing with ${oldDate}';
+
+	/// en: 'Compare'
 	String get compare => 'Compare';
+
+	/// en: 'Comparison'
 	String get comparison => 'Comparison';
+
+	/// en: 'Enter username or \$avgX (where X is rank)'
 	String get enterUsername => 'Enter username or \$avgX (where X is rank)';
+
+	/// en: 'General'
 	String get general => 'General';
+
+	/// en: 'Badges'
 	String get badges => 'Badges';
+
+	/// en: 'Obtained ${date}'
 	String obtainDate({required Object date}) => 'Obtained ${date}';
+
+	/// en: 'That badge was assigned manually by TETR.IO admins'
 	String get assignedManualy => 'That badge was assigned manually by TETR.IO admins';
+
+	/// en: 'Distinguishment'
 	String get distinguishment => 'Distinguishment';
+
+	/// en: 'Banned'
 	String get banned => 'Banned';
+
+	/// en: 'Bans are placed when TETR.IO rules or terms of service are broken'
 	String get bannedSubtext => 'Bans are placed when TETR.IO rules or terms of service are broken';
+
+	/// en: 'Bad standing'
 	String get badStanding => 'Bad standing';
+
+	/// en: 'One or more recent bans on record'
 	String get badStandingSubtext => 'One or more recent bans on record';
+
+	/// en: 'Bot account'
 	String get botAccount => 'Bot account';
+
+	/// en: 'Operated by $botMaintainers'
 	String botAccountSubtext({required Object botMaintainers}) => 'Operated by ${botMaintainers}';
+
+	/// en: 'Copied to clipboard!'
 	String get copiedToClipboard => 'Copied to clipboard!';
+
+	/// en: 'Bio'
 	String get bio => 'Bio';
+
+	/// en: 'News'
 	String get news => 'News';
+
 	late final TranslationsMatchResultEn matchResult = TranslationsMatchResultEn._(_root);
 	late final TranslationsDistinguishmentsEn distinguishments = TranslationsDistinguishmentsEn._(_root);
 	late final TranslationsNewsEntriesEn newsEntries = TranslationsNewsEntriesEn._(_root);
+
+	/// en: '${r} rank'
 	String rankupMiddle({required Object r}) => '${r} rank';
+
+	/// en: 'Click to copy user ID'
 	String get copyUserID => 'Click to copy user ID';
+
+	/// en: 'Username or ID'
 	String get searchHint => 'Username or ID';
+
+	/// en: 'Navigation menu'
 	String get navMenu => 'Navigation menu';
+
+	/// en: 'Open navigation menu'
 	String get navMenuTooltip => 'Open navigation menu';
+
+	/// en: 'Refresh data'
 	String get refresh => 'Refresh data';
+
+	/// en: 'Search'
 	String get searchButton => 'Search';
+
+	/// en: 'Tracked Players'
 	String get trackedPlayers => 'Tracked Players';
+
+	/// en: 'Standing'
 	String get standing => 'Standing';
+
+	/// en: 'Previous Seasons'
 	String get previousSeasons => 'Previous Seasons';
+
+	/// en: 'Checking cache...'
 	String get checkingCache => 'Checking cache...';
+
+	/// en: 'Fetching Records...'
 	String get fetchingRecords => 'Fetching Records...';
+
+	/// en: 'Munching...'
 	String get munching => 'Munching...';
+
+	/// en: 'out of'
 	String get outOf => 'out of';
+
+	/// en: 'replays done'
 	String get replaysDone => 'replays done';
+
+	/// en: 'Analysis'
 	String get analysis => 'Analysis';
+
+	/// en: 'via MinoMuncher by Freyhoe'
 	String get minomuncherMention => 'via MinoMuncher by Freyhoe';
+
+	/// en: 'Recent'
 	String get recent => 'Recent';
+
+	/// en: 'Top'
 	String get top => 'Top';
+
+	/// en: 'No record'
 	String get noRecord => 'No record';
+
+	/// en: 'Relevance: ${date}'
 	String sprintAndBlitsRelevance({required Object date}) => 'Relevance: ${date}';
+
 	late final TranslationsSnackBarMessagesEn snackBarMessages = TranslationsSnackBarMessagesEn._(_root);
 	late final TranslationsErrorsEn errors = TranslationsErrorsEn._(_root);
 	late final TranslationsActionsEn actions = TranslationsActionsEn._(_root);
@@ -429,14 +568,66 @@ class TranslationsDestinationsEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Home'
 	String get home => 'Home';
+
+	/// en: 'Graphs'
 	String get graphs => 'Graphs';
+
+	/// en: 'Leaderboards'
 	String get leaderboards => 'Leaderboards';
+
+	/// en: 'Rank Averages'
 	String get cutoffs => 'Rank Averages';
+
+	/// en: 'Calculator'
 	String get calc => 'Calculator';
+
+	/// en: 'Info Center'
 	String get info => 'Info Center';
+
+	/// en: 'Saved Data'
 	String get data => 'Saved Data';
+
+	/// en: 'Settings'
 	String get settings => 'Settings';
+}
+
+// Path: dialog212
+class TranslationsDialog212En {
+	TranslationsDialog212En._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Question about your preferences'
+	String get title => 'Question about your preferences';
+
+	/// en: 'Which graphs, in your opinion, are more useful?'
+	String get question => 'Which graphs, in your opinion, are more useful?';
+
+	/// en: 'Your choice will determine, which graphs you gonna see in Standing section of Tetra League stats'
+	String get explanation => 'Your choice will determine, which graphs you gonna see in Standing section of Tetra League stats';
+}
+
+// Path: changeLogDialog
+class TranslationsChangeLogDialogEn {
+	TranslationsChangeLogDialogEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Tetra Stats has been updated!'
+	String get title => 'Tetra Stats has been updated!';
+
+	/// en: 'Now current version is ${ver} build number ${build}'
+	String ver({required Object ver, required Object build}) => 'Now current version is ${ver} build number ${build}';
+
+	/// en: '### Changes relative to v2.1.1: * Now you can change, what set of graphs to show in Standing section of Tetra League stats * This popup. It's gonna appear once every update Changes, that was applied to web version before version number change: * Additional mesuares to prevent 9.9 burst PPS in minomuncher analysis * Est TR formula was updated'
+	String get changesMD => '### Changes relative to v2.1.1:\n* Now you can change, what set of graphs to show in Standing section of Tetra League stats\n* This popup. It\'s gonna appear once every update\n\nChanges, that was applied to web version before version number change:\n* Additional mesuares to prevent 9.9 burst PPS in minomuncher analysis\n* Est TR formula was updated';
 }
 
 // Path: xp
@@ -446,8 +637,14 @@ class TranslationsXpEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'XP Level'
 	String get title => 'XP Level';
+
+	/// en: 'Progress to next level: $percentage'
 	String progressToNextLevel({required Object percentage}) => 'Progress to next level: ${percentage}';
+
+	/// en: 'Progress from 0 XP to level $goal: $percentage ($left XP left)'
 	String progressTowardsGoal({required Object goal, required Object percentage, required Object left}) => 'Progress from 0 XP to level ${goal}: ${percentage} (${left} XP left)';
 }
 
@@ -458,8 +655,14 @@ class TranslationsGametimeEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Exact gametime'
 	String get title => 'Exact gametime';
+
+	/// en: '$gametime a day in average'
 	String gametimeAday({required Object gametime}) => '${gametime} a day in average';
+
+	/// en: 'It's $years years, or $months months, or $days days, or $minutes minutes or $seconds seconds'
 	String breakdown({required Object years, required Object months, required Object days, required Object minutes, required Object seconds}) => 'It\'s ${years} years,\nor ${months} months,\nor ${days} days,\nor ${minutes} minutes\nor ${seconds} seconds';
 }
 
@@ -470,12 +673,26 @@ class TranslationsMatchResultEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Victory'
 	String get victory => 'Victory';
+
+	/// en: 'Defeat'
 	String get defeat => 'Defeat';
+
+	/// en: 'Tie'
 	String get tie => 'Tie';
+
+	/// en: 'Opponent was DQ'ed'
 	String get dqvictory => 'Opponent was DQ\'ed';
+
+	/// en: 'Disqualified'
 	String get dqdefeat => 'Disqualified';
+
+	/// en: 'No Contest'
 	String get nocontest => 'No Contest';
+
+	/// en: 'Nullified'
 	String get nullified => 'Nullified';
 }
 
@@ -486,9 +703,17 @@ class TranslationsDistinguishmentsEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Header is missing'
 	String get noHeader => 'Header is missing';
+
+	/// en: 'Footer is missing'
 	String get noFooter => 'Footer is missing';
+
+	/// en: 'TETR.IO World Champion'
 	String get twc => 'TETR.IO World Champion';
+
+	/// en: '$year TETR.IO World Championship'
 	String twcYear({required Object year}) => '${year} TETR.IO World Championship';
 }
 
@@ -499,36 +724,50 @@ class TranslationsNewsEntriesEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Got № $rank in $gametype'
 	TextSpan leaderboard({required InlineSpan rank, required InlineSpan gametype}) => TextSpan(children: [
 		const TextSpan(text: 'Got № '),
 		rank,
 		const TextSpan(text: ' in '),
 		gametype,
 	]);
+
+	/// en: 'Got a new PB in $gametype of $pb'
 	TextSpan personalbest({required InlineSpan gametype, required InlineSpan pb}) => TextSpan(children: [
 		const TextSpan(text: 'Got a new PB in '),
 		gametype,
 		const TextSpan(text: ' of '),
 		pb,
 	]);
+
+	/// en: 'Obtained a $badge badge'
 	TextSpan badge({required InlineSpan badge}) => TextSpan(children: [
 		const TextSpan(text: 'Obtained a '),
 		badge,
 		const TextSpan(text: ' badge'),
 	]);
+
+	/// en: 'Obtained $rank in Tetra League'
 	TextSpan rankup({required InlineSpan rank}) => TextSpan(children: [
 		const TextSpan(text: 'Obtained '),
 		rank,
 		const TextSpan(text: ' in Tetra League'),
 	]);
+
+	/// en: 'Became a ${s(TETR.IO supporter)}'
 	TextSpan supporter({required InlineSpanBuilder s}) => TextSpan(children: [
 		const TextSpan(text: 'Became a '),
 		s('TETR.IO supporter'),
 	]);
+
+	/// en: 'Received the gift of ${s(TETR.IO supporter)}'
 	TextSpan supporter_gift({required InlineSpanBuilder s}) => TextSpan(children: [
 		const TextSpan(text: 'Received the gift of '),
 		s('TETR.IO supporter'),
 	]);
+
+	/// en: 'Unknown news of type $type'
 	TextSpan unknown({required InlineSpan type}) => TextSpan(children: [
 		const TextSpan(text: 'Unknown news of type '),
 		type,
@@ -542,10 +781,20 @@ class TranslationsSnackBarMessagesEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: '${date} state was removed from database!'
 	String stateRemoved({required Object date}) => '${date} state was removed from database!';
+
+	/// en: '${date} match was removed from database!'
 	String matchRemoved({required Object date}) => '${date} match was removed from database!';
+
+	/// en: 'Function is not available for web version'
 	String get notForWeb => 'Function is not available for web version';
+
+	/// en: 'Import successful'
 	String get importSuccess => 'Import successful';
+
+	/// en: 'Import was cancelled'
 	String get importCancelled => 'Import was cancelled';
 }
 
@@ -556,34 +805,92 @@ class TranslationsErrorsEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'No records'
 	String get noRecords => 'No records';
+
+	/// en: 'Not enough data'
 	String get notEnoughData => 'Not enough data';
+
+	/// en: 'No history saved'
 	String get noHistorySaved => 'No history saved';
+
+	/// en: 'Some issue with connection: ${code} ${message}'
 	String connection({required Object code, required Object message}) => 'Some issue with connection: ${code} ${message}';
+
+	/// en: 'No such user'
 	String get noSuchUser => 'No such user';
+
+	/// en: 'Either you mistyped something, or the account no longer exists'
 	String get noSuchUserSub => 'Either you mistyped something, or the account no longer exists';
+
+	/// en: 'No connections found'
 	String get discordNotAssigned => 'No connections found';
+
+	/// en: 'Your query should look like described in [API guide](https://tetr.io/about/api/#userssearchquery)'
 	String get discordNotAssignedSub => 'Your query should look like described in [API guide](https://tetr.io/about/api/#userssearchquery)';
+
+	/// en: 'History for that player is missing'
 	String get history => 'History for that player is missing';
+
+	/// en: 'Perhaps, you want to'
 	String get actionSuggestion => 'Perhaps, you want to';
+
+	/// en: 'No Tetra League matches was found'
 	String get p1nkl0bst3rTLmatches => 'No Tetra League matches was found';
+
+	/// en: 'No internet connection'
 	String get clientException => 'No internet connection';
+
+	/// en: 'Your IP address is blocked'
 	String get forbidden => 'Your IP address is blocked';
+
+	/// en: 'If you are using VPN or Proxy, turn it off. If this does not help, reach out to $nickname'
 	String forbiddenSub({required Object nickname}) => 'If you are using VPN or Proxy, turn it off. If this does not help, reach out to ${nickname}';
+
+	/// en: 'You have been rate limited.'
 	String get tooManyRequests => 'You have been rate limited.';
+
+	/// en: 'Wait a few moments and try again'
 	String get tooManyRequestsSub => 'Wait a few moments and try again';
+
+	/// en: 'Something happened on the tetr.io side'
 	String get internal => 'Something happened on the tetr.io side';
+
+	/// en: 'osk, probably, already aware about it'
 	String get internalSub => 'osk, probably, already aware about it';
+
+	/// en: 'Something happened on the tetr.io side (or on oskware_bridge, idk honestly)'
 	String get internalWebVersion => 'Something happened on the tetr.io side (or on oskware_bridge, idk honestly)';
+
+	/// en: 'If osk status page says that everything is ok, let dan63047 know about this issue'
 	String get internalWebVersionSub => 'If osk status page says that everything is ok, let dan63047 know about this issue';
+
+	/// en: 'Something happened with oskware_bridge'
 	String get oskwareBridge => 'Something happened with oskware_bridge';
+
+	/// en: 'Let dan63047 know'
 	String get oskwareBridgeSub => 'Let dan63047 know';
+
+	/// en: 'Third party API blocked your IP address'
 	String get p1nkl0bst3rForbidden => 'Third party API blocked your IP address';
+
+	/// en: 'Too many requests to third party API. Try again later'
 	String get p1nkl0bst3rTooManyRequests => 'Too many requests to third party API. Try again later';
+
+	/// en: 'Something happened on the p1nkl0bst3r side'
 	String get p1nkl0bst3rinternal => 'Something happened on the p1nkl0bst3r side';
+
+	/// en: 'Something happened on the p1nkl0bst3r side (or on oskware_bridge, idk honestly)'
 	String get p1nkl0bst3rinternalWebVersion => 'Something happened on the p1nkl0bst3r side (or on oskware_bridge, idk honestly)';
+
+	/// en: 'Replay already saved'
 	String get replayAlreadySaved => 'Replay already saved';
+
+	/// en: 'Replay expired and not available anymore'
 	String get replayExpired => 'Replay expired and not available anymore';
+
+	/// en: 'Third party API blocked your IP address'
 	String get replayRejected => 'Third party API blocked your IP address';
 }
 
@@ -594,10 +901,20 @@ class TranslationsActionsEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Cancel'
 	String get cancel => 'Cancel';
+
+	/// en: 'Submit'
 	String get submit => 'Submit';
+
+	/// en: 'OK'
 	String get ok => 'OK';
+
+	/// en: 'Apply'
 	String get apply => 'Apply';
+
+	/// en: 'Refresh'
 	String get refresh => 'Refresh';
 }
 
@@ -608,13 +925,28 @@ class TranslationsGraphsDestinationEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Fetch History'
 	String get fetchAndsaveTLHistory => 'Fetch History';
+
+	/// en: 'Get Tetra League matches history'
 	String get fetchAndSaveOldTLmatches => 'Get Tetra League matches history';
+
+	/// en: '${number} states was found'
 	String fetchAndsaveTLHistoryResult({required Object number}) => '${number} states was found';
+
+	/// en: '${number} matches was found'
 	String fetchAndSaveOldTLmatchesResult({required Object number}) => '${number} matches was found';
+
+	/// en: '$games played'
 	String gamesPlayed({required Object games}) => '${games} played';
+
+	/// en: 'Date & Time'
 	String get dateAndTime => 'Date & Time';
+
+	/// en: 'Filter ranks on graph'
 	String get filterModaleTitle => 'Filter ranks on graph';
+
 	late final TranslationsGraphsDestinationHistoryEn history = TranslationsGraphsDestinationHistoryEn._(_root);
 }
 
@@ -625,6 +957,8 @@ class TranslationsFilterModaleEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'All'
 	String get all => 'All';
 }
 
@@ -635,23 +969,59 @@ class TranslationsCutoffsDestinationEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Tetra League State'
 	String get title => 'Tetra League State';
+
+	/// en: 'as of $timestamp'
 	String relevance({required Object timestamp}) => 'as of ${timestamp}';
+
+	/// en: 'Actual'
 	String get actual => 'Actual';
+
+	/// en: 'Target'
 	String get target => 'Target';
+
+	/// en: 'Cutoff TR'
 	String get cutoffTR => 'Cutoff TR';
+
+	/// en: 'Target TR'
 	String get targetTR => 'Target TR';
+
+	/// en: 'State'
 	String get state => 'State';
+
+	/// en: 'Advanced'
 	String get advanced => 'Advanced';
+
+	/// en: 'Players ($n)'
 	String players({required Object n}) => 'Players (${n})';
+
+	/// en: 'More Info'
 	String get moreInfo => 'More Info';
+
+	/// en: '№ 1 is $tr TR'
 	String NumberOne({required Object tr}) => '№ 1 is ${tr} TR';
+
+	/// en: 'Inflated on $tr TR'
 	String inflated({required Object tr}) => 'Inflated on ${tr} TR';
+
+	/// en: 'Not inflated'
 	String get notInflated => 'Not inflated';
+
+	/// en: 'Deflated on $tr TR'
 	String deflated({required Object tr}) => 'Deflated on ${tr} TR';
+
+	/// en: 'Not deflated'
 	String get notDeflated => 'Not deflated';
+
+	/// en: 'Well...'
 	String get wellDotDotDot => 'Well...';
+
+	/// en: 'from № $n'
 	String fromPlace({required Object n}) => 'from № ${n}';
+
+	/// en: 'View'
 	String get viewButton => 'View';
 }
 
@@ -662,22 +1032,56 @@ class TranslationsRankViewEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: '$rank rank data'
 	String rankTitle({required Object rank}) => '${rank} rank data';
+
+	/// en: 'Entire leaderboard'
 	String get everyoneTitle => 'Entire leaderboard';
+
+	/// en: 'TR Range'
 	String get trRange => 'TR Range';
+
+	/// en: 'Supposed to be'
 	String get supposedToBe => 'Supposed to be';
+
+	/// en: '$value gap'
 	String gap({required Object value}) => '${value} gap';
+
+	/// en: '$value TR gap'
 	String trGap({required Object value}) => '${value} TR gap';
+
+	/// en: 'Deflation gap'
 	String get deflationGap => 'Deflation gap';
+
+	/// en: 'Inflation gap'
 	String get inflationGap => 'Inflation gap';
+
+	/// en: 'LB pos range'
 	String get LBposRange => 'LB pos range';
+
+	/// en: 'Overpopulated by a $players'
 	String overpopulated({required Object players}) => 'Overpopulated by a ${players}';
+
+	/// en: 'Underpopulated by a $players'
 	String underpopulated({required Object players}) => 'Underpopulated by a ${players}';
+
+	/// en: 'cute'
 	String get PlayersEqualSupposedToBe => 'cute';
+
+	/// en: 'Average Stats'
 	String get avgStats => 'Average Stats';
+
+	/// en: 'Average for $rank rank'
 	String avgForRank({required Object rank}) => 'Average for ${rank} rank';
+
+	/// en: 'Average Nerd Stats'
 	String get avgNerdStats => 'Average Nerd Stats';
+
+	/// en: 'Minimums'
 	String get minimums => 'Minimums';
+
+	/// en: 'Maximums'
 	String get maximums => 'Maximums';
 }
 
@@ -688,6 +1092,8 @@ class TranslationsStateViewEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'State from $date'
 	String title({required Object date}) => 'State from ${date}';
 }
 
@@ -698,16 +1104,38 @@ class TranslationsTlMatchViewEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Match'
 	String get match => 'Match';
+
+	/// en: 'vs'
 	String get vs => 'vs';
+
+	/// en: 'Winner'
 	String get winner => 'Winner';
+
+	/// en: 'Round $n'
 	String roundNumber({required Object n}) => 'Round ${n}';
+
+	/// en: 'Stats for'
 	String get statsFor => 'Stats for';
+
+	/// en: 'Number of rounds'
 	String get numberOfRounds => 'Number of rounds';
+
+	/// en: 'Match Length'
 	String get matchLength => 'Match Length';
+
+	/// en: 'Round Length'
 	String get roundLength => 'Round Length';
+
+	/// en: 'Match stats'
 	String get matchStats => 'Match stats';
+
+	/// en: 'Download .ttrm replay'
 	String get downloadReplay => 'Download .ttrm replay';
+
+	/// en: 'Open replay in TETR.IO'
 	String get openReplay => 'Open replay in TETR.IO';
 }
 
@@ -718,30 +1146,80 @@ class TranslationsCalcDestinationEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Enter your $stat'
 	String placeholders({required Object stat}) => 'Enter your ${stat}';
+
+	/// en: 'Enter values and press "Calc" to see Nerd Stats for them'
 	String get tip => 'Enter values and press "Calc" to see Nerd Stats for them';
+
+	/// en: 'Please, enter valid values'
 	String get invalidValues => 'Please, enter valid values';
+
+	/// en: 'Calc'
 	String get statsCalcButton => 'Calc';
+
+	/// en: 'Click on the actions on the left to add them here'
 	String get damageCalcTip => 'Click on the actions on the left to add them here';
+
+	/// en: 'Clear all'
 	String get clearAll => 'Clear all';
+
+	/// en: 'Actions'
 	String get actions => 'Actions';
+
+	/// en: 'Results'
 	String get results => 'Results';
+
+	/// en: 'Rules'
 	String get rules => 'Rules';
+
+	/// en: 'No Spin Clears'
 	String get noSpinClears => 'No Spin Clears';
+
+	/// en: 'Spins'
 	String get spins => 'Spins';
+
+	/// en: 'Mini spins'
 	String get miniSpins => 'Mini spins';
+
+	/// en: 'No lineclear (Break Combo)'
 	String get noLineclear => 'No lineclear (Break Combo)';
+
+	/// en: 'Custom'
 	String get custom => 'Custom';
+
+	/// en: 'Multiplier'
 	String get multiplier => 'Multiplier';
+
+	/// en: 'Perfect Clear Damage'
 	String get pcDamage => 'Perfect Clear Damage';
+
+	/// en: 'Combo Table'
 	String get comboTable => 'Combo Table';
+
+	/// en: 'Back-To-Back Chaining'
 	String get b2bChaining => 'Back-To-Back Chaining';
+
+	/// en: 'Starts at B2B'
 	String get surgeStartAtB2B => 'Starts at B2B';
+
+	/// en: 'Start amount'
 	String get surgeStartAmount => 'Start amount';
+
+	/// en: 'Total damage'
 	String get totalDamage => 'Total damage';
+
+	/// en: 'Lineclears'
 	String get lineclears => 'Lineclears';
+
+	/// en: 'Combo'
 	String get combo => 'Combo';
+
+	/// en: 'Surge'
 	String get surge => 'Surge';
+
+	/// en: 'PCs'
 	String get pcs => 'PCs';
 }
 
@@ -752,12 +1230,26 @@ class TranslationsInfoDestinationEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Information Center'
 	String get title => 'Information Center';
+
+	/// en: '40 Lines & Blitz Averages'
 	String get sprintAndBlitzAverages => '40 Lines & Blitz Averages';
+
+	/// en: 'Since calculating 40 Lines & Blitz averages is tedious process, it gets updated only once in a while. Click on the title of this card to see the full 40 Lines & Blitz averages table'
 	String get sprintAndBlitzAveragesDescription => 'Since calculating 40 Lines & Blitz averages is tedious process, it gets updated only once in a while. Click on the title of this card to see the full 40 Lines & Blitz averages table';
+
+	/// en: 'Tetra Stats Wiki'
 	String get tetraStatsWiki => 'Tetra Stats Wiki';
+
+	/// en: 'Find more information about Tetra Stats functions and statistics that it provides'
 	String get tetraStatsWikiDescription => 'Find more information about Tetra Stats functions and statistics that it provides';
+
+	/// en: 'About Tetra Stats'
 	String get about => 'About Tetra Stats';
+
+	/// en: 'Developed by dan63 '
 	String get aboutDescription => 'Developed by dan63\n';
 }
 
@@ -768,9 +1260,17 @@ class TranslationsLeaderboardsDestinationEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Leaderboards'
 	String get title => 'Leaderboards';
+
+	/// en: 'Tetra League (Current Season)'
 	String get tl => 'Tetra League (Current Season)';
+
+	/// en: 'Tetra League (Current Season, full one)'
 	String get fullTL => 'Tetra League (Current Season, full one)';
+
+	/// en: 'Achievement Points'
 	String get ar => 'Achievement Points';
 }
 
@@ -781,9 +1281,17 @@ class TranslationsSavedDataDestinationEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Saved Data'
 	String get title => 'Saved Data';
+
+	/// en: 'Select nickname on the left to see data associated with it'
 	String get tip => 'Select nickname on the left to see data associated with it';
+
+	/// en: 'S$s TL States'
 	String seasonTLstates({required Object s}) => 'S${s} TL States';
+
+	/// en: 'TL Records'
 	String get TLrecords => 'TL Records';
 }
 
@@ -794,18 +1302,44 @@ class TranslationsSettingsDestinationEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Settings'
 	String get title => 'Settings';
+
+	/// en: 'General'
 	String get general => 'General';
+
+	/// en: 'Customization'
 	String get customization => 'Customization';
+
+	/// en: 'Local database'
 	String get database => 'Local database';
+
+	/// en: 'Checking...'
 	String get checking => 'Checking...';
+
+	/// en: 'Press Enter to submit'
 	String get enterToSubmit => 'Press Enter to submit';
+
+	/// en: 'Your account in TETR.IO'
 	String get account => 'Your account in TETR.IO';
+
+	/// en: 'Stats of that player will be loaded initially right after launching this app. By default it loads my (dan63) stats. To change that, enter your nickname here.'
 	String get accountDescription => 'Stats of that player will be loaded initially right after launching this app. By default it loads my (dan63) stats. To change that, enter your nickname here.';
+
+	/// en: 'Done!'
 	String get done => 'Done!';
+
+	/// en: 'No such account'
 	String get noSuchAccount => 'No such account';
+
+	/// en: 'Language'
 	String get language => 'Language';
+
+	/// en: 'Tetra Stats was translated on $languages. By default, app will pick your system one or English, if locale of your system isn't avaliable.'
 	String languageDescription({required Object languages}) => 'Tetra Stats was translated on ${languages}. By default, app will pick your system one or English, if locale of your system isn\'t avaliable.';
+
+	/// en: '(zero) {zero languages} (one) {$n language} (two) {$n languages} (few) {$n languages} (many) {$n languages} (other) {$n languages}'
 	String languages({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
 		zero: 'zero languages',
 		one: '${n} language',
@@ -814,40 +1348,122 @@ class TranslationsSettingsDestinationEn {
 		many: '${n} languages',
 		other: '${n} languages',
 	);
+
+	/// en: 'Update data in the background'
 	String get updateInTheBackground => 'Update data in the background';
+
+	/// en: 'If on, Tetra Stats will attempt to retrieve new info once cache expires. Usually that happens every 5 minutes'
 	String get updateInTheBackgroundDescription => 'If on, Tetra Stats will attempt to retrieve new info once cache expires. Usually that happens every 5 minutes';
+
+	/// en: 'Stats preferences'
+	String get statsPreferencesTitle => 'Stats preferences';
+
+	/// en: 'If you believe, that SheetBot graphs are useless, you can set MinoMuncher graphs to appear in "Standing" section of Tetra League stats'
+	String get statsPreferencesDescription => 'If you believe, that SheetBot graphs are useless, you can set MinoMuncher graphs to appear in "Standing" section of Tetra League stats';
+
+	/// en: 'SheetBot'
+	String get sheetbot => 'SheetBot';
+
+	/// en: 'MinoMuncher'
+	String get minomuncher => 'MinoMuncher';
+
+	/// en: 'Limit for Minomuncher analysis'
 	String get munchLimit => 'Limit for Minomuncher analysis';
+
+	/// en: 'By default, minomuncher will analyse first 10 available replays. If you want more, you can adjust it here (max of 25).'
 	String get munchLimitDescription => 'By default, minomuncher will analyse first 10 available replays. If you want more, you can adjust it here (max of 25).';
+
+	/// en: 'Too much, rejected'
 	String get munchLimitTooMuch => 'Too much, rejected';
+
+	/// en: 'Compare TL stats with rank averages'
 	String get compareStats => 'Compare TL stats with rank averages';
+
+	/// en: 'If on, Tetra Stats will provide additional metrics, which allow you to compare yourself with average player on your rank. The way you'll see it — stats will be highlighted with corresponding color, hover over them with the cursor for more info.'
 	String get compareStatsDescription => 'If on, Tetra Stats will provide additional metrics, which allow you to compare yourself with average player on your rank. The way you\'ll see it — stats will be highlighted with corresponding color, hover over them with the cursor for more info.';
+
+	/// en: 'Show position on leaderboard by stats'
 	String get showPosition => 'Show position on leaderboard by stats';
+
+	/// en: 'This can take some time (and traffic) to load, but will allow you to see your position on the leaderboard, sorted by a stat'
 	String get showPositionDescription => 'This can take some time (and traffic) to load, but will allow you to see your position on the leaderboard, sorted by a stat';
+
+	/// en: 'Accent color'
 	String get accentColor => 'Accent color';
+
+	/// en: 'That color is seen across this app and usually highlights interactive UI elements.'
 	String get accentColorDescription => 'That color is seen across this app and usually highlights interactive UI elements.';
+
+	/// en: 'Pick an accent color'
 	String get accentColorModale => 'Pick an accent color';
+
+	/// en: 'Timestamps format'
 	String get timestamps => 'Timestamps format';
+
+	/// en: 'You can choose, in which way timestamps shows time. By default, they show time in GMT timezone, formatted according to chosen locale, example: $d.'
 	String timestampsDescriptionPart1({required Object d}) => 'You can choose, in which way timestamps shows time. By default, they show time in GMT timezone, formatted according to chosen locale, example: ${d}.';
+
+	/// en: 'There is also: • Locale formatted in your timezone: $y • Relative timestamp: $r'
 	String timestampsDescriptionPart2({required Object y, required Object r}) => 'There is also:\n• Locale formatted in your timezone: ${y}\n• Relative timestamp: ${r}';
+
+	/// en: 'Absolute (GMT)'
 	String get timestampsAbsoluteGMT => 'Absolute (GMT)';
+
+	/// en: 'Absolute (Your timezone)'
 	String get timestampsAbsoluteLocalTime => 'Absolute (Your timezone)';
+
+	/// en: 'Relative'
 	String get timestampsRelative => 'Relative';
+
+	/// en: 'Sheetbot-like behavior for radar graphs'
 	String get sheetbotLikeGraphs => 'Sheetbot-like behavior for radar graphs';
+
+	/// en: 'Altough it was considered by me, that the way graphs work in SheetBot is not very correct, some people were confused to see, that -0.5 stride doesn't look the way it looks on SheetBot graph. Hence, here we are: if this toggle is on, points on the graphs can appear on the opposite half of the graph if value is negative.'
 	String get sheetbotLikeGraphsDescription => 'Altough it was considered by me, that the way graphs work in SheetBot is not very correct, some people were confused to see, that -0.5 stride doesn\'t look the way it looks on SheetBot graph. Hence, here we are: if this toggle is on, points on the graphs can appear on the opposite half of the graph if value is negative.';
+
+	/// en: 'Osk-Kagari gimmick'
 	String get oskKagariGimmick => 'Osk-Kagari gimmick';
+
+	/// en: 'If on, instead of osk's rank, :kagari: will be rendered.'
 	String get oskKagariGimmickDescription => 'If on, instead of osk\'s rank, :kagari: will be rendered.';
+
+	/// en: 'of data stored'
 	String get bytesOfDataStored => 'of data stored';
+
+	/// en: 'Tetra League records saved'
 	String get TLrecordsSaved => 'Tetra League records saved';
+
+	/// en: 'Tetra League playerstates saved'
 	String get TLplayerstatesSaved => 'Tetra League playerstates saved';
+
+	/// en: 'Fix'
 	String get fixButton => 'Fix';
+
+	/// en: 'Compress'
 	String get compressButton => 'Compress';
+
+	/// en: 'Export local database'
 	String get exportDB => 'Export local database';
+
+	/// en: 'Desktop export'
 	String get desktopExportAlertTitle => 'Desktop export';
+
+	/// en: 'It seems like you using this app on desktop. Check your documents folder, you should find "TetraStats.db". Copy it somewhere'
 	String get desktopExportText => 'It seems like you using this app on desktop. Check your documents folder, you should find "TetraStats.db". Copy it somewhere';
+
+	/// en: 'Android export'
 	String get androidExportAlertTitle => 'Android export';
+
+	/// en: 'Exported. ${exportedDB}'
 	String androidExportText({required Object exportedDB}) => 'Exported.\n${exportedDB}';
+
+	/// en: 'Import local database'
 	String get importDB => 'Import local database';
+
+	/// en: 'Restore your backup. Notice that already stored database will be overwritten.'
 	String get importDBDescription => 'Restore your backup. Notice that already stored database will be overwritten.';
+
+	/// en: 'Wrong file type'
 	String get importWrongFileType => 'Wrong file type';
 }
 
@@ -858,13 +1474,29 @@ class TranslationsHomeNavigationEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Overview'
 	String get overview => 'Overview';
+
+	/// en: 'Standing'
 	String get standing => 'Standing';
+
+	/// en: 'Seasons'
 	String get seasons => 'Seasons';
+
+	/// en: 'Matches'
 	String get mathces => 'Matches';
+
+	/// en: 'PB'
 	String get pb => 'PB';
+
+	/// en: 'Normal'
 	String get normal => 'Normal';
+
+	/// en: 'Expert'
 	String get expert => 'Expert';
+
+	/// en: 'Ex Records'
 	String get expertRecords => 'Ex Records';
 }
 
@@ -875,8 +1507,14 @@ class TranslationsGraphsNavigationEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Player History'
 	String get history => 'Player History';
+
+	/// en: 'League State'
 	String get league => 'League State';
+
+	/// en: 'Cutoffs History'
 	String get cutoffs => 'Cutoffs History';
 }
 
@@ -887,7 +1525,11 @@ class TranslationsCalcNavigationEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Stats Calculator'
 	String get stats => 'Stats Calculator';
+
+	/// en: 'Damage Calculator'
 	String get damage => 'Damage Calculator';
 }
 
@@ -898,13 +1540,29 @@ class TranslationsFirstTimeViewEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Welcome to Tetra Stats'
 	String get welcome => 'Welcome to Tetra Stats';
+
+	/// en: 'Service, that allows you to keep track of various statistics for TETR.IO'
 	String get description => 'Service, that allows you to keep track of various statistics for TETR.IO';
+
+	/// en: 'What's your nickname?'
 	String get nicknameQuestion => 'What\'s your nickname?';
+
+	/// en: 'Type it here... (3-16 symbols)'
 	String get inpuntHint => 'Type it here... (3-16 symbols)';
+
+	/// en: 'Can't submit an empty string'
 	String get emptyInputError => 'Can\'t submit an empty string';
+
+	/// en: 'Nice to see you, $n'
 	String niceToSeeYou({required Object n}) => 'Nice to see you, ${n}';
+
+	/// en: 'Let's take a look at your stats...'
 	String get letsTakeALook => 'Let\'s take a look at your stats...';
+
+	/// en: 'Skip'
 	String get skip => 'Skip';
 }
 
@@ -915,22 +1573,56 @@ class TranslationsAboutViewEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'About Tetra Stats'
 	String get title => 'About Tetra Stats';
+
+	/// en: 'Tetra Stats is a service, that works with TETR.IO Tetra Channel API, providing data from it and calculating some addtitional metrics, based on this data. Service allows user to track their progress in Tetra League with "Track" function, which records every Tetra League change into local database (not automatically, you have to visit service from time to time), so these changes could be looked through graphs. Beanserver blaster is a part of a Tetra Stats, that decoupled into a serverside script. It provides full Tetra League leaderboard, allowing Tetra Stats to sort leaderboard by any metric and build scatter chart, that allows user to analyse Tetra League trends. It also provides history of Tetra League ranks cutoffs, which can be viewed by user via graph as well. There are plans to add replay analysis and tournaments history, so stay tuned! Service is not associated with TETR.IO or osk in any capacity.'
 	String get about => 'Tetra Stats is a service, that works with TETR.IO Tetra Channel API, providing data from it and calculating some addtitional metrics, based on this data. Service allows user to track their progress in Tetra League with "Track" function, which records every Tetra League change into local database (not automatically, you have to visit service from time to time), so these changes could be looked through graphs.\n\nBeanserver blaster is a part of a Tetra Stats, that decoupled into a serverside script. It provides full Tetra League leaderboard, allowing Tetra Stats to sort leaderboard by any metric and build scatter chart, that allows user to analyse Tetra League trends. It also provides history of Tetra League ranks cutoffs, which can be viewed by user via graph as well.\n\nThere are plans to add replay analysis and tournaments history, so stay tuned!\n\nService is not associated with TETR.IO or osk in any capacity.';
+
+	/// en: 'App Version'
 	String get appVersion => 'App Version';
+
+	/// en: 'Build $build'
 	String build({required Object build}) => 'Build ${build}';
+
+	/// en: 'GitHub Repository'
 	String get GHrepo => 'GitHub Repository';
+
+	/// en: 'Submit an issue'
 	String get submitAnIssue => 'Submit an issue';
+
+	/// en: 'Credits'
 	String get credits => 'Credits';
+
+	/// en: 'Autor & developer'
 	String get authorAndDeveloper => 'Autor & developer';
+
+	/// en: 'Provided formulas'
 	String get providedFormulas => 'Provided formulas';
+
+	/// en: 'Provided S1 history'
 	String get providedS1history => 'Provided S1 history';
+
+	/// en: 'Inoue (replay grabber)'
 	String get inoue => 'Inoue (replay grabber)';
+
+	/// en: 'Simplfied Chinese locale'
 	String get zhCNlocale => 'Simplfied Chinese locale';
+
+	/// en: 'German locale'
 	String get deDElocale => 'German locale';
+
+	/// en: 'Korean locale'
 	String get koKRlocale => 'Korean locale';
+
+	/// en: 'Polish locale'
 	String get plPLlocale => 'Polish locale';
+
+	/// en: 'With fixes by $username'
 	String withFixesBy({required Object username}) => 'With fixes by ${username}';
+
+	/// en: 'Support him!'
 	String get supportHim => 'Support him!';
 }
 
@@ -941,11 +1633,22 @@ class TranslationsStatsEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Registration Date'
 	String get registrationDate => 'Registration Date';
+
+	/// en: 'Time Played'
 	String get gametime => 'Time Played';
+
+	/// en: 'Online Games Played'
 	String get ogp => 'Online Games Played';
+
+	/// en: 'Online Games Won'
 	String get ogw => 'Online Games Won';
+
+	/// en: 'Followers'
 	String get followers => 'Followers';
+
 	late final TranslationsStatsXpEn xp = TranslationsStatsXpEn._(_root);
 	late final TranslationsStatsTrEn tr = TranslationsStatsTrEn._(_root);
 	late final TranslationsStatsGlickoEn glicko = TranslationsStatsGlickoEn._(_root);
@@ -991,50 +1694,140 @@ class TranslationsStatsEn {
 	late final TranslationsStatsQuadEfficiencyEn quadEfficiency = TranslationsStatsQuadEfficiencyEn._(_root);
 	late final TranslationsStatsTspinEfficiencyEn tspinEfficiency = TranslationsStatsTspinEfficiencyEn._(_root);
 	late final TranslationsStatsAllspinEfficiencyEn allspinEfficiency = TranslationsStatsAllspinEfficiencyEn._(_root);
+
+	/// en: '$p points'
 	String blitzScore({required Object p}) => '${p} points';
+
+	/// en: 'Level up requirement: $p'
 	String levelUpRequirement({required Object p}) => 'Level up requirement: ${p}';
+
+	/// en: 'Total pieces placed'
 	String get piecesTotal => 'Total pieces placed';
+
+	/// en: 'Placed with perfect finesse'
 	String get piecesWithPerfectFinesse => 'Placed with perfect finesse';
+
+	/// en: 'Score'
 	String get score => 'Score';
+
+	/// en: 'Lines'
 	String get lines => 'Lines';
+
+	/// en: 'L'
 	String get linesShort => 'L';
+
+	/// en: 'Perfect Clears'
 	String get pcs => 'Perfect Clears';
+
+	/// en: 'Holds'
 	String get holds => 'Holds';
+
+	/// en: 'Top Spike'
 	String get spike => 'Top Spike';
+
+	/// en: 'Top $percentage'
 	String top({required Object percentage}) => 'Top ${percentage}';
+
+	/// en: 'Top rank: $rank'
 	String topRank({required Object rank}) => 'Top rank: ${rank}';
+
+	/// en: 'Floor'
 	String get floor => 'Floor';
+
+	/// en: 'Split'
 	String get split => 'Split';
+
+	/// en: 'Total'
 	String get total => 'Total';
+
+	/// en: 'Sent'
 	String get sent => 'Sent';
+
+	/// en: 'Received'
 	String get received => 'Received';
+
+	/// en: 'Placement'
 	String get placement => 'Placement';
+
+	/// en: 'Peak'
 	String get peak => 'Peak';
+
+	/// en: 'Overall'
 	String get overall => 'Overall';
+
+	/// en: 'Midgame'
 	String get midgame => 'Midgame';
+
+	/// en: 'Efficiency'
 	String get efficiency => 'Efficiency';
+
+	/// en: 'Upstack'
 	String get upstack => 'Upstack';
+
+	/// en: 'Downstack'
 	String get downstack => 'Downstack';
+
+	/// en: 'Variance'
 	String get variance => 'Variance';
+
+	/// en: 'Burst'
 	String get burst => 'Burst';
+
+	/// en: 'Length'
 	String get length => 'Length';
+
+	/// en: 'Rate'
 	String get rate => 'Rate';
+
+	/// en: 'Secs/DS'
 	String get secsDS => 'Secs/DS';
+
+	/// en: 'Secs/Cheese'
 	String get secsCheese => 'Secs/Cheese';
+
+	/// en: 'Attack Cheesiness'
 	String get attackCheesiness => 'Attack Cheesiness';
+
+	/// en: 'Downstacking Ratio'
 	String get downstackingRatio => 'Downstacking Ratio';
+
+	/// en: 'Clear Types'
 	String get clearTypes => 'Clear Types';
+
+	/// en: 'Well Column Distribution'
 	String get wellColumnDistribution => 'Well Column Distribution';
+
+	/// en: 'All Spins'
 	String get allSpins => 'All Spins';
+
+	/// en: 'Incoming Attack Sankey Chart'
 	String get sankeyTitle => 'Incoming Attack Sankey Chart';
+
+	/// en: 'Incoming Attack'
 	String get incomingAttack => 'Incoming Attack';
+
+	/// en: 'Clean'
 	String get clean => 'Clean';
+
+	/// en: 'Cancelled'
 	String get cancelled => 'Cancelled';
+
+	/// en: 'Cheese Tanked'
 	String get cheeseTanked => 'Cheese Tanked';
+
+	/// en: 'Clean Tanked'
 	String get cleanTanked => 'Clean Tanked';
+
+	/// en: 'Kills'
 	String get kills => 'Kills';
+
+	/// en: 'Deaths'
 	String get deaths => 'Deaths';
+
+	/// en: 'PPS distribution'
 	String get ppsDistribution => 'PPS distribution';
+
+	/// en: '(one) {With 1 mod} (two) {With $n mods} (few) {With $n mods} (many) {With $n mods} (other) {With $n mods}'
 	String qpWithMods({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
 		one: 'With 1 mod',
 		two: 'With ${n} mods',
@@ -1042,6 +1835,8 @@ class TranslationsStatsEn {
 		many: 'With ${n} mods',
 		other: 'With ${n} mods',
 	);
+
+	/// en: '(zero) {$n key presses} (one) {$n key press} (two) {$n key presses} (few) {$n key presses} (many) {$n key presses} (other) {$n key presses}'
 	String inputs({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
 		zero: '${n} key presses',
 		one: '${n} key press',
@@ -1050,6 +1845,8 @@ class TranslationsStatsEn {
 		many: '${n} key presses',
 		other: '${n} key presses',
 	);
+
+	/// en: '(zero) {$n T-spins total} (one) {$n T-spin total} (two) {$n T-spins total} (few) {$n T-spins total} (many) {$n T-spins total} (other) {$n T-spins total}'
 	String tspinsTotal({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
 		zero: '${n} T-spins total',
 		one: '${n} T-spin total',
@@ -1058,6 +1855,8 @@ class TranslationsStatsEn {
 		many: '${n} T-spins total',
 		other: '${n} T-spins total',
 	);
+
+	/// en: '(zero) {$n lines cleared} (one) {$n line cleared} (two) {$n lines cleared} (few) {$n lines cleared} (many) {$n lines cleared} (other) {$n lines cleared}'
 	String linesCleared({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
 		zero: '${n} lines cleared',
 		one: '${n} line cleared',
@@ -1066,7 +1865,10 @@ class TranslationsStatsEn {
 		many: '${n} lines cleared',
 		other: '${n} lines cleared',
 	);
+
 	late final TranslationsStatsGraphsEn graphs = TranslationsStatsGraphsEn._(_root);
+
+	/// en: '(zero) {$n players} (one) {$n player} (two) {$n players} (few) {$n players} (many) {$n players} (other) {$n players}'
 	String players({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
 		zero: '${n} players',
 		one: '${n} player',
@@ -1075,6 +1877,8 @@ class TranslationsStatsEn {
 		many: '${n} players',
 		other: '${n} players',
 	);
+
+	/// en: '(zero) {$n games} (one) {$n game} (two) {$n games} (few) {$n games} (many) {$n games} (other) {$n games}'
 	String games({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
 		zero: '${n} games',
 		one: '${n} game',
@@ -1083,12 +1887,23 @@ class TranslationsStatsEn {
 		many: '${n} games',
 		other: '${n} games',
 	);
+
 	late final TranslationsStatsLineClearEn lineClear = TranslationsStatsLineClearEn._(_root);
 	late final TranslationsStatsLineClearsEn lineClears = TranslationsStatsLineClearsEn._(_root);
+
+	/// en: 'Mini'
 	String get mini => 'Mini';
+
+	/// en: 'T-spin'
 	String get tSpin => 'T-spin';
+
+	/// en: 'T-spins'
 	String get tSpins => 'T-spins';
+
+	/// en: 'Spin'
 	String get spin => 'Spin';
+
+	/// en: 'Spins'
 	String get spins => 'Spins';
 }
 
@@ -1099,9 +1914,17 @@ class TranslationsGraphsDestinationHistoryEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Last 7 Days'
 	String get last7 => 'Last 7 Days';
+
+	/// en: 'Last 30 Days'
 	String get last30 => 'Last 30 Days';
+
+	/// en: 'Last 90 Days'
 	String get last90 => 'Last 90 Days';
+
+	/// en: 'Full History'
 	String get full => 'Full History';
 }
 
@@ -1112,7 +1935,11 @@ class TranslationsStatsXpEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'XP'
 	String get short => 'XP';
+
+	/// en: 'Experience Points'
 	String get full => 'Experience Points';
 }
 
@@ -1123,7 +1950,11 @@ class TranslationsStatsTrEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'TR'
 	String get short => 'TR';
+
+	/// en: 'Tetra Rating'
 	String get full => 'Tetra Rating';
 }
 
@@ -1134,7 +1965,11 @@ class TranslationsStatsGlickoEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Glicko'
 	String get short => 'Glicko';
+
+	/// en: 'Glicko'
 	String get full => 'Glicko';
 }
 
@@ -1145,7 +1980,11 @@ class TranslationsStatsRdEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'RD'
 	String get short => 'RD';
+
+	/// en: 'Rating Deviation'
 	String get full => 'Rating Deviation';
 }
 
@@ -1156,7 +1995,11 @@ class TranslationsStatsGlixareEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'GXE'
 	String get short => 'GXE';
+
+	/// en: 'GLIXARE'
 	String get full => 'GLIXARE';
 }
 
@@ -1167,7 +2010,11 @@ class TranslationsStatsS1trEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'S1 TR'
 	String get short => 'S1 TR';
+
+	/// en: 'Season 1 like TR'
 	String get full => 'Season 1 like TR';
 }
 
@@ -1178,7 +2025,11 @@ class TranslationsStatsGpEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'GP'
 	String get short => 'GP';
+
+	/// en: 'Games Played'
 	String get full => 'Games Played';
 }
 
@@ -1189,7 +2040,11 @@ class TranslationsStatsGwEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'GW'
 	String get short => 'GW';
+
+	/// en: 'Games Won'
 	String get full => 'Games Won';
 }
 
@@ -1200,7 +2055,11 @@ class TranslationsStatsWinrateEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'WR%'
 	String get short => 'WR%';
+
+	/// en: 'Win Rate'
 	String get full => 'Win Rate';
 }
 
@@ -1211,7 +2070,11 @@ class TranslationsStatsApmEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'APM'
 	String get short => 'APM';
+
+	/// en: 'Attack Per Minute'
 	String get full => 'Attack Per Minute';
 }
 
@@ -1222,7 +2085,11 @@ class TranslationsStatsPpsEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'PPS'
 	String get short => 'PPS';
+
+	/// en: 'Pieces Per Second'
 	String get full => 'Pieces Per Second';
 }
 
@@ -1233,7 +2100,11 @@ class TranslationsStatsVsEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'VS'
 	String get short => 'VS';
+
+	/// en: 'Versus Score'
 	String get full => 'Versus Score';
 }
 
@@ -1244,7 +2115,11 @@ class TranslationsStatsAppEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'APP'
 	String get short => 'APP';
+
+	/// en: 'Attack Per Piece'
 	String get full => 'Attack Per Piece';
 }
 
@@ -1255,7 +2130,11 @@ class TranslationsStatsVsapmEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'VS/APM'
 	String get short => 'VS/APM';
+
+	/// en: 'VS / APM'
 	String get full => 'VS / APM';
 }
 
@@ -1266,7 +2145,11 @@ class TranslationsStatsDssEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'DS/S'
 	String get short => 'DS/S';
+
+	/// en: 'Downstack Per Second'
 	String get full => 'Downstack Per Second';
 }
 
@@ -1277,7 +2160,11 @@ class TranslationsStatsDspEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'DS/P'
 	String get short => 'DS/P';
+
+	/// en: 'Downstack Per Piece'
 	String get full => 'Downstack Per Piece';
 }
 
@@ -1288,7 +2175,11 @@ class TranslationsStatsAppdspEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'APP+DSP'
 	String get short => 'APP+DSP';
+
+	/// en: 'APP + DSP'
 	String get full => 'APP + DSP';
 }
 
@@ -1299,7 +2190,11 @@ class TranslationsStatsCheeseEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Cheese'
 	String get short => 'Cheese';
+
+	/// en: 'Cheese Index'
 	String get full => 'Cheese Index';
 }
 
@@ -1310,7 +2205,11 @@ class TranslationsStatsGbeEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'GbE'
 	String get short => 'GbE';
+
+	/// en: 'Garbage Efficiency'
 	String get full => 'Garbage Efficiency';
 }
 
@@ -1321,7 +2220,11 @@ class TranslationsStatsNyaappEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'wAPP'
 	String get short => 'wAPP';
+
+	/// en: 'Weighted APP'
 	String get full => 'Weighted APP';
 }
 
@@ -1332,7 +2235,11 @@ class TranslationsStatsAreaEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Area'
 	String get short => 'Area';
+
+	/// en: 'Area'
 	String get full => 'Area';
 }
 
@@ -1343,7 +2250,11 @@ class TranslationsStatsEtrEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'eTR'
 	String get short => 'eTR';
+
+	/// en: 'Estimated TR'
 	String get full => 'Estimated TR';
 }
 
@@ -1354,7 +2265,11 @@ class TranslationsStatsEtraccEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: '±eTR'
 	String get short => '±eTR';
+
+	/// en: 'Accuracy of Estimated TR'
 	String get full => 'Accuracy of Estimated TR';
 }
 
@@ -1365,7 +2280,11 @@ class TranslationsStatsOpenerEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Opener'
 	String get short => 'Opener';
+
+	/// en: 'Opener'
 	String get full => 'Opener';
 }
 
@@ -1376,7 +2295,11 @@ class TranslationsStatsPlonkEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Plonk'
 	String get short => 'Plonk';
+
+	/// en: 'Plonk'
 	String get full => 'Plonk';
 }
 
@@ -1387,7 +2310,11 @@ class TranslationsStatsStrideEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Stride'
 	String get short => 'Stride';
+
+	/// en: 'Stride'
 	String get full => 'Stride';
 }
 
@@ -1398,7 +2325,11 @@ class TranslationsStatsInfdsEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Inf. DS'
 	String get short => 'Inf. DS';
+
+	/// en: 'Infinite Downstack'
 	String get full => 'Infinite Downstack';
 }
 
@@ -1409,7 +2340,11 @@ class TranslationsStatsAltitudeEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'm'
 	String get short => 'm';
+
+	/// en: 'Altitude'
 	String get full => 'Altitude';
 }
 
@@ -1420,8 +2355,14 @@ class TranslationsStatsClimbSpeedEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'CSP'
 	String get short => 'CSP';
+
+	/// en: 'Climb Speed'
 	String get full => 'Climb Speed';
+
+	/// en: 'Climb Speed'
 	String get gaugetTitle => 'Climb\nSpeed';
 }
 
@@ -1432,8 +2373,14 @@ class TranslationsStatsPeakClimbSpeedEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Peak CSP'
 	String get short => 'Peak CSP';
+
+	/// en: 'Peak Climb Speed'
 	String get full => 'Peak Climb Speed';
+
+	/// en: 'Peak'
 	String get gaugetTitle => 'Peak';
 }
 
@@ -1444,7 +2391,11 @@ class TranslationsStatsKosEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'KO's'
 	String get short => 'KO\'s';
+
+	/// en: 'Knockouts'
 	String get full => 'Knockouts';
 }
 
@@ -1455,7 +2406,11 @@ class TranslationsStatsB2bEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'B2B'
 	String get short => 'B2B';
+
+	/// en: 'Back-To-Back'
 	String get full => 'Back-To-Back';
 }
 
@@ -1466,8 +2421,14 @@ class TranslationsStatsFinesseEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'F'
 	String get short => 'F';
+
+	/// en: 'Finesse'
 	String get full => 'Finesse';
+
+	/// en: 'inesse'
 	String get widgetTitle => 'inesse';
 }
 
@@ -1478,7 +2439,11 @@ class TranslationsStatsFinesseFaultsEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'FF'
 	String get short => 'FF';
+
+	/// en: 'Finesse Faults'
 	String get full => 'Finesse Faults';
 }
 
@@ -1489,8 +2454,14 @@ class TranslationsStatsTotalTimeEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Time'
 	String get short => 'Time';
+
+	/// en: 'Total Time'
 	String get full => 'Total Time';
+
+	/// en: 'otal Time'
 	String get widgetTitle => 'otal Time';
 }
 
@@ -1501,7 +2472,11 @@ class TranslationsStatsLevelEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Lvl'
 	String get short => 'Lvl';
+
+	/// en: 'Level'
 	String get full => 'Level';
 }
 
@@ -1512,7 +2487,11 @@ class TranslationsStatsPiecesEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'P'
 	String get short => 'P';
+
+	/// en: 'Pieces'
 	String get full => 'Pieces';
 }
 
@@ -1523,7 +2502,11 @@ class TranslationsStatsSppEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'SPP'
 	String get short => 'SPP';
+
+	/// en: 'Score Per Piece'
 	String get full => 'Score Per Piece';
 }
 
@@ -1534,7 +2517,11 @@ class TranslationsStatsKpEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'KP'
 	String get short => 'KP';
+
+	/// en: 'Key presses'
 	String get full => 'Key presses';
 }
 
@@ -1545,7 +2532,11 @@ class TranslationsStatsKppEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'KPP'
 	String get short => 'KPP';
+
+	/// en: 'Key presses Per Piece'
 	String get full => 'Key presses Per Piece';
 }
 
@@ -1556,7 +2547,11 @@ class TranslationsStatsKpsEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'KPS'
 	String get short => 'KPS';
+
+	/// en: 'Key presses Per Second'
 	String get full => 'Key presses Per Second';
 }
 
@@ -1567,7 +2562,11 @@ class TranslationsStatsAplEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'APL'
 	String get short => 'APL';
+
+	/// en: 'Attack Per Line'
 	String get full => 'Attack Per Line';
 }
 
@@ -1578,7 +2577,11 @@ class TranslationsStatsQuadEfficiencyEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Q Eff.'
 	String get short => 'Q Eff.';
+
+	/// en: 'Quad efficiency'
 	String get full => 'Quad efficiency';
 }
 
@@ -1589,7 +2592,11 @@ class TranslationsStatsTspinEfficiencyEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'T Eff.'
 	String get short => 'T Eff.';
+
+	/// en: 'T-spin efficiency'
 	String get full => 'T-spin efficiency';
 }
 
@@ -1600,7 +2607,11 @@ class TranslationsStatsAllspinEfficiencyEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'All Eff.'
 	String get short => 'All Eff.';
+
+	/// en: 'All-spin efficiency'
 	String get full => 'All-spin efficiency';
 }
 
@@ -1611,9 +2622,17 @@ class TranslationsStatsGraphsEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Attack'
 	String get attack => 'Attack';
+
+	/// en: 'Speed'
 	String get speed => 'Speed';
+
+	/// en: 'Defense'
 	String get defense => 'Defense';
+
+	/// en: 'Cheese'
 	String get cheese => 'Cheese';
 }
 
@@ -1624,26 +2643,68 @@ class TranslationsStatsLineClearEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Single'
 	String get single => 'Single';
+
+	/// en: 'Double'
 	String get double => 'Double';
+
+	/// en: 'Triple'
 	String get triple => 'Triple';
+
+	/// en: 'Quad'
 	String get quad => 'Quad';
+
+	/// en: 'Penta'
 	String get penta => 'Penta';
+
+	/// en: 'Hexa'
 	String get hexa => 'Hexa';
+
+	/// en: 'Hepta'
 	String get hepta => 'Hepta';
+
+	/// en: 'Octa'
 	String get octa => 'Octa';
+
+	/// en: 'Ennea'
 	String get ennea => 'Ennea';
+
+	/// en: 'Deca'
 	String get deca => 'Deca';
+
+	/// en: 'Hendeca'
 	String get hendeca => 'Hendeca';
+
+	/// en: 'Dodeca'
 	String get dodeca => 'Dodeca';
+
+	/// en: 'Triadeca'
 	String get triadeca => 'Triadeca';
+
+	/// en: 'Tessaradeca'
 	String get tessaradeca => 'Tessaradeca';
+
+	/// en: 'Pentedeca'
 	String get pentedeca => 'Pentedeca';
+
+	/// en: 'Hexadeca'
 	String get hexadeca => 'Hexadeca';
+
+	/// en: 'Heptadeca'
 	String get heptadeca => 'Heptadeca';
+
+	/// en: 'Octadeca'
 	String get octadeca => 'Octadeca';
+
+	/// en: 'Enneadeca'
 	String get enneadeca => 'Enneadeca';
+
+	/// en: 'Eicosa'
 	String get eicosa => 'Eicosa';
+
+	/// en: 'Kagaris'
 	String get kagaris => 'Kagaris';
 }
 
@@ -1654,11 +2715,23 @@ class TranslationsStatsLineClearsEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Zeros'
 	String get zero => 'Zeros';
+
+	/// en: 'Singles'
 	String get single => 'Singles';
+
+	/// en: 'Doubles'
 	String get double => 'Doubles';
+
+	/// en: 'Triples'
 	String get triple => 'Triples';
+
+	/// en: 'Quads'
 	String get quad => 'Quads';
+
+	/// en: 'Pentas'
 	String get penta => 'Pentas';
 }
 
@@ -1696,6 +2769,12 @@ extension on Translations {
 			case 'playerRole.mod': return 'Moderator';
 			case 'playerRole.halfmod': return 'Community moderator';
 			case 'playerRole.anon': return 'Anonymous';
+			case 'dialog212.title': return 'Question about your preferences';
+			case 'dialog212.question': return 'Which graphs, in your opinion, are more useful?';
+			case 'dialog212.explanation': return 'Your choice will determine, which graphs you gonna see in Standing section of Tetra League stats';
+			case 'changeLogDialog.title': return 'Tetra Stats has been updated!';
+			case 'changeLogDialog.ver': return ({required Object ver, required Object build}) => 'Now current version is ${ver} build number ${build}';
+			case 'changeLogDialog.changesMD': return '### Changes relative to v2.1.1:\n* Now you can change, what set of graphs to show in Standing section of Tetra League stats\n* This popup. It\'s gonna appear once every update\n\nChanges, that was applied to web version before version number change:\n* Additional mesuares to prevent 9.9 burst PPS in minomuncher analysis\n* Est TR formula was updated';
 			case 'goBackButton': return 'Go Back';
 			case 'nanow': return 'Not avaliable for now...';
 			case 'seasonEnds': return ({required Object countdown}) => 'Season ends in ${countdown}';
@@ -1974,6 +3053,10 @@ extension on Translations {
 			);
 			case 'settingsDestination.updateInTheBackground': return 'Update data in the background';
 			case 'settingsDestination.updateInTheBackgroundDescription': return 'If on, Tetra Stats will attempt to retrieve new info once cache expires. Usually that happens every 5 minutes';
+			case 'settingsDestination.statsPreferencesTitle': return 'Stats preferences';
+			case 'settingsDestination.statsPreferencesDescription': return 'If you believe, that SheetBot graphs are useless, you can set MinoMuncher graphs to appear in "Standing" section of Tetra League stats';
+			case 'settingsDestination.sheetbot': return 'SheetBot';
+			case 'settingsDestination.minomuncher': return 'MinoMuncher';
 			case 'settingsDestination.munchLimit': return 'Limit for Minomuncher analysis';
 			case 'settingsDestination.munchLimitDescription': return 'By default, minomuncher will analyse first 10 available replays. If you want more, you can adjust it here (max of 25).';
 			case 'settingsDestination.munchLimitTooMuch': return 'Too much, rejected';

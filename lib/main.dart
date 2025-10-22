@@ -97,7 +97,7 @@ void main() async {
   teto = TetrioService();
 
   router = GoRouter(
-    initialLocation: prefs.getBool("notFirstTime") == true ? "/" : "/hihello",
+    initialLocation: (prefs.getBool("notFirstTime") == true || prefs.getBool("hiSkipped") == true ) ? "/" : "/hihello",
     routes: [
       GoRoute(
         path: "/",

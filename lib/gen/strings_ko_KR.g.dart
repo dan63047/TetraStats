@@ -64,6 +64,8 @@ class TranslationsKoKr implements Translations {
 		'halfmod': '커뮤니티 운영자',
 		'anon': '익명',
 	};
+	@override late final _TranslationsDialog212KoKr dialog212 = _TranslationsDialog212KoKr._(_root);
+	@override late final _TranslationsChangeLogDialogKoKr changeLogDialog = _TranslationsChangeLogDialogKoKr._(_root);
 	@override String get goBackButton => '뒤로';
 	@override String get nanow => '지금은 사용할 수 없습니다...';
 	@override String seasonEnds({required Object countdown}) => '시즌이 ${countdown} 뒤에 종료됩니다';
@@ -434,6 +436,30 @@ class _TranslationsDestinationsKoKr implements TranslationsDestinationsEn {
 	@override String get info => '정보';
 	@override String get data => '저장된 데이터';
 	@override String get settings => '설정';
+}
+
+// Path: dialog212
+class _TranslationsDialog212KoKr implements TranslationsDialog212En {
+	_TranslationsDialog212KoKr._(this._root);
+
+	final TranslationsKoKr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Question about your preferences';
+	@override String get question => 'Which graphs, in your opinion, are more useful?';
+	@override String get explanation => 'Your choice will determine, which graphs you gonna see in Standing section of Tetra League stats';
+}
+
+// Path: changeLogDialog
+class _TranslationsChangeLogDialogKoKr implements TranslationsChangeLogDialogEn {
+	_TranslationsChangeLogDialogKoKr._(this._root);
+
+	final TranslationsKoKr _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Tetra Stats has been updated!';
+	@override String ver({required Object ver, required Object build}) => 'Now current version is ${ver} build number ${build}';
+	@override String get changesMD => '### Changes relative to v2.1.1:\n* Now you can change, what set of graphs to show in Standing section of Tetra League stats\n* This popup. It\'s gonna appear once every update\n\nChanges, that was applied before version number change:\n* Additional mesuares to prevent 9.9 burst PPS in minomuncher analysis\n* Est TR formula was updated';
 }
 
 // Path: xp
@@ -812,6 +838,10 @@ class _TranslationsSettingsDestinationKoKr implements TranslationsSettingsDestin
 	);
 	@override String get updateInTheBackground => '백그라운드에서 정보 업데이트';
 	@override String get updateInTheBackgroundDescription => '켜져 있다면, Tetra Stats는 캐시가 만료될 때마다 새로운 정보를 받으려고 시도할 것입니다. 주로 이는 5분마다 일어납니다.';
+	@override String get statsPreferencesTitle => 'Stats preferences';
+	@override String get statsPreferencesDescription => 'If you believe, that SheetBot graphs are useless, you can set MinoMuncher graphs to appear in Standing section of Tetra League stats';
+	@override String get sheetbot => 'SheetBot';
+	@override String get minomuncher => 'MinoMuncher';
 	@override String get munchLimit => 'Limit for Minomuncher analysis';
 	@override String get munchLimitDescription => 'By default, minomuncher will analyse first 10 available replays. If you want more, you can adjust it here (max of 25).';
 	@override String get munchLimitTooMuch => 'Too much, rejected';
@@ -1692,6 +1722,12 @@ extension on TranslationsKoKr {
 			case 'playerRole.mod': return '운영자';
 			case 'playerRole.halfmod': return '커뮤니티 운영자';
 			case 'playerRole.anon': return '익명';
+			case 'dialog212.title': return 'Question about your preferences';
+			case 'dialog212.question': return 'Which graphs, in your opinion, are more useful?';
+			case 'dialog212.explanation': return 'Your choice will determine, which graphs you gonna see in Standing section of Tetra League stats';
+			case 'changeLogDialog.title': return 'Tetra Stats has been updated!';
+			case 'changeLogDialog.ver': return ({required Object ver, required Object build}) => 'Now current version is ${ver} build number ${build}';
+			case 'changeLogDialog.changesMD': return '### Changes relative to v2.1.1:\n* Now you can change, what set of graphs to show in Standing section of Tetra League stats\n* This popup. It\'s gonna appear once every update\n\nChanges, that was applied before version number change:\n* Additional mesuares to prevent 9.9 burst PPS in minomuncher analysis\n* Est TR formula was updated';
 			case 'goBackButton': return '뒤로';
 			case 'nanow': return '지금은 사용할 수 없습니다...';
 			case 'seasonEnds': return ({required Object countdown}) => '시즌이 ${countdown} 뒤에 종료됩니다';
@@ -1969,6 +2005,10 @@ extension on TranslationsKoKr {
 			);
 			case 'settingsDestination.updateInTheBackground': return '백그라운드에서 정보 업데이트';
 			case 'settingsDestination.updateInTheBackgroundDescription': return '켜져 있다면, Tetra Stats는 캐시가 만료될 때마다 새로운 정보를 받으려고 시도할 것입니다. 주로 이는 5분마다 일어납니다.';
+			case 'settingsDestination.statsPreferencesTitle': return 'Stats preferences';
+			case 'settingsDestination.statsPreferencesDescription': return 'If you believe, that SheetBot graphs are useless, you can set MinoMuncher graphs to appear in Standing section of Tetra League stats';
+			case 'settingsDestination.sheetbot': return 'SheetBot';
+			case 'settingsDestination.minomuncher': return 'MinoMuncher';
 			case 'settingsDestination.munchLimit': return 'Limit for Minomuncher analysis';
 			case 'settingsDestination.munchLimitDescription': return 'By default, minomuncher will analyse first 10 available replays. If you want more, you can adjust it here (max of 25).';
 			case 'settingsDestination.munchLimitTooMuch': return 'Too much, rejected';

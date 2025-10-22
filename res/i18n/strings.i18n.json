@@ -36,6 +36,16 @@
         "halfmod": "Community moderator",
         "anon": "Anonymous"
     },
+    "dialog212": {
+        "title": "Question about your preferences",
+        "question": "Which graphs, in your opinion, are more useful?",
+        "explanation": "Your choice will determine, which graphs you gonna see in Standing section of Tetra League stats"
+    },
+    "changeLogDialog": {
+        "title": "Tetra Stats has been updated!",
+        "ver": "Now current version is ${ver} build number ${build}",
+        "changesMD": "### Changes relative to v2.1.1:\n* Now you can change, what set of graphs to show in Standing section of Tetra League stats\n* This popup. It's gonna appear once every update\n\nChanges, that was applied to web version before version number change:\n* Additional mesuares to prevent 9.9 burst PPS in minomuncher analysis\n* Est TR formula was updated"
+    },
     "goBackButton": "Go Back",
     "nanow": "Not avaliable for now...",
     "seasonEnds": "Season ends in ${countdown}",
@@ -326,6 +336,10 @@
         },
         "updateInTheBackground": "Update data in the background",
         "updateInTheBackgroundDescription": "If on, Tetra Stats will attempt to retrieve new info once cache expires. Usually that happens every 5 minutes",
+        "statsPreferencesTitle": "Stats preferences",
+        "statsPreferencesDescription": "If you believe, that SheetBot graphs are useless, you can set MinoMuncher graphs to appear in \"Standing\" section of Tetra League stats",
+        "sheetbot": "SheetBot",
+        "minomuncher": "MinoMuncher",
         "munchLimit": "Limit for Minomuncher analysis",
         "munchLimitDescription": "By default, minomuncher will analyse first 10 available replays. If you want more, you can adjust it here (max of 25).",
         "munchLimitTooMuch": "Too much, rejected",

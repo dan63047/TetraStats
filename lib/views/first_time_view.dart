@@ -147,6 +147,8 @@ class _FirstTimeState extends State<FirstTimeView> with SingleTickerProviderStat
           title = t.firstTimeView.niceToSeeYou(n: nickname);
           subtitle = t.firstTimeView.letsTakeALook;
         });
+        prefs.setString("statsPreference", "minomuncher");
+        prefs.setString("awareAboutUpdates", packageInfo.buildNumber);
         Timer(Duration(seconds: 2), () => _animController.animateTo(1.0, duration: Duration(seconds: 1)));
         Timer(Duration(seconds: 3), () => context.replace("/"));
         return true;
@@ -230,7 +232,7 @@ class _FirstTimeState extends State<FirstTimeView> with SingleTickerProviderStat
                 ),
               ),
               Spacer(flex: 2),
-              TextButton(onPressed: (){ context.replace("/"); }, child: Text(t.firstTimeView.skip))
+              TextButton(onPressed: (){ prefs.setBool("hiSkipped", true); context.replace("/"); }, child: Text(t.firstTimeView.skip))
             ],
           ),
         ),

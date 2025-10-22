@@ -64,6 +64,8 @@ class TranslationsRuRu implements Translations {
 		'halfmod': 'Модератор сообщества',
 		'anon': 'Аноним',
 	};
+	@override late final _TranslationsDialog212RuRu dialog212 = _TranslationsDialog212RuRu._(_root);
+	@override late final _TranslationsChangeLogDialogRuRu changeLogDialog = _TranslationsChangeLogDialogRuRu._(_root);
 	@override String get goBackButton => 'Назад';
 	@override String get nanow => 'Сейчас недоступно...';
 	@override String seasonEnds({required Object countdown}) => 'Сезон закончится через ${countdown}';
@@ -434,6 +436,30 @@ class _TranslationsDestinationsRuRu implements TranslationsDestinationsEn {
 	@override String get info => 'Инфо-центр';
 	@override String get data => 'Сохранённые данные';
 	@override String get settings => 'Настройки';
+}
+
+// Path: dialog212
+class _TranslationsDialog212RuRu implements TranslationsDialog212En {
+	_TranslationsDialog212RuRu._(this._root);
+
+	final TranslationsRuRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Вопрос о ваших предпочтениях';
+	@override String get question => 'Графики от какого инструмента, по вашему, наиболее полезны?';
+	@override String get explanation => 'Ваш выбор определит, какие графики вы будете видеть во вкадке "Положение" в статистике Тетра Лиги';
+}
+
+// Path: changeLogDialog
+class _TranslationsChangeLogDialogRuRu implements TranslationsChangeLogDialogEn {
+	_TranslationsChangeLogDialogRuRu._(this._root);
+
+	final TranslationsRuRu _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Tetra Stats был обновлен!';
+	@override String ver({required Object ver, required Object build}) => 'Номер версии поднялся до ${ver}, номер сборки ${build}';
+	@override String get changesMD => '### Изменения относительно v2.1.1:\n* Теперь вы можете менять, какие графики будут показываться во вкадке "Положение" в статистике Тетра Лиги\n* Это модальное окно. Оно будет появляться единожды после каждого обновления\n\nИзменения, которые уже побывали в веб версии до изменения номера версии:\n* Дополнительные меры, чтобы 9.9 burst PPS больше не появлялось\n* Формула расчетного TR была обновлена';
 }
 
 // Path: xp
@@ -813,6 +839,10 @@ class _TranslationsSettingsDestinationRuRu implements TranslationsSettingsDestin
 	);
 	@override String get updateInTheBackground => 'Обновлять данные в фоновом режиме';
 	@override String get updateInTheBackgroundDescription => 'Пока Tetra Stats работает, он может обновлять статистику самостоятельно когда кэш истекает. Обычно это происходит каждые 5 минут';
+	@override String get statsPreferencesTitle => 'Предпочтения по статам';
+	@override String get statsPreferencesDescription => 'Если вы считаете, что графики SheetBot-а бесполезны, вы можете включить отображение графиков MinoMuncher-а прямо во вкадке "Положение" в статистике Тетра Лиги';
+	@override String get sheetbot => 'SheetBot';
+	@override String get minomuncher => 'MinoMuncher';
 	@override String get munchLimit => 'Лимит повторов для анализа';
 	@override String get munchLimitDescription => 'По умолчанию, Minomuncher обработает первые 10 доступных повторов. Если хочется больше, то это можно изменить здесь (максимум до 25 повторов).';
 	@override String get munchLimitTooMuch => 'Слишком много, отклонено';
@@ -1693,6 +1723,12 @@ extension on TranslationsRuRu {
 			case 'playerRole.mod': return 'Модератор';
 			case 'playerRole.halfmod': return 'Модератор сообщества';
 			case 'playerRole.anon': return 'Аноним';
+			case 'dialog212.title': return 'Вопрос о ваших предпочтениях';
+			case 'dialog212.question': return 'Графики от какого инструмента, по вашему, наиболее полезны?';
+			case 'dialog212.explanation': return 'Ваш выбор определит, какие графики вы будете видеть во вкадке "Положение" в статистике Тетра Лиги';
+			case 'changeLogDialog.title': return 'Tetra Stats был обновлен!';
+			case 'changeLogDialog.ver': return ({required Object ver, required Object build}) => 'Номер версии поднялся до ${ver}, номер сборки ${build}';
+			case 'changeLogDialog.changesMD': return '### Изменения относительно v2.1.1:\n* Теперь вы можете менять, какие графики будут показываться во вкадке "Положение" в статистике Тетра Лиги\n* Это модальное окно. Оно будет появляться единожды после каждого обновления\n\nИзменения, которые уже побывали в веб версии до изменения номера версии:\n* Дополнительные меры, чтобы 9.9 burst PPS больше не появлялось\n* Формула расчетного TR была обновлена';
 			case 'goBackButton': return 'Назад';
 			case 'nanow': return 'Сейчас недоступно...';
 			case 'seasonEnds': return ({required Object countdown}) => 'Сезон закончится через ${countdown}';
@@ -1971,6 +2007,10 @@ extension on TranslationsRuRu {
 			);
 			case 'settingsDestination.updateInTheBackground': return 'Обновлять данные в фоновом режиме';
 			case 'settingsDestination.updateInTheBackgroundDescription': return 'Пока Tetra Stats работает, он может обновлять статистику самостоятельно когда кэш истекает. Обычно это происходит каждые 5 минут';
+			case 'settingsDestination.statsPreferencesTitle': return 'Предпочтения по статам';
+			case 'settingsDestination.statsPreferencesDescription': return 'Если вы считаете, что графики SheetBot-а бесполезны, вы можете включить отображение графиков MinoMuncher-а прямо во вкадке "Положение" в статистике Тетра Лиги';
+			case 'settingsDestination.sheetbot': return 'SheetBot';
+			case 'settingsDestination.minomuncher': return 'MinoMuncher';
 			case 'settingsDestination.munchLimit': return 'Лимит повторов для анализа';
 			case 'settingsDestination.munchLimitDescription': return 'По умолчанию, Minomuncher обработает первые 10 доступных повторов. Если хочется больше, то это можно изменить здесь (максимум до 25 повторов).';
 			case 'settingsDestination.munchLimitTooMuch': return 'Слишком много, отклонено';

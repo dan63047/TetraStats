@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:super_drag_and_drop/super_drag_and_drop.dart';
 import 'package:tetra_stats/data_objects/beta_record.dart';
@@ -17,6 +18,7 @@ import 'package:tetra_stats/data_objects/tetrio_multiplayer_replay.dart';
 import 'package:tetra_stats/data_objects/tetrio_player.dart';
 import 'package:tetra_stats/data_objects/tetrio_players_leaderboard.dart';
 import 'package:tetra_stats/gen/strings.g.dart';
+import 'package:tetra_stats/utils/open_in_browser.dart';
 import 'package:tetra_stats/utils/text_shadow.dart';
 import 'package:tetra_stats/views/destination_calculator.dart';
 import 'package:tetra_stats/views/destination_cutoffs.dart';
@@ -124,12 +126,75 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
     teto.open();
     controller = ScrollController();
     changePlayer(prefs.getString('playerID')??_searchFor);
-
     if (prefs.getBool("updateInBG") == true) {
       _backgroundUpdate = Timer(Duration(minutes: 5), () {
         changePlayer(_searchFor);
       });
     }
+
+    Timer(Durations.extralong4, (){
+        if (prefs.getString("statsPreference") == null && prefs.getString("hiSkipped") == null) showDialog(
+          context: context,
+          barrierLabel: "choice",
+          builder: (context){
+            return AlertDialog(
+              title: Text(t.dialog212.question, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: [
+                    Text(t.dialog212.explanation, style: TextStyle(color: Colors.grey)),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text(t.settingsDestination.sheetbot),
+                  onPressed: () {
+                    prefs.setString("statsPreference", "sheetbot");
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: Text(t.settingsDestination.minomuncher),
+                  onPressed: () {
+                    prefs.setString("statsPreference", "minomuncher");
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          });
+      });
+      Timer(Durations.extralong4, (){
+        if (prefs.getString("awareAboutUpdates") != packageInfo.buildNumber) showDialog(
+          context: context,
+          barrierLabel: "choice",
+          builder: (context){
+            prefs.setString("awareAboutUpdates", packageInfo.buildNumber);
+            return AlertDialog(
+              title: Text(t.changeLogDialog.title, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: [
+                    Text(t.changeLogDialog.ver(ver: packageInfo.version, build: packageInfo.buildNumber), style: TextStyle(color: Colors.grey)),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: MarkdownBody(data: t.changeLogDialog.changesMD, styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.center), onTapLink: (String text, String? href, String title){launchInBrowser(Uri.parse(href!));}),
+                    ),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text(t.actions.ok),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          });
+      });
 
     super.initState();
   }
