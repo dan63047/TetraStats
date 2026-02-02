@@ -117,7 +117,7 @@ class _DestinationSettings extends State<DestinationSettings> with SingleTickerP
     ratingMode = prefs.getInt("ratingMode") ?? 0;
     timestampMode = prefs.getInt("timestampMode") ?? 0;
     munchLimit = prefs.getInt("munchLimit") ?? 10;
-    statsPreference = prefs.getString("statsPreference") ?? "sheetbot";
+    statsPreference = prefs.getString("statsPreference") ?? "minomuncher";
     _setDefaultNickname(prefs.getString("player")??"").then((v){setState((){});});
     defaultID = prefs.getString("playerID")??"";
   }

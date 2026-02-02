@@ -165,36 +165,36 @@ class _MainState extends State<MainView> with TickerProviderStateMixin {
             );
           });
       });
-      Timer(Durations.extralong4, (){
-        if (prefs.getString("awareAboutUpdates") != packageInfo.buildNumber) showDialog(
-          context: context,
-          barrierLabel: "choice",
-          builder: (context){
-            prefs.setString("awareAboutUpdates", packageInfo.buildNumber);
-            return AlertDialog(
-              title: Text(t.changeLogDialog.title, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
-              content: SingleChildScrollView(
-                child: ListBody(
-                  children: [
-                    Text(t.changeLogDialog.ver(ver: packageInfo.version, build: packageInfo.buildNumber), style: TextStyle(color: Colors.grey)),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: MarkdownBody(data: t.changeLogDialog.changesMD, styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.center), onTapLink: (String text, String? href, String title){launchInBrowser(Uri.parse(href!));}),
-                    ),
-                  ],
-                ),
-              ),
-              actions: <Widget>[
-                TextButton(
-                  child: Text(t.actions.ok),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          });
-      });
+      // Timer(Durations.extralong4, (){
+      //   if (prefs.getString("awareAboutUpdates") != packageInfo.buildNumber) showDialog(
+      //     context: context,
+      //     barrierLabel: "choice",
+      //     builder: (context){
+      //       prefs.setString("awareAboutUpdates", packageInfo.buildNumber);
+      //       return AlertDialog(
+      //         title: Text(t.changeLogDialog.title, style: const TextStyle(fontFamily: "Eurostile Round Extended")),
+      //         content: SingleChildScrollView(
+      //           child: ListBody(
+      //             children: [
+      //               Text(t.changeLogDialog.ver(ver: packageInfo.version, build: packageInfo.buildNumber), style: TextStyle(color: Colors.grey)),
+      //               Padding(
+      //                 padding: const EdgeInsets.only(top: 8.0),
+      //                 child: MarkdownBody(data: t.changeLogDialog.changesMD, styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.center), onTapLink: (String text, String? href, String title){launchInBrowser(Uri.parse(href!));}),
+      //               ),
+      //             ],
+      //           ),
+      //         ),
+      //         actions: <Widget>[
+      //           TextButton(
+      //             child: Text(t.actions.ok),
+      //             onPressed: () {
+      //               Navigator.of(context).pop();
+      //             },
+      //           ),
+      //         ],
+      //       );
+      //     });
+      // });
 
     super.initState();
   }

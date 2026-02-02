@@ -24,9 +24,9 @@ class SmallLeague{
   SmallLeague(this.glicko, this.rd, this.tr, this.rank, this.placement);
 
   SmallLeague.fromJson(Map<String, dynamic> json){
-    glicko = json['glicko'];
-    rd = json['rd'];
-    tr = json['tr'];
+    glicko = json['glicko'].toDouble();
+    rd = json['rd'].toDouble();
+    tr = json['tr'].toDouble();
     rank = json['rank'];
     placement = json['placement']??-1;
   }
