@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 const int currentSeason = 2;
-final DateTime sprintAndBlitzRelevance = DateTime(2025, 9, 10);
+final DateTime sprintAndBlitzRelevance = DateTime(2026, 5, 6);
 const double noTrRd = 60.9;
 const double apmWeight = 1;
 const double ppsWeight = 45;
