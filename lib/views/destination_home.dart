@@ -1379,11 +1379,27 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 						List<Achievement> qpExAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? snapshot.data!.summaries!.achievements.where((e) => e.category == "zenith" && e.object.contains("Expert Mode")).toList() : [];
 						List<Achievement> sprintAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? snapshot.data!.summaries!.achievements.where((e) => e.category == "solo" && !e.object.contains("BLITZ")).toList() : [];
 						List<Achievement> blitzAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? snapshot.data!.summaries!.achievements.where((e) => e.category == "solo" && e.object.contains("BLITZ")).toList() : [];
-						tlAchievements.sort((a, b) => a.o! - b.o!);
-						qpAchievements.sort((a, b) => a.o! - b.o!);
-						qpExAchievements.sort((a, b) => a.o! - b.o!);
-						sprintAchievements.sort((a, b) => a.o! - b.o!);
-						blitzAchievements.sort((a, b) => a.o! - b.o!);
+
+						int sortAchivements(Achievement a, Achievement b) {
+							int cmp = (b.rank ?? -1).compareTo(a.rank ?? -1);
+							if (cmp != 0) return cmp;
+
+							DateTime dateA = a.t ?? DateTime.fromMillisecondsSinceEpoch(0);
+							DateTime dateB = b.t ?? DateTime.fromMillisecondsSinceEpoch(0);
+							cmp = dateB.compareTo(dateA);
+							if (cmp != 0) return cmp;
+
+							cmp = (a.o ?? 0).compareTo(b.o ?? 0);
+							if (cmp != 0) return cmp;
+
+							return (a.k ?? 0).compareTo(b.k ?? 0);
+						}
+
+						tlAchievements.sort(sortAchivements);
+						qpAchievements.sort(sortAchivements);
+						qpExAchievements.sort(sortAchivements);
+						sprintAchievements.sort(sortAchivements);
+						blitzAchievements.sort(sortAchivements);
 						return TweenAnimationBuilder(
 							duration: Durations.long4,
 							tween: Tween<double>(begin: 0, end: 1),

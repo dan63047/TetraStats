@@ -20,7 +20,7 @@
         "home": "Strona Główna",
         "graphs": "Wykresy",
         "leaderboards": "Rankingi",
-        "cutoffs": "Cutoffy",
+        "cutoffs": "Średnie rang",
         "calc": "Kalkulator",
         "info": "Centrum informacji",
         "data": "Zapisane Dane",
@@ -37,14 +37,14 @@
         "anon": "Anonim"
     },
     "dialog212": {
-        "title": "Question about your preferences",
-        "question": "Which graphs, in your opinion, are more useful?",
-        "explanation": "Your choice will determine, which graphs you gonna see in Standing section of Tetra League stats"
+        "title": "Pytanie dot. preferencji",
+        "question": "Które wykresy, według Ciebie, są przydatniejsze?",
+        "explanation": "Twój wybór zadecyduje który rodzaj wykresów zobaczysz w sekcji Miejsce statystyk Tetra League"
     },
     "changeLogDialog": {
-        "title": "Tetra Stats has been updated!",
-        "ver": "Now current version is ${ver} build number ${build}",
-        "changesMD": "### Changes relative to v2.1.1:\n* Now you can change, what set of graphs to show in Standing section of Tetra League stats\n* This popup. It's gonna appear once every update\n\nChanges, that was applied before version number change:\n* Additional mesuares to prevent 9.9 burst PPS in minomuncher analysis\n* Est TR formula was updated"
+        "title": "Tetra Stats zostało zaktualizowane!",
+        "ver": "Obecna wersja to ${ver}, numer buildu ${build}",
+        "changesMD": "### Zmiany w porównanu do v2.1.1:\n* Możesz teraz wybrać, który zestaw wykresów wolisz wyświetlać w sekcji Miejsce statystyk Tetra League\n* Ten pop-up. Będzie się pokazywał przy każdej aktualizacji\n\nZmiany w wersji webowej wprowadzone przed zmianą numeracji wersji:\n* Dodano dodatkowe środki zapobiegania wartości 9,9 PPS zrywu w analizach MinoMunchera\n* Zaktualizowano wzór na szacowane TR"
     },
     "goBackButton": "Powrót",
     "nanow": "Obecnie niedostępne...",
@@ -201,10 +201,10 @@
         "dateAndTime": "Data i czas",
         "filterModaleTitle": "Filtruj rangi na wykresie",
         "history": {
-            "last7": "Last 7 Days",
-            "last30": "Last 30 Days",
-            "last90": "Last 90 Days",
-            "full": "Full History"
+            "last7": "Ostatnie 7 dni",
+            "last30": "Ostatnie 30 dni",
+            "last90": "Ostatnie 90 dni",
+            "full": "Pełna historia"
         }
     },
     "filterModale": {
@@ -336,13 +336,13 @@
         },
         "updateInTheBackground": "Aktualizuj dane w tle",
         "updateInTheBackgroundDescription": "Jeśli włączone, Tetra Stats będzie próbowało otrzymać nowe informacje po wygaśnięciu pamięci podręcznej. Zwykle dzieje się to co 5 minut",
-        "statsPreferencesTitle": "Stats preferences",
-        "statsPreferencesDescription": "If you believe, that SheetBot graphs are useless, you can set MinoMuncher graphs to appear in Standing section of Tetra League stats",
+        "statsPreferencesTitle": "Preferencje statystyk",
+        "statsPreferencesDescription": "Jeśli uważasz, że wykresy SheetBota są bezużyteczne, możesz ustawić, żeby w sekcji \"Miejsce\" statystyk Tetra League wyświetlały się wykresy MinoMunchera",
         "sheetbot": "SheetBot",
         "minomuncher": "MinoMuncher",
-        "munchLimit": "Limit for Minomuncher analysis",
-        "munchLimitDescription": "By default, minomuncher will analyse first 10 available replays. If you want more, you can adjust it here (max of 25).",
-        "munchLimitTooMuch": "Too much, rejected",
+        "munchLimit": "Limit analizy MinoMunchera",
+        "munchLimitDescription": "Domyślnie MinoMuncher przeanalizuje tylko pierwsze 10 dostępnych powtórek. Jeśli chcesz, możesz zwiększyć tę wartość w tym miejscu (maks. 25).",
+        "munchLimitTooMuch": "Za dużo, odrzucono",
         "compareStats": "Porównaj statystyki TL ze średnimi rang",
         "compareStatsDescription": "Jeśli włączone, Tetra Stats zapewni dodatkowe pomiary, które pozwolą ci porównać siebie do średniego gracza w twojej randze. Będzie to widoczne w ten sposób — statystyki będą podświetlane odpowiednim kolorem, najedź na nie kursorem, aby zobaczyć więcej informacji.",
         "showPosition": "Pokaż pozycję w rankingu według statystyk",
@@ -419,7 +419,7 @@
         "deDElocale": "Język niemiecki",
         "koKRlocale": "Język koreański",
         "plPLlocale": "Język polski",
-        "withFixesBy": "Z poprawkami $username",
+        "withFixesBy": "Z poprawkami użytkownika $username",
         "supportHim": "Wesprzyj go!"
     },
     "stats": {

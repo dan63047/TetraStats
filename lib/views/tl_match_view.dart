@@ -218,7 +218,8 @@ class TlMatchResultState extends State<TlMatchResultView> {
                           label: t.stats.sent, higherIsBetter: true),
                         if (widget.record.gamemode == "league") CompareThingy(greenSide: roundSelector.isNegative ? widget.record.results.leaderboard[greenSidePlayer].stats.garbageReceived : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id == widget.initPlayerId).stats.garbageReceived,
                           redSide: roundSelector.isNegative ? widget.record.results.leaderboard[redSidePlayer].stats.garbageReceived : widget.record.results.rounds[roundSelector].firstWhere((element) => element.id != widget.initPlayerId).stats.garbageReceived,
-                          label: t.stats.received, higherIsBetter: true),                    const Divider(),
+                          label: t.stats.received, higherIsBetter: true), // https://github.com/dan63047/TetraStats/issues/282
+                          const Divider(),
                           Column(
                             children: [
                               Padding(
