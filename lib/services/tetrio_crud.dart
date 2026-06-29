@@ -38,7 +38,7 @@ import 'package:tetra_stats/services/sqlite_db_controller.dart';
 import 'package:csv/csv.dart';
 
 const String dbName = "TetraStats.db";
-const String webVersionDomain = "ts.dan63.by";
+const String webVersionDomain = "tsbeta.dan63.by";
 const String tetrioUsersTable = "tetrioUsers";
 const String tetrioUsersToTrackTable = "tetrioUsersToTrack";
 const String tetraLeagueMatchesTable = "tetrioAlphaLeagueMathces";
@@ -424,6 +424,7 @@ class TetrioService extends DB {
         body: replay.asBytes
       );
       switch (response.statusCode) {
+        // TODO: replays with zero rounds are doing something bad to minomuncher
         case 200:
           if (response.contentLength! > 0) {
             Map<String, dynamic> json = jsonDecode(response.body);
@@ -508,7 +509,7 @@ class TetrioService extends DB {
     } else{
       TetraLeagueBetaStream stream = await fetchTLStream(id);
       List<BetaRecord> avaliable = stream.records;
-      avaliable.removeWhere((element) => element.stub);
+      avaliable.removeWhere((element) => (element.stub || element.results.rounds.length == 0));
       if (avaliable.isEmpty) throw TetrioNoReplays();
       progress.avaliable = avaliable.take(prefs.getInt("munchLimit")??10).toList();
       yield progress;
@@ -824,12 +825,8 @@ class TetrioService extends DB {
   /// Retrieves Tetra League history from p1nkl0bst3r api for a player with given [id]. Returns a list of states
   /// (state = instance of [TetrioPlayer] at some point of time). Can throw an exception if fails to retrieve data.
   Future<List<TetraLeague>> fetchAndsaveS1TLHistory(String id) async {
-    Uri url;
-    if (kIsWeb) {
-      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "TLHistory", "user": id});
-    } else {
-      url = Uri.https('api.p1nkl0bst3r.xyz', 'tlhist/$id');
-    }
+    Uri url= Uri.https(webVersionDomain, 'oskware_bridge.php', {"endpoint": "TLHistory", "user": id});
+   
     try{
       final response = await client.get(url);
 
@@ -838,27 +835,27 @@ class TetrioService extends DB {
           await ensureDbIsOpen();
           final db = getDatabaseOrThrow();
           // that one api returns csv instead of json
-          List<List<dynamic>> csv = const CsvToListConverter().convert(response.body)..removeAt(0);
+          List<List<dynamic>> csv = const CsvToListConverter().convert(response.body, textDelimiter: ",", eol: "\n");
           List<TetraLeague> history = [];
           Batch batch = db.batch();
           for (List<dynamic> entry in csv){ // each entry is one state
             TetraLeague state = TetraLeague(
                 id: id,
-                timestamp: DateTime.parse(entry[9]),
-                apm: entry[6] != '' ? entry[6] : null,
-                pps: entry[7] != '' ? entry[7] : null,
-                vs: entry[8] != '' ? entry[8] : null,
-                glicko: entry[4],
-                rd: noTrRd,
+                timestamp: DateTime.parse(entry[0]),
+                apm: entry[6] != '' ? entry[6].toDouble() : null,
+                pps: entry[7] != '' ? entry[7].toDouble() : null,
+                vs: entry[8] != '' ? entry[8].toDouble() : null,
+                glicko: entry[4].toDouble(),
+                rd: entry[5].toDouble(),
                 gamesPlayed: entry[1],
                 gamesWon: entry[2],
                 bestRank: "z",
                 decaying: false,
-                tr: entry[3],
+                tr: entry[3].toDouble(),
                 gxe: -1,
-                rank: entry[5],
-                percentileRank: entry[5],
-                percentile: rankCutoffs[entry[5]]!,
+                rank: "z",
+                percentileRank: "z",
+                percentile: -1,
                 standing: -1,
                 standingLocal: -1,
                 nextAt: -1,
