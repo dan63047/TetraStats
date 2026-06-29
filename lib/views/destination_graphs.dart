@@ -155,7 +155,7 @@ class _DestinationGraphsState extends State<DestinationGraphs> {
     var playerID = (await teto.fetchPlayer(widget.searchFor)).userId;
     if(fetchHistory){
       try{
-        var history = await Future.wait([teto.fetchAndsaveS1TLHistory(widget.searchFor), teto.fetchAndsaveS2TLHistory(widget.searchFor)]); // S1 history unavaliable because of certificate issue on p1nkl0bst3r side
+        var history = await Future.wait([teto.fetchAndsaveS1TLHistory(playerID), teto.fetchAndsaveS2TLHistory(playerID)]); // S1 history unavaliable because of certificate issue on p1nkl0bst3r side
         //var history = await teto.fetchAndsaveS2TLHistory(playerID);
         if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.graphsDestination.fetchAndsaveTLHistoryResult(number: history.length))));
       }on TetrioHistoryNotExist{
