@@ -648,7 +648,7 @@ class AchievementSummary extends StatelessWidget{
 												text: TextSpan(
 												style: const TextStyle(fontFamily: "Eurostile Round", fontSize: 14, color: Colors.grey),
 												children: [
-													if (achievement!.object.isNotEmpty) TextSpan(text: "${achievement!.object}\n"),
+													if (achievement!.object!.isNotEmpty) TextSpan(text: "${achievement!.object}\n"),
 													if (achievement!.vt == 4) TextSpan(text: "${t.stats.floor} ${achievement?.a != null ? achievement!.a! : "-"}"),
 													if (achievement!.vt == 4) TextSpan(text: " • "),
 													if (achievement!.vt != 5) TextSpan(text: (achievement?.pos != null && !achievement!.pos!.isNegative) ? "№ ${intf.format(achievement!.pos!+1)}" : "№ ---", style: TextStyle(color: achievement?.pos != null ? getColorOfRank(achievement!.pos!+1) : Colors.grey)),
@@ -1375,10 +1375,10 @@ class _DestinationHomeState extends State<DestinationHome> with SingleTickerProv
 							blitzBetterThanClosestAverage = false;
 						}
 						List<Achievement> tlAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? snapshot.data!.summaries!.achievements.where((e) => e.category == "league").toList() : [];
-						List<Achievement> qpAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? snapshot.data!.summaries!.achievements.where((e) => e.category == "zenith" && !e.object.contains("Expert Mode")).toList() : [];
-						List<Achievement> qpExAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? snapshot.data!.summaries!.achievements.where((e) => e.category == "zenith" && e.object.contains("Expert Mode")).toList() : [];
-						List<Achievement> sprintAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? snapshot.data!.summaries!.achievements.where((e) => e.category == "solo" && !e.object.contains("BLITZ")).toList() : [];
-						List<Achievement> blitzAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? snapshot.data!.summaries!.achievements.where((e) => e.category == "solo" && e.object.contains("BLITZ")).toList() : [];
+						List<Achievement> qpAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? snapshot.data!.summaries!.achievements.where((e) => e.category == "zenith" && !e.object!.contains("Expert Mode")).toList() : [];
+						List<Achievement> qpExAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? snapshot.data!.summaries!.achievements.where((e) => e.category == "zenith" && e.object!.contains("Expert Mode")).toList() : [];
+						List<Achievement> sprintAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? snapshot.data!.summaries!.achievements.where((e) => e.category == "solo" && !e.object!.contains("BLITZ")).toList() : [];
+						List<Achievement> blitzAchievements = snapshot.data!.summaries!.achievements.isNotEmpty ? snapshot.data!.summaries!.achievements.where((e) => e.category == "solo" && e.object!.contains("BLITZ")).toList() : [];
 
 						int sortAchivements(Achievement a, Achievement b) {
 							int cmp = (b.rank ?? -1).compareTo(a.rank ?? -1);

@@ -1,20 +1,23 @@
 // ignore_for_file: hash_and_equals
 
+import 'package:tetra_stats/data_objects/tetrio_prisecter.dart';
+
 class Achievement {
-  late int k;
+  int? k;
   int? o;
-  late int rt;
-  late int vt;
-  late int min;
-  late int deci;
-  late String name;
-  late String object;
-  late String category;
-  late bool hidden;
-  late int art;
-  late bool nolb;
-  late String desc;
-  late String n;
+  Map<String, dynamic>? u;
+  int? rt;
+  int? vt;
+  int? min;
+  int? deci;
+  String? name;
+  String? object;
+  String? category;
+  bool? hidden;
+  int? art;
+  bool? nolb;
+  String? desc;
+  String? n;
   String? sId;
   double? v;
   late int? a;
@@ -22,16 +25,18 @@ class Achievement {
   int? pos;
   int? total;
   int? rank;
+  Prisecter? prisecter;
 
   Achievement(
       {required this.k,
       this.o,
+      this.u,
       required this.rt,
       required this.vt,
       required this.min,
       required this.deci,
       required this.name,
-      required this.object,
+      this.object,
       required this.category,
       required this.hidden,
       required this.art,
@@ -44,7 +49,8 @@ class Achievement {
       this.t,
       this.pos,
       this.total,
-      this.rank});
+      this.rank,
+      this.prisecter});
 
   @override
   String toString(){
@@ -73,6 +79,8 @@ class Achievement {
     pos = json['pos'];
     total = json['total'];
     rank = json['rank'];
+    if (json.containsKey('u')) u = json['u'];
+    if (json.containsKey('p')) prisecter = Prisecter.fromJson(json['p']);
   }
 
   Map<String, dynamic> toJson() {

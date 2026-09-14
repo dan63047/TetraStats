@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:tetra_stats/data_objects/achievement.dart';
 import 'package:tetra_stats/data_objects/beta_record.dart';
 import 'package:tetra_stats/data_objects/cutoff_tetrio.dart';
 import 'package:tetra_stats/data_objects/end_context_multi.dart';
@@ -1374,6 +1375,72 @@ class TetrioService extends DB {
         default:
           developer.log(
               "fetchTetrioRecordsLeaderboard: Failed to fetch leaderboard",
+              name: "services/tetrio_crud",
+              error: response.statusCode);
+          throw ConnectionIssue(
+              response.statusCode, response.reasonPhrase ?? "No reason");
+      }
+    } on http.ClientException catch (e, s) {
+      developer.log("$e, $s");
+      throw http.ClientException(e.message, e.uri);
+    }
+  }
+
+  Future<List<Achievement>> fetchTetrioAchievementsLeaderboard(
+      {String? prisecter, String? lb}) async {
+    Uri url;
+    if (kIsWeb) {
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php', {
+        "endpoint": "AchievementsLeaderboard",
+        "lb": lb ?? "1",
+        if (prisecter != null) "after": prisecter,
+      });
+    } else {
+      url = Uri.https('ch.tetr.io', 'api/achievements/${lb ?? "1"}',
+          {"limit": "100", if (prisecter != null) "after": prisecter});
+    }
+    try {
+      final response = await client.get(url);
+
+      switch (response.statusCode) {
+        case 200:
+          _lbPositions.clear();
+          var rawJson = jsonDecode(response.body);
+          if (rawJson['success']) {
+            // if api confirmed that everything ok
+            List<Achievement> leaderboard = [];
+            developer.log(rawJson.toString(),
+                name: "fetchTetrioAchievementsLeaderboard");
+            for (Map<String, dynamic> entry in rawJson['data']['leaderboard']) {
+              leaderboard.add(Achievement.fromJson(entry));
+            }
+            //developer.log(
+            //    "fetchTetrioAchievementsLeaderboard: Leaderboard retrieved and cached",
+            //    name: "services/tetrio_crud");
+            //_leaderboardsCache[rawJson['cache']['cached_until'].toString()] = leaderboard;
+            //_cache.store(leaderboard, rawJson['cache']['cached_until']);
+            return leaderboard;
+          } else {
+            // idk how to hit that one
+            developer.log("fetchTetrioAchievementsLeaderboard: Bruh",
+                name: "services/tetrio_crud", error: rawJson);
+            throw Exception(
+                "Failed to get leaderboard (problems on the tetr.io side)"); // will it be on tetr.io side?
+          }
+        case 403:
+          throw TetrioForbidden();
+        case 429:
+          throw TetrioTooManyRequests();
+        case 418:
+          throw TetrioOskwareBridgeProblem();
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+          throw TetrioInternalProblem();
+        default:
+          developer.log(
+              "fetchTetrioAchievementsLeaderboard: Failed to fetch leaderboard",
               name: "services/tetrio_crud",
               error: response.statusCode);
           throw ConnectionIssue(
