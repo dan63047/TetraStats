@@ -22,56 +22,63 @@ late TetrioService teto;
 late GoRouter router;
 
 ThemeData theme = ThemeData(
-  fontFamily: 'Eurostile Round',
-  colorScheme: const ColorScheme.dark(
-    primary: Colors.cyanAccent,
-    surface: Color.fromARGB(255, 10, 10, 10),
-    secondary: Color(0xFF00838F),
-  ),
-  textTheme: TextTheme(
-    titleLarge: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42),
-    titleSmall: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 28, height: 0.9, fontWeight: FontWeight.w200),
-    headlineMedium: TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36),
-    displayLarge: TextStyle(fontSize: 18),
-  ),
-  cardTheme: const CardThemeData(surfaceTintColor: Color.fromARGB(255, 10, 10, 10)),
-  drawerTheme: const DrawerThemeData(surfaceTintColor: Color.fromARGB(255, 10, 10, 10)),
-  searchBarTheme: const SearchBarThemeData(
-    shadowColor: WidgetStatePropertyAll(Colors.black),
-    shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.horizontal(left: Radius.circular(12.0), right: Radius.circular(12.0)))),
-    elevation: WidgetStatePropertyAll(8.0)
-  ),
-  chipTheme: const ChipThemeData(
-    side: BorderSide(color: Colors.transparent),
-  ),
-  segmentedButtonTheme: SegmentedButtonThemeData(
-    style: ButtonStyle(
+    fontFamily: 'Eurostile Round',
+    colorScheme: const ColorScheme.dark(
+      primary: Colors.cyanAccent,
+      surface: Color.fromARGB(255, 10, 10, 10),
+      secondary: Color(0xFF00838F),
+    ),
+    textTheme: TextTheme(
+      titleLarge:
+          TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 42),
+      titleSmall: TextStyle(
+          fontFamily: "Eurostile Round Extended",
+          fontSize: 28,
+          height: 0.9,
+          fontWeight: FontWeight.w200),
+      headlineMedium:
+          TextStyle(fontFamily: "Eurostile Round Extended", fontSize: 36),
+      displayLarge: TextStyle(fontSize: 18),
+    ),
+    cardTheme:
+        const CardThemeData(surfaceTintColor: Color.fromARGB(255, 10, 10, 10)),
+    drawerTheme: const DrawerThemeData(
+        surfaceTintColor: Color.fromARGB(255, 10, 10, 10)),
+    searchBarTheme: const SearchBarThemeData(
+        shadowColor: WidgetStatePropertyAll(Colors.black),
+        shape: WidgetStatePropertyAll(RoundedRectangleBorder(
+            borderRadius: BorderRadius.horizontal(
+                left: Radius.circular(12.0), right: Radius.circular(12.0)))),
+        elevation: WidgetStatePropertyAll(8.0)),
+    chipTheme: const ChipThemeData(
+      side: BorderSide(color: Colors.transparent),
+    ),
+    segmentedButtonTheme: SegmentedButtonThemeData(
+        style: ButtonStyle(
       visualDensity: VisualDensity(horizontal: -4.0, vertical: -4.0),
       side: const WidgetStatePropertyAll(BorderSide(color: Colors.transparent)),
       surfaceTintColor: const WidgetStatePropertyAll(Colors.cyanAccent),
       iconColor: const WidgetStatePropertyAll(Colors.cyanAccent),
       shadowColor: WidgetStatePropertyAll(Colors.cyanAccent.shade200),
-    )
-  ),
-  dividerColor: Color.fromARGB(50, 158, 158, 158),
-  dividerTheme: DividerThemeData(color: Color.fromARGB(50, 158, 158, 158)),
-  expansionTileTheme: ExpansionTileThemeData(
-    expansionAnimationStyle: AnimationStyle(curve: Easing.standard, reverseCurve: Easing.standard),
-    expandedAlignment: Alignment.bottomCenter,
-  ),
-  dropdownMenuTheme: DropdownMenuThemeData(textStyle: TextStyle(fontFamily: "Eurostile Round", fontSize: 18)),
-  scaffoldBackgroundColor: Colors.black,
-  tooltipTheme: TooltipThemeData(
-    textStyle: TextStyle(color: Colors.white, fontFamily: "Eurostile Round"),
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.all(Radius.circular(8.0)),
-      border: Border.all(
-        color: Colors.white
-      ),
-      color: Colors.black,
-    )
-  )
-);
+    )),
+    dividerColor: Color.fromARGB(50, 158, 158, 158),
+    dividerTheme: DividerThemeData(color: Color.fromARGB(50, 158, 158, 158)),
+    expansionTileTheme: ExpansionTileThemeData(
+      expansionAnimationStyle:
+          AnimationStyle(curve: Easing.standard, reverseCurve: Easing.standard),
+      expandedAlignment: Alignment.bottomCenter,
+    ),
+    dropdownMenuTheme: DropdownMenuThemeData(
+        textStyle: TextStyle(fontFamily: "Eurostile Round", fontSize: 18)),
+    scaffoldBackgroundColor: Colors.black,
+    tooltipTheme: TooltipThemeData(
+        textStyle:
+            TextStyle(color: Colors.white, fontFamily: "Eurostile Round"),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(8.0)),
+          border: Border.all(color: Colors.white),
+          color: Colors.black,
+        )));
 
 void main() async {
   // Initializing sqflite
@@ -85,10 +92,13 @@ void main() async {
 
   // Initializing funny things
   WidgetsFlutterBinding.ensureInitialized();
-  if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS){ // we can't control windows manager in web and mobile 
-    await WindowManager.instance.ensureInitialized(); // Initializing windows manager
+  if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) {
+    // we can't control windows manager in web and mobile
+    await WindowManager.instance
+        .ensureInitialized(); // Initializing windows manager
     windowManager.waitUntilReadyToShow().then((_) async {
-     await windowManager.setTitle('Tetra Stats'); // And setting the windows title
+      await windowManager
+          .setTitle('Tetra Stats'); // And setting the windows title
     });
   }
 
@@ -97,16 +107,19 @@ void main() async {
   teto = TetrioService();
 
   router = GoRouter(
-    initialLocation: (prefs.getBool("notFirstTime") == true || prefs.getBool("hiSkipped") == true ) ? "/" : "/hihello",
+    initialLocation: (prefs.getBool("notFirstTime") == true ||
+            prefs.getBool("hiSkipped") == true)
+        ? "/"
+        : "/hihello",
     routes: [
       GoRoute(
         path: "/",
         builder: (_, __) => const MainView(),
       ),
-      GoRoute( // that one intended for Android users, that can open https://ch.tetr.io/u/ links
-        path: "/u/:userId",
-        builder: (_, __) => MainView(player: __.pathParameters['userId'])
-      ),
+      GoRoute(
+          // that one intended for Android users, that can open https://ch.tetr.io/u/ links
+          path: "/u/:userId",
+          builder: (_, __) => MainView(player: __.pathParameters['userId'])),
       GoRoute(
         path: "/hihello",
         builder: (_, __) => const FirstTimeView(),
@@ -116,18 +129,20 @@ void main() async {
 
   // Choosing the locale
   String? locale = prefs.getString("locale");
-  if (locale == null){
+  if (locale == null) {
     LocaleSettings.useDeviceLocale();
-  }else{
+  } else {
     LocaleSettings.setLocaleRaw(locale);
   }
 
   // I dont want to store old cache
-  Timer.periodic(const Duration(minutes: 5), (Timer timer) { 
+  Timer.periodic(const Duration(minutes: 5), (Timer timer) {
     teto.cacheRoutine();
-    developer.log("Cache routine complete, next one in ${DateTime.now().add(const Duration(minutes: 5))}", name: "main");
+    developer.log(
+        "Cache routine complete, next one in ${DateTime.now().add(const Duration(minutes: 5))}",
+        name: "main");
   });
-  
+
   runApp(TranslationProvider(
     child: const MyApp(),
   ));
@@ -141,31 +156,39 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
-
   @override
   void initState() {
-    setAccentColor(prefs.getInt("accentColor") != null ? Color(prefs.getInt("accentColor")!) : Colors.cyanAccent);
+    setAccentColor(prefs.getInt("accentColor") != null
+        ? Color(prefs.getInt("accentColor")!)
+        : Colors.cyanAccent);
     super.initState();
   }
-  
-  void setAccentColor(Color color){ // does this thing work??? yes??? no??? 
+
+  void setAccentColor(Color color) {
+    // does this thing work??? yes??? no???
     setState(() {
-      theme = theme.copyWith(colorScheme: theme.colorScheme.copyWith(primary: color));
+      theme = theme.copyWith(
+          colorScheme: theme.colorScheme.copyWith(primary: color));
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: "Tetra Stats", 
-      routerConfig: router,
-      scrollBehavior: const MaterialScrollBehavior().copyWith(
-        dragDevices: {PointerDeviceKind.mouse, PointerDeviceKind.touch, PointerDeviceKind.stylus, PointerDeviceKind.unknown},
-      ),
-      locale: TranslationProvider.of(context).flutterLocale,
-      supportedLocales: AppLocaleUtils.supportedLocales,
-      localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      theme: theme
-    );
+        title: "Tetra Stats",
+        routerConfig: router,
+        scrollBehavior: const MaterialScrollBehavior().copyWith(
+          dragDevices: {
+            PointerDeviceKind.mouse,
+            PointerDeviceKind.touch,
+            PointerDeviceKind.stylus,
+            PointerDeviceKind.unknown,
+            PointerDeviceKind.trackpad
+          },
+        ),
+        locale: TranslationProvider.of(context).flutterLocale,
+        supportedLocales: AppLocaleUtils.supportedLocales,
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
+        theme: theme);
   }
 }
