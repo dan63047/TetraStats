@@ -10,6 +10,14 @@
 analyzer:
   errors:
     use_build_context_synchronously: ignore
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
 in ignoreclude: package:flutter_lints/flutter.yaml
 
 linter:
