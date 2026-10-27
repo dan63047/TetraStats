@@ -46,6 +46,7 @@ const String tetraLeagueMatchesTable = "tetrioAlphaLeagueMathces";
 const String tetrioTLReplayStatsTable = "tetrioTLReplayStats";
 const String tetrioLeagueTable = "tetrioLeague";
 const String idCol = "id";
+const String tsCol = "ts";
 const String replayID = "replayId";
 const String nickCol = "nickname";
 const String timestamp = "timestamp";
@@ -67,6 +68,34 @@ const List<String> tetraLeagueMatchesTableRows = [
 ];
 const List<String> tetrioTLReplayStatsTableRows = [idCol, "data", "freyhoe"];
 const List<String> tetrioLeagueTableRows = [
+  idCol,
+  tsCol,
+  "gamesplayed",
+  "gameswon",
+  "tr",
+  "glicko",
+  "rd",
+  "gxe",
+  "rank",
+  "bestrank",
+  "apm",
+  "pps",
+  "vs",
+  "decaying",
+  "standing",
+  "standing_local",
+  "percentile",
+  "prev_rank",
+  "prev_at",
+  "next_rank",
+  "next_at",
+  "percentile_rank",
+  "season"
+];
+
+/// Columns of the pre-v1 schema of [tetrioLeagueTable] (no [tsCol]).
+/// Kept to recognize old backups, which get migrated on import.
+const List<String> tetrioLeagueTableRowsV0 = [
   idCol,
   "gamesplayed",
   "gameswon",
@@ -134,6 +163,7 @@ const String createTetrioTLReplayStats = '''
 const String createTetrioLeagueTable = '''
         CREATE TABLE IF NOT EXISTS "tetrioLeague" (
           "id"	TEXT NOT NULL,
+          "ts"	INTEGER NOT NULL DEFAULT 0,
           "gamesplayed"	INTEGER NOT NULL DEFAULT 0,
           "gameswon"	INTEGER NOT NULL DEFAULT 0,
           "tr"	REAL,
@@ -154,10 +184,10 @@ const String createTetrioLeagueTable = '''
           "next_rank"	TEXT,
           "next_at"	INTEGER NOT NULL DEFAULT -1,
           "percentile_rank"	TEXT NOT NULL DEFAULT 'z',
-          "season"	INTEGER NOT NULL DEFAULT 1,
-	        PRIMARY KEY("id")
-        )
-''';
+  	        "season"	INTEGER NOT NULL DEFAULT 1,
+  	        PRIMARY KEY("id", "ts")
+          )
+  ''';
 
 class CacheController {
   late Map<String, dynamic> _cache;
@@ -323,7 +353,7 @@ class TetrioService extends DB {
       _players.removeWhere((key, value) => key == id);
       _tetrioStreamController.add(_players);
     }
-    await db.delete(tetrioLeagueTable, where: "id LIKE ?", whereArgs: ["$id%"]);
+    await db.delete(tetrioLeagueTable, where: '$idCol = ?', whereArgs: [id]);
   }
 
   /// Gets nickname from database or requests it from API if missing.
@@ -1858,17 +1888,16 @@ class TetrioService extends DB {
     await ensureDbIsOpen();
     final db = getDatabaseOrThrow();
     List<Map> query = await db.query(tetrioLeagueTable,
-        where: season != null ? '"id" LIKE ? AND "season" = ?' : '"id" LIKE ?',
-        whereArgs: season != null ? ["${userID}%", season] : ["${userID}%"],
-        orderBy: '"id" ASC');
+        where: season != null ? '$idCol = ? AND "season" = ?' : '$idCol = ?',
+        whereArgs: season != null ? [userID, season] : [userID],
+        orderBy: '"ts" ASC');
     return [
       for (var entry in query)
         TetraLeague.fromJson(
             entry as Map<String, dynamic>,
-            DateTime.fromMillisecondsSinceEpoch(
-                int.parse(entry["id"].substring(24), radix: 16)),
+            DateTime.fromMillisecondsSinceEpoch(entry["ts"] as int),
             entry["season"],
-            entry["id"].substring(0, 24))
+            entry["id"] as String)
     ];
   }
 
@@ -1877,22 +1906,23 @@ class TetrioService extends DB {
     await ensureDbIsOpen();
     final db = getDatabaseOrThrow();
     List<Map> test = await db.query(tetrioLeagueTable,
-        where: '"id" LIKE ? AND "gamesplayed" = ? AND "rd" = ?',
-        whereArgs: ["${league.id}%", league.gamesPlayed, league.rd]);
+        where: '$idCol = ? AND "gamesplayed" = ? AND "rd" = ?',
+        whereArgs: [league.id, league.gamesPlayed, league.rd]);
     if (test.isEmpty) {
       await db.insert(tetrioLeagueTable, league.toJson());
     }
   }
 
-  /// Remove state, which has [dbID] from the local database
-  /// ([dbid] is a concatenation of player id and UINX milliseconds in hex)
-  Future<void> deleteState(String dbID) async {
+  /// Removes the state of [userID] at [ts] (UNIX milliseconds)
+  /// from the local database.
+  Future<void> deleteState(String userID, int ts) async {
     await ensureDbIsOpen();
     final db = getDatabaseOrThrow();
-    int result =
-        await db.delete(tetrioLeagueTable, where: "id = ?", whereArgs: [dbID]);
+    int result = await db.delete(tetrioLeagueTable,
+        where: '$idCol = ? AND "ts" = ?', whereArgs: [userID, ts]);
     if (result == 0)
-      throw Exception("Failed to remove a row $dbID - it's probably not exist");
+      throw Exception(
+          "Failed to remove a row $userID/$ts - it's probably not exist");
   }
 
   /// Retrieves general stats of [user] from Tetra Channel api. Returns [TetrioPlayer] object of this user.

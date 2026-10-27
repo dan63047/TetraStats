@@ -62,8 +62,8 @@ class TetraLeague {
         ? NerdStats(apm!, pps!, vs!)
         : null;
     estTr = (nerdStats != null)
-        ? EstTr(apm!, pps!, vs!, gamesWon, rd??noTrRd, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp,
-            nerdStats!.gbe)
+        ? EstTr(apm!, pps!, vs!, gamesWon, rd ?? noTrRd, nerdStats!.app,
+            nerdStats!.dss, nerdStats!.dsp, nerdStats!.gbe)
         : null;
     playstyle = (nerdStats != null)
         ? Playstyle(apm!, pps!, nerdStats!.app, nerdStats!.vsapm,
@@ -113,8 +113,8 @@ class TetraLeague {
         ? NerdStats(apm!, pps!, vs!)
         : null;
     estTr = (nerdStats != null)
-        ? EstTr(apm!, pps!, vs!, gamesWon, rd??noTrRd, nerdStats!.app, nerdStats!.dss, nerdStats!.dsp,
-            nerdStats!.gbe)
+        ? EstTr(apm!, pps!, vs!, gamesWon, rd ?? noTrRd, nerdStats!.app,
+            nerdStats!.dss, nerdStats!.dsp, nerdStats!.gbe)
         : null;
     playstyle = (nerdStats != null)
         ? Playstyle(apm!, pps!, nerdStats!.app, nerdStats!.vsapm,
@@ -155,8 +155,8 @@ class TetraLeague {
           -1,
           Duration(seconds: -1),
           -1);
-  
-  num? getStatByEnum(Stats stat){
+
+  num? getStatByEnum(Stats stat) {
     switch (stat) {
       case Stats.tr:
         return tr;
@@ -173,7 +173,7 @@ class TetraLeague {
       case Stats.gw:
         return gamesWon;
       case Stats.wr:
-        return winrate*100;
+        return winrate * 100;
       case Stats.apm:
         return apm;
       case Stats.pps:
@@ -213,15 +213,16 @@ class TetraLeague {
       case Stats.stride:
         return playstyle?.stride;
       case Stats.stridemMinusPlonk:
-        return (playstyle?.stride??0.00) - (playstyle?.plonk??0.00);
+        return (playstyle?.stride ?? 0.00) - (playstyle?.plonk ?? 0.00);
       case Stats.openerMinusInfDS:
-        return (playstyle?.opener??0.00) - (playstyle?.infds??0.00);
+        return (playstyle?.opener ?? 0.00) - (playstyle?.infds ?? 0.00);
     }
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id + timestamp.millisecondsSinceEpoch.toRadixString(16);
+    data['id'] = id;
+    data['ts'] = timestamp.millisecondsSinceEpoch;
     if (gamesPlayed > 0) data['gamesplayed'] = gamesPlayed;
     if (gamesWon > 0) data['gameswon'] = gamesWon;
     if (tr >= 0) data['tr'] = tr;
