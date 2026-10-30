@@ -1416,17 +1416,66 @@ class TetrioService extends DB {
     }
   }
 
+  Future<Achievement> fetchTetrioAchievement(int? id) async {
+    Uri url;
+    if (kIsWeb) {
+      url = Uri.https(webVersionDomain, 'oskware_bridge.php',
+          {"endpoint": "Achievement", "id": id ?? 1});
+    } else {
+      url = Uri.https('ch.tetr.io', 'api/achievements/${id ?? 1}');
+    }
+    try {
+      final response = await client.get(url);
+
+      switch (response.statusCode) {
+        case 200:
+          _lbPositions.clear();
+          var rawJson = jsonDecode(response.body);
+          if (rawJson['success']) {
+            //_leaderboardsCache[rawJson['cache']['cached_until'].toString()] = leaderboard;
+            //_cache.store(leaderboard, rawJson['cache']['cached_until']);
+            return Achievement.fromJson(rawJson['data']['achievement']);
+          } else {
+            // idk how to hit that one
+            developer.log("fetchTetrioAchievement: Bruh",
+                name: "services/tetrio_crud", error: rawJson);
+            throw Exception(
+                "Failed to get achievement (problems on the tetr.io side)"); // will it be on tetr.io side?
+          }
+        case 403:
+          throw TetrioForbidden();
+        case 429:
+          throw TetrioTooManyRequests();
+        case 418:
+          throw TetrioOskwareBridgeProblem();
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+          throw TetrioInternalProblem();
+        default:
+          developer.log("fetchTetrioAchievement: Failed to fetch achievement",
+              name: "services/tetrio_crud", error: response.statusCode);
+          throw ConnectionIssue(
+              response.statusCode, response.reasonPhrase ?? "No reason");
+      }
+    } on http.ClientException catch (e, s) {
+      developer.log("$e, $s");
+      throw http.ClientException(e.message, e.uri);
+    }
+  }
+
   Future<List<Achievement>> fetchTetrioAchievementsLeaderboard(
-      {String? prisecter, String? lb}) async {
+      {String? prisecter, int? lb}) async {
     Uri url;
     if (kIsWeb) {
       url = Uri.https(webVersionDomain, 'oskware_bridge.php', {
         "endpoint": "AchievementsLeaderboard",
-        "lb": lb ?? "1",
+        "lb": lb ?? 1,
         if (prisecter != null) "after": prisecter,
       });
     } else {
-      url = Uri.https('ch.tetr.io', 'api/achievements/${lb ?? "1"}',
+      url = Uri.https('ch.tetr.io', 'api/achievements/${lb ?? 1}/entries',
           {"limit": "100", if (prisecter != null) "after": prisecter});
     }
     try {
@@ -1441,7 +1490,7 @@ class TetrioService extends DB {
             List<Achievement> leaderboard = [];
             developer.log(rawJson.toString(),
                 name: "fetchTetrioAchievementsLeaderboard");
-            for (Map<String, dynamic> entry in rawJson['data']['leaderboard']) {
+            for (Map<String, dynamic> entry in rawJson['data']['entries']) {
               leaderboard.add(Achievement.fromJson(entry));
             }
             //developer.log(

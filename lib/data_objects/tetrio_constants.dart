@@ -26,8 +26,47 @@ const Map<int, double> xpTableScuffed = {
   50000: 28468683855.2853
 };
 
-const List<String> ranks = ["d", "d+", "c-", "c", "c+", "b-", "b", "b+", "a-", "a", "a+", "s-", "s", "s+", "ss", "u", "x", "x+"];
-const List<String> ranks2 = ["top1", "x+", "x", "u", "ss", "s+", "s", "s-", "a+", "a", "a-", "b+", "b", "b-", "c+", "c", "c-", "d+", "d"];
+const List<String> ranks = [
+  "d",
+  "d+",
+  "c-",
+  "c",
+  "c+",
+  "b-",
+  "b",
+  "b+",
+  "a-",
+  "a",
+  "a+",
+  "s-",
+  "s",
+  "s+",
+  "ss",
+  "u",
+  "x",
+  "x+"
+];
+const List<String> ranks2 = [
+  "top1",
+  "x+",
+  "x",
+  "u",
+  "ss",
+  "s+",
+  "s",
+  "s-",
+  "a+",
+  "a",
+  "a-",
+  "b+",
+  "b",
+  "b-",
+  "c+",
+  "c",
+  "c-",
+  "d+",
+  "d"
+];
 const Map<String, double> rankCutoffs = {
   "x+": 0.002,
   "x": 0.01,
@@ -229,7 +268,8 @@ const Map<String, int> blitzAverages = {
 
 List<DateTime> seasonStarts = [
   DateTime.utc(2020, DateTime.april, 18, 4), // Source = twitter or something
-  DateTime.utc(2024, DateTime.august, 16, 18, 41, 10) // Source = osk status page
+  DateTime.utc(
+      2024, DateTime.august, 16, 18, 41, 10) // Source = osk status page
 ];
 
 List<DateTime> seasonEnds = [
@@ -322,4 +362,85 @@ const Map<ComboTables, List<int>> combotable = {
   ComboTables.none: [0],
   ComboTables.classic: [0, 1, 1, 2, 2, 3, 3, 4, 4, 4, 5],
   ComboTables.modern: [0, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4]
+};
+
+const Map<int, String> achievements = {
+  // k: name
+  1: "Stacker",
+  2: "Powerlevelling",
+  3: "Garbage Offensive",
+  4: "Elegance",
+  5: "Sprinter",
+  6: "Blitzer",
+  7: "Secret Grade",
+  8: "20TSD",
+  9: "10PC",
+  10: "Contender",
+  12: "The Spike of all Time",
+  13: "Speed Player",
+  14: "Plonk",
+  15: "Opener Main",
+  16: "Tower Climber",
+  17: "Whatever It Takes",
+  18: "Zenith Explorer",
+  19: "The Emperor",
+  20: "The Devil",
+  21: "Strength",
+  22: "The Tower",
+  23: "Temperance",
+  24: "Wheel of Fortune",
+  25: "The Hermit",
+  26: "The Magician",
+  27: "The Lovers",
+  28: "A Modern Classic",
+  29: "Deadlock",
+  30: "The Grandmaster",
+  31: "Emperor's Decadence",
+  32: "Divine Mastery",
+  33: "The Escape Artist",
+  34: "Swamp Water",
+  35: "Champion of the Lobby",
+  36: "Snake Eyes",
+  37: "1-8 Stacking",
+  38: "Mr. Boardwide",
+  39: "Wabi-Sabi",
+  40: "Trained Professionals",
+  41: "The Responsible One",
+  42: "Zenith Speedrun",
+  43: "Guardian Angel",
+  44: "The Starving Artist",
+  45: "Supercharged",
+  46: "VIP List",
+  47: "Against all Odds",
+  48: "Detail Oriented",
+  49: "The Con Artist",
+  50: "Block Rationing",
+  51: "Talentless",
+  52: "Empty Box",
+  53: "Swamp Water Lite",
+  54: "Rolling The Snowman 2024",
+  55: "Bleeding Hearts 2025",
+  56: "Lovers' Promise 2025",
+  57: "Grand Audience",
+  58: "Redacted List",
+  59: "The Fool 2025",
+  60: "Perfecting the Snowman",
+  61: "Permafrost Board",
+  62: "Naga Eyes",
+  63: "Rolling The Snowman",
+  64: "Lovers' Promise",
+  65: "A Second Chance",
+  66: "The Fool II",
+  67: "Fool's Voucher",
+  55937: "Last Stand",
+  55938: "Freefall",
+  55939: "Asceticism",
+  55940: "Loaded Dice",
+  55941: "The Exile",
+  55942: "The Warlock",
+  55943: "The Tyrant",
+  55944: "Damnation",
+  55945: "The Harbinger",
+  55946: "A Fool's Errand",
+  55947: "Bleeding Hearts",
 };

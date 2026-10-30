@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:tetra_stats/data_objects/achievement.dart';
 import 'package:tetra_stats/data_objects/tetrio_constants.dart';
 import 'package:tetra_stats/data_objects/tetrio_player_from_leaderboard.dart';
 import 'package:tetra_stats/data_objects/tetrio_players_leaderboard.dart';
@@ -71,8 +72,14 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
     for (MapEntry e in chartsShortTitles.entries)
       DropdownMenuEntry(value: e.key, label: e.value)
   ];
+  List<DropdownMenuEntry> _achievements = [
+    for (MapEntry e in achievements.entries)
+      DropdownMenuEntry(value: e.key, label: e.value)
+  ];
   String? _country;
   Stats stat = Stats.tr;
+  int _achievement = 1;
+  Achievement? _achievementData;
   int? fullTLlbPlayers;
   DateTime? fullTLlbTimestamp;
 
@@ -99,6 +106,13 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
         _reachedTheEnd = true;
       }
 
+      if (_currentLb == Leaderboards.achievements &&
+          (_achievementData == null || _achievementData!.k != _achievement)) {
+        _achievementData = await teto.fetchTetrioAchievement(_achievement);
+      }
+      if (_currentLb != Leaderboards.achievements) {
+        _achievementData = null;
+      }
       final items = switch (_currentLb) {
         Leaderboards.tl => await teto.fetchTetrioLeaderboard(
             prisecter: prisecter, country: _country),
@@ -117,7 +131,8 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
         Leaderboards.zenithex => await teto.fetchTetrioRecordsLeaderboard(
             prisecter: prisecter, lb: "zenithex", country: _country),
         Leaderboards.achievements =>
-          await teto.fetchTetrioAchievementsLeaderboard(prisecter: prisecter),
+          await teto.fetchTetrioAchievementsLeaderboard(
+              prisecter: prisecter, lb: _achievement),
       };
 
       if (_currentLb == Leaderboards.fullTL && _excludeRanks.isNotEmpty)
@@ -187,24 +202,44 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                       Wrap(
                         alignment: WrapAlignment.center,
                         children: [
-                          DropdownMenu(
-                              leadingIcon: Icon(Icons.public),
-                              inputDecorationTheme: InputDecorationTheme(
-                                isDense: true,
-                              ),
-                              textStyle: TextStyle(fontSize: 14, height: 0.9),
-                              dropdownMenuEntries: _countries,
-                              initialSelection: "",
-                              onSelected: ((value) {
-                                _country = value as String?;
-                                list.clear();
-                                prisecter = null;
-                                _isFetchingData = false;
-                                _reachedTheEnd = false;
-                                setState(() {
-                                  _fetchData();
-                                });
-                              })),
+                          _currentLb == Leaderboards.achievements
+                              ? DropdownMenu(
+                                  inputDecorationTheme: InputDecorationTheme(
+                                    isDense: true,
+                                  ),
+                                  textStyle:
+                                      TextStyle(fontSize: 14, height: 0.9),
+                                  dropdownMenuEntries: _achievements,
+                                  initialSelection: _achievement,
+                                  onSelected: ((value) {
+                                    _achievement = value;
+                                    list.clear();
+                                    prisecter = null;
+                                    _isFetchingData = false;
+                                    _reachedTheEnd = false;
+                                    setState(() {
+                                      _fetchData();
+                                    });
+                                  }))
+                              : DropdownMenu(
+                                  leadingIcon: Icon(Icons.public),
+                                  inputDecorationTheme: InputDecorationTheme(
+                                    isDense: true,
+                                  ),
+                                  textStyle:
+                                      TextStyle(fontSize: 14, height: 0.9),
+                                  dropdownMenuEntries: _countries,
+                                  initialSelection: "",
+                                  onSelected: ((value) {
+                                    _country = value as String?;
+                                    list.clear();
+                                    prisecter = null;
+                                    _isFetchingData = false;
+                                    _reachedTheEnd = false;
+                                    setState(() {
+                                      _fetchData();
+                                    });
+                                  })),
                           if (_currentLb == Leaderboards.fullTL)
                             SizedBox(width: 5.0),
                           if (_currentLb == Leaderboards.fullTL)
@@ -355,7 +390,10 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                             itemBuilder: (BuildContext context, int index) {
                               return ListTile(
                                 leading: Text(intf.format(index + 1)),
-                                title: Text(_currentLb == Leaderboards.achievements ? snapshot.data![index].u['username'] : snapshot.data![index].username,
+                                title: Text(
+                                    _currentLb == Leaderboards.achievements
+                                        ? snapshot.data![index].u['username']
+                                        : snapshot.data![index].username,
                                     style: TextStyle(fontSize: 22)),
                                 trailing: switch (_currentLb) {
                                   Leaderboards.tl => Row(
@@ -421,11 +459,29 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                                       "${f2.format(snapshot.data![index].stats.zenith!.altitude)} m",
                                       style: trailingStyle),
                                   Leaderboards.achievements => Text(
-                                      "${snapshot.data![index].v}",
+                                      switch (_achievementData?.vt) {
+                                        1 =>
+                                          intf.format(snapshot.data![index].v),
+                                        2 => get40lTime(
+                                            (snapshot.data![index].v! * 1000)
+                                                .floor()),
+                                        3 => get40lTime(
+                                            (snapshot.data![index].v!.abs() *
+                                                    1000)
+                                                .floor()),
+                                        4 =>
+                                          "${f2.format(snapshot.data![index].v!)} m",
+                                        5 => timestamp(snapshot.data![index].t),
+                                        6 => intf.format(
+                                            snapshot.data![index].v!.abs()),
+                                        _ => "lol"
+                                      },
                                       style: trailingStyle),
                                 },
-                                subtitle: width >= eukjsakjas
-                                    ? Text(
+                                subtitle: width < eukjsakjas ||
+                                        _achievementData?.vt == 5
+                                    ? null
+                                    : Text(
                                         switch (_currentLb) {
                                           Leaderboards.tl =>
                                             "${f2.format(snapshot.data![index].apm)} APM, ${f2.format(snapshot.data![index].pps)} PPS, ${f2.format(snapshot.data![index].vs)} VS, ${f2.format(snapshot.data![index].nerdStats.app)} APP, ${f2.format(snapshot.data![index].nerdStats.vsapm)} VS/APM",
@@ -448,18 +504,22 @@ class _DestinationLeaderboardsState extends State<DestinationLeaderboards> {
                                           Leaderboards.zenithex =>
                                             "${f2.format(snapshot.data![index].aggregateStats.apm)} APM, ${f2.format(snapshot.data![index].aggregateStats.pps)} PPS, ${intf.format(snapshot.data![index].stats.kills)} KO's, ${f2.format(snapshot.data![index].stats.cps)} climb speed (${f2.format(snapshot.data![index].stats.zenith!.peakrank)} peak), ${intf.format(snapshot.data![index].stats.topBtB)} B2B",
                                           Leaderboards.achievements =>
-                                            "${snapshot.data![index].sId} achievements",
+                                            _achievementData?.vt == 5
+                                                ? ""
+                                                : timestamp(
+                                                    snapshot.data![index].t),
                                         },
                                         style: TextStyle(
-                                            color: Colors.grey, fontSize: 12))
-                                    : null,
+                                            color: Colors.grey, fontSize: 12)),
                                 onTap: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => UserView(
-                                          searchFor:
-                                              snapshot.data![index].userId),
+                                          searchFor: _currentLb ==
+                                                  Leaderboards.achievements
+                                              ? snapshot.data![index].u["_id"]
+                                              : snapshot.data![index].userId),
                                     ),
                                   );
                                 },
